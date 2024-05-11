@@ -1,0 +1,39 @@
+{
+  "name": "j7-dev/power-course",
+  "description": "可能是 WordPress 最好用的課程外掛",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-only",
+  "authors": [
+    {
+      "name": "JerryLiu",
+      "email": "j7.dev.gg@gmail.com",
+      "homepage": "https://github.com/j7-dev",
+      "role": "Developer"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "require": {
+    "kucrut/vite-for-wp": "^0.8.0",
+    "yahnis-elsts/plugin-update-checker": "^5.3",
+    "j7-dev/tgm-plugin-activation-forked": "^1.0",
+    "micropackage/singleton": "^1.1"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "@stable",
+    "wp-coding-standards/wpcs": "@stable",
+    "dealerdirect/phpcodesniffer-composer-installer": "@stable"
+  },
+  "scripts": {
+    "lint": "phpcs"
+  }
+}
