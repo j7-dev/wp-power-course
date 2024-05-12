@@ -38,7 +38,7 @@ final class Bootstrap extends Singleton {
 	 * @return void
 	 */
 	public function admin_enqueue_script( $hook ): void {
-		$this->enqueue_script();
+		self::enqueue_script();
 	}
 
 
@@ -49,7 +49,7 @@ final class Bootstrap extends Singleton {
 	 * @return void
 	 */
 	public function frontend_enqueue_script(): void {
-		$this->enqueue_script();
+		self::enqueue_script();
 	}
 
 	/**
@@ -58,7 +58,7 @@ final class Bootstrap extends Singleton {
 	 *
 	 * @return void
 	 */
-	public function enqueue_script(): void {
+	public static function enqueue_script(): void {
 
 		Vite\enqueue_asset(
 			Plugin::$dir . '/js/dist',
@@ -86,8 +86,8 @@ final class Bootstrap extends Singleton {
 					'KEBAB'         => Plugin::KEBAB,
 					'SNAKE'         => Plugin::SNAKE,
 					'BASE_URL'      => Base::BASE_URL,
-					'APP1_SELECTOR' => '#' . Base::APP1_SELECTOR,
-					'APP2_SELECTOR' => '#' . Base::APP2_SELECTOR,
+					'APP1_SELECTOR' => Base::APP1_SELECTOR,
+					'APP2_SELECTOR' => Base::APP2_SELECTOR,
 					'API_TIMEOUT'   => Base::API_TIMEOUT,
 					'nonce'         => \wp_create_nonce( Plugin::KEBAB ),
 				),

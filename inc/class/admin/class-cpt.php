@@ -1,6 +1,6 @@
 <?php
 /**
- * Custom Post Type: Power Course
+ * Custom Post Type: power-course
  */
 
 declare(strict_types=1);
@@ -21,7 +21,7 @@ final class CPT extends Singleton {
 	 *
 	 * @var array
 	 */
-	public $post_metas = array();
+	public $post_meta_array = array();
 	/**
 	 * Rewrite
 	 *
@@ -35,12 +35,12 @@ final class CPT extends Singleton {
 	 * @param array $args Arguments.
 	 */
 	public function __construct( $args ) {
-		$this->post_metas = $args['post_metas'];
-		$this->rewrite    = $args['rewrite'] ?? array();
+		$this->post_meta_array = $args['post_meta_array'];
+		$this->rewrite         = $args['rewrite'] ?? array();
 
 		\add_action( 'init', array( $this, 'init' ) );
 
-		if ( ! empty( $args['post_metas'] ) ) {
+		if ( ! empty( $args['post_meta_array'] ) ) {
 			\add_action( 'rest_api_init', array( $this, 'add_post_meta' ) );
 		}
 
@@ -109,7 +109,7 @@ final class CPT extends Singleton {
 			'labels'                => $labels,
 			'description'           => '',
 			'public'                => true,
-			'hierarchical'          => false,
+			'hierarchical'          => true,
 			'exclude_from_search'   => true,
 			'publicly_queryable'    => true,
 			'show_ui'               => true,
@@ -140,7 +140,7 @@ final class CPT extends Singleton {
 	 * Register meta fields for post type to show in rest api
 	 */
 	public function add_post_meta(): void {
-		foreach ( $this->post_metas as $meta_key ) {
+		foreach ( $this->post_meta_array as $meta_key ) {
 			\register_meta(
 				'post',
 				Plugin::SNAKE . '_' . $meta_key,
@@ -280,7 +280,7 @@ final class CPT extends Singleton {
 
 CPT::get(
 	array(
-		'post_metas' => array( 'meta', 'settings' ),
+		'post_meta_array' => array( 'meta', 'settings' ),
 		'rewrite'    => array(
 			'template_path' => 'test.php',
 			'slug'          => 'test',

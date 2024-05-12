@@ -57,11 +57,11 @@ function App() {
         options={{
           syncWithLocation: false,
           warnWhenUnsavedChanges: true,
-          projectId: 'IIIxOo-nIeSnx-oood94',
+          projectId: 'power-course',
         }}
       >
         <Routes>
-          {/* <Route
+          <Route
             element={
               <ThemedLayoutV2
                 Sider={(props) => <ThemedSiderV2 {...props} fixed />}
@@ -69,9 +69,10 @@ function App() {
                 <Outlet />
               </ThemedLayoutV2>
             }
-          ></Route> */}
-          <Route element={<Outlet />}>
+          >
             <Route index element={<DefaultPage />} />
+            <Route path="/dashboard" element={<About />} />
+            <Route path="/courses" element={<About />} />
             <Route path="/about" element={<About />} />
             <Route path="*" element={<ErrorComponent />} />
           </Route>
