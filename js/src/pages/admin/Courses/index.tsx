@@ -1,8 +1,8 @@
 import React from 'react'
-import ProductSelector from './ProductSelector'
+import CourseSelector from './CourseSelector'
 
 const index = () => {
-  return <ProductSelector />
+  return <CourseSelector />
 }
 
 export default index

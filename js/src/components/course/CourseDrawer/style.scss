@@ -1,0 +1,10 @@
+.pc-course-drawer-tabs {
+	.ant-tabs-nav-list,
+	.ant-tabs-tab {
+		@apply w-full;
+	}
+
+	.ant-tabs-tab {
+		@apply flex justify-center;
+	}
+}
