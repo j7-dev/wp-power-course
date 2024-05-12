@@ -19,7 +19,7 @@ export const filterLabels: {
   backorders: '允許延期交貨',
   stock_status: '庫存狀態',
   date_created: '商品發佈日期',
-  is_second_hand: '商品狀態',
+  is_course: '商品狀態',
   price_range: '價格範圍',
 }
 

@@ -20,7 +20,7 @@ import {
   defaultBooleanRadioButtonProps,
 } from '@/pages/admin/Courses/ProductSelector/utils'
 import useOptions from '@/pages/admin/Courses/ProductSelector/hooks/useOptions'
-import { backordersOptions, stockStatusOptions } from '@/utils'
+import { backordersOptions, stockStatusOptions, statusOptions } from '@/utils'
 import { SearchOutlined, UndoOutlined } from '@ant-design/icons'
 import { BsChevronDoubleDown, BsChevronDoubleUp } from 'react-icons/bs'
 
@@ -33,7 +33,7 @@ export const initialFilteredValues = {
   downloadable: '',
   virtual: '',
   sold_individually: '',
-  is_second_hand: '',
+  is_course: '',
 }
 
 /**
@@ -132,7 +132,7 @@ const index: FC<{
           {(
             [
               'featured',
-              'is_second_hand',
+              'is_course',
               'downloadable',
               'virtual',
               'sold_individually',
@@ -147,6 +147,15 @@ const index: FC<{
               }}
             />
           ))}
+          <Item name={['status']} label={keyLabelMapper('status')}>
+            <Select
+              size="small"
+              options={statusOptions}
+              mode="multiple"
+              placeholder="可多選"
+              allowClear
+            />
+          </Item>
           <Item name={['backorders']} label={keyLabelMapper('backorders')}>
             <Select
               size="small"

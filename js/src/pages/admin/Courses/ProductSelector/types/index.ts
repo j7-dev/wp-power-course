@@ -14,7 +14,7 @@ export type TFilterProps = Partial<{
   backorders: string
   stock_status: string
   date_created: [Dayjs, Dayjs]
-  is_second_hand: boolean
+  is_course: boolean
   price_range: [number, number]
 }>
 

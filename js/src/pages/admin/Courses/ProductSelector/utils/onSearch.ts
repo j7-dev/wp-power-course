@@ -41,9 +41,9 @@ export const onSearch = (
       value: values.featured,
     },
     {
-      field: 'is_second_hand',
+      field: 'is_course',
       operator: 'eq',
-      value: values.is_second_hand,
+      value: values.is_course,
     },
     {
       field: 'downloadable',
