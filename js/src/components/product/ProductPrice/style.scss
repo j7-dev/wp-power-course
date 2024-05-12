@@ -1,0 +1,22 @@
+.at-product-price {
+	del,
+	ins {
+		@apply ml-0 block;
+	}
+
+	.woocommerce-Price-currencySymbol {
+		@apply mr-2;
+	}
+
+	&,
+	bdi,
+	.woocommerce-Price-amount {
+		@apply text-gray-500 font-light text-base opacity-100;
+	}
+
+	ins {
+		bdi {
+			@apply text-red-500 no-underline font-bold text-xl;
+		}
+	}
+}

@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
-import Banner from '@/components/Banner'
 
 function About() {
   return (
     <div className="App py-20">
-      <Banner />
       <h1>This is About Page</h1>
       <p>
         with <span className="text-red-500">hash router</span>

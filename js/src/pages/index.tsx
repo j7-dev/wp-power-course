@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import GetPostsPage from '@/pages/getPosts'
 import { Link } from 'react-router-dom'
-import Banner from '@/components/Banner'
 
 function DefaultPage() {
   const [
@@ -15,8 +14,6 @@ function DefaultPage() {
 
   return (
     <div className="App py-20">
-      <Banner />
-
       <div className="flex justify-center mb-8">
         <button
           type="button"

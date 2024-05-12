@@ -20,6 +20,7 @@ import { dataProvider } from './rest-data-provider'
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
+import Courses from '@/pages/admin/Courses'
 
 function App() {
   return (
@@ -51,7 +52,8 @@ function App() {
             }
           >
             <Route index element={<DefaultPage />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/dashboard" element={<About />} />
+            <Route path="/courses" element={<Courses />} />
 
             <Route path="*" element={<ErrorComponent />} />
           </Route>

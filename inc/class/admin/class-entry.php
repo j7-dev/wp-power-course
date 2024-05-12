@@ -32,14 +32,24 @@ final class Entry extends Singleton {
 	 * Add menu
 	 */
 	public function add_menu(): void {
-		\add_dashboard_page(
+		\add_menu_page(
 			__( 'Power Course', 'power_course' ),
 			'Power Course',
 			'manage_options',
 			Plugin::KEBAB,
 			'',
+			'dashicons-welcome-learn-more',
 			6
 		);
+	}
+
+	/**
+	 * Render the app.
+	 *
+	 * @deprecated
+	 */
+	public function render_app(): void {
+		echo '<div id="' . Plugin::SNAKE . '"></div>'; // phpcs:ignore
 	}
 
 	/**
