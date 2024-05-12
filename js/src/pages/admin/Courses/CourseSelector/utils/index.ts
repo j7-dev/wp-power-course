@@ -1,4 +1,4 @@
-import { TFilterProps } from '@/pages/admin/Courses/CourseSelector/types'
+import { TFilterProps, TTerm } from '@/pages/admin/Courses/CourseSelector/types'
 import { PaginationProps, TableProps, RadioGroupProps } from 'antd'
 
 export * from './onSearch'
@@ -59,4 +59,11 @@ export const defaultPaginationProps: PaginationProps & {
   showTitle: true,
   showTotal: (total: number, range: [number, number]) =>
     `目前顯示第 ${range[0]} ~ ${range[1]} 個商品，總共有 ${total} 個商品`,
+}
+
+export const termFormatter = (terms: TTerm[]) => {
+  return terms?.map((term) => ({
+    value: term.id,
+    label: term.name,
+  }))
 }

@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { Drawer, DrawerProps, Tabs, TabsProps, Form } from 'antd'
+import { CourseDescription } from '@/components/course/form'
 
 // import './style.scss'
 
@@ -15,7 +16,7 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
       key: '1',
       forceRender: true,
       label: '課程描述',
-      children: 'Content of Tab Pane 1',
+      children: <CourseDescription />,
     },
     {
       key: '2',
@@ -46,7 +47,7 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
   return (
     <>
       <Drawer {...drawerProps}>
-        <Form>
+        <Form layout="vertical">
           <Tabs
             className="pc-course-drawer-tabs"
             defaultActiveKey={items?.[0]?.key}

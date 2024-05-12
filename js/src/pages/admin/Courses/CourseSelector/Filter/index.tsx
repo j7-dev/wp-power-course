@@ -11,10 +11,11 @@ import {
   Spin,
 } from 'antd'
 import { BooleanSegmented } from 'antd-toolkit'
-import { TFilterProps, TTerm } from '@/pages/admin/Courses/CourseSelector/types'
+import { TFilterProps } from '@/pages/admin/Courses/CourseSelector/types'
 import {
   keyLabelMapper,
   defaultBooleanRadioButtonProps,
+  termFormatter,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { backordersOptions, stockStatusOptions, statusOptions } from '@/utils'
@@ -79,7 +80,7 @@ const index: FC<{
           >
             <Select
               size="small"
-              options={formatter(product_cats)}
+              options={termFormatter(product_cats)}
               mode="multiple"
               placeholder="可多選"
               allowClear
@@ -92,7 +93,7 @@ const index: FC<{
           >
             <Select
               size="small"
-              options={formatter(product_tags)}
+              options={termFormatter(product_tags)}
               mode="multiple"
               placeholder="可多選"
               allowClear
@@ -198,13 +199,6 @@ const index: FC<{
       </Form>
     </Spin>
   )
-}
-
-function formatter(terms: TTerm[]) {
-  return terms?.map((term) => ({
-    value: term.id,
-    label: term.name,
-  }))
 }
 
 export default index

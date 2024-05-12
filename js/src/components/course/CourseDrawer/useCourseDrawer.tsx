@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DrawerProps } from 'antd'
+import { DrawerProps, Button } from 'antd'
 
 export const useCourseDrawer = () => {
   const [open, setOpen] = useState(false)
@@ -17,6 +17,7 @@ export const useCourseDrawer = () => {
     onClose: close,
     open,
     width: '70%',
+    extra: <Button type="primary">儲存</Button>,
   }
 
   return {
