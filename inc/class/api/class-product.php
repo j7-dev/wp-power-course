@@ -10,13 +10,14 @@ namespace J7\PowerCourse\Api;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use Micropackage\Singleton\Singleton;
+use J7\WpUtils\Classes\WC;
 
 
 /**
  * Class Api
  */
-final class Product extends Singleton {
+final class Product {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor.
@@ -86,7 +87,7 @@ final class Product extends Singleton {
 
 		foreach ( $apis as $api ) {
 			\register_rest_route(
-				Plugin::KEBAB,
+				Plugin::$kebab,
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
@@ -108,7 +109,7 @@ final class Product extends Singleton {
 
 		$params = $request?->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\PowerCourse\Utils\Base', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
 			'status'         => 'publish',
@@ -287,7 +288,7 @@ final class Product extends Singleton {
 
 		$params = $request?->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\PowerCourse\Utils', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
 
 		// it seems no need to add post_per_page, get_terms will return all terms
 		$default_args = array(
@@ -357,7 +358,7 @@ final class Product extends Singleton {
 
 		$formatted_tags = array_map( array( $this, 'format_terms' ), array_keys( $tags ), array_values( $tags ) );
 
-		$top_sales_products = Base::get_top_sales_products( 5 );
+		$top_sales_products = WC::get_top_sales_products( 5 );
 
 		[
 			'max_price' => $max_price,
@@ -430,4 +431,4 @@ final class Product extends Singleton {
 	}
 }
 
-Product::get();
+Product::instance();

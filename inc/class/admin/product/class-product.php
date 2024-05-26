@@ -7,12 +7,11 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use Micropackage\Singleton\Singleton;
-
 /**
  * Class Product
  */
-final class Product extends Singleton {
+final class Product {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	const PRODUCT_OPTION_NAME = 'is_course';
 
@@ -65,4 +64,4 @@ final class Product extends Singleton {
 	}
 }
 
-Product::get();
+Product::instance();

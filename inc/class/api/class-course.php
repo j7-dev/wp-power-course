@@ -10,13 +10,13 @@ namespace J7\PowerCourse\Api;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use Micropackage\Singleton\Singleton;
 
 
 /**
  * Class Course
  */
-final class Course extends Singleton {
+final class Course {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor.
@@ -41,7 +41,7 @@ final class Course extends Singleton {
 
 		foreach ( $apis as $api ) {
 			\register_rest_route(
-				Plugin::KEBAB,
+				Plugin::$kebab,
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
@@ -63,7 +63,7 @@ final class Course extends Singleton {
 
 		$params = $request?->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\PowerCourse\Utils\Base', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
 			'status'         => 'publish',
@@ -232,4 +232,4 @@ final class Course extends Singleton {
 	}
 }
 
-Course::get();
+Course::instance();

@@ -7,14 +7,14 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use Micropackage\Singleton\Singleton;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Plugin;
 
 /**
  * Class CPT
  */
-final class CPT extends Singleton {
+final class CPT {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Post metas
@@ -31,10 +31,16 @@ final class CPT extends Singleton {
 
 	/**
 	 * Constructor
-	 *
-	 * @param array $args Arguments.
 	 */
-	public function __construct( $args ) {
+	public function __construct() {
+		$args                  = array(
+			'post_meta_array' => array( 'meta', 'settings' ),
+			'rewrite'         => array(
+				'template_path' => 'test.php',
+				'slug'          => 'test',
+				'var'           => Plugin::$snake . '_test',
+			),
+		);
 		$this->post_meta_array = $args['post_meta_array'];
 		$this->rewrite         = $args['rewrite'] ?? array();
 
@@ -143,7 +149,7 @@ final class CPT extends Singleton {
 		foreach ( $this->post_meta_array as $meta_key ) {
 			\register_meta(
 				'post',
-				Plugin::SNAKE . '_' . $meta_key,
+				Plugin::$snake . '_' . $meta_key,
 				array(
 					'type'         => 'string',
 					'show_in_rest' => true,
@@ -168,9 +174,9 @@ final class CPT extends Singleton {
 	 * @param string $post_type Post type.
 	 */
 	public function add_metabox( string $post_type ): void {
-		if ( in_array( $post_type, array( Plugin::KEBAB ) ) ) {
+		if ( in_array( $post_type, array( Plugin::$kebab ) ) ) {
 			\add_meta_box(
-				Plugin::KEBAB . '-metabox',
+				Plugin::$kebab . '-metabox',
 				__( 'Power Course', 'power_course' ),
 				array( $this, 'render_meta_box' ),
 				$post_type,
@@ -254,15 +260,15 @@ final class CPT extends Singleton {
 		/* OK, it's safe for us to save the data now. */
 
 		// Sanitize the user input.
-		$meta_data = \sanitize_text_field( $_POST[ Plugin::SNAKE . '_meta' ] );
+		$meta_data = \sanitize_text_field( $_POST[ Plugin::$snake . '_meta' ] );
 
 		// Update the meta field.
-		\update_post_meta( $post_id, Plugin::SNAKE . '_meta', $meta_data );
+		\update_post_meta( $post_id, Plugin::$snake . '_meta', $meta_data );
 	}
 
 	/**
 	 * Load custom template
-	 * Set {Plugin::KEBAB}/{slug}/report  php template
+	 * Set {Plugin::$kebab}/{slug}/report  php template
 	 *
 	 * @param string $template Template.
 	 */
@@ -278,13 +284,4 @@ final class CPT extends Singleton {
 	}
 }
 
-CPT::get(
-	array(
-		'post_meta_array' => array( 'meta', 'settings' ),
-		'rewrite'    => array(
-			'template_path' => 'test.php',
-			'slug'          => 'test',
-			'var'           => Plugin::SNAKE . '_test',
-		),
-	)
-);
+CPT::instance();

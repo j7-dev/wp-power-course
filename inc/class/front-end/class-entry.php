@@ -7,13 +7,13 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\FrontEnd;
 
-use Micropackage\Singleton\Singleton;
 use J7\PowerCourse\Utils\Base;
 
 /**
  * Class FrontEnd
  */
-final class Entry extends Singleton {
+final class Entry {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor
@@ -31,4 +31,4 @@ final class Entry extends Singleton {
 	}
 }
 
-Entry::get();
+Entry::instance();

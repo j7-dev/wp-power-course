@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use Micropackage\Singleton\Singleton;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Bootstrap;
@@ -16,7 +15,8 @@ use J7\PowerCourse\Bootstrap;
 /**
  * Class Entry
  */
-final class Entry extends Singleton {
+final class Entry {
+	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
 	 * Constructor
@@ -36,7 +36,7 @@ final class Entry extends Singleton {
 			__( 'Power Course', 'power_course' ),
 			'Power Course',
 			'manage_options',
-			Plugin::KEBAB,
+			Plugin::$kebab,
 			'',
 			'dashicons-welcome-learn-more',
 			6
@@ -49,7 +49,7 @@ final class Entry extends Singleton {
 	 * @deprecated
 	 */
 	public function render_app(): void {
-		echo '<div id="' . Plugin::SNAKE . '"></div>'; // phpcs:ignore
+		echo '<div id="' . Plugin::$snake . '"></div>'; // phpcs:ignore
 	}
 
 	/**
@@ -63,7 +63,7 @@ final class Entry extends Singleton {
 
 		// Make sure we're on the right screen.
 		$screen = \get_current_screen();
-		if ( Plugin::KEBAB !== $screen?->id ) {
+		if ( Plugin::$kebab !== $screen?->id ) {
 			return;
 		}
 		// require_once ABSPATH . 'wp-admin/admin-header.php';
@@ -109,4 +109,4 @@ final class Entry extends Singleton {
 	}
 }
 
-Entry::get();
+Entry::instance();
