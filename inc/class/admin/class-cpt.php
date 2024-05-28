@@ -1,13 +1,12 @@
 <?php
 /**
- * Custom Post Type: power-course
+ * Custom Post Type: chapter
  */
 
 declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Plugin;
 
 /**
@@ -16,42 +15,25 @@ use J7\PowerCourse\Plugin;
 final class CPT {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	/**
-	 * Post metas
-	 *
-	 * @var array
-	 */
-	public $post_meta_array = array();
+	const POST_TYPE = 'pc_chapter';
+
 	/**
 	 * Rewrite
 	 *
 	 * @var array
 	 */
-	public $rewrite = array();
+	public $rewrite = array(
+		'template_path' => 'test.php',
+		'slug'          => 'test',
+		'var'           => 'power_course_test',
+	);
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		$args                  = array(
-			'post_meta_array' => array( 'meta', 'settings' ),
-			'rewrite'         => array(
-				'template_path' => 'test.php',
-				'slug'          => 'test',
-				'var'           => Plugin::$snake . '_test',
-			),
-		);
-		$this->post_meta_array = $args['post_meta_array'];
-		$this->rewrite         = $args['rewrite'] ?? array();
 
 		\add_action( 'init', array( $this, 'init' ) );
-
-		if ( ! empty( $args['post_meta_array'] ) ) {
-			\add_action( 'rest_api_init', array( $this, 'add_post_meta' ) );
-		}
-
-		\add_action( 'load-post.php', array( $this, 'init_metabox' ) );
-		\add_action( 'load-post-new.php', array( $this, 'init_metabox' ) );
 
 		if ( ! empty( $args['rewrite'] ) ) {
 			\add_filter( 'query_vars', array( $this, 'add_query_var' ) );
@@ -78,40 +60,40 @@ final class CPT {
 	public static function register_cpt(): void {
 
 		$labels = array(
-			'name'                     => \esc_html__( 'power-course', 'power_course' ),
-			'singular_name'            => \esc_html__( 'power-course', 'power_course' ),
-			'add_new'                  => \esc_html__( 'Add new', 'power_course' ),
-			'add_new_item'             => \esc_html__( 'Add new item', 'power_course' ),
-			'edit_item'                => \esc_html__( 'Edit', 'power_course' ),
-			'new_item'                 => \esc_html__( 'New', 'power_course' ),
-			'view_item'                => \esc_html__( 'View', 'power_course' ),
-			'view_items'               => \esc_html__( 'View', 'power_course' ),
-			'search_items'             => \esc_html__( 'Search power-course', 'power_course' ),
-			'not_found'                => \esc_html__( 'Not Found', 'power_course' ),
-			'not_found_in_trash'       => \esc_html__( 'Not found in trash', 'power_course' ),
-			'parent_item_colon'        => \esc_html__( 'Parent item', 'power_course' ),
-			'all_items'                => \esc_html__( 'All', 'power_course' ),
-			'archives'                 => \esc_html__( 'power-course archives', 'power_course' ),
-			'attributes'               => \esc_html__( 'power-course attributes', 'power_course' ),
-			'insert_into_item'         => \esc_html__( 'Insert to this power-course', 'power_course' ),
-			'uploaded_to_this_item'    => \esc_html__( 'Uploaded to this power-course', 'power_course' ),
-			'featured_image'           => \esc_html__( 'Featured image', 'power_course' ),
-			'set_featured_image'       => \esc_html__( 'Set featured image', 'power_course' ),
-			'remove_featured_image'    => \esc_html__( 'Remove featured image', 'power_course' ),
-			'use_featured_image'       => \esc_html__( 'Use featured image', 'power_course' ),
-			'menu_name'                => \esc_html__( 'power-course', 'power_course' ),
-			'filter_items_list'        => \esc_html__( 'Filter power-course list', 'power_course' ),
-			'filter_by_date'           => \esc_html__( 'Filter by date', 'power_course' ),
-			'items_list_navigation'    => \esc_html__( 'power-course list navigation', 'power_course' ),
-			'items_list'               => \esc_html__( 'power-course list', 'power_course' ),
-			'item_published'           => \esc_html__( 'power-course published', 'power_course' ),
-			'item_published_privately' => \esc_html__( 'power-course published privately', 'power_course' ),
-			'item_reverted_to_draft'   => \esc_html__( 'power-course reverted to draft', 'power_course' ),
-			'item_scheduled'           => \esc_html__( 'power-course scheduled', 'power_course' ),
-			'item_updated'             => \esc_html__( 'power-course updated', 'power_course' ),
+			'name'                     => \esc_html__( 'chapter', 'power-course' ),
+			'singular_name'            => \esc_html__( 'chapter', 'power-course' ),
+			'add_new'                  => \esc_html__( 'Add new', 'power-course' ),
+			'add_new_item'             => \esc_html__( 'Add new item', 'power-course' ),
+			'edit_item'                => \esc_html__( 'Edit', 'power-course' ),
+			'new_item'                 => \esc_html__( 'New', 'power-course' ),
+			'view_item'                => \esc_html__( 'View', 'power-course' ),
+			'view_items'               => \esc_html__( 'View', 'power-course' ),
+			'search_items'             => \esc_html__( 'Search power-course', 'power-course' ),
+			'not_found'                => \esc_html__( 'Not Found', 'power-course' ),
+			'not_found_in_trash'       => \esc_html__( 'Not found in trash', 'power-course' ),
+			'parent_item_colon'        => \esc_html__( 'Parent item', 'power-course' ),
+			'all_items'                => \esc_html__( 'All', 'power-course' ),
+			'archives'                 => \esc_html__( 'chapter archives', 'power-course' ),
+			'attributes'               => \esc_html__( 'chapter attributes', 'power-course' ),
+			'insert_into_item'         => \esc_html__( 'Insert to this power-course', 'power-course' ),
+			'uploaded_to_this_item'    => \esc_html__( 'Uploaded to this power-course', 'power-course' ),
+			'featured_image'           => \esc_html__( 'Featured image', 'power-course' ),
+			'set_featured_image'       => \esc_html__( 'Set featured image', 'power-course' ),
+			'remove_featured_image'    => \esc_html__( 'Remove featured image', 'power-course' ),
+			'use_featured_image'       => \esc_html__( 'Use featured image', 'power-course' ),
+			'menu_name'                => \esc_html__( 'chapter', 'power-course' ),
+			'filter_items_list'        => \esc_html__( 'Filter power-course list', 'power-course' ),
+			'filter_by_date'           => \esc_html__( 'Filter by date', 'power-course' ),
+			'items_list_navigation'    => \esc_html__( 'chapter list navigation', 'power-course' ),
+			'items_list'               => \esc_html__( 'chapter list', 'power-course' ),
+			'item_published'           => \esc_html__( 'chapter published', 'power-course' ),
+			'item_published_privately' => \esc_html__( 'chapter published privately', 'power-course' ),
+			'item_reverted_to_draft'   => \esc_html__( 'chapter reverted to draft', 'power-course' ),
+			'item_scheduled'           => \esc_html__( 'chapter scheduled', 'power-course' ),
+			'item_updated'             => \esc_html__( 'chapter updated', 'power-course' ),
 		);
 		$args   = array(
-			'label'                 => \esc_html__( 'power-course', 'power_course' ),
+			'label'                 => \esc_html__( 'chapter', 'power-course' ),
 			'labels'                => $labels,
 			'description'           => '',
 			'public'                => true,
@@ -131,7 +113,7 @@ final class CPT {
 			'menu_position'         => 6,
 			'menu_icon'             => 'dashicons-store',
 			'capability_type'       => 'post',
-			'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author' ),
+			'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'page-attributes' ),
 			'taxonomies'            => array(),
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
 			'rewrite'               => array(
@@ -139,59 +121,7 @@ final class CPT {
 			),
 		);
 
-		\register_post_type( 'power-course', $args );
-	}
-
-	/**
-	 * Register meta fields for post type to show in rest api
-	 */
-	public function add_post_meta(): void {
-		foreach ( $this->post_meta_array as $meta_key ) {
-			\register_meta(
-				'post',
-				Plugin::$snake . '_' . $meta_key,
-				array(
-					'type'         => 'string',
-					'show_in_rest' => true,
-					'single'       => true,
-				)
-			);
-		}
-	}
-
-	/**
-	 * Meta box initialization.
-	 */
-	public function init_metabox(): void {
-		\add_action( 'add_meta_boxes', array( $this, 'add_metabox' ) );
-		\add_action( 'save_post', array( $this, 'save_metabox' ), 10, 2 );
-		\add_filter( 'rewrite_rules_array', array( $this, 'custom_post_type_rewrite_rules' ) );
-	}
-
-	/**
-	 * Adds the meta box.
-	 *
-	 * @param string $post_type Post type.
-	 */
-	public function add_metabox( string $post_type ): void {
-		if ( in_array( $post_type, array( Plugin::$kebab ) ) ) {
-			\add_meta_box(
-				Plugin::$kebab . '-metabox',
-				__( 'Power Course', 'power_course' ),
-				array( $this, 'render_meta_box' ),
-				$post_type,
-				'advanced',
-				'high'
-			);
-		}
-	}
-
-	/**
-	 * Render meta box.
-	 */
-	public function render_meta_box(): void {
-		// phpcs:ignore
-		echo '<div id="' . Base::APP2_SELECTOR . '" class="relative"></div>';
+		\register_post_type( self::POST_TYPE, $args );
 	}
 
 
@@ -218,53 +148,6 @@ final class CPT {
 		return $rules;
 	}
 
-	/**
-	 * Save the meta when the post is saved.
-	 *
-	 * @param int     $post_id Post ID.
-	 * @param WP_Post $post    Post object.
-	 */
-	public function save_metabox( $post_id, $post ) { // phpcs:ignore
-		// phpcs:disable
-		/*
-		* We need to verify this came from the our screen and with proper authorization,
-		* because save_post can be triggered at other times.
-		*/
-
-		// Check if our nonce is set.
-		if ( ! isset( $_POST['_wpnonce'] ) ) {
-			return $post_id;
-		}
-
-		$nonce = $_POST['_wpnonce'];
-
-		/*
-		* If this is an autosave, our form has not been submitted,
-		* so we don't want to do anything.
-		*/
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-			return $post_id;
-		}
-
-		$post_type = \sanitize_text_field( $_POST['post_type'] ?? '' );
-
-		// Check the user's permissions.
-		if ( 'power-course' !== $post_type ) {
-			return $post_id;
-		}
-
-		if ( ! \current_user_can( 'edit_post', $post_id ) ) {
-			return $post_id;
-		}
-
-		/* OK, it's safe for us to save the data now. */
-
-		// Sanitize the user input.
-		$meta_data = \sanitize_text_field( $_POST[ Plugin::$snake . '_meta' ] );
-
-		// Update the meta field.
-		\update_post_meta( $post_id, Plugin::$snake . '_meta', $meta_data );
-	}
 
 	/**
 	 * Load custom template

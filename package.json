@@ -26,6 +26,7 @@
     "lint:fix"
   ],
   "dependencies": {
+    "@ant-design/pro-editor": "^1.2.1",
     "@refinedev/antd": "^5.37.5",
     "@refinedev/cli": "^2.16.27",
     "@refinedev/core": "^4.48.0",
@@ -34,6 +35,7 @@
     "@refinedev/simple-rest": "^5.0.3",
     "@tanstack/react-query": "4.36.1",
     "@uidotdev/usehooks": "^2.4.1",
+    "antd-style": "^3.6.2",
     "antd-toolkit": "^1.0.0",
     "axios": "^1.6.8",
     "canvas-confetti": "^1.9.3",

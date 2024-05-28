@@ -16,14 +16,14 @@ export const CourseDescription = () => {
 
   return (
     <>
-      <Item name={['title']} label="課程名稱">
+      <Item name={['name']} label="課程名稱">
         <Input />
       </Item>
       <Item name={['sub_title']} label="課程副標題">
-        <Input />
+        <Input disabled />
       </Item>
       <Item
-        name={['product_category_id']}
+        name={['category_ids']}
         label={keyLabelMapper('product_category_id')}
       >
         <Select
@@ -39,6 +39,7 @@ export const CourseDescription = () => {
           mode="multiple"
           placeholder="可多選"
           allowClear
+          disabled
         />
       </Item>
       <Item name={['slug']} label="銷售網址">
@@ -53,7 +54,7 @@ export const CourseDescription = () => {
 
       <p>課程封面圖</p>
       <Uploader />
-      <Item hidden name={['feature_image']} label="課程封面圖">
+      <Item hidden name={['image_id']} label="課程封面圖">
         <Input />
       </Item>
     </>

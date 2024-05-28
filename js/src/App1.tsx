@@ -21,6 +21,7 @@ import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
 import Courses from '@/pages/admin/Courses'
+import { ConfigProvider } from 'antd'
 
 function App() {
   return (
@@ -44,11 +45,21 @@ function App() {
         <Routes>
           <Route
             element={
-              <ThemedLayoutV2
-                Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Collapse: {
+                      contentPadding: '8px 8px',
+                    },
+                  },
+                }}
               >
-                <Outlet />
-              </ThemedLayoutV2>
+                <ThemedLayoutV2
+                  Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+                >
+                  <Outlet />
+                </ThemedLayoutV2>
+              </ConfigProvider>
             }
           >
             <Route index element={<DefaultPage />} />

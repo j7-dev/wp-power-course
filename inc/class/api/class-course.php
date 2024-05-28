@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course API
  */
@@ -16,6 +17,8 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
  * Class Course
  */
 final class Course {
+
+
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -37,6 +40,10 @@ final class Course {
 				'endpoint' => 'courses',
 				'method'   => 'get',
 			),
+			array(
+				'endpoint' => 'courses',
+				'method'   => 'post',
+			),
 		);
 
 		foreach ( $apis as $api ) {
@@ -46,7 +53,9 @@ final class Course {
 				array(
 					'methods'             => $api['method'],
 					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
-					'permission_callback' => '__return_true',
+					'permission_callback' => function () {
+						return \current_user_can( 'manage_options' );
+					},
 				)
 			);
 		}
@@ -55,11 +64,13 @@ final class Course {
 
 	/**
 	 * Get courses callback
+	 * 當商品是 "課程" 時，才會被抓出來
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function get_courses_callback( $request ) { // phpcs:ignore
+	public function get_courses_callback( $request )
+	{ // phpcs:ignore
 
 		$params = $request?->get_query_params() ?? array();
 
@@ -120,7 +131,8 @@ final class Course {
 	 * @param bool        $with_description With description.
 	 * @return array
 	 */
-	public function format_product_details( $product , $with_description = true) { // phpcs:ignore
+	public function format_product_details( $product, $with_description = true )
+	{ // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return array();
@@ -177,8 +189,8 @@ final class Course {
 			'type'               => $product?->get_type(),
 			'name'               => $product?->get_name(),
 			'slug'               => $product?->get_slug(),
-			'date_created'       => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
 			'status'             => $product?->get_status(),
 			'featured'           => $product?->get_featured(),
 			'catalog_visibility' => $product?->get_catalog_visibility(),
@@ -229,6 +241,109 @@ final class Course {
 			$description_array,
 			$base_array
 		);
+	}
+
+	/**
+	 * Post courses callback
+	 *
+	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_courses_callback( $request ) {
+
+		$body_params = $request->get_json_params() ?? array();
+
+		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+
+		$product = new \WC_Product_Simple();
+
+		$keys = array(
+			'name',
+			'slug',
+			'regular_price',
+			'sale_price',
+			'short_description',
+			'description',
+			'image_id',
+			'gallery_image_ids',
+			'status',
+			'catalog_visibility',
+			'category_ids',
+		);
+
+		// TODO
+		$meta_keys = array(
+			'sub_title',
+		);
+
+		foreach ( $keys as $key ) {
+			if ( isset( $body_params[ $key ] ) ) {
+				$$key        = $body_params[ $key ];
+				$method_name = 'set_' . $key;
+				$product->$method_name( $$key );
+			}
+		}
+
+		$product->save();
+
+		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
+
+		$product->save_meta_data();
+
+		return new \WP_REST_Response( $this->format_product_details( $product ) );
+	}
+
+	/**
+	 * Post courses callback
+	 *
+	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_courses_callback_BAK( $request ) {
+
+		$body_params = $request->get_json_params() ?? array();
+
+		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+
+		$product = new \WC_Product_Simple();
+
+		$name               = $body_params['name'];
+		$slug               = $body_params['slug'] ?? $name;
+		$regular_price      = $body_params['regular_price'];
+		$sale_price         = $body_params['sale_price'];
+		$short_description  = $body_params['short_description'] ?? '';
+		$description        = $body_params['description'] ?? '';
+		$image_id           = $body_params['image_id'];
+		$gallery_image_ids  = $body_params['gallery_image_ids'] ?? array();
+		$status             = $body_params['status'] ?? 'publish';
+		$catalog_visibility = $body_params['catalog_visibility'] ?? 'visible';
+		$category_ids       = $body_params['category_ids'] ?? array();
+
+		$product->set_name( $name ); // product title
+
+		$product->set_slug( $slug );
+
+		$product->set_regular_price( $regular_price );
+		$product->set_sale_price( $sale_price );
+
+		$product->set_short_description( $short_description );
+		// you can also add a full product description
+		$product->set_description( $description );
+
+		$product->set_image_id( $image_id );
+		$product->set_gallery_image_ids( $gallery_image_ids );
+		$product->set_status( $status ); // product status (publish, draft, etc.)
+		$product->set_catalog_visibility( $catalog_visibility );
+
+		// let's suppose that our 'Accessories' category has ID = 19
+		$product->set_category_ids( $category_ids );
+		// you can also use $product->set_tag_ids() for tags, brands etc
+
+		$product->save();
 	}
 }
 

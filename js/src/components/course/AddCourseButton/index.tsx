@@ -1,9 +1,10 @@
 import { PlusOutlined } from '@ant-design/icons'
-import { Button } from 'antd'
+import { Button, Form } from 'antd'
 import { useCourseDrawer, CourseDrawer } from '@/components/course/CourseDrawer'
 
 export const AddCourseButton = () => {
-  const { show: showDrawer, drawerProps } = useCourseDrawer()
+  const [form] = Form.useForm()
+  const { show: showDrawer, drawerProps } = useCourseDrawer(form)
   return (
     <>
       <Button
@@ -14,7 +15,9 @@ export const AddCourseButton = () => {
       >
         新增課程
       </Button>
-      <CourseDrawer {...drawerProps} />
+      <Form layout="vertical" form={form}>
+        <CourseDrawer {...drawerProps} />
+      </Form>
     </>
   )
 }

@@ -1,12 +1,13 @@
 import { FC } from 'react'
 import { Drawer, DrawerProps, Tabs, TabsProps, Form } from 'antd'
-import { CourseDescription } from '@/components/course/form'
+import { CourseDescription, CourseQA } from '@/components/course/form'
 
 // import './style.scss'
 
 export * from './useCourseDrawer'
 
 export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
+  const form = Form.useFormInstance()
   const onChange = (key: string) => {
     console.log(key)
   }
@@ -22,7 +23,7 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
       key: '2',
       forceRender: true,
       label: 'QA設定',
-      children: 'Content of Tab Pane 2',
+      children: <CourseQA />,
     },
     {
       key: '3',
@@ -47,7 +48,7 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
   return (
     <>
       <Drawer {...drawerProps}>
-        <Form layout="vertical">
+        <Form layout="vertical" form={form}>
           <Tabs
             className="pc-course-drawer-tabs"
             defaultActiveKey={items?.[0]?.key}
