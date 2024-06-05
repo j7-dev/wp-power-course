@@ -62,6 +62,10 @@ final class Course {
 		$apis_with_id = array(
 			array(
 				'endpoint' => 'courses',
+				'method'   => 'patch',
+			),
+			array(
+				'endpoint' => 'courses',
 				'method'   => 'delete',
 			),
 		);
@@ -215,8 +219,8 @@ final class Course {
 			'name'               => $product->get_name(),
 			'depth'              => 0,
 			'slug'               => $product->get_slug(),
-			'date_created'       => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
 			'status'             => $product->get_status(),
 			'featured'           => $product->get_featured(),
 			'catalog_visibility' => $product->get_catalog_visibility(),
@@ -392,6 +396,77 @@ final class Course {
 		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
 
 		$product = new \WC_Product_Simple();
+
+		$keys = array(
+			'name',
+			'slug',
+			'regular_price',
+			'sale_price',
+			'short_description',
+			'description',
+			'image_id',
+			'gallery_image_ids',
+			'status',
+			'catalog_visibility',
+			'category_ids',
+		);
+
+		// TODO
+		$meta_keys = array(
+			'sub_title',
+		);
+
+		foreach ( $keys as $key ) {
+			if ( isset( $body_params[ $key ] ) ) {
+				$$key        = $body_params[ $key ];
+				$method_name = 'set_' . $key;
+				$product->$method_name( $$key );
+			}
+		}
+
+		$product->save();
+
+		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
+
+		$product->save_meta_data();
+
+		return new \WP_REST_Response( $this->format_product_details( $product ) );
+	}
+
+	/**
+	 * Patch courses with id callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function patch_courses_with_id_callback( $request ) {
+
+		$id = $request['id'];
+		if ( empty( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '更新失敗，請提供ID',
+				],
+				400
+			);
+		}
+
+		$body_params = $request->get_json_params() ?? array();
+
+		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+
+		$product = \wc_get_product( $id );
+
+		if ( ! $product ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '更新失敗，找不到商品',
+				],
+				400
+			);
+		}
 
 		$keys = array(
 			'name',

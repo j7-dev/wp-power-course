@@ -37,11 +37,11 @@ final class Chapter {
 		$apis = array(
 			array(
 				'endpoint' => 'chapters',
-				'method'   => 'get',
+				'method'   => 'post',
 			),
 			array(
 				'endpoint' => 'chapters',
-				'method'   => 'post',
+				'method'   => 'get',
 			),
 		);
 
@@ -63,6 +63,10 @@ final class Chapter {
 			array(
 				'endpoint' => 'chapters',
 				'method'   => 'delete',
+			),
+			array(
+				'endpoint' => 'chapters',
+				'method'   => 'patch',
 			),
 		);
 
@@ -160,6 +164,56 @@ final class Chapter {
 			[
 				'id'      => $new_post_id,
 				'message' => '新增成功',
+			]
+		);
+	}
+
+	/**
+	 * Patch Chapter callback
+	 * TODO 更新章節
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function patch_chapters_with_id_callback( $request ) {
+
+		$id = $request['id'];
+		if ( empty( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '更新失敗，請提供ID',
+				],
+				400
+			);
+		}
+
+		$body_params = $request->get_json_params() ?? array();
+
+		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+
+		$args = array(
+			'ID'         => $id,
+			'post_title' => $body_params['name'] ?? '新章節',
+
+		);
+
+		$update_post_id = \wp_update_post( $args );
+
+		if ( ! $update_post_id ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '更新失敗',
+				],
+				400
+			);
+		}
+
+		return new \WP_REST_Response(
+			[
+				'id'      => $id,
+				'message' => '更新成功',
 			]
 		);
 	}

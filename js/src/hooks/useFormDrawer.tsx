@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
-import { useCreate, useUpdate } from '@refinedev/core'
+import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 
 export function useFormDrawer<DataType>({
   form,
@@ -13,6 +13,7 @@ export function useFormDrawer<DataType>({
 }) {
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+  const invalidate = useInvalidate()
 
   const show = () => {
     setOpen(true)
@@ -22,19 +23,35 @@ export function useFormDrawer<DataType>({
     setOpen(false)
   }
 
-  const { mutate: create } = useCreate()
-  const { mutate: update } = useUpdate()
+  const { mutate: create, isLoading: isLoadingCreate } = useCreate()
+  const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
+
+  const invalidateCourse = () => {
+    if (resource === 'chapters') {
+      invalidate({
+        resource: 'courses',
+        invalidates: ['list'],
+      })
+    }
+  }
 
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
 
       if (isUpdate) {
-        update({
-          id: record?.id,
-          resource,
-          values,
-        })
+        update(
+          {
+            id: record?.id,
+            resource,
+            values,
+          },
+          {
+            onSuccess: () => {
+              invalidateCourse()
+            },
+          },
+        )
       } else {
         create(
           {
@@ -45,6 +62,7 @@ export function useFormDrawer<DataType>({
             onSuccess: () => {
               close()
               form.resetFields()
+              invalidateCourse()
             },
           },
         )
@@ -61,7 +79,11 @@ export function useFormDrawer<DataType>({
     open,
     width: '50%',
     extra: (
-      <Button type="primary" onClick={handleSave}>
+      <Button
+        type="primary"
+        onClick={handleSave}
+        loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
+      >
         儲存
       </Button>
     ),
