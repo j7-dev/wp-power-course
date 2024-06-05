@@ -25,6 +25,7 @@ import {
   ProductTotalSales,
   ProductCat,
   ProductStock,
+  ProductAction,
 } from '@/components/product'
 import useValueLabelMapper from '@/pages/admin/Courses/CourseSelector/hooks/useValueLabelMapper'
 import { useWindowSize } from '@uidotdev/usehooks'
@@ -177,6 +178,11 @@ const index = () => {
               title="商品分類 / 商品標籤"
               dataIndex="category_ids"
               render={(_, record) => <ProductCat record={record} />}
+            />
+            <Table.Column<TProductRecord>
+              title="操作"
+              dataIndex="_actions"
+              render={(_, record) => <ProductAction record={record} />}
             />
           </Table>
         </Spin>

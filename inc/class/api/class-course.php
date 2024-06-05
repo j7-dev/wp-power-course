@@ -297,6 +297,7 @@ final class Course {
 
 	/**
 	 * Post courses callback
+	 * DELETE
 	 *
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
