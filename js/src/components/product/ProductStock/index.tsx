@@ -2,7 +2,7 @@ import { FC } from 'react'
 import {
   TProductRecord,
   TStockStatus,
-} from '@/pages/admin/Courses/ProductSelector/types'
+} from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag } from 'antd'
 import {
   FieldTimeOutlined,
@@ -22,6 +22,7 @@ export const ProductStock: FC<TProductStockProps> = ({
   type = 'text',
 }) => {
   const { stock_status, stock_quantity, low_stock_amount = 0 } = record
+  if (!stock_status) return null
   const { label, color, Icon } = getTagProps(
     stock_status,
     stock_quantity,

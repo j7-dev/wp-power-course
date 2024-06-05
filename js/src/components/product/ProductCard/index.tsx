@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { ProductPrice } from '@/components/product'

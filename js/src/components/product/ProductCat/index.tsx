@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag } from 'antd'
 import useOptions from '@/pages/admin/Courses/ProductSelector/hooks/useOptions'
 
@@ -10,7 +10,7 @@ export const ProductCat: FC<{ record: TProductRecord }> = ({ record }) => {
   return (
     <>
       <div>
-        {category_ids.map((cat_id) => {
+        {category_ids?.map((cat_id) => {
           return (
             <Tag key={cat_id} color="blue" bordered={false}>
               {product_cats.find((cat) => cat.id === cat_id)?.name}
@@ -19,7 +19,7 @@ export const ProductCat: FC<{ record: TProductRecord }> = ({ record }) => {
         })}
       </div>
       <div>
-        {tag_ids.map((tag_id) => {
+        {tag_ids?.map((tag_id) => {
           return (
             <span key={tag_id} className="text-gray-400 text-xs mr-2">
               #{product_tags.find((tag) => tag.id === tag_id)?.name}

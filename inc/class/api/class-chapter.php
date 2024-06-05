@@ -9,8 +9,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
-use J7\PowerCourse\Admin\Product as AdminProduct;
+use J7\PowerCourse\Admin\CPT;
 
 
 /**
@@ -105,55 +104,34 @@ final class Chapter {
 
 	/**
 	 * Post Chapter callback
-	 * 創建課程
+	 * 創建章節
 	 *
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_callback( $request ) {
+	public function post_chapters_callback( $request ) {
 
 		$body_params = $request->get_json_params() ?? array();
 
 		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
 
-		$product = new \WC_Product_Simple();
-
-		$keys = array(
-			'name',
-			'slug',
-			'regular_price',
-			'sale_price',
-			'short_description',
-			'description',
-			'image_id',
-			'gallery_image_ids',
-			'status',
-			'catalog_visibility',
-			'category_ids',
+		$args = array(
+			'post_title'  => $body_params['post_title'] ?? '新章節',
+			'post_status' => 'draft',
+			'post_author' => \get_current_user_id(),
+			'post_parent' => $body_params['post_parent'] ?? 0,
+			'post_type'   => CPT::POST_TYPE,
 		);
 
-		// TODO
-		$meta_keys = array(
-			'sub_title',
+		$new_post_id = \wp_insert_post( $args );
+
+		return new \WP_REST_Response(
+			[
+				'id' => $new_post_id,
+			]
 		);
-
-		foreach ( $keys as $key ) {
-			if ( isset( $body_params[ $key ] ) ) {
-				$$key        = $body_params[ $key ];
-				$method_name = 'set_' . $key;
-				$product->$method_name( $$key );
-			}
-		}
-
-		$product->save();
-
-		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
-
-		$product->save_meta_data();
-
-		return new \WP_REST_Response( $this->format_product_details( $product ) );
 	}
 
 

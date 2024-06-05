@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Admin\CPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 
 
@@ -72,7 +72,7 @@ final class Course {
 	public function get_courses_callback( $request )
 	{ // phpcs:ignore
 
-		$params = $request?->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? array();
 
 		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
 
@@ -138,43 +138,48 @@ final class Course {
 			return array();
 		}
 
-		$date_created  = $product?->get_date_created();
-		$date_modified = $product?->get_date_modified();
+		$date_created  = $product->get_date_created();
+		$date_modified = $product->get_date_modified();
 
-		$image_id  = $product?->get_image_id();
+		$image_id  = $product->get_image_id();
 		$image_url = \wp_get_attachment_url( $image_id );
 
-		$gallery_image_ids  = $product?->get_gallery_image_ids();
+		$gallery_image_ids  = $product->get_gallery_image_ids();
 		$gallery_image_urls = array_map( 'wp_get_attachment_url', $gallery_image_ids );
 
 		$description_array = $with_description ? array(
-			'description'       => $product?->get_description(),
-			'short_description' => $product?->get_short_description(),
+			'description'       => $product->get_description(),
+			'short_description' => $product->get_short_description(),
 		) : array();
 
-		$low_stock_amount = ( '' === $product?->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
+		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
-		$variation_ids = $product?->get_children(); // get variations
-		$children      = array();
-		if ( ! empty( $variation_ids ) ) {
-			$variation_products = array_map( 'wc_get_product', $variation_ids );
-			$children_details   = array_map( array( $this, 'format_product_details' ), $variation_products );
-			$children           = array(
-				'children'  => $children_details,
-				'parent_id' => (string) $product?->get_id(),
-			);
-		}
+		$chapters = array_values(
+			\get_children(
+				array(
+					'post_parent' => $product->get_id(),
+					'post_type'   => CPT::POST_TYPE,
+					'numberposts' => -1,
+					'post_status' => 'any',
+				)
+			)
+		);
+		$chapters = array_map( array( $this, 'format_chapter_details' ), $chapters );
 
-		$attributes = $product?->get_attributes(); // get attributes object
+		$children = ! ! $chapters ? [
+			'children' => $chapters,
+		] : [];
+
+		$attributes = $product->get_attributes(); // get attributes object
 
 		$attributes_arr = array();
 
 		foreach ( $attributes as $key => $attribute ) {
 			if ( $attribute instanceof \WC_Product_Attribute ) {
 				$attributes_arr[] = array(
-					'name'     => $attribute?->get_name(),
-					'options'  => $attribute?->get_options(),
-					'position' => $attribute?->get_position(),
+					'name'     => $attribute->get_name(),
+					'options'  => $attribute->get_options(),
+					'position' => $attribute->get_position(),
 				);
 			}
 
@@ -185,56 +190,164 @@ final class Course {
 
 		$base_array = array(
 			// Get Product General Info
-			'id'                 => (string) $product?->get_id(),
-			'type'               => $product?->get_type(),
-			'name'               => $product?->get_name(),
-			'slug'               => $product?->get_slug(),
-			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
-			'status'             => $product?->get_status(),
-			'featured'           => $product?->get_featured(),
-			'catalog_visibility' => $product?->get_catalog_visibility(),
-			'sku'                => $product?->get_sku(),
-			// 'menu_order'         => $product?->get_menu_order(),
-			'virtual'            => $product?->get_virtual(),
-			'downloadable'       => $product?->get_downloadable(),
-			'permalink'          => get_permalink( $product?->get_id() ),
+			'id'                 => (string) $product->get_id(),
+			'type'               => $product->get_type(),
+			'name'               => $product->get_name(),
+			'depth'              => 0,
+			'slug'               => $product->get_slug(),
+			'date_created'       => $date_created->date( 'Y-m-d H:i:s' ),
+			'date_modified'      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'status'             => $product->get_status(),
+			'featured'           => $product->get_featured(),
+			'catalog_visibility' => $product->get_catalog_visibility(),
+			'sku'                => $product->get_sku(),
+			// 'menu_order'         => $product->get_menu_order(),
+			'virtual'            => $product->get_virtual(),
+			'downloadable'       => $product->get_downloadable(),
+			'permalink'          => \get_permalink( $product->get_id() ),
 
 			// Get Product Prices
-			'price_html'         => $product?->get_price_html(),
-			'regular_price'      => $product?->get_regular_price(),
-			'sale_price'         => $product?->get_sale_price(),
-			'on_sale'            => $product?->is_on_sale(),
-			'date_on_sale_from'  => $product?->get_date_on_sale_from(),
-			'date_on_sale_to'    => $product?->get_date_on_sale_to(),
-			'total_sales'        => $product?->get_total_sales(),
+			'price_html'         => $product->get_price_html(),
+			'regular_price'      => $product->get_regular_price(),
+			'sale_price'         => $product->get_sale_price(),
+			'on_sale'            => $product->is_on_sale(),
+			'date_on_sale_from'  => $product->get_date_on_sale_from(),
+			'date_on_sale_to'    => $product->get_date_on_sale_to(),
+			'total_sales'        => $product->get_total_sales(),
 
 			// Get Product Stock
-			'stock'              => $product?->get_stock_quantity(),
-			'stock_status'       => $product?->get_stock_status(),
-			'manage_stock'       => $product?->get_manage_stock(),
-			'stock_quantity'     => $product?->get_stock_quantity(),
-			'backorders'         => $product?->get_backorders(),
-			'backorders_allowed' => $product?->backorders_allowed(),
-			'backordered'        => $product?->is_on_backorder(),
+			'stock'              => $product->get_stock_quantity(),
+			'stock_status'       => $product->get_stock_status(),
+			'manage_stock'       => $product->get_manage_stock(),
+			'stock_quantity'     => $product->get_stock_quantity(),
+			'backorders'         => $product->get_backorders(),
+			'backorders_allowed' => $product->backorders_allowed(),
+			'backordered'        => $product->is_on_backorder(),
 			'low_stock_amount'   => $low_stock_amount,
 
 			// Get Linked Products
-			'upsell_ids'         => array_map( 'strval', $product?->get_upsell_ids() ),
-			'cross_sell_ids'     => array_map( 'strval', $product?->get_cross_sell_ids() ),
+			'upsell_ids'         => array_map( 'strval', $product->get_upsell_ids() ),
+			'cross_sell_ids'     => array_map( 'strval', $product->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
 			'attributes'         => $attributes_arr,
 
 			// Get Product Taxonomies
-			'category_ids'       => array_map( 'strval', $product?->get_category_ids() ),
-			'tag_ids'            => array_map( 'strval', $product?->get_tag_ids() ),
+			'category_ids'       => array_map( 'strval', $product->get_category_ids() ),
+			'tag_ids'            => array_map( 'strval', $product->get_tag_ids() ),
 
 			// Get Product Images
 			'image_url'          => $image_url,
 			'gallery_image_urls' => $gallery_image_urls,
 
-			'is_course'          => $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+		) + $children;
+
+		return array_merge(
+			$description_array,
+			$base_array
+		);
+	}
+
+	/**
+	 * Format Chapter details
+	 * TODO
+	 *
+	 * @param \WP_Post $post Chapter.
+	 * @param bool     $with_description With description.
+	 * @return array
+	 */
+	public function format_chapter_details( $post, $with_description = true, $depth = 0 ){ // phpcs:ignore
+
+		if ( ! ( $post instanceof \WP_Post ) ) {
+			return array();
+		}
+
+		$date_created  = $post->post_date;
+		$date_modified = $post->post_modified;
+
+		$image_id  = \get_post_thumbnail_id( $post->ID );
+		$image_url = \wp_get_attachment_url( $image_id );
+
+		$description_array = $with_description ? array(
+			'description'       => $post->post_content,
+			'short_description' => $post->post_excerpt,
+		) : array();
+
+		$chapters = array_values(
+			\get_children(
+				array(
+					'post_parent' => $post->ID,
+					'post_type'   => CPT::POST_TYPE,
+					'numberposts' => -1,
+					'post_status' => 'any',
+				)
+			)
+		);
+		$chapters = array_map(
+			array( $this, 'format_chapter_details' ),
+			$chapters,
+			array_fill( 0, count( $chapters ), false ),
+			array_fill( 0, count( $chapters ), $depth + 1 )
+		);
+
+		$children = ! ! $chapters ? [
+			'children' => $chapters,
+		] : [];
+
+		$base_array = array(
+			// Get Product General Info
+			'id'                 => (string) $post->ID,
+			'type'               => 'chapter',
+			'depth'              => $depth,
+			'name'               => $post->post_title,
+			'slug'               => $post->post_name,
+			'date_created'       => $date_created,
+			'date_modified'      => $date_modified,
+			'status'             => $post->post_status,
+			'featured'           => false,
+			'catalog_visibility' => '',
+			'sku'                => '',
+			// 'menu_order'         => $product->get_menu_order(),
+			'virtual'            => false,
+			'downloadable'       => false,
+			'permalink'          => \get_permalink( $post->ID ),
+
+			// Get Product Prices
+			'price_html'         => '',
+			'regular_price'      => '',
+			'sale_price'         => '',
+			'on_sale'            => '',
+			'date_on_sale_from'  => '',
+			'date_on_sale_to'    => '',
+			'total_sales'        => '',
+
+			// Get Product Stock
+			'stock'              => '',
+			'stock_status'       => '',
+			'manage_stock'       => '',
+			'stock_quantity'     => '',
+			'backorders'         => '',
+			'backorders_allowed' => '',
+			'backordered'        => '',
+			'low_stock_amount'   => '',
+
+			// Get Linked Products
+			'upsell_ids'         => [],
+			'cross_sell_ids'     => [],
+
+			// Get Product Variations and Attributes
+			'attributes'         => [],
+
+			// Get Product Taxonomies
+			'category_ids'       => [],
+			'tag_ids'            => [],
+
+			// Get Product Images
+			'image_url'          => $image_url,
+			'gallery_image_urls' => [],
+
+			'is_course'          => false,
 		) + $children;
 
 		return array_merge(

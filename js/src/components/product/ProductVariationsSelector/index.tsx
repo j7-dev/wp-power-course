@@ -2,7 +2,7 @@ import React, { FC } from 'react'
 import {
   TProductRecord,
   TProductVariation,
-} from '@/pages/admin/Courses/ProductSelector/types'
+} from '@/pages/admin/Courses/CourseSelector/types'
 import { CloseCircleFilled, CheckCircleFilled } from '@ant-design/icons'
 import { Button } from 'antd'
 

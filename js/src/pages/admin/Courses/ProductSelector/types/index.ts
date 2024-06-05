@@ -41,6 +41,7 @@ export type TProductAttribute = {
 export type TProductRecord = {
   id: string
   type: TProductType
+  depth: number
   name: string
   slug: string
   date_created: string

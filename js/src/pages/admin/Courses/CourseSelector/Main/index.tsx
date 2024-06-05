@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin } from 'antd'
+import { Table, FormInstance, Spin, Tag } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
   initialFilteredValues,
@@ -17,7 +17,7 @@ import {
   defaultPaginationProps,
   defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
-import { getInitialFilters, getIsVariation } from '@/utils'
+import { getInitialFilters, getIsVariation, getPostStatus } from '@/utils'
 import {
   ProductName,
   ProductType,
@@ -149,6 +149,21 @@ const index = () => {
               dataIndex="name"
               width={300}
               render={(_, record) => <ProductName record={record} />}
+            />
+            <Table.Column<TProductRecord>
+              title="狀態"
+              dataIndex="status"
+              width={80}
+              render={(_, record) => (
+                <Tag color={getPostStatus(record?.status)?.color}>
+                  {getPostStatus(record?.status)?.label}
+                </Tag>
+              )}
+            />
+            <Table.Column<TProductRecord>
+              title="時數"
+              dataIndex="hours"
+              width={180}
             />
             <Table.Column<TProductRecord>
               title="商品類型"

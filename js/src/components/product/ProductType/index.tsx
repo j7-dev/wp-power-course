@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag, Tooltip } from 'antd'
 import {
   StarFilled,
@@ -11,7 +11,8 @@ import { IoMdDownload } from 'react-icons/io'
 import { productTypes } from '@/utils'
 
 export const ProductType: FC<{ record: TProductRecord }> = ({ record }) => {
-  const type = record?.type || 'unknown'
+  const type = record?.type || ''
+  if (!type || 'chapter' === type) return null
   const tag = productTypes.find((productType) => productType.value === type)
   return (
     <div className="flex items-center gap-2">
