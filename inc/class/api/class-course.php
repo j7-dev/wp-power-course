@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Course API
  */
@@ -53,6 +52,27 @@ final class Course {
 				array(
 					'methods'             => $api['method'],
 					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
+					'permission_callback' => function () {
+						return \current_user_can( 'manage_options' );
+					},
+				)
+			);
+		}
+
+		$apis_with_id = array(
+			array(
+				'endpoint' => 'courses',
+				'method'   => 'delete',
+			),
+		);
+
+		foreach ( $apis_with_id as $api ) {
+			\register_rest_route(
+				Plugin::$kebab . '/' . $api['endpoint'],
+				'/(?P<id>\d+)',
+				array(
+					'methods'             => $api['method'],
+					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_with_id_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -255,6 +275,7 @@ final class Course {
 	 *
 	 * @param \WP_Post $post Chapter.
 	 * @param bool     $with_description With description.
+	 * @param int      $depth Depth.
 	 * @return array
 	 */
 	public function format_chapter_details( $post, $with_description = true, $depth = 0 ){ // phpcs:ignore
@@ -408,56 +429,43 @@ final class Course {
 		return new \WP_REST_Response( $this->format_product_details( $product ) );
 	}
 
+
 	/**
-	 * Post courses callback
-	 * DELETE
-	 *
-	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
+	 * Delete courses with id callback
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_callback_BAK( $request ) {
+	public function delete_courses_with_id_callback( $request ) {
 
-		$body_params = $request->get_json_params() ?? array();
+		$id = $request['id'];
+		if ( empty( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '刪除失敗，請提供ID',
+				],
+				400
+			);
+		}
 
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$delete_result = \wp_delete_post( $id );
 
-		$product = new \WC_Product_Simple();
-
-		$name               = $body_params['name'];
-		$slug               = $body_params['slug'] ?? $name;
-		$regular_price      = $body_params['regular_price'];
-		$sale_price         = $body_params['sale_price'];
-		$short_description  = $body_params['short_description'] ?? '';
-		$description        = $body_params['description'] ?? '';
-		$image_id           = $body_params['image_id'];
-		$gallery_image_ids  = $body_params['gallery_image_ids'] ?? array();
-		$status             = $body_params['status'] ?? 'publish';
-		$catalog_visibility = $body_params['catalog_visibility'] ?? 'visible';
-		$category_ids       = $body_params['category_ids'] ?? array();
-
-		$product->set_name( $name ); // product title
-
-		$product->set_slug( $slug );
-
-		$product->set_regular_price( $regular_price );
-		$product->set_sale_price( $sale_price );
-
-		$product->set_short_description( $short_description );
-		// you can also add a full product description
-		$product->set_description( $description );
-
-		$product->set_image_id( $image_id );
-		$product->set_gallery_image_ids( $gallery_image_ids );
-		$product->set_status( $status ); // product status (publish, draft, etc.)
-		$product->set_catalog_visibility( $catalog_visibility );
-
-		// let's suppose that our 'Accessories' category has ID = 19
-		$product->set_category_ids( $category_ids );
-		// you can also use $product->set_tag_ids() for tags, brands etc
-
-		$product->save();
+		if ( ! $delete_result ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '刪除失敗',
+				],
+				400
+			);
+		}
+		return new \WP_REST_Response(
+			[
+				'id'      => $id,
+				'message' => '刪除成功',
+			]
+		);
 	}
 }
 

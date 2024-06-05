@@ -1,6 +1,7 @@
 <?php
 /**
  * Product API
+ * DELETE
  */
 
 declare(strict_types=1);

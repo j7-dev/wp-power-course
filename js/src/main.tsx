@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { app1Selector, app2Selector } from '@/utils'
 import { StyleProvider } from '@ant-design/cssinjs'
 
@@ -40,7 +39,6 @@ mapping.forEach(({ els, App }) => {
             <StyleProvider hashPriority="high">
               <App />
             </StyleProvider>
-            <ReactQueryDevtools initialIsOpen={false} />
           </QueryClientProvider>
         </React.StrictMode>,
       )

@@ -2,6 +2,15 @@
 # yarn lockfile v1
 
 
+"@aliemir/dom-to-fiber-utils@^0.4.0":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@aliemir/dom-to-fiber-utils/-/dom-to-fiber-utils-0.4.1.tgz#fe83e71b9eed89d6d50461c81bd7ad5cc26f8dd8"
+  integrity sha512-mWjCp9Uu3B1Rbtdnk23Coak831zgy+/1oS+FCTVhCAozGPUURE8IfVFQsCblZMWuT5j+QSc6JNDQ+l2JcZclzA==
+  dependencies:
+    react "^18.0.0"
+    react-dom "^18.0.0"
+    react-reconciler "^0.29.0"
+
 "@aliemir/react-live@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@aliemir/react-live/-/react-live-4.0.0.tgz#666a713b9e66c06ac0dba09fa1fd56266472b342"
@@ -2329,6 +2338,25 @@
     "@tanstack/react-query" "^4.10.1"
     error-stack-parser "^2.1.4"
 
+"@refinedev/devtools-shared@1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@refinedev/devtools-shared/-/devtools-shared-1.1.8.tgz#25ddd84eb6004d1687cf907b25a0513dfd4265d0"
+  integrity sha512-TUiZJYUY3oXzejqWXN/bgTvGVjAPbhNLGExYvr+DVQnvYxITe3JZ/1RfZOhZd6dxtKq7fIuQolDwQ4mB9jomYw==
+  dependencies:
+    "@tanstack/react-query" "^4.10.1"
+    error-stack-parser "^2.1.4"
+
+"@refinedev/devtools@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@refinedev/devtools/-/devtools-1.2.2.tgz#df399bfa4952b51aa3e0fee0ca0d80fd9471ab47"
+  integrity sha512-SWxZWoPJaqzo/W4+nOw7h2wiELMSMQtb4FPDEXhewrfZdOa4Jyxe55itaob/60RKaqsLzBhHL4xvRzFcK56ePA==
+  dependencies:
+    "@aliemir/dom-to-fiber-utils" "^0.4.0"
+    "@refinedev/devtools-shared" "1.1.8"
+    error-stack-parser "^2.1.4"
+    lodash "^4.17.21"
+    lodash-es "^4.17.21"
+
 "@refinedev/inferencer@^4.5.21":
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/@refinedev/inferencer/-/inferencer-4.6.2.tgz#23e2761c9cb438da82c39834c2b2d08d4fffc7d3"
@@ -2845,18 +2873,6 @@
   version "4.36.1"
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.36.1.tgz#79f8c1a539d47c83104210be2388813a7af2e524"
   integrity sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==
-
-"@tanstack/query-devtools@5.32.1":
-  version "5.32.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-devtools/-/query-devtools-5.32.1.tgz#2c03f2fbe9162b650e697c469c8618c7a05d593f"
-  integrity sha512-7Xq57Ctopiy/4atpb0uNY5VRuCqRS/1fi/WBCKKX6jHMa6cCgDuV/AQuiwRXcKARbq2OkVAOrW2v4xK9nTbcCA==
-
-"@tanstack/react-query-devtools@^5.28.14":
-  version "5.35.5"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-5.35.5.tgz#7d2c2e56a0cea5acfff34586afb87c38a31b0168"
-  integrity sha512-4Xll14B9uhgEJ+uqZZ5tqZ7G1LDR7wGYgb+NOZHGn11TTABnlV8GWon7zDMqdaHeR5mjjuY1UFo9pbz39kuZKQ==
-  dependencies:
-    "@tanstack/query-devtools" "5.32.1"
 
 "@tanstack/react-query@4.36.1", "@tanstack/react-query@^4.10.1":
   version "4.36.1"
@@ -11072,6 +11088,14 @@ react-markdown@^8.0.7:
     unified "^10.0.0"
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
+
+react-reconciler@^0.29.0:
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.29.2.tgz#8ecfafca63549a4f4f3e4c1e049dd5ad9ac3a54f"
+  integrity sha512-zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==
+  dependencies:
+    loose-envify "^1.1.0"
+    scheduler "^0.23.2"
 
 react-refresh@^0.14.0:
   version "0.14.2"

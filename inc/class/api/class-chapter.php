@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Chapter API
  */
@@ -10,6 +9,7 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\CPT;
+use J7\WpUtils\Classes\WP;
 
 
 /**
@@ -43,10 +43,6 @@ final class Chapter {
 				'endpoint' => 'chapters',
 				'method'   => 'post',
 			),
-			array(
-				'endpoint' => 'upload',
-				'method'   => 'post',
-			),
 		);
 
 		foreach ( $apis as $api ) {
@@ -56,6 +52,27 @@ final class Chapter {
 				array(
 					'methods'             => $api['method'],
 					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
+					'permission_callback' => function () {
+						return \current_user_can( 'manage_options' );
+					},
+				)
+			);
+		}
+
+		$apis_with_id = array(
+			array(
+				'endpoint' => 'chapters',
+				'method'   => 'delete',
+			),
+		);
+
+		foreach ( $apis_with_id as $api ) {
+			\register_rest_route(
+				Plugin::$kebab . '/' . $api['endpoint'],
+				'/(?P<id>\d+)',
+				array(
+					'methods'             => $api['method'],
+					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_with_id_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -117,6 +134,18 @@ final class Chapter {
 
 		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
 
+		$include_required_params = WP::include_required_params(
+			$body_params,
+			array(
+				'post_parent',
+			),
+			true
+		);
+
+		if ( true !== $include_required_params ) {
+			return $include_required_params;
+		}
+
 		$args = array(
 			'post_title'  => $body_params['post_title'] ?? '新章節',
 			'post_status' => 'draft',
@@ -129,34 +158,47 @@ final class Chapter {
 
 		return new \WP_REST_Response(
 			[
-				'id' => $new_post_id,
+				'id'      => $new_post_id,
+				'message' => '新增成功',
 			]
 		);
 	}
 
-
-
-	public function post_upload_callback( $request ) {
-		$files = $request->get_file_params();
-		ob_start();
-		var_dump( $files );
-		\J7\WpUtils\Classes\Log::info( '' . ob_get_clean() );
-
-		if ( empty( $files ) ) {
-			return new \WP_Error( 'no_file', 'No file provided', array( 'status' => 400 ) );
+	/**
+	 * Delete Chapter callback
+	 * 刪除章節
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function delete_chapters_with_id_callback( $request ) {
+		$id = $request['id'];
+		if ( empty( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '刪除失敗，請提供ID',
+				],
+				400
+			);
 		}
+		$delete_result = \wp_delete_post( $id );
 
-		$uploaded_file = $files['file'];
-
-		$upload_overrides = array( 'test_form' => false );
-
-		$movefile = wp_handle_upload( $uploaded_file, $upload_overrides );
-
-		if ( $movefile && ! isset( $movefile['error'] ) ) {
-			return rest_ensure_response( $movefile );
-		} else {
-			return new \WP_Error( 'upload_error', $movefile['error'], array( 'status' => 500 ) );
+		if ( ! $delete_result ) {
+			return new \WP_REST_Response(
+				[
+					'id'      => $id,
+					'message' => '刪除失敗',
+				],
+				400
+			);
 		}
+		return new \WP_REST_Response(
+			[
+				'id'      => $id,
+				'message' => '刪除成功',
+			]
+		);
 	}
 }
 

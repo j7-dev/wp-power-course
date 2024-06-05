@@ -1,13 +1,13 @@
 import { FC } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
-import { Tooltip } from 'antd'
+import { Tooltip, Button } from 'antd'
 import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { useCreate, useInvalidate } from '@refinedev/core'
 
 const AddChapter: FC<{
   record: TProductRecord
 }> = ({ record }) => {
-  const { mutate } = useCreate()
+  const { mutate, isLoading } = useCreate()
   const invalidate = useInvalidate()
   const { type, depth } = record
   const isChapter = type === 'chapter'
@@ -38,8 +38,12 @@ const AddChapter: FC<{
   return (
     <>
       <Tooltip title={`新增${itemLabel}`}>
-        <PlusOutlined
-          className="text-gray-400 cursor-pointer"
+        <Button
+          loading={isLoading}
+          type="link"
+          size="small"
+          className="mx-0"
+          icon={<PlusOutlined className="text-gray-400 cursor-pointer" />}
           onClick={handleCreate}
         />
       </Tooltip>
