@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
 import { useCreate, useUpdate } from '@refinedev/core'
+import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
 type TUseCourseDrawerParams = {
   form: FormInstance
-  id?: string
+  record?: TProductRecord
 }
 
-export const useCourseDrawer = ({ form, id }: TUseCourseDrawerParams) => {
+export const useCourseDrawer = ({ form, record }: TUseCourseDrawerParams) => {
   const [open, setOpen] = useState(false)
+  const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
 
   const show = () => {
     setOpen(true)
@@ -24,9 +26,10 @@ export const useCourseDrawer = ({ form, id }: TUseCourseDrawerParams) => {
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
-      if (!!id) {
+
+      if (isUpdate) {
         updateCourse({
-          id,
+          id: record?.id,
           resource: 'courses',
           values,
         })
@@ -48,17 +51,23 @@ export const useCourseDrawer = ({ form, id }: TUseCourseDrawerParams) => {
   }
 
   const drawerProps: DrawerProps = {
-    title: '新增課程',
+    title: `${isUpdate ? '編輯' : '新增'}課程`,
     forceRender: true,
     onClose: close,
     open,
-    width: '70%',
+    width: '50%',
     extra: (
       <Button type="primary" onClick={handleSave}>
         儲存
       </Button>
     ),
   }
+
+  useEffect(() => {
+    if (record?.id) {
+      form.setFieldsValue(record)
+    }
+  }, [record?.id])
 
   return {
     open,

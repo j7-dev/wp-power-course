@@ -6,15 +6,8 @@ import {
   CourseAnnouncement,
 } from '@/components/course/form'
 
-// import './style.scss'
-
-export * from './useCourseDrawer'
-
 export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
   const form = Form.useFormInstance()
-  const onChange = (key: string) => {
-    console.log(key)
-  }
 
   const items: TabsProps['items'] = [
     {
@@ -52,12 +45,12 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
   return (
     <>
       <Drawer {...drawerProps}>
+        {/* 這邊這個 form 只是為了調整 style */}
         <Form layout="vertical" form={form}>
           <Tabs
             className="pc-course-drawer-tabs"
             defaultActiveKey={items?.[0]?.key}
             items={items}
-            onChange={onChange}
             centered
           />
         </Form>
@@ -65,3 +58,5 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
     </>
   )
 }
+
+export * from './useCourseDrawer'
