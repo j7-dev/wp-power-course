@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
 import { useCreate, useUpdate } from '@refinedev/core'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
-type TUseCourseDrawerParams = {
+export function useFormDrawer<DataType>({
+  form,
+  record,
+  resource = 'courses',
+}: {
   form: FormInstance
-  record?: TProductRecord
-}
-
-export const useCourseDrawer = ({ form, record }: TUseCourseDrawerParams) => {
+  record?: DataType & { id: string; depth: number }
+  resource?: string
+}) {
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
 
@@ -20,23 +22,23 @@ export const useCourseDrawer = ({ form, record }: TUseCourseDrawerParams) => {
     setOpen(false)
   }
 
-  const { mutate: createCourse } = useCreate()
-  const { mutate: updateCourse } = useUpdate()
+  const { mutate: create } = useCreate()
+  const { mutate: update } = useUpdate()
 
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
 
       if (isUpdate) {
-        updateCourse({
+        update({
           id: record?.id,
-          resource: 'courses',
+          resource,
           values,
         })
       } else {
-        createCourse(
+        create(
           {
-            resource: 'courses',
+            resource,
             values,
           },
           {
@@ -50,8 +52,10 @@ export const useCourseDrawer = ({ form, record }: TUseCourseDrawerParams) => {
     })
   }
 
+  const itemLabel = getItemLabel(resource, record?.depth)
+
   const drawerProps: DrawerProps = {
-    title: `${isUpdate ? '編輯' : '新增'}課程`,
+    title: `${isUpdate ? '編輯' : '新增'}${itemLabel}`,
     forceRender: true,
     onClose: close,
     open,
@@ -76,4 +80,9 @@ export const useCourseDrawer = ({ form, record }: TUseCourseDrawerParams) => {
     close,
     drawerProps,
   }
+}
+
+function getItemLabel(resource: string, depth: number | undefined) {
+  if (resource === 'courses') return '課程'
+  return depth === 0 ? '章節' : '段落'
 }

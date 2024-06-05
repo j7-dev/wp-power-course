@@ -6,7 +6,7 @@ import {
   CourseAnnouncement,
 } from '@/components/course/form'
 
-export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
+export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
   const form = Form.useFormInstance()
 
   const items: TabsProps['items'] = [

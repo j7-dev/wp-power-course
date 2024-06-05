@@ -4,15 +4,31 @@ import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { Image, Form } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { useCourseDrawer, CourseDrawer } from '@/components/course/CourseDrawer'
+import { CourseDrawer } from '@/components/course/CourseDrawer'
+import { useFormDrawer } from '@/hooks'
+import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 
 export const ProductName: FC<{
   record: TProductRecord
 }> = ({ record }) => {
-  const { id, sku, name, image_url } = record
+  const { id, sku, name, image_url, type } = record
+  const isChapter = type === 'chapter'
 
-  const [form] = Form.useForm()
-  const { show: showDrawer, drawerProps } = useCourseDrawer({ form, record })
+  const [courseForm] = Form.useForm()
+  const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
+    useFormDrawer({ form: courseForm, record, resource: 'courses' })
+
+  const [chapterForm] = Form.useForm()
+  const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
+    useFormDrawer({ form: chapterForm, record, resource: 'chapters' })
+
+  const handleClick = () => {
+    if (isChapter) {
+      showChapterDrawer()
+    } else {
+      showCourseDrawer()
+    }
+  }
 
   return (
     <>
@@ -34,7 +50,7 @@ export const ProductName: FC<{
         <div className="flex-1">
           <p
             className="mb-1 text-primary hover:text-primary/70 cursor-pointer"
-            onClick={showDrawer}
+            onClick={handleClick}
           >
             {renderHTML(name)}
           </p>
@@ -44,8 +60,12 @@ export const ProductName: FC<{
           </div>
         </div>
       </div>
-      <Form layout="vertical" form={form}>
-        <CourseDrawer {...drawerProps} />
+      <Form layout="vertical" form={courseForm}>
+        <CourseDrawer {...courseDrawerProps} />
+      </Form>
+
+      <Form layout="vertical" form={chapterForm}>
+        <ChapterDrawer {...chapterDrawerProps} />
       </Form>
     </>
   )
