@@ -4,7 +4,7 @@ import { useCourseDrawer, CourseDrawer } from '@/components/course/CourseDrawer'
 
 export const AddCourseButton = () => {
   const [form] = Form.useForm()
-  const { show: showDrawer, drawerProps } = useCourseDrawer(form)
+  const { show: showDrawer, drawerProps } = useCourseDrawer({ form })
   return (
     <>
       <Button

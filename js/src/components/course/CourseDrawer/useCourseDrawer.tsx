@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
-import { useCreate } from '@refinedev/core'
+import { useCreate, useUpdate } from '@refinedev/core'
 
-export const useCourseDrawer = (form: FormInstance) => {
+type TUseCourseDrawerParams = {
+  form: FormInstance
+  id?: string
+}
+
+export const useCourseDrawer = ({ form, id }: TUseCourseDrawerParams) => {
   const [open, setOpen] = useState(false)
 
   const show = () => {
@@ -14,22 +19,31 @@ export const useCourseDrawer = (form: FormInstance) => {
   }
 
   const { mutate: createCourse } = useCreate()
+  const { mutate: updateCourse } = useUpdate()
 
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
-      createCourse(
-        {
+      if (!!id) {
+        updateCourse({
+          id,
           resource: 'courses',
           values,
-        },
-        {
-          onSuccess: () => {
-            close()
-            form.resetFields()
+        })
+      } else {
+        createCourse(
+          {
+            resource: 'courses',
+            values,
           },
-        },
-      )
+          {
+            onSuccess: () => {
+              close()
+              form.resetFields()
+            },
+          },
+        )
+      }
     })
   }
 
