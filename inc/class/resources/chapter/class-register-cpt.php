@@ -5,14 +5,14 @@
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\Admin;
+namespace J7\PowerCourse\Resources\Chapter;
 
 use J7\PowerCourse\Plugin;
 
 /**
- * Class CPT
+ * Class RegisterCPT
  */
-final class CPT {
+final class RegisterCPT {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	const POST_TYPE = 'pc_chapter';
@@ -167,4 +167,4 @@ final class CPT {
 	}
 }
 
-CPT::instance();
+RegisterCPT::instance();

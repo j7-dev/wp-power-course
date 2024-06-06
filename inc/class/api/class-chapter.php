@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Admin\CPT;
+use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\WpUtils\Classes\WP;
 
 
@@ -155,7 +155,7 @@ final class Chapter {
 			'post_status' => 'draft',
 			'post_author' => \get_current_user_id(),
 			'post_parent' => $body_params['post_parent'] ?? 0,
-			'post_type'   => CPT::POST_TYPE,
+			'post_type'   => RegisterCPT::POST_TYPE,
 		);
 
 		$new_post_id = \wp_insert_post( $args );

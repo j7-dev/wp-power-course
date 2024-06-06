@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Admin\CPT;
+use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 
 
@@ -182,7 +182,7 @@ final class Course {
 			\get_children(
 				array(
 					'post_parent' => $product->get_id(),
-					'post_type'   => CPT::POST_TYPE,
+					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any',
 				)
@@ -303,7 +303,7 @@ final class Course {
 			\get_children(
 				array(
 					'post_parent' => $post->ID,
-					'post_type'   => CPT::POST_TYPE,
+					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any',
 				)
