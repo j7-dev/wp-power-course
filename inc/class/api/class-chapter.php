@@ -8,8 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\RegisterCPT;
-use J7\WpUtils\Classes\WP;
+use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 
 
 /**
@@ -38,10 +37,6 @@ final class Chapter {
 			array(
 				'endpoint' => 'chapters',
 				'method'   => 'post',
-			),
-			array(
-				'endpoint' => 'chapters',
-				'method'   => 'get',
 			),
 		);
 
@@ -86,48 +81,12 @@ final class Chapter {
 	}
 
 
-	/**
-	 * Get chapters callback
-	 * TODO 需要這支API嗎?
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response
-	 */
-	public function get_courses_callback( $request )
-	{ // phpcs:ignore
 
-		$response = new \WP_REST_Response( [] );
 
-		// set pagination in header
-		$response->header( 'X-WP-Total', 0 );
-		$response->header( 'X-WP-TotalPages', 0 );
-
-		return $response;
-	}
-
-	/**
-	 * Format Chapter details
-	 * TODO
-	 *
-	 * @param \WP_Post $post Chapter.
-	 * @param bool     $with_description With description.
-	 * @return array
-	 */
-	public function format_chapter_details( $post, $with_description = true )
-	{ // phpcs:ignore
-
-		if ( ! ( $post instanceof \WP_Post ) ) {
-			return array();
-		}
-
-		return [];
-	}
 
 	/**
 	 * Post Chapter callback
 	 * 創建章節
-	 *
-	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
@@ -138,82 +97,57 @@ final class Chapter {
 
 		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
 
-		$include_required_params = WP::include_required_params(
-			$body_params,
-			array(
-				'post_parent',
-			),
-			true
-		);
+		$create_result = ChapterFactory::create_chapter( $body_params );
 
-		if ( true !== $include_required_params ) {
-			return $include_required_params;
+		if ( \is_wp_error( $create_result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'id'      => 0,
+					'message' => $create_result->get_error_message(),
+				),
+				400
+			);
 		}
 
-		$args = array(
-			'post_title'  => $body_params['post_title'] ?? '新章節',
-			'post_status' => 'draft',
-			'post_author' => \get_current_user_id(),
-			'post_parent' => $body_params['post_parent'] ?? 0,
-			'post_type'   => RegisterCPT::POST_TYPE,
-		);
-
-		$new_post_id = \wp_insert_post( $args );
-
 		return new \WP_REST_Response(
-			[
-				'id'      => $new_post_id,
+			array(
+				'id'      => $create_result,
 				'message' => '新增成功',
-			]
+			)
 		);
 	}
 
 	/**
 	 * Patch Chapter callback
-	 * TODO 更新章節
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
 	public function patch_chapters_with_id_callback( $request ) {
 
-		$id = $request['id'];
-		if ( empty( $id ) ) {
-			return new \WP_REST_Response(
-				[
-					'id'      => $id,
-					'message' => '更新失敗，請提供ID',
-				],
-				400
-			);
-		}
-
+		$id          = $request['id'];
 		$body_params = $request->get_json_params() ?? array();
-
 		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
 
-		$args = array(
-			'ID'         => $id,
-			'post_title' => $body_params['name'] ?? '新章節',
-		);
+		$formatted_params = ChapterFactory::converter( $body_params );
 
-		$update_post_id = \wp_update_post( $args );
+		$update_result = ChapterFactory::update_chapter( $id, $formatted_params );
 
-		if ( ! $update_post_id ) {
+		if ( \is_wp_error( $update_result ) ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '更新失敗',
-				],
+				),
 				400
 			);
 		}
 
 		return new \WP_REST_Response(
-			[
+			array(
 				'id'      => $id,
 				'message' => '更新成功',
-			]
+			)
 		);
 	}
 
@@ -225,32 +159,23 @@ final class Chapter {
 	 * @return \WP_REST_Response
 	 */
 	public function delete_chapters_with_id_callback( $request ) {
-		$id = $request['id'];
-		if ( empty( $id ) ) {
-			return new \WP_REST_Response(
-				[
-					'id'      => $id,
-					'message' => '刪除失敗，請提供ID',
-				],
-				400
-			);
-		}
-		$delete_result = \wp_delete_post( $id );
+		$id            = $request['id'];
+		$delete_result = ChapterFactory::delete_chapter( $id );
 
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '刪除失敗',
-				],
+				),
 				400
 			);
 		}
 		return new \WP_REST_Response(
-			[
+			array(
 				'id'      => $id,
 				'message' => '刪除成功',
-			]
+			)
 		);
 	}
 }

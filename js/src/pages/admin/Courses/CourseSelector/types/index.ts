@@ -38,7 +38,12 @@ export type TProductAttribute = {
   position: number
 }
 
-export type TProductRecord = {
+type TImage = {
+  id: string
+  url: string
+}
+
+export type TCourseRecord = {
   id: string
   type: TProductType
   depth: number
@@ -52,6 +57,7 @@ export type TProductRecord = {
   description: string
   short_description: string
   sku: string
+  menu_order: number
   virtual: boolean
   downloadable: boolean
   permalink: string
@@ -72,18 +78,32 @@ export type TProductRecord = {
   low_stock_amount: number | null
   upsell_ids: number[]
   cross_sell_ids: number[]
-  variations: number[]
   attributes: TProductAttribute[]
   category_ids: string[]
   tag_ids: string[]
-  image_url: string
-  gallery_image_urls: string[]
-  children?: TProductVariation[]
+  images: TImage[]
+  children?: TChapter[]
+  is_course: boolean
   parent_id?: string
 }
 
-export type TProductVariation = TProductRecord & {
-  type: TProductType | 'variation' | 'subscription_variation'
-  parent_id: string
-  attributes: { [key: string]: string }
+export type TChapter = {
+  id: string
+  type: TProductType
+  depth: number
+  name: string
+  slug: string
+  date_created: string
+  date_modified: string
+  status: string
+  catalog_visibility: string
+  description: string
+  short_description: string
+  menu_order: number
+  permalink: string
+  category_ids: string[]
+  tag_ids: string[]
+  images: TImage[]
+  children?: TChapter[]
+  parent_id?: string
 }

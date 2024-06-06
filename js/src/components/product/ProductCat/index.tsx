@@ -1,9 +1,9 @@
 import React, { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag } from 'antd'
 import useOptions from '@/pages/admin/Courses/ProductSelector/hooks/useOptions'
 
-export const ProductCat: FC<{ record: TProductRecord }> = ({ record }) => {
+export const ProductCat: FC<{ record: TCourseRecord }> = ({ record }) => {
   const { category_ids, tag_ids } = record
   const { options } = useOptions()
   const { product_cats = [], product_tags = [] } = options

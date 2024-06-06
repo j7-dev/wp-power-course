@@ -9,7 +9,7 @@ import MobileFilter from '@/pages/admin/Courses/ProductSelector/Filter/MobileFil
 import { HttpError } from '@refinedev/core'
 import {
   TFilterProps,
-  TProductRecord,
+  TCourseRecord,
 } from '@/pages/admin/Courses/ProductSelector/types'
 import {
   keyLabelMapper,
@@ -36,7 +36,7 @@ const index = () => {
   const isMobile = width ? width < 810 : false
 
   const { tableProps, searchFormProps, filters } = useTable<
-    TProductRecord,
+    TCourseRecord,
     HttpError,
     TFilterProps
   >({
@@ -63,7 +63,7 @@ const index = () => {
 
   const { valueLabelMapper } = useValueLabelMapper()
 
-  const { rowSelection, setSelectedRowKeys } = useRowSelection<TProductRecord>({
+  const { rowSelection, setSelectedRowKeys } = useRowSelection<TCourseRecord>({
     getCheckboxProps: (record) => {
       const isVariation = getIsVariation(record?.type)
       return {
@@ -141,37 +141,37 @@ const index = () => {
             }}
             rowSelection={rowSelection}
           >
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="商品名稱"
               dataIndex="name"
               width={300}
               render={(_, record) => <ProductName record={record} />}
             />
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="商品類型"
               dataIndex="type"
               width={180}
               render={(_, record) => <ProductType record={record} />}
             />
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="價格"
               dataIndex="price"
               width={150}
               render={(_, record) => <ProductPrice record={record} />}
             />
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="總銷量"
               dataIndex="total_sales"
               width={150}
               render={(_, record) => <ProductTotalSales record={record} />}
             />
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="庫存"
               dataIndex="stock"
               width={150}
               render={(_, record) => <ProductStock record={record} />}
             />
-            <Table.Column<TProductRecord>
+            <Table.Column<TCourseRecord>
               title="商品分類 / 商品標籤"
               dataIndex="category_ids"
               render={(_, record) => <ProductCat record={record} />}

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { ProductPrice } from '@/components/product'
@@ -8,14 +8,16 @@ import { AddToCartButton } from '@/components/woocommerce'
 import { Button, ButtonProps } from 'antd'
 
 export const ProductCard: FC<{
-  record: TProductRecord
+  record: TCourseRecord
   cardBodyProps?: React.HTMLAttributes<HTMLDivElement>
   cardButtonProps?: {
     more?: ButtonProps
     addToCart?: ButtonProps
   }
 }> = ({ record, cardBodyProps, cardButtonProps }) => {
-  const { id, name, image_url = defaultImage, type } = record
+  const { id, name, images, type } = record
+  const image_url = images?.[0]?.url || defaultImage
+
   const moreButtonProps = cardButtonProps?.more || {}
   const addToCartButtonProps = cardButtonProps?.addToCart || {}
   return (

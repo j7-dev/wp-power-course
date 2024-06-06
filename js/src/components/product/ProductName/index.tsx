@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { Image, Form } from 'antd'
@@ -9,9 +9,10 @@ import { useFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 
 export const ProductName: FC<{
-  record: TProductRecord
+  record: TCourseRecord
 }> = ({ record }) => {
-  const { id, sku, name, image_url, type } = record
+  const { id, sku, name, images, type } = record
+  const image_url = images?.[0]?.url || defaultImage
   const isChapter = type === 'chapter'
 
   const [courseForm] = Form.useForm()

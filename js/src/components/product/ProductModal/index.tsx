@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import {
@@ -21,7 +21,7 @@ import { Modal, ModalProps, Row, Col } from 'antd'
 import { ShrinkOutlined, ArrowsAltOutlined } from '@ant-design/icons'
 
 export const ProductModal: FC<{
-  record: TProductRecord
+  record: TCourseRecord
   modal: {
     show: () => void
     close: () => void
@@ -38,14 +38,9 @@ export const ProductModal: FC<{
     useProductVariationsSelector(record)
   const { selectedVariation, setSelectedAttributes } =
     productVariationsSelectorProps
-  const {
-    id,
-    name,
-    image_url = defaultImage,
-    gallery_image_urls,
-    description,
-    short_description,
-  } = record
+  const { id, name, images, description, short_description } = record
+
+  const image_urls = images.map((image) => image?.url || defaultImage)
 
   const handleExpand = () => {
     setIsExpand(!isExpand)
@@ -72,7 +67,7 @@ export const ProductModal: FC<{
         >
           <Col span={24} lg={{ span: 10 }} className="mb-4 relative">
             <div className="sticky top-0">
-              <Gallery images={[image_url, ...gallery_image_urls]} />
+              <Gallery images={image_urls} />
             </div>
           </Col>
           <Col span={24} lg={{ span: 14 }}>

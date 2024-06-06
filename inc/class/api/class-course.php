@@ -165,11 +165,11 @@ final class Course {
 		$date_created  = $product->get_date_created();
 		$date_modified = $product->get_date_modified();
 
-		$image_id  = $product->get_image_id();
-		$image_url = \wp_get_attachment_url( $image_id );
+		$image_id          = $product->get_image_id();
+		$gallery_image_ids = $product->get_gallery_image_ids();
 
-		$gallery_image_ids  = $product->get_gallery_image_ids();
-		$gallery_image_urls = array_map( 'wp_get_attachment_url', $gallery_image_ids );
+		$image_ids = array( $image_id, ...$gallery_image_ids );
+		$images    = array_map( array( 'J7\WpUtils\Classes\WP', 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
 			'description'       => $product->get_description(),
@@ -184,15 +184,15 @@ final class Course {
 					'post_parent' => $product->get_id(),
 					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
-					'post_status' => 'any',
+					'post_status' => 'any', // TODO
 				)
 			)
 		);
-		$chapters = array_map( array( $this, 'format_chapter_details' ), $chapters );
+		$chapters = array_map( array( 'J7\PowerCourse\Resources\Chapter\ChapterFactory', 'format_chapter_details' ), $chapters );
 
-		$children = ! ! $chapters ? [
+		$children = ! ! $chapters ? array(
 			'children' => $chapters,
-		] : [];
+		) : array();
 
 		$attributes = $product->get_attributes(); // get attributes object
 
@@ -225,7 +225,7 @@ final class Course {
 			'featured'           => $product->get_featured(),
 			'catalog_visibility' => $product->get_catalog_visibility(),
 			'sku'                => $product->get_sku(),
-			// 'menu_order'         => $product->get_menu_order(),
+			'menu_order'         => (int) $product->get_menu_order(),
 			'virtual'            => $product->get_virtual(),
 			'downloadable'       => $product->get_downloadable(),
 			'permalink'          => \get_permalink( $product->get_id() ),
@@ -261,10 +261,10 @@ final class Course {
 			'tag_ids'            => array_map( 'strval', $product->get_tag_ids() ),
 
 			// Get Product Images
-			'image_url'          => $image_url,
-			'gallery_image_urls' => $gallery_image_urls,
+			'images'             => $images,
 
 			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'          => $product->get_parent_id(),
 		) + $children;
 
 		return array_merge(
@@ -273,113 +273,6 @@ final class Course {
 		);
 	}
 
-	/**
-	 * Format Chapter details
-	 * TODO
-	 *
-	 * @param \WP_Post $post Chapter.
-	 * @param bool     $with_description With description.
-	 * @param int      $depth Depth.
-	 * @return array
-	 */
-	public function format_chapter_details( $post, $with_description = true, $depth = 0 ){ // phpcs:ignore
-
-		if ( ! ( $post instanceof \WP_Post ) ) {
-			return array();
-		}
-
-		$date_created  = $post->post_date;
-		$date_modified = $post->post_modified;
-
-		$image_id  = \get_post_thumbnail_id( $post->ID );
-		$image_url = \wp_get_attachment_url( $image_id );
-
-		$description_array = $with_description ? array(
-			'description'       => $post->post_content,
-			'short_description' => $post->post_excerpt,
-		) : array();
-
-		$chapters = array_values(
-			\get_children(
-				array(
-					'post_parent' => $post->ID,
-					'post_type'   => RegisterCPT::POST_TYPE,
-					'numberposts' => -1,
-					'post_status' => 'any',
-				)
-			)
-		);
-		$chapters = array_map(
-			array( $this, 'format_chapter_details' ),
-			$chapters,
-			array_fill( 0, count( $chapters ), false ),
-			array_fill( 0, count( $chapters ), $depth + 1 )
-		);
-
-		$children = ! ! $chapters ? [
-			'children' => $chapters,
-		] : [];
-
-		$base_array = array(
-			// Get Product General Info
-			'id'                 => (string) $post->ID,
-			'type'               => 'chapter',
-			'depth'              => $depth,
-			'name'               => $post->post_title,
-			'slug'               => $post->post_name,
-			'date_created'       => $date_created,
-			'date_modified'      => $date_modified,
-			'status'             => $post->post_status,
-			'featured'           => false,
-			'catalog_visibility' => '',
-			'sku'                => '',
-			// 'menu_order'         => $product->get_menu_order(),
-			'virtual'            => false,
-			'downloadable'       => false,
-			'permalink'          => \get_permalink( $post->ID ),
-
-			// Get Product Prices
-			'price_html'         => '',
-			'regular_price'      => '',
-			'sale_price'         => '',
-			'on_sale'            => '',
-			'date_on_sale_from'  => '',
-			'date_on_sale_to'    => '',
-			'total_sales'        => '',
-
-			// Get Product Stock
-			'stock'              => '',
-			'stock_status'       => '',
-			'manage_stock'       => '',
-			'stock_quantity'     => '',
-			'backorders'         => '',
-			'backorders_allowed' => '',
-			'backordered'        => '',
-			'low_stock_amount'   => '',
-
-			// Get Linked Products
-			'upsell_ids'         => [],
-			'cross_sell_ids'     => [],
-
-			// Get Product Variations and Attributes
-			'attributes'         => [],
-
-			// Get Product Taxonomies
-			'category_ids'       => [],
-			'tag_ids'            => [],
-
-			// Get Product Images
-			'image_url'          => $image_url,
-			'gallery_image_urls' => [],
-
-			'is_course'          => false,
-		) + $children;
-
-		return array_merge(
-			$description_array,
-			$base_array
-		);
-	}
 
 	/**
 	 * Post courses callback
@@ -444,10 +337,10 @@ final class Course {
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '更新失敗，請提供ID',
-				],
+				),
 				400
 			);
 		}
@@ -460,10 +353,10 @@ final class Course {
 
 		if ( ! $product ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '更新失敗，找不到商品',
-				],
+				),
 				400
 			);
 		}
@@ -516,10 +409,10 @@ final class Course {
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '刪除失敗，請提供ID',
-				],
+				),
 				400
 			);
 		}
@@ -528,18 +421,18 @@ final class Course {
 
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
-				[
+				array(
 					'id'      => $id,
 					'message' => '刪除失敗',
-				],
+				),
 				400
 			);
 		}
 		return new \WP_REST_Response(
-			[
+			array(
 				'id'      => $id,
 				'message' => '刪除成功',
-			]
+			)
 		);
 	}
 }

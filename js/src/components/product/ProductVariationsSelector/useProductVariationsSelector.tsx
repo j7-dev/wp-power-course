@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { TProductVariationsSelectorParams } from './index'
-import { TProductRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
 type TProductVariationsSelectorProps = Omit<
   TProductVariationsSelectorParams,
   'record'
 >
 
-type TUseProductVariationsSelector = (record: TProductRecord) => {
+type TUseProductVariationsSelector = (record: TCourseRecord) => {
   productVariationsSelectorProps: TProductVariationsSelectorProps
 }
 

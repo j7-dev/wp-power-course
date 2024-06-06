@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import {
-  TProductRecord,
+  TCourseRecord,
   TStockStatus,
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag } from 'antd'
@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons'
 
 type TProductStockProps = {
-  record: TProductRecord
+  record: TCourseRecord
   type?: 'tag' | 'text'
 }
 

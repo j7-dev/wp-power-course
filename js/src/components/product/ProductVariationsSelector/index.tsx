@@ -1,13 +1,13 @@
 import React, { FC } from 'react'
 import {
-  TProductRecord,
+  TCourseRecord,
   TProductVariation,
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { CloseCircleFilled, CheckCircleFilled } from '@ant-design/icons'
 import { Button } from 'antd'
 
 export type TProductVariationsSelectorParams = {
-  record: TProductRecord
+  record: TCourseRecord
   selectedAttributes: { name: string; value: string }[]
   setSelectedAttributes: React.Dispatch<
     React.SetStateAction<

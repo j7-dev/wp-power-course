@@ -38,7 +38,7 @@ export type TProductAttribute = {
   position: number
 }
 
-export type TProductRecord = {
+export type TCourseRecord = {
   id: string
   type: TProductType
   depth: number
@@ -82,7 +82,7 @@ export type TProductRecord = {
   parent_id?: string
 }
 
-export type TProductVariation = TProductRecord & {
+export type TProductVariation = TCourseRecord & {
   type: TProductType | 'variation' | 'subscription_variation'
   parent_id: string
   attributes: { [key: string]: string }
