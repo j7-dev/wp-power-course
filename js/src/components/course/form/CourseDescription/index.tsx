@@ -7,12 +7,16 @@ import {
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
 import { Uploader } from '@/components/general'
+import { CopyText } from 'antd-toolkit'
 
 const { Item } = Form
 
 export const CourseDescription = () => {
+  const form = Form.useFormInstance()
   const { options, isLoading } = useOptions()
   const { product_cats = [], product_tags = [] } = options
+  const productUrl = `${siteUrl}/product/`
+  const slug = Form.useWatch(['slug'], form)
 
   return (
     <>
@@ -43,7 +47,10 @@ export const CourseDescription = () => {
         />
       </Item>
       <Item name={['slug']} label="銷售網址">
-        <Input addonBefore={`${siteUrl}/product/`} />
+        <Input
+          addonBefore={productUrl}
+          addonAfter={<CopyText text={`${productUrl}${slug}`} />}
+        />
       </Item>
       <Item name={['short_description']} label="課程簡介">
         <Input.TextArea rows={8} />
