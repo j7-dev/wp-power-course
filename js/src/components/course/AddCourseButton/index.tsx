@@ -12,7 +12,7 @@ export const AddCourseButton = () => {
         type="primary"
         className="mb-4"
         icon={<PlusOutlined />}
-        onClick={showDrawer}
+        onClick={showDrawer()}
       >
         新增課程
       </Button>

@@ -1,33 +1,30 @@
 import React, { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TChapterRecord,
+  TCourseRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
-import { Image, Form } from 'antd'
+import { Image } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
-import { CourseDrawer } from '@/components/course/CourseDrawer'
-import { useFormDrawer } from '@/hooks'
-import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 
 export const ProductName: FC<{
-  record: TCourseRecord
-}> = ({ record }) => {
-  const { id, sku, name, images, type } = record
+  record: TCourseRecord | TChapterRecord
+  show: {
+    showChapterDrawer: (_record: TCourseRecord | TChapterRecord) => () => void
+    showCourseDrawer: (_record: TCourseRecord | TChapterRecord) => () => void
+  }
+}> = ({ record, show }) => {
+  const { id, sku = '', name, images, type } = record
+  const { showChapterDrawer, showCourseDrawer } = show
   const image_url = images?.[0]?.url || defaultImage
   const isChapter = type === 'chapter'
 
-  const [courseForm] = Form.useForm()
-  const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
-    useFormDrawer({ form: courseForm, record, resource: 'courses' })
-
-  const [chapterForm] = Form.useForm()
-  const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
-    useFormDrawer({ form: chapterForm, record, resource: 'chapters' })
-
   const handleClick = () => {
     if (isChapter) {
-      showChapterDrawer()
+      showChapterDrawer(record)()
     } else {
-      showCourseDrawer()
+      showCourseDrawer(record)()
     }
   }
 
@@ -61,13 +58,6 @@ export const ProductName: FC<{
           </div>
         </div>
       </div>
-      <Form layout="vertical" form={courseForm}>
-        <CourseDrawer {...courseDrawerProps} />
-      </Form>
-
-      <Form layout="vertical" form={chapterForm}>
-        <ChapterDrawer {...chapterDrawerProps} />
-      </Form>
     </>
   )
 }

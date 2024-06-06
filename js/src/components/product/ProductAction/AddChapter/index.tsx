@@ -1,11 +1,14 @@
 import { FC } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Tooltip, Button } from 'antd'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TCourseRecord,
+  TChapterRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 import { useCreate, useInvalidate } from '@refinedev/core'
 
 const AddChapter: FC<{
-  record: TCourseRecord
+  record: TCourseRecord | TChapterRecord
 }> = ({ record }) => {
   const { mutate, isLoading } = useCreate()
   const invalidate = useInvalidate()

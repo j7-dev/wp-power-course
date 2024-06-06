@@ -264,7 +264,7 @@ final class Course {
 			'images'             => $images,
 
 			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'          => $product->get_parent_id(),
+			'parent_id'          => (string) $product->get_parent_id(),
 		) + $children;
 
 		return array_merge(

@@ -125,7 +125,7 @@ final class ChapterFactory {
 			// Get Product Images
 			'images'             => $images,
 
-			'parent_id'          => $post->post_parent,
+			'parent_id'          => (string) $post->post_parent,
 		) + $children;
 
 		return array_merge(

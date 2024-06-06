@@ -1,6 +1,7 @@
 import React, { FC } from 'react'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import AddChapter from '@/components/product/ProductAction/AddChapter'
+import ToggleVisibility from './ToggleVisibility'
 import { DeleteButton } from '@refinedev/antd'
 import { useInvalidate } from '@refinedev/core'
 
@@ -14,6 +15,7 @@ export const ProductAction: FC<{
   return (
     <div className="flex gap-2">
       <AddChapter record={record} />
+      <ToggleVisibility record={record} />
       <DeleteButton
         resource={resource}
         recordItemId={record.id}

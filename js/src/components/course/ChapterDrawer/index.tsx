@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Drawer, DrawerProps, Input, Form } from 'antd'
+import { Drawer, DrawerProps, Input, Form, Switch } from 'antd'
 
 const { Item } = Form
 
@@ -13,6 +13,9 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
         <Form layout="vertical" form={form}>
           <Item name={['name']} label="課程名稱">
             <Input />
+          </Item>
+          <Item name={['status']} label="發佈" valuePropName="checked">
+            <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
           </Item>
         </Form>
       </Drawer>

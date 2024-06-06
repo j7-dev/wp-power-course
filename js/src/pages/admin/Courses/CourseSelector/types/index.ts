@@ -82,12 +82,12 @@ export type TCourseRecord = {
   category_ids: string[]
   tag_ids: string[]
   images: TImage[]
-  children?: TChapter[]
+  children?: TChapterRecord[]
   is_course: boolean
   parent_id?: string
 }
 
-export type TChapter = {
+export type TChapterRecord = {
   id: string
   type: TProductType
   depth: number

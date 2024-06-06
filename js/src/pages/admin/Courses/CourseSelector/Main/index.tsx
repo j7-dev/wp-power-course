@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Tag } from 'antd'
+import { Table, FormInstance, Spin, Tag, Form } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
   initialFilteredValues,
@@ -32,6 +32,9 @@ import { useWindowSize } from '@uidotdev/usehooks'
 import { useAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
 import { AddCourseButton } from '@/components/course'
+import { CourseDrawer } from '@/components/course/CourseDrawer'
+import { useFormDrawer } from '@/hooks'
+import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 
 const index = () => {
   const { width = 1920 } = useWindowSize()
@@ -109,6 +112,16 @@ const index = () => {
     tableProps?.loading,
   ])
 
+  // Drawer
+
+  const [courseForm] = Form.useForm()
+  const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
+    useFormDrawer({ form: courseForm, resource: 'courses' })
+
+  const [chapterForm] = Form.useForm()
+  const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
+    useFormDrawer({ form: chapterForm, resource: 'chapters' })
+
   return (
     <div className="flex gap-8 flex-col">
       {!isMobile && (
@@ -148,7 +161,12 @@ const index = () => {
               title="商品名稱"
               dataIndex="name"
               width={300}
-              render={(_, record) => <ProductName record={record} />}
+              render={(_, record) => (
+                <ProductName
+                  record={record}
+                  show={{ showCourseDrawer, showChapterDrawer }}
+                />
+              )}
             />
             <Table.Column<TCourseRecord>
               title="狀態"
@@ -200,6 +218,13 @@ const index = () => {
               render={(_, record) => <ProductAction record={record} />}
             />
           </Table>
+          <Form layout="vertical" form={courseForm}>
+            <CourseDrawer {...courseDrawerProps} />
+          </Form>
+
+          <Form layout="vertical" form={chapterForm}>
+            <ChapterDrawer {...chapterDrawerProps} />
+          </Form>
         </Spin>
       </div>
     </div>

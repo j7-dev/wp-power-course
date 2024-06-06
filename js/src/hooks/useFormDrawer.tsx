@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
+import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
 export function useFormDrawer<DataType>({
   form,
-  record,
   resource = 'courses',
 }: {
   form: FormInstance
-  record?: DataType & { id: string; depth: number }
   resource?: string
 }) {
   const [open, setOpen] = useState(false)
+  const [record, setRecord] = useState<(DataType & TChapterRecord) | undefined>(
+    undefined,
+  )
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+  const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
 
-  const show = () => {
+  const show = (theRecord?: DataType & TChapterRecord) => () => {
+    setRecord(theRecord)
     setOpen(true)
   }
 
@@ -38,13 +42,17 @@ export function useFormDrawer<DataType>({
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
+      const formattedValues = {
+        ...values,
+        status: values.status ? 'publish' : 'draft',
+      }
 
       if (isUpdate) {
         update(
           {
             id: record?.id,
             resource,
-            values,
+            values: formattedValues,
           },
           {
             onSuccess: () => {
@@ -56,7 +64,7 @@ export function useFormDrawer<DataType>({
         create(
           {
             resource,
-            values,
+            values: formattedValues,
           },
           {
             onSuccess: () => {
@@ -91,7 +99,11 @@ export function useFormDrawer<DataType>({
 
   useEffect(() => {
     if (record?.id) {
-      form.setFieldsValue(record)
+      const { status, ...rest } = record
+      form.setFieldsValue(rest)
+      form.setFieldValue(['status'], status === 'publish')
+    } else {
+      form.resetFields()
     }
   }, [record?.id])
 
