@@ -195,7 +195,6 @@ final class Chapter {
 		$args = array(
 			'ID'         => $id,
 			'post_title' => $body_params['name'] ?? '新章節',
-
 		);
 
 		$update_post_id = \wp_update_post( $args );

@@ -2,15 +2,6 @@
 # yarn lockfile v1
 
 
-"@aliemir/dom-to-fiber-utils@^0.4.0":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@aliemir/dom-to-fiber-utils/-/dom-to-fiber-utils-0.4.1.tgz#fe83e71b9eed89d6d50461c81bd7ad5cc26f8dd8"
-  integrity sha512-mWjCp9Uu3B1Rbtdnk23Coak831zgy+/1oS+FCTVhCAozGPUURE8IfVFQsCblZMWuT5j+QSc6JNDQ+l2JcZclzA==
-  dependencies:
-    react "^18.0.0"
-    react-dom "^18.0.0"
-    react-reconciler "^0.29.0"
-
 "@aliemir/react-live@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@aliemir/react-live/-/react-live-4.0.0.tgz#666a713b9e66c06ac0dba09fa1fd56266472b342"
@@ -2338,25 +2329,6 @@
     "@tanstack/react-query" "^4.10.1"
     error-stack-parser "^2.1.4"
 
-"@refinedev/devtools-shared@1.1.8":
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/@refinedev/devtools-shared/-/devtools-shared-1.1.8.tgz#25ddd84eb6004d1687cf907b25a0513dfd4265d0"
-  integrity sha512-TUiZJYUY3oXzejqWXN/bgTvGVjAPbhNLGExYvr+DVQnvYxITe3JZ/1RfZOhZd6dxtKq7fIuQolDwQ4mB9jomYw==
-  dependencies:
-    "@tanstack/react-query" "^4.10.1"
-    error-stack-parser "^2.1.4"
-
-"@refinedev/devtools@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@refinedev/devtools/-/devtools-1.2.2.tgz#df399bfa4952b51aa3e0fee0ca0d80fd9471ab47"
-  integrity sha512-SWxZWoPJaqzo/W4+nOw7h2wiELMSMQtb4FPDEXhewrfZdOa4Jyxe55itaob/60RKaqsLzBhHL4xvRzFcK56ePA==
-  dependencies:
-    "@aliemir/dom-to-fiber-utils" "^0.4.0"
-    "@refinedev/devtools-shared" "1.1.8"
-    error-stack-parser "^2.1.4"
-    lodash "^4.17.21"
-    lodash-es "^4.17.21"
-
 "@refinedev/inferencer@^4.5.21":
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/@refinedev/inferencer/-/inferencer-4.6.2.tgz#23e2761c9cb438da82c39834c2b2d08d4fffc7d3"
@@ -2869,10 +2841,26 @@
   resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.3.0.tgz#ae7194d44a3808d97e8fcd47439eb8772d138659"
   integrity sha512-PLVe9d7b59sKytbx00KgeGhQG3N176Ezv8YMmsnSz4s0ifDzMWlp/h2wEfQZ0ZNe8e377GY2OW6kovUe3Rnd0g==
 
+"@tanstack/match-sorter-utils@^8.7.0":
+  version "8.15.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/match-sorter-utils/-/match-sorter-utils-8.15.1.tgz#715e028ff43cf79ece10bd5a757047a1016c3bba"
+  integrity sha512-PnVV3d2poenUM31ZbZi/yXkBu3J7kd5k2u51CGwwNojag451AjTH9N6n41yjXz2fpLeewleyLBmNS6+HcGDlXw==
+  dependencies:
+    remove-accents "0.5.0"
+
 "@tanstack/query-core@4.36.1":
   version "4.36.1"
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.36.1.tgz#79f8c1a539d47c83104210be2388813a7af2e524"
   integrity sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==
+
+"@tanstack/react-query-devtools@4":
+  version "4.36.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-devtools/-/react-query-devtools-4.36.1.tgz#7e63601135902a993ca9af73507b125233b1554e"
+  integrity sha512-WYku83CKP3OevnYSG8Y/QO9g0rT75v1om5IvcWUwiUZJ4LanYGLVCZ8TdFG5jfsq4Ej/lu2wwDAULEUnRIMBSw==
+  dependencies:
+    "@tanstack/match-sorter-utils" "^8.7.0"
+    superjson "^1.10.0"
+    use-sync-external-store "^1.2.0"
 
 "@tanstack/react-query@4.36.1", "@tanstack/react-query@^4.10.1":
   version "4.36.1"
@@ -5250,6 +5238,13 @@ cookie@0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.6.0.tgz#2798b04b071b0ecbff0dbb62a505a8efa4e19051"
   integrity sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==
+
+copy-anything@^3.0.2:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/copy-anything/-/copy-anything-3.0.5.tgz#2d92dce8c498f790fa7ad16b01a1ae5a45b020a0"
+  integrity sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==
+  dependencies:
+    is-what "^4.1.8"
 
 copy-to-clipboard@^3.3.1, copy-to-clipboard@^3.3.3:
   version "3.3.3"
@@ -7953,6 +7948,11 @@ is-weakset@^2.0.3:
   dependencies:
     call-bind "^1.0.7"
     get-intrinsic "^1.2.4"
+
+is-what@^4.1.8:
+  version "4.1.16"
+  resolved "https://registry.yarnpkg.com/is-what/-/is-what-4.1.16.tgz#1ad860a19da8b4895ad5495da3182ce2acdd7a6f"
+  integrity sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==
 
 is-wsl@^2.2.0:
   version "2.2.0"
@@ -11089,14 +11089,6 @@ react-markdown@^8.0.7:
     unist-util-visit "^4.0.0"
     vfile "^5.0.0"
 
-react-reconciler@^0.29.0:
-  version "0.29.2"
-  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.29.2.tgz#8ecfafca63549a4f4f3e4c1e049dd5ad9ac3a54f"
-  integrity sha512-zZQqIiYgDCTP/f1N/mAR10nJGrPD2ZR+jDSEsKWJHYC7Cm2wodlwbR3upZRdC3cjIjSlTLNVyO7Iu0Yy7t2AYg==
-  dependencies:
-    loose-envify "^1.1.0"
-    scheduler "^0.23.2"
-
 react-refresh@^0.14.0:
   version "0.14.2"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.2.tgz#3833da01ce32da470f1f936b9d477da5c7028bf9"
@@ -11457,6 +11449,11 @@ remark-rehype@^8.0.0:
   integrity sha512-EbCu9kHgAxKmW1yEYjx3QafMyGY3q8noUbNUI5xyKbaFP89wbhDrKxyIQNukNYthzjNHZu6J7hwFg7hRm1svYA==
   dependencies:
     mdast-util-to-hast "^10.2.0"
+
+remove-accents@0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/remove-accents/-/remove-accents-0.5.0.tgz#77991f37ba212afba162e375b627631315bed687"
+  integrity sha512-8g3/Otx1eJaVD12e31UbJj1YzdtVvzH85HV7t+9MJYk/u3XmkOUJ5Ys9wQrf9PCPK8+xn4ymzqYCiZl6QWKn+A==
 
 repeat-string@^1.0.0, repeat-string@^1.6.1:
   version "1.6.1"
@@ -12330,6 +12327,13 @@ sunflower-antd@1.0.0-beta.3:
   version "1.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/sunflower-antd/-/sunflower-antd-1.0.0-beta.3.tgz#5e72feefc8f592f4eda6cbc7bd7f9421463c6980"
   integrity sha512-SAdjHgNemTFNxUF/QJ2KdC0x6wWpY1EsMJMo+F5KIHCDRsUUahjAIldoK+ejH00rPgUoCOhAHQ/ob/J7eyZ5qg==
+
+superjson@^1.10.0:
+  version "1.13.3"
+  resolved "https://registry.yarnpkg.com/superjson/-/superjson-1.13.3.tgz#3bd64046f6c0a47062850bb3180ef352a471f930"
+  integrity sha512-mJiVjfd2vokfDxsQPOwJ/PtanO87LhpYY88ubI5dUB1Ab58Txbyje3+jpm+/83R/fevaq/107NNhtYBLuoTrFg==
+  dependencies:
+    copy-anything "^3.0.2"
 
 supports-color@^2.0.0:
   version "2.0.0"

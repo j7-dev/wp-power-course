@@ -22,60 +22,58 @@ import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
 import Courses from '@/pages/admin/Courses'
 import { ConfigProvider } from 'antd'
-import { DevtoolsPanel, DevtoolsProvider } from '@refinedev/devtools'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 function App() {
   return (
     <HashRouter>
-      <DevtoolsProvider>
-        <Refine
-          dataProvider={{
-            default: dataProvider(`${apiUrl}/${kebab}`),
-            'wp-rest': dataProvider(`${apiUrl}/wp/v2`),
-            'wc-rest': dataProvider(`${apiUrl}/wc/v3`),
-            'wc-store': dataProvider(`${apiUrl}/wc/store/v1`),
-          }}
-          notificationProvider={useNotificationProvider}
-          routerProvider={routerBindings}
-          resources={resources}
-          options={{
-            syncWithLocation: false,
-            warnWhenUnsavedChanges: true,
-            projectId: 'power-course',
-          }}
-        >
-          <Routes>
-            <Route
-              element={
-                <ConfigProvider
-                  theme={{
-                    components: {
-                      Collapse: {
-                        contentPadding: '8px 8px',
-                      },
+      <Refine
+        dataProvider={{
+          default: dataProvider(`${apiUrl}/${kebab}`),
+          'wp-rest': dataProvider(`${apiUrl}/wp/v2`),
+          'wc-rest': dataProvider(`${apiUrl}/wc/v3`),
+          'wc-store': dataProvider(`${apiUrl}/wc/store/v1`),
+        }}
+        notificationProvider={useNotificationProvider}
+        routerProvider={routerBindings}
+        resources={resources}
+        options={{
+          syncWithLocation: false,
+          warnWhenUnsavedChanges: true,
+          projectId: 'power-course',
+        }}
+      >
+        <Routes>
+          <Route
+            element={
+              <ConfigProvider
+                theme={{
+                  components: {
+                    Collapse: {
+                      contentPadding: '8px 8px',
                     },
-                  }}
+                  },
+                }}
+              >
+                <ThemedLayoutV2
+                  Sider={(props) => <ThemedSiderV2 {...props} fixed />}
                 >
-                  <ThemedLayoutV2
-                    Sider={(props) => <ThemedSiderV2 {...props} fixed />}
-                  >
-                    <Outlet />
-                  </ThemedLayoutV2>
-                </ConfigProvider>
-              }
-            >
-              <Route index element={<DefaultPage />} />
-              <Route path="/dashboard" element={<About />} />
-              <Route path="/courses" element={<Courses />} />
+                  <Outlet />
+                </ThemedLayoutV2>
+              </ConfigProvider>
+            }
+          >
+            <Route index element={<DefaultPage />} />
+            <Route path="/dashboard" element={<About />} />
+            <Route path="/courses" element={<Courses />} />
 
-              <Route path="*" element={<ErrorComponent />} />
-            </Route>
-          </Routes>
-          <UnsavedChangesNotifier />
-          <DocumentTitleHandler />
-          <DevtoolsPanel />
-        </Refine>
-      </DevtoolsProvider>
+            <Route path="*" element={<ErrorComponent />} />
+          </Route>
+        </Routes>
+        <UnsavedChangesNotifier />
+        <DocumentTitleHandler />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </Refine>
     </HashRouter>
   )
 }
