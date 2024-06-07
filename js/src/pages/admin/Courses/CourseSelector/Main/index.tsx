@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Tag, Form } from 'antd'
+import { Table, FormInstance, Spin, Form } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
   initialFilteredValues,
@@ -17,16 +17,7 @@ import {
   defaultPaginationProps,
   defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
-import { getInitialFilters, getIsVariation, getPostStatus } from '@/utils'
-import {
-  ProductName,
-  ProductType,
-  ProductPrice,
-  ProductTotalSales,
-  ProductCat,
-  ProductStock,
-  ProductAction,
-} from '@/components/product'
+import { getInitialFilters, getIsVariation } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Courses/CourseSelector/hooks/useValueLabelMapper'
 import { useWindowSize } from '@uidotdev/usehooks'
 import { useAtom } from 'jotai'
@@ -35,6 +26,7 @@ import { AddCourseButton } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
 import { useFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
+import useColumns from '@/pages/admin/Courses/CourseSelector/hooks/useColumns'
 
 const index = () => {
   const { width = 1920 } = useWindowSize()
@@ -122,6 +114,11 @@ const index = () => {
   const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
     useFormDrawer({ form: chapterForm, resource: 'chapters' })
 
+  const columns = useColumns({
+    showCourseDrawer,
+    showChapterDrawer,
+  })
+
   return (
     <div className="flex gap-8 flex-col">
       {!isMobile && (
@@ -156,68 +153,9 @@ const index = () => {
               ...defaultPaginationProps,
             }}
             rowSelection={rowSelection}
-          >
-            <Table.Column<TCourseRecord>
-              title="商品名稱"
-              dataIndex="name"
-              width={300}
-              render={(_, record) => (
-                <ProductName
-                  record={record}
-                  show={{ showCourseDrawer, showChapterDrawer }}
-                />
-              )}
-            />
-            <Table.Column<TCourseRecord>
-              title="狀態"
-              dataIndex="status"
-              width={80}
-              render={(_, record) => (
-                <Tag color={getPostStatus(record?.status)?.color}>
-                  {getPostStatus(record?.status)?.label}
-                </Tag>
-              )}
-            />
-            <Table.Column<TCourseRecord>
-              title="時數"
-              dataIndex="hours"
-              width={180}
-            />
-            <Table.Column<TCourseRecord>
-              title="商品類型"
-              dataIndex="type"
-              width={180}
-              render={(_, record) => <ProductType record={record} />}
-            />
-            <Table.Column<TCourseRecord>
-              title="價格"
-              dataIndex="price"
-              width={150}
-              render={(_, record) => <ProductPrice record={record} />}
-            />
-            <Table.Column<TCourseRecord>
-              title="總銷量"
-              dataIndex="total_sales"
-              width={150}
-              render={(_, record) => <ProductTotalSales record={record} />}
-            />
-            <Table.Column<TCourseRecord>
-              title="庫存"
-              dataIndex="stock"
-              width={150}
-              render={(_, record) => <ProductStock record={record} />}
-            />
-            <Table.Column<TCourseRecord>
-              title="商品分類 / 商品標籤"
-              dataIndex="category_ids"
-              render={(_, record) => <ProductCat record={record} />}
-            />
-            <Table.Column<TCourseRecord>
-              title="操作"
-              dataIndex="_actions"
-              render={(_, record) => <ProductAction record={record} />}
-            />
-          </Table>
+            columns={columns}
+          />
+
           <Form layout="vertical" form={courseForm}>
             <CourseDrawer {...courseDrawerProps} />
           </Form>
