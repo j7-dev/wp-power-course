@@ -11,8 +11,8 @@ import { EyeOutlined } from '@ant-design/icons'
 export const ProductName: FC<{
   record: TCourseRecord | TChapterRecord
   show: {
-    showChapterDrawer: (_record: TCourseRecord | TChapterRecord) => () => void
-    showCourseDrawer: (_record: TCourseRecord | TChapterRecord) => () => void
+    showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
+    showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
   }
 }> = ({ record, show }) => {
   const { id, sku = '', name, images, type } = record
@@ -22,11 +22,13 @@ export const ProductName: FC<{
 
   const handleClick = () => {
     if (isChapter) {
-      showChapterDrawer(record)()
+      showChapterDrawer(record as TChapterRecord)()
     } else {
-      showCourseDrawer(record)()
+      showCourseDrawer(record as TCourseRecord)()
     }
   }
+
+  const idLabel = id.startsWith('new-') ? '儲存後才會有 id' : id
 
   return (
     <>
@@ -53,7 +55,7 @@ export const ProductName: FC<{
             {renderHTML(name)}
           </p>
           <div className="flex text-[0.675rem] text-gray-500">
-            <span className="pr-3">{`ID: ${id}`}</span>
+            <span className="pr-3">{`ID: ${idLabel}`}</span>
             {sku && <span className="pr-3">{`SKU: ${sku}`}</span>}
           </div>
         </div>

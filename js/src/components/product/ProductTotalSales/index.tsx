@@ -1,5 +1,8 @@
 import React, { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TCourseRecord,
+  TChapterRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 import { Badge, Tooltip } from 'antd'
 import useOptions from '@/pages/admin/Courses/ProductSelector/hooks/useOptions'
 
@@ -11,9 +14,9 @@ enum ColorGrade {
   'tier-1' = '#f5222d',
 }
 
-export const ProductTotalSales: FC<{ record: TCourseRecord }> = ({
-  record,
-}) => {
+export const ProductTotalSales: FC<{
+  record: TCourseRecord | TChapterRecord
+}> = ({ record }) => {
   const { total_sales } = record
   if (!total_sales) return null
   const { options } = useOptions()

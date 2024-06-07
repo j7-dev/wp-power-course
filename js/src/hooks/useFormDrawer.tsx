@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TChapterRecord,
+  TCourseRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 
-export function useFormDrawer<DataType>({
+export function useFormDrawer({
   form,
   resource = 'courses',
 }: {
@@ -11,14 +14,14 @@ export function useFormDrawer<DataType>({
   resource?: string
 }) {
   const [open, setOpen] = useState(false)
-  const [record, setRecord] = useState<(DataType & TChapterRecord) | undefined>(
-    undefined,
-  )
+  const [record, setRecord] = useState<
+    TCourseRecord | TChapterRecord | undefined
+  >(undefined)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
 
-  const show = (theRecord?: DataType & TChapterRecord) => () => {
+  const show = (theRecord?: TCourseRecord | TChapterRecord) => () => {
     setRecord(theRecord)
     setOpen(true)
   }

@@ -22,7 +22,7 @@ import useValueLabelMapper from '@/pages/admin/Courses/CourseSelector/hooks/useV
 import { useWindowSize } from '@uidotdev/usehooks'
 import { useAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
-import { AddCourseButton } from '@/components/course'
+import { AddCourseButton, SortableChapter } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
 import { useFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
@@ -154,6 +154,19 @@ const index = () => {
             }}
             rowSelection={rowSelection}
             columns={columns}
+            expandable={{
+              expandedRowRender: (record) => (
+                <SortableChapter
+                  record={record}
+                  show={{
+                    showCourseDrawer,
+                    showChapterDrawer,
+                  }}
+                />
+              ),
+              rowExpandable: (record: TCourseRecord) =>
+                !!record?.children?.length,
+            }}
           />
 
           <Form layout="vertical" form={courseForm}>

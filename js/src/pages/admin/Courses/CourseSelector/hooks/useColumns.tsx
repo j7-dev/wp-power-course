@@ -1,5 +1,5 @@
 import React from 'react'
-import { TableProps, Tag } from 'antd'
+import { Table, TableProps, Tag } from 'antd'
 import {
   TChapterRecord,
   TCourseRecord,
@@ -19,10 +19,12 @@ const useColumns = ({
   showCourseDrawer,
   showChapterDrawer,
 }: {
-  showCourseDrawer: (_record?: TChapterRecord | undefined) => () => void
+  showCourseDrawer: (_record?: TCourseRecord | undefined) => () => void
   showChapterDrawer: (_record?: TChapterRecord | undefined) => () => void
 }) => {
   const columns: TableProps<TCourseRecord>['columns'] = [
+    Table.SELECTION_COLUMN,
+    Table.EXPAND_COLUMN,
     {
       title: '商品名稱',
       dataIndex: 'name',

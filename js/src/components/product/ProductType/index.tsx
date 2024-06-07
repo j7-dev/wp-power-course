@@ -1,5 +1,8 @@
 import React, { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TCourseRecord,
+  TChapterRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 import { Tag, Tooltip } from 'antd'
 import {
   StarFilled,
@@ -10,7 +13,9 @@ import {
 import { IoMdDownload } from 'react-icons/io'
 import { productTypes } from '@/utils'
 
-export const ProductType: FC<{ record: TCourseRecord }> = ({ record }) => {
+export const ProductType: FC<{ record: TCourseRecord | TChapterRecord }> = ({
+  record,
+}) => {
   const type = record?.type || ''
   if (!type || 'chapter' === type) return null
   const tag = productTypes.find((productType) => productType.value === type)

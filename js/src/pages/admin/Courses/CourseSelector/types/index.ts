@@ -85,25 +85,29 @@ export type TCourseRecord = {
   children?: TChapterRecord[]
   is_course: boolean
   parent_id?: string
+  hours: number
 }
 
 export type TChapterRecord = {
   id: string
-  type: TProductType
+  type: 'chapter'
+  status: string
   depth: number
   name: string
-  slug: string
-  date_created: string
-  date_modified: string
-  status: string
-  catalog_visibility: string
-  description: string
-  short_description: string
-  menu_order: number
-  permalink: string
-  category_ids: string[]
-  tag_ids: string[]
-  images: TImage[]
-  children?: TChapter[]
+  slug?: string
+  date_created?: string
+  date_modified?: string
+  catalog_visibility?: string
+  description?: string
+  short_description?: string
+  sku?: undefined
+  menu_order?: number
+  total_sales?: undefined
+  permalink?: string
+  category_ids?: string[]
+  tag_ids?: string[]
+  images?: TImage[]
+  children?: TChapterRecord[]
   parent_id?: string
+  hours?: number
 }

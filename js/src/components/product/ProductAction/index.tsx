@@ -1,12 +1,15 @@
 import React, { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import {
+  TCourseRecord,
+  TChapterRecord,
+} from '@/pages/admin/Courses/CourseSelector/types'
 import AddChapter from '@/components/product/ProductAction/AddChapter'
 import ToggleVisibility from './ToggleVisibility'
 import { DeleteButton } from '@refinedev/antd'
 import { useInvalidate } from '@refinedev/core'
 
 export const ProductAction: FC<{
-  record: TCourseRecord
+  record: TCourseRecord | TChapterRecord
 }> = ({ record }) => {
   const isChapter = record?.type === 'chapter'
   const resource = isChapter ? 'chapters' : 'courses'

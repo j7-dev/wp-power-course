@@ -48,6 +48,9 @@ div[class^="ant-"] {
 		}
 	}
 }
+li.ant-editor-sortable-tree-node button.ant-editor-sortable-tree-node-handle {
+	@apply absolute;
+}
 
 @media print {
 	html,
