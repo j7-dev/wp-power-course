@@ -1,10 +1,5 @@
 import React, { FC, useState, useEffect } from 'react'
-import {
-  SortableTree,
-  TreeData,
-  TreeNode,
-  useSortableTree,
-} from '@ant-design/pro-editor'
+import { SortableTree, TreeData } from '@ant-design/pro-editor'
 import {
   TCourseRecord,
   TChapterRecord,
@@ -12,6 +7,8 @@ import {
 import { message, Button } from 'antd'
 import NodeRender from './NodeRender'
 import { nanoid } from 'nanoid'
+import { chapterToTreeNode, treeToParams } from './utils'
+import { useCustomMutation, useApiUrl } from '@refinedev/core'
 
 export const SortableChapter: FC<{
   record: TCourseRecord | TChapterRecord
@@ -21,11 +18,16 @@ export const SortableChapter: FC<{
   }
 }> = ({ record, show }) => {
   const [treeData, setTreeData] = useState<TreeData<TChapterRecord>>([])
+  const [originTree, setOriginTree] = useState<TreeData<TChapterRecord>>([])
+
+  const apiUrl = useApiUrl()
+  const { mutate, isLoading } = useCustomMutation()
 
   useEffect(() => {
     if (!!record?.children) {
       const chapterTree = record?.children?.map(chapterToTreeNode)
       setTreeData(chapterTree)
+      setOriginTree(chapterTree)
     }
   }, [record?.id])
 
@@ -36,6 +38,7 @@ export const SortableChapter: FC<{
       status: 'draft',
       type: 'chapter',
       depth: 0,
+      parent_id: record.id,
     }
     setTreeData((prev) => [...prev, chapterToTreeNode(newChapter)])
   }
@@ -43,7 +46,17 @@ export const SortableChapter: FC<{
   const handleSave = () => {
     // 這個儲存只存新增，不存章節的細部資料
 
-    const params = treeToParams(treeData)
+    const from_tree = treeToParams(originTree)
+    const to_tree = treeToParams(treeData)
+
+    mutate({
+      url: `${apiUrl}/chapters/sort`,
+      method: 'post',
+      values: {
+        from_tree,
+        to_tree,
+      },
+    })
   }
 
   return (
@@ -69,69 +82,13 @@ export const SortableChapter: FC<{
         />
       </div>
       <div className="flex gap-1">
-        <Button block onClick={handleAdd}>
+        <Button block onClick={handleAdd} disabled={isLoading}>
           新增
         </Button>
-        <Button type="primary" block onClick={handleSave}>
-          儲存排序
+        <Button type="primary" block onClick={handleSave} loading={isLoading}>
+          儲存
         </Button>
       </div>
     </>
   )
-}
-
-/**
- * 將章節 TChapterRecord 傳換成 TreeNode<TChapterRecord>
- *
- * @param {TChapterRecord} chapter
- * @return {TreeNode<TChapterRecord>}
- */
-
-function chapterToTreeNode(chapter: TChapterRecord): TreeNode<TChapterRecord> {
-  const { id, children, ...rest } = chapter
-  return {
-    id,
-    content: {
-      id,
-      ...rest,
-    },
-    children: children?.map(chapterToTreeNode) || [],
-    showExtra: false,
-    collapsed: false,
-  }
-}
-
-/**
- * 將 TreeData<TChapterRecord> 轉換成 Create API 傳送的參數
- * 只抓出順序、parent_id、id
- *
- * @param {TreeData<TChapterRecord>} treeData
- * @return {*}
- */
-
-function treeToParams(treeData: TreeData<TChapterRecord>): any {
-  console.log('treeData', treeData)
-  const depth0 = treeData.map((node, index) => {
-    return {
-      id: node.id,
-      depth: 0,
-      menu_order: index,
-    }
-  })
-  const depth1 = treeData
-    .map((parentNode) => {
-      const nodes = parentNode.children.map((node, index) => {
-        return {
-          id: node.id,
-          depth: 1,
-          menu_order: index,
-          parent_id: parentNode.id,
-        }
-      })
-      return nodes
-    })
-    .flat()
-  console.log('depth1', depth1)
-
-  return [...depth0, ...depth1]
 }

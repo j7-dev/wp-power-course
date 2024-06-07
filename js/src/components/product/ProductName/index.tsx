@@ -5,7 +5,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
-import { Image } from 'antd'
+import { Image, message } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
 
 export const ProductName: FC<{
@@ -19,16 +19,21 @@ export const ProductName: FC<{
   const { showChapterDrawer, showCourseDrawer } = show
   const image_url = images?.[0]?.url || defaultImage
   const isChapter = type === 'chapter'
+  const isNew = id.startsWith('new-')
 
   const handleClick = () => {
-    if (isChapter) {
-      showChapterDrawer(record as TChapterRecord)()
+    if (!isNew) {
+      if (isChapter) {
+        showChapterDrawer(record as TChapterRecord)()
+      } else {
+        showCourseDrawer(record as TCourseRecord)()
+      }
     } else {
-      showCourseDrawer(record as TCourseRecord)()
+      message.error('請先儲存後再進行編輯')
     }
   }
 
-  const idLabel = id.startsWith('new-') ? '儲存後才會有 id' : id
+  const idLabel = isNew ? '儲存後才會有 id' : id
 
   return (
     <>

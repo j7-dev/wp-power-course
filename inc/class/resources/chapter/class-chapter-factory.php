@@ -60,6 +60,8 @@ final class ChapterFactory {
 					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
 				)
 			)
 		);
@@ -141,10 +143,11 @@ final class ChapterFactory {
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
 	 * @param array $args Arguments.
+	 * @param bool  $keep_id Keep id.
 	 *
 	 * @return array
 	 */
-	public static function converter( array $args ): array {
+	public static function converter( array $args, ?bool $keep_id = false ): array {
 		$fields_mapper = array(
 			'id'                => 'unset',
 			'name'              => 'post_title',
@@ -155,14 +158,19 @@ final class ChapterFactory {
 			'category_ids'      => 'post_category',
 			'tag_ids'           => 'tags_input',
 			'parent_id'         => 'post_parent',
+			'depth'             => 'unset',
 		);
+
+		if ( $keep_id ) {
+			unset( $fields_mapper['id'] );
+		}
 
 		$formatted_args = array();
 		foreach ( $args as $key => $value ) {
-			if ( 'unset' === $fields_mapper[ $key ] ) {
-				continue;
-			}
 			if ( in_array( $key, array_keys( $fields_mapper ), true ) ) {
+				if ( 'unset' === $fields_mapper[ $key ] ) {
+					continue;
+				}
 				$formatted_args[ $fields_mapper[ $key ] ] = $value;
 			} else {
 				$formatted_args[ $key ] = $value;
@@ -215,8 +223,8 @@ final class ChapterFactory {
 
 		// 將資料拆成 data 與 meta_data
 		[
-			'data' => $data,
-			'meta_data' => $meta_data,
+		'data' => $data,
+		'meta_data' => $meta_data,
 		] = WP::separator( $args );
 
 		if ( isset( $meta_data['image_ids'] ) ) {
@@ -242,5 +250,56 @@ final class ChapterFactory {
 	public static function delete_chapter( string $id, ?bool $force_delete = false ): \WP_Post|false|null {
 		$delete_result = \wp_delete_post( $id, $force_delete );
 		return $delete_result;
+	}
+
+
+
+	/**
+	 * Sort chapters
+	 *
+	 * @param array $params Parameters.
+	 * @return integer|\WP_Error
+	 */
+	public static function sort_chapters( array $params ): int|\WP_Error {
+		$from_tree = $params['from_tree'] ?? array();
+		$to_tree   = $params['to_tree'] ?? array();
+
+		ob_start();
+		var_dump( $params );
+		\J7\WpUtils\Classes\Log::info( '' . ob_get_clean() );
+
+		$last_error = 200;
+
+		$delete_ids = array();
+		foreach ( $from_tree as $from_node ) {
+			$id      = $from_node['id'];
+			$to_node = array_filter( $to_tree, fn( $node ) => $node['id'] === $id );
+			if ( empty( $to_node ) ) {
+				$delete_ids[] = $id;
+			}
+		}
+		foreach ( $to_tree as $node ) {
+			$id             = $node['id'];
+			$is_new_chapter = strpos( $id, 'new-' ) === 0;
+			$args           = self::converter( $node, keep_id: ! $is_new_chapter );
+
+			if ( $is_new_chapter ) {
+				$insert_result = self::create_chapter( $args );
+			} else {
+				$insert_result = self::update_chapter( $id, $args );
+			}
+			if ( \is_wp_error( $insert_result ) ) {
+				$last_error = $insert_result;
+			}
+		}
+
+		foreach ( $delete_ids as $id ) {
+			$delete_result = self::delete_chapter( $id );
+			if ( \is_wp_error( $delete_result ) ) {
+				$last_error = $delete_result;
+			}
+		}
+
+		return $last_error;
 	}
 }

@@ -38,15 +38,21 @@ final class Chapter {
 				'endpoint' => 'chapters',
 				'method'   => 'post',
 			),
+			array(
+				'endpoint' => 'chapters/sort',
+				'method'   => 'post',
+			),
 		);
 
 		foreach ( $apis as $api ) {
+			$strip_endpoint = str_replace( '/', '_', $api['endpoint'] );
+
 			\register_rest_route(
 				Plugin::$kebab,
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
+					'callback'            => array( $this, $api['method'] . '_' . $strip_endpoint . '_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -112,6 +118,40 @@ final class Chapter {
 		return new \WP_REST_Response(
 			array(
 				'id'      => $create_result,
+				'message' => '新增成功',
+			)
+		);
+	}
+
+
+	/**
+	 * Post Chapter Sort callback
+	 * 處理排序
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_chapters_sort_callback( $request ) {
+
+		$body_params = $request->get_json_params() ?? array();
+
+		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+
+		$sort_result = ChapterFactory::sort_chapters( $body_params );
+
+		if ( \is_wp_error( $sort_result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'id'      => 0,
+					'message' => $sort_result->get_error_message(),
+				),
+				400
+			);
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'id'      => $sort_result,
 				'message' => '新增成功',
 			)
 		);

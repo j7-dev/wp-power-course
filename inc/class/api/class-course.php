@@ -185,6 +185,8 @@ final class Course {
 					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any', // TODO
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
 				)
 			)
 		);
