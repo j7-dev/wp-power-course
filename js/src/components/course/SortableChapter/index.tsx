@@ -8,7 +8,7 @@ import { message, Button } from 'antd'
 import NodeRender from './NodeRender'
 import { nanoid } from 'nanoid'
 import { chapterToTreeNode, treeToParams } from './utils'
-import { useCustomMutation, useApiUrl } from '@refinedev/core'
+import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 
 export const SortableChapter: FC<{
   record: TCourseRecord | TChapterRecord
@@ -19,6 +19,7 @@ export const SortableChapter: FC<{
 }> = ({ record, show }) => {
   const [treeData, setTreeData] = useState<TreeData<TChapterRecord>>([])
   const [originTree, setOriginTree] = useState<TreeData<TChapterRecord>>([])
+  const invalidate = useInvalidate()
 
   const apiUrl = useApiUrl()
   const { mutate, isLoading } = useCustomMutation()
@@ -29,7 +30,7 @@ export const SortableChapter: FC<{
       setTreeData(chapterTree)
       setOriginTree(chapterTree)
     }
-  }, [record?.id])
+  }, [record])
 
   const handleAdd = () => {
     const newChapter: TChapterRecord = {
@@ -49,14 +50,24 @@ export const SortableChapter: FC<{
     const from_tree = treeToParams(originTree)
     const to_tree = treeToParams(treeData)
 
-    mutate({
-      url: `${apiUrl}/chapters/sort`,
-      method: 'post',
-      values: {
-        from_tree,
-        to_tree,
+    mutate(
+      {
+        url: `${apiUrl}/chapters/sort`,
+        method: 'post',
+        values: {
+          from_tree,
+          to_tree,
+        },
       },
-    })
+      {
+        onSuccess: () => {
+          invalidate({
+            resource: 'courses',
+            invalidates: ['list'],
+          })
+        },
+      },
+    )
   }
 
   return (
