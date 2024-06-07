@@ -101,7 +101,7 @@ final class Course {
 		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
-			'status'         => 'publish',
+			'status'         => array( 'publish', 'draft' ),
 			'paginate'       => true,
 			'posts_per_page' => 10,
 			'page'           => 1,

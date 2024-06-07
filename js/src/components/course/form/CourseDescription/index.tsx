@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Input, Select } from 'antd'
+import { Form, Input, Select, Switch } from 'antd'
 import {
   keyLabelMapper,
   termFormatter,
@@ -63,6 +63,9 @@ export const CourseDescription = () => {
       <Uploader />
       <Item hidden name={['image_id']} label="課程封面圖">
         <Input />
+      </Item>
+      <Item name={['status']} label="發佈" valuePropName="checked">
+        <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
       </Item>
     </>
   )
