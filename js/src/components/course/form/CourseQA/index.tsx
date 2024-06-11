@@ -1,11 +1,7 @@
 /* eslint-disable lines-around-comment */
-import { useRef, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { Input, Button, Collapse, CollapseProps, Form } from 'antd'
-import {
-  SortableList,
-  SortableListRef,
-  useSortableList,
-} from '@ant-design/pro-editor'
+import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
 import { nanoid } from 'nanoid'
 
@@ -16,77 +12,75 @@ type TListItem = {
   answer: string
 }
 
+const { Item } = Form
+
 export const CourseQA = () => {
   const ref = useRef<SortableListRef>(null)
   const form = Form.useFormInstance()
 
-  const watchQAList = Form.useWatch(['qa_list'], form)
-  const sortableQAListInstance = useSortableList()
+  const watchQAList = (Form.useWatch(['qa_list'], form) || []) as TListItem[]
 
-  const [list, setList] = useState<TListItem[]>([
-    {
-      key: 'defaultQA',
-      question: '',
-      answer: '',
-    },
-  ])
+  useEffect(() => {
+    if (!watchQAList.length) {
+      form.setFieldValue(
+        ['qa_list'],
+        [
+          {
+            key: 'defaultQA',
+            question: '',
+            answer: '',
+          },
+        ],
+      )
+    }
+  }, [watchQAList?.length])
 
   return (
     <>
       <div className="gap-6 p-6">
         <Button
           onClick={() => {
-            ref.current!.addItem(
+            const newList = [
+              ...watchQAList,
               {
                 key: nanoid(),
                 question: '',
                 answer: '',
               },
-              list.length,
-            )
+            ]
+            form.setFieldValue(['qa_list'], newList)
           }}
         >
           新增
         </Button>
 
         <SortableList<TListItem>
-          value={list}
+          value={watchQAList}
           ref={ref}
-          onChange={setList}
+          onChange={(newList) => {
+            form.setFieldValue(['qa_list'], newList)
+          }}
           getItemStyles={() => ({ padding: '16px' })}
           renderItem={(item: TListItem, { index, listeners }) => {
             const collapseItem: TCollapseItem = {
               key: item.key,
               label: (
-                <Input
-                  placeholder="請輸入問題"
-                  defaultValue={item.question}
-                  onBlur={(e) => {
-                    sortableQAListInstance.updateItem(
-                      {
-                        ...item,
-                        question: e.target.value,
-                      },
-                      index as number,
-                    )
-                  }}
-                />
+                <Item
+                  name={['qa_list', index, 'question'] as string[]}
+                  noStyle
+                  initialValue={item.question}
+                >
+                  <Input placeholder="請輸入問題" />
+                </Item>
               ),
               children: (
-                <Input.TextArea
-                  placeholder="請輸入答案"
-                  defaultValue={item.answer}
-                  rows={5}
-                  onBlur={(e) => {
-                    sortableQAListInstance.updateItem(
-                      {
-                        ...item,
-                        answer: e.target.value,
-                      },
-                      index as number,
-                    )
-                  }}
-                />
+                <Item
+                  name={['qa_list', index, 'answer'] as string[]}
+                  noStyle
+                  initialValue={item.answer}
+                >
+                  <Input.TextArea placeholder="請輸入答案" rows={5} />
+                </Item>
               ),
               showArrow: false,
             }
@@ -116,6 +110,9 @@ export const CourseQA = () => {
           }}
         />
       </div>
+      <Item hidden name={['qa_list']}>
+        <Input />
+      </Item>
     </>
   )
 }

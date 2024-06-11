@@ -108,7 +108,10 @@ const index = () => {
 
   const [courseForm] = Form.useForm()
   const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
-    useFormDrawer({ form: courseForm, resource: 'courses' })
+    useFormDrawer({
+      form: courseForm,
+      resource: 'courses',
+    })
 
   const [chapterForm] = Form.useForm()
   const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =

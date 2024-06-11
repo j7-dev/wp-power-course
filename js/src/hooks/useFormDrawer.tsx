@@ -106,7 +106,16 @@ export function useFormDrawer({
       const { status, meta_data, ...rest } = record
       form.setFieldsValue(rest)
       form.setFieldValue(['status'], status === 'publish')
-      form.setFieldValue(['is_free'], meta_data?.is_free === 'yes')
+
+      Object.keys(meta_data || {}).forEach((key) => {
+        // boolean 要特別處理
+
+        if (['is_free'].includes(key)) {
+          form.setFieldValue([key], meta_data?.[key] === 'yes')
+        } else {
+          form.setFieldValue([key], meta_data?.[key])
+        }
+      })
     } else {
       form.resetFields()
     }
