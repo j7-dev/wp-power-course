@@ -11,6 +11,8 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\WC;
+
 
 
 /**
@@ -44,15 +46,25 @@ final class Course {
 				'endpoint' => 'courses',
 				'method'   => 'post',
 			),
+			array(
+				'endpoint' => 'terms',
+				'method'   => 'get',
+			),
+			array(
+				'endpoint' => 'options',
+				'method'   => 'get',
+			),
 		);
 
 		foreach ( $apis as $api ) {
+			// 用正則表達式替換 -, / 替換為 _
+			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
 			\register_rest_route(
 				Plugin::$kebab,
 				$api['endpoint'],
 				array(
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
+					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -72,12 +84,14 @@ final class Course {
 		);
 
 		foreach ( $apis_with_id as $api ) {
+			// 用正則表達式替換 -, / 替換為 _
+			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
 			\register_rest_route(
-				Plugin::$kebab . '/' . $api['endpoint'],
-				'/(?P<id>\d+)',
+				Plugin::$kebab,
+				$api['endpoint'] . '/(?P<id>\d+)',
 				array(
 					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_with_id_callback' ),
+					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_with_id_callback' ),
 					'permission_callback' => function () {
 						return \current_user_can( 'manage_options' );
 					},
@@ -462,6 +476,160 @@ final class Course {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Get terms callback
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/get_terms/
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array
+	 */
+	public function get_terms_callback( $request ) { // phpcs:ignore
+
+		$params = $request?->get_query_params() ?? array();
+
+		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+
+		// it seems no need to add post_per_page, get_terms will return all terms
+		$default_args = array(
+			'taxonomy'   => 'product_cat',
+			'fields'     => 'id=>name',
+			'hide_empty' => true,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		);
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		$terms = \get_terms( $args );
+
+		$formatted_terms = array_map( array( $this, 'format_terms' ), array_keys( $terms ), array_values( $terms ) );
+
+		return $formatted_terms;
+	}
+
+	/**
+	 * Format terms
+	 *
+	 * @param string $key Key.
+	 * @param string $value Value.
+	 * @return array
+	 */
+	public function format_terms( $key, $value ) {
+		return array(
+			'id'   => (string) $key,
+			'name' => $value,
+		);
+	}
+
+
+	/**
+	 * Get options callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array
+	 */
+	public function get_options_callback( $request ) { // phpcs:ignore
+
+		// it seems no need to add post_per_page, get_terms will return all terms
+		$cat_args = array(
+			'taxonomy'   => 'product_cat',
+			'fields'     => 'id=>name',
+			'hide_empty' => true,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		);
+		$cats     = \get_terms( $cat_args );
+
+		$formatted_cats = array_map( array( $this, 'format_terms' ), array_keys( $cats ), array_values( $cats ) );
+
+		$tag_args = array(
+			'taxonomy'   => 'product_tag',
+			'fields'     => 'id=>name',
+			'hide_empty' => true,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		);
+
+		$tags = \get_terms( $tag_args );
+
+		$formatted_tags = array_map( array( $this, 'format_terms' ), array_keys( $tags ), array_values( $tags ) );
+
+		$top_sales_products = WC::get_top_sales_products( 5 );
+
+		[
+			'max_price' => $max_price,
+			'min_price' => $min_price,
+		] = self::get_max_min_prices();
+
+		return array(
+			'product_cats'       => $formatted_cats,
+			'product_tags'       => $formatted_tags,
+			'top_sales_products' => $top_sales_products,
+			'max_price'          => (int) $max_price,
+			'min_price'          => (int) $min_price,
+		);
+	}
+
+	/**
+	 * Get Max Min Price
+	 *
+	 * @return array
+	 */
+	public static function get_max_min_prices(): array {
+		$transient_key = 'max_min_prices';
+
+		$max_min_prices = \get_transient( $transient_key );
+
+		if ( false !== $max_min_prices ) {
+			return $max_min_prices;
+		}
+		// 獲取最高價格的商品
+		$max_price_products = \wc_get_products(
+			array(
+				'order'    => 'DESC', // 遞減排序
+				'orderby'  => 'meta_value_num',
+				'meta_key' => '_price',
+				'limit'    => 1, // 僅獲取一個結果
+				'status'   => 'publish', // 僅包含已發佈的商品
+			)
+		);
+		$max_price          = 0;
+		if ( ! empty( $max_price_products ) ) {
+			$max_price_product = reset( $max_price_products ); // 獲取第一個元素
+			$max_price         = $max_price_product?->get_price(); // 獲取最高價格
+		}
+
+		// 獲取最低價格的商品
+		$min_price_products = \wc_get_products(
+			array(
+				'order'    => 'ASC', // 遞增排序
+				'orderby'  => 'meta_value_num',
+				'meta_key' => '_price',
+				'limit'    => 1, // 僅獲取一個結果
+				'status'   => 'publish', // 僅包含已發佈的商品
+			)
+		);
+
+		$min_price = 0;
+		if ( ! empty( $min_price_products ) ) {
+			$min_price_product = reset( $min_price_products ); // 獲取第一個元素
+			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
+		}
+
+		$max_min_prices = array(
+			'max_price' => $max_price,
+			'min_price' => $min_price,
+		);
+
+		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
+
+		return $max_min_prices;
 	}
 }
 
