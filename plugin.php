@@ -54,7 +54,7 @@ if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
 				array(
 					'app_name'    => 'Power Course',
 					'github_repo' => 'https://github.com/j7-dev/wp-power-course',
-					'callback'    => array( 'J7\PowerCourse\Bootstrap', 'instance' ),
+					'callback'    => array( Bootstrap::class, 'instance' ),
 				)
 			);
 

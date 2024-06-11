@@ -46,7 +46,7 @@ final class ChapterFactory {
 
 		$image_id  = \get_post_thumbnail_id( $post->ID );
 		$image_ids = array( $image_id );
-		$images    = array_map( array( 'J7\WpUtils\Classes\WP', 'get_image_info' ), $image_ids );
+		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
 			'description'       => $post->post_content,
@@ -256,6 +256,7 @@ final class ChapterFactory {
 
 	/**
 	 * Sort chapters
+	 * 改變章節順序
 	 *
 	 * @param array $params Parameters.
 	 * @return integer|\WP_Error
@@ -263,10 +264,6 @@ final class ChapterFactory {
 	public static function sort_chapters( array $params ): int|\WP_Error {
 		$from_tree = $params['from_tree'] ?? array();
 		$to_tree   = $params['to_tree'] ?? array();
-
-		ob_start();
-		var_dump( $params );
-		\J7\WpUtils\Classes\Log::info( '' . ob_get_clean() );
 
 		$last_error = 200;
 
@@ -289,14 +286,14 @@ final class ChapterFactory {
 				$insert_result = self::update_chapter( $id, $args );
 			}
 			if ( \is_wp_error( $insert_result ) ) {
-				$last_error = $insert_result;
+				return $insert_result;
 			}
 		}
 
 		foreach ( $delete_ids as $id ) {
 			$delete_result = self::delete_chapter( $id );
 			if ( \is_wp_error( $delete_result ) ) {
-				$last_error = $delete_result;
+				return $delete_result;
 			}
 		}
 

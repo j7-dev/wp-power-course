@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Api;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
+use J7\WpUtils\Classes\WP;
 
 
 /**
@@ -98,7 +99,7 @@ final class Course {
 
 		$params = $request->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
 			'status'         => array( 'publish', 'draft' ),
@@ -169,7 +170,7 @@ final class Course {
 		$gallery_image_ids = $product->get_gallery_image_ids();
 
 		$image_ids = array( $image_id, ...$gallery_image_ids );
-		$images    = array_map( array( 'J7\WpUtils\Classes\WP', 'get_image_info' ), $image_ids );
+		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
 			'description'       => $product->get_description(),
@@ -288,7 +289,7 @@ final class Course {
 
 		$body_params = $request->get_json_params() ?? array();
 
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$product = new \WC_Product_Simple();
 
@@ -349,7 +350,7 @@ final class Course {
 
 		$body_params = $request->get_json_params() ?? array();
 
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$product = \wc_get_product( $id );
 

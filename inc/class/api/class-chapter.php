@@ -9,7 +9,7 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\ChapterFactory;
-
+use J7\WpUtils\Classes\WP;
 
 /**
  * Class Course
@@ -101,7 +101,7 @@ final class Chapter {
 
 		$body_params = $request->get_json_params() ?? array();
 
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$create_result = ChapterFactory::create_chapter( $body_params );
 
@@ -135,7 +135,7 @@ final class Chapter {
 
 		$body_params = $request->get_json_params() ?? array();
 
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$sort_result = ChapterFactory::sort_chapters( $body_params );
 
@@ -167,7 +167,7 @@ final class Chapter {
 
 		$id          = $request['id'];
 		$body_params = $request->get_json_params() ?? array();
-		$body_params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$formatted_params = ChapterFactory::converter( $body_params );
 

@@ -9,10 +9,9 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WC;
-
+use J7\WpUtils\Classes\WP;
 
 /**
  * Class Api
@@ -110,7 +109,7 @@ final class Product {
 
 		$params = $request?->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
 			'status'         => 'publish',
@@ -289,7 +288,7 @@ final class Product {
 
 		$params = $request?->get_query_params() ?? array();
 
-		$params = array_map( array( 'J7\WpUtils\Classes\WP', 'sanitize_text_field_deep' ), $params );
+		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
 
 		// it seems no need to add post_per_page, get_terms will return all terms
 		$default_args = array(
