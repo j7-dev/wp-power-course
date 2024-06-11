@@ -259,13 +259,11 @@ final class ChapterFactory {
 	 * 改變章節順序
 	 *
 	 * @param array $params Parameters.
-	 * @return integer|\WP_Error
+	 * @return true|\WP_Error
 	 */
-	public static function sort_chapters( array $params ): int|\WP_Error {
+	public static function sort_chapters( array $params ): bool|\WP_Error {
 		$from_tree = $params['from_tree'] ?? array();
 		$to_tree   = $params['to_tree'] ?? array();
-
-		$last_error = 200;
 
 		$delete_ids = array();
 		foreach ( $from_tree as $from_node ) {
@@ -297,6 +295,6 @@ final class ChapterFactory {
 			}
 		}
 
-		return $last_error;
+		return true;
 	}
 }

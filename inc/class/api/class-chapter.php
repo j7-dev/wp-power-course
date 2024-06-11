@@ -106,19 +106,16 @@ final class Chapter {
 		$create_result = ChapterFactory::create_chapter( $body_params );
 
 		if ( \is_wp_error( $create_result ) ) {
-			return new \WP_REST_Response(
-				array(
-					'id'      => 0,
-					'message' => $create_result->get_error_message(),
-				),
-				400
-			);
+			return $create_result;
 		}
 
 		return new \WP_REST_Response(
 			array(
-				'id'      => $create_result,
+				'code'    => 'create_success',
 				'message' => '新增成功',
+				'data'    => array(
+					'id' => $create_result,
+				),
 			)
 		);
 	}
@@ -140,19 +137,14 @@ final class Chapter {
 		$sort_result = ChapterFactory::sort_chapters( $body_params );
 
 		if ( \is_wp_error( $sort_result ) ) {
-			return new \WP_REST_Response(
-				array(
-					'id'      => 0,
-					'message' => $sort_result->get_error_message(),
-				),
-				400
-			);
+			return $sort_result;
 		}
 
 		return new \WP_REST_Response(
 			array(
-				'id'      => $sort_result,
-				'message' => '新增成功',
+				'code'    => 'sort_success',
+				'message' => '修改排序成功',
+				'data'    => null,
 			)
 		);
 	}
@@ -174,19 +166,16 @@ final class Chapter {
 		$update_result = ChapterFactory::update_chapter( $id, $formatted_params );
 
 		if ( \is_wp_error( $update_result ) ) {
-			return new \WP_REST_Response(
-				array(
-					'id'      => $id,
-					'message' => '更新失敗',
-				),
-				400
-			);
+			return $update_result;
 		}
 
 		return new \WP_REST_Response(
 			array(
-				'id'      => $id,
+				'code'    => 'update_success',
 				'message' => '更新成功',
+				'data'    => array(
+					'id' => $id,
+				),
 			)
 		);
 	}
@@ -205,16 +194,22 @@ final class Chapter {
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
 				array(
-					'id'      => $id,
+					'code'    => 'delete_failed',
 					'message' => '刪除失敗',
+					'data'    => array(
+						'id' => $id,
+					),
 				),
 				400
 			);
 		}
 		return new \WP_REST_Response(
 			array(
-				'id'      => $id,
+				'code'    => 'delete_success',
 				'message' => '刪除成功',
+				'data'    => array(
+					'id' => $id,
+				),
 			)
 		);
 	}

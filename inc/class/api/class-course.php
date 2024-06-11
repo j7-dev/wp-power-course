@@ -326,7 +326,15 @@ final class Course {
 
 		$product->save_meta_data();
 
-		return new \WP_REST_Response( $this->format_product_details( $product ) );
+		return new \WP_REST_Response(
+			array(
+				'code'    => 'create_success',
+				'message' => '新增成功',
+				'data'    => array(
+					'id' => (string) $product->get_id(),
+				),
+			)
+		);
 	}
 
 	/**
@@ -341,8 +349,9 @@ final class Course {
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
 				array(
-					'id'      => $id,
+					'code'    => 'id_not_provided',
 					'message' => '更新失敗，請提供ID',
+					'data'    => null,
 				),
 				400
 			);
@@ -357,8 +366,11 @@ final class Course {
 		if ( ! $product ) {
 			return new \WP_REST_Response(
 				array(
-					'id'      => $id,
+					'code'    => 'product_not_found',
 					'message' => '更新失敗，找不到商品',
+					'data'    => array(
+						'id' => $id,
+					),
 				),
 				400
 			);
@@ -397,7 +409,15 @@ final class Course {
 
 		$product->save_meta_data();
 
-		return new \WP_REST_Response( $this->format_product_details( $product ) );
+		return new \WP_REST_Response(
+			array(
+				'code'    => 'update_success',
+				'message' => '更新成功',
+				'data'    => array(
+					'id' => $id,
+				),
+			)
+		);
 	}
 
 
@@ -413,8 +433,9 @@ final class Course {
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
 				array(
-					'id'      => $id,
+					'code'    => 'id_not_provided',
 					'message' => '刪除失敗，請提供ID',
+					'data'    => null,
 				),
 				400
 			);
@@ -425,16 +446,20 @@ final class Course {
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
 				array(
-					'id'      => $id,
+					'code'    => 'delete_failed',
 					'message' => '刪除失敗',
+					'data'    => $delete_result,
 				),
 				400
 			);
 		}
 		return new \WP_REST_Response(
 			array(
-				'id'      => $id,
+				'code'    => 'delete_success',
 				'message' => '刪除成功',
+				'data'    => array(
+					'id' => $id,
+				),
 			)
 		);
 	}
