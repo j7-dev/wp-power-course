@@ -48,6 +48,7 @@ export function useFormDrawer({
       const formattedValues = {
         ...values,
         status: values.status ? 'publish' : 'draft',
+        is_free: values.is_free ? 'yes' : 'no',
       }
 
       if (isUpdate) {
@@ -102,9 +103,10 @@ export function useFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
-      const { status, ...rest } = record
+      const { status, meta_data, ...rest } = record
       form.setFieldsValue(rest)
       form.setFieldValue(['status'], status === 'publish')
+      form.setFieldValue(['is_free'], meta_data?.is_free === 'yes')
     } else {
       form.resetFields()
     }

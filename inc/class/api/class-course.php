@@ -249,8 +249,8 @@ final class Course {
 
 			// Get Product Prices
 			'price_html'         => $product->get_price_html(),
-			'regular_price'      => $product->get_regular_price(),
-			'sale_price'         => $product->get_sale_price(),
+			'regular_price'      => (int) $product->get_regular_price(),
+			'sale_price'         => (int) $product->get_sale_price(),
 			'on_sale'            => $product->is_on_sale(),
 			'date_on_sale_from'  => $product->get_date_on_sale_from(),
 			'date_on_sale_to'    => $product->get_date_on_sale_to(),
@@ -280,6 +280,9 @@ final class Course {
 			// Get Product Images
 			'images'             => $images,
 
+			// meta data
+			'meta_data'          => WC::get_formatted_meta_data( $product ),
+
 			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
 			'parent_id'          => (string) $product->get_parent_id(),
 		) + $children;
@@ -289,7 +292,6 @@ final class Course {
 			$base_array
 		);
 	}
-
 
 	/**
 	 * Post courses callback
@@ -390,34 +392,21 @@ final class Course {
 			);
 		}
 
-		$keys = array(
-			'name',
-			'slug',
-			'regular_price',
-			'sale_price',
-			'short_description',
-			'description',
-			'image_id',
-			'gallery_image_ids',
-			'status',
-			'catalog_visibility',
-			'category_ids',
-		);
+		[
+		'data' => $data,
+		'meta_data' => $meta_data,
+		] = WP::separator( $body_params, 'product' );
 
-		// TODO
-		$meta_keys = array(
-			'sub_title',
-		);
-
-		foreach ( $keys as $key ) {
-			if ( isset( $body_params[ $key ] ) ) {
-				$$key        = $body_params[ $key ];
-				$method_name = 'set_' . $key;
-				$product->$method_name( $$key );
-			}
+		foreach ( $data as $key => $value ) {
+			$method_name = 'set_' . $key;
+			$product->$method_name( $value );
 		}
 
 		$product->save();
+
+		foreach ( $meta_data as $key => $value ) {
+			$product->update_meta_data( $key, $value );
+		}
 
 		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
 
