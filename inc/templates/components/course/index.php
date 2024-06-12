@@ -46,7 +46,8 @@ abstract class Course {
 			$icon = call_user_func(
 				array( Icons::class, $item['icon'] ),
 				array(
-					'class' => 'fill-white h-4 w-4',
+					'class' => 'h-4 w-4',
+					'color' => '#ffffff',
 				)
 			);
 			echo $icon;

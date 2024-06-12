@@ -49,7 +49,9 @@ get_header(); ?>
 		</div>
 
 		<div class="flex h-8 items-center gap-2">
-		<?php echo Icons::fire(); ?>
+		<?php
+		echo Icons::fire();
+		?>
 		熱門課程
 		</div>
 
@@ -58,6 +60,8 @@ get_header(); ?>
 		<?php echo Icons::shopping_bag(); ?>
 		2,310 人已購買
 		</div>
+
+		<?php echo Icons::clock(); ?>
 
 		<?php
 		echo Buttons::button(
@@ -72,7 +76,7 @@ get_header(); ?>
 		<?php
 		echo Rate::rate(
 			array(
-				'value' => 4.5,
+				'value' => 3.7,
 				'total' => 100,
 			)
 		);
@@ -91,27 +95,27 @@ echo Course::info(
 	array(
 		'items' => array(
 			array(
-				'icon'  => 'fire',
+				'icon'  => 'calendar',
 				'label' => '開課時間',
 				'value' => '2022/08/31 16:00',
 			),
 			array(
-				'icon'  => 'fire',
+				'icon'  => 'clock',
 				'label' => '預計時長',
 				'value' => '15 小時 8 分',
 			),
 			array(
-				'icon'  => 'fire',
+				'icon'  => 'list',
 				'label' => '預計單元',
 				'value' => '39個',
 			),
 			array(
-				'icon'  => 'fire',
+				'icon'  => 'eye',
 				'label' => '觀看時間',
 				'value' => '無限制',
 			),
 			array(
-				'icon'  => 'fire',
+				'icon'  => 'team',
 				'label' => '課程學員',
 				'value' => '1214 人',
 			),
