@@ -39,7 +39,7 @@ final class Product {
 
 		$product_type_options[ $option ] = array(
 			'id'            => "_{$option}",
-			'wrapper_class' => '',
+			'wrapper_class' => 'show_if_simple',
 			'label'         => '課程',
 			'description'   => '是否為課程商品',
 			'default'       => 'no',

@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Templates\Components;
 
-use J7\PowerCourse\Templates\Components\Icons;
+use J7\PowerCourse\Templates\Components\Icon;
 
 /**
  * Class FrontEnd
@@ -48,16 +48,16 @@ abstract class Rate {
 		$outline_start_num = $count - $fill_start_num - $half_start_num;
 		$icons_html        = '';
 		for ( $i = 0; $i < $fill_start_num; $i++ ) {
-			$icons_html .= Icons::star();
+			$icons_html .= Icon::star();
 		}
-		$icons_html .= ( $half_start_num === 1 ) ? Icons::star(
+		$icons_html .= ( $half_start_num === 1 ) ? Icon::star(
 			array(
 				'type' => 'half',
 			)
 		) : '';
 
 		for ( $i = 0; $i < $outline_start_num; $i++ ) {
-			$icons_html .= Icons::star(
+			$icons_html .= Icon::star(
 				array(
 					'type' => 'outline',
 				)

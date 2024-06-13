@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Utils\Base;
 
 
 /**
@@ -108,6 +109,17 @@ final class Templates {
 		$courses_slug           = \get_query_var( self::SLUG );
 		if ( $courses_slug ) {
 			if ( file_exists( $override_template_path ) ) {
+				global $product;
+				$product_post = \get_page_by_path( $courses_slug, OBJECT, 'product' );
+				$product      = \wc_get_product( $product_post->ID );
+
+				// 如果商品不是課程，則不要載入模板
+				$is_course_product = Base::is_course_product( $product );
+
+				if ( ! $is_course_product ) {
+					return $template;
+				}
+
 				return $override_template_path;
 			}
 		}

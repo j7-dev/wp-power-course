@@ -5,12 +5,12 @@
  * Description:       可能是 WordPress 最好用的課程外掛
  * Version:           0.0.1
  * Requires at least: 5.7
- * Requires PHP:      7.4
+ * Requires PHP:      8.0
  * Author:            J7
  * Author URI:        https://github.com/j7-dev
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       power_course
+ * Text Domain:       power-course
  * Domain Path:       /languages
  * Tags: LMS, online course, vite, react, tailwind, typescript, react-query, scss, WordPress, WordPress plugin, refine
  */
@@ -21,6 +21,9 @@ namespace J7\PowerCourse;
 
 if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
 	require_once __DIR__ . '/vendor/autoload.php';
+
+	// 之後要獨立成一個 plugin
+	require_once __DIR__ . '/modules/power-bundle-product/plugin.php';
 
 	/**
 		* Class Plugin
@@ -57,8 +60,6 @@ if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
 					'callback'    => array( Bootstrap::class, 'instance' ),
 				)
 			);
-
-			\add_action( 'plugins_loaded', array( $this, 'check_required_plugins' ) );
 		}
 	}
 

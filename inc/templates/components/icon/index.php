@@ -1,18 +1,18 @@
 <?php
 /**
- * SVG Icons
- *
- * #1677ff
+ * SVG Icon
  */
 
 declare(strict_types=1);
 
 namespace J7\PowerCourse\Templates\Components;
 
+use J7\PowerCourse\Utils\Base;
+
 /**
  * Class FrontEnd
  */
-abstract class Icons {
+abstract class Icon {
 
 
 	/**
@@ -58,7 +58,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
@@ -92,7 +92,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
@@ -123,7 +123,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
@@ -154,7 +154,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
@@ -184,7 +184,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
@@ -217,7 +217,7 @@ abstract class Icons {
 		$default_props = array(
 			'type'  => '',  // '
 			'class' => 'w-6 h-6',
-			'color' => '#1677ff',
+			'color' => Base::PRIMARY_COLOR,
 		);
 
 		$props = array_merge( $default_props, $props );
