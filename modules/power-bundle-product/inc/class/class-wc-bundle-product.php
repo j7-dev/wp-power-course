@@ -16,17 +16,17 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 	 */
 	final class BundleProduct extends \WC_Product {
 
-		const BUNDLE_IDS_META_KEY = 'pbp_bundlesell_ids';
+		const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
+		const LINK_TO_BUNDLE_IDS_META_KEY  = 'pbp_bundle_ids'; // 此商品連結到哪個 bundle product ids
 
 		/**
 		 * Constructor of this class.
 		 *
 		 * @param object $product product.
 		 */
-		public function __construct( $product ) {
+		public function __construct( $product = 0 ) {
 			$this->product_type = Plugin::PRODUCT_TYPE;
 			$this->supports[]   = 'ajax_add_to_cart';
-			$this->bundle_ids   = $this->get_bundle_ids();
 
 			parent::__construct( $product );
 		}
@@ -43,13 +43,17 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		/**
 		 * Get bundle_ids
 		 *
-		 * @return array
+		 * @return array string[] product_ids
 		 */
-		public function get_bundle_ids(): array {
-			$bundle_ids = $this->get_meta( self::BUNDLE_IDS_META_KEY );
-			if ( ! is_array( $bundle_ids ) ) {
-				$bundle_ids = array();
+		public function get_bundled_ids(): array {
+			$meta_data_array = $this->get_meta( self::INCLUDE_PRODUCT_IDS_META_KEY, false );
+			$bundle_ids      = array();
+
+			foreach ( $meta_data_array as $meta_data ) {
+				$value        = $meta_data->__get( 'value' );
+				$bundle_ids[] = $value;
 			}
+
 			return $bundle_ids;
 		}
 
@@ -59,12 +63,13 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * @param int $product_id product_id.
 		 * @return void
 		 */
-		public function add_bundle_ids( int $product_id ): void {
-			$bundle_ids = $this->bundle_ids;
+		public function add_bundled_ids( int $product_id ): void {
+			$bundle_ids = $this->get_bundled_ids();
 			if ( in_array( (string) $product_id, $bundle_ids, true ) ) {
 				return;
 			}
-			$this->add_meta_data( self::BUNDLE_IDS_META_KEY, $product_id );
+			$this->add_meta_data( self::INCLUDE_PRODUCT_IDS_META_KEY, $product_id );
+			$this->save_meta_data();
 		}
 
 
@@ -75,7 +80,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * @param array $product_ids product_ids.
 		 * @return void
 		 */
-		public function set_bundle_ids( array $product_ids ): void {
+		public function set_bundled_ids( array $product_ids ): void {
 		}
 
 		/**
@@ -84,8 +89,8 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * @param int $product_id product_id.
 		 * @return void
 		 */
-		public function delete_bundle_ids( int $product_id ): void {
-			$this->delete_meta_data_value( self::BUNDLE_IDS_META_KEY, $product_id );
+		public function delete_bundled_ids( int $product_id ): void {
+			$this->delete_meta_data_value( self::INCLUDE_PRODUCT_IDS_META_KEY, $product_id );
 		}
 	}
 }

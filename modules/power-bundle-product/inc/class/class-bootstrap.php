@@ -20,6 +20,8 @@ final class Bootstrap {
 	 */
 	public function __construct() {
 
+		require_once Plugin::$dir . '/inc/class/class-wc-bundle-product.php';
+
 		\add_action( 'woocommerce_loaded', array( $this, 'load_bundle_product_class' ) );
 
 		// 不需要顯示在前端
