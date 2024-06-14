@@ -251,7 +251,8 @@ final class Product {
 	 */
 	public function post_products_callback( $request ) {
 
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_body_params() ?? array();
+		$file_params = $request->get_file_params();
 
 		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
@@ -260,7 +261,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( $body_params, 'product' );
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -268,6 +269,8 @@ final class Product {
 		}
 
 		$product->save();
+
+		$meta_data = self::handle_special_fields( $meta_data, $product );
 
 		foreach ( $meta_data as $key => $value ) {
 			$product->update_meta_data( $key, $value );
@@ -284,6 +287,30 @@ final class Product {
 				),
 			)
 		);
+	}
+
+
+	/**
+	 * 針對特殊欄位處理
+	 *
+	 * @param array $meta_data Meta data.
+	 * @param mixed $product Product.
+	 * @return array
+	 */
+	public static function handle_special_fields( $meta_data, $product ) {
+		if ( isset( $meta_data['pbp_product_ids'] ) && is_array( $meta_data['pbp_product_ids'] ) ) {
+			foreach ( $meta_data['pbp_product_ids'] as $pbp_product_id ) {
+				$product->add_meta_data( BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY, $pbp_product_id, unique:false );
+			}
+			$product->save_meta_data();
+			unset( $meta_data['pbp_product_ids'] );
+		}
+
+		if ( isset( $meta_data['product_type'] ) ) {
+			unset( $meta_data['product_type'] );
+		}
+
+		return $meta_data;
 	}
 }
 

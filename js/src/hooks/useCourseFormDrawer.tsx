@@ -5,13 +5,17 @@ import {
   TChapterRecord,
   TCourseRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
+import { head } from 'lodash-es'
+import { toFormData } from 'axios'
 
-export function useFormDrawer({
+export function useCourseFormDrawer({
   form,
   resource = 'courses',
+  drawerProps,
 }: {
   form: FormInstance
   resource?: string
+  drawerProps?: DrawerProps
 }) {
   const [open, setOpen] = useState(false)
   const [record, setRecord] = useState<
@@ -51,12 +55,17 @@ export function useFormDrawer({
         is_free: values.is_free ? 'yes' : 'no',
       }
 
+      const formData = toFormData(formattedValues)
+
       if (isUpdate) {
         update(
           {
             id: record?.id,
             resource,
-            values: formattedValues,
+            values: formData,
+            meta: {
+              headers: { 'Content-Type': 'multipart/form-data;' },
+            },
           },
           {
             onSuccess: () => {
@@ -68,7 +77,10 @@ export function useFormDrawer({
         create(
           {
             resource,
-            values: formattedValues,
+            values: formData,
+            meta: {
+              headers: { 'Content-Type': 'multipart/form-data;' },
+            },
           },
           {
             onSuccess: () => {
@@ -84,9 +96,10 @@ export function useFormDrawer({
 
   const itemLabel = getItemLabel(resource, record?.depth)
 
-  const drawerProps: DrawerProps = {
+  const mergedDrawerProps: DrawerProps = {
     title: `${isUpdate ? '編輯' : '新增'}${itemLabel}`,
     forceRender: true,
+    push: false,
     onClose: close,
     open,
     width: '50%',
@@ -99,6 +112,7 @@ export function useFormDrawer({
         儲存
       </Button>
     ),
+    ...drawerProps,
   }
 
   useEffect(() => {
@@ -126,7 +140,7 @@ export function useFormDrawer({
     setOpen,
     show,
     close,
-    drawerProps,
+    drawerProps: mergedDrawerProps,
   }
 }
 

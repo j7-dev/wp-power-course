@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Form, Input, Select, Switch } from 'antd'
 import {
   keyLabelMapper,
@@ -6,7 +6,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
-import { Uploader } from '@/components/general'
+import { Upload, useUpload } from '@/components/general'
 import { CopyText } from 'antd-toolkit'
 
 const { Item } = Form
@@ -15,11 +15,19 @@ export const CourseDescription = () => {
   const form = Form.useFormInstance()
   const { options, isLoading } = useOptions()
   const { product_cats = [], product_tags = [] } = options
-  const productUrl = `${siteUrl}/product/`
+  const productUrl = `${siteUrl}/course/`
   const slug = Form.useWatch(['slug'], form)
+  const { uploadProps, fileList } = useUpload()
+
+  useEffect(() => {
+    form.setFieldValue(['files'], fileList)
+  }, [fileList])
 
   return (
     <>
+      <Item name={['id']} hidden>
+        <Input />
+      </Item>
       <Item name={['name']} label="課程名稱">
         <Input />
       </Item>
@@ -60,10 +68,12 @@ export const CourseDescription = () => {
       </Item>
 
       <p>課程封面圖</p>
-      <Uploader />
-      <Item hidden name={['image_id']} label="課程封面圖">
-        <Input />
-      </Item>
+      <div className="mb-8">
+        <Upload uploadProps={uploadProps} />
+        <Item hidden name={['files']} label="課程封面圖">
+          <Input />
+        </Item>
+      </div>
       <Item name={['status']} label="發佈" valuePropName="checked">
         <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
       </Item>

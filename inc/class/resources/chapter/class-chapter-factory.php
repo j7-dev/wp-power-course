@@ -225,7 +225,7 @@ final class ChapterFactory {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( $args );
+		] = WP::separator( args:$args, obj:'post', files:array() );
 
 		if ( isset( $meta_data['image_ids'] ) ) {
 			\set_post_thumbnail( $id, $meta_data['image_ids'][0] );

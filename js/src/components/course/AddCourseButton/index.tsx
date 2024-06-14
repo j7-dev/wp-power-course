@@ -1,11 +1,11 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Form } from 'antd'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
-import { useFormDrawer } from '@/hooks'
+import { useCourseFormDrawer } from '@/hooks'
 
 export const AddCourseButton = () => {
   const [form] = Form.useForm()
-  const { show: showDrawer, drawerProps } = useFormDrawer({ form })
+  const { show: showDrawer, drawerProps } = useCourseFormDrawer({ form })
   return (
     <>
       <Button

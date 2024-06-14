@@ -280,7 +280,8 @@ final class Course {
 	 */
 	public function post_courses_callback( $request ) {
 
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_body_params() ?? array();
+		$file_params = $request->get_file_params();
 
 		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
@@ -289,7 +290,7 @@ final class Course {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( $body_params, 'product' );
+			] = WP::separator( args: $body_params, obj:'product', files: $file_params['files'] ?? array() );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -336,8 +337,8 @@ final class Course {
 				400
 			);
 		}
-
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_body_params() ?? array();
+		$file_params = $request->get_file_params();
 
 		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
@@ -359,7 +360,7 @@ final class Course {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( $body_params, 'product' );
+		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;

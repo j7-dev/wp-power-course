@@ -38,7 +38,12 @@ export type TProductAttribute = {
   position: number
 }
 
-export type TCourseRecord = {
+type TImage = {
+  id: string
+  url: string
+}
+
+export type TProductRecord = {
   id: string
   type: TProductType
   depth: number
@@ -76,13 +81,15 @@ export type TCourseRecord = {
   attributes: TProductAttribute[]
   category_ids: string[]
   tag_ids: string[]
-  image_url: string
-  gallery_image_urls: string[]
+  images?: TImage[]
+  meta_data: {
+    [key: string]: any
+  }
   children?: TProductVariation[]
   parent_id?: string
 }
 
-export type TProductVariation = TCourseRecord & {
+export type TProductVariation = TProductRecord & {
   type: TProductType | 'variation' | 'subscription_variation'
   parent_id: string
   attributes: { [key: string]: string }

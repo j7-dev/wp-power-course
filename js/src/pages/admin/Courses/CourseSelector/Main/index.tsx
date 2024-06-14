@@ -24,7 +24,7 @@ import { useAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
 import { AddCourseButton, SortableChapter } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
-import { useFormDrawer } from '@/hooks'
+import { useCourseFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 import useColumns from '@/pages/admin/Courses/CourseSelector/hooks/useColumns'
 
@@ -108,14 +108,14 @@ const index = () => {
 
   const [courseForm] = Form.useForm()
   const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
-    useFormDrawer({
+    useCourseFormDrawer({
       form: courseForm,
       resource: 'courses',
     })
 
   const [chapterForm] = Form.useForm()
   const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
-    useFormDrawer({ form: chapterForm, resource: 'chapters' })
+    useCourseFormDrawer({ form: chapterForm, resource: 'chapters' })
 
   const columns = useColumns({
     showCourseDrawer,
