@@ -55,7 +55,10 @@ export const CourseQA = () => {
         </Button>
 
         <SortableList<TListItem>
-          value={watchQAList}
+          value={watchQAList.filter(
+            (item) =>
+              !(item.question === undefined && item.answer === undefined),
+          )}
           ref={ref}
           onChange={(newList) => {
             form.setFieldValue(['qa_list'], newList)
@@ -102,7 +105,13 @@ export const CourseQA = () => {
                       e.stopPropagation()
                     }}
                     className="text-red-500 cursor-pointer mt-4"
-                    onClick={() => ref.current!.removeItem(index as number)}
+                    onClick={() => {
+                      const list = form.getFieldValue(['qa_list'])
+                      form.setFieldValue(
+                        ['qa_list'],
+                        list.filter((_: TListItem, i: number) => i !== index),
+                      )
+                    }}
                   />
                 </div>
               </div>
