@@ -1,7 +1,6 @@
 <?php
 /**
  * Product API
- * DELETE
  */
 
 declare(strict_types=1);
@@ -10,57 +9,42 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\WC;
+use J7\PowerBundleProduct\BundleProduct;
+
 
 /**
  * Class Api
  */
 final class Product {
 	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * APIs
+	 *
+	 * @var array
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 */
+	protected $apis = array(
+		array(
+			'endpoint' => 'products',
+			'method'   => 'get',
+		),
+		array(
+			'endpoint' => 'products',
+			'method'   => 'post',
+		),
+	);
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_filter( 'woocommerce_product_data_store_cpt_get_products_query', array( $this, 'handle_custom_query_var' ), 10, 2 );
 		\add_action( 'rest_api_init', array( $this, 'register_api_products' ) );
-	}
-
-	/**
-	 * Handle a custom 'customvar' query var to get products with the 'customvar' meta.
-	 * 新增篩選 option name 的商品
-	 *
-	 * @param array $query - Args for WP_Query.
-	 * @param array $query_vars - Query vars from WC_Product_Query.
-	 * @return array modified $query
-	 */
-	public function handle_custom_query_var( $query, $query_vars ) {
-
-		$option_name = $query_vars[ AdminProduct::PRODUCT_OPTION_NAME ] ?? '';
-		if ( '' !== $option_name ) {
-			if ( '1' === (string) $option_name ) {
-				$query['meta_query'][] = array(
-					'key'   => '_' . AdminProduct::PRODUCT_OPTION_NAME,
-					'value' => 'yes',
-				);
-			} elseif ( '0' === (string) $option_name ) {
-				$query['meta_query'] = array(
-					'relation'     => 'OR',
-					'value_clause' => array(
-						'key'   => '_' . AdminProduct::PRODUCT_OPTION_NAME,
-						'value' => 'no',
-					),
-					'field_clause' => array(
-						'key'     => '_' . AdminProduct::PRODUCT_OPTION_NAME,
-						'compare' => 'NOT EXISTS',
-					),
-				);
-
-			}
-		}
-
-		return $query;
 	}
 
 	/**
@@ -69,33 +53,11 @@ final class Product {
 	 * @return void
 	 */
 	public function register_api_products(): void {
-
-		$apis = array(
-			array(
-				'endpoint' => 'products',
-				'method'   => 'get',
-			),
-			array(
-				'endpoint' => 'terms',
-				'method'   => 'get',
-			),
-			array(
-				'endpoint' => 'options',
-				'method'   => 'get',
-			),
+		$this->register_apis(
+			apis: $this->apis,
+			namespace: Plugin::$kebab,
+			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
-
-		foreach ( $apis as $api ) {
-			\register_rest_route(
-				Plugin::$kebab,
-				$api['endpoint'],
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_callback' ),
-					'permission_callback' => '__return_true',
-				)
-			);
-		}
 	}
 
 
@@ -174,11 +136,11 @@ final class Product {
 		$date_created  = $product?->get_date_created();
 		$date_modified = $product?->get_date_modified();
 
-		$image_id  = $product?->get_image_id();
-		$image_url = \wp_get_attachment_url( $image_id );
+		$image_id          = $product->get_image_id();
+		$gallery_image_ids = $product->get_gallery_image_ids();
 
-		$gallery_image_ids  = $product?->get_gallery_image_ids();
-		$gallery_image_urls = array_map( 'wp_get_attachment_url', $gallery_image_ids );
+		$image_ids = array( $image_id, ...$gallery_image_ids );
+		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
 			'description'       => $product?->get_description(),
@@ -264,10 +226,13 @@ final class Product {
 			'tag_ids'            => array_map( 'strval', $product?->get_tag_ids() ),
 
 			// Get Product Images
-			'image_url'          => $image_url,
-			'gallery_image_urls' => $gallery_image_urls,
+			'images'             => $images,
+
+			// meta data
+			'meta_data'          => WC::get_formatted_meta_data( $product ),
 
 			'is_course'          => $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'          => (string) $product->get_parent_id(),
 		) + $children;
 
 		return array_merge(
@@ -277,157 +242,48 @@ final class Product {
 	}
 
 	/**
-	 * Get terms callback
+	 * Post product callback
 	 *
-	 * @see https://developer.wordpress.org/reference/functions/get_terms/
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 * @return array
-	 */
-	public function get_terms_callback( $request ) { // phpcs:ignore
-
-		$params = $request?->get_query_params() ?? array();
-
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
-
-		// it seems no need to add post_per_page, get_terms will return all terms
-		$default_args = array(
-			'taxonomy'   => 'product_cat',
-			'fields'     => 'id=>name',
-			'hide_empty' => true,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		);
-
-		$args = \wp_parse_args(
-			$params,
-			$default_args,
-		);
-
-		$terms = \get_terms( $args );
-
-		$formatted_terms = array_map( array( $this, 'format_terms' ), array_keys( $terms ), array_values( $terms ) );
-
-		return $formatted_terms;
-	}
-
-	/**
-	 * Format terms
-	 *
-	 * @param string $key Key.
-	 * @param string $value Value.
-	 * @return array
-	 */
-	public function format_terms( $key, $value ) {
-		return array(
-			'id'   => (string) $key,
-			'name' => $value,
-		);
-	}
-
-
-	/**
-	 * Get options callback
+	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return array
+	 * @return \WP_REST_Response
 	 */
-	public function get_options_callback( $request ) { // phpcs:ignore
+	public function post_products_callback( $request ) {
 
-		// it seems no need to add post_per_page, get_terms will return all terms
-		$cat_args = array(
-			'taxonomy'   => 'product_cat',
-			'fields'     => 'id=>name',
-			'hide_empty' => true,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		);
-		$cats     = \get_terms( $cat_args );
+		$body_params = $request->get_json_params() ?? array();
 
-		$formatted_cats = array_map( array( $this, 'format_terms' ), array_keys( $cats ), array_values( $cats ) );
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
-		$tag_args = array(
-			'taxonomy'   => 'product_tag',
-			'fields'     => 'id=>name',
-			'hide_empty' => true,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		);
-
-		$tags = \get_terms( $tag_args );
-
-		$formatted_tags = array_map( array( $this, 'format_terms' ), array_keys( $tags ), array_values( $tags ) );
-
-		$top_sales_products = WC::get_top_sales_products( 5 );
+		$product = new BundleProduct();
 
 		[
-			'max_price' => $max_price,
-			'min_price' => $min_price,
-		] = self::get_max_min_prices();
+			'data' => $data,
+			'meta_data' => $meta_data,
+			] = WP::separator( $body_params, 'product' );
 
-		return array(
-			'product_cats'       => $formatted_cats,
-			'product_tags'       => $formatted_tags,
-			'top_sales_products' => $top_sales_products,
-			'max_price'          => (int) $max_price,
-			'min_price'          => (int) $min_price,
-		);
-	}
-
-	/**
-	 * Get Max Min Price
-	 *
-	 * @return array
-	 */
-	public static function get_max_min_prices(): array {
-		$transient_key = 'max_min_prices';
-
-		$max_min_prices = \get_transient( $transient_key );
-
-		if ( false !== $max_min_prices ) {
-			return $max_min_prices;
+		foreach ( $data as $key => $value ) {
+			$method_name = 'set_' . $key;
+			$product->$method_name( $value );
 		}
-		// 獲取最高價格的商品
-		$max_price_products = \wc_get_products(
+
+		$product->save();
+
+		foreach ( $meta_data as $key => $value ) {
+			$product->update_meta_data( $key, $value );
+		}
+
+		$product->save_meta_data();
+
+		return new \WP_REST_Response(
 			array(
-				'order'    => 'DESC', // 遞減排序
-				'orderby'  => 'meta_value_num',
-				'meta_key' => '_price',
-				'limit'    => 1, // 僅獲取一個結果
-				'status'   => 'publish', // 僅包含已發佈的商品
+				'code'    => 'create_success',
+				'message' => '新增成功',
+				'data'    => array(
+					'id' => (string) $product->get_id(),
+				),
 			)
 		);
-		$max_price          = 0;
-		if ( ! empty( $max_price_products ) ) {
-			$max_price_product = reset( $max_price_products ); // 獲取第一個元素
-			$max_price         = $max_price_product?->get_price(); // 獲取最高價格
-		}
-
-		// 獲取最低價格的商品
-		$min_price_products = \wc_get_products(
-			array(
-				'order'    => 'ASC', // 遞增排序
-				'orderby'  => 'meta_value_num',
-				'meta_key' => '_price',
-				'limit'    => 1, // 僅獲取一個結果
-				'status'   => 'publish', // 僅包含已發佈的商品
-			)
-		);
-
-		$min_price = 0;
-		if ( ! empty( $min_price_products ) ) {
-			$min_price_product = reset( $min_price_products ); // 獲取第一個元素
-			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
-		}
-
-		$max_min_prices = array(
-			'max_price' => $max_price,
-			'min_price' => $min_price,
-		);
-
-		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
-
-		return $max_min_prices;
 	}
 }
 

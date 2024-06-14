@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Card
  */
@@ -10,6 +9,7 @@ namespace J7\PowerCourse\Templates\Components;
 
 use J7\PowerCourse\Templates\Components\Button;
 use J7\PowerCourse\Templates\Components\Course;
+use J7\PowerBundleProduct\BundleProduct;
 
 
 /**
@@ -84,25 +84,27 @@ abstract class Card {
 
 
 	/**
-	 * Group product Card
+	 * Bundle product Card
 	 *
 	 * @param array $props props.
-	 * - products \WC_Product[]
+	 * - bundle_product \WC_Product bundle_product 方案商品
 	 * - title string
 	 * @return string
 	 */
-	public static function group_product( array $props ): string {
-		$products = $props['products'] ?? null;
+	public static function bundle_product( array $props ): string {
+		$bundle_product = $props['bundle_product'] ?? null; // parent product
 
-		foreach ( $products as $product ) {
-			if ( ! ( $product instanceof \WC_Product ) ) {
-				throw new \Exception( 'products 不是 WC_Product' );
-			}
+		if ( ! ( $bundle_product instanceof \WC_Product ) ) {
+			throw new \Exception( 'product 不是 WC_Product' );
 		}
+
+		$bundle_product = new BundleProduct( $bundle_product );
+
+		$product_ids = $bundle_product->get_bundled_product_ids();
 
 		$title = $props['title'];
 
-		$purchase_note = \wpautop( $product->get_purchase_note() );
+		$purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 
 		ob_start();
 		?>
@@ -117,14 +119,32 @@ abstract class Card {
 			</div>
 
 
+		<?php
+		foreach ( $product_ids as $product_id ) :
+			$product = \wc_get_product( $product_id );
+			?>
+<div>
+			<?php
+			echo Course::list(
+				array(
+					'product' => $product,
+				)
+			);
+			?>
+</div>
+			<?php echo self::HR; ?>
 
-		<?php echo self::HR; ?>
+			<?php
+			endforeach;
+		?>
+
+
 
 			<div class="flex gap-3 justify-between items-end">
 		<?php
 		echo self::price(
 			array(
-				'product' => $products[0],
+				'product' => $bundle_product,
 				'size'    => 'small',
 			)
 		);

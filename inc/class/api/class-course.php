@@ -19,15 +19,49 @@ use J7\WpUtils\Classes\WC;
  * Class Course
  */
 final class Course {
-
-
 	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * APIs
+	 *
+	 * @var array
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 */
+	protected $apis = array(
+		array(
+			'endpoint' => 'courses',
+			'method'   => 'get',
+		),
+		array(
+			'endpoint' => 'courses',
+			'method'   => 'post',
+		),
+		array(
+			'endpoint' => 'courses/(?P<id>\d+)',
+			'method'   => 'patch',
+		),
+		array(
+			'endpoint' => 'courses/(?P<id>\d+)',
+			'method'   => 'delete',
+		),
+		array(
+			'endpoint' => 'terms',
+			'method'   => 'get',
+		),
+		array(
+			'endpoint' => 'options',
+			'method'   => 'get',
+		),
+	);
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_products' ) );
+		\add_action( 'rest_api_init', array( $this, 'register_api_course' ) );
 	}
 
 	/**
@@ -35,69 +69,12 @@ final class Course {
 	 *
 	 * @return void
 	 */
-	public function register_api_products(): void {
-
-		$apis = array(
-			array(
-				'endpoint' => 'courses',
-				'method'   => 'get',
-			),
-			array(
-				'endpoint' => 'courses',
-				'method'   => 'post',
-			),
-			array(
-				'endpoint' => 'terms',
-				'method'   => 'get',
-			),
-			array(
-				'endpoint' => 'options',
-				'method'   => 'get',
-			),
+	public function register_api_course(): void {
+		$this->register_apis(
+			apis: $this->apis,
+			namespace: Plugin::$kebab,
+			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
-
-		foreach ( $apis as $api ) {
-			// 用正則表達式替換 -, / 替換為 _
-			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
-			\register_rest_route(
-				Plugin::$kebab,
-				$api['endpoint'],
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_callback' ),
-					'permission_callback' => function () {
-						return \current_user_can( 'manage_options' );
-					},
-				)
-			);
-		}
-
-		$apis_with_id = array(
-			array(
-				'endpoint' => 'courses',
-				'method'   => 'patch',
-			),
-			array(
-				'endpoint' => 'courses',
-				'method'   => 'delete',
-			),
-		);
-
-		foreach ( $apis_with_id as $api ) {
-			// 用正則表達式替換 -, / 替換為 _
-			$endpoint_fn = preg_replace( '/[-\/]/', '_', $api['endpoint'] );
-			\register_rest_route(
-				Plugin::$kebab,
-				$api['endpoint'] . '/(?P<id>\d+)',
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $endpoint_fn . '_with_id_callback' ),
-					'permission_callback' => function () {
-						return \current_user_can( 'manage_options' );
-					},
-				)
-			);
-		}
 	}
 
 
@@ -309,34 +286,21 @@ final class Course {
 
 		$product = new \WC_Product_Simple();
 
-		$keys = array(
-			'name',
-			'slug',
-			'regular_price',
-			'sale_price',
-			'short_description',
-			'description',
-			'image_id',
-			'gallery_image_ids',
-			'status',
-			'catalog_visibility',
-			'category_ids',
-		);
+		[
+			'data' => $data,
+			'meta_data' => $meta_data,
+			] = WP::separator( $body_params, 'product' );
 
-		// TODO
-		$meta_keys = array(
-			'sub_title',
-		);
-
-		foreach ( $keys as $key ) {
-			if ( isset( $body_params[ $key ] ) ) {
-				$$key        = $body_params[ $key ];
-				$method_name = 'set_' . $key;
-				$product->$method_name( $$key );
-			}
+		foreach ( $data as $key => $value ) {
+			$method_name = 'set_' . $key;
+			$product->$method_name( $value );
 		}
 
 		$product->save();
+
+		foreach ( $meta_data as $key => $value ) {
+			$product->update_meta_data( $key, $value );
+		}
 
 		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
 

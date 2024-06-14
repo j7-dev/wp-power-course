@@ -26,7 +26,7 @@ use J7\PowerCourse\Templates\Components\Course;
 use J7\PowerCourse\Templates\Components\Title;
 use J7\PowerCourse\Templates\Components\User;
 use J7\PowerCourse\Templates\Components\Card;
-
+use J7\PowerBundleProduct\BundleProduct;
 
 global $product;
 
@@ -185,22 +185,24 @@ get_header(); ?>
 			?>
 
 <?php
-echo Card::group_product(
+echo Card::bundle_product(
 	array(
-		'products' => array( $product, $product ),
-		'title'    => '峰值體驗2Ｘ超級數字力｜合購優惠',
+		'bundle_product' => $product,
+		'title'          => '峰值體驗2Ｘ超級數字力｜合購優惠',
 	)
 );
 ?>
-
 
 <?php
-echo Course::list(
+echo Card::bundle_product(
 	array(
-		'product' => $product,
+		'bundle_product' => $product,
+		'title'          => '峰值體驗3Ｘ超級數字力｜合購優惠',
 	)
 );
 ?>
+
+
 		</div>
 
 	</div>

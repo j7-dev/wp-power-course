@@ -15,9 +15,27 @@ use J7\WpUtils\Classes\WP;
  * Class Course
  */
 final class Chapter {
-
-
 	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * APIs
+	 *
+	 * @var array
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 */
+	protected $apis = array(
+		array(
+			'endpoint' => 'chapters',
+			'method'   => 'post',
+		),
+		array(
+			'endpoint' => 'chapters/sort',
+			'method'   => 'post',
+		),
+	);
 
 	/**
 	 * Constructor.
@@ -32,63 +50,12 @@ final class Chapter {
 	 * @return void
 	 */
 	public function register_api_chapters(): void {
-
-		$apis = array(
-			array(
-				'endpoint' => 'chapters',
-				'method'   => 'post',
-			),
-			array(
-				'endpoint' => 'chapters/sort',
-				'method'   => 'post',
-			),
+		$this->register_apis(
+			apis: $this->apis,
+			namespace: Plugin::$kebab,
+			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
-
-		foreach ( $apis as $api ) {
-			$strip_endpoint = str_replace( '/', '_', $api['endpoint'] );
-
-			\register_rest_route(
-				Plugin::$kebab,
-				$api['endpoint'],
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $strip_endpoint . '_callback' ),
-					'permission_callback' => function () {
-						return \current_user_can( 'manage_options' );
-					},
-				)
-			);
-		}
-
-		$apis_with_id = array(
-			array(
-				'endpoint' => 'chapters',
-				'method'   => 'delete',
-			),
-			array(
-				'endpoint' => 'chapters',
-				'method'   => 'patch',
-			),
-		);
-
-		foreach ( $apis_with_id as $api ) {
-			\register_rest_route(
-				Plugin::$kebab . '/' . $api['endpoint'],
-				'/(?P<id>\d+)',
-				array(
-					'methods'             => $api['method'],
-					'callback'            => array( $this, $api['method'] . '_' . $api['endpoint'] . '_with_id_callback' ),
-					'permission_callback' => function () {
-						return \current_user_can( 'manage_options' );
-					},
-				)
-			);
-		}
 	}
-
-
-
-
 
 	/**
 	 * Post Chapter callback
