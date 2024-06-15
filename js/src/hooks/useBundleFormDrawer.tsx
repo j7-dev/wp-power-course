@@ -31,14 +31,12 @@ export function useBundleFormDrawer({
   const { mutate: create, isLoading: isLoadingCreate } = useCreate()
   const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
 
-  // const invalidateCourse = () => {
-  //   if (resource === 'chapters') {
-  //     invalidate({
-  //       resource: 'courses',
-  //       invalidates: ['list'],
-  //     })
-  //   }
-  // }
+  const invalidateCourse = () => {
+    invalidate({
+      resource: 'courses',
+      invalidates: ['list'],
+    })
+  }
 
   const handleSave = () => {
     form.validateFields().then(() => {
@@ -77,7 +75,7 @@ export function useBundleFormDrawer({
           },
           {
             onSuccess: () => {
-              // invalidateCourse()
+              invalidateCourse()
             },
           },
         )
@@ -94,8 +92,7 @@ export function useBundleFormDrawer({
             onSuccess: () => {
               close()
               form.resetFields()
-
-              // invalidateCourse()
+              invalidateCourse()
             },
           },
         )

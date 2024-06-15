@@ -67,7 +67,7 @@ export const CourseDescription = () => {
         <Input.TextArea rows={8} />
       </Item>
 
-      <p>課程封面圖</p>
+      <p className="mb-3">課程封面圖</p>
       <div className="mb-8">
         <Upload uploadProps={uploadProps} />
         <Item hidden name={['files']} label="課程封面圖">

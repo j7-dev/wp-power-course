@@ -16,10 +16,9 @@ import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { useList } from '@refinedev/core'
-import { Upload, useUpload } from '@/components/general'
+import { Upload, useUpload, PopconfirmDelete } from '@/components/general'
 
-// TODO 應該要排除 bundle 商品
-// TODO 查看當前有哪些組合方案
+// TODO 搜尋應該要排除 bundle 商品
 // TODO 如何結合可變商品?
 
 dayjs.extend(customParseFormat)
@@ -41,7 +40,7 @@ const CourseBundle: FC<{
 }> = ({ courseId, form: bundleProductForm }) => {
   const watchRegularPrice = Form.useWatch(['regular_price'], bundleProductForm)
   const [enabled, setEnabled] = useState(false)
-  const { uploadProps } = useUpload()
+  const { uploadProps, fileList } = useUpload()
 
   const { selectProps, queryResult } = useSelect<TProductRecord>({
     resource: 'products',
@@ -60,6 +59,11 @@ const CourseBundle: FC<{
           operator: 'eq',
           value: [courseId],
         },
+        {
+          field: 'posts_per_page',
+          operator: 'eq',
+          value: 20,
+        },
       ]
     },
     queryOptions: {
@@ -67,7 +71,7 @@ const CourseBundle: FC<{
     },
   })
 
-  const watchIncludedProductIds = Form.useWatch(
+  const watchIncludedProductIds: string[] = Form.useWatch(
     [INCLUDED_PRODUCT_IDS_FIELD_NAME],
     bundleProductForm,
   )
@@ -126,6 +130,10 @@ const CourseBundle: FC<{
     watchIncludedProductIds?.length,
   ])
 
+  useEffect(() => {
+    bundleProductForm.setFieldValue(['files'], fileList)
+  }, [fileList])
+
   return (
     <Form form={bundleProductForm} layout="vertical">
       <Item
@@ -141,10 +149,11 @@ const CourseBundle: FC<{
       <Item name={['description']} label="銷售方案說明">
         <Input.TextArea rows={8} />
       </Item>
+
       <Item
         name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]}
         label="請選擇要加入的商品"
-        tooltip="請輸入 2 個字以上才會搜尋"
+        tooltip="請輸入 2 個字以上才會搜尋，每次最多返回 20 筆資料"
       >
         <Select
           {...selectProps}
@@ -165,6 +174,35 @@ const CourseBundle: FC<{
           loading={queryResult.isFetching}
         />
       </Item>
+
+      {includedProducts?.map(({ id, images, name, price_html }) => (
+        <div
+          key={id}
+          className="flex items-center justify-between gap-4 border border-dash border-gray-200 p-2 rounded-md mb-2"
+        >
+          <img
+            src={images?.[0]?.url || defaultImage}
+            className="h-9 w-16 rounded object-cover"
+          />
+          <div className="w-full">
+            {name} #{id} {renderHTML(price_html)}
+          </div>
+          <div className="w-8 text-right">
+            <PopconfirmDelete
+              popconfirmProps={{
+                onConfirm: () => {
+                  bundleProductForm.setFieldValue(
+                    [INCLUDED_PRODUCT_IDS_FIELD_NAME],
+                    watchIncludedProductIds?.filter(
+                      (productId) => productId !== id,
+                    ),
+                  )
+                },
+              }}
+            />
+          </div>
+        </div>
+      ))}
 
       <Item name={['regular_price']} label="此銷售組合原價" hidden>
         <InputNumber
@@ -232,7 +270,7 @@ const CourseBundle: FC<{
         />
       </Item>
 
-      <p>課程封面圖</p>
+      <p className="mb-3">課程封面圖</p>
       <div className="mb-8">
         <Upload uploadProps={uploadProps} />
         <Item hidden name={['files']} label="課程封面圖">

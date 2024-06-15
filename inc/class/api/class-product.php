@@ -10,7 +10,6 @@ namespace J7\PowerCourse\Api;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
-use J7\WpUtils\Classes\WC;
 use J7\PowerBundleProduct\BundleProduct;
 
 
@@ -35,7 +34,7 @@ final class Product {
 			'method'   => 'get',
 		),
 		array(
-			'endpoint' => 'products',
+			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		),
 	);
@@ -74,7 +73,7 @@ final class Product {
 		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
 
 		$default_args = array(
-			'status'         => 'publish',
+			'status'         => array( 'publish', 'draft' ),
 			'paginate'       => true,
 			'posts_per_page' => 10,
 			'page'           => 1,
@@ -100,7 +99,8 @@ final class Product {
 			unset( $args['price_range'] );
 		}
 
-		$results     = \wc_get_products( $args );
+		$results = \wc_get_products( $args );
+
 		$total       = $results->total;
 		$total_pages = $results->max_num_pages;
 
@@ -178,61 +178,65 @@ final class Product {
 			}
 		}
 
+		$include_product_ids = \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
+
 		$base_array = array(
 			// Get Product General Info
-			'id'                 => (string) $product?->get_id(),
-			'type'               => $product?->get_type(),
-			'name'               => $product?->get_name(),
-			'slug'               => $product?->get_slug(),
-			'date_created'       => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified->date( 'Y-m-d H:i:s' ),
-			'status'             => $product?->get_status(),
-			'featured'           => $product?->get_featured(),
-			'catalog_visibility' => $product?->get_catalog_visibility(),
-			'sku'                => $product?->get_sku(),
+			'id'                                        => (string) $product?->get_id(),
+			'type'                                      => $product?->get_type(),
+			'name'                                      => $product?->get_name(),
+			'slug'                                      => $product?->get_slug(),
+			'date_created'                              => $date_created->date( 'Y-m-d H:i:s' ),
+			'date_modified'                             => $date_modified->date( 'Y-m-d H:i:s' ),
+			'status'                                    => $product?->get_status(),
+			'featured'                                  => $product?->get_featured(),
+			'catalog_visibility'                        => $product?->get_catalog_visibility(),
+			'sku'                                       => $product?->get_sku(),
 			// 'menu_order'         => $product?->get_menu_order(),
-			'virtual'            => $product?->get_virtual(),
-			'downloadable'       => $product?->get_downloadable(),
-			'permalink'          => get_permalink( $product?->get_id() ),
+			'virtual'                                   => $product?->get_virtual(),
+			'downloadable'                              => $product?->get_downloadable(),
+			'permalink'                                 => get_permalink( $product?->get_id() ),
 
 			// Get Product Prices
-			'price_html'         => $product?->get_price_html(),
-			'regular_price'      => $product?->get_regular_price(),
-			'sale_price'         => $product?->get_sale_price(),
-			'on_sale'            => $product?->is_on_sale(),
-			'date_on_sale_from'  => $product?->get_date_on_sale_from(),
-			'date_on_sale_to'    => $product?->get_date_on_sale_to(),
-			'total_sales'        => $product?->get_total_sales(),
+			'price_html'                                => $product?->get_price_html(),
+			'regular_price'                             => $product?->get_regular_price(),
+			'sale_price'                                => $product?->get_sale_price(),
+			'on_sale'                                   => $product?->is_on_sale(),
+			'date_on_sale_from'                         => $product?->get_date_on_sale_from(),
+			'date_on_sale_to'                           => $product?->get_date_on_sale_to(),
+			'total_sales'                               => $product?->get_total_sales(),
 
 			// Get Product Stock
-			'stock'              => $product?->get_stock_quantity(),
-			'stock_status'       => $product?->get_stock_status(),
-			'manage_stock'       => $product?->get_manage_stock(),
-			'stock_quantity'     => $product?->get_stock_quantity(),
-			'backorders'         => $product?->get_backorders(),
-			'backorders_allowed' => $product?->backorders_allowed(),
-			'backordered'        => $product?->is_on_backorder(),
-			'low_stock_amount'   => $low_stock_amount,
+			'stock'                                     => $product?->get_stock_quantity(),
+			'stock_status'                              => $product?->get_stock_status(),
+			'manage_stock'                              => $product?->get_manage_stock(),
+			'stock_quantity'                            => $product?->get_stock_quantity(),
+			'backorders'                                => $product?->get_backorders(),
+			'backorders_allowed'                        => $product?->backorders_allowed(),
+			'backordered'                               => $product?->is_on_backorder(),
+			'low_stock_amount'                          => $low_stock_amount,
 
 			// Get Linked Products
-			'upsell_ids'         => array_map( 'strval', $product?->get_upsell_ids() ),
-			'cross_sell_ids'     => array_map( 'strval', $product?->get_cross_sell_ids() ),
+			'upsell_ids'                                => array_map( 'strval', $product?->get_upsell_ids() ),
+			'cross_sell_ids'                            => array_map( 'strval', $product?->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
-			'attributes'         => $attributes_arr,
+			'attributes'                                => $attributes_arr,
 
 			// Get Product Taxonomies
-			'category_ids'       => array_map( 'strval', $product?->get_category_ids() ),
-			'tag_ids'            => array_map( 'strval', $product?->get_tag_ids() ),
+			'category_ids'                              => array_map( 'strval', $product?->get_category_ids() ),
+			'tag_ids'                                   => array_map( 'strval', $product?->get_tag_ids() ),
 
 			// Get Product Images
-			'images'             => $images,
+			'images'                                    => $images,
 
-			// meta data
-			'meta_data'          => WC::get_formatted_meta_data( $product ),
+			// PENDING meta data
+			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
+			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $include_product_ids,
 
-			'is_course'          => $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'          => (string) $product->get_parent_id(),
+			'is_course'                                 => $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'                                 => (string) $product->get_parent_id(),
+
 		) + $children;
 
 		return array_merge(
@@ -242,14 +246,14 @@ final class Product {
 	}
 
 	/**
-	 * Post product callback
+	 * Post bundle product callback (bundle product)
 	 *
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function post_products_callback( $request ) {
+	public function post_bundle_products_callback( $request ) {
 
 		$body_params = $request->get_body_params() ?? array();
 		$file_params = $request->get_file_params();
@@ -292,6 +296,8 @@ final class Product {
 
 	/**
 	 * 針對特殊欄位處理
+	 * 'pbp_product_ids', 'product_type'
+	 * 前端送出資料後，要存入 WP 前處理
 	 *
 	 * @param array $meta_data Meta data.
 	 * @param mixed $product Product.

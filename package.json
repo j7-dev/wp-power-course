@@ -26,6 +26,7 @@
     "lint:fix"
   ],
   "dependencies": {
+    "@ant-design/pro-components": "^2.7.10",
     "@ant-design/pro-editor": "^1.2.1",
     "@refinedev/antd": "^5.37.5",
     "@refinedev/cli": "^2.16.27",

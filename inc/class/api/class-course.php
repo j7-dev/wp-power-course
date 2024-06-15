@@ -12,6 +12,7 @@ use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\WC;
+use J7\PowerCourse\Utils\Base;
 
 
 
@@ -206,6 +207,8 @@ final class Course {
 			}
 		}
 
+		$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
+
 		$base_array = array(
 			// Get Product General Info
 			'id'                 => (string) $product->get_id(),
@@ -257,11 +260,14 @@ final class Course {
 			// Get Product Images
 			'images'             => $images,
 
-			// meta data
-			'meta_data'          => WC::get_formatted_meta_data( $product ),
+			// PENDING meta data
+			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
 
 			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
 			'parent_id'          => (string) $product->get_parent_id(),
+
+			// bundle product
+			'bundle_ids'         => $bundle_ids,
 		) + $children;
 
 		return array_merge(

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Drawer, DrawerProps, Tabs, TabsProps, Form } from 'antd'
 import {
   CourseDescription,
@@ -50,6 +50,14 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
     },
   ]
 
+  const [activeKey, setActiveKey] = useState('1')
+
+  useEffect(() => {
+    if (drawerProps.open) {
+      setActiveKey('1')
+    }
+  }, [drawerProps.open])
+
   return (
     <>
       <Drawer {...drawerProps}>
@@ -57,9 +65,12 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
         <Form layout="vertical" form={form}>
           <Tabs
             className="pc-course-drawer-tabs"
-            defaultActiveKey={items?.[0]?.key}
             items={items}
             centered
+            activeKey={activeKey}
+            onChange={(key: string) => {
+              setActiveKey(key)
+            }}
           />
         </Form>
       </Drawer>
