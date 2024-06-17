@@ -82,13 +82,11 @@ export type TCourseRecord = {
   category_ids: string[]
   tag_ids: string[]
   images: TImage[]
-  meta_data: {
-    [key: string]: any
-  }
   children?: TChapterRecord[]
   is_course: boolean
   parent_id?: string
   hours: number
+  is_free: 'yes' | 'no' | ''
 }
 
 export type TChapterRecord = {
@@ -110,8 +108,8 @@ export type TChapterRecord = {
   category_ids?: string[]
   tag_ids?: string[]
   images?: TImage[]
-  meta_data: undefined
   children?: TChapterRecord[]
   parent_id?: string
   hours?: number
+  is_free: 'yes' | 'no' | ''
 }

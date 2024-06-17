@@ -74,7 +74,13 @@ export const CourseDescription = () => {
           <Input />
         </Item>
       </div>
-      <Item name={['status']} label="發佈" valuePropName="checked">
+      <Item
+        name={['status']}
+        label="發佈"
+        valuePropName="checked"
+        getValueProps={(value) => ({ value: value === 'publish' })}
+        normalize={(value) => (value ? 'publish' : 'draft')}
+      >
         <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
       </Item>
     </>

@@ -18,7 +18,8 @@ export const dataProvider = (
   getList: async ({ resource, pagination, filters, sorters, meta }) => {
     // TODO
 
-    console.log('⭐  filters:', filters)
+    // console.log('⭐  filters:', filters)
+
     const url = `${apiUrl}/${resource}`
 
     const { current = 1, pageSize = 10, mode = 'server' } = pagination ?? {}
@@ -95,7 +96,7 @@ export const dataProvider = (
     const url = `${apiUrl}/${resource}/${id}`
 
     const { headers, method } = meta ?? {}
-    const requestMethod = (method as THttpMethodsWithBody) ?? 'patch'
+    const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
 
     const { data } = await httpClient[requestMethod](url, variables, {
       headers,

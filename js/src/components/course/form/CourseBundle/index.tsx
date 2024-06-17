@@ -8,13 +8,14 @@ import { useList } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
+import { SaleRange } from '@/components/general'
+import ProductCheckCard from './ProductCheckCard'
 
 const { Item } = Form
 
 export const CourseBundle = () => {
   const form = Form.useFormInstance()
   const watchBundleIds = Form.useWatch(['bundle_ids'], form) || []
-  const courseId: string = Form.useWatch(['id'], form) || ''
   const [bundleProductForm] = Form.useForm()
   const { drawerProps, show } = useBundleFormDrawer({
     form: bundleProductForm,
@@ -60,68 +61,14 @@ export const CourseBundle = () => {
         新增銷售方案
       </Button>
       {!!watchBundleIds.length && (
-        <div className="mt-8 grid grid-cols-1 xl:grid-cols-2 gap-x-4">
-          {bundleProducts?.map((bundleProduct) => {
-            const {
-              id,
-              name,
-              regular_price,
-              sale_price,
-              sale_date_range,
-              images,
-              description,
-              status,
-              price_html,
-            } = bundleProduct
-            const imgUrl = images?.[0]?.url || defaultImage
-            return (
-              <div key={id}>
-                <CheckCard
-                  className="w-full"
-                  avatar={
-                    <div className="group aspect-video w-20 rounded overflow-hidden">
-                      <img
-                        className="group-hover:scale-125 transition duration-300 ease-in-out object-cover w-full h-full"
-                        src={imgUrl}
-                      />
-                    </div>
-                  }
-                  title={
-                    <div>
-                      {renderHTML(name)}
-                      <p className="m-0 text-[0.675rem] text-gray-500">
-                        ID: {id}
-                      </p>
-                    </div>
-                  }
-                  description={
-                    <div className="flex justify-between">
-                      <div className="whitespace-nowrap">
-                        {renderHTML(price_html)}
-                      </div>
-                      <div>
-                        <Button
-                          type="link"
-                          className="m-0 p-0"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            return show(bundleProduct)()
-                          }}
-                        >
-                          編輯 <EditOutlined />
-                        </Button>
-                      </div>
-                    </div>
-                  }
-                  onChange={(checked) => {
-                    console.log('CARD checked', checked)
-                  }}
-
-                  // checked={status === 'publish'}
-                />
-              </div>
-            )
-          })}
+        <div className="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-x-4">
+          {bundleProducts?.map((bundleProduct) => (
+            <ProductCheckCard
+              key={bundleProduct.id}
+              product={bundleProduct}
+              show={show}
+            />
+          ))}
         </div>
       )}
 
@@ -130,7 +77,7 @@ export const CourseBundle = () => {
       </Item>
 
       <Drawer {...drawerProps}>
-        <BundleForm courseId={courseId} form={bundleProductForm} />
+        <BundleForm form={bundleProductForm} />
       </Drawer>
     </>
   )

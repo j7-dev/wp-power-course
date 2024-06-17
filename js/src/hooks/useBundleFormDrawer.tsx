@@ -31,9 +31,13 @@ export function useBundleFormDrawer({
   const { mutate: create, isLoading: isLoadingCreate } = useCreate()
   const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
 
-  const invalidateCourse = () => {
+  const invalidateCourse = async () => {
     invalidate({
       resource: 'courses',
+      invalidates: ['list'],
+    })
+    invalidate({
+      resource: 'products',
       invalidates: ['list'],
     })
   }
@@ -43,21 +47,22 @@ export function useBundleFormDrawer({
       const values = form.getFieldsValue()
       const sale_date_range = values?.sale_date_range || [null, null]
 
+      // 處理日期欄位 sale_date_range
+
       const sale_from =
         sale_date_range[0] instanceof dayjs
           ? (sale_date_range[0] as Dayjs).unix()
           : sale_date_range[0]
-      const sale_end =
+      const sale_to =
         sale_date_range[1] instanceof dayjs
           ? (sale_date_range[1] as Dayjs).unix()
           : sale_date_range[1]
 
       const formattedValues = {
         ...values,
-        status: values.status ? 'publish' : 'draft',
         product_type: 'power_bundle_product', // 創建綑綁商品
         sale_from,
-        sale_end,
+        sale_to,
         sale_date_range: undefined,
       }
 
@@ -122,19 +127,7 @@ export function useBundleFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
-      const { status, meta_data, ...rest } = record
-      form.setFieldsValue(rest)
-      form.setFieldValue(['status'], status === 'publish')
-
-      Object.keys(meta_data || {}).forEach((key) => {
-        // boolean 要特別處理
-
-        if (['is_free'].includes(key)) {
-          form.setFieldValue([key], meta_data?.[key] === 'yes')
-        } else {
-          form.setFieldValue([key], meta_data?.[key])
-        }
-      })
+      form.setFieldsValue(record)
     } else {
       form.resetFields()
     }

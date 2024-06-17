@@ -6,7 +6,7 @@ const { Item } = Form
 export const CoursePrice = () => {
   const form = Form.useFormInstance()
   const watchRegularPrice = Form.useWatch(['regular_price'], form)
-  const watchIsFree = Form.useWatch(['is_free'], form)
+  const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
 
   useEffect(() => {
     if (watchIsFree) {
@@ -35,8 +35,9 @@ export const CoursePrice = () => {
       <Item
         name={['is_free']}
         label="這是免費課程"
-        valuePropName="checked"
         initialValue={false}
+        getValueProps={(value) => (value === 'yes' ? { checked: true } : {})}
+        normalize={(value) => (value ? 'yes' : 'no')}
       >
         <Switch />
       </Item>

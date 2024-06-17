@@ -64,8 +64,6 @@ export type TProductRecord = {
   regular_price: string
   sale_price: string
   on_sale: boolean
-  date_on_sale_from: string | null
-  date_on_sale_to: string | null
   total_sales: number
   stock: number | null
   stock_status: TStockStatus
@@ -82,11 +80,11 @@ export type TProductRecord = {
   category_ids: string[]
   tag_ids: string[]
   images?: TImage[]
-  meta_data: {
-    [key: string]: any
-  }
   children?: TProductVariation[]
   parent_id?: string
+  pbp_product_ids: string[]
+  sale_date_range: [number, number]
+  is_free: 'yes' | 'no' | ''
 }
 
 export type TProductVariation = TProductRecord & {

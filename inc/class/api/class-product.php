@@ -37,6 +37,10 @@ final class Product {
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		),
+		array(
+			'endpoint' => 'bundle_products/(?P<id>\d+)',
+			'method'   => 'post',
+		),
 	);
 
 	/**
@@ -68,7 +72,7 @@ final class Product {
 	 */
 	public function get_products_callback( $request ) { // phpcs:ignore
 
-		$params = $request?->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? array();
 
 		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
 
@@ -224,18 +228,23 @@ final class Product {
 			'attributes'                                => $attributes_arr,
 
 			// Get Product Taxonomies
-			'category_ids'                              => array_map( 'strval', $product?->get_category_ids() ),
-			'tag_ids'                                   => array_map( 'strval', $product?->get_tag_ids() ),
+			'category_ids'                              => array_map( 'strval', $product->get_category_ids() ),
+			'tag_ids'                                   => array_map( 'strval', $product->get_tag_ids() ),
 
 			// Get Product Images
 			'images'                                    => $images,
 
 			// PENDING meta data
 			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
+
+			'is_course'                                 => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'                                 => (string) $product->get_parent_id(),
+
+			// Bundle 商品包含的商品 ids
 			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $include_product_ids,
 
-			'is_course'                                 => $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'                                 => (string) $product->get_parent_id(),
+			'sale_date_range'                           => array( (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ),
+			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
 
 		) + $children;
 
@@ -247,6 +256,8 @@ final class Product {
 
 	/**
 	 * Post bundle product callback (bundle product)
+	 * 新增 bundle product
+	 * 用 form-data 方式送出
 	 *
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
@@ -265,7 +276,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] );
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -288,6 +299,67 @@ final class Product {
 				'message' => '新增成功',
 				'data'    => array(
 					'id' => (string) $product->get_id(),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Patch bundle product callback (bundle product)
+	 * 修改 bundle product
+	 * 用 form-data 方式送出
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_bundle_products_with_id_callback( $request ) {
+		$id          = $request['id'];
+		$body_params = $request->get_body_params() ?? array();
+		$file_params = $request->get_file_params();
+
+		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+
+		$product = \wc_get_product( $id );
+		if ( ! $product ) {
+			return new \WP_REST_Response(
+				array(
+					'code'    => 'patch_failed',
+					'message' => '修改失敗，找不到商品',
+					'data'    => array(
+						'id' => (string) $id,
+					),
+				),
+				400
+			);
+		}
+		$product = new BundleProduct( $product );
+
+		[
+			'data' => $data,
+			'meta_data' => $meta_data,
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
+
+		foreach ( $data as $key => $value ) {
+			$method_name = 'set_' . $key;
+			$product->$method_name( $value );
+		}
+
+		$product->save();
+
+		$meta_data = self::handle_special_fields( $meta_data, $product );
+
+		foreach ( $meta_data as $key => $value ) {
+			$product->update_meta_data( $key, $value );
+		}
+
+		$product->save_meta_data();
+
+		return new \WP_REST_Response(
+			array(
+				'code'    => 'patch_success',
+				'message' => '修改成功',
+				'data'    => array(
+					'id' => (string) $id,
 				),
 			)
 		);

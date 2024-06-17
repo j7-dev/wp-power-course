@@ -42,7 +42,7 @@ final class Course {
 		),
 		array(
 			'endpoint' => 'courses/(?P<id>\d+)',
-			'method'   => 'patch',
+			'method'   => 'post',
 		),
 		array(
 			'endpoint' => 'courses/(?P<id>\d+)',
@@ -265,6 +265,7 @@ final class Course {
 
 			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
 			'parent_id'          => (string) $product->get_parent_id(),
+			'is_free'            => (string) $product->get_meta( 'is_free' ),
 
 			// bundle product
 			'bundle_ids'         => $bundle_ids,
@@ -325,12 +326,13 @@ final class Course {
 	}
 
 	/**
-	 * Patch courses with id callback
+	 * Post courses with id callback
+	 * 更新課程
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function patch_courses_with_id_callback( $request ) {
+	public function post_courses_with_id_callback( $request ) {
 
 		$id = $request['id'];
 		if ( empty( $id ) ) {

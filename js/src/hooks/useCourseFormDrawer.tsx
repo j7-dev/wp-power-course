@@ -5,8 +5,9 @@ import {
   TChapterRecord,
   TCourseRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
-import { head } from 'lodash-es'
 import { toFormData } from 'axios'
+import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
+import { useAtom } from 'jotai'
 
 export function useCourseFormDrawer({
   form,
@@ -17,10 +18,8 @@ export function useCourseFormDrawer({
   resource?: string
   drawerProps?: DrawerProps
 }) {
+  const [record, setRecord] = useAtom(selectedRecordAtom)
   const [open, setOpen] = useState(false)
-  const [record, setRecord] = useState<
-    TCourseRecord | TChapterRecord | undefined
-  >(undefined)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
@@ -49,13 +48,8 @@ export function useCourseFormDrawer({
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
-      const formattedValues = {
-        ...values,
-        status: values.status ? 'publish' : 'draft',
-        is_free: values.is_free ? 'yes' : 'no',
-      }
 
-      const formData = toFormData(formattedValues)
+      const formData = toFormData(values)
 
       if (isUpdate) {
         update(
@@ -117,19 +111,7 @@ export function useCourseFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
-      const { status, meta_data, ...rest } = record
-      form.setFieldsValue(rest)
-      form.setFieldValue(['status'], status === 'publish')
-
-      Object.keys(meta_data || {}).forEach((key) => {
-        // boolean 要特別處理
-
-        if (['is_free'].includes(key)) {
-          form.setFieldValue([key], meta_data?.[key] === 'yes')
-        } else {
-          form.setFieldValue([key], meta_data?.[key])
-        }
-      })
+      form.setFieldsValue(record)
     } else {
       form.resetFields()
     }
