@@ -15,7 +15,7 @@ export const CourseDescription = () => {
   const form = Form.useFormInstance()
   const { options, isLoading } = useOptions()
   const { product_cats = [], product_tags = [] } = options
-  const productUrl = `${siteUrl}/course/`
+  const productUrl = `${siteUrl}/courses/`
   const slug = Form.useWatch(['slug'], form)
   const { uploadProps, fileList } = useUpload()
 
