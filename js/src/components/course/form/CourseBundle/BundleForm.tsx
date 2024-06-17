@@ -175,7 +175,7 @@ const BundleForm: FC<{
 
   return (
     <Form form={bundleProductForm} layout="vertical">
-      <Item name={['id']} hidden>
+      <Item name={['id']} hidden normalize={() => undefined}>
         <Input />
       </Item>
       <Item
@@ -308,10 +308,10 @@ const BundleForm: FC<{
               key={id}
               className="flex items-center justify-start gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2 animate-pulse"
             >
-              <div className="bg-slate-400 h-9 w-16 rounded object-cover" />
+              <div className="bg-slate-300 h-9 w-16 rounded object-cover" />
               <div>
-                <div className="bg-slate-400 h-3 w-20 mb-1" />
-                <div className="bg-slate-400 h-3 w-20" />
+                <div className="bg-slate-300 h-3 w-20 mb-1" />
+                <div className="bg-slate-300 h-3 w-32" />
               </div>
             </div>
           ))}
@@ -404,11 +404,7 @@ const BundleForm: FC<{
       <Item
         name={['status']}
         label="發佈"
-        getValueProps={(value) => {
-          console.log('⭐ value:', value)
-
-          return { value: value === 'publish' }
-        }}
+        getValueProps={(value) => ({ value: value === 'publish' })}
         normalize={(value) => (value ? 'publish' : 'draft')}
       >
         <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
@@ -431,7 +427,7 @@ function getPrice({
   returnType?: 'string' | 'number'
 }) {
   if (isFetching) {
-    return <div className="w-20 bg-slate-400 animate-pulse h-3 inline-block" />
+    return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
   }
 
   const coursePrice = Number(

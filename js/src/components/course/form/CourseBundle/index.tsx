@@ -15,14 +15,14 @@ const { Item } = Form
 
 export const CourseBundle = () => {
   const form = Form.useFormInstance()
-  const watchBundleIds = Form.useWatch(['bundle_ids'], form) || []
+  const watchBundleIds: string[] = Form.useWatch(['bundle_ids'], form) || []
   const [bundleProductForm] = Form.useForm()
   const { drawerProps, show } = useBundleFormDrawer({
     form: bundleProductForm,
     resource: 'bundle_products',
   })
 
-  const { data, isLoading } = useList<TProductRecord>({
+  const { data, isFetching } = useList<TProductRecord>({
     resource: 'products',
     filters: [
       {
@@ -53,14 +53,13 @@ export const CourseBundle = () => {
   })
 
   const bundleProducts = data?.data || []
-  console.log('⭐  bundleProducts:', bundleProducts)
 
   return (
     <>
       <Button type="primary" icon={<PlusOutlined />} onClick={show()}>
         新增銷售方案
       </Button>
-      {!!watchBundleIds.length && (
+      {!isFetching && !!watchBundleIds.length && (
         <div className="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-x-4">
           {bundleProducts?.map((bundleProduct) => (
             <ProductCheckCard
@@ -69,6 +68,19 @@ export const CourseBundle = () => {
               show={show}
             />
           ))}
+          {isFetching &&
+            watchBundleIds.map((id) => (
+              <div
+                key={id}
+                className="p-4 border border-solid border-gray-200 rounded-md animate-pulse"
+              >
+                <div className="aspect-video w-full rounded bg-slate-300 mb-2" />
+                <div className="mb-2 h-3 bg-slate-300 w-3/4" />
+                <div className="mb-2 h-2 bg-slate-300 w-12" />
+                <div className="mb-2 h-3 bg-slate-300 w-1/2" />
+                <div className="mb-2 h-3 bg-slate-300 w-full" />
+              </div>
+            ))}
         </div>
       )}
 

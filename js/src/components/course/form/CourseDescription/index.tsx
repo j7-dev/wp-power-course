@@ -25,7 +25,7 @@ export const CourseDescription = () => {
 
   return (
     <>
-      <Item name={['id']} hidden>
+      <Item name={['id']} hidden normalize={() => undefined}>
         <Input />
       </Item>
       <Item name={['name']} label="課程名稱">
