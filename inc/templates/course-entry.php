@@ -27,13 +27,14 @@ use J7\PowerCourse\Templates\Components\Title;
 use J7\PowerCourse\Templates\Components\User;
 use J7\PowerCourse\Templates\Components\Card;
 use J7\PowerBundleProduct\BundleProduct;
+use J7\PowerCourse\Utils\Base;
 
 global $product;
 
 
 get_header(); ?>
 <script src="https://cdn.tailwindcss.com"></script>
-<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto bg-slate-100 px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
+<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
 	<!-- Header -->
 	<div class="flex gap-6 flex-col md:flex-row">
@@ -138,6 +139,8 @@ get_header(); ?>
 				);
 				?>
 			</div>
+			<!-- Tabs -->
+			<?php require_once __DIR__ . '/tabs/index.php'; ?>
 
 			<div class="mb-12">
 				<?php
@@ -185,22 +188,28 @@ get_header(); ?>
 			?>
 
 <?php
-echo Card::bundle_product(
-	array(
-		'bundle_product' => $product,
-		'title'          => '峰值體驗2Ｘ超級數字力｜合購優惠',
-	)
-);
+$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
+
+foreach ( $bundle_ids as $bundle_id ) {
+	$bundle_product = \wc_get_product( $bundle_id );
+	if ( ! $bundle_product ) {
+		continue;
+	}
+
+	$bundle_product = new BundleProduct( $bundle_product );
+	if ( 'publish' !== $bundle_product->get_status() ) {
+		continue;
+	}
+	echo Card::bundle_product(
+		array(
+			'bundle_product' => $bundle_product,
+			'title'          => $bundle_product->get_name(),
+		)
+	);
+
+}
 ?>
 
-<?php
-echo Card::bundle_product(
-	array(
-		'bundle_product' => $product,
-		'title'          => '峰值體驗3Ｘ超級數字力｜合購優惠',
-	)
-);
-?>
 
 
 		</div>

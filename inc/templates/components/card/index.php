@@ -19,14 +19,13 @@ abstract class Card {
 
 	const HR = '<hr class="border-none h-[1px] w-full bg-gray-200 my-4" />';
 
-
-
 	/**
 	 * Single product Card
 	 *
 	 * @param array $props props.
 	 * - product \WC_Product
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function single_product( array $props ): string {
 		$product = $props['product'] ?? null;
@@ -87,20 +86,19 @@ abstract class Card {
 	 * Bundle product Card
 	 *
 	 * @param array $props props.
-	 * - bundle_product \WC_Product bundle_product 方案商品
+	 * - bundle_product BundleProduct bundle_product 方案商品
 	 * - title string
 	 * @return string
+	 * @throws \Exception
 	 */
 	public static function bundle_product( array $props ): string {
 		$bundle_product = $props['bundle_product'] ?? null; // parent product
 
-		if ( ! ( $bundle_product instanceof \WC_Product ) ) {
-			throw new \Exception( 'product 不是 WC_Product' );
+		if ( ! ( $bundle_product instanceof BundleProduct ) ) {
+			throw new \Exception( 'product 不是 BundleProduct' );
 		}
 
-		$bundle_product = new BundleProduct( $bundle_product );
-
-		$product_ids = $bundle_product->get_bundled_product_ids();
+		$product_ids = $bundle_product->get_bundled_ids();
 
 		$title = $props['title'];
 

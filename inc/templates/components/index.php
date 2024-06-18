@@ -6,3 +6,4 @@ require_once __DIR__ . '/course/index.php';
 require_once __DIR__ . '/title/index.php';
 require_once __DIR__ . '/user/index.php';
 require_once __DIR__ . '/card/index.php';
+require_once __DIR__ . '/tabs/index.php';

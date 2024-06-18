@@ -165,8 +165,8 @@ final class Course {
 		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
-			'description'       => $product->get_description(),
-			'short_description' => $product->get_short_description(),
+			'description'       => \wpautop( $product->get_description() ),
+			'short_description' => \wpautop( $product->get_short_description() ),
 		) : array();
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();

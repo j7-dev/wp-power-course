@@ -9,7 +9,7 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
-
+use J7\PowerBundleProduct\BundleProduct;
 
 /**
  * Class FrontEnd
@@ -23,7 +23,7 @@ final class Templates {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_filter( 'wc_get_template', array( $this, 'override_wc_template' ), 999999, 5 );
+		// \add_filter( 'wc_get_template', array( $this, 'override_wc_template' ), 999999, 5 );
 
 		\add_action(
 			'init',
@@ -32,6 +32,8 @@ final class Templates {
 
 		\add_filter( 'query_vars', array( $this, 'add_query_var' ) );
 		\add_filter( 'template_include', array( $this, 'load_custom_template' ), 999999 );
+
+		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
 	/**
@@ -43,7 +45,7 @@ final class Templates {
 		// get registered rewrite rules.
 		$rules = get_option( 'rewrite_rules', array() );
 		// set the regex.
-		$regex = 'courses/([a-z0-9-]+)[/]?$';
+		$regex = '^courses/?([^/]*)/?';
 
 		// add the rewrite rule.
 		\add_rewrite_rule( $regex, 'index.php?' . self::SLUG . '=$matches[1]', 'top' );
@@ -107,11 +109,17 @@ final class Templates {
 	public function load_custom_template( $template ) {
 		$override_template_path = Plugin::$dir . '/inc/templates/course-entry.php';
 		$courses_slug           = \get_query_var( self::SLUG );
+
 		if ( $courses_slug ) {
 			if ( file_exists( $override_template_path ) ) {
 				global $product;
 				$product_post = \get_page_by_path( $courses_slug, OBJECT, 'product' );
-				$product      = \wc_get_product( $product_post->ID );
+				if ( ! $product_post ) {
+					\wp_safe_redirect( \home_url( '/404' ) );
+					exit;
+				}
+
+				$product = \wc_get_product( $product_post->ID );
 
 				// 如果商品不是課程，則不要載入模板
 				$is_course_product = Base::is_course_product( $product );
@@ -124,6 +132,15 @@ final class Templates {
 			}
 		}
 		return $template;
+	}
+
+	/**
+	 * Enqueue assets
+	 *
+	 * @return void
+	 */
+	public function enqueue_assets() {
+		\wp_enqueue_script( 'jquery-ui-accordion' );
 	}
 }
 
