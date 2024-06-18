@@ -1,32 +1,15 @@
 <?php
 
 use J7\PowerCourse\Templates\Components\Tabs;
+use J7\PowerCourse\Templates\Components\Collapse;
+
 
 
 $description = $product->get_description();
 
-ob_start();
-?>
-<div class="pc-accordion">
-<section class="accordion">
-	<div class="tab">
-		<input type="checkbox" name="accordion-1" id="cb1">
-		<label for="cb1" class="tab__label">Checkbox</label>
-		<div class="tab__content">
-			<p>Pure CSS accordion based on the "input:checked + label" style trick.</p>
-		</div>
-	</div>
-	<div class="tab">
-		<input type="checkbox" name="accordion-1" id="cb2">
-		<label for="cb2" class="tab__label">Open multiple</label>
-		<div class="tab__content">
-			<p>Using <code>&lt;input type="checkbox"&gt;</code> allows to have several tabs open at the same time.</p>
-		</div>
-	</div>
-</section>
-</div>
-<?php
-$accordion = ob_get_clean();
+$accordion = Collapse::chapter( array( 'product' => $product ) );
+$qa        = Collapse::qa( array( 'product' => $product ) );
+
 
 $course_tabs = array(
 	array(
@@ -42,22 +25,22 @@ $course_tabs = array(
 	array(
 		'key'     => '3',
 		'label'   => '問答',
-		'content' => '學習資源內容',
+		'content' => $qa,
 	),
 	array(
 		'key'     => '4',
 		'label'   => '留言',
-		'content' => '學習評價內容',
+		'content' => '🚧 施工中... 🚧',
 	),
 	array(
 		'key'     => '5',
 		'label'   => '評價',
-		'content' => '學習評價內容',
+		'content' => '🚧 施工中... 🚧',
 	),
 	array(
 		'key'     => '6',
 		'label'   => '公告',
-		'content' => '學習評價內容',
+		'content' => '🚧 施工中... 🚧',
 	),
 );
 

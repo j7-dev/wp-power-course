@@ -33,6 +33,7 @@ final class Templates {
 		\add_filter( 'template_include', array( $this, 'load_custom_template' ), 999999 );
 
 		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		\add_filter( 'language_attributes', array( $this, 'add_html_attr' ), 20, 2 );
 	}
 
 	/**
@@ -158,6 +159,12 @@ final class Templates {
 			array(),
 			Plugin::$version
 		);
+	}
+
+	public function add_html_attr( $output, $doctype ) {
+
+		// ["light", "dark", "cupcake"]
+		return $output . ' data-theme="light"';
 	}
 }
 

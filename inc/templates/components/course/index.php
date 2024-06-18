@@ -14,8 +14,6 @@ use J7\PowerCourse\Utils\Base;
  * Class FrontEnd
  */
 abstract class Course {
-
-
 	/**
 	 * 課程資訊
 	 *

@@ -14,7 +14,12 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
           <Item name={['name']} label="課程名稱">
             <Input />
           </Item>
-          <Item name={['status']} label="發佈" valuePropName="checked">
+          <Item
+            name={['status']}
+            label="發佈"
+            getValueProps={(value) => ({ value: value === 'publish' })}
+            normalize={(value) => (value ? 'publish' : 'draft')}
+          >
             <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
           </Item>
         </Form>

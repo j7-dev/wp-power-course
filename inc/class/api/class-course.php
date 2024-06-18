@@ -165,8 +165,8 @@ final class Course {
 		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
 
 		$description_array = $with_description ? array(
-			'description'       => \wpautop( $product->get_description() ),
-			'short_description' => \wpautop( $product->get_short_description() ),
+			'description'       => $product->get_description(),
+			'short_description' => $product->get_short_description(),
 		) : array();
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
@@ -347,8 +347,10 @@ final class Course {
 		}
 		$body_params = $request->get_body_params() ?? array();
 		$file_params = $request->get_file_params();
-
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		ob_start();
+		var_dump( $body_params );
+		\J7\WpUtils\Classes\Log::info( '' . ob_get_clean() );
+		// $body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$product = \wc_get_product( $id );
 

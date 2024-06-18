@@ -35,6 +35,10 @@ final class Chapter {
 			'endpoint' => 'chapters/sort',
 			'method'   => 'post',
 		),
+		array(
+			'endpoint' => 'chapters/(?P<id>\d+)',
+			'method'   => 'post',
+		),
 	);
 
 	/**
@@ -122,10 +126,10 @@ final class Chapter {
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public function patch_chapters_with_id_callback( $request ) {
+	public function post_chapters_with_id_callback( $request ) {
 
 		$id          = $request['id'];
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_body_params() ?? array();
 		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
 
 		$formatted_params = ChapterFactory::converter( $body_params );

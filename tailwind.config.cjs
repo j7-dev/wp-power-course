@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 // eslint-disable-next-line no-undef
 module.exports = {
-  important: true,
+  // important: true,
+
   corePlugins: {
     preflight: false,
   },
@@ -20,6 +21,12 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('daisyui'),
+  ],
   safelist: [],
+  daisyui: {
+    themes: ['light', 'dark', 'cupcake'],
+    prefix: 'pc-', // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+  },
 }

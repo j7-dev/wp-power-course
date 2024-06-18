@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import '@/assets/scss/index.scss'
 
-$(document.body).on('updated_checkout', function () {
+$(document).ready(function () {
   console.log(123)
 })

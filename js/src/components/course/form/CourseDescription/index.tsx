@@ -77,7 +77,6 @@ export const CourseDescription = () => {
       <Item
         name={['status']}
         label="發佈"
-        valuePropName="checked"
         getValueProps={(value) => ({ value: value === 'publish' })}
         normalize={(value) => (value ? 'publish' : 'draft')}
       >
