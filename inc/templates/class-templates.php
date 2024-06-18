@@ -9,7 +9,6 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
-use J7\PowerBundleProduct\BundleProduct;
 
 /**
  * Class FrontEnd
@@ -140,7 +139,25 @@ final class Templates {
 	 * @return void
 	 */
 	public function enqueue_assets() {
-		\wp_enqueue_script( 'jquery-ui-accordion' );
+		// DELETE \wp_enqueue_script( 'jquery-ui-accordion' );
+
+		\wp_enqueue_script(
+			Plugin::$kebab . '-template',
+			Plugin::$url . '/inc/assets/dist/index.js',
+			array( 'jquery' ),
+			Plugin::$version,
+			array(
+				'strategy'  => 'async',
+				'in_footer' => true,
+			)
+		);
+
+		\wp_enqueue_style(
+			Plugin::$kebab . '-template',
+			Plugin::$url . '/inc/assets/dist/css/index.css',
+			array(),
+			Plugin::$version
+		);
 	}
 }
 

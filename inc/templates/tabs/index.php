@@ -7,40 +7,24 @@ $description = $product->get_description();
 
 ob_start();
 ?>
-
-<div id="accordion">
-	<h3>Section 1</h3>
-	<div>
-	<p>Mauris mauris ante, blandit et, ultrices a, suscipit eget.
-	Integer ut neque. Vivamus nisi metus, molestie vel, gravida in,
-	condimentum sit amet, nunc. Nam a nibh. Donec suscipit eros.
-	Nam mi. Proin viverra leo ut odio.</p>
+<div class="pc-accordion">
+<section class="accordion">
+	<div class="tab">
+		<input type="checkbox" name="accordion-1" id="cb1">
+		<label for="cb1" class="tab__label">Checkbox</label>
+		<div class="tab__content">
+			<p>Pure CSS accordion based on the "input:checked + label" style trick.</p>
+		</div>
 	</div>
-	<h3>Section 2</h3>
-	<div>
-	<p>Sed non urna. Phasellus eu ligula. Vestibulum sit amet purus.
-	Vivamus hendrerit, dolor aliquet laoreet, mauris turpis velit,
-	faucibus interdum tellus libero ac justo.</p>
+	<div class="tab">
+		<input type="checkbox" name="accordion-1" id="cb2">
+		<label for="cb2" class="tab__label">Open multiple</label>
+		<div class="tab__content">
+			<p>Using <code>&lt;input type="checkbox"&gt;</code> allows to have several tabs open at the same time.</p>
+		</div>
 	</div>
-	<h3>Section 3</h3>
-	<div>
-	<p>Nam enim risus, molestie et, porta ac, aliquam ac, risus.
-	Quisque lobortis.Phasellus pellentesque purus in massa.</p>
-	<ul>
-		<li>List item one</li>
-		<li>List item two</li>
-		<li>List item three</li>
-	</ul>
-	</div>
+</section>
 </div>
-<script>
-	(function($){
-		setTimeout(() => {
-			$( "#accordion" ).accordion();
-		}, 3000);
-
-	})(jQuery);
-</script>
 <?php
 $accordion = ob_get_clean();
 
