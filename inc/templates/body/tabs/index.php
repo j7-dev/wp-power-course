@@ -1,15 +1,11 @@
 <?php
-
-use J7\PowerCourse\Templates\Components\Tabs;
-use J7\PowerCourse\Templates\Components\Collapse;
+use J7\PowerCourse\Templates\Templates;
 
 
-
+$product     = $args;
 $description = $product->get_description();
-
-$accordion = Collapse::chapter( array( 'product' => $product ) );
-$qa        = Collapse::qa( array( 'product' => $product ) );
-
+$accordion   = Templates::get( 'collapse/chapter', args: $product, load_once: false, echo: false );
+$qa          = Templates::get( 'collapse/qa', args: $product, load_once: false, echo: false );
 
 $course_tabs = array(
 	array(
@@ -44,8 +40,8 @@ $course_tabs = array(
 	),
 );
 
-
-echo Tabs::base(
+Templates::get(
+	'tabs/base',
 	array(
 		'course_tabs'        => $course_tabs,
 		'default_active_key' => '1',

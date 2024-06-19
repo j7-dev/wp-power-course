@@ -19,12 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-
-use J7\PowerCourse\Templates\Components\Course;
-use J7\PowerCourse\Templates\Components\Title;
-use J7\PowerCourse\Templates\Components\Card;
-use J7\PowerBundleProduct\BundleProduct;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Templates\Templates;
 
 global $product;
 
@@ -34,99 +29,14 @@ get_header(); ?>
 <div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
 	<!-- Header -->
-	<?php require_once __DIR__ . '/header/index.php'; ?>
+	<?php Templates::get( 'header', $product, true ); ?>
 
 	<div class="flex flex-col md:flex-row gap-8">
 		<!-- Body -->
-		<div class="flex-1">
-
-			<div class="mb-12">
-				<?php
-				echo Title::title(
-					array(
-						'value' => '課程資訊',
-					)
-				);
-				?>
-				<?php
-				echo Course::info(
-					array(
-						'items' => array(
-							array(
-								'icon'  => 'calendar',
-								'label' => '開課時間',
-								'value' => '2022/08/31 16:00',
-							),
-							array(
-								'icon'  => 'clock',
-								'label' => '預計時長',
-								'value' => '15 小時 8 分',
-							),
-							array(
-								'icon'  => 'list',
-								'label' => '預計單元',
-								'value' => '39個',
-							),
-							array(
-								'icon'  => 'eye',
-								'label' => '觀看時間',
-								'value' => '無限制',
-							),
-							array(
-								'icon'  => 'team',
-								'label' => '課程學員',
-								'value' => '1214 人',
-							),
-						),
-					)
-				);
-				?>
-			</div>
-			<!-- Tabs -->
-			<?php require_once __DIR__ . '/tabs/index.php'; ?>
-
-			<!-- Footer -->
-			<?php require_once __DIR__ . '/footer/index.php'; ?>
-		</div>
+		<?php Templates::get( 'body', $product, true ); ?>
 
 		<!-- Sider -->
-		<div class="w-[20rem] flex flex-col gap-6">
-
-			<?php
-			echo Card::single_product(
-				array(
-					'product' => $product,
-				)
-			);
-			?>
-
-<?php
-$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
-
-foreach ( $bundle_ids as $bundle_id ) {
-	$bundle_product = \wc_get_product( $bundle_id );
-	if ( ! $bundle_product ) {
-		continue;
-	}
-
-	$bundle_product = new BundleProduct( $bundle_product );
-	if ( 'publish' !== $bundle_product->get_status() ) {
-		continue;
-	}
-	echo Card::bundle_product(
-		array(
-			'bundle_product' => $bundle_product,
-			'title'          => $bundle_product->get_name(),
-		)
-	);
-
-}
-?>
-
-
-
-		</div>
-
+		<?php Templates::get( 'sider', $product, true ); ?>
 	</div>
 
 </div>

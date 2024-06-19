@@ -1,0 +1,66 @@
+<?php
+
+use J7\PowerCourse\Templates\Templates;
+use J7\PowerBundleProduct\BundleProduct;
+
+$bundle_product = $args;
+
+if ( ! ( $bundle_product instanceof BundleProduct ) ) {
+	throw new \Exception( 'product 不是 BundleProduct' );
+}
+
+$product_ids = $bundle_product->get_bundled_ids();
+
+$bundle_title = $bundle_product->get_name();
+
+$purchase_note = \wpautop( $bundle_product->get_purchase_note() );
+
+?>
+<div class="w-full bg-white shadow-lg rounded p-6">
+	<p class="text-xs text-center mb-1 text-red-400">合購優惠</p>
+	<h6 class="text-base font-semibold text-center"><?php echo $bundle_title; ?></h6>
+
+	<?php Templates::get( 'divider/base' ); ?>
+
+	<div class="mb-6 text-sm">
+		<?php echo $purchase_note; ?>
+	</div>
+
+
+	<?php
+	foreach ( $product_ids as $product_id ) :
+		$product = \wc_get_product( $product_id );
+		?>
+		<div>
+		<?php Templates::get( 'course/list', $product ); ?>
+		</div>
+		<?php Templates::get( 'divider/base' ); ?>
+
+		<?php
+	endforeach;
+	?>
+
+
+
+	<div class="flex gap-3 justify-between items-end">
+		<?php
+		Templates::get(
+			'price/base',
+			array(
+				'product' => $bundle_product,
+				'size'    => 'small',
+			)
+		);
+		?>
+
+		<?php
+		Templates::get(
+			'button/base',
+			array(
+				'children' => '加入購物車',
+				'class'    => 'px-6',
+			)
+		);
+		?>
+	</div>
+</div>

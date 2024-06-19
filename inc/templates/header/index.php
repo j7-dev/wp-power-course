@@ -1,10 +1,8 @@
 <?php
-use J7\PowerCourse\Templates\Components\Icon;
-use J7\PowerCourse\Templates\Components\Button;
-use J7\PowerCourse\Templates\Components\Rate;
-use J7\PowerCourse\Templates\Components\Course;
-use J7\PowerCourse\Templates\Components\User;
+use J7\PowerCourse\Templates\Templates;
 
+
+$product     = $args;
 $product_id  = $product->get_id();
 $teacher_ids = \get_post_meta( $product_id, 'teacher_ids', false );
 if ( ! is_array( $teacher_ids ) ) {
@@ -12,25 +10,19 @@ if ( ! is_array( $teacher_ids ) ) {
 }
 
 ?>
-<div class="flex gap-6 flex-col md:flex-row">
+<div class="flex gap-6 flex-col md:flex-row mb-20">
 		<div class="w-full md:w-[55%]">
-			<?php echo Course::video(); ?>
+		<?php Templates::get( 'course/video' ); ?>
 		</div>
 
 		<div class="w-full md:w-[45%]">
 			<div class="mb-2 flex gap-x-4 gap-y-2 flex-wrap">
 			<?php
-			foreach ( $teacher_ids as $teacher_id ) :
+			foreach ( $teacher_ids as $teacher_id ) {
 				$teacher = \get_user_by( 'id', $teacher_id );
-				?>
-				<?php
-				echo User::Base(
-					array(
-						'user' => $teacher,
-					)
-				);
-				?>
-			<?php endforeach; ?>
+				Templates::get( 'user/base', $teacher );
+			}
+			?>
 			</div>
 
 			<h1 class="mb-[10px] text-xl md:text-4xl md:leading-[3rem] font-semibold">
@@ -45,44 +37,10 @@ if ( ! is_array( $teacher_ids ) ) {
 			?>
 			</div>
 
-			<div class="flex h-8 items-center gap-2">
+
 				<?php
-				echo Icon::fire();
-				?>
-				熱門課程
-			</div>
-
-
-			<div class="flex h-8 items-center gap-2">
-				<?php echo Icon::shopping_bag(); ?>
-				2,310 人已購買
-			</div>
-
-			<?php echo Icon::clock(); ?>
-
-			<?php
-			echo Button::base(
-				array(
-					'children' => '立即購買',
-					'icon'     => 'fire',
-				)
-			);
-			?>
-
-			<div class="flex h-8 items-center gap-2">
-				<?php
-				echo Rate::rate(
-					array(
-						'value' => 3.7,
-						'total' => 100,
-					)
-				);
-				?>
-			</div>
-
-			<div class="flex h-8 items-center gap-2">
-				<?php
-				echo Rate::base(
+				Templates::get(
+					'rate/base',
 					array(
 						'show_before' => true,
 						'value'       => 3.7,
@@ -90,10 +48,5 @@ if ( ! is_array( $teacher_ids ) ) {
 					)
 				);
 				?>
-			</div>
-
-
-
-
 		</div>
 </div>

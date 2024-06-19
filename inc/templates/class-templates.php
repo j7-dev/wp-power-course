@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 覆寫 WooCommerce 模板
  */
@@ -14,6 +15,7 @@ use J7\PowerCourse\Utils\Base;
  * Class FrontEnd
  */
 final class Templates {
+
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	const SLUG = 'course_slug';
@@ -35,6 +37,76 @@ final class Templates {
 		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		\add_filter( 'language_attributes', array( $this, 'add_html_attr' ), 20, 2 );
 	}
+
+	/**
+	 * 從指定的模板路徑讀取模板文件並渲染數據
+	 *
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param bool   $load_once 是否只載入一次
+	 * @param bool   $echo 是否輸出
+	 * @return ?string|null
+	 * @throws \Exception 如果模板文件不存在.
+	 */
+	public static function get( string $name, mixed $args = null, ?bool $load_once = false, ?bool $echo = true ): ?string {
+		$result = self::safe_get( $name, $args, $load_once, $echo );
+		if ( '' === $result ) {
+			throw new \Exception( "模板文件 {$name} 不存在" );
+		}
+		return $result;
+	}
+
+	/**
+	 * 從指定的模板路徑讀取模板文件並渲染數據
+	 *
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param bool   $load_once 是否只載入一次
+	 * @param bool   $echo 是否輸出
+	 * @return string|false|null
+	 * @throws \Exception 如果模板文件不存在.
+	 */
+	public static function safe_get( string $name, mixed $args = null, ?bool $load_once = false, ?bool $echo = true ): string|false|null {
+		$area_names = array( 'head', 'header', 'body', 'main', 'sider', 'footer' ); // 區域名稱
+		// 如果 $name 是以 area name 開頭的，那就去 area folder 裡面找
+		$is_area = false;
+		foreach ( $area_names as $area_name ) {
+			if ( strpos( $name, $area_name ) === 0 ) {
+				$is_area = true;
+				break;
+			}
+		}
+
+		if ( $is_area ) {
+			$template_path = Plugin::$dir . '/inc/templates/' . $name;
+		} else { // 不是區域名稱就去 components 裡面找
+			$template_path = Plugin::$dir . '/inc/templates/components/' . $name;
+		}
+
+		// 檢查模板文件是否存在
+		if ( file_exists( "{$template_path}.php" ) ) {
+			if ( $echo ) {
+				\load_template( "{$template_path}.php", $load_once, $args );
+				return null;
+			}
+			ob_start();
+			\load_template( "{$template_path}.php", $load_once, $args );
+			$output = ob_get_clean();
+			return $output;
+		} elseif ( file_exists( "{$template_path}/index.php" ) ) {
+			if ( $echo ) {
+				\load_template( "{$template_path}/index.php", $load_once, $args );
+				return null;
+			}
+			ob_start();
+			\load_template( "{$template_path}/index.php", $load_once, $args );
+			$output = ob_get_clean();
+			return $output;
+		}
+		return '';
+	}
+
+
 
 	/**
 	 * Add rewrite rules
