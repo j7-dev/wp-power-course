@@ -47,6 +47,26 @@ div[class^="ant-"] {
 			@apply pb-0 text-xs;
 		}
 	}
+
+	// Radio Group 平均寬度
+	.ant-radio-group {
+		&.w-avg {
+			display: flex;
+			> label {
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+				span {
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+				}
+			}
+		}
+	}
 }
 li.ant-editor-sortable-tree-node button.ant-editor-sortable-tree-node-handle {
 	@apply absolute;

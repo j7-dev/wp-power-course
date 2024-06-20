@@ -6,7 +6,6 @@ import {
   Select,
   Input,
   FormInstance,
-  Switch,
   List,
   Tag,
 } from 'antd'
@@ -21,6 +20,7 @@ import { CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtomValue } from 'jotai'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { FiSwitch } from '@/components/formItem'
 
 // TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?
@@ -401,14 +401,19 @@ const BundleForm: FC<{
           <Input />
         </Item>
       </div>
-      <Item
-        name={['status']}
-        label="發佈"
-        getValueProps={(value) => ({ value: value === 'publish' })}
-        normalize={(value) => (value ? 'publish' : 'draft')}
-      >
-        <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
-      </Item>
+
+      <FiSwitch
+        formItemProps={{
+          name: ['status'],
+          label: '發佈',
+          getValueProps: (value) => ({ value: value === 'publish' }),
+          normalize: (value) => (value ? 'publish' : 'draft'),
+        }}
+        switchProps={{
+          checkedChildren: '發佈',
+          unCheckedChildren: '草稿',
+        }}
+      />
     </Form>
   )
 }

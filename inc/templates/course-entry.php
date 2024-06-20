@@ -22,7 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 use J7\PowerCourse\Templates\Templates;
 
 global $product;
+$product->set_average_rating( 9.7 );
+$average_rating = $product->get_average_rating();
 
+var_dump( $average_rating );
 
 get_header(); ?>
 <!-- <script src="https://cdn.tailwindcss.com"></script> -->

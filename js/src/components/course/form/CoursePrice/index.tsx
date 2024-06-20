@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { Form, InputNumber, Switch } from 'antd'
+import { Form, InputNumber } from 'antd'
+import { FiSwitch } from '@/components/formItem'
 
 const { Item } = Form
 
@@ -32,15 +33,12 @@ export const CoursePrice = () => {
         <InputNumber className="w-full" min={0} disabled={watchIsFree} />
       </Item>
 
-      <Item
-        name={['is_free']}
-        label="這是免費課程"
-        initialValue={false}
-        getValueProps={(value) => (value === 'yes' ? { checked: true } : {})}
-        normalize={(value) => (value ? 'yes' : 'no')}
-      >
-        <Switch />
-      </Item>
+      <FiSwitch
+        formItemProps={{
+          name: ['is_free'],
+          label: '這是免費課程',
+        }}
+      />
     </>
   )
 }

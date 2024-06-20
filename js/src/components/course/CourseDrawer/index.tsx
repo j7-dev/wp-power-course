@@ -6,6 +6,7 @@ import {
   CourseAnnouncement,
   CoursePrice,
   CourseBundle,
+  CourseOther,
 } from '@/components/course/form'
 
 export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
@@ -34,7 +35,7 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
       key: '4',
       forceRender: true,
       label: '其他設定',
-      children: 'Content of Tab Pane 3',
+      children: <CourseOther />,
     },
     {
       key: '5',
