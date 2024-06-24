@@ -23,7 +23,7 @@ export const CourseOther = () => {
 
       <Heading>課程評價</Heading>
 
-      <div className="grid 2xl:grid-cols-3 gap-6">
+      <div className="grid 2xl:grid-cols-3 gap-6 mb-12">
         <Item label="自訂課程評價" name={['average_rating']} initialValue={2.5}>
           <Slider step={0.1} min={0} max={5} />
         </Item>
@@ -57,9 +57,23 @@ export const CourseOther = () => {
           />
         </Item>
 
-        <Item label="開放已購買用戶評價課程" name={['average_rating']}>
-          <Switch />
-        </Item>
+        <FiSwitch
+          formItemProps={{
+            name: ['enable_review'],
+            label: '開放已購買用戶評價課程',
+          }}
+        />
+      </div>
+
+      <Heading>課程留言</Heading>
+
+      <div className="grid 2xl:grid-cols-3 gap-6 mb-12">
+        <FiSwitch
+          formItemProps={{
+            name: ['enable_comment'],
+            label: '開放用戶留言',
+          }}
+        />
       </div>
     </>
   )

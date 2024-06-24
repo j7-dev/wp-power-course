@@ -245,6 +245,7 @@ final class Product {
 
 			'sale_date_range'                           => array( (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ),
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
+			'qa_list'                                   => array(),
 
 		) + $children;
 

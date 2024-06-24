@@ -5,7 +5,6 @@ import {
   Input,
   InputNumber,
   Select,
-  Switch,
   Space,
   Radio,
 } from 'antd'
@@ -22,18 +21,6 @@ import dayjs from 'dayjs'
 
 const { Item } = Form
 
-const selectAfter = (
-  <Select
-    options={[
-      { label: '日', value: 'day' },
-      { label: '月', value: 'month' },
-      { label: '年', value: 'year' },
-    ]}
-    defaultValue="day"
-    style={{ width: 60 }}
-  />
-)
-
 export const CourseDescription = () => {
   const form = Form.useFormInstance()
   const { options, isLoading } = useOptions()
@@ -42,81 +29,91 @@ export const CourseDescription = () => {
   const slug = Form.useWatch(['slug'], form)
   const { uploadProps, fileList } = useUpload()
   const watchLimitType: string = Form.useWatch(['limit_type'], form)
+  const watchId = Form.useWatch(['id'], form)
+  const isEdit = !!watchId
 
   useEffect(() => {
     form.setFieldValue(['files'], fileList)
   }, [fileList])
 
+  const handleReset = (value: string) => {
+    if ('unlimited' === value) {
+      form.setFieldsValue({ limit_value: '', limit_unit: '' })
+    }
+    if ('fixed' === value) {
+      form.setFieldsValue({ limit_value: '1', limit_unit: 'day' })
+    }
+    if ('assigned' === value) {
+      form.setFieldsValue({
+        limit_value: undefined,
+        limit_unit: 'second',
+      })
+    }
+  }
+
   return (
     <>
-      <Item name={['id']} hidden normalize={() => undefined}>
-        <Input />
-      </Item>
-      <Item name={['name']} label="課程名稱">
-        <Input />
-      </Item>
-      <Item name={['sub_title']} label="課程副標題">
-        <Input disabled />
-      </Item>
-      <Item
-        name={['category_ids']}
-        label={keyLabelMapper('product_category_id')}
-      >
-        <Select
-          options={termFormatter(product_cats)}
-          mode="multiple"
-          placeholder="可多選"
-          allowClear
-        />
-      </Item>
-      <Item name={['product_tag_id']} label={keyLabelMapper('product_tag_id')}>
-        <Select
-          options={termFormatter(product_tags)}
-          mode="multiple"
-          placeholder="可多選"
-          allowClear
-          disabled
-        />
-      </Item>
-      <Item name={['slug']} label="銷售網址">
-        <Input
-          addonBefore={productUrl}
-          addonAfter={<CopyText text={`${productUrl}${slug}`} />}
-        />
-      </Item>
-      <Item name={['short_description']} label="課程簡介">
-        <Input.TextArea rows={8} />
-      </Item>
-      <Item name={['description']} label="課程重點介紹">
-        <Input.TextArea rows={8} />
-      </Item>
+      <div className="mb-12">
+        <Heading>課程描述</Heading>
 
-      <p className="mb-3">課程封面圖</p>
-      <div className="mb-8">
-        <Upload uploadProps={uploadProps} />
-        <Item hidden name={['files']} label="課程封面圖">
+        <Item name={['id']} hidden normalize={() => undefined}>
           <Input />
         </Item>
+        <Item name={['name']} label="課程名稱">
+          <Input allowClear />
+        </Item>
+        <Item name={['sub_title']} label="課程副標題">
+          <Input allowClear />
+        </Item>
+        <Item
+          name={['category_ids']}
+          label={keyLabelMapper('product_category_id')}
+        >
+          <Select
+            options={termFormatter(product_cats)}
+            mode="multiple"
+            placeholder="可多選"
+            allowClear
+          />
+        </Item>
+        <Item name={['tag_ids']} label={keyLabelMapper('product_tag_id')}>
+          <Select
+            options={termFormatter(product_tags)}
+            mode="multiple"
+            placeholder="可多選"
+            allowClear
+          />
+        </Item>
+
+        <Item name={['short_description']} label="課程簡介">
+          <Input.TextArea rows={8} allowClear />
+        </Item>
+        <Item name={['description']} label="課程重點介紹">
+          <Input.TextArea rows={8} disabled />
+        </Item>
+
+        <p className="mb-3">課程封面圖</p>
+        <div className="mb-8">
+          <Upload uploadProps={uploadProps} />
+          <Item hidden name={['files']} label="課程封面圖">
+            <Input />
+          </Item>
+        </div>
       </div>
 
-      <FiSwitch
-        formItemProps={{
-          name: ['status'],
-          label: '發佈',
-          getValueProps: (value) => ({ value: value === 'publish' }),
-          normalize: (value) => (value ? 'publish' : 'draft'),
-        }}
-        switchProps={{
-          checkedChildren: '發佈',
-          unCheckedChildren: '草稿',
-        }}
-      />
-
-      <div className="min-h-[12rem]">
+      <div className="min-h-[12rem] mb-12">
         <Heading>課程資訊</Heading>
 
         <div className="grid 2xl:grid-cols-3 gap-6">
-          <Item name={['course_schedule']} label="開課時間" className="mb-0">
+          <Item
+            name={['course_schedule']}
+            label="開課時間"
+            className="mb-0"
+            getValueProps={(value) => ({
+              value: value ? dayjs.unix(value) : null,
+            })}
+            normalize={(value) => value?.unix()}
+          >
             <DatePicker
               className="w-full"
               format="YYYY-MM-DD HH:mm"
@@ -126,7 +123,7 @@ export const CourseDescription = () => {
 
           <div>
             <p className="mb-2">預計時長</p>
-            <Space.Compact>
+            <Space.Compact block>
               <Item name={['course_hour']} noStyle>
                 <InputNumber className="w-1/2" min={0} addonAfter="時" />
               </Item>
@@ -147,29 +144,98 @@ export const CourseDescription = () => {
                 options={[
                   { label: '無期限', value: 'unlimited' },
                   { label: '固定天數', value: 'fixed' },
-                  { label: '指定到期日', value: 'assigned' },
+                  { label: '指定時間', value: 'assigned' },
                 ]}
                 optionType="button"
                 buttonStyle="solid"
+                onChange={(e) => {
+                  const value = e?.target?.value || ''
+                  handleReset(value)
+                }}
               />
             </Item>
             {'fixed' === watchLimitType && (
-              <div>
-                <InputNumber
+              <Space.Compact block>
+                <Item
+                  name={['limit_value']}
+                  initialValue={1}
                   className="w-full"
-                  min={1}
-                  addonAfter={selectAfter}
-                />
-              </div>
+                >
+                  <InputNumber className="w-full" min={1} />
+                </Item>
+                <Item name={['limit_unit']} initialValue="day">
+                  <Select
+                    options={[
+                      { label: '日', value: 'day' },
+                      { label: '月', value: 'month' },
+                      { label: '年', value: 'year' },
+                    ]}
+                    className="w-16"
+                  />
+                </Item>
+              </Space.Compact>
+            )}
+
+            {'unlimited' === watchLimitType && (
+              <>
+                <Item name={['limit_value']} initialValue="" hidden>
+                  <Input />
+                </Item>
+                <Item name={['limit_unit']} initialValue="" hidden>
+                  <Input />
+                </Item>
+              </>
             )}
 
             {'assigned' === watchLimitType && (
-              <div>
-                <DatePicker className="w-full" />
-              </div>
+              <>
+                <Item
+                  name={['limit_value']}
+                  label="指定時間"
+                  noStyle
+                  className="mb-0"
+                  getValueProps={(value) => ({
+                    value: value ? dayjs.unix(value) : undefined,
+                  })}
+                  normalize={(value) => (value ? value?.unix() : '')}
+                >
+                  <DatePicker
+                    className="w-full"
+                    format="YYYY-MM-DD HH:mm"
+                    showTime={{ defaultValue: dayjs() }}
+                  />
+                </Item>
+                <Item name={['limit_unit']} initialValue="second" hidden>
+                  <Input />
+                </Item>
+              </>
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mb-12">
+        <Heading>課程發佈</Heading>
+
+        <Item name={['slug']} label="銷售網址">
+          <Input
+            addonBefore={productUrl}
+            addonAfter={<CopyText text={`${productUrl}${slug}`} />}
+          />
+        </Item>
+
+        <FiSwitch
+          formItemProps={{
+            name: ['status'],
+            label: '發佈',
+            getValueProps: (value) => ({ value: value === 'publish' }),
+            normalize: (value) => (value ? 'publish' : 'draft'),
+          }}
+          switchProps={{
+            checkedChildren: '發佈',
+            unCheckedChildren: '草稿',
+          }}
+        />
       </div>
     </>
   )

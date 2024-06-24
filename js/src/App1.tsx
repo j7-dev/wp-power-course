@@ -17,6 +17,8 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from '@refinedev/react-router-v6'
 import { dataProvider } from './rest-data-provider'
+import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
+
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
@@ -33,6 +35,9 @@ function App() {
           'wp-rest': dataProvider(`${apiUrl}/wp/v2`),
           'wc-rest': dataProvider(`${apiUrl}/wc/v3`),
           'wc-store': dataProvider(`${apiUrl}/wc/store/v1`),
+          'bunny-stream': bunnyStreamDataProvider(
+            'https://video.bunnycdn.com/library',
+          ),
         }}
         notificationProvider={useNotificationProvider}
         routerProvider={routerBindings}

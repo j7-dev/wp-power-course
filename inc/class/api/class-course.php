@@ -211,64 +211,75 @@ final class Course {
 
 		$base_array = array(
 			// Get Product General Info
-			'id'                 => (string) $product->get_id(),
-			'type'               => $product->get_type(),
-			'name'               => $product->get_name(),
-			'depth'              => 0,
-			'slug'               => $product->get_slug(),
-			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
-			'status'             => $product->get_status(),
-			'featured'           => $product->get_featured(),
-			'catalog_visibility' => $product->get_catalog_visibility(),
-			'sku'                => $product->get_sku(),
-			'menu_order'         => (int) $product->get_menu_order(),
-			'virtual'            => $product->get_virtual(),
-			'downloadable'       => $product->get_downloadable(),
-			'permalink'          => \get_permalink( $product->get_id() ),
+			'id'                  => (string) $product->get_id(),
+			'type'                => $product->get_type(),
+			'name'                => $product->get_name(),
+			'depth'               => 0,
+			'slug'                => $product->get_slug(),
+			'date_created'        => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'       => $date_modified?->date( 'Y-m-d H:i:s' ),
+			'status'              => $product->get_status(),
+			'featured'            => $product->get_featured(),
+			'catalog_visibility'  => $product->get_catalog_visibility(),
+			'sku'                 => $product->get_sku(),
+			'menu_order'          => (int) $product->get_menu_order(),
+			'virtual'             => $product->get_virtual(),
+			'downloadable'        => $product->get_downloadable(),
+			'permalink'           => \get_permalink( $product->get_id() ),
 
 			// Get Product Prices
-			'price_html'         => $product->get_price_html(),
-			'regular_price'      => (int) $product->get_regular_price(),
-			'sale_price'         => (int) $product->get_sale_price(),
-			'on_sale'            => $product->is_on_sale(),
-			'date_on_sale_from'  => $product->get_date_on_sale_from(),
-			'date_on_sale_to'    => $product->get_date_on_sale_to(),
-			'total_sales'        => $product->get_total_sales(),
+			'price_html'          => $product->get_price_html(),
+			'regular_price'       => (int) $product->get_regular_price(),
+			'sale_price'          => (int) $product->get_sale_price(),
+			'on_sale'             => $product->is_on_sale(),
+			'date_on_sale_from'   => $product->get_date_on_sale_from(),
+			'date_on_sale_to'     => $product->get_date_on_sale_to(),
+			'total_sales'         => $product->get_total_sales(),
 
 			// Get Product Stock
-			'stock'              => $product->get_stock_quantity(),
-			'stock_status'       => $product->get_stock_status(),
-			'manage_stock'       => $product->get_manage_stock(),
-			'stock_quantity'     => $product->get_stock_quantity(),
-			'backorders'         => $product->get_backorders(),
-			'backorders_allowed' => $product->backorders_allowed(),
-			'backordered'        => $product->is_on_backorder(),
-			'low_stock_amount'   => $low_stock_amount,
+			'stock'               => $product->get_stock_quantity(),
+			'stock_status'        => $product->get_stock_status(),
+			'manage_stock'        => $product->get_manage_stock(),
+			'stock_quantity'      => $product->get_stock_quantity(),
+			'backorders'          => $product->get_backorders(),
+			'backorders_allowed'  => $product->backorders_allowed(),
+			'backordered'         => $product->is_on_backorder(),
+			'low_stock_amount'    => $low_stock_amount,
 
 			// Get Linked Products
-			'upsell_ids'         => array_map( 'strval', $product->get_upsell_ids() ),
-			'cross_sell_ids'     => array_map( 'strval', $product->get_cross_sell_ids() ),
+			'upsell_ids'          => array_map( 'strval', $product->get_upsell_ids() ),
+			'cross_sell_ids'      => array_map( 'strval', $product->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
-			'attributes'         => $attributes_arr,
+			'attributes'          => $attributes_arr,
 
 			// Get Product Taxonomies
-			'category_ids'       => array_map( 'strval', $product->get_category_ids() ),
-			'tag_ids'            => array_map( 'strval', $product->get_tag_ids() ),
+			'category_ids'        => array_map( 'strval', $product->get_category_ids() ),
+			'tag_ids'             => array_map( 'strval', $product->get_tag_ids() ),
 
 			// Get Product Images
-			'images'             => $images,
+			'images'              => $images,
 
 			// PENDING meta data
 			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
 
-			'is_course'          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'          => (string) $product->get_parent_id(),
-			'is_free'            => (string) $product->get_meta( 'is_free' ),
-
+			'is_course'           => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'           => (string) $product->get_parent_id(),
+			'is_free'             => (string) $product->get_meta( 'is_free' ),
+			'qa_list'             => (array) $product->get_meta( 'qa_list' ),
+			'sub_title'           => (string) $product->get_meta( 'sub_title' ),
+			'course_schedule'     => (int) $product->get_meta( 'course_schedule' ),
+			'course_hour'         => (int) $product->get_meta( 'course_hour' ),
+			'course_minute'       => (int) $product->get_meta( 'course_minute' ),
+			'limit_type'          => (string) $product->get_meta( 'limit_type' ),
+			'is_popular'          => (string) $product->get_meta( 'is_popular' ),
+			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
+			'enable_review'       => (string) $product->get_meta( 'enable_review' ),
+			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
+			'limit_value'         => (int) $product->get_meta( 'limit_value' ),
+			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
 			// bundle product
-			'bundle_ids'         => $bundle_ids,
+			'bundle_ids'          => $bundle_ids,
 		) + $children;
 
 		return array_merge(
