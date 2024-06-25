@@ -7,6 +7,7 @@ import { useCreate, useCustomMutation, useApiUrl } from '@refinedev/core'
 import { Progress } from 'antd'
 import { NotificationInstance } from 'antd/es/notification/interface'
 import { nanoid } from 'nanoid'
+import { useVideoLibrary } from '@/bunny/hooks'
 
 type TCreateVideoResponse = {
   videoLibraryId: number
@@ -44,11 +45,8 @@ type TCreateVideoParams = {
   thumbnailTime?: number
 }
 
-type TUseListVideoParams = {
-  libraryId: number
-}
-
-export const useCreateVideo = ({ libraryId }: TUseListVideoParams) => {
+export const useCreateVideo = () => {
+  const { libraryId } = useVideoLibrary()
   const apiUrl = useApiUrl('bunny-stream')
   const result = useCreate<TCreateVideoResponse>()
   const { mutate: create } = result
@@ -65,7 +63,6 @@ export const useCreateVideo = ({ libraryId }: TUseListVideoParams) => {
   }) => {
     const key = nanoid()
     const fileSize = binary.size
-    console.log('⭐  binary:', binary)
 
     const notification = ({
       percent = 0,

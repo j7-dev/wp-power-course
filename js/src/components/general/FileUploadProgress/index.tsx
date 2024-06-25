@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react'
 import { BiMoviePlay } from 'react-icons/bi'
 import { Typography, Progress } from 'antd'
-import { RcFile } from 'antd/lib/upload/interface'
-import { getFileExtension, getEstimateUploadTimeInSeconds } from '@/utils'
+import { getEstimateUploadTimeInSeconds } from '@/utils'
+import { TFileInQueue } from '@/pages/admin/Courses'
 
 const { Paragraph } = Typography
 
@@ -17,10 +17,10 @@ const { Paragraph } = Typography
  */
 
 export const FileUploadProgress: FC<{
-  file: RcFile
-  status?: 'active' | 'normal' | 'exception' | 'success' | undefined
-}> = ({ file, status = 'active' }) => {
+  fileInQueue: TFileInQueue
+}> = ({ fileInQueue }) => {
   const [percent, setPercent] = useState(0)
+  const { file, status = 'active', encodeProgress } = fileInQueue
 
   // 估計上傳時間
   const estimatedTimeInSeconds = getEstimateUploadTimeInSeconds(file.size)
@@ -28,23 +28,21 @@ export const FileUploadProgress: FC<{
   // 每 3 秒增加 XX %
   const step = (100 / estimatedTimeInSeconds) * 3
 
-  // TEST
-  console.log('⭐  file:', {
-    size: file.size,
-    percent,
-    step,
-    estimatedTimeInSeconds,
-  })
-
   useEffect(() => {
     // 用來模擬上傳進度
+    let timer: any = null
 
     if (['success'].includes(status)) {
       setPercent(100)
+      return () => {
+        clearInterval(timer)
+      }
     }
 
     if (!file.size) {
-      return
+      return () => {
+        clearInterval(timer)
+      }
     }
 
     // 新的百分比
@@ -52,11 +50,13 @@ export const FileUploadProgress: FC<{
 
     // 如果新的百分比 >= 100 則返回
     if (newPercent >= 100) {
-      return
+      return () => {
+        clearInterval(timer)
+      }
     }
 
     // 設定定時器新的百分比
-    const timer = setInterval(() => {
+    timer = setInterval(() => {
       setPercent(Number(newPercent.toFixed(1)))
     }, 3000)
 
@@ -70,7 +70,7 @@ export const FileUploadProgress: FC<{
     <>
       <Paragraph className="mb-0 text-xs" ellipsis>
         <BiMoviePlay className="relative top-[2px] mr-1" />
-        {file.name}
+        {100 === encodeProgress ? '影片已處理完畢' : '影片上傳中'} {file.name}
       </Paragraph>
       <Progress percent={percent} status={status} />
     </>

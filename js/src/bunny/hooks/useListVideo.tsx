@@ -4,12 +4,10 @@
 
 import React from 'react'
 import { useList } from '@refinedev/core'
+import { useVideoLibrary } from '@/bunny/hooks'
 
-type TUseListVideoParams = {
-  libraryId: number
-}
-
-export const useListVideo = ({ libraryId }: TUseListVideoParams) => {
+export const useListVideo = () => {
+  const { libraryId } = useVideoLibrary()
   const result = useList({
     resource: `${libraryId}/videos`,
     dataProviderName: 'bunny-stream',

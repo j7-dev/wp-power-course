@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { GetProp, UploadFile, UploadProps } from 'antd'
-import { useVideoLibrary } from './useVideoLibrary'
 import { NotificationInstance } from 'antd/es/notification/interface'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
 import { nanoid } from 'nanoid'
-import { useGetVideo } from '@/bunny/hooks'
-import { filesInQueueAtom, TFileInQueue } from '@/pages/admin/Courses'
+import { useGetVideo, useVideoLibrary } from '@/bunny/hooks'
+import { filesInQueueAtom } from '@/pages/admin/Courses'
 import { useAtom } from 'jotai'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
@@ -61,20 +60,8 @@ type TUploadVideoResponse = {
 export const useUpload = (props: TUseUploadParams) => {
   const [filesInQueue, setFilesInQueue] = useAtom(filesInQueueAtom)
   const { libraryId } = useVideoLibrary()
-  const [videoId, setVideoId] = useState<string>('')
 
   const uploadProps = props?.uploadProps
-  const notificationApi = props.notificationApi
-
-  const { data } = useGetVideo({
-    libraryId,
-    videoId,
-    queryOptions: {
-      enabled: !!videoId,
-    },
-  })
-
-  console.log('⭐  data:', data)
 
   const [fileList, setFileList] = useState<UploadFile[]>([])
 
@@ -95,6 +82,9 @@ export const useUpload = (props: TUseUploadParams) => {
             | 'exception'
             | 'success'
             | undefined,
+          videoId: '',
+          isEncoding: false,
+          encodeProgress: 0,
         },
       ])
 
@@ -109,12 +99,27 @@ export const useUpload = (props: TUseUploadParams) => {
           )
 
         // 取得影片 ID
-        const theVideoId = createVideoResult?.data?.guid || 'unknown id'
-        setVideoId(theVideoId)
+        const videoId = createVideoResult?.data?.guid || 'unknown id'
+
+        // 更新到狀態
+        setFilesInQueue((prev) => {
+          const newFilesInQueue = prev.map((fileInQueue) => {
+            if (fileInQueue.key === fileInQueueKey) {
+              return {
+                ...fileInQueue,
+                videoId,
+              }
+            }
+
+            return fileInQueue
+          })
+
+          return newFilesInQueue
+        })
 
         // 上傳影片 API
         const uploadVideo = await bunnyStreamAxios.put<TUploadVideoResponse>(
-          `/${libraryId}/videos/${theVideoId}?enabledResolutions=720p%2C1080p`,
+          `/${libraryId}/videos/${videoId}?enabledResolutions=720p%2C1080p`,
           file,
           {
             headers: {
@@ -124,25 +129,18 @@ export const useUpload = (props: TUseUploadParams) => {
         )
 
         if (uploadVideo?.data?.success) {
-          // 設定為 100% 並顯示成功
+          // 設定為 100% 並顯示成功，狀態不用改，馬上就要 encode
           setFilesInQueue((prev) => {
-            console.log('⭐ success prev:', prev)
             const newFilesInQueue = prev.map((fileInQueue) => {
               if (fileInQueue.key === fileInQueueKey) {
                 return {
                   ...fileInQueue,
-                  status: 'success' as
-                    | 'active'
-                    | 'normal'
-                    | 'exception'
-                    | 'success'
-                    | undefined,
+                  isEncoding: true,
                 }
               }
 
               return fileInQueue
             })
-            console.log('⭐ success newFilesInQueue:', newFilesInQueue)
 
             return newFilesInQueue
           })
