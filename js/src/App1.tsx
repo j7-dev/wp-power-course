@@ -46,6 +46,17 @@ function App() {
           syncWithLocation: false,
           warnWhenUnsavedChanges: true,
           projectId: 'power-course',
+          reactQuery: {
+            clientConfig: {
+              defaultOptions: {
+                queries: {
+                  staleTime: 1000 * 60 * 15,
+                  cacheTime: 1000 * 60 * 15,
+                  retry: 0,
+                },
+              },
+            },
+          },
         }}
       >
         <Routes>
