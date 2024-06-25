@@ -13,9 +13,9 @@ $user_avatar_url = \get_user_meta( $user_id, 'avatar_url', true );
 
 $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url(
 	$user->ID,
-	array(
+	[
 		'size' => 200,
-	)
+	]
 );
 
 $user_link = \get_author_posts_url( $user_id );

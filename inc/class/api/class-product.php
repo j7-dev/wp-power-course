@@ -28,26 +28,26 @@ final class Product {
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
 	 */
-	protected $apis = array(
-		array(
+	protected $apis = [
+		[
 			'endpoint' => 'products',
 			'method'   => 'get',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'bundle_products/(?P<id>\d+)',
 			'method'   => 'post',
-		),
-	);
+		],
+	];
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_products' ) );
+		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
 	}
 
 	/**
@@ -72,18 +72,18 @@ final class Product {
 	 */
 	public function get_products_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? [];
 
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
-		$default_args = array(
-			'status'         => array( 'publish', 'draft' ),
+		$default_args = [
+			'status'         => [ 'publish', 'draft' ],
 			'paginate'       => true,
 			'posts_per_page' => 10,
 			'page'           => 1,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
-		);
+		];
 
 		$args = \wp_parse_args(
 			$params,
@@ -91,15 +91,15 @@ final class Product {
 		);
 
 		if ( isset( $args['price_range'] ) ) {
-			$args['meta_query'] = array(
+			$args['meta_query'] = [
 				'relation' => 'AND',
-				array(
+				[
 					'key'     => '_price', // 價格自定義欄位
-					'value'   => $args['price_range'] ?? array( 0, 10000000 ), // 設定價格範圍
+					'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
 					'compare' => 'BETWEEN', // 在此範圍之間
 					'type'    => 'DECIMAL', // 處理為數值
-				),
-			);
+				],
+			];
 			unset( $args['price_range'] );
 		}
 
@@ -110,7 +110,7 @@ final class Product {
 
 		$products = $results->products;
 
-		$formatted_products = array_map( array( $this, 'format_product_details' ), $products );
+		$formatted_products = array_map( [ $this, 'format_product_details' ], $products );
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -134,7 +134,7 @@ final class Product {
 	public function format_product_details( $product , $with_description = true) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
-			return array();
+			return [];
 		}
 
 		$date_created  = $product?->get_date_created();
@@ -143,38 +143,38 @@ final class Product {
 		$image_id          = $product->get_image_id();
 		$gallery_image_ids = $product->get_gallery_image_ids();
 
-		$image_ids = array( $image_id, ...$gallery_image_ids );
-		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
+		$image_ids = [ $image_id, ...$gallery_image_ids ];
+		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
 
-		$description_array = $with_description ? array(
+		$description_array = $with_description ? [
 			'description'       => $product?->get_description(),
 			'short_description' => $product?->get_short_description(),
-		) : array();
+		] : [];
 
 		$low_stock_amount = ( '' === $product?->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
 
 		$variation_ids = $product?->get_children(); // get variations
-		$children      = array();
+		$children      = [];
 		if ( ! empty( $variation_ids ) ) {
 			$variation_products = array_map( 'wc_get_product', $variation_ids );
-			$children_details   = array_map( array( $this, 'format_product_details' ), $variation_products );
-			$children           = array(
+			$children_details   = array_map( [ $this, 'format_product_details' ], $variation_products );
+			$children           = [
 				'children'  => $children_details,
 				'parent_id' => (string) $product?->get_id(),
-			);
+			];
 		}
 
 		$attributes = $product?->get_attributes(); // get attributes object
 
-		$attributes_arr = array();
+		$attributes_arr = [];
 
 		foreach ( $attributes as $key => $attribute ) {
 			if ( $attribute instanceof \WC_Product_Attribute ) {
-				$attributes_arr[] = array(
+				$attributes_arr[] = [
 					'name'     => $attribute?->get_name(),
 					'options'  => $attribute?->get_options(),
 					'position' => $attribute?->get_position(),
-				);
+				];
 			}
 
 			if ( is_string( $key ) && is_string( $attribute ) ) {
@@ -184,7 +184,7 @@ final class Product {
 
 		$include_product_ids = \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
 
-		$base_array = array(
+		$base_array = [
 			// Get Product General Info
 			'id'                                        => (string) $product?->get_id(),
 			'type'                                      => $product?->get_type(),
@@ -243,11 +243,11 @@ final class Product {
 			// Bundle 商品包含的商品 ids
 			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $include_product_ids,
 
-			'sale_date_range'                           => array( (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ),
+			'sale_date_range'                           => [ (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
-			'qa_list'                                   => array(),
+			'qa_list'                                   => [],
 
-		) + $children;
+		] + $children;
 
 		return array_merge(
 			$description_array,
@@ -267,17 +267,17 @@ final class Product {
 	 */
 	public function post_bundle_products_callback( $request ) {
 
-		$body_params = $request->get_body_params() ?? array();
+		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$product = new BundleProduct();
 
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -295,13 +295,13 @@ final class Product {
 		$product->save_meta_data();
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'create_success',
 				'message' => '新增成功',
-				'data'    => array(
+				'data'    => [
 					'id' => (string) $product->get_id(),
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -315,21 +315,21 @@ final class Product {
 	 */
 	public function post_bundle_products_with_id_callback( $request ) {
 		$id          = $request['id'];
-		$body_params = $request->get_body_params() ?? array();
+		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$product = \wc_get_product( $id );
 		if ( ! $product ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'patch_failed',
 					'message' => '修改失敗，找不到商品',
-					'data'    => array(
+					'data'    => [
 						'id' => (string) $id,
-					),
-				),
+					],
+				],
 				400
 			);
 		}
@@ -338,7 +338,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -356,13 +356,13 @@ final class Product {
 		$product->save_meta_data();
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'patch_success',
 				'message' => '修改成功',
-				'data'    => array(
+				'data'    => [
 					'id' => (string) $id,
-				),
-			)
+				],
+			]
 		);
 	}
 

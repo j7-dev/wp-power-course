@@ -18,9 +18,9 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 		<?php
 		Templates::get(
 			'price/base',
-			array(
+			[
 				'product' => $product,
-			)
+			]
 		);
 		?>
 	</div>
@@ -33,19 +33,19 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 		<?php
 		Templates::get(
 			'button/base',
-			array(
+			[
 				'children' => '立即購買',
 				'class'    => 'w-full',
-			)
+			]
 		);
 
 		Templates::get(
 			'button/base',
-			array(
+			[
 				'children' => '',
 				'type'     => 'outline',
 				'icon'     => 'shopping_bag',
-			)
+			]
 		);
 		?>
 	</div>

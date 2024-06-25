@@ -4,29 +4,29 @@ use J7\PowerCourse\Utils\Base;
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'level'  => 'h2', // 'h1', 'h2', 'h3', 'h4', 'h5', 'h6
 	'value'  => '標題',
 	'color'  => Base::PRIMARY_COLOR,
 	'class'  => '',
-	'styles' => array(),
-);
+	'styles' => [],
+];
 
 $props = \array_merge( $default_props, $props );
 
 $color = $props['color'];
 
-$styles       = array(
+$styles       = [
 	'border-left'   => "4px solid {$color}",
 	'padding-left'  => '0.75rem',
 	'margin-bottom' => '2rem',
 	'font-size'     => '1.25rem',
 	'font-weight'   => '400',
 	'color'         => '#333333',
-);
+];
 $props_styles = $props['styles'];
 if ( ! is_array( $props_styles ) ) {
-	$props_styles = array();
+	$props_styles = [];
 }
 $styles = \array_merge( $styles, $props_styles );
 

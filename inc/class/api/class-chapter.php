@@ -26,26 +26,26 @@ final class Chapter {
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
 	 */
-	protected $apis = array(
-		array(
+	protected $apis = [
+		[
 			'endpoint' => 'chapters',
 			'method'   => 'post',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'chapters/sort',
 			'method'   => 'post',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'chapters/(?P<id>\d+)',
 			'method'   => 'post',
-		),
-	);
+		],
+	];
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_chapters' ) );
+		\add_action( 'rest_api_init', [ $this, 'register_api_chapters' ] );
 	}
 
 	/**
@@ -70,9 +70,9 @@ final class Chapter {
 	 */
 	public function post_chapters_callback( $request ) {
 
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_json_params() ?? [];
 
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$create_result = ChapterFactory::create_chapter( $body_params );
 
@@ -81,13 +81,13 @@ final class Chapter {
 		}
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'create_success',
 				'message' => '新增成功',
-				'data'    => array(
+				'data'    => [
 					'id' => $create_result,
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -101,9 +101,9 @@ final class Chapter {
 	 */
 	public function post_chapters_sort_callback( $request ) {
 
-		$body_params = $request->get_json_params() ?? array();
+		$body_params = $request->get_json_params() ?? [];
 
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$sort_result = ChapterFactory::sort_chapters( $body_params );
 
@@ -112,11 +112,11 @@ final class Chapter {
 		}
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'sort_success',
 				'message' => '修改排序成功',
 				'data'    => null,
-			)
+			]
 		);
 	}
 
@@ -129,8 +129,8 @@ final class Chapter {
 	public function post_chapters_with_id_callback( $request ) {
 
 		$id          = $request['id'];
-		$body_params = $request->get_body_params() ?? array();
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = $request->get_body_params() ?? [];
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$formatted_params = ChapterFactory::converter( $body_params );
 
@@ -141,13 +141,13 @@ final class Chapter {
 		}
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'update_success',
 				'message' => '更新成功',
-				'data'    => array(
+				'data'    => [
 					'id' => $id,
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -164,24 +164,24 @@ final class Chapter {
 
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'delete_failed',
 					'message' => '刪除失敗',
-					'data'    => array(
+					'data'    => [
 						'id' => $id,
-					),
-				),
+					],
+				],
 				400
 			);
 		}
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
-				'data'    => array(
+				'data'    => [
 					'id' => $id,
-				),
-			)
+				],
+			]
 		);
 	}
 }

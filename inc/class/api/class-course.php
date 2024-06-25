@@ -31,38 +31,38 @@ final class Course {
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
 	 */
-	protected $apis = array(
-		array(
+	protected $apis = [
+		[
 			'endpoint' => 'courses',
 			'method'   => 'get',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'courses',
 			'method'   => 'post',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'post',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'delete',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'terms',
 			'method'   => 'get',
-		),
-		array(
+		],
+		[
 			'endpoint' => 'options',
 			'method'   => 'get',
-		),
-	);
+		],
+	];
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', array( $this, 'register_api_course' ) );
+		\add_action( 'rest_api_init', [ $this, 'register_api_course' ] );
 	}
 
 	/**
@@ -89,19 +89,19 @@ final class Course {
 	public function get_courses_callback( $request )
 	{ // phpcs:ignore
 
-		$params = $request->get_query_params() ?? array();
+		$params = $request->get_query_params() ?? [];
 
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
-		$default_args = array(
-			'status'         => array( 'publish', 'draft' ),
+		$default_args = [
+			'status'         => [ 'publish', 'draft' ],
 			'paginate'       => true,
 			'posts_per_page' => 10,
 			'page'           => 1,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 			'is_course'      => true,
-		);
+		];
 
 		$args = \wp_parse_args(
 			$params,
@@ -109,15 +109,15 @@ final class Course {
 		);
 
 		if ( isset( $args['price_range'] ) ) {
-			$args['meta_query'] = array(
+			$args['meta_query'] = [
 				'relation' => 'AND',
-				array(
+				[
 					'key'     => '_price', // 價格自定義欄位
-					'value'   => $args['price_range'] ?? array( 0, 10000000 ), // 設定價格範圍
+					'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
 					'compare' => 'BETWEEN', // 在此範圍之間
 					'type'    => 'DECIMAL', // 處理為數值
-				),
-			);
+				],
+			];
 			unset( $args['price_range'] );
 		}
 
@@ -127,7 +127,7 @@ final class Course {
 
 		$products = $results->products;
 
-		$formatted_products = array_map( array( $this, 'format_product_details' ), $products );
+		$formatted_products = array_map( [ $this, 'format_product_details' ], $products );
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -152,7 +152,7 @@ final class Course {
 	{ // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
-			return array();
+			return [];
 		}
 
 		$date_created  = $product->get_date_created();
@@ -161,45 +161,45 @@ final class Course {
 		$image_id          = $product->get_image_id();
 		$gallery_image_ids = $product->get_gallery_image_ids();
 
-		$image_ids = array( $image_id, ...$gallery_image_ids );
-		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
+		$image_ids = [ $image_id, ...$gallery_image_ids ];
+		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
 
-		$description_array = $with_description ? array(
+		$description_array = $with_description ? [
 			'description'       => $product->get_description(),
 			'short_description' => $product->get_short_description(),
-		) : array();
+		] : [];
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
 		$chapters = array_values(
 			\get_children(
-				array(
+				[
 					'post_parent' => $product->get_id(),
 					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any', // TODO
 					'orderby'     => 'menu_order',
 					'order'       => 'ASC',
-				)
+				]
 			)
 		);
-		$chapters = array_map( array( 'J7\PowerCourse\Resources\Chapter\ChapterFactory', 'format_chapter_details' ), $chapters );
+		$chapters = array_map( [ 'J7\PowerCourse\Resources\Chapter\ChapterFactory', 'format_chapter_details' ], $chapters );
 
-		$children = ! ! $chapters ? array(
+		$children = ! ! $chapters ? [
 			'children' => $chapters,
-		) : array();
+		] : [];
 
 		$attributes = $product->get_attributes(); // get attributes object
 
-		$attributes_arr = array();
+		$attributes_arr = [];
 
 		foreach ( $attributes as $key => $attribute ) {
 			if ( $attribute instanceof \WC_Product_Attribute ) {
-				$attributes_arr[] = array(
+				$attributes_arr[] = [
 					'name'     => $attribute->get_name(),
 					'options'  => $attribute->get_options(),
 					'position' => $attribute->get_position(),
-				);
+				];
 			}
 
 			if ( is_string( $key ) && is_string( $attribute ) ) {
@@ -209,7 +209,7 @@ final class Course {
 
 		$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
 
-		$base_array = array(
+		$base_array = [
 			// Get Product General Info
 			'id'                  => (string) $product->get_id(),
 			'type'                => $product->get_type(),
@@ -280,7 +280,7 @@ final class Course {
 			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
 			// bundle product
 			'bundle_ids'          => $bundle_ids,
-		) + $children;
+		] + $children;
 
 		return array_merge(
 			$description_array,
@@ -298,17 +298,17 @@ final class Course {
 	 */
 	public function post_courses_callback( $request ) {
 
-		$body_params = $request->get_body_params() ?? array();
+		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$product = new \WC_Product_Simple();
 
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj:'product', files: $file_params['files'] ?? array() );
+			] = WP::separator( args: $body_params, obj:'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -326,13 +326,13 @@ final class Course {
 		$product->save_meta_data();
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'create_success',
 				'message' => '新增成功',
-				'data'    => array(
+				'data'    => [
 					'id' => (string) $product->get_id(),
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -348,15 +348,15 @@ final class Course {
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'id_not_provided',
 					'message' => '更新失敗，請提供ID',
 					'data'    => null,
-				),
+				],
 				400
 			);
 		}
-		$body_params = $request->get_body_params() ?? array();
+		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 		ob_start();
 		var_dump( $body_params );
@@ -367,13 +367,13 @@ final class Course {
 
 		if ( ! $product ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'product_not_found',
 					'message' => '更新失敗，找不到商品',
-					'data'    => array(
+					'data'    => [
 						'id' => $id,
-					),
-				),
+					],
+				],
 				400
 			);
 		}
@@ -381,7 +381,7 @@ final class Course {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? array() );
+		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -399,13 +399,13 @@ final class Course {
 		$product->save_meta_data();
 
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'update_success',
 				'message' => '更新成功',
-				'data'    => array(
+				'data'    => [
 					'id' => $id,
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -421,11 +421,11 @@ final class Course {
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'id_not_provided',
 					'message' => '刪除失敗，請提供ID',
 					'data'    => null,
-				),
+				],
 				400
 			);
 		}
@@ -434,22 +434,22 @@ final class Course {
 
 		if ( ! $delete_result ) {
 			return new \WP_REST_Response(
-				array(
+				[
 					'code'    => 'delete_failed',
 					'message' => '刪除失敗',
 					'data'    => $delete_result,
-				),
+				],
 				400
 			);
 		}
 		return new \WP_REST_Response(
-			array(
+			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
-				'data'    => array(
+				'data'    => [
 					'id' => $id,
-				),
-			)
+				],
+			]
 		);
 	}
 
@@ -463,18 +463,18 @@ final class Course {
 	 */
 	public function get_terms_callback( $request ) { // phpcs:ignore
 
-		$params = $request?->get_query_params() ?? array();
+		$params = $request?->get_query_params() ?? [];
 
-		$params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $params );
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
 		// it seems no need to add post_per_page, get_terms will return all terms
-		$default_args = array(
+		$default_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 
 		$args = \wp_parse_args(
 			$params,
@@ -483,7 +483,7 @@ final class Course {
 
 		$terms = \get_terms( $args );
 
-		$formatted_terms = array_map( array( $this, 'format_terms' ), array_keys( $terms ), array_values( $terms ) );
+		$formatted_terms = array_map( [ $this, 'format_terms' ], array_keys( $terms ), array_values( $terms ) );
 
 		return $formatted_terms;
 	}
@@ -496,10 +496,10 @@ final class Course {
 	 * @return array
 	 */
 	public function format_terms( $key, $value ) {
-		return array(
+		return [
 			'id'   => (string) $key,
 			'name' => $value,
-		);
+		];
 	}
 
 
@@ -512,28 +512,28 @@ final class Course {
 	public function get_options_callback( $request ) { // phpcs:ignore
 
 		// it seems no need to add post_per_page, get_terms will return all terms
-		$cat_args = array(
+		$cat_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 		$cats     = \get_terms( $cat_args );
 
-		$formatted_cats = array_map( array( $this, 'format_terms' ), array_keys( $cats ), array_values( $cats ) );
+		$formatted_cats = array_map( [ $this, 'format_terms' ], array_keys( $cats ), array_values( $cats ) );
 
-		$tag_args = array(
+		$tag_args = [
 			'taxonomy'   => 'product_tag',
 			'fields'     => 'id=>name',
 			'hide_empty' => true,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
-		);
+		];
 
 		$tags = \get_terms( $tag_args );
 
-		$formatted_tags = array_map( array( $this, 'format_terms' ), array_keys( $tags ), array_values( $tags ) );
+		$formatted_tags = array_map( [ $this, 'format_terms' ], array_keys( $tags ), array_values( $tags ) );
 
 		$top_sales_products = WC::get_top_sales_products( 5 );
 
@@ -542,13 +542,13 @@ final class Course {
 			'min_price' => $min_price,
 		] = self::get_max_min_prices();
 
-		return array(
+		return [
 			'product_cats'       => $formatted_cats,
 			'product_tags'       => $formatted_tags,
 			'top_sales_products' => $top_sales_products,
 			'max_price'          => (int) $max_price,
 			'min_price'          => (int) $min_price,
-		);
+		];
 	}
 
 	/**
@@ -566,13 +566,13 @@ final class Course {
 		}
 		// 獲取最高價格的商品
 		$max_price_products = \wc_get_products(
-			array(
+			[
 				'order'    => 'DESC', // 遞減排序
 				'orderby'  => 'meta_value_num',
 				'meta_key' => '_price',
 				'limit'    => 1, // 僅獲取一個結果
 				'status'   => 'publish', // 僅包含已發佈的商品
-			)
+			]
 		);
 		$max_price          = 0;
 		if ( ! empty( $max_price_products ) ) {
@@ -582,13 +582,13 @@ final class Course {
 
 		// 獲取最低價格的商品
 		$min_price_products = \wc_get_products(
-			array(
+			[
 				'order'    => 'ASC', // 遞增排序
 				'orderby'  => 'meta_value_num',
 				'meta_key' => '_price',
 				'limit'    => 1, // 僅獲取一個結果
 				'status'   => 'publish', // 僅包含已發佈的商品
-			)
+			]
 		);
 
 		$min_price = 0;
@@ -597,10 +597,10 @@ final class Course {
 			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
 		}
 
-		$max_min_prices = array(
+		$max_min_prices = [
 			'max_price' => $max_price,
 			'min_price' => $min_price,
-		);
+		];
 
 		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
 

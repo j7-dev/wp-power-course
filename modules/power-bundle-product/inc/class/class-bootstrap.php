@@ -22,7 +22,7 @@ final class Bootstrap {
 
 		require_once Plugin::$dir . '/inc/class/class-wc-bundle-product.php';
 
-		\add_action( 'woocommerce_loaded', array( $this, 'load_bundle_product_class' ) );
+		\add_action( 'woocommerce_loaded', [ $this, 'load_bundle_product_class' ] );
 
 		// 不需要顯示在前端
 
@@ -92,7 +92,7 @@ final class Bootstrap {
 		}
 
 		foreach ( $tabs as $key => $val ) {
-			$product_tabs = array( 'general', 'attribute', 'shipping', 'linked_product', 'advanced' );
+			$product_tabs = [ 'general', 'attribute', 'shipping', 'linked_product', 'advanced' ];
 
 			if ( ! in_array( $key, $product_tabs ) ) {
 				$tabs[ $key ]['class'][] = 'hide_if_' . Plugin::PRODUCT_TYPE;

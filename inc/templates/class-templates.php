@@ -28,14 +28,14 @@ final class Templates {
 
 		\add_action(
 			'init',
-			array( $this, 'add_rewrite_rules' )
+			[ $this, 'add_rewrite_rules' ]
 		);
 
-		\add_filter( 'query_vars', array( $this, 'add_query_var' ) );
-		\add_filter( 'template_include', array( $this, 'load_custom_template' ), 999999 );
+		\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
+		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 999999 );
 
-		\add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-		\add_filter( 'language_attributes', array( $this, 'add_html_attr' ), 20, 2 );
+		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
 	}
 
 	/**
@@ -67,7 +67,7 @@ final class Templates {
 	 * @throws \Exception 如果模板文件不存在.
 	 */
 	public static function safe_get( string $name, mixed $args = null, ?bool $load_once = false, ?bool $echo = true ): string|false|null {
-		$area_names = array( 'head', 'header', 'body', 'main', 'sider', 'footer' ); // 區域名稱
+		$area_names = [ 'head', 'header', 'body', 'main', 'sider', 'footer' ]; // 區域名稱
 		// 如果 $name 是以 area name 開頭的，那就去 area folder 裡面找
 		$is_area = false;
 		foreach ( $area_names as $area_name ) {
@@ -115,7 +115,7 @@ final class Templates {
 	 */
 	public function add_rewrite_rules(): void {
 		// get registered rewrite rules.
-		$rules = get_option( 'rewrite_rules', array() );
+		$rules = get_option( 'rewrite_rules', [] );
 		// set the regex.
 		$regex = '^courses/?([^/]*)/?';
 
@@ -217,18 +217,18 @@ final class Templates {
 		\wp_enqueue_script(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/index.js',
-			array( 'jquery' ),
+			[ 'jquery' ],
 			Plugin::$version,
-			array(
+			[
 				'strategy'  => 'async',
 				'in_footer' => true,
-			)
+			]
 		);
 
 		\wp_enqueue_style(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/css/index.css',
-			array(),
+			[],
 			Plugin::$version
 		);
 	}

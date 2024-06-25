@@ -3,11 +3,11 @@ use J7\PowerCourse\Utils\Base;
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'type'  => '',  // '
 	'class' => 'w-6 h-6',
 	'color' => Base::PRIMARY_COLOR,
-);
+];
 
 $props = array_merge( $default_props, $props );
 

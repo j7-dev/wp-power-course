@@ -37,11 +37,11 @@ if ( ! class_exists( 'Plugin' ) ) {
 			require_once __DIR__ . '/inc/class/class-bootstrap.php';
 
 			$this->init(
-				array(
+				[
 					'app_name'    => 'Power Bundle Product',
 					'github_repo' => '',
-					'callback'    => array( Bootstrap::class, 'instance' ),
-				)
+					'callback'    => [ Bootstrap::class, 'instance' ],
+				]
 			);
 		}
 	}

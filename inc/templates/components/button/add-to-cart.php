@@ -3,11 +3,11 @@
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'children' => '加入購物車',
 	'icon'     => '',
 	'href'     => '',
-);
+];
 
 $props = \array_merge( $default_props, $props );
 

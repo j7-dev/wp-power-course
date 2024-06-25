@@ -38,27 +38,27 @@ if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
 		public function __construct() {
 			require_once __DIR__ . '/inc/class/class-bootstrap.php';
 
-			$this->required_plugins = array(
-				array(
+			$this->required_plugins = [
+				[
 					'name'     => 'WooCommerce',
 					'slug'     => 'woocommerce',
 					'required' => true,
 					'version'  => '7.6.0',
-				),
+				],
 				// array(
 				// 'name'     => 'WP Toolkit',
 				// 'slug'     => 'wp-toolkit',
 				// 'source'   => 'Author URL/wp-toolkit/releases/latest/download/wp-toolkit.zip',
 				// 'required' => true,
 				// ),
-			);
+			];
 
 			$this->init(
-				array(
+				[
 					'app_name'    => 'Power Course',
 					'github_repo' => 'https://github.com/j7-dev/wp-power-course',
-					'callback'    => array( Bootstrap::class, 'instance' ),
-				)
+					'callback'    => [ Bootstrap::class, 'instance' ],
+				]
 			);
 		}
 	}

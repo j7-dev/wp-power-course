@@ -1,13 +1,13 @@
 <?php
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'show_before' => false, // 是否顯示前面的文字
 	'count'       => 5, // 總共幾個星星
 	'value'       => 3.7, // 有幾個星星是填滿的
 	'total'       => null, // 有幾個評論 null | int
 	'disabled'    => true, // 是否禁用
-);
+];
 
 $props = \array_merge( $default_props, $props );
 

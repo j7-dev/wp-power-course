@@ -2,11 +2,11 @@
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'type'  => 'fill',  // 'fill', 'half', 'outline'
 	'class' => 'w-6 h-6',
 	'color' => '#FFD700',
-);
+];
 
 $props = array_merge( $default_props, $props );
 

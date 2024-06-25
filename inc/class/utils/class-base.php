@@ -47,14 +47,14 @@ abstract class Base {
 	 */
 	public static function get_bundle_ids_by_product( int $product_id ): array {
 		$ids = \get_posts(
-			array(
+			[
 				'post_type'   => 'product',
 				'numberposts' => -1,
-				'post_status' => array( 'publish', 'draft' ),
+				'post_status' => [ 'publish', 'draft' ],
 				'fields'      => 'ids', // 只取 id
 				'meta_key'    => 'pbp_product_ids',
 				'meta_value'  => $product_id,
-			)
+			]
 		);
 		return $ids;
 	}

@@ -20,8 +20,8 @@ final class Product {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_filter( 'product_type_options', array( $this, 'add_product_type_options' ) );
-		\add_action( 'save_post_product', array( $this, 'save_product_type_options' ), 10, 3 );
+		\add_filter( 'product_type_options', [ $this, 'add_product_type_options' ] );
+		\add_action( 'save_post_product', [ $this, 'save_product_type_options' ], 10, 3 );
 	}
 
 
@@ -37,13 +37,13 @@ final class Product {
 
 		$option = self::PRODUCT_OPTION_NAME;
 
-		$product_type_options[ $option ] = array(
+		$product_type_options[ $option ] = [
 			'id'            => "_{$option}",
 			'wrapper_class' => 'show_if_simple',
 			'label'         => '課程',
 			'description'   => '是否為課程商品',
 			'default'       => 'no',
-		);
+		];
 
 		return $product_type_options;
 	}

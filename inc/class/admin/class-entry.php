@@ -16,6 +16,7 @@ use J7\PowerCourse\Bootstrap;
  * Class Entry
  */
 final class Entry {
+
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -23,9 +24,9 @@ final class Entry {
 	 */
 	public function __construct() {
 
-		\add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		\add_action( 'admin_menu', [ $this, 'add_menu' ] );
 		// Add the admin page for full-screen.
-		\add_action( 'current_screen', array( $this, 'maybe_output_admin_page' ), 10 );
+		\add_action( 'current_screen', [ $this, 'maybe_output_admin_page' ], 10 );
 	}
 
 	/**
@@ -84,16 +85,18 @@ final class Entry {
 
 		?>
 		<!doctype html>
-<html lang="zh_tw">
-	<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Power Course | 可能是 WordPress 最好用的課程外掛</title>
-	</head>
-	<body>
-		<main id="power_course">
+		<html lang="zh_tw">
 
-		</main>
+		<head>
+			<meta charset="UTF-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<title>Power Course | 可能是 WordPress 最好用的課程外掛</title>
+		</head>
+
+		<body>
+			<main id="power_course">
+
+			</main>
 		<?php
 		/**
 		 * Prints any scripts and data queued for the footer.
@@ -103,8 +106,9 @@ final class Entry {
 		\do_action( 'admin_print_footer_scripts' );
 
 		?>
-	</body>
-	</html>
+		</body>
+
+		</html>
 		<?php
 	}
 }

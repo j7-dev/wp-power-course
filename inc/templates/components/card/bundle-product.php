@@ -46,20 +46,20 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 		<?php
 		Templates::get(
 			'price/base',
-			array(
+			[
 				'product' => $bundle_product,
 				'size'    => 'small',
-			)
+			]
 		);
 		?>
 
 		<?php
 		Templates::get(
 			'button/base',
-			array(
+			[
 				'children' => '加入購物車',
 				'class'    => 'px-6',
-			)
+			]
 		);
 		?>
 	</div>

@@ -22,7 +22,7 @@ final class ChapterFactory {
 	 *
 	 * @param array $args Arguments.
 	 */
-	public function __construct( $args = array() ) {
+	public function __construct( $args = [] ) {
 		self::create_chapter( $args );
 	}
 
@@ -38,45 +38,45 @@ final class ChapterFactory {
 	public static function format_chapter_details( \WP_Post $post, ?bool $with_description = true, ?int $depth = 0 ){ // phpcs:ignore
 
 		if ( ! ( $post instanceof \WP_Post ) ) {
-			return array();
+			return [];
 		}
 
 		$date_created  = $post->post_date;
 		$date_modified = $post->post_modified;
 
 		$image_id  = \get_post_thumbnail_id( $post->ID );
-		$image_ids = array( $image_id );
-		$images    = array_map( array( WP::class, 'get_image_info' ), $image_ids );
+		$image_ids = [ $image_id ];
+		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
 
-		$description_array = $with_description ? array(
+		$description_array = $with_description ? [
 			'description'       => $post->post_content,
 			'short_description' => $post->post_excerpt,
-		) : array();
+		] : [];
 
 		$chapters = array_values(
 			\get_children(
-				array(
+				[
 					'post_parent' => $post->ID,
 					'post_type'   => RegisterCPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any',
 					'orderby'     => 'menu_order',
 					'order'       => 'ASC',
-				)
+				]
 			)
 		);
 		$chapters = array_map(
-			array( __CLASS__, 'format_chapter_details' ),
+			[ __CLASS__, 'format_chapter_details' ],
 			$chapters,
 			array_fill( 0, count( $chapters ), false ),
 			array_fill( 0, count( $chapters ), $depth + 1 )
 		);
 
-		$children = ! ! $chapters ? array(
+		$children = ! ! $chapters ? [
 			'children' => $chapters,
-		) : array();
+		] : [];
 
-		$base_array = array(
+		$base_array = [
 			// Get Product General Info
 			'id'                 => (string) $post->ID,
 			'type'               => 'chapter',
@@ -121,14 +121,14 @@ final class ChapterFactory {
 			// 'attributes'         => array(),
 
 			// Get Product Taxonomies
-			'category_ids'       => array(),
-			'tag_ids'            => array(),
+			'category_ids'       => [],
+			'tag_ids'            => [],
 
 			// Get Product Images
 			'images'             => $images,
 
 			'parent_id'          => (string) $post->post_parent,
-		) + $children;
+		] + $children;
 
 		return array_merge(
 			$description_array,
@@ -148,7 +148,7 @@ final class ChapterFactory {
 	 * @return array
 	 */
 	public static function converter( array $args, ?bool $keep_id = false ): array {
-		$fields_mapper = array(
+		$fields_mapper = [
 			'id'                => 'unset',
 			'name'              => 'post_title',
 			'slug'              => 'post_name',
@@ -159,13 +159,13 @@ final class ChapterFactory {
 			'tag_ids'           => 'tags_input',
 			'parent_id'         => 'post_parent',
 			'depth'             => 'unset',
-		);
+		];
 
 		if ( $keep_id ) {
 			unset( $fields_mapper['id'] );
 		}
 
-		$formatted_args = array();
+		$formatted_args = [];
 		foreach ( $args as $key => $value ) {
 			if ( in_array( $key, array_keys( $fields_mapper ), true ) ) {
 				if ( 'unset' === $fields_mapper[ $key ] ) {
@@ -195,9 +195,9 @@ final class ChapterFactory {
 
 		WP::include_required_params(
 			$args,
-			array(
+			[
 				'post_parent',
-			),
+			],
 		);
 
 		$args['post_title']    = $params['post_title'] ?? '新章節';
@@ -225,7 +225,7 @@ final class ChapterFactory {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( args:$args, obj:'post', files:array() );
+		] = WP::separator( args:$args, obj:'post', files:[] );
 
 		if ( isset( $meta_data['image_ids'] ) ) {
 			\set_post_thumbnail( $id, $meta_data['image_ids'][0] );
@@ -262,10 +262,10 @@ final class ChapterFactory {
 	 * @return true|\WP_Error
 	 */
 	public static function sort_chapters( array $params ): bool|\WP_Error {
-		$from_tree = $params['from_tree'] ?? array();
-		$to_tree   = $params['to_tree'] ?? array();
+		$from_tree = $params['from_tree'] ?? [];
+		$to_tree   = $params['to_tree'] ?? [];
 
-		$delete_ids = array();
+		$delete_ids = [];
 		foreach ( $from_tree as $from_node ) {
 			$id      = $from_node['id'];
 			$to_node = array_filter( $to_tree, fn( $node ) => $node['id'] === $id );

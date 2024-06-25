@@ -7,9 +7,9 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$default_props = array(
+$default_props = [
 	'size' => 'large',
-);
+];
 
 $props = \array_merge( $default_props, $props );
 

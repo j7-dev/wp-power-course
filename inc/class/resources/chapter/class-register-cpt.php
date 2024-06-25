@@ -22,22 +22,22 @@ final class RegisterCPT {
 	 *
 	 * @var array
 	 */
-	public $rewrite = array(
+	public $rewrite = [
 		'template_path' => 'test.php',
 		'slug'          => 'test',
 		'var'           => 'power_course_test',
-	);
+	];
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 
-		\add_action( 'init', array( $this, 'init' ) );
+		\add_action( 'init', [ $this, 'init' ] );
 
 		if ( ! empty( $args['rewrite'] ) ) {
-			\add_filter( 'query_vars', array( $this, 'add_query_var' ) );
-			\add_filter( 'template_include', array( $this, 'load_custom_template' ), 99 );
+			\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
+			\add_filter( 'template_include', [ $this, 'load_custom_template' ], 99 );
 		}
 	}
 
@@ -59,7 +59,7 @@ final class RegisterCPT {
 	 */
 	public static function register_cpt(): void {
 
-		$labels = array(
+		$labels = [
 			'name'                     => \esc_html__( 'chapter', 'power-course' ),
 			'singular_name'            => \esc_html__( 'chapter', 'power-course' ),
 			'add_new'                  => \esc_html__( 'Add new', 'power-course' ),
@@ -91,8 +91,8 @@ final class RegisterCPT {
 			'item_reverted_to_draft'   => \esc_html__( 'chapter reverted to draft', 'power-course' ),
 			'item_scheduled'           => \esc_html__( 'chapter scheduled', 'power-course' ),
 			'item_updated'             => \esc_html__( 'chapter updated', 'power-course' ),
-		);
-		$args   = array(
+		];
+		$args   = [
 			'label'                 => \esc_html__( 'chapter', 'power-course' ),
 			'labels'                => $labels,
 			'description'           => '',
@@ -113,13 +113,13 @@ final class RegisterCPT {
 			'menu_position'         => 6,
 			'menu_icon'             => 'dashicons-store',
 			'capability_type'       => 'post',
-			'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'page-attributes' ),
-			'taxonomies'            => array(),
+			'supports'              => [ 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'page-attributes' ],
+			'taxonomies'            => [],
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
-			'rewrite'               => array(
+			'rewrite'               => [
 				'with_front' => true,
-			),
-		);
+			],
+		];
 
 		\register_post_type( self::POST_TYPE, $args );
 	}

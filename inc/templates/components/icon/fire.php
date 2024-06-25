@@ -2,11 +2,11 @@
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'type'  => '',  // '
 	'class' => 'w-6 h-6',
 	'color' => '#FF4D00',
-);
+];
 
 $props = array_merge( $default_props, $props );
 

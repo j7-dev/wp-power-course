@@ -6,7 +6,7 @@ $items = $args;
 
 if ( ! is_array( $items ) ) {
 	echo 'items 必須是陣列';
-	$items = array();
+	$items = [];
 }
 
 ?>
@@ -17,10 +17,10 @@ if ( ! is_array( $items ) ) {
 		<?php
 		Templates::safe_get(
 			'icon/' . $item['icon'],
-			array(
+			[
 				'class' => 'h-4 w-4',
 				'color' => '#ffffff',
-			)
+			]
 		);
 		?>
 			</div>

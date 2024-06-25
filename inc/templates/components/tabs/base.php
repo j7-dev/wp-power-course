@@ -1,10 +1,10 @@
 <?php
 $props = $args;
 
-$default_props = array(
-	'course_tabs'        => array(),
+$default_props = [
+	'course_tabs'        => [],
 	'default_active_key' => '0',
-);
+];
 
 $props = \array_merge( $default_props, $props );
 

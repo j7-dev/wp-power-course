@@ -8,24 +8,24 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'Invalid Product' );
 }
 
-$args = array(
+$args = [
 	'posts_per_page' => -1,
 	'order'          => 'ASC',
 	'post_parent'    => $product->get_id(),
 	'post_status'    => 'publish',
 	'post_type'      => RegisterCPT::POST_TYPE,
-);
+];
 
 $chapters = \get_children( $args );
 
 foreach ( $chapters as $chapter_id => $chapter ) :
-	$args = array(
+	$args = [
 		'posts_per_page' => -1,
 		'order'          => 'ASC',
 		'post_parent'    => $chapter_id,
 		'post_status'    => 'publish',
 		'post_type'      => RegisterCPT::POST_TYPE,
-	);
+	];
 
 	$sub_chapters = \get_children( $args );
 

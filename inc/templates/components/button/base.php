@@ -5,14 +5,14 @@ use J7\PowerCourse\Templates\Templates;
 
 $props = $args;
 
-$default_props = array(
+$default_props = [
 	'type'     => 'primary',
 	'children' => '按鈕',
 	'icon'     => '',
 	'disabled' => false,
 	'href'     => null,
 	'class'    => '',
-);
+];
 
 $props = \array_merge( $default_props, $props );
 
@@ -38,9 +38,9 @@ $icon = $props['icon'];
 
 $icon_html = Templates::safe_get(
 	"icon/{$icon}",
-	array(
+	[
 		'class' => $icon_class,
-	),
+	],
 	load_once: false,
 	echo: false
 );

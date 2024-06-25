@@ -5,7 +5,7 @@ $product     = $args;
 $product_id  = $product->get_id();
 $teacher_ids = \get_post_meta( $product_id, 'teacher_ids', false );
 if ( ! is_array( $teacher_ids ) ) {
-	$teacher_ids = array();
+	$teacher_ids = [];
 }
 ?>
 
@@ -13,9 +13,9 @@ if ( ! is_array( $teacher_ids ) ) {
 <?php
 Templates::get(
 	'typography/title',
-	array(
+	[
 		'value' => '課程試看',
-	)
+	]
 );
 ?>
 
@@ -28,9 +28,9 @@ Templates::get(
 			if ( ! ! $teacher_ids ) {
 				Templates::get(
 					'typography/title',
-					array(
+					[
 						'value' => '關於講師',
-					)
+					]
 				);
 			}
 

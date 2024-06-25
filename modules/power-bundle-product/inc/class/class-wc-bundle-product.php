@@ -47,7 +47,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 */
 		public function get_bundled_ids(): array {
 			$meta_data_array = $this->get_meta( self::INCLUDE_PRODUCT_IDS_META_KEY, false );
-			$bundle_ids      = array();
+			$bundle_ids      = [];
 
 			foreach ( $meta_data_array as $meta_data ) {
 				$value        = $meta_data->__get( 'value' );
