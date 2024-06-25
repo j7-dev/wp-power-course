@@ -82,3 +82,34 @@ export function removeTrailingSlash(str: string) {
 export const getIsVariation = (type: string) => {
   return ['variation', 'subscription_variation'].includes(type)
 }
+
+export const getFileExtension = (filename: string) => {
+  // 先將檔名轉為小寫，以便處理大小寫不同的情況
+  const name = filename.toLowerCase()
+
+  // 尋找最後一個點的位置
+  const lastDotPosition = name.lastIndexOf('.')
+
+  // 如果沒有找到點，或者點在開頭（隱藏檔案），則返回空字串
+  if (lastDotPosition < 1) return ''
+
+  // 返回從最後一個點之後到結尾的子字串
+  return name.slice(lastDotPosition + 1)
+}
+
+export const getEstimateUploadTimeInSeconds = (fileSize: number) => {
+  // 將文件大小轉換為 bits（1 byte = 8 bits）
+
+  const fileSizeInBits = fileSize * 8
+
+  // 上傳速度（30 Mbps = 30,000,000 bits/second）
+  const uploadSpeed = 30 * 1000 * 1000 // bits per second
+
+  // 計算預期上傳時間（秒）
+
+  const estimatedTimeInSeconds = fileSizeInBits / uploadSpeed
+
+  // 返回秒數，保留兩位小數
+
+  return Number(estimatedTimeInSeconds.toFixed(2))
+}

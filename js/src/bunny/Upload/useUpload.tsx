@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
-import { GetProp, UploadFile, UploadProps, Progress } from 'antd'
+import { useState } from 'react'
+import { GetProp, UploadFile, UploadProps } from 'antd'
 import { useVideoLibrary } from './useVideoLibrary'
 import { NotificationInstance } from 'antd/es/notification/interface'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
 import { nanoid } from 'nanoid'
 import { useGetVideo } from '@/bunny/hooks'
+import { filesInQueueAtom, TFileInQueue } from '@/pages/admin/Courses'
+import { useAtom } from 'jotai'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -57,92 +59,12 @@ type TUploadVideoResponse = {
 }
 
 export const useUpload = (props: TUseUploadParams) => {
+  const [filesInQueue, setFilesInQueue] = useAtom(filesInQueueAtom)
   const { libraryId } = useVideoLibrary()
-
-  const [progress, setProgress] = useState<{
-    percent: number
-    status: 'active' | 'exception' | 'success' | 'normal' | undefined
-  }>({
-    percent: 0,
-    status: 'active',
-  })
-
-  const [fileInfo, setFileInfo] = useState<{
-    key: string
-    size: number
-  }>({
-    key: '',
-    size: 0,
-  })
-
   const [videoId, setVideoId] = useState<string>('')
 
   const uploadProps = props?.uploadProps
   const notificationApi = props.notificationApi
-
-  const notification = ({
-    percent = 0,
-    status = 'active',
-  }: {
-    percent?: number
-    status?: 'active' | 'exception' | 'success' | 'normal' | undefined
-  }) => {
-    let label = '上傳中'
-    switch (status) {
-      case 'exception':
-        label = '上傳失敗'
-        break
-      case 'success':
-        label = '上傳已完成'
-        break
-      default:
-        break
-    }
-
-    notificationApi.info({
-      key: fileInfo.key,
-      message: `影片${label}`,
-      description: <Progress percent={percent} status={status} />,
-    })
-  }
-
-  useEffect(() => {
-    // 用來模擬上傳進度
-
-    if (!fileInfo?.key || !fileInfo?.size || progress?.percent > 100) {
-      return
-    }
-
-    // 顯示通知
-    notification(progress)
-
-    // 估計上傳時間
-    const estimatedTimeInSeconds = estimateUploadTimeInSeconds(fileInfo.size)
-
-    // 每 3 秒增加 XX %
-    const step = (100 / estimatedTimeInSeconds) * 3
-
-    // 新的百分比
-    const newPercent = progress.percent + step
-
-    // 如果新的百分比 >= 100 則返回
-    if (newPercent >= 100) {
-      return
-    }
-
-    // 設定定時器新的百分比
-    const timer = setInterval(() => {
-      setProgress((pre) => ({
-        ...pre,
-        percent: Number(newPercent.toFixed(1)),
-      }))
-    }, 3000)
-
-    // 清除定時器
-    return () => {
-      clearInterval(timer)
-    }
-  }, [fileInfo, progress])
 
   const { data } = useGetVideo({
     libraryId,
@@ -159,6 +81,23 @@ export const useUpload = (props: TUseUploadParams) => {
   const mergedUploadProps: UploadProps = {
     customRequest: async (options) => {
       const { file } = options
+      const fileInQueueKey = nanoid()
+
+      // 添加到佇列
+      setFilesInQueue((prev) => [
+        ...prev,
+        {
+          key: fileInQueueKey,
+          file: file as RcFile,
+          status: 'active' as
+            | 'active'
+            | 'normal'
+            | 'exception'
+            | 'success'
+            | undefined,
+        },
+      ])
+
       try {
         // 創建影片 API
         const createVideoResult =
@@ -184,18 +123,72 @@ export const useUpload = (props: TUseUploadParams) => {
           },
         )
 
-        // 設定為 100% 並顯示成功
-        setProgress({
-          percent: 100,
-          status: 'success',
-        })
+        if (uploadVideo?.data?.success) {
+          // 設定為 100% 並顯示成功
+          setFilesInQueue((prev) => {
+            console.log('⭐ success prev:', prev)
+            const newFilesInQueue = prev.map((fileInQueue) => {
+              if (fileInQueue.key === fileInQueueKey) {
+                return {
+                  ...fileInQueue,
+                  status: 'success' as
+                    | 'active'
+                    | 'normal'
+                    | 'exception'
+                    | 'success'
+                    | undefined,
+                }
+              }
 
-        console.log('⭐  uploadVideo:', uploadVideo)
+              return fileInQueue
+            })
+            console.log('⭐ success newFilesInQueue:', newFilesInQueue)
+
+            return newFilesInQueue
+          })
+        } else {
+          // 顯示失敗
+          setFilesInQueue((prev) => {
+            const newFilesInQueue = prev.map((fileInQueue) => {
+              if (fileInQueue.key === fileInQueueKey) {
+                return {
+                  ...fileInQueue,
+                  status: 'exception' as
+                    | 'active'
+                    | 'normal'
+                    | 'exception'
+                    | 'success'
+                    | undefined,
+                }
+              }
+
+              return fileInQueue
+            })
+
+            return newFilesInQueue
+          })
+        }
       } catch (error) {
-        setProgress((prev) => ({
-          ...prev,
-          status: 'exception',
-        }))
+        // 顯示失敗
+        setFilesInQueue((prev) => {
+          const newFilesInQueue = prev.map((fileInQueue) => {
+            if (fileInQueue.key === fileInQueueKey) {
+              return {
+                ...fileInQueue,
+                status: 'exception' as
+                  | 'active'
+                  | 'normal'
+                  | 'exception'
+                  | 'success'
+                  | undefined,
+              }
+            }
+
+            return fileInQueue
+          })
+
+          return newFilesInQueue
+        })
       }
     },
 
@@ -214,24 +207,13 @@ export const useUpload = (props: TUseUploadParams) => {
 
     accept: 'video/*',
     multiple: false, // 是否支持多選文件，ie10+ 支持。按住 ctrl 多選文件
-    maxCount: 1, // 最大檔案數
+    maxCount: 2, // 最大檔案數
     beforeUpload: (file, theFileList) => {
       setFileList([...fileList, ...theFileList])
 
       return true
     },
-    onChange: (info) => {
-      const { file } = info
-      const notificationKey = nanoid()
-      setFileInfo({
-        key: notificationKey,
-        size: (file as RcFile)?.size,
-      })
-      setProgress({
-        percent: 0,
-        status: 'active',
-      })
-    },
+
     onRemove: (file) => {
       const index = fileList.indexOf(file)
       const newFileList = fileList.slice()
@@ -244,21 +226,4 @@ export const useUpload = (props: TUseUploadParams) => {
   }
 
   return { uploadProps: mergedUploadProps, fileList, setFileList }
-}
-
-function estimateUploadTimeInSeconds(fileSize: number) {
-  // 將文件大小轉換為 bits（1 byte = 8 bits）
-
-  const fileSizeInBits = fileSize * 8
-
-  // 上傳速度（30 Mbps = 30,000,000 bits/second）
-  const uploadSpeed = 30 * 1000 * 1000 // bits per second
-
-  // 計算預期上傳時間（秒）
-
-  const estimatedTimeInSeconds = fileSizeInBits / uploadSpeed
-
-  // 返回秒數，保留兩位小數
-
-  return Number(estimatedTimeInSeconds.toFixed(2))
 }

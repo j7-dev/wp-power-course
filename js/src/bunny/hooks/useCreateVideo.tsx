@@ -1,5 +1,5 @@
 /**
- * TODO
+ * DELETE
  */
 
 import React, { useEffect } from 'react'
@@ -160,21 +160,4 @@ export const useCreateVideo = ({ libraryId }: TUseListVideoParams) => {
     ...result,
     createVideo,
   }
-}
-
-function estimateUploadTimeInSeconds(fileSize: number) {
-  // 將文件大小轉換為 bits（1 byte = 8 bits）
-
-  const fileSizeInBits = fileSize * 8
-
-  // 上傳速度（30 Mbps = 30,000,000 bits/second）
-  const uploadSpeed = 30 * 1000 * 1000 // bits per second
-
-  // 計算預期上傳時間（秒）
-
-  const estimatedTimeInSeconds = fileSizeInBits / uploadSpeed
-
-  // 返回秒數，保留兩位小數
-
-  return Number(estimatedTimeInSeconds.toFixed(2))
 }
