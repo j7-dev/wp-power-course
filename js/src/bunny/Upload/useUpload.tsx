@@ -4,6 +4,8 @@ import { useVideoLibrary } from './useVideoLibrary'
 import { NotificationInstance } from 'antd/es/notification/interface'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
+import { nanoid } from 'nanoid'
+import { useGetVideo } from '@/bunny/hooks'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -57,8 +59,6 @@ type TUploadVideoResponse = {
 export const useUpload = (props: TUseUploadParams) => {
   const { libraryId } = useVideoLibrary()
 
-  // const key = 'test'
-
   const [progress, setProgress] = useState<{
     percent: number
     status: 'active' | 'exception' | 'success' | 'normal' | undefined
@@ -74,6 +74,8 @@ export const useUpload = (props: TUseUploadParams) => {
     key: '',
     size: 0,
   })
+
+  const [videoId, setVideoId] = useState<string>('')
 
   const uploadProps = props?.uploadProps
   const notificationApi = props.notificationApi
@@ -104,33 +106,53 @@ export const useUpload = (props: TUseUploadParams) => {
     })
   }
 
-  notification(progress)
-
   useEffect(() => {
     // 用來模擬上傳進度
 
-    if (progress?.percent >= 100 || !fileInfo?.key || !fileInfo?.size) {
+    if (!fileInfo?.key || !fileInfo?.size || progress?.percent > 100) {
       return
     }
 
+    // 顯示通知
+    notification(progress)
+
+    // 估計上傳時間
     const estimatedTimeInSeconds = estimateUploadTimeInSeconds(fileInfo.size)
+
+    // 每 3 秒增加 XX %
     const step = (100 / estimatedTimeInSeconds) * 3
 
-    if (progress.percent + step >= 100) {
+    // 新的百分比
+    const newPercent = progress.percent + step
+
+    // 如果新的百分比 >= 100 則返回
+    if (newPercent >= 100) {
       return
     }
 
+    // 設定定時器新的百分比
     const timer = setInterval(() => {
       setProgress((pre) => ({
         ...pre,
-        percent: Number((pre.percent + step).toFixed(1)),
+        percent: Number(newPercent.toFixed(1)),
       }))
     }, 3000)
 
+    // 清除定時器
     return () => {
       clearInterval(timer)
     }
   }, [fileInfo, progress])
+
+  const { data } = useGetVideo({
+    libraryId,
+    videoId,
+    queryOptions: {
+      enabled: !!videoId,
+    },
+  })
+
+  console.log('⭐  data:', data)
 
   const [fileList, setFileList] = useState<UploadFile[]>([])
 
@@ -138,11 +160,7 @@ export const useUpload = (props: TUseUploadParams) => {
     customRequest: async (options) => {
       const { file } = options
       try {
-        setFileInfo({
-          key: (file as RcFile)?.name || 'unknown name',
-          size: (file as RcFile)?.size,
-        })
-
+        // 創建影片 API
         const createVideoResult =
           await bunnyStreamAxios.post<TCreateVideoResponse>(
             `/${libraryId}/videos`,
@@ -151,11 +169,13 @@ export const useUpload = (props: TUseUploadParams) => {
             },
           )
 
-        console.log('⭐  createVideoResult:', createVideoResult)
+        // 取得影片 ID
+        const theVideoId = createVideoResult?.data?.guid || 'unknown id'
+        setVideoId(theVideoId)
 
-        const videoId = createVideoResult?.data?.guid || 'unknown id'
+        // 上傳影片 API
         const uploadVideo = await bunnyStreamAxios.put<TUploadVideoResponse>(
-          `/${libraryId}/videos/${videoId}?enabledResolutions=720p%2C1080p`,
+          `/${libraryId}/videos/${theVideoId}?enabledResolutions=720p%2C1080p`,
           file,
           {
             headers: {
@@ -164,6 +184,7 @@ export const useUpload = (props: TUseUploadParams) => {
           },
         )
 
+        // 設定為 100% 並顯示成功
         setProgress({
           percent: 100,
           status: 'success',
@@ -201,8 +222,9 @@ export const useUpload = (props: TUseUploadParams) => {
     },
     onChange: (info) => {
       const { file } = info
+      const notificationKey = nanoid()
       setFileInfo({
-        key: (file as RcFile)?.name || 'unknown name',
+        key: notificationKey,
         size: (file as RcFile)?.size,
       })
       setProgress({
