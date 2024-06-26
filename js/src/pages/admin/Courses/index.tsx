@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
-import CourseSelector from './CourseSelector'
-import { Upload, useUpload } from '@/bunny/Upload'
-import { notification } from 'antd'
-import { FileUploadProgress, FileEncodeProgress } from '@/components/general'
-import { atom, useAtomValue } from 'jotai'
-import { RcFile } from 'antd/lib/upload/interface'
+import { useEffect } from "react"
+import CourseSelector from "./CourseSelector"
+import { Upload, useUpload } from "@/bunny/Upload"
+import { notification } from "antd"
+import { FileEncodeProgress, FileUploadProgress } from "@/components/general"
+import { atom, useAtomValue, useSetAtom } from "jotai"
+import { RcFile } from "antd/lib/upload/interface"
+import { NotificationInstance } from "antd/es/notification/interface"
 
 export type TFileInQueue = {
   key: string
@@ -16,18 +17,21 @@ export type TFileInQueue = {
 }
 
 export const filesInQueueAtom = atom<TFileInQueue[]>([])
+export const queueNotificationApiAtom = atom<NotificationInstance | null>(null)
+
 export const NOTIFICATION_API_KEY = 'upload-queue'
 
 const index = () => {
   const filesInQueue = useAtomValue(filesInQueueAtom)
+  const setQueueNotificationApi = useSetAtom(queueNotificationApiAtom)
+
   const [notificationApi, contextHolder] = notification.useNotification({
     duration: 0,
     placement: 'bottomLeft',
     stack: { threshold: 1 },
   })
-  const bunnyUploadProps = useUpload({
-    notificationApi,
-  })
+
+  const bunnyUploadProps = useUpload()
 
   useEffect(() => {
     if (!filesInQueue.length) {
@@ -56,6 +60,12 @@ const index = () => {
       ),
     })
   }, [filesInQueue])
+
+  useEffect(() => {
+    if (notificationApi) {
+      setQueueNotificationApi(notificationApi)
+    }
+  }, [notificationApi])
 
   return (
     <>

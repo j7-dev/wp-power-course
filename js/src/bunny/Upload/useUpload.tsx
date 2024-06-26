@@ -1,18 +1,14 @@
-import { useState } from 'react'
-import { UploadFile, UploadProps } from 'antd'
-import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
-import { RcFile } from 'antd/lib/upload/interface'
-import { useVideoLibrary } from '@/bunny/hooks'
-import { filesInQueueAtom } from '@/pages/admin/Courses'
-import { useSetAtom } from 'jotai'
-import { getVideoUrl } from '@/utils'
-import {
-  TUseUploadParams,
-  TCreateVideoResponse,
-  TUploadVideoResponse,
-} from '@/bunny/Upload/types'
+import { useState } from "react"
+import { UploadFile, UploadProps } from "antd"
+import { bunnyStreamAxios } from "@/rest-data-provider/bunny-stream"
+import { RcFile } from "antd/lib/upload/interface"
+import { useVideoLibrary } from "@/bunny/hooks"
+import { filesInQueueAtom } from "@/pages/admin/Courses"
+import { useSetAtom } from "jotai"
+import { getVideoUrl } from "@/utils"
+import { TCreateVideoResponse, TUploadVideoResponse, TUseUploadParams } from "@/bunny/Upload/types"
 
-export const useUpload = (props: TUseUploadParams) => {
+export const useUpload = (props?: TUseUploadParams) => {
   const setFilesInQueue = useSetAtom(filesInQueueAtom)
   const { libraryId } = useVideoLibrary()
 
@@ -167,9 +163,6 @@ export const useUpload = (props: TUseUploadParams) => {
         })
       }
     },
-    accept: 'video/*',
-    multiple: false, // 是否支持多選文件，ie10+ 支持。按住 ctrl 多選文件
-    maxCount: 2, // 最大檔案數
     beforeUpload: (file, theFileList) => {
       // 生成預覽 URL 並更新到狀態上
       const newFileList = theFileList.map((theFile) => {
@@ -192,6 +185,9 @@ export const useUpload = (props: TUseUploadParams) => {
     listType: 'text',
     itemRender: () => <></>,
     fileList,
+    accept: 'video/*',
+    multiple: false, // 是否支持多選文件，ie10+ 支持。按住 ctrl 多選文件
+    maxCount: 1, // 最大檔案數
     ...uploadProps,
   }
 

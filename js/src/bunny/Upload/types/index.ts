@@ -1,9 +1,7 @@
-import { UploadProps } from 'antd'
-import { NotificationInstance } from 'antd/es/notification/interface'
+import { UploadProps } from "antd"
 
 export type TUseUploadParams = {
   uploadProps?: UploadProps
-  notificationApi: NotificationInstance
 }
 
 export type TCreateVideoResponse = {
