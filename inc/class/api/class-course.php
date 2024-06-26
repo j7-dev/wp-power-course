@@ -3,17 +3,17 @@
  * Course API
  */
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace J7\PowerCourse\Api;
 
-use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\WpUtils\Classes\WP;
-use J7\WpUtils\Classes\WC;
+use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Resources\Chapter\ChapterFactory;
+use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Utils\Base;
-
+use J7\WpUtils\Classes\WC;
+use J7\WpUtils\Classes\WP;
 
 
 /**
@@ -84,10 +84,10 @@ final class Course {
 	 * 當商品是 "課程" 時，才會被抓出來
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return \WP_REST_Response
 	 */
-	public function get_courses_callback( $request )
-	{ // phpcs:ignore
+	public function get_courses_callback( $request ) { // phpcs:ignore
 
 		$params = $request->get_query_params() ?? [];
 
@@ -146,10 +146,10 @@ final class Course {
 	 *
 	 * @param \WC_Product $product Product.
 	 * @param bool        $with_description With description.
+	 *
 	 * @return array
 	 */
-	public function format_product_details( $product, $with_description = true )
-	{ // phpcs:ignore
+	public function format_product_details( $product, $with_description = true ) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
@@ -176,17 +176,17 @@ final class Course {
 				[
 					'post_parent' => $product->get_id(),
 					'post_type'   => RegisterCPT::POST_TYPE,
-					'numberposts' => -1,
+					'numberposts' => - 1,
 					'post_status' => 'any', // TODO
 					'orderby'     => 'menu_order',
 					'order'       => 'ASC',
 				]
 			)
 		);
-		$chapters = array_map( [ 'J7\PowerCourse\Resources\Chapter\ChapterFactory', 'format_chapter_details' ], $chapters );
+		$chapters = array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters );
 
 		$children = ! ! $chapters ? [
-			'children' => $chapters,
+			'chapters' => $chapters,
 		] : [];
 
 		$attributes = $product->get_attributes(); // get attributes object
@@ -294,10 +294,10 @@ final class Course {
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return \WP_REST_Response
 	 */
 	public function post_courses_callback( $request ) {
-
 		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
@@ -306,9 +306,9 @@ final class Course {
 		$product = new \WC_Product_Simple();
 
 		[
-			'data' => $data,
+			'data'      => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj:'product', files: $file_params['files'] ?? [] );
+		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -341,10 +341,10 @@ final class Course {
 	 * 更新課程
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return \WP_REST_Response
 	 */
 	public function post_courses_with_id_callback( $request ) {
-
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
@@ -379,8 +379,8 @@ final class Course {
 		}
 
 		[
-		'data' => $data,
-		'meta_data' => $meta_data,
+			'data'      => $data,
+			'meta_data' => $meta_data,
 		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
 		foreach ( $data as $key => $value ) {
@@ -414,10 +414,10 @@ final class Course {
 	 * Delete courses with id callback
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return \WP_REST_Response
 	 */
 	public function delete_courses_with_id_callback( $request ) {
-
 		$id = $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
@@ -442,6 +442,7 @@ final class Course {
 				400
 			);
 		}
+
 		return new \WP_REST_Response(
 			[
 				'code'    => 'delete_success',
@@ -459,6 +460,7 @@ final class Course {
 	 * @see https://developer.wordpress.org/reference/functions/get_terms/
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return array
 	 */
 	public function get_terms_callback( $request ) { // phpcs:ignore
@@ -493,6 +495,7 @@ final class Course {
 	 *
 	 * @param string $key Key.
 	 * @param string $value Value.
+	 *
 	 * @return array
 	 */
 	public function format_terms( $key, $value ) {
@@ -507,6 +510,7 @@ final class Course {
 	 * Get options callback
 	 *
 	 * @param \WP_REST_Request $request Request.
+	 *
 	 * @return array
 	 */
 	public function get_options_callback( $request ) { // phpcs:ignore

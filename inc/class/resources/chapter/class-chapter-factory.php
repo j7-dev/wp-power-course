@@ -4,7 +4,7 @@
  * 我希望 new ChapterFactory() 時，能夠創建一個新的 Chapter 物件
  */
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace J7\PowerCourse\Resources\Chapter;
 
@@ -27,15 +27,50 @@ final class ChapterFactory {
 	}
 
 	/**
+	 * Create a new chapter
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/wp_insert_post/
+	 *
+	 * 簡單的新增，沒有太多參數，所以不使用 Converter
+	 *
+	 * @param array $args Arguments.
+	 *
+	 * @return int|\WP_Error
+	 */
+	public static function create_chapter( array $args ): int|\WP_Error {
+		WP::include_required_params(
+			$args,
+			[
+				'post_parent',
+			],
+		);
+
+		$args['post_title']    = $params['post_title'] ?? '新章節';
+		$args['post_status']   = 'draft';
+		$args['post_author']   = \get_current_user_id();
+		$args['post_type']     = RegisterCPT::POST_TYPE;
+		$args['page_template'] = self::TEMPLATE;
+
+		$new_post_id = \wp_insert_post( $args );
+
+		return $new_post_id;
+	}
+
+	/**
 	 * Format Chapter details
 	 * WP_Post 轉 array
 	 *
 	 * @param \WP_Post $post Chapter.
 	 * @param bool     $with_description With description.
 	 * @param int      $depth Depth.
+	 *
 	 * @return array
 	 */
-	public static function format_chapter_details( \WP_Post $post, ?bool $with_description = true, ?int $depth = 0 ){ // phpcs:ignore
+	public static function format_chapter_details(
+		\WP_Post $post,
+		?bool $with_description = true,
+		?int $depth = 0
+	) { // phpcs:ignore
 
 		if ( ! ( $post instanceof \WP_Post ) ) {
 			return [];
@@ -58,7 +93,7 @@ final class ChapterFactory {
 				[
 					'post_parent' => $post->ID,
 					'post_type'   => RegisterCPT::POST_TYPE,
-					'numberposts' => -1,
+					'numberposts' => - 1,
 					'post_status' => 'any',
 					'orderby'     => 'menu_order',
 					'order'       => 'ASC',
@@ -73,7 +108,7 @@ final class ChapterFactory {
 		);
 
 		$children = ! ! $chapters ? [
-			'children' => $chapters,
+			'chapters' => $chapters,
 		] : [];
 
 		$base_array = [
@@ -137,6 +172,51 @@ final class ChapterFactory {
 	}
 
 	/**
+	 * Sort chapters
+	 * 改變章節順序
+	 *
+	 * @param array $params Parameters.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public static function sort_chapters( array $params ): bool|\WP_Error {
+		$from_tree = $params['from_tree'] ?? [];
+		$to_tree   = $params['to_tree'] ?? [];
+
+		$delete_ids = [];
+		foreach ( $from_tree as $from_node ) {
+			$id      = $from_node['id'];
+			$to_node = array_filter( $to_tree, fn( $node ) => $node['id'] === $id );
+			if ( empty( $to_node ) ) {
+				$delete_ids[] = $id;
+			}
+		}
+		foreach ( $to_tree as $node ) {
+			$id             = $node['id'];
+			$is_new_chapter = strpos( $id, 'new-' ) === 0;
+			$args           = self::converter( $node, keep_id: ! $is_new_chapter );
+
+			if ( $is_new_chapter ) {
+				$insert_result = self::create_chapter( $args );
+			} else {
+				$insert_result = self::update_chapter( $id, $args );
+			}
+			if ( \is_wp_error( $insert_result ) ) {
+				return $insert_result;
+			}
+		}
+
+		foreach ( $delete_ids as $id ) {
+			$delete_result = self::delete_chapter( $id );
+			if ( \is_wp_error( $delete_result ) ) {
+				return $delete_result;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Converter 轉換器
 	 * 把 key 轉換/重新命名，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
 	 *
@@ -181,51 +261,19 @@ final class ChapterFactory {
 	}
 
 	/**
-	 * Create a new chapter
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/wp_insert_post/
-	 *
-	 * 簡單的新增，沒有太多參數，所以不使用 Converter
-	 *
-	 * @param array $args Arguments.
-	 *
-	 * @return int|\WP_Error
-	 */
-	public static function create_chapter( array $args ): int|\WP_Error {
-
-		WP::include_required_params(
-			$args,
-			[
-				'post_parent',
-			],
-		);
-
-		$args['post_title']    = $params['post_title'] ?? '新章節';
-		$args['post_status']   = 'draft';
-		$args['post_author']   = \get_current_user_id();
-		$args['post_type']     = RegisterCPT::POST_TYPE;
-		$args['page_template'] = self::TEMPLATE;
-
-		$new_post_id = \wp_insert_post( $args );
-
-		return $new_post_id;
-	}
-
-
-	/**
 	 * Update a chapter
 	 *
 	 * @param string $id chapter id.
 	 * @param array  $args Arguments.
+	 *
 	 * @return integer|\WP_Error
 	 */
 	public static function update_chapter( string $id, array $args ): int|\WP_Error {
-
 		// 將資料拆成 data 與 meta_data
 		[
-		'data' => $data,
-		'meta_data' => $meta_data,
-		] = WP::separator( args:$args, obj:'post', files:[] );
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = WP::separator( args: $args, obj: 'post', files: [] );
 
 		if ( isset( $meta_data['image_ids'] ) ) {
 			\set_post_thumbnail( $id, $meta_data['image_ids'][0] );
@@ -236,6 +284,7 @@ final class ChapterFactory {
 		$data['meta_input'] = $meta_data;
 
 		$update_result = \wp_update_post( $data );
+
 		return $update_result;
 	}
 
@@ -249,52 +298,7 @@ final class ChapterFactory {
 	 */
 	public static function delete_chapter( string $id, ?bool $force_delete = false ): \WP_Post|false|null {
 		$delete_result = \wp_delete_post( $id, $force_delete );
+
 		return $delete_result;
-	}
-
-
-
-	/**
-	 * Sort chapters
-	 * 改變章節順序
-	 *
-	 * @param array $params Parameters.
-	 * @return true|\WP_Error
-	 */
-	public static function sort_chapters( array $params ): bool|\WP_Error {
-		$from_tree = $params['from_tree'] ?? [];
-		$to_tree   = $params['to_tree'] ?? [];
-
-		$delete_ids = [];
-		foreach ( $from_tree as $from_node ) {
-			$id      = $from_node['id'];
-			$to_node = array_filter( $to_tree, fn( $node ) => $node['id'] === $id );
-			if ( empty( $to_node ) ) {
-				$delete_ids[] = $id;
-			}
-		}
-		foreach ( $to_tree as $node ) {
-			$id             = $node['id'];
-			$is_new_chapter = strpos( $id, 'new-' ) === 0;
-			$args           = self::converter( $node, keep_id: ! $is_new_chapter );
-
-			if ( $is_new_chapter ) {
-				$insert_result = self::create_chapter( $args );
-			} else {
-				$insert_result = self::update_chapter( $id, $args );
-			}
-			if ( \is_wp_error( $insert_result ) ) {
-				return $insert_result;
-			}
-		}
-
-		foreach ( $delete_ids as $id ) {
-			$delete_result = self::delete_chapter( $id );
-			if ( \is_wp_error( $delete_result ) ) {
-				return $delete_result;
-			}
-		}
-
-		return true;
 	}
 }
