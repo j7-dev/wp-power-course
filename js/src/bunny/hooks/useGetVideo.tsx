@@ -2,7 +2,6 @@
  * TODO
  */
 
-import React from 'react'
 import { useOne } from '@refinedev/core'
 import { UseQueryOptions, QueryKey } from '@tanstack/react-query'
 import {

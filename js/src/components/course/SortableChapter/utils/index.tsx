@@ -11,14 +11,14 @@ import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
 export function chapterToTreeNode(
   chapter: TChapterRecord,
 ): TreeNode<TChapterRecord> {
-  const { id, children, ...rest } = chapter
+  const { id, chapters, ...rest } = chapter
   return {
     id,
     content: {
       id,
       ...rest,
     },
-    children: children?.map(chapterToTreeNode) || [],
+    children: chapters?.map(chapterToTreeNode) || [],
     showExtra: false,
     collapsed: false,
   }

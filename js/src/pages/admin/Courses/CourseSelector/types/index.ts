@@ -82,7 +82,7 @@ export type TCourseRecord = {
   category_ids: string[]
   tag_ids: string[]
   images: TImage[]
-  children?: TChapterRecord[]
+  chapters?: TChapterRecord[]
   is_course: boolean
   parent_id?: string
   hours: number
@@ -108,7 +108,7 @@ export type TChapterRecord = {
   category_ids?: string[]
   tag_ids?: string[]
   images?: TImage[]
-  children?: TChapterRecord[]
+  chapters?: TChapterRecord[]
   parent_id?: string
   hours?: number
   is_free: 'yes' | 'no' | ''

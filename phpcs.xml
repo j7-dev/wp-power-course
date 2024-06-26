@@ -35,6 +35,14 @@
 		<exclude name="WordPress.Files.FileName"/>
 		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.SpaceAfterOpenBracket"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.SpaceBeforeCloseBracket"/>
+		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceAfterOpenParenthesis"/>
+		<exclude name="WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore"/>
+		<exclude name="WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter"/>
+		<exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis"/>
+
 	</rule>
 
 	<exclude-pattern>./release/*</exclude-pattern>
@@ -99,7 +107,10 @@
 		<exclude name="Generic.Files.LineEndings.InvalidEOLChar"/>
 	</rule>
 
-
+	<!-- 允許單行 <?php. -->
+  <rule ref="Squiz.PHP.EmbeddedPhp.ContentAfterOpen">
+    <severity>0</severity>
+  </rule>
 
 
 </ruleset>

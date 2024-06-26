@@ -25,8 +25,8 @@ export const SortableChapter: FC<{
   const { mutate, isLoading } = useCustomMutation()
 
   useEffect(() => {
-    if (!!record?.children) {
-      const chapterTree = record?.children?.map(chapterToTreeNode)
+    if (!!record?.chapters) {
+      const chapterTree = record?.chapters?.map(chapterToTreeNode)
       setTreeData(chapterTree)
       setOriginTree(chapterTree)
     }
@@ -85,7 +85,7 @@ export const SortableChapter: FC<{
           }}
           indentationWidth={48}
           sortableRule={({ activeNode, projected }) => {
-            const activeNodeHasChild = !!activeNode.children.length
+            const activeNodeHasChild = !!activeNode.chapters.length
             const sortable = projected?.depth <= (activeNodeHasChild ? 0 : 1)
             if (!sortable) message.error('超過最大深度，無法執行')
             return sortable

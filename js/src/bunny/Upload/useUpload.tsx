@@ -1,64 +1,19 @@
 import { useState } from 'react'
-import { GetProp, UploadFile, UploadProps } from 'antd'
-import { NotificationInstance } from 'antd/es/notification/interface'
+import { UploadFile, UploadProps } from 'antd'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
-import { nanoid } from 'nanoid'
-import { useGetVideo, useVideoLibrary } from '@/bunny/hooks'
+import { useVideoLibrary } from '@/bunny/hooks'
 import { filesInQueueAtom } from '@/pages/admin/Courses'
-import { useAtom } from 'jotai'
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
-
-/**
- * accept: string
- * @example '.jpg,.png' , 'image/*', 'video/*', 'audio/*', 'image/png,image/jpeg', '.pdf, .docx, .doc, .xml'
- * @see accept https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#unique_file_type_specifiers
- */
-
-type TUseUploadParams = {
-  uploadProps?: UploadProps
-  notificationApi: NotificationInstance
-}
-
-type TCreateVideoResponse = {
-  videoLibraryId: number
-  guid: string
-  title: string
-  dateUploaded: string
-  views: number
-  isPublic: boolean
-  length: number
-  status: number
-  framerate: number
-  rotation: null //TODO
-  width: number
-  height: number
-  availableResolutions: null //TODO
-  thumbnailCount: number
-  encodeProgress: number
-  storageSize: number
-  captions: Array<any> //TODO
-  hasMP4Fallback: boolean
-  collectionId: string
-  thumbnailFileName: string
-  averageWatchTime: number
-  totalWatchTime: number
-  category: string
-  chapters: Array<any> //TODO
-  moments: Array<any> //TODO
-  metaTags: Array<any> //TODO
-  transcodingMessages: Array<any> //TODO
-}
-
-type TUploadVideoResponse = {
-  success: boolean
-  message: string
-  statusCode: number
-}
+import { useSetAtom } from 'jotai'
+import { getVideoUrl } from '@/utils'
+import {
+  TUseUploadParams,
+  TCreateVideoResponse,
+  TUploadVideoResponse,
+} from '@/bunny/Upload/types'
 
 export const useUpload = (props: TUseUploadParams) => {
-  const [filesInQueue, setFilesInQueue] = useAtom(filesInQueueAtom)
+  const setFilesInQueue = useSetAtom(filesInQueueAtom)
   const { libraryId } = useVideoLibrary()
 
   const uploadProps = props?.uploadProps
@@ -67,14 +22,13 @@ export const useUpload = (props: TUseUploadParams) => {
 
   const mergedUploadProps: UploadProps = {
     customRequest: async (options) => {
-      const { file } = options
-      const fileInQueueKey = nanoid()
+      const file = options?.file as RcFile
 
       // 添加到佇列
       setFilesInQueue((prev) => [
         ...prev,
         {
-          key: fileInQueueKey,
+          key: file?.uid,
           file: file as RcFile,
           status: 'active' as
             | 'active'
@@ -98,28 +52,58 @@ export const useUpload = (props: TUseUploadParams) => {
             },
           )
 
-        // 取得影片 ID
-        const videoId = createVideoResult?.data?.guid || 'unknown id'
+        // 取得 bunny 影片 ID
+        const vId = createVideoResult?.data?.guid || 'unknown id'
 
-        // 更新到狀態
+        // 把 vid 更新到狀態上
+        setFileList((prev) => {
+          return prev.map((fileInList) => {
+            if (fileInList.uid === file?.uid) {
+              return {
+                ...fileInList,
+                videoId: vId,
+              }
+            }
+
+            return fileInList
+          })
+        })
+
+        // 把 vid, preview URL 更新到全局佇列狀態
         setFilesInQueue((prev) => {
-          const newFilesInQueue = prev.map((fileInQueue) => {
-            if (fileInQueue.key === fileInQueueKey) {
+          return prev.map((fileInQueue) => {
+            const findFileInList = fileList.find(
+              (fileInList) => fileInList.uid === fileInQueue.key,
+            )
+            if (findFileInList) {
               return {
                 ...fileInQueue,
-                videoId,
+                videoId: vId,
+                preview: findFileInList?.preview,
               }
             }
 
             return fileInQueue
           })
+        })
 
-          return newFilesInQueue
+        // 更新到狀態
+        setFilesInQueue((prev) => {
+          return prev.map((fileInQueue) => {
+            if (fileInQueue.key === file?.uid) {
+              return {
+                ...fileInQueue,
+                videoId: vId,
+              }
+            }
+
+            return fileInQueue
+          })
         })
 
         // 上傳影片 API
         const uploadVideo = await bunnyStreamAxios.put<TUploadVideoResponse>(
-          `/${libraryId}/videos/${videoId}?enabledResolutions=720p%2C1080p`,
+          `/${libraryId}/videos/${vId}?enabledResolutions=720p%2C1080p`,
           file,
           {
             headers: {
@@ -131,8 +115,8 @@ export const useUpload = (props: TUseUploadParams) => {
         if (uploadVideo?.data?.success) {
           // 設定為 100% 並顯示成功，狀態不用改，馬上就要 encode
           setFilesInQueue((prev) => {
-            const newFilesInQueue = prev.map((fileInQueue) => {
-              if (fileInQueue.key === fileInQueueKey) {
+            return prev.map((fileInQueue) => {
+              if (fileInQueue.key === file?.uid) {
                 return {
                   ...fileInQueue,
                   isEncoding: true,
@@ -141,14 +125,12 @@ export const useUpload = (props: TUseUploadParams) => {
 
               return fileInQueue
             })
-
-            return newFilesInQueue
           })
         } else {
           // 顯示失敗
           setFilesInQueue((prev) => {
-            const newFilesInQueue = prev.map((fileInQueue) => {
-              if (fileInQueue.key === fileInQueueKey) {
+            return prev.map((fileInQueue) => {
+              if (fileInQueue.key === file?.uid) {
                 return {
                   ...fileInQueue,
                   status: 'exception' as
@@ -162,15 +144,13 @@ export const useUpload = (props: TUseUploadParams) => {
 
               return fileInQueue
             })
-
-            return newFilesInQueue
           })
         }
       } catch (error) {
         // 顯示失敗
         setFilesInQueue((prev) => {
-          const newFilesInQueue = prev.map((fileInQueue) => {
-            if (fileInQueue.key === fileInQueueKey) {
+          return prev.map((fileInQueue) => {
+            if (fileInQueue.key === file?.uid) {
               return {
                 ...fileInQueue,
                 status: 'exception' as
@@ -184,41 +164,33 @@ export const useUpload = (props: TUseUploadParams) => {
 
             return fileInQueue
           })
-
-          return newFilesInQueue
         })
       }
     },
-
-    // previewFile(file) {
-    //   console.log('Your upload file:', file)
-
-    //   // Your process logic. Here we just mock to the same file
-
-    //   return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
-    //     method: 'POST',
-    //     body: file,
-    //   })
-    //     .then((res) => res.json())
-    //     .then(({ thumbnail }) => thumbnail)
-    // },
-
     accept: 'video/*',
     multiple: false, // 是否支持多選文件，ie10+ 支持。按住 ctrl 多選文件
     maxCount: 2, // 最大檔案數
     beforeUpload: (file, theFileList) => {
-      setFileList([...fileList, ...theFileList])
+      // 生成預覽 URL 並更新到狀態上
+      const newFileList = theFileList.map((theFile) => {
+        const preview = getVideoUrl(theFile) // 用瀏覽器轉換為預覽的 URL
+        return {
+          ...theFile,
+          preview,
+        }
+      })
+      setFileList([...fileList, ...newFileList])
 
       return true
     },
-
     onRemove: (file) => {
       const index = fileList.indexOf(file)
       const newFileList = fileList.slice()
       newFileList.splice(index, 1)
       setFileList(newFileList)
     },
-    listType: 'picture',
+    listType: 'text',
+    itemRender: () => <></>,
     fileList,
     ...uploadProps,
   }

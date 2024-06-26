@@ -18,7 +18,7 @@ export const useProductVariationsSelector: TUseProductVariationsSelector = (
     { name: string; value: string }[]
   >([])
 
-  const children = record?.children || []
+  const children = record?.chapters || []
 
   const selectedVariation = children.find(({ attributes }) => {
     const allAttributeKeys = Object.keys(attributes)

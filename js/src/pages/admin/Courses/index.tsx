@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import CourseSelector from './CourseSelector'
 import { Upload, useUpload } from '@/bunny/Upload'
 import { notification } from 'antd'
@@ -25,7 +25,7 @@ const index = () => {
     placement: 'bottomLeft',
     stack: { threshold: 1 },
   })
-  const { uploadProps } = useUpload({
+  const bunnyUploadProps = useUpload({
     notificationApi,
   })
 
@@ -60,7 +60,7 @@ const index = () => {
   return (
     <>
       {contextHolder}
-      <Upload uploadProps={uploadProps} />
+      <Upload {...bunnyUploadProps} />
       <CourseSelector />
     </>
   )

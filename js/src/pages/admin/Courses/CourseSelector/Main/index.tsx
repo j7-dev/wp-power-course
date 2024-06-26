@@ -168,7 +168,7 @@ const index = () => {
                 />
               ),
               rowExpandable: (record: TCourseRecord) =>
-                !!record?.children?.length,
+                !!record?.chapters?.length,
             }}
           />
 

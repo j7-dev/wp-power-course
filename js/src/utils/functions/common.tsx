@@ -113,3 +113,7 @@ export const getEstimateUploadTimeInSeconds = (fileSize: number) => {
 
   return Number(estimatedTimeInSeconds.toFixed(2))
 }
+
+export const getVideoUrl = (file: File) => {
+  return URL.createObjectURL(file)
+}

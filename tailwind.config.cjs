@@ -2,7 +2,6 @@
 // eslint-disable-next-line no-undef
 module.exports = {
   important: true,
-
   corePlugins: {
     preflight: false,
   },
