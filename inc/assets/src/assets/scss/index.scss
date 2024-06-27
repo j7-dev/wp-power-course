@@ -2,10 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+// daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
 div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] ~ input {
   --tw-bg-opacity: .2 !important;
 }
 
+// AJAX 加入購物車時，loading 圖示不顯示
 .ajax_add_to_cart.loading svg {
   display: none !important;
+}
+
+.pc-course-card {
+  &__image-wrap {
+    @apply w-full aspect-video rounded-md overflow-hidden mb-3 relative;
+
+    &::before {
+      content: "進入上課教室";
+      @apply opacity-0 hover:opacity-100 absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold text-base z-50 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+    }
+
+    &::after {
+      content: url('../svg/play.svg');
+      @apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-50 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+    }
+
+  }
+
+  &___image {
+    @apply h-full w-full object-cover;
+  }
+
+  &__name {
+    @apply mt-0 mb-2 h-16 font-semibold text-lg leading-8 line-clamp-2;
+  }
+
+  &__teachers {
+    @apply mt-0 font-thin text-xs;
+  }
+
 }

@@ -88,4 +88,30 @@ abstract class Base {
 
 		return "{$limit_type_label} {$limit_value} {$limit_unit_label}";
 	}
+
+	/**
+	 * 取得商品圖片
+	 *
+	 * @param \WC_Product $product 商品
+	 * @param string|null $size 尺寸
+	 *
+	 * @return string
+	 */
+	public static function get_image_url_by_product(
+		\WC_Product $product,
+		?string $size = 'single-post-thumbnail'
+	): string {
+		$product_image = \wp_get_attachment_image_src(
+			\get_post_thumbnail_id( $product->get_id() ),
+			$size
+		);
+
+		if ( ! $product_image ) {
+			$product_image_url = self::DEFAULT_IMAGE;
+		} else {
+			$product_image_url = $product_image[0];
+		}
+
+		return $product_image_url;
+	}
 }

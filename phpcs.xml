@@ -43,6 +43,7 @@
         <exclude name="WordPress.WhiteSpace.OperatorSpacing.NoSpaceAfter"/>
         <exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis"/>
         <exclude name="WordPress.DateTime.RestrictedFunctions.date_date"/>
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
     </rule>
 
     <exclude-pattern>.idea/*</exclude-pattern>

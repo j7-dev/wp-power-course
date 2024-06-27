@@ -15,21 +15,23 @@ $regular_price_html = $regular_price ? '<del class="block text-xs text-gray-600"
 
 $product_name = $product->get_name();
 
-$product_image = \wp_get_attachment_image_src( \get_post_thumbnail_id( $product->get_id() ), 'single-post-thumbnail' );
-
-if ( ! $product_image ) {
-	$product_image_url = Base::DEFAULT_IMAGE;
-} else {
-	$product_image_url = $product_image[0];
-}
+$product_image_url = Base::get_image_url_by_product( $product );
 
 ?>
 <div class="flex gap-5">
 	<div class="group w-[35%] aspect-video rounded overflow-hidden">
-		<img class="w-full h-full object-cover group-hover:scale-125 transition duration-300 ease-in-out" src="<?php echo $product_image_url; ?>">
+		<img class="w-full h-full object-cover group-hover:scale-125 transition duration-300 ease-in-out" src="
+		<?php
+		echo $product_image_url;
+		?>
+		">
 	</div>
 	<div class="w-[65%]">
-		<h6 class="text-sm font-semibold mb-1"><?php echo $product_name; ?></h6>
+		<h6 class="text-sm font-semibold mb-1">
+		<?php
+		echo $product_name;
+		?>
+		</h6>
 		<del class="block text-xs text-gray-600">NT$12,000</del>
 	</div>
 </div>

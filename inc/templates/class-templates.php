@@ -4,7 +4,7 @@
  * 覆寫 WooCommerce 模板
  */
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace J7\PowerCourse\Templates;
 
@@ -18,7 +18,7 @@ final class Templates {
 
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const SLUG = 'course_slug';
+	public const SLUG = 'course_slug';
 
 	/**
 	 * Constructor
@@ -45,14 +45,21 @@ final class Templates {
 	 * @param mixed  $args 要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
 	 * @param bool   $echo 是否輸出
+	 *
 	 * @return ?string|null
 	 * @throws \Exception 如果模板文件不存在.
 	 */
-	public static function get( string $name, mixed $args = null, ?bool $load_once = false, ?bool $echo = true ): ?string {
+	public static function get(
+		string $name,
+		mixed $args = null,
+		?bool $load_once = false,
+		?bool $echo = true
+	): ?string {
 		$result = self::safe_get( $name, $args, $load_once, $echo );
 		if ( '' === $result ) {
 			throw new \Exception( "模板文件 {$name} 不存在" );
 		}
+
 		return $result;
 	}
 
@@ -63,11 +70,18 @@ final class Templates {
 	 * @param mixed  $args 要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
 	 * @param bool   $echo 是否輸出
+	 *
 	 * @return string|false|null
 	 * @throws \Exception 如果模板文件不存在.
 	 */
-	public static function safe_get( string $name, mixed $args = null, ?bool $load_once = false, ?bool $echo = true ): string|false|null {
-		$area_names = [ 'head', 'header', 'body', 'main', 'sider', 'footer' ]; // 區域名稱
+	public static function safe_get(
+		string $name,
+		mixed $args = null,
+		?bool $load_once = false,
+		?bool $echo = true
+	): string|false|null {
+		$area_names = [ 'head', 'header', 'body', 'main', 'sider', 'footer', 'my-account' ]; // 區域名稱
+
 		// 如果 $name 是以 area name 開頭的，那就去 area folder 裡面找
 		$is_area = false;
 		foreach ( $area_names as $area_name ) {
@@ -87,25 +101,27 @@ final class Templates {
 		if ( file_exists( "{$template_path}.php" ) ) {
 			if ( $echo ) {
 				\load_template( "{$template_path}.php", $load_once, $args );
+
 				return null;
 			}
 			ob_start();
 			\load_template( "{$template_path}.php", $load_once, $args );
-			$output = ob_get_clean();
-			return $output;
+
+			return ob_get_clean();
 		} elseif ( file_exists( "{$template_path}/index.php" ) ) {
 			if ( $echo ) {
 				\load_template( "{$template_path}/index.php", $load_once, $args );
+
 				return null;
 			}
 			ob_start();
 			\load_template( "{$template_path}/index.php", $load_once, $args );
-			$output = ob_get_clean();
-			return $output;
+
+			return ob_get_clean();
 		}
+
 		return '';
 	}
-
 
 
 	/**
@@ -136,6 +152,7 @@ final class Templates {
 	 * @param array  $args Args.
 	 * @param string $template_path Template path.
 	 * @param string $default_path Default path.
+	 *
 	 * @return string
 	 */
 	public function override_wc_template( $located, $template_name, $args, $template_path, $default_path ) {
@@ -153,10 +170,12 @@ final class Templates {
 	 * Add query var
 	 *
 	 * @param array $vars Vars.
+	 *
 	 * @return array
 	 */
 	public function add_query_var( $vars ) {
 		$vars[] = self::SLUG;
+
 		return $vars;
 	}
 
@@ -164,11 +183,13 @@ final class Templates {
 	 * Custom post type rewrite rules
 	 *
 	 * @param array $rules Rules.
+	 *
 	 * @return array
 	 */
-	public function custom_post_type_rewrite_rules( $rules ) {
+	public function custom_post_type_rewrite_rules( $rules ): array {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
+
 		return $rules;
 	}
 
@@ -203,6 +224,7 @@ final class Templates {
 				return $override_template_path;
 			}
 		}
+
 		return $template;
 	}
 
@@ -234,7 +256,6 @@ final class Templates {
 	}
 
 	public function add_html_attr( $output, $doctype ) {
-
 		// ["light", "dark", "cupcake"]
 		return $output . ' data-theme="light"';
 	}

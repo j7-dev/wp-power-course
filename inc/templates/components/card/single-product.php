@@ -2,6 +2,9 @@
 
 use J7\PowerCourse\Templates\Templates;
 
+/**
+ * @var WC_Product $args
+ */
 $product = $args;
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
@@ -53,6 +56,6 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 			]
 		);
 		?>
-		
+
 	</div>
 </div>

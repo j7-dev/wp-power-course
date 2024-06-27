@@ -3,6 +3,9 @@
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Templates\Templates;
 
+/**
+ * @var BundleProduct $args
+ */
 $bundle_product = $args;
 
 if ( ! ( $bundle_product instanceof BundleProduct ) ) {
@@ -19,9 +22,9 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 <div class="w-full bg-white shadow-lg rounded p-6">
 	<p class="text-xs text-center mb-1 text-red-400">合購優惠</p>
 	<h6 class="text-base font-semibold text-center">
-	<?php
-	echo $bundle_title;
-	?>
+		<?php
+		echo $bundle_title;
+		?>
 	</h6>
 
 	<?php
