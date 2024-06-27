@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] ~ input {
+  --tw-bg-opacity: .2 !important;
+}
+
+.ajax_add_to_cart.loading svg {
+  display: none !important;
+}

@@ -22,27 +22,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 use J7\PowerCourse\Templates\Templates;
 
 global $product;
-$product->set_average_rating( 9.7 );
-$average_rating = $product->get_average_rating();
-
-var_dump( $average_rating );
 
 get_header(); ?>
-<!-- <script src="https://cdn.tailwindcss.com"></script> -->
-<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
+	<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+	<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
-	<!-- Header -->
-	<?php Templates::get( 'header', $product, true ); ?>
+		<!-- Header -->
+		<?php
+		Templates::get( 'header', $product, true );
+		?>
 
-	<div class="flex flex-col md:flex-row gap-8">
-		<!-- Body -->
-		<?php Templates::get( 'body', $product, true ); ?>
+		<div class="flex flex-col md:flex-row gap-8">
+			<!-- Body -->
+			<?php
+			Templates::get( 'body', $product, true );
+			?>
 
-		<!-- Sider -->
-		<?php Templates::get( 'sider', $product, true ); ?>
+			<!-- Sider -->
+			<?php
+			Templates::get( 'sider', $product, true );
+			?>
+		</div>
+
 	</div>
-
-</div>
 <?php
 get_footer();
 

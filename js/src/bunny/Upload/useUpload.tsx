@@ -1,12 +1,16 @@
-import { useState } from "react"
-import { UploadFile, UploadProps } from "antd"
-import { bunnyStreamAxios } from "@/rest-data-provider/bunny-stream"
-import { RcFile } from "antd/lib/upload/interface"
-import { useVideoLibrary } from "@/bunny/hooks"
-import { filesInQueueAtom } from "@/pages/admin/Courses"
-import { useSetAtom } from "jotai"
-import { getVideoUrl } from "@/utils"
-import { TCreateVideoResponse, TUploadVideoResponse, TUseUploadParams } from "@/bunny/Upload/types"
+import { useState } from 'react'
+import { UploadFile, UploadProps } from 'antd'
+import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
+import { RcFile } from 'antd/lib/upload/interface'
+import { useVideoLibrary } from '@/bunny/hooks'
+import { filesInQueueAtom } from '@/pages/admin/Courses'
+import { useSetAtom } from 'jotai'
+import { getVideoUrl } from '@/utils'
+import {
+  TCreateVideoResponse,
+  TUploadVideoResponse,
+  TUseUploadParams,
+} from '@/bunny/Upload/types'
 
 export const useUpload = (props?: TUseUploadParams) => {
   const setFilesInQueue = useSetAtom(filesInQueueAtom)
@@ -14,7 +18,11 @@ export const useUpload = (props?: TUseUploadParams) => {
 
   const uploadProps = props?.uploadProps
 
-  const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [fileList, setFileList] = useState<
+    (UploadFile & {
+      videoId?: string
+    })[]
+  >([])
 
   const mergedUploadProps: UploadProps = {
     customRequest: async (options) => {

@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import {
   DatePicker,
   Form,
   Input,
   InputNumber,
+  Radio,
   Select,
   Space,
-  Radio,
 } from 'antd'
 import {
   keyLabelMapper,
@@ -14,10 +14,11 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
-import { Upload, useUpload, Heading } from '@/components/general'
+import { Heading, Upload, useUpload } from '@/components/general'
 import { FiSwitch } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import dayjs from 'dayjs'
+import VideoInput from './VideoInput'
 
 const { Item } = Form
 
@@ -92,12 +93,25 @@ export const CourseDescription = () => {
           <Input.TextArea rows={8} disabled />
         </Item>
 
-        <p className="mb-3">課程封面圖</p>
-        <div className="mb-8">
-          <Upload uploadProps={uploadProps} />
-          <Item hidden name={['files']} label="課程封面圖">
-            <Input />
-          </Item>
+        <div className="grid grid-cols-2 gap-6 mb-12">
+          <div className="mb-8">
+            <p className="mb-3">課程封面圖</p>
+            <Upload uploadProps={uploadProps} />
+            <Item hidden name={['files']} label="課程封面圖">
+              <Input />
+            </Item>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="mb-8">
+            <p className="mb-3">課程封面影片</p>
+            <VideoInput name={['feature_video']} />
+          </div>
+          <div className="mb-8">
+            <p className="mb-3">課程免費試看影片</p>
+            <VideoInput name={['trial_video']} />
+          </div>
         </div>
       </div>
 

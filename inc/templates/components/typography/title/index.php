@@ -2,7 +2,9 @@
 
 use J7\PowerCourse\Utils\Base;
 
-$props = $args;
+/**
+ * @var mixed $args
+ */
 
 $default_props = [
 	'level'  => 'h2', // 'h1', 'h2', 'h3', 'h4', 'h5', 'h6
@@ -12,7 +14,7 @@ $default_props = [
 	'styles' => [],
 ];
 
-$props = \array_merge( $default_props, $props );
+$props = wp_parse_args( $args, $default_props );
 
 $color = $props['color'];
 

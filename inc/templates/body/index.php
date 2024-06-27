@@ -1,57 +1,86 @@
 <?php
-use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Templates\Components\Title;
-use J7\PowerCourse\Templates\Components\Course;
 
+namespace J7\PowerCourse\Templates\Components;
+
+use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Base;
+use WC_Product;
+
+/**
+ * @var WC_Product $args
+ */
 $product = $args;
 ?>
 <div class="flex-1">
 
-			<div class="mb-12">
-				<?php
-				Templates::get(
-					'typography/title',
-					[
-						'value' => '課程資訊',
-					]
-				);
+	<div class="mb-12">
+		<?php
+		Templates::get(
+			'typography/title',
+			[
+				'value' => '課程資訊',
+			]
+		);
 
-				Templates::get(
-					'course/info',
-					[
-						[
-							'icon'  => 'calendar',
-							'label' => '開課時間',
-							'value' => '2022/08/31 16:00',
-						],
-						[
-							'icon'  => 'clock',
-							'label' => '預計時長',
-							'value' => '15 小時 8 分',
-						],
-						[
-							'icon'  => 'list',
-							'label' => '預計單元',
-							'value' => '39個',
-						],
-						[
-							'icon'  => 'eye',
-							'label' => '觀看時間',
-							'value' => '無限制',
-						],
-						[
-							'icon'  => 'team',
-							'label' => '課程學員',
-							'value' => '1214 人',
-						],
-					],
-				);
+		$course_schedule_in_timestamp = $product->get_meta( 'course_schedule' );
+		$course_schedule              = $course_schedule_in_timestamp ? \date(
+			'Y/m/d H:i',
+			$course_schedule_in_timestamp
+		) : '未設定';
+		$course_hour                  = (int) $product->get_meta( 'course_hour' );
+		$course_minute                = (int) $product->get_meta( 'course_minute' );
+		$all_chapters                 = \get_pages(
+			[
+				'child_of'  => $product->get_id(),
+				'post_type' => \J7\PowerCourse\Resources\Chapter\RegisterCPT::POST_TYPE,
+			]
+		);
+		$count_all_chapters           = (int) count( $all_chapters );
 
-				?>
-			</div>
-			<!-- Tabs -->
-			<?php Templates::get( 'body/tabs', $product, true ); ?>
 
-			<!-- Footer -->
-			<?php Templates::get( 'body/footer', $product, true ); ?>
-		</div>
+		$total_sales = ( $product->get_total_sales() ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+		$limit_label = Base::get_limit_label_by_product( $product );
+
+		Templates::get(
+			'course/info',
+			[
+				[
+					'icon'  => 'calendar',
+					'label' => '開課時間',
+					'value' => $course_schedule,
+				],
+				[
+					'icon'  => 'clock',
+					'label' => '預計時長',
+					'value' => "{$course_hour} 小時 {$course_minute} 分",
+				],
+				[
+					'icon'  => 'list',
+					'label' => '預計單元',
+					'value' => "{$count_all_chapters} 個",
+				],
+				[
+					'icon'  => 'eye',
+					'label' => '觀看時間',
+					'value' => $limit_label,
+				],
+				[
+					'icon'  => 'team',
+					'label' => '課程學員',
+					'value' => "{$total_sales} 人",
+				],
+			],
+		);
+
+		?>
+	</div>
+	<!-- Tabs -->
+	<?php
+	Templates::get( 'body/tabs', $product, true );
+	?>
+
+	<!-- Footer -->
+	<?php
+	Templates::get( 'body/footer', $product, true );
+	?>
+</div>

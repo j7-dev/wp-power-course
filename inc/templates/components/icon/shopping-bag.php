@@ -1,6 +1,10 @@
 <?php
+
 use J7\PowerCourse\Utils\Base;
 
+/**
+ * @var array $args
+ */
 $props = $args;
 
 $default_props = [
@@ -9,7 +13,7 @@ $default_props = [
 	'color' => Base::PRIMARY_COLOR,
 ];
 
-$props = array_merge( $default_props, $props );
+$props = wp_parse_args( $props, $default_props );
 
 $html = sprintf(
 	'<svg class="%1$s" fill="%2$s" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve">

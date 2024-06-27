@@ -3,7 +3,7 @@
  * Custom Post Type: chapter
  */
 
-declare(strict_types=1);
+declare( strict_types=1 );
 
 namespace J7\PowerCourse\Resources\Chapter;
 
@@ -15,7 +15,7 @@ use J7\PowerCourse\Plugin;
 final class RegisterCPT {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const POST_TYPE = 'pc_chapter';
+	public const POST_TYPE = 'pc_chapter';
 
 	/**
 	 * Rewrite
@@ -32,7 +32,6 @@ final class RegisterCPT {
 	 * Constructor
 	 */
 	public function __construct() {
-
 		\add_action( 'init', [ $this, 'init' ] );
 
 		if ( ! empty( $args['rewrite'] ) ) {
@@ -49,7 +48,11 @@ final class RegisterCPT {
 
 		// add {$this->post_type}/{slug}/test rewrite rule
 		if ( ! empty( $this->rewrite ) ) {
-			\add_rewrite_rule( '^power-course/([^/]+)/' . $this->rewrite['slug'] . '/?$', 'index.php?post_type=power-course&name=$matches[1]&' . $this->rewrite['var'] . '=1', 'top' );
+			\add_rewrite_rule(
+				'^power-course/([^/]+)/' . $this->rewrite['slug'] . '/?$',
+				'index.php?post_type=power-course&name=$matches[1]&' . $this->rewrite['var'] . '=1',
+				'top'
+			);
 			\flush_rewrite_rules();
 		}
 	}
@@ -58,7 +61,6 @@ final class RegisterCPT {
 	 * Register power-course custom post type
 	 */
 	public static function register_cpt(): void {
-
 		$labels = [
 			'name'                     => \esc_html__( 'chapter', 'power-course' ),
 			'singular_name'            => \esc_html__( 'chapter', 'power-course' ),
@@ -129,10 +131,12 @@ final class RegisterCPT {
 	 * Add query var
 	 *
 	 * @param array $vars Vars.
+	 *
 	 * @return array
 	 */
 	public function add_query_var( $vars ) {
 		$vars[] = $this->rewrite['var'];
+
 		return $vars;
 	}
 
@@ -140,11 +144,13 @@ final class RegisterCPT {
 	 * Custom post type rewrite rules
 	 *
 	 * @param array $rules Rules.
+	 *
 	 * @return array
 	 */
 	public function custom_post_type_rewrite_rules( $rules ) {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
+
 		return $rules;
 	}
 
@@ -163,6 +169,7 @@ final class RegisterCPT {
 				return $repor_template_path;
 			}
 		}
+
 		return $template;
 	}
 }

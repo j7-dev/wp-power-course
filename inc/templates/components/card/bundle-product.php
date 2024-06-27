@@ -1,7 +1,7 @@
 <?php
 
-use J7\PowerCourse\Templates\Templates;
 use J7\PowerBundleProduct\BundleProduct;
+use J7\PowerCourse\Templates\Templates;
 
 $bundle_product = $args;
 
@@ -18,12 +18,20 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 ?>
 <div class="w-full bg-white shadow-lg rounded p-6">
 	<p class="text-xs text-center mb-1 text-red-400">合購優惠</p>
-	<h6 class="text-base font-semibold text-center"><?php echo $bundle_title; ?></h6>
+	<h6 class="text-base font-semibold text-center">
+	<?php
+	echo $bundle_title;
+	?>
+	</h6>
 
-	<?php Templates::get( 'divider/base' ); ?>
+	<?php
+	Templates::get( 'divider/base' );
+	?>
 
 	<div class="mb-6 text-sm">
-		<?php echo $purchase_note; ?>
+		<?php
+		echo $purchase_note;
+		?>
 	</div>
 
 
@@ -32,14 +40,17 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 		$product = \wc_get_product( $product_id );
 		?>
 		<div>
-		<?php Templates::get( 'course/list', $product ); ?>
+		<?php
+		Templates::get( 'course/list', $product );
+		?>
 		</div>
-		<?php Templates::get( 'divider/base' ); ?>
+		<?php
+		Templates::get( 'divider/base' );
+		?>
 
 		<?php
 	endforeach;
 	?>
-
 
 
 	<div class="flex gap-3 justify-between items-end">
@@ -55,10 +66,10 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 
 		<?php
 		Templates::get(
-			'button/base',
+			'button/add-to-cart',
 			[
-				'children' => '加入購物車',
-				'class'    => 'px-6',
+				'product' => $bundle_product,
+				'class'   => 'px-6',
 			]
 		);
 		?>

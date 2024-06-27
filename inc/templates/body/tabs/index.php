@@ -1,7 +1,10 @@
 <?php
+
 use J7\PowerCourse\Templates\Templates;
 
-
+/**
+ * @var WC_Product $args
+ */
 $product     = $args;
 $description = $product->get_description();
 $accordion   = Templates::get( 'collapse/chapter', args: $product, load_once: false, echo: false );

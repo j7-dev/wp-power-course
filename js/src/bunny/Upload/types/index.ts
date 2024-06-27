@@ -1,4 +1,4 @@
-import { UploadProps } from "antd"
+import { UploadProps } from 'antd'
 
 export type TUseUploadParams = {
   uploadProps?: UploadProps

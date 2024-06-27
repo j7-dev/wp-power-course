@@ -12,7 +12,9 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 ?>
 <div class="w-full bg-white shadow-lg rounded p-6">
 	<h6 class="text-base font-semibold text-center">購買單堂課</h6>
-	<?php Templates::get( 'divider/base' ); ?>
+	<?php
+	Templates::get( 'divider/base' );
+	?>
 
 	<div class="my-8">
 		<?php
@@ -26,7 +28,9 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 	</div>
 
 	<div class="mb-6 text-sm">
-		<?php echo $purchase_note; ?>
+		<?php
+		echo $purchase_note;
+		?>
 	</div>
 
 	<div class="flex gap-3">
@@ -35,18 +39,20 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 			'button/base',
 			[
 				'children' => '立即購買',
-				'class'    => 'w-full',
+				'class'    => 'flex-1',
 			]
 		);
 
 		Templates::get(
-			'button/base',
+			'button/add-to-cart',
 			[
-				'children' => '',
-				'type'     => 'outline',
-				'icon'     => 'shopping_bag',
+				'product'       => $product,
+				'label'         => 'icon',
+				'wrapper_class' => '[&_a.wc-forward]:hidden',
+				'class'         => 'border-2 border-solid border-blue-500 h-10 w-10 rounded-md flex items-center justify-center',
 			]
 		);
 		?>
+		
 	</div>
 </div>

@@ -1,6 +1,8 @@
 <?php
 
-$props = $args;
+/**
+ * @var mixed $args
+ */
 
 $default_props = [
 	'type'  => 'fill',  // 'fill', 'half', 'outline'
@@ -8,7 +10,7 @@ $default_props = [
 	'color' => '#FFD700',
 ];
 
-$props = array_merge( $default_props, $props );
+$props = wp_parse_args( $args, $default_props );
 
 switch ( $props['type'] ) {
 	case 'fill':

@@ -1,7 +1,10 @@
 <?php
+
 use J7\PowerCourse\Utils\Base;
 
-$props = $args;
+/**
+ * @var mixed $args
+ */
 
 $default_props = [
 	'type'  => '',  // '
@@ -9,7 +12,7 @@ $default_props = [
 	'color' => Base::PRIMARY_COLOR,
 ];
 
-$props = array_merge( $default_props, $props );
+$props = wp_parse_args( $args, $default_props );
 
 $html = sprintf(
 	'<svg class="%1$s" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

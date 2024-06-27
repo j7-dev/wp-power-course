@@ -2,6 +2,9 @@
 
 use J7\PowerCourse\Templates\Templates;
 
+/**
+ * @var array $args
+ */
 $items = $args;
 
 if ( ! is_array( $items ) ) {
@@ -11,7 +14,9 @@ if ( ! is_array( $items ) ) {
 
 ?>
 <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-	<?php foreach ( $items as $index => $item ) : ?>
+	<?php
+	foreach ( $items as $index => $item ) :
+		?>
 		<div class="flex items-center gap-3">
 			<div class="bg-blue-500 rounded-xl h-8 w-8 flex items-center justify-center">
 		<?php
@@ -25,11 +30,17 @@ if ( ! is_array( $items ) ) {
 		?>
 			</div>
 			<div>
-		<?php echo $item['label']; ?>
+		<?php
+		echo $item['label'];
+		?>
 			</div>
 			<div class="font-semibold">
-		<?php echo $item['value']; ?>
+		<?php
+		echo $item['value'];
+		?>
 			</div>
 		</div>
-	<?php endforeach; ?>
+		<?php
+	endforeach;
+	?>
 </div>

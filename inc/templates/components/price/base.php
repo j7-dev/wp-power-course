@@ -1,17 +1,20 @@
 <?php
 
-$props   = $args;
-$product = $props['product'] ?? null;
-
-if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
-}
+/**
+ * @var array $args
+ */
 
 $default_props = [
 	'size' => 'large',
 ];
 
-$props = \array_merge( $default_props, $props );
+$props = wp_parse_args( $args, $default_props );
+
+$product = $props['product'] ?? null;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
 
 $regular_price = $product->get_regular_price();
 $sale_price    = $product->get_sale_price();
@@ -22,5 +25,7 @@ $price_html .= '<ins class="text-red-400 text-2xl font-semibold">' . ( is_numeri
 
 ?>
 <div class="flex flex-col">
-	<?php echo $price_html; ?>
+	<?php
+	echo $price_html;
+	?>
 </div>

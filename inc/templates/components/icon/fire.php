@@ -1,6 +1,8 @@
 <?php
 
-$props = $args;
+/**
+ * @var mixed $args
+ */
 
 $default_props = [
 	'type'  => '',  // '
@@ -8,7 +10,7 @@ $default_props = [
 	'color' => '#FF4D00',
 ];
 
-$props = array_merge( $default_props, $props );
+$props = wp_parse_args( $args, $default_props );
 
 $html = sprintf(
 	'<svg class="%1$s" fill="%2$s" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
