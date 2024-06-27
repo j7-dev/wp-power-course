@@ -3,6 +3,9 @@
 
 use J7\PowerCourse\Utils\Base;
 
+/**
+ * @var WC_Product $args
+ */
 $product = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
@@ -17,6 +20,8 @@ $product_name = $product->get_name();
 
 $product_image_url = Base::get_image_url_by_product( $product );
 
+$regular_price = \wc_price( $product->get_regular_price() );
+
 ?>
 <div class="flex gap-5">
 	<div class="group w-[35%] aspect-video rounded overflow-hidden">
@@ -28,10 +33,14 @@ $product_image_url = Base::get_image_url_by_product( $product );
 	</div>
 	<div class="w-[65%]">
 		<h6 class="text-sm font-semibold mb-1">
-		<?php
-		echo $product_name;
-		?>
+			<?php
+			echo $product_name;
+			?>
 		</h6>
-		<del class="block text-xs text-gray-600">NT$12,000</del>
+		<del class="block text-xs text-gray-600">
+			<?php
+			echo $regular_price;
+			?>
+		</del>
 	</div>
 </div>

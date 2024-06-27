@@ -28,16 +28,25 @@ div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] 
 
   }
 
-  &___image {
-    @apply h-full w-full object-cover;
+  &__image {
+    height: 100% !important;
+    width: 100% !important;
+    object-fit: cover !important;
   }
 
   &__name {
-    @apply mt-0 mb-2 h-16 font-semibold text-lg leading-8 line-clamp-2;
+    margin: 0rem 0rem 0.5rem 0rem !important;
+    height: 3rem !important;
+    font-weight: 600 !important;
+    font-size: 1.125rem !important;
+    line-height: 1.5rem !important;
+    @apply line-clamp-2;
   }
 
   &__teachers {
-    @apply mt-0 font-thin text-xs;
+    margin: 0rem 0rem 0.5rem 0rem !important;
+    font-weight: 300 !important;
+    font-size: 0.75rem !important;
   }
 
 }
