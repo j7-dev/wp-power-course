@@ -1,4 +1,8 @@
 <?php
+/**
+ * My Account 裡面上課用的卡片
+ * 已登入，有上課進度，可直接上課
+ */
 
 use J7\PowerCourse\Utils\Base;
 
@@ -25,14 +29,17 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 printf(
 	'
 <div class="pc-course-card">
-	<div class="pc-course-card__image-wrap group">
-   		 <img class="pc-course-card__image group-hover:scale-125 transition duration-300 ease-in-out" src="%1$s" alt="%2$s">
-    </div>
+	<a href="%4$s">
+		<div class="pc-course-card__image-wrap group">
+	         <img class="pc-course-card__image group-hover:scale-125 transition duration-300 ease-in-out" src="%1$s" alt="%2$s" loading="lazy">
+	    </div>
+    </a>
     <h3 class="pc-course-card__name">%2$s</h3>
     <p class="pc-course-card__teachers">by %3$s</p>
 </div>
 ',
 	$product_image_url,
 	$name,
-	$teacher_name
+	$teacher_name,
+	site_url( 'classroom' . '/' . $product->get_slug() )
 );

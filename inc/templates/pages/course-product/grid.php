@@ -15,7 +15,7 @@ $default_props = [
 
 $props = \wp_parse_args( $args, $default_props );
 
-$type = $props['type'];
+$course_type = $props['type'];
 
 $current_user_id = \get_current_user_id();
 $user_course_ids = (array) \get_user_meta( $current_user_id, 'course_ids', false );
@@ -24,7 +24,7 @@ $user_course_ids = [ 2030, 2031, 2035, 2038, 2294 ];// DELETE
 
 $filtered_course_ids = array_filter(
 	$user_course_ids,
-	function ( $course_id ) use ( $type ) {
+	function ( $course_id ) use ( $course_type ) {
 		$course = \wc_get_product( $course_id );
 		if ( ! $course ) {
 			return false;
@@ -32,11 +32,11 @@ $filtered_course_ids = array_filter(
 
 		$is_launched = $course->get_meta( 'is_launched' ) === 'yes';
 
-		if ( 'launched' === $type && ! $is_launched ) {
+		if ( 'launched' === $course_type && ! $is_launched ) {
 			return false;
 		}
 
-		if ( 'un_launched' === $type && $is_launched ) {
+		if ( 'un_launched' === $course_type && $is_launched ) {
 			return false;
 		}
 

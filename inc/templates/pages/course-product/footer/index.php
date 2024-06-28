@@ -31,7 +31,7 @@ if ( ! ! $trial_video ) :
 	$library_id = \get_option( 'library_id', '244459' );
 
 	Templates::get(
-		'course/video',
+		'bunny/video',
 		[
 			'library_id' => $library_id,
 			'video_id'   => $trial_video,

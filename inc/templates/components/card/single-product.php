@@ -38,11 +38,19 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 
 	<div class="flex gap-3">
 		<?php
+		$checkout_url = \wc_get_checkout_url();
+		$url          = \add_query_arg(
+			[
+				'add-to-cart' => $product->get_id(),
+			],
+			$checkout_url
+		);
 		Templates::get(
 			'button/base',
 			[
 				'children' => '立即購買',
 				'class'    => 'flex-1',
+				'href'     => $url,
 			]
 		);
 

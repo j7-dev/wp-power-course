@@ -15,31 +15,18 @@
  * @version     1.6.4
  */
 
+use J7\PowerCourse\Templates\Templates;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-use J7\PowerCourse\Templates\Templates;
-
 global $product;
 
-get_header(); ?>
-	<!-- <script src="https://cdn.tailwindcss.com"></script> -->
-	<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
+get_header();
 
-		<!-- Header -->
-		<?php Templates::get( 'course-product/header', $product, true ); ?>
+Templates::get( 'classroom/sider', $product, true );
 
-		<div class="flex flex-col md:flex-row gap-8">
-			<!-- Body -->
-			<?php Templates::get( 'course-product/body', $product, true ); ?>
+Templates::get( 'classroom/body', $product, true );
 
-			<!-- Sider -->
-			<?php Templates::get( 'course-product/sider', $product, true ); ?>
-		</div>
-
-	</div>
-<?php
 get_footer();
-
-/* Omit closing PHP tag at the end of PHP files to avoid "headers already sent" issues. */

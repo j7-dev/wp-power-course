@@ -8,9 +8,6 @@ module.exports = {
     content: ['./js/src/**/*.{js,ts,jsx,tsx}', './inc/**/*.php'],
     theme: {
         extend: {
-            colors: {
-                primary: '#1677ff',
-            },
             screens: {
                 sm: '576px', // iphone SE
                 md: '810px', // ipad Portrait
@@ -25,7 +22,26 @@ module.exports = {
     ],
     safelist: [],
     daisyui: {
-        themes: ['light', 'dark', 'cupcake'],
+        themes: [
+            {
+                power: {
+                    "color-scheme": "light",
+                    "primary": "#377cfb",
+                    "primary-content": "#223D30",
+                    "secondary": "#66cc8a",
+                    "secondary-content": "#fff",
+                    "accent": "#f68067",
+                    "accent-content": "#000",
+                    "neutral": "#333c4d",
+                    "neutral-content": "#f9fafb",
+                    "base-100": "oklch(100% 0 0)",
+                    "base-content": "#333c4d",
+                    "--animation-btn": "0",
+                    "--animation-input": "0",
+                    "--btn-focus-scale": "1",
+                },
+            }
+        ],
         prefix: 'pc-', // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
     },
 }

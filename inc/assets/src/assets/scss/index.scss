@@ -12,6 +12,8 @@ div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] 
   display: none !important;
 }
 
+
+// My Account 頁面的課程卡片樣式
 .pc-course-card {
   &__image-wrap {
     @apply w-full aspect-video rounded-md overflow-hidden mb-3 relative;
@@ -49,4 +51,14 @@ div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] 
     font-size: 0.75rem !important;
   }
 
+}
+
+// classroom 樣式
+header,
+header#header {
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  border-bottom: 1px solid #eee;
 }

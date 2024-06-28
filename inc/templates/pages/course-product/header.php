@@ -6,9 +6,10 @@ use J7\PowerCourse\Templates\Templates;
  * @var WC_Product $product
  * @var WC_Product $args
  */
-$product     = $args;
-$product_id  = $product->get_id();
-$teacher_ids = \get_post_meta( $product_id, 'teacher_ids', false );
+$product      = $args;
+$product_id   = $product->get_id();
+$product_name = $product->get_name();
+$teacher_ids  = \get_post_meta( $product_id, 'teacher_ids', false );
 if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
 }
@@ -17,7 +18,7 @@ if ( ! is_array( $teacher_ids ) ) {
 <div class="flex gap-6 flex-col md:flex-row mb-20">
 	<div class="w-full md:w-[55%] px-8 md:px-0">
 		<?php
-		// TODO 清除預設值
+		// TODO 清除預設值 DELETE
 		$library_id = \get_option( 'library_id', '244459' );
 
 		$feature_video = \get_post_meta( $product_id, 'feature_video', true );
@@ -26,7 +27,7 @@ if ( ! is_array( $teacher_ids ) ) {
 
 		if ( ! ! $feature_video ) {
 			Templates::get(
-				'course/video',
+				'bunny/video',
 				[
 					'library_id' => $library_id,
 					'video_id'   => $feature_video,
@@ -35,9 +36,10 @@ if ( ! is_array( $teacher_ids ) ) {
 		} else {
 			printf(
 				'<div class="group w-full rounded-2xl aspect-video overflow-hidden">
-			<img src="%s" class="h-full w-full object-cover group-hover:scale-125 duration-300 transition ease-in-out" alt="">
+			<img src="%s" class="h-full w-full object-cover group-hover:scale-125 duration-300 transition ease-in-out" alt="%2$s" loading="lazy">
 			</div>',
-				$image_url
+				$image_url,
+				$product_name
 			);
 		}
 		?>

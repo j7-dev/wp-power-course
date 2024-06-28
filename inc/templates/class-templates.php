@@ -18,14 +18,16 @@ final class Templates {
 
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	public const SLUG = 'course_slug';
+	// 課程頁面
+	public const COURSE_SLUG = 'course_slug';
+
+	// 上課頁面
+	public const CLASSROOM_SLUG = 'classroom_slug';
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		// \add_filter( 'wc_get_template', array( $this, 'override_wc_template' ), 999999, 5 );
-
 		\add_action(
 			'init',
 			[ $this, 'add_rewrite_rules' ]
@@ -41,10 +43,10 @@ final class Templates {
 	/**
 	 * 從指定的模板路徑讀取模板文件並渲染數據
 	 *
-	 * @param string $name 指定路徑裡面的文件名
-	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param string $name      指定路徑裡面的文件名
+	 * @param mixed  $args      要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
-	 * @param bool   $echo 是否輸出
+	 * @param bool   $echo      是否輸出
 	 *
 	 * @return ?string|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -66,10 +68,10 @@ final class Templates {
 	/**
 	 * 從指定的模板路徑讀取模板文件並渲染數據
 	 *
-	 * @param string $name 指定路徑裡面的文件名
-	 * @param mixed  $args 要渲染到模板中的數據
+	 * @param string $name      指定路徑裡面的文件名
+	 * @param mixed  $args      要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
-	 * @param bool   $echo 是否輸出
+	 * @param bool   $echo      是否輸出
 	 *
 	 * @return string|false|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -80,19 +82,19 @@ final class Templates {
 		?bool $load_once = false,
 		?bool $echo = true
 	): string|false|null {
-		$area_names = [ 'head', 'header', 'body', 'main', 'sider', 'footer', 'my-account' ]; // 區域名稱
+		$area_names = [ 'course-product', 'classroom', 'my-account' ]; // 區域名稱
 
 		// 如果 $name 是以 area name 開頭的，那就去 area folder 裡面找
-		$is_area = false;
+		$is_page = false;
 		foreach ( $area_names as $area_name ) {
-			if ( strpos( $name, $area_name ) === 0 ) {
-				$is_area = true;
+			if ( str_starts_with( $name, $area_name ) ) {
+				$is_page = true;
 				break;
 			}
 		}
 
-		if ( $is_area ) {
-			$template_path = Plugin::$dir . '/inc/templates/' . $name;
+		if ( $is_page ) {
+			$template_path = Plugin::$dir . '/inc/templates/pages/' . $name;
 		} else { // 不是區域名稱就去 components 裡面找
 			$template_path = Plugin::$dir . '/inc/templates/components/' . $name;
 		}
@@ -132,37 +134,16 @@ final class Templates {
 	public function add_rewrite_rules(): void {
 		// get registered rewrite rules.
 		$rules = get_option( 'rewrite_rules', [] );
-		// set the regex.
-		$regex = '^courses/?([^/]*)/?';
+		// 課程頁面
+		$course_regex = '^courses/?([^/]*)/?';
+		\add_rewrite_rule( $course_regex, 'index.php?' . self::COURSE_SLUG . '=$matches[1]', 'top' );
 
-		// add the rewrite rule.
-		\add_rewrite_rule( $regex, 'index.php?' . self::SLUG . '=$matches[1]', 'top' );
+		// 上課頁面
+		$classroom_regex = '^classroom/?([^/]*)/?';
+		\add_rewrite_rule( $classroom_regex, 'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]', 'top' );
 
-		// maybe flush rewrite rules if it was not previously in the option.
-		if ( ! isset( $rules[ $regex ] ) ) {
+		if ( ! isset( $rules[ $course_regex ] ) || ! isset( $rules[ $classroom_regex ] ) ) {
 			\flush_rewrite_rules();
-		}
-	}
-
-	/**
-	 * Override template
-	 *
-	 * @param string $located Located.
-	 * @param string $template_name Template name.
-	 * @param array  $args Args.
-	 * @param string $template_path Template path.
-	 * @param string $default_path Default path.
-	 *
-	 * @return string
-	 */
-	public function override_wc_template( $located, $template_name, $args, $template_path, $default_path ) {
-		$type                      = 'basic';
-		$plugin_template_file_path = Plugin::$dir . "/inc/templates/{$type}/{$template_name}";
-
-		if ( file_exists( $plugin_template_file_path ) ) {
-			return $plugin_template_file_path;
-		} else {
-			return $located;
 		}
 	}
 
@@ -173,8 +154,9 @@ final class Templates {
 	 *
 	 * @return array
 	 */
-	public function add_query_var( $vars ) {
-		$vars[] = self::SLUG;
+	public function add_query_var( array $vars ): array {
+		$vars[] = self::COURSE_SLUG;
+		$vars[] = self::CLASSROOM_SLUG;
 
 		return $vars;
 	}
@@ -186,7 +168,7 @@ final class Templates {
 	 *
 	 * @return array
 	 */
-	public function custom_post_type_rewrite_rules( $rules ): array {
+	public function custom_post_type_rewrite_rules( array $rules ): array {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
 
@@ -199,29 +181,43 @@ final class Templates {
 	 *
 	 * @param string $template Template.
 	 */
-	public function load_custom_template( $template ) {
-		$override_template_path = Plugin::$dir . '/inc/templates/course-entry.php';
-		$courses_slug           = \get_query_var( self::SLUG );
+	public function load_custom_template( string $template ) {
+		// 使用自定義的模板
+		$items = [
+			[
+				'slug' => \get_query_var( self::COURSE_SLUG ),
+				'path' => Plugin::$dir . '/inc/templates/course-entry.php',
+			],
+			[
+				'slug' => \get_query_var( self::CLASSROOM_SLUG ),
+				'path' => Plugin::$dir . '/inc/templates/classroom-entry.php',
+			],
+		];
 
-		if ( $courses_slug ) {
-			if ( file_exists( $override_template_path ) ) {
-				global $product;
-				$product_post = \get_page_by_path( $courses_slug, OBJECT, 'product' );
-				if ( ! $product_post ) {
-					\wp_safe_redirect( \home_url( '/404' ) );
-					exit;
+		foreach ( $items as $item ) {
+			$slug = $item['slug'];
+			$path = $item['path'];
+
+			if ( $slug ) {
+				if ( file_exists( $path ) ) {
+					global $product;
+					$product_post = \get_page_by_path( $slug, OBJECT, 'product' );
+					if ( ! $product_post ) {
+						\wp_safe_redirect( \home_url( '/404' ) );
+						exit;
+					}
+
+					$product = \wc_get_product( $product_post->ID );
+
+					// 如果商品不是課程，則不要載入模板
+					$is_course_product = Base::is_course_product( $product );
+
+					if ( ! $is_course_product ) {
+						return $template;
+					}
+
+					return $path;
 				}
-
-				$product = \wc_get_product( $product_post->ID );
-
-				// 如果商品不是課程，則不要載入模板
-				$is_course_product = Base::is_course_product( $product );
-
-				if ( ! $is_course_product ) {
-					return $template;
-				}
-
-				return $override_template_path;
 			}
 		}
 
@@ -233,9 +229,7 @@ final class Templates {
 	 *
 	 * @return void
 	 */
-	public function enqueue_assets() {
-		// DELETE \wp_enqueue_script( 'jquery-ui-accordion' );
-
+	public function enqueue_assets(): void {
 		\wp_enqueue_script(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/index.js',
@@ -255,9 +249,18 @@ final class Templates {
 		);
 	}
 
-	public function add_html_attr( $output, $doctype ) {
+	/**
+	 * Add html attr
+	 * 用來切換 daisyUI 的主題
+	 *
+	 * @param string $output  Output.
+	 * @param string $doctype Doctype.
+	 *
+	 * @return string
+	 */
+	public function add_html_attr( string $output, string $doctype ): string {
 		// ["light", "dark", "cupcake"]
-		return $output . ' data-theme="light"';
+		return $output . ' data-theme="power"';
 	}
 }
 

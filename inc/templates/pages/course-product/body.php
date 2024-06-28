@@ -1,10 +1,7 @@
 <?php
 
-namespace J7\PowerCourse\Templates\Components;
-
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Base;
-use WC_Product;
 
 /**
  * @var WC_Product $args
@@ -42,7 +39,7 @@ $product = $args;
 		$limit_label = Base::get_limit_label_by_product( $product );
 
 		Templates::get(
-			'course/info',
+			'course-product/info',
 			[
 				[
 					'icon'  => 'calendar',
@@ -75,12 +72,8 @@ $product = $args;
 		?>
 	</div>
 	<!-- Tabs -->
-	<?php
-	Templates::get( 'body/tabs', $product, true );
-	?>
+	<?php Templates::get( 'course-product/tabs', $product, true ); ?>
 
 	<!-- Footer -->
-	<?php
-	Templates::get( 'body/footer', $product, true );
-	?>
+	<?php Templates::get( 'course-product/footer', $product, true ); ?>
 </div>

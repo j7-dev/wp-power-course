@@ -51,7 +51,7 @@ $icon_html = Templates::safe_get(
 $button_class = $type_class . ' ' . $props['class'];
 
 /** @noinspection HtmlUnknownTarget */
-$html = sprintf(
+printf(
 	'<a href="%4$s" class="%1$s py-0 px-3 rounded-md  transition duration-300 ease-in-out flex items-center justify-center whitespace-nowrap h-10 text-sm font-normal tracking-wide">
 %2$s %3$s
 </a>',
@@ -60,5 +60,3 @@ $html = sprintf(
 	$props['children'], // %3$s
 	$props['href'] ?? '#' // %4$s
 );
-
-echo $html;
