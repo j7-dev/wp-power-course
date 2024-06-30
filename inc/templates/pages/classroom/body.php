@@ -7,7 +7,7 @@ use J7\PowerCourse\Templates\Templates;
  */
 $product = $args;
 ?>
-<div id="pc-classroom-body" class="w-full pl-[25rem] bg-white">
+<div class="w-full bg-white">
 	<?php
 	Templates::get( 'classroom/header', $product );
 

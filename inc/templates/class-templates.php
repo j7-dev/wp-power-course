@@ -9,7 +9,7 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * Class FrontEnd
@@ -23,6 +23,7 @@ final class Templates {
 
 	// 上課頁面
 	public const CLASSROOM_SLUG = 'classroom_slug';
+	public const CHAPTER_SLUG   = 'chapter_slug';
 
 	/**
 	 * Constructor
@@ -43,10 +44,10 @@ final class Templates {
 	/**
 	 * 從指定的模板路徑讀取模板文件並渲染數據
 	 *
-	 * @param string $name      指定路徑裡面的文件名
-	 * @param mixed  $args      要渲染到模板中的數據
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
-	 * @param bool   $echo      是否輸出
+	 * @param bool   $echo 是否輸出
 	 *
 	 * @return ?string|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -68,10 +69,10 @@ final class Templates {
 	/**
 	 * 從指定的模板路徑讀取模板文件並渲染數據
 	 *
-	 * @param string $name      指定路徑裡面的文件名
-	 * @param mixed  $args      要渲染到模板中的數據
+	 * @param string $name 指定路徑裡面的文件名
+	 * @param mixed  $args 要渲染到模板中的數據
 	 * @param bool   $load_once 是否只載入一次
-	 * @param bool   $echo      是否輸出
+	 * @param bool   $echo 是否輸出
 	 *
 	 * @return string|false|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -82,12 +83,12 @@ final class Templates {
 		?bool $load_once = false,
 		?bool $echo = true
 	): string|false|null {
-		$area_names = [ 'course-product', 'classroom', 'my-account' ]; // 區域名稱
+		$page_names = [ 'course-product', 'classroom', 'my-account', '404' ]; // 區域名稱
 
 		// 如果 $name 是以 area name 開頭的，那就去 area folder 裡面找
 		$is_page = false;
-		foreach ( $area_names as $area_name ) {
-			if ( str_starts_with( $name, $area_name ) ) {
+		foreach ( $page_names as $page_name ) {
+			if ( str_starts_with( $name, $page_name ) ) {
 				$is_page = true;
 				break;
 			}
@@ -210,7 +211,7 @@ final class Templates {
 					$product = \wc_get_product( $product_post->ID );
 
 					// 如果商品不是課程，則不要載入模板
-					$is_course_product = Base::is_course_product( $product );
+					$is_course_product = CourseUtils::is_course_product( $product );
 
 					if ( ! $is_course_product ) {
 						return $template;
@@ -253,7 +254,7 @@ final class Templates {
 	 * Add html attr
 	 * 用來切換 daisyUI 的主題
 	 *
-	 * @param string $output  Output.
+	 * @param string $output Output.
 	 * @param string $doctype Doctype.
 	 *
 	 * @return string

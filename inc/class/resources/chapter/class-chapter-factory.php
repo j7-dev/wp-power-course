@@ -51,18 +51,16 @@ final class ChapterFactory {
 		$args['post_type']     = RegisterCPT::POST_TYPE;
 		$args['page_template'] = self::TEMPLATE;
 
-		$new_post_id = \wp_insert_post( $args );
-
-		return $new_post_id;
+		return \wp_insert_post( $args );
 	}
 
 	/**
 	 * Format Chapter details
 	 * WP_Post 轉 array
 	 *
-	 * @param \WP_Post $post Chapter.
+	 * @param \WP_Post $post             Chapter.
 	 * @param bool     $with_description With description.
-	 * @param int      $depth Depth.
+	 * @param int      $depth            Depth.
 	 *
 	 * @return array
 	 */
@@ -222,7 +220,7 @@ final class ChapterFactory {
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
-	 * @param array $args Arguments.
+	 * @param array $args    Arguments.
 	 * @param bool  $keep_id Keep id.
 	 *
 	 * @return array
@@ -263,7 +261,7 @@ final class ChapterFactory {
 	/**
 	 * Update a chapter
 	 *
-	 * @param string $id chapter id.
+	 * @param string $id   chapter id.
 	 * @param array  $args Arguments.
 	 *
 	 * @return integer|\WP_Error
@@ -291,7 +289,7 @@ final class ChapterFactory {
 	/**
 	 * Delete a chapter
 	 *
-	 * @param string $id chapter id.
+	 * @param string $id           chapter id.
 	 * @param bool   $force_delete Force delete.
 	 *
 	 * @return \WP_Post|false|null

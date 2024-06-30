@@ -12,12 +12,12 @@ $course_tabs = [
 	[
 		'key'     => '2',
 		'label'   => '已開課',
-		'content' => Templates::get( 'course-product/grid', [ 'type' => 'launched' ], false, false ),
+		'content' => Templates::get( 'course-product/grid', [ 'type' => 'ready' ], false, false ),
 	],
 	[
 		'key'     => '3',
 		'label'   => '尚未開課',
-		'content' => Templates::get( 'course-product/grid', [ 'type' => 'un_launched' ], false, false ),
+		'content' => Templates::get( 'course-product/grid', [ 'type' => 'not-ready' ], false, false ),
 	],
 ];
 

@@ -5,19 +5,18 @@
  * @package WooCommerce Custom Product Type
  */
 
-declare (strict_types = 1);
+declare ( strict_types=1 );
 
 namespace J7\PowerBundleProduct;
 
 if ( ! class_exists( 'BundleProduct' ) ) {
-
 	/**
 	 * Custom Product class.
 	 */
 	final class BundleProduct extends \WC_Product {
 
-		const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
-		const LINK_TO_BUNDLE_IDS_META_KEY  = 'pbp_bundle_ids'; // 此商品連結到哪個 bundle product ids
+		public const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
+		const LINK_TO_BUNDLE_IDS_META_KEY         = 'pbp_bundle_ids';          // 此商品連結到哪個 bundle product ids
 
 		/**
 		 * Constructor of this class.
@@ -36,35 +35,46 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 *
 		 * @return string
 		 */
-		public function get_type() {
+		public function get_type(): string {
 			return Plugin::PRODUCT_TYPE;
 		}
 
 		/**
-		 * Get bundle_ids
+		 * is_bundle_product
 		 *
-		 * @return array string[] product_ids
+		 * @param \WC_Product|int $product product.
+		 *
+		 * @return bool
 		 */
-		public function get_bundled_ids(): array {
-			$meta_data_array = $this->get_meta( self::INCLUDE_PRODUCT_IDS_META_KEY, false );
-			$bundle_ids      = [];
-
-			foreach ( $meta_data_array as $meta_data ) {
-				$value        = $meta_data->__get( 'value' );
-				$bundle_ids[] = $value;
+		public static function is_bundle_product( \WC_Product|int $product ): bool {
+			if ( ! is_numeric( $product ) ) {
+				$product = $product->get_id();
 			}
+			$included_products = \get_post_meta( $product, self::INCLUDE_PRODUCT_IDS_META_KEY, false );
 
-			return $bundle_ids;
+			return ! ! $included_products;
+		}
+
+		/**
+		 * 此銷售方案都有哪些商品
+		 *
+		 * @return array string[] 被綑綁的 product_ids
+		 */
+		public function get_product_ids(): array {
+			$id = $this->get_id();
+
+			return (array) \get_post_meta( $id, self::INCLUDE_PRODUCT_IDS_META_KEY );
 		}
 
 		/**
 		 * Add bundle_ids
 		 *
 		 * @param int $product_id product_id.
+		 *
 		 * @return void
 		 */
 		public function add_bundled_ids( int $product_id ): void {
-			$bundle_ids = $this->get_bundled_ids();
+			$bundle_ids = $this->get_product_ids();
 			if ( in_array( (string) $product_id, $bundle_ids, true ) ) {
 				return;
 			}
@@ -78,6 +88,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * TODO
 		 *
 		 * @param array $product_ids product_ids.
+		 *
 		 * @return void
 		 */
 		public function set_bundled_ids( array $product_ids ): void {
@@ -87,6 +98,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * Delete bundle_ids
 		 *
 		 * @param int $product_id product_id.
+		 *
 		 * @return void
 		 */
 		public function delete_bundled_ids( int $product_id ): void {

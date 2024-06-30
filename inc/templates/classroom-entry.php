@@ -16,17 +16,35 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+$current_user_id = get_current_user_id();
+
+if ( ! $current_user_id ) {
+	wp_safe_redirect( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+	exit;
+}
+
+
 global $product;
 
 get_header();
 
-Templates::get( 'classroom/sider', $product, true );
+echo '<div id="pc-classroom-main">';
 
-Templates::get( 'classroom/body', $product, true );
+if ( ! CourseUtils::has_bought( $product->get_id() ) ) {
+	Templates::get( '404/buy', $product, false );
+} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
+	Templates::get( '404/not-ready', $product, false );
+} else {
+	Templates::get( 'classroom/sider', $product, true );
+	Templates::get( 'classroom/body', $product, true );
+}
+
+echo '</div>';
 
 get_footer();

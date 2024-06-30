@@ -2,7 +2,7 @@
 
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * @var WC_Product $args
@@ -14,7 +14,7 @@ $product = $args;
 
 	<?php Templates::get( 'card/single-product', $product ); ?>
 	<?php
-	$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
+	$bundle_ids = CourseUtils::get_bundle_ids_by_product( $product->get_id() );
 
 	foreach ( $bundle_ids as $bundle_id ) {
 		$bundle_product = \wc_get_product( $bundle_id );

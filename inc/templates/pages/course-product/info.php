@@ -12,35 +12,33 @@ if ( ! is_array( $items ) ) {
 	$items = [];
 }
 
-?>
-<div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-	<?php
-	foreach ( $items as $index => $item ) :
-		?>
-		<div class="flex items-center gap-3">
+echo '<div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">';
+foreach ( $items as $index => $item ) :
+	printf(
+		'
+        <div class="flex items-center gap-3">
 			<div class="bg-blue-500 rounded-xl h-8 w-8 flex items-center justify-center">
-		<?php
+		        %1$s
+            </div>
+            <div>
+                %2$s
+            </div>
+            <div class="font-semibold">
+                %3$s
+            </div>
+        </div>
+        ',
 		Templates::safe_get(
 			'icon/' . $item['icon'],
 			[
 				'class' => 'h-4 w-4',
 				'color' => '#ffffff',
-			]
-		);
-		?>
-			</div>
-			<div>
-		<?php
-		echo $item['label'];
-		?>
-			</div>
-			<div class="font-semibold">
-		<?php
-		echo $item['value'];
-		?>
-			</div>
-		</div>
-		<?php
-	endforeach;
-	?>
-</div>
+			],
+			false,
+			false
+		),
+		$item['label'],
+		$item['value']
+	);
+endforeach;
+echo '</div>';

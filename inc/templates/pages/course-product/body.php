@@ -1,7 +1,7 @@
 <?php
 
 use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * @var WC_Product $args
@@ -26,17 +26,12 @@ $product = $args;
 		) : '未設定';
 		$course_hour                  = (int) $product->get_meta( 'course_hour' );
 		$course_minute                = (int) $product->get_meta( 'course_minute' );
-		$all_chapters                 = \get_pages(
-			[
-				'child_of'  => $product->get_id(),
-				'post_type' => \J7\PowerCourse\Resources\Chapter\RegisterCPT::POST_TYPE,
-			]
-		);
-		$count_all_chapters           = (int) count( $all_chapters );
+
+		$count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 
 
 		$total_sales = ( $product->get_total_sales() ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-		$limit_label = Base::get_limit_label_by_product( $product );
+		$limit_label = CourseUtils::get_limit_label_by_product( $product );
 
 		Templates::get(
 			'course-product/info',

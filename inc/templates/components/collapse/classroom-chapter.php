@@ -1,6 +1,7 @@
 <?php
 
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
+use J7\PowerCourse\Templates\Templates;
 
 /**
  * @var WC_Product $args
@@ -37,11 +38,14 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$children_html .= sprintf(
 			'
-                    <div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex pl-8 pr-4">
-                        <div class="w-8 flex justify-center items-start">•</div>
-                        <div class="flex-1">%1$s</div>
-                    </div>
+					<a>
+	                    <div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer">
+	                        <div class="w-8 flex justify-center items-start">%1$s</div>
+	                        <div class="flex-1 text-gray-800 hover:text-gray-600">%2$s</div>
+	                    </div>
+                    </a>
                     ',
+			Templates::get( 'icon/video', null, false, false ),
 			$sub_chapter->post_title,
 		);
 	endforeach;

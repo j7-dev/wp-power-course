@@ -12,7 +12,7 @@ if ( ! ( $bundle_product instanceof BundleProduct ) ) {
 	throw new \Exception( 'product 不是 BundleProduct' );
 }
 
-$product_ids = $bundle_product->get_bundled_ids();
+$product_ids = $bundle_product->get_product_ids();
 
 $bundle_title = $bundle_product->get_name();
 

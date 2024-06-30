@@ -11,7 +11,7 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
-use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
 
@@ -112,10 +112,10 @@ final class Course {
 			$args['meta_query'] = [
 				'relation' => 'AND',
 				[
-					'key'     => '_price', // 價格自定義欄位
+					'key'     => '_price',                                // 價格自定義欄位
 					'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
-					'compare' => 'BETWEEN', // 在此範圍之間
-					'type'    => 'DECIMAL', // 處理為數值
+					'compare' => 'BETWEEN',                               // 在此範圍之間
+					'type'    => 'DECIMAL',                               // 處理為數值
 				],
 			];
 			unset( $args['price_range'] );
@@ -207,7 +207,7 @@ final class Course {
 			}
 		}
 
-		$bundle_ids = Base::get_bundle_ids_by_product( $product->get_id() );
+		$bundle_ids = CourseUtils::get_bundle_ids_by_product( $product->get_id() );
 
 		$base_array = [
 			// Get Product General Info
@@ -574,13 +574,13 @@ final class Course {
 				'order'    => 'DESC', // 遞減排序
 				'orderby'  => 'meta_value_num',
 				'meta_key' => '_price',
-				'limit'    => 1, // 僅獲取一個結果
+				'limit'    => 1,         // 僅獲取一個結果
 				'status'   => 'publish', // 僅包含已發佈的商品
 			]
 		);
 		$max_price          = 0;
 		if ( ! empty( $max_price_products ) ) {
-			$max_price_product = reset( $max_price_products ); // 獲取第一個元素
+			$max_price_product = reset( $max_price_products );     // 獲取第一個元素
 			$max_price         = $max_price_product?->get_price(); // 獲取最高價格
 		}
 
@@ -590,14 +590,14 @@ final class Course {
 				'order'    => 'ASC', // 遞增排序
 				'orderby'  => 'meta_value_num',
 				'meta_key' => '_price',
-				'limit'    => 1, // 僅獲取一個結果
+				'limit'    => 1,         // 僅獲取一個結果
 				'status'   => 'publish', // 僅包含已發佈的商品
 			]
 		);
 
 		$min_price = 0;
 		if ( ! empty( $min_price_products ) ) {
-			$min_price_product = reset( $min_price_products ); // 獲取第一個元素
+			$min_price_product = reset( $min_price_products );     // 獲取第一個元素
 			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
 		}
 
