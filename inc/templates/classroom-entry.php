@@ -30,19 +30,19 @@ if ( ! $current_user_id ) {
 }
 
 
-global $product;
+global $product, $chapter;
 
 get_header();
 
 echo '<div id="pc-classroom-main">';
 
 if ( ! CourseUtils::has_bought( $product->get_id() ) ) {
-	Templates::get( '404/buy', $product, false );
+	Templates::get( '404/buy', null, false );
 } elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-	Templates::get( '404/not-ready', $product, false );
+	Templates::get( '404/not-ready', null, false );
 } else {
-	Templates::get( 'classroom/sider', $product, true );
-	Templates::get( 'classroom/body', $product, true );
+	Templates::get( 'classroom/sider', null, true );
+	Templates::get( 'classroom/body', null, true );
 }
 
 echo '</div>';

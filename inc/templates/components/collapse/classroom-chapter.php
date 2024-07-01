@@ -2,15 +2,20 @@
 
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
- * @var WC_Product $args
+ * @var WC_Product $product
+ * @var WP_Post $chapter
  */
-$product = $args;
+global $product, $chapter;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'Invalid Product' );
 }
+
+$finished_chapters = CourseUtils::get_finished_chapters( $product );
 
 $args = [
 	'posts_per_page' => - 1,
@@ -21,7 +26,7 @@ $args = [
 	'post_type'      => RegisterCPT::POST_TYPE,
 ];
 
-$chapters = \get_children( $args );
+$chapters = get_children( $args );
 
 foreach ( $chapters as $chapter_id => $chapter ) :
 	$args = [
@@ -33,20 +38,30 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		'post_type'      => RegisterCPT::POST_TYPE,
 	];
 
-	$sub_chapters  = \get_children( $args );
+	$sub_chapters  = get_children( $args );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
+		$video_length = (int) get_post_meta( $sub_chapter->ID, 'video_length', true );
+		$is_finished  = in_array( $sub_chapter->ID, $finished_chapters );
+		$icon 	   = $is_finished ? 'icon/check' : 'icon/video';
+
+		/** @noinspection HtmlUnknownTarget */
 		$children_html .= sprintf(
 			'
-					<a>
+					<a href="%1$s">
 	                    <div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer">
-	                        <div class="w-8 flex justify-center items-start">%1$s</div>
-	                        <div class="flex-1 text-gray-800 hover:text-gray-600">%2$s</div>
+	                        <div class="w-8 flex justify-center items-start">%2$s</div>
+	                        <div class="flex-1 text-gray-800 hover:text-gray-600">
+		                        <p class="mb-1 font-medium">%3$s</p>
+		                        <p class="text-gray-400 text-xs m-0 font-light">%4$s</p>
+							</div>
 	                    </div>
                     </a>
                     ',
-			Templates::get( 'icon/video', null, false, false ),
+			site_url( "classroom/{$product->get_slug()}/{$sub_chapter->ID}" ),
+			Templates::get( $icon, null, false, false ),
 			$sub_chapter->post_title,
+			Base::get_video_length_by_seconds( $video_length )
 		);
 	endforeach;
 

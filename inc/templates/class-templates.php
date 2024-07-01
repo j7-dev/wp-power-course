@@ -9,6 +9,7 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
@@ -140,8 +141,12 @@ final class Templates {
 		\add_rewrite_rule( $course_regex, 'index.php?' . self::COURSE_SLUG . '=$matches[1]', 'top' );
 
 		// 上課頁面
-		$classroom_regex = '^classroom/?([^/]*)/?';
-		\add_rewrite_rule( $classroom_regex, 'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]', 'top' );
+		$classroom_regex = '^classroom/([^/]+)/?([^/]*)/?'; // '^classroom/?([^/]*)/?';
+		\add_rewrite_rule(
+			$classroom_regex,
+			'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]&' . self::CHAPTER_SLUG . '=$matches[2]',
+			'top'
+		);
 
 		if ( ! isset( $rules[ $course_regex ] ) || ! isset( $rules[ $classroom_regex ] ) ) {
 			\flush_rewrite_rules();
@@ -158,6 +163,7 @@ final class Templates {
 	public function add_query_var( array $vars ): array {
 		$vars[] = self::COURSE_SLUG;
 		$vars[] = self::CLASSROOM_SLUG;
+		$vars[] = self::CHAPTER_SLUG;
 
 		return $vars;
 	}
@@ -186,18 +192,21 @@ final class Templates {
 		// 使用自定義的模板
 		$items = [
 			[
-				'slug' => \get_query_var( self::COURSE_SLUG ),
-				'path' => Plugin::$dir . '/inc/templates/course-entry.php',
+				'slug'   => \get_query_var( self::COURSE_SLUG ),
+				'slug_2' => '',
+				'path'   => Plugin::$dir . '/inc/templates/course-entry.php',
 			],
 			[
-				'slug' => \get_query_var( self::CLASSROOM_SLUG ),
-				'path' => Plugin::$dir . '/inc/templates/classroom-entry.php',
+				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
+				'slug_2' => \get_query_var( self::CHAPTER_SLUG ),
+				'path'   => Plugin::$dir . '/inc/templates/classroom-entry.php',
 			],
 		];
 
 		foreach ( $items as $item ) {
-			$slug = $item['slug'];
-			$path = $item['path'];
+			$slug   = $item['slug'];
+			$slug_2 = $item['slug_2'];
+			$path   = $item['path'];
 
 			if ( $slug ) {
 				if ( file_exists( $path ) ) {
@@ -215,6 +224,21 @@ final class Templates {
 
 					if ( ! $is_course_product ) {
 						return $template;
+					}
+
+					// $slug_2 就是 chapter id
+					if ( ! ! $slug_2 ) {
+						$maybe_chapters = \get_pages(
+							[
+								'child_of'  => $product_post->ID,
+								'include'   => [ $slug_2 ],
+								'post_type' => RegisterCPT::POST_TYPE,
+							]
+						);
+						if ( ! ! $maybe_chapters ) {
+							global $chapter;
+							$chapter = $maybe_chapters[0];
+						}
 					}
 
 					return $path;

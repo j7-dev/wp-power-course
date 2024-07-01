@@ -53,7 +53,7 @@ abstract class Course {
 	 * @param \WC_Product $product 商品
 	 * @param bool|null   $return_ids 是否只回傳 id
 	 *
-	 * @return array
+	 * @return array int[]|WP_Post[]
 	 */
 	public static function get_sub_chapters( \WC_Product $product, ?bool $return_ids = false ): array {
 		$args = [
@@ -89,6 +89,54 @@ abstract class Course {
 		return $sub_chapters;
 	}
 
+	/**
+	 * 取得課程長度
+	 *
+	 * @param \WC_Product $product 商品
+	 * @param string|null $type 類型 'second' | 'minute' | 'hour' | 'video_length'
+	 *
+	 * @return string
+	 */
+	public static function get_course_length( \WC_Product $product, ?string $type = 'second' ): string {
+		$chapter_ids = self::get_sub_chapters( $product, true );
+
+		$length = 0;
+		foreach ( $chapter_ids as $chapter_id ) {
+			$video_length = (int) \get_post_meta( $chapter_id, 'video_length', true );
+			$length += $video_length;
+		}
+
+		if ( 'minute' === $type ) {
+			return (string) floor( $length / 60 );
+		}
+
+		if ( 'hour' === $type ) {
+			return (string) floor( $length / 3600 );
+		}
+
+		if('video_length' === $type){
+			return Base::get_video_length_by_seconds( $length);
+		}
+		return (string) $length;
+	}
+
+	/**
+	 * 取得已完成章節
+	 *
+	 * @param \WC_Product $product 商品
+	 * @param int|null    $user_id 用户 ID
+	 *
+	 * @return array int[]|string[]
+	 */
+	public static function get_finished_chapters(\WC_Product $product, ?int $user_id = 0): array{
+		if(!$user_id){
+			$user_id = get_current_user_id();
+		}
+		$course_id = $product->get_id();
+		$meta_key = "finished_chapter_ids_in_course_{$course_id}";
+
+		return (array) get_user_meta($user_id, $meta_key, true);
+	}
 
 	/**
 	 * 取得 bundle_ids (銷售方案 ids) by product

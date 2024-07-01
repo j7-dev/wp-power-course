@@ -3,9 +3,9 @@
 use J7\PowerCourse\Templates\Templates;
 
 /**
- * @var \WC_Product $args
+ * @var \WC_Product $product
  */
-$product = $args;
+global $product;
 
 $message = sprintf(
 	'OOPS! 🤯 您好像還沒購買此課程，<a target="_blank" href="%1$s" class="font-semibold underline hover:no-underline">前往購買</a>',

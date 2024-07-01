@@ -3,9 +3,9 @@
 use J7\PowerCourse\Templates\Templates;
 
 /**
- * @var \WC_Product $args
+ * @var \WC_Product $product
  */
-$product = $args;
+global $product;
 
 $course_schedule_timestamp = $product->get_meta( 'course_schedule' );
 
