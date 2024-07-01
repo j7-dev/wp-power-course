@@ -40,14 +40,17 @@ export type TParam = {
   name?: string
 }
 
-export function treeToParams(treeData: TreeData<TChapterRecord>): TParam[] {
+export function treeToParams(
+  treeData: TreeData<TChapterRecord>,
+  topParentId: string,
+): TParam[] {
   const depth0 = treeData.map((node, index) => {
     return {
       id: node.id as string,
       depth: 0,
       menu_order: index,
       name: node?.content?.name,
-      parent_id: node?.content?.parent_id,
+      parent_id: topParentId,
     }
 
     // parent_id 不帶就不變更

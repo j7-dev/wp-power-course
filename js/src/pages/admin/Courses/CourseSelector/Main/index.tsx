@@ -139,7 +139,6 @@ const index = () => {
               valueLabelMapper={valueLabelMapper}
               booleanKeys={[
                 'featured',
-                'is_second_hand',
                 'downloadable',
                 'virtual',
                 'sold_individually',
@@ -170,6 +169,7 @@ const index = () => {
               rowExpandable: (record: TCourseRecord) =>
                 !!record?.chapters?.length,
             }}
+            rowKey={(record) => record.id.toString()}
           />
 
           <Form layout="vertical" form={courseForm}>

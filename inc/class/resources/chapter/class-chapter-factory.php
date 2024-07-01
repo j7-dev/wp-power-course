@@ -1,10 +1,11 @@
 <?php
+
 /**
  * ChapterFactory
  * 我希望 new ChapterFactory() 時，能夠創建一個新的 Chapter 物件
  */
 
-declare( strict_types=1 );
+declare(strict_types=1);
 
 namespace J7\PowerCourse\Resources\Chapter;
 
@@ -15,6 +16,7 @@ use J7\WpUtils\Classes\WP;
  */
 final class ChapterFactory {
 
+
 	const TEMPLATE = '';
 
 	/**
@@ -23,7 +25,7 @@ final class ChapterFactory {
 	 * @param array $args Arguments.
 	 */
 	public function __construct( $args = [] ) {
-		self::create_chapter( $args );
+		self::create_chapter($args);
 	}
 
 	/**
@@ -51,7 +53,7 @@ final class ChapterFactory {
 		$args['post_type']     = RegisterCPT::POST_TYPE;
 		$args['page_template'] = self::TEMPLATE;
 
-		return \wp_insert_post( $args );
+		return \wp_insert_post($args);
 	}
 
 	/**
@@ -70,16 +72,16 @@ final class ChapterFactory {
 		?int $depth = 0
 	) { // phpcs:ignore
 
-		if ( ! ( $post instanceof \WP_Post ) ) {
+		if (!( $post instanceof \WP_Post )) {
 			return [];
 		}
 
 		$date_created  = $post->post_date;
 		$date_modified = $post->post_modified;
 
-		$image_id  = \get_post_thumbnail_id( $post->ID );
+		$image_id  = \get_post_thumbnail_id($post->ID);
 		$image_ids = [ $image_id ];
-		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
+		$images    = array_map([ WP::class, 'get_image_info' ], $image_ids);
 
 		$description_array = $with_description ? [
 			'description'       => $post->post_content,
@@ -91,7 +93,7 @@ final class ChapterFactory {
 				[
 					'post_parent' => $post->ID,
 					'post_type'   => RegisterCPT::POST_TYPE,
-					'numberposts' => - 1,
+					'numberposts' => -1,
 					'post_status' => 'any',
 					'orderby'     => 'menu_order',
 					'order'       => 'ASC',
@@ -101,11 +103,11 @@ final class ChapterFactory {
 		$chapters = array_map(
 			[ __CLASS__, 'format_chapter_details' ],
 			$chapters,
-			array_fill( 0, count( $chapters ), false ),
-			array_fill( 0, count( $chapters ), $depth + 1 )
+			array_fill(0, count($chapters), false),
+			array_fill(0, count($chapters), $depth + 1)
 		);
 
-		$children = ! ! $chapters ? [
+		$children = !!$chapters ? [
 			'chapters' => $chapters,
 		] : [];
 
@@ -125,7 +127,7 @@ final class ChapterFactory {
 			'menu_order'         => (int) $post->menu_order,
 			// 'virtual'            => false,
 			// 'downloadable'       => false,
-			'permalink'          => \get_permalink( $post->ID ),
+			'permalink'          => \get_permalink($post->ID),
 
 			// Get Product Prices
 			// 'price_html'         => '',
@@ -182,31 +184,31 @@ final class ChapterFactory {
 		$to_tree   = $params['to_tree'] ?? [];
 
 		$delete_ids = [];
-		foreach ( $from_tree as $from_node ) {
+		foreach ($from_tree as $from_node) {
 			$id      = $from_node['id'];
-			$to_node = array_filter( $to_tree, fn( $node ) => $node['id'] === $id );
-			if ( empty( $to_node ) ) {
+			$to_node = array_filter($to_tree, fn ( $node ) => $node['id'] === $id);
+			if (empty($to_node)) {
 				$delete_ids[] = $id;
 			}
 		}
-		foreach ( $to_tree as $node ) {
+		foreach ($to_tree as $node) {
 			$id             = $node['id'];
-			$is_new_chapter = strpos( $id, 'new-' ) === 0;
-			$args           = self::converter( $node, keep_id: ! $is_new_chapter );
+			$is_new_chapter = strpos($id, 'new-') === 0;
+			$args           = self::converter($node, keep_id: !$is_new_chapter);
 
-			if ( $is_new_chapter ) {
-				$insert_result = self::create_chapter( $args );
+			if ($is_new_chapter) {
+				$insert_result = self::create_chapter($args);
 			} else {
-				$insert_result = self::update_chapter( $id, $args );
+				$insert_result = self::update_chapter($id, $args);
 			}
-			if ( \is_wp_error( $insert_result ) ) {
+			if (\is_wp_error($insert_result)) {
 				return $insert_result;
 			}
 		}
 
-		foreach ( $delete_ids as $id ) {
-			$delete_result = self::delete_chapter( $id );
-			if ( \is_wp_error( $delete_result ) ) {
+		foreach ($delete_ids as $id) {
+			$delete_result = self::delete_chapter($id);
+			if (\is_wp_error($delete_result)) {
 				return $delete_result;
 			}
 		}
@@ -239,14 +241,14 @@ final class ChapterFactory {
 			'depth'             => 'unset',
 		];
 
-		if ( $keep_id ) {
-			unset( $fields_mapper['id'] );
+		if ($keep_id) {
+			unset($fields_mapper['id']);
 		}
 
 		$formatted_args = [];
-		foreach ( $args as $key => $value ) {
-			if ( in_array( $key, array_keys( $fields_mapper ), true ) ) {
-				if ( 'unset' === $fields_mapper[ $key ] ) {
+		foreach ($args as $key => $value) {
+			if (in_array($key, array_keys($fields_mapper), true)) {
+				if ('unset' === $fields_mapper[ $key ]) {
 					continue;
 				}
 				$formatted_args[ $fields_mapper[ $key ] ] = $value;
@@ -271,17 +273,17 @@ final class ChapterFactory {
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( args: $args, obj: 'post', files: [] );
+		] = WP::separator(args: $args, obj: 'post', files: []);
 
-		if ( isset( $meta_data['image_ids'] ) ) {
-			\set_post_thumbnail( $id, $meta_data['image_ids'][0] );
-			unset( $meta_data['image_ids'] );
+		if (isset($meta_data['image_ids'])) {
+			\set_post_thumbnail($id, $meta_data['image_ids'][0]);
+			unset($meta_data['image_ids']);
 		}
 
 		$data['ID']         = $id;
 		$data['meta_input'] = $meta_data;
 
-		$update_result = \wp_update_post( $data );
+		$update_result = \wp_update_post($data);
 
 		return $update_result;
 	}
@@ -295,7 +297,7 @@ final class ChapterFactory {
 	 * @return \WP_Post|false|null
 	 */
 	public static function delete_chapter( string $id, ?bool $force_delete = false ): \WP_Post|false|null {
-		$delete_result = \wp_delete_post( $id, $force_delete );
+		$delete_result = \wp_delete_post($id, $force_delete);
 
 		return $delete_result;
 	}

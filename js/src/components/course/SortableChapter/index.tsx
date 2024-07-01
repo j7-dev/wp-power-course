@@ -40,15 +40,20 @@ export const SortableChapter: FC<{
       type: 'chapter',
       depth: 0,
       parent_id: record.id,
+      is_free: 'no',
     }
     setTreeData((prev) => [...prev, chapterToTreeNode(newChapter)])
   }
 
-  const handleSave = () => {
+  const handleSave = (data: TreeData<TChapterRecord>) => {
     // 這個儲存只存新增，不存章節的細部資料
-
-    const from_tree = treeToParams(originTree)
-    const to_tree = treeToParams(treeData)
+    message.loading({
+      content: '排序儲存中...',
+      key: 'chapter-sorting',
+    })
+    const topParentId = record.id
+    const from_tree = treeToParams(originTree, topParentId)
+    const to_tree = treeToParams(data, topParentId)
 
     mutate(
       {
@@ -61,6 +66,18 @@ export const SortableChapter: FC<{
       },
       {
         onSuccess: () => {
+          message.success({
+            content: '排序儲存成功',
+            key: 'chapter-sorting',
+          })
+        },
+        onError: () => {
+          message.loading({
+            content: '排序儲存失敗',
+            key: 'chapter-sorting',
+          })
+        },
+        onSettled: () => {
           invalidate({
             resource: 'courses',
             invalidates: ['list'],
@@ -77,7 +94,9 @@ export const SortableChapter: FC<{
           hideAdd
           treeData={treeData}
           onTreeDataChange={(data: TreeData<TChapterRecord>) => {
+            console.log('⭐  data:', data)
             setTreeData(data)
+            handleSave(data)
           }}
           renderContent={(node) => {
             const theRecord = node.content
@@ -85,7 +104,7 @@ export const SortableChapter: FC<{
           }}
           indentationWidth={48}
           sortableRule={({ activeNode, projected }) => {
-            const activeNodeHasChild = !!activeNode.chapters.length
+            const activeNodeHasChild = !!activeNode.children.length
             const sortable = projected?.depth <= (activeNodeHasChild ? 0 : 1)
             if (!sortable) message.error('超過最大深度，無法執行')
             return sortable
@@ -96,9 +115,9 @@ export const SortableChapter: FC<{
         <Button block onClick={handleAdd} disabled={isLoading}>
           新增
         </Button>
-        <Button type="primary" block onClick={handleSave} loading={isLoading}>
+        {/* <Button type="primary" block onClick={handleSave} loading={isLoading}>
           儲存
-        </Button>
+        </Button> */}
       </div>
     </>
   )
