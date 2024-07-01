@@ -36,13 +36,13 @@ abstract class Base {
 		return WC::get_image_url_by_product( $product, $size, self::DEFAULT_IMAGE );
 	}
 
-	public static function get_video_length_by_seconds(int $seconds):string{
-		if(!$seconds){
+	public static function get_video_length_by_seconds( int $seconds ): string {
+		if (!$seconds) {
 			return '-- : -- : --';
 		}
-		$video_length_h = sprintf("%02d", floor($seconds / 3600));
-		$video_length_m =  sprintf("%02d", floor(($seconds - $video_length_h * 3600) / 60));
-		$video_length_s =  sprintf("%02d", $seconds - $video_length_h * 3600 - $video_length_m * 60);
+		$video_length_h = sprintf('%02d', floor($seconds / 3600));
+		$video_length_m = sprintf('%02d', floor(( $seconds - $video_length_h * 3600 ) / 60));
+		$video_length_s = sprintf('%02d', $seconds - $video_length_h * 3600 - $video_length_m * 60);
 		return "$video_length_h : $video_length_m : $video_length_s";
 	}
 }

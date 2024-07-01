@@ -1,12 +1,13 @@
 <?php
 
 /**
- * @var WC_Product $args
+ * @var WC_Product $product
  */
-$product = $args;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
-$progress = 37;
+global $product;
 
+$progress = CourseUtils::get_course_progress( $product );
 
 printf(
 	'

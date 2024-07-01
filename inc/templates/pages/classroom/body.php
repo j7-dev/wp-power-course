@@ -13,7 +13,7 @@ $video_id   = get_post_meta( $chapter->ID, 'bunny_video_id', true );
 
 echo '<div class="w-full bg-white">';
 
-Templates::get( 'classroom/header', $product );
+Templates::get( 'classroom/header' );
 
 Templates::get(
 	'bunny/video',
@@ -24,7 +24,7 @@ Templates::get(
 	]
 );
 
-Templates::get( 'course-product/progress', $product );
+Templates::get( 'course-product/progress' );
 
 $course_tabs = [
 	[

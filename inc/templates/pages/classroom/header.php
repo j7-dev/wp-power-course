@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @var WC_Product $args
+ * @var WC_Product $product
  */
 
-$product = $args;
+global $product;
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }

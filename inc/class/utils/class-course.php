@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use WC_Product;
+use function is_array;
 
 
 /**
@@ -103,7 +104,7 @@ abstract class Course {
 		$length = 0;
 		foreach ( $chapter_ids as $chapter_id ) {
 			$video_length = (int) \get_post_meta( $chapter_id, 'video_length', true );
-			$length += $video_length;
+			$length      += $video_length;
 		}
 
 		if ( 'minute' === $type ) {
@@ -114,12 +115,30 @@ abstract class Course {
 			return (string) floor( $length / 3600 );
 		}
 
-		if('video_length' === $type){
+		if ('video_length' === $type) {
 			return Base::get_video_length_by_seconds( $length);
 		}
 		return (string) $length;
 	}
 
+	/**
+	 * 取得課程進度
+	 *
+	 * @param WC_Product $product
+	 * @param int|null   $user_id
+	 *
+	 * @return float
+	 */
+	public static function get_course_progress( \WC_Product $product, ?int $user_id = 0 ): float {
+		if (!$user_id) {
+			$user_id = get_current_user_id();
+		}
+
+		$sub_chapters_count      = count(self::get_sub_chapters($product, true));
+		$finished_chapters_count = count(self::get_finished_chapters($product, $user_id));
+
+		return $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
+	}
 	/**
 	 * 取得已完成章節
 	 *
@@ -128,14 +147,15 @@ abstract class Course {
 	 *
 	 * @return array int[]|string[]
 	 */
-	public static function get_finished_chapters(\WC_Product $product, ?int $user_id = 0): array{
-		if(!$user_id){
+	public static function get_finished_chapters( \WC_Product $product, ?int $user_id = 0 ): array {
+		if (!$user_id) {
 			$user_id = get_current_user_id();
 		}
-		$course_id = $product->get_id();
-		$meta_key = "finished_chapter_ids_in_course_{$course_id}";
+		$course_id  = $product->get_id();
+		$meta_key   = "finished_chapter_ids_in_course_{$course_id}";
+		$meta_value = get_user_meta($user_id, $meta_key, true);
 
-		return (array) get_user_meta($user_id, $meta_key, true);
+		return is_array($meta_value) ? $meta_value : [];
 	}
 
 	/**

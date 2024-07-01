@@ -43,7 +43,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$video_length = (int) get_post_meta( $sub_chapter->ID, 'video_length', true );
 		$is_finished  = in_array( $sub_chapter->ID, $finished_chapters );
-		$icon 	   = $is_finished ? 'icon/check' : 'icon/video';
+		$icon         = $is_finished ? 'icon/check' : 'icon/video';
 
 		/** @noinspection HtmlUnknownTarget */
 		$children_html .= sprintf(

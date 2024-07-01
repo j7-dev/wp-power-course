@@ -19,7 +19,7 @@ global $product;
 // 'order'       => 'ASC',
 // ]
 // );
-$count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
+$count_all_chapters       = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 $course_length_in_minutes = CourseUtils::get_course_length( $product, 'minute' );
 
 printf(
