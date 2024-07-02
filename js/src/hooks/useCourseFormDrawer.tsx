@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { DrawerProps, Button, FormInstance } from 'antd'
+import { useState, useEffect, useRef } from 'react'
+import { DrawerProps, Button, FormInstance, Popconfirm } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import {
   TChapterRecord,
@@ -8,6 +8,7 @@ import {
 import { toFormData } from 'axios'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtom } from 'jotai'
+import { CloseOutlined } from '@ant-design/icons'
 
 export function useCourseFormDrawer({
   form,
@@ -21,6 +22,8 @@ export function useCourseFormDrawer({
   const [record, setRecord] = useAtom(selectedRecordAtom)
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+  const closeRef = useRef(null)
+
   // const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
 
@@ -30,7 +33,9 @@ export function useCourseFormDrawer({
   }
 
   const close = () => {
-    setOpen(false)
+    closeRef?.current?.click()
+
+    // setOpen(false)
   }
 
   const { mutate: create, isLoading: isLoadingCreate } = useCreate()
@@ -78,7 +83,7 @@ export function useCourseFormDrawer({
           },
           {
             onSuccess: () => {
-              close()
+              setOpen(false)
               form.resetFields()
               invalidateCourse()
             },
@@ -98,13 +103,29 @@ export function useCourseFormDrawer({
     open,
     width: '50%',
     extra: (
-      <Button
-        type="primary"
-        onClick={handleSave}
-        loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
-      >
-        儲存
-      </Button>
+      <div className="flex">
+        <Popconfirm
+          title="你儲存了嗎?"
+          description="確認關閉後，你的編輯可能會遺失，請確認操作"
+          placement="leftTop"
+          okText="確認關閉"
+          cancelText="取消"
+          onConfirm={() => {
+            setOpen(false)
+          }}
+        >
+          <p ref={closeRef} className="">
+            &nbsp;
+          </p>
+        </Popconfirm>
+        <Button
+          type="primary"
+          onClick={handleSave}
+          loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
+        >
+          儲存
+        </Button>
+      </div>
     ),
     ...drawerProps,
   }

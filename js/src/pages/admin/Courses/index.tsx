@@ -19,7 +19,6 @@ export const NOTIFICATION_API_KEY = 'upload-queue'
 
 const index = () => {
   const filesInQueue = useAtomValue(filesInQueueAtom)
-  console.log(filesInQueue)
 
   const [notificationApi, contextHolder] = notification.useNotification({
     duration: 0,

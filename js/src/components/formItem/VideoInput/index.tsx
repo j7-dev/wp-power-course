@@ -11,6 +11,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
   const bunnyUploadProps = useUpload()
   const { fileList } = bunnyUploadProps
   const videoId = fileList?.[0]?.videoId // 上傳影片到 bunny 後取得的 videoId
+  const preview = fileList?.[0]?.preview // 瀏覽器端的 preview
   const name = formItemProps?.name
 
   useEffect(() => {
@@ -23,10 +24,12 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
     throw new Error('name is required')
   }
 
-  const watchChapterId = Form.useWatch(['id'], form)
+  const recordId = Form.useWatch(['id'], form)
 
   // 取得後端傳來的 saved video id
   const savedVideoId: string | undefined = Form.useWatch(name, form)
+  const allValues = form.getFieldsValue()
+  console.log('⭐  allValues:', { allValues, savedVideoId })
 
   const isEmpty = savedVideoId === ''
 
@@ -42,11 +45,11 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
       <Item hidden {...formItemProps}>
         <Input />
       </Item>
-      {/* 如果章節已經有存影片，則顯示影片 */}
-      {watchChapterId && (
+      {/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
+      {recordId && !preview && (
         <div className={'mt-8'}>
           <div
-            className={!isEmpty ? 'block' : 'hidden'}
+            className={`rounded-xl bg-gray-200 ${!isEmpty ? 'block' : 'hidden'}`}
             style={{
               position: 'relative',
               paddingTop: '56.25%',
