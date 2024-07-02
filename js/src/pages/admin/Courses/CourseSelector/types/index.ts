@@ -110,6 +110,5 @@ export type TChapterRecord = {
   images?: TImage[]
   chapters?: TChapterRecord[]
   parent_id?: string
-  hours?: number
-  is_free: 'yes' | 'no' | ''
+  bunny_video_id?: string
 }

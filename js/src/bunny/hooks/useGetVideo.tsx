@@ -9,7 +9,7 @@ import {
   BaseRecord,
   HttpError,
 } from '@refinedev/core/dist/contexts/data/types'
-import { useVideoLibrary } from '@/bunny/hooks'
+import { useVideoLibrary } from '@/bunny'
 
 type TUseGetVideoParams<T = BaseRecord> = {
   videoId: string

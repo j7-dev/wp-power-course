@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ChapterFactory
  * 我希望 new ChapterFactory() 時，能夠創建一個新的 Chapter 物件
@@ -15,7 +14,6 @@ use J7\WpUtils\Classes\WP;
  * Class ChapterFactory
  */
 final class ChapterFactory {
-
 
 	const TEMPLATE = '';
 
@@ -47,7 +45,7 @@ final class ChapterFactory {
 			],
 		);
 
-		$args['post_title']    = $params['post_title'] ?? '新章節';
+		$args['post_title']    = $args['post_title'] ?? '新章節';
 		$args['post_status']   = 'draft';
 		$args['post_author']   = \get_current_user_id();
 		$args['post_type']     = RegisterCPT::POST_TYPE;
@@ -70,12 +68,7 @@ final class ChapterFactory {
 		\WP_Post $post,
 		?bool $with_description = true,
 		?int $depth = 0
-	) { // phpcs:ignore
-
-		if (!( $post instanceof \WP_Post )) {
-			return [];
-		}
-
+	) {
 		$date_created  = $post->post_date;
 		$date_modified = $post->post_modified;
 
@@ -163,6 +156,7 @@ final class ChapterFactory {
 			'images'             => $images,
 
 			'parent_id'          => (string) $post->post_parent,
+			'bunny_video_id'     => \get_post_meta($post->ID, 'bunny_video_id', true),
 		] + $children;
 
 		return array_merge(
@@ -271,7 +265,7 @@ final class ChapterFactory {
 	public static function update_chapter( string $id, array $args ): int|\WP_Error {
 		// 將資料拆成 data 與 meta_data
 		[
-			'data'      => $data,
+			'data' => $data,
 			'meta_data' => $meta_data,
 		] = WP::separator(args: $args, obj: 'post', files: []);
 

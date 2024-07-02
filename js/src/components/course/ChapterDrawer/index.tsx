@@ -44,6 +44,9 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
           <Item name={['depth']} hidden>
             <Input />
           </Item>
+          <Item name={['id']} hidden>
+            <Input />
+          </Item>
         </Form>
       </Drawer>
     </>

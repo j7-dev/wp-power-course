@@ -1,0 +1,10 @@
+parameters:
+	level: 6
+	paths:
+		- plugin.php
+		- inc/
+	excludePaths:
+		- */vendor/*
+		- */node_modules/*
+	bootstrapFiles:
+		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php

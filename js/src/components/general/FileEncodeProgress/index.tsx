@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { Typography, Progress } from 'antd'
 import { filesInQueueAtom, TFileInQueue } from '@/pages/admin/Courses'
-import { useGetVideo } from '@/bunny/hooks'
+import { useGetVideo } from '@/bunny'
 import { CodeOutlined } from '@ant-design/icons'
 import { useSetAtom } from 'jotai'
 

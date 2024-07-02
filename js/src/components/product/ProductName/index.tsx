@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import {
   TChapterRecord,
   TCourseRecord,
@@ -14,26 +14,24 @@ export const ProductName: FC<{
     showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
     showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
   }
-}> = ({ record, show }) => {
+  loading?: boolean
+}> = ({ record, show, loading = false }) => {
   const { id, sku = '', name, images, type } = record
   const { showChapterDrawer, showCourseDrawer } = show
   const image_url = images?.[0]?.url || defaultImage
   const isChapter = type === 'chapter'
-  const isNew = id.startsWith('new-')
 
   const handleClick = () => {
-    if (!isNew) {
+    if (!loading) {
       if (isChapter) {
         showChapterDrawer(record as TChapterRecord)()
       } else {
         showCourseDrawer(record as TCourseRecord)()
       }
     } else {
-      message.error('請先儲存後再進行編輯')
+      message.error('請等待儲存後再進行編輯')
     }
   }
-
-  const idLabel = isNew ? '儲存後才會有 id' : id
 
   return (
     <>
@@ -60,7 +58,7 @@ export const ProductName: FC<{
             {renderHTML(name)}
           </p>
           <div className="flex text-[0.675rem] text-gray-500">
-            <span className="pr-3">{`ID: ${idLabel}`}</span>
+            <span className="pr-3">{`ID: ${id}`}</span>
             {sku && <span className="pr-3">{`SKU: ${sku}`}</span>}
           </div>
         </div>

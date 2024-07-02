@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC } from 'react'
+import { useEffect, useState, FC } from 'react'
 import {
   Form,
   InputNumber,
@@ -15,12 +15,13 @@ import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { useList } from '@refinedev/core'
-import { Upload, useUpload, PopconfirmDelete } from '@/components/general'
+import { Upload, PopconfirmDelete } from '@/components/general'
 import { CheckOutlined, PlusOutlined } from '@ant-design/icons'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtomValue } from 'jotai'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FiSwitch } from '@/components/formItem'
+import { useUpload } from '@/bunny'
 
 // TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?

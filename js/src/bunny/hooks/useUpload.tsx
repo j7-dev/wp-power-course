@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { UploadFile, UploadProps } from 'antd'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
-import { useVideoLibrary } from '@/bunny/hooks'
+import { useVideoLibrary } from '@/bunny'
 import { filesInQueueAtom } from '@/pages/admin/Courses'
 import { useSetAtom } from 'jotai'
 import { getVideoUrl } from '@/utils'
@@ -10,7 +10,7 @@ import {
   TCreateVideoResponse,
   TUploadVideoResponse,
   TUseUploadParams,
-} from '@/bunny/Upload/types'
+} from 'bunny/types'
 
 export const useUpload = (props?: TUseUploadParams) => {
   const setFilesInQueue = useSetAtom(filesInQueueAtom)

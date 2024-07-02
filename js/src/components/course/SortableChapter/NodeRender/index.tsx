@@ -13,11 +13,12 @@ const NodeRender: FC<{
     showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
     showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
   }
-}> = ({ record, show }) => {
+  loading: boolean
+}> = ({ record, show, loading }) => {
   return (
     <div className="flex gap-4 justify-start items-center">
       <div>
-        <ProductName record={record} show={show} />
+        <ProductName record={record} show={show} loading={loading} />
       </div>
       <div>
         <Tag color={getPostStatus(record?.status)?.color}>

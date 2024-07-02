@@ -1,5 +1,5 @@
 import { useList } from '@refinedev/core'
-import { useVideoLibrary } from '@/bunny/hooks'
+import { useVideoLibrary } from '@/bunny'
 
 export const useListVideo = () => {
   const { libraryId } = useVideoLibrary()

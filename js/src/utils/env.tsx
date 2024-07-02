@@ -24,3 +24,5 @@ export const permalink =
   removeTrailingSlash(window?.[APP_DOMAIN]?.env?.permalink) || '/'
 export const apiTimeout = '30000'
 export const ajaxNonce = window?.[APP_DOMAIN]?.env?.nonce || ''
+export const bunny_library_id =
+  window?.[APP_DOMAIN]?.env?.bunny_library_id || ''

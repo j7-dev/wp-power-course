@@ -115,7 +115,7 @@ export function useCourseFormDrawer({
     } else {
       form.resetFields()
     }
-  }, [record?.id])
+  }, [record])
 
   return {
     open,

@@ -1,12 +1,24 @@
-import { useEffect } from "react"
-import { DatePicker, Form, Input, InputNumber, Radio, Select, Space } from "antd"
-import { keyLabelMapper, termFormatter } from "@/pages/admin/Courses/CourseSelector/utils"
-import useOptions from "@/pages/admin/Courses/CourseSelector/hooks/useOptions"
-import { siteUrl } from "@/utils"
-import { Heading, Upload, useUpload } from "@/components/general"
-import { FiSwitch, VideoInput } from "@/components/formItem"
-import { CopyText } from "antd-toolkit"
-import dayjs from "dayjs"
+import { useEffect } from 'react'
+import {
+  DatePicker,
+  Form,
+  Input,
+  InputNumber,
+  Radio,
+  Select,
+  Space,
+} from 'antd'
+import {
+  keyLabelMapper,
+  termFormatter,
+} from '@/pages/admin/Courses/CourseSelector/utils'
+import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
+import { siteUrl } from '@/utils'
+import { Heading, Upload } from '@/components/general'
+import { FiSwitch, VideoInput } from '@/components/formItem'
+import { CopyText } from 'antd-toolkit'
+import dayjs from 'dayjs'
+import { useUpload } from '@/bunny'
 
 const { Item } = Form
 

@@ -40,9 +40,12 @@ export const SortableChapter: FC<{
       type: 'chapter',
       depth: 0,
       parent_id: record.id,
-      is_free: 'no',
     }
-    setTreeData((prev) => [...prev, chapterToTreeNode(newChapter)])
+
+    const newTreeData = [...treeData, chapterToTreeNode(newChapter)]
+
+    setTreeData(newTreeData)
+    handleSave(newTreeData)
   }
 
   const handleSave = (data: TreeData<TChapterRecord>) => {
@@ -94,13 +97,20 @@ export const SortableChapter: FC<{
           hideAdd
           treeData={treeData}
           onTreeDataChange={(data: TreeData<TChapterRecord>) => {
-            console.log('⭐  data:', data)
             setTreeData(data)
             handleSave(data)
           }}
           renderContent={(node) => {
             const theRecord = node.content
-            return theRecord && <NodeRender record={theRecord} show={show} />
+            return (
+              theRecord && (
+                <NodeRender
+                  record={theRecord}
+                  show={show}
+                  loading={isLoading}
+                />
+              )
+            )
           }}
           indentationWidth={48}
           sortableRule={({ activeNode, projected }) => {
@@ -112,8 +122,8 @@ export const SortableChapter: FC<{
         />
       </div>
       <div className="flex gap-1">
-        <Button block onClick={handleAdd} disabled={isLoading}>
-          新增
+        <Button block onClick={handleAdd} type="primary" disabled={isLoading}>
+          新增章節
         </Button>
         {/* <Button type="primary" block onClick={handleSave} loading={isLoading}>
           儲存
