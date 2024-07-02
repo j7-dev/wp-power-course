@@ -3,7 +3,7 @@ import { Form, FormItemProps, Input } from 'antd'
 import { FC, useEffect } from 'react'
 
 const { Item } = Form
-const VideoInput: FC<FormItemProps> = (formItemProps) => {
+export const VideoInput: FC<FormItemProps> = (formItemProps) => {
   const form = Form.useFormInstance()
   const bunnyUploadProps = useUpload()
   const { fileList } = bunnyUploadProps
@@ -29,5 +29,3 @@ const VideoInput: FC<FormItemProps> = (formItemProps) => {
     </>
   )
 }
-
-export default VideoInput

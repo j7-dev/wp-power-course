@@ -21,7 +21,7 @@ export function useCourseFormDrawer({
   const [record, setRecord] = useAtom(selectedRecordAtom)
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
-  const isChapter = resource === 'chapters'
+  // const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
 
   const show = (theRecord?: TCourseRecord | TChapterRecord) => () => {

@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { Form, Switch, FormItemProps, SwitchProps } from 'antd'
 
 const { Item } = Form
