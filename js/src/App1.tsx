@@ -7,6 +7,7 @@ import { Refine } from '@refinedev/core'
 
 import {
   ThemedLayoutV2,
+  ThemedTitleV2,
   ThemedSiderV2,
   ErrorComponent,
   useNotificationProvider,
@@ -20,11 +21,12 @@ import { dataProvider } from './rest-data-provider'
 import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
 
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
-import { apiUrl, kebab } from '@/utils'
+import { apiUrl, kebab, siteUrl } from '@/utils'
 import { resources } from '@/resources'
 import Courses from '@/pages/admin/Courses'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { WpLogo } from '@/components/general'
 
 function App() {
   return (
@@ -73,6 +75,21 @@ function App() {
               >
                 <ThemedLayoutV2
                   Sider={(props) => <ThemedSiderV2 {...props} fixed />}
+                  Title={({ collapsed }) => (
+                    <a
+                      href={`${siteUrl}/wp-admin/`}
+                      className="hover:opacity-75 transition duration-300"
+                    >
+                      <div className="flex gap-4 items-center">
+                        <WpLogo />
+                        {!collapsed && (
+                          <span className="text-gray-600 font-light">
+                            回 wp-admin
+                          </span>
+                        )}
+                      </div>
+                    </a>
+                  )}
                 >
                   <Outlet />
                 </ThemedLayoutV2>
