@@ -1,10 +1,14 @@
 import { FC } from 'react'
-import { Drawer, DrawerProps, Input, Form, Switch } from 'antd'
+import { Drawer, DrawerProps, Form, Input, Switch } from 'antd'
+import { VideoInput } from '@/components/formItem'
 
 const { Item } = Form
 
 export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
   const form = Form.useFormInstance()
+
+  // 取得課程深度，用來判斷是否為子章節
+  const watchDepth = Form.useWatch(['depth'], form)
 
   return (
     <>
@@ -14,6 +18,21 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
           <Item name={['name']} label="課程名稱">
             <Input />
           </Item>
+          {/*// 如果深度為 0 清除 bunny_video_id*/}
+          {watchDepth === 0 && (
+            <Item name={['bunny_video_id']} hidden>
+              <Input />
+            </Item>
+          )}
+          {/*// 如果深度為 1 顯示上傳課程內容*/}
+          {watchDepth === 1 && (
+            <div className={'mb-6'}>
+              <p className={'mb-3'}>上傳課程內容</p>
+              <div className={'max-w-[20rem]'}>
+                <VideoInput name={['bunny_video_id']} />
+              </div>
+            </div>
+          )}
           <Item
             name={['status']}
             label="發佈"
@@ -21,6 +40,9 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
             normalize={(value) => (value ? 'publish' : 'draft')}
           >
             <Switch checkedChildren="發佈" unCheckedChildren="草稿" />
+          </Item>
+          <Item name={['depth']} hidden>
+            <Input />
           </Item>
         </Form>
       </Drawer>
