@@ -25,18 +25,21 @@
   },
   "require": {
     "kucrut/vite-for-wp": "^0.8.0",
-    "j7-dev/wp-utils": "0.1.11",
-    "phpstan/extension-installer": "^1.4"
+    "j7-dev/wp-utils": "0.1.11"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "@stable",
     "wp-coding-standards/wpcs": "@stable",
     "dealerdirect/phpcodesniffer-composer-installer": "@stable",
+    "phpcompatibility/php-compatibility": "@stable",
     "phpstan/phpstan": "^1.11",
-    "szepeviktor/phpstan-wordpress": "^1.3",
-    "php-stubs/woocommerce-stubs": "^9.0"
+    "php-stubs/woocommerce-stubs": "^9.0",
+    "php-stubs/wordpress-stubs": "^6.5",
+    "phpstan/extension-installer": "^1.4"
   },
   "scripts": {
-		"phpstan": "phpstan analyse --memory-limit=3072M"
+    "phpstan": "phpstan analyse --memory-limit=3072M",
+    "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
+    "post-update-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
   }
 }

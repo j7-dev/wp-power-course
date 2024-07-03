@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name:       Power Course | 可能是 WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
@@ -15,20 +16,22 @@
  * Tags: LMS, online course, vite, react, tailwind, typescript, react-query, scss, WordPress, WordPress plugin, refine
  */
 
-declare (strict_types = 1);
+
+declare(strict_types=1);
 
 namespace J7\PowerCourse;
 
-if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
+if (!\class_exists('J7\PowerCourse\Plugin')) {
 	require_once __DIR__ . '/vendor/autoload.php';
 
 	// 之後要獨立成一個 plugin
 	require_once __DIR__ . '/modules/power-bundle-product/plugin.php';
 
 	/**
-		* Class Plugin
-		*/
+	 * Class Plugin
+	 */
 	final class Plugin {
+
 		use \J7\WpUtils\Traits\PluginTrait;
 		use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -49,6 +52,7 @@ if ( ! \class_exists( 'J7\PowerCourse\Plugin' ) ) {
 				// 'name'     => 'WP Toolkit',
 				// 'slug'     => 'wp-toolkit',
 				// 'source'   => 'Author URL/wp-toolkit/releases/latest/download/wp-toolkit.zip',
+				// 'version'  => '1.6.0',
 				// 'required' => true,
 				// ),
 			];
