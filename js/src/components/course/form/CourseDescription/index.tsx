@@ -28,7 +28,8 @@ export const CourseDescription = () => {
   const { product_cats = [], product_tags = [] } = options
   const productUrl = `${siteUrl}/courses/`
   const slug = Form.useWatch(['slug'], form)
-  const { uploadProps, fileList } = useUpload()
+  const bunnyUploadProps = useUpload()
+  const { fileList } = bunnyUploadProps
   const watchLimitType: string = Form.useWatch(['limit_type'], form)
   const watchId = Form.useWatch(['id'], form)
   const isEdit = !!watchId
@@ -96,7 +97,7 @@ export const CourseDescription = () => {
         <div className="grid grid-cols-2 gap-6 mb-12">
           <div className="mb-8">
             <p className="mb-3">課程封面圖</p>
-            <Upload uploadProps={uploadProps} />
+            <Upload {...bunnyUploadProps} />
             <Item hidden name={['files']} label="課程封面圖">
               <Input />
             </Item>

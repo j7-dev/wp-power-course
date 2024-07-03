@@ -25,7 +25,7 @@
   },
   "require": {
     "kucrut/vite-for-wp": "^0.8.0",
-    "j7-dev/wp-utils": "0.1.11"
+    "j7-dev/wp-utils": "0.1.12"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "@stable",
@@ -38,8 +38,6 @@
     "phpstan/extension-installer": "^1.4"
   },
   "scripts": {
-    "phpstan": "phpstan analyse --memory-limit=3072M",
-    "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility",
-    "post-update-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/phpcompatibility/php-compatibility"
+    "phpstan": "phpstan analyse --memory-limit=3072M"
   }
 }

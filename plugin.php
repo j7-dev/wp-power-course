@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Plugin Name:       Power Course | 可能是 WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
  * Description:       可能是 WordPress 最好用的課程外掛
- * Version:           0.0.1
+ * Version:           0.1.1
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            J7
@@ -15,7 +14,6 @@
  * Domain Path:       /languages
  * Tags: LMS, online course, vite, react, tailwind, typescript, react-query, scss, WordPress, WordPress plugin, refine
  */
-
 
 declare(strict_types=1);
 

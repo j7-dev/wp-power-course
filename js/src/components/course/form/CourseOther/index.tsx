@@ -27,9 +27,6 @@ export const CourseOther = () => {
         <Item label="自訂課程評價" name={['average_rating']} initialValue={2.5}>
           <Slider step={0.1} min={0} max={5} />
         </Item>
-        <Item label="自訂評價數量" name={['review_count']} initialValue={20}>
-          <InputNumber className="w-full" min={0} />
-        </Item>
         <div>
           <p className="mb-2">預覽</p>
           <Tooltip title="預覽" className="w-fit mb-12">
@@ -42,7 +39,9 @@ export const CourseOther = () => {
             </div>
           </Tooltip>
         </div>
-
+        <Item label="自訂評價數量" name={['review_count']} initialValue={20}>
+          <InputNumber className="w-full" min={0} />
+        </Item>
         <Item
           label="灌水學員人數"
           name={['extra_student_count']}

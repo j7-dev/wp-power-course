@@ -52,7 +52,8 @@ const BundleForm: FC<{
   const [searchKeyWord, setSearchKeyWord] = useState<string>('')
   const [showList, setShowList] = useState<boolean>(false)
 
-  const { uploadProps, fileList } = useUpload()
+  const bunnyUploadProps = useUpload()
+  const { fileList } = bunnyUploadProps
 
   const onSearch = (value: string) => {
     setSearchKeyWord(value)
@@ -397,7 +398,7 @@ const BundleForm: FC<{
 
       <p className="mb-3">課程封面圖</p>
       <div className="mb-8">
-        <Upload uploadProps={uploadProps} />
+        <Upload {...bunnyUploadProps} />
         <Item hidden name={['files']} label="課程封面圖">
           <Input />
         </Item>

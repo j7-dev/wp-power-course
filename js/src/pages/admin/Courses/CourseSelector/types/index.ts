@@ -61,6 +61,8 @@ export type TCourseRecord = {
   virtual: boolean
   downloadable: boolean
   permalink: string
+  average_rating: number
+  review_count: number
   price_html: string
   regular_price: string
   sale_price: string

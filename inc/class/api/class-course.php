@@ -226,6 +226,8 @@ final class Course {
 			'virtual'             => $product->get_virtual(),
 			'downloadable'        => $product->get_downloadable(),
 			'permalink'           => \get_permalink( $product->get_id() ),
+			'average_rating'      => (float) $product->get_average_rating(),
+			'review_count'        => (int) $product->get_review_count(),
 
 			// Get Product Prices
 			'price_html'          => $product->get_price_html(),
@@ -340,13 +342,13 @@ final class Course {
 	 * Post courses with id callback
 	 * 更新課程
 	 *
-	 * @param \WP_REST_Request $request Request.
+	 * @param \WP_REST_Request<array{'id': string}> $request Request.
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_with_id_callback( $request ) {
+	public function post_courses_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$id = $request['id'];
-		if ( empty( $id ) ) {
+		if ( !$id ) {
 			return new \WP_REST_Response(
 				[
 					'code'    => 'id_not_provided',
@@ -356,12 +358,10 @@ final class Course {
 				400
 			);
 		}
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
-		ob_start();
-		var_dump( $body_params );
-		\J7\WpUtils\Classes\Log::info( '' . ob_get_clean() );
-		// $body_params = array_map( array( WP::class, 'sanitize_text_field_deep' ), $body_params );
+
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		$product = \wc_get_product( $id );
 
