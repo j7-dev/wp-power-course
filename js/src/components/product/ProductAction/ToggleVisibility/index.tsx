@@ -6,7 +6,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tooltip } from 'antd'
 
-// TODO
+// TODO 還沒接API
 
 const ToggleVisibility: FC<{
   record: TCourseRecord | TChapterRecord

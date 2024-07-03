@@ -14,24 +14,24 @@ export type TCreateVideoResponse = {
   length: number
   status: number
   framerate: number
-  rotation: null //TODO
+  rotation: null //TYPE
   width: number
   height: number
-  availableResolutions: null //TODO
+  availableResolutions: null //TYPE
   thumbnailCount: number
   encodeProgress: number
   storageSize: number
-  captions: Array<any> //TODO
+  captions: Array<any> //TYPE
   hasMP4Fallback: boolean
   collectionId: string
   thumbnailFileName: string
   averageWatchTime: number
   totalWatchTime: number
   category: string
-  chapters: Array<any> //TODO
-  moments: Array<any> //TODO
-  metaTags: Array<any> //TODO
-  transcodingMessages: Array<any> //TODO
+  chapters: Array<any> //TYPE
+  moments: Array<any> //TYPE
+  metaTags: Array<any> //TYPE
+  transcodingMessages: Array<any> //TYPE
 }
 
 export type TUploadVideoResponse = {

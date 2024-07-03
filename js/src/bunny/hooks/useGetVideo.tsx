@@ -1,7 +1,3 @@
-/**
- * TODO
- */
-
 import { useOne } from '@refinedev/core'
 import { UseQueryOptions, QueryKey } from '@tanstack/react-query'
 import {
@@ -35,16 +31,16 @@ export type TGetVideoResponse = {
   thumbnailCount: number
   encodeProgress: number
   storageSize: number
-  captions: Array<any> //TODO
+  captions: Array<any> //TYPE
   hasMP4Fallback: true
   collectionId: string
   thumbnailFileName: string
   averageWatchTime: number
   totalWatchTime: number
   category: string
-  chapters: Array<any> //TODO
-  moments: Array<any> //TODO
-  metaTags: Array<any> //TODO
+  chapters: Array<any> //TYPE
+  moments: Array<any> //TYPE
+  metaTags: Array<any> //TYPE
   transcodingMessages: {
     timeStamp: string
     level: number

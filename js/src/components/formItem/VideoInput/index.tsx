@@ -69,7 +69,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 
             <div
               onClick={handleDelete}
-              className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition durartion-300 hover:bg-red-500 cursor-pointer"
+              className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
             >
               <DeleteOutlined className="text-red-500 group-hover:text-white" />
             </div>
