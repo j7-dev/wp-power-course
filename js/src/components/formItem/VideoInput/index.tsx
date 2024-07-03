@@ -9,16 +9,22 @@ const { Item } = Form
 export const VideoInput: FC<FormItemProps> = (formItemProps) => {
   const form = Form.useFormInstance()
   const bunnyUploadProps = useUpload()
-  const { fileList } = bunnyUploadProps
+  const { fileList, setFileList } = bunnyUploadProps
   const videoId = fileList?.[0]?.videoId // 上傳影片到 bunny 後取得的 videoId
   const preview = fileList?.[0]?.preview // 瀏覽器端的 preview
   const name = formItemProps?.name
+  const watchId = Form.useWatch(['id'], form)
 
   useEffect(() => {
     if (videoId) {
       form.setFieldValue(name, videoId)
     }
   }, [videoId])
+
+  useEffect(() => {
+    // 如果開啟另一個章節，則清空 fileList
+    setFileList([])
+  }, [watchId])
 
   if (!name) {
     throw new Error('name is required')
@@ -28,8 +34,6 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 
   // 取得後端傳來的 saved video id
   const savedVideoId: string | undefined = Form.useWatch(name, form)
-  const allValues = form.getFieldsValue()
-  console.log('⭐  allValues:', { allValues, savedVideoId })
 
   const isEmpty = savedVideoId === ''
 
