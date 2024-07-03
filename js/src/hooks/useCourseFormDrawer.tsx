@@ -8,7 +8,7 @@ import {
 import { toFormData } from 'axios'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtom } from 'jotai'
-import { CloseOutlined } from '@ant-design/icons'
+import { isEqual } from 'lodash-es'
 
 export function useCourseFormDrawer({
   form,
@@ -22,7 +22,7 @@ export function useCourseFormDrawer({
   const [record, setRecord] = useAtom(selectedRecordAtom)
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
-  const closeRef = useRef(null)
+  const closeRef = useRef<HTMLDivElement>(null)
 
   // const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
@@ -33,9 +33,23 @@ export function useCourseFormDrawer({
   }
 
   const close = () => {
-    closeRef?.current?.click()
+    // 與原本的值相比是否有變更
+    const newValues = form.getFieldsValue()
+    const fieldNames = Object.keys(newValues).filter(
+      (fieldName) => !['files'].includes(fieldName),
+    )
+    const isEquals = fieldNames.every((fieldName) => {
+      const originValue = record?.[fieldName as keyof typeof record]
+      const newValue = newValues[fieldName]
 
-    // setOpen(false)
+      return isEqual(originValue, newValue)
+    })
+
+    if (!isEquals) {
+      closeRef?.current?.click()
+    } else {
+      setOpen(false)
+    }
   }
 
   const { mutate: create, isLoading: isLoadingCreate } = useCreate()
