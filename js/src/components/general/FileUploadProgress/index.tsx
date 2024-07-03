@@ -72,6 +72,9 @@ export const FileUploadProgress: FC<{
         <BiMoviePlay className="relative top-[2px] mr-1" />
         {100 === encodeProgress ? '影片已處理完畢' : '影片上傳中'} {file.name}
       </Paragraph>
+      {100 !== encodeProgress && (
+        <p className="text-xs my-0 ml-4">課程還在上傳中，請不要關閉視窗</p>
+      )}
       <Progress percent={percent} status={status} />
     </>
   )

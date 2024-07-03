@@ -52,6 +52,9 @@ export const FileEncodeProgress: FC<{
         <CodeOutlined className="mr-1" />
         影片處理中 {file.name}
       </Paragraph>
+      <p className="text-xs my-0 ml-4">
+        您可以先儲存此課程/章節/段落，去編輯其他部分了
+      </p>
       <Progress percent={encodeProgress} status={status} />
     </>
   )
