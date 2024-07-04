@@ -7,6 +7,7 @@ import {
   CoursePrice,
   CourseBundle,
   CourseOther,
+  CourseStudents,
 } from '@/components/course/form'
 
 export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
@@ -48,6 +49,12 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
       forceRender: true,
       label: '銷售方案',
       children: <CourseBundle />,
+    },
+    {
+      key: '7',
+      forceRender: true,
+      label: '學員管理',
+      children: <CourseStudents />,
     },
   ]
 
