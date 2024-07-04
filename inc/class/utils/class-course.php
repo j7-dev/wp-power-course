@@ -9,8 +9,6 @@ namespace J7\PowerCourse\Utils;
 
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
-use WC_Product;
-use function is_array;
 
 
 /**
@@ -21,11 +19,11 @@ abstract class Course {
 	/**
 	 * 檢查商品是否為課程商品
 	 *
-	 * @param WC_Product|int $product Product.
+	 * @param \WC_Product|int $product Product.
 	 *
 	 * @return bool
 	 */
-	public static function is_course_product( WC_Product|int $product ): bool {
+	public static function is_course_product( \WC_Product|int $product ): bool {
 		if ( is_numeric( $product ) ) {
 			$product = \wc_get_product( $product );
 		}
@@ -124,8 +122,8 @@ abstract class Course {
 	/**
 	 * 取得課程進度
 	 *
-	 * @param WC_Product $product
-	 * @param int|null   $user_id
+	 * @param \WC_Product $product
+	 * @param int|null    $user_id
 	 *
 	 * @return float
 	 */
@@ -155,7 +153,7 @@ abstract class Course {
 		$meta_key   = "finished_chapter_ids_in_course_{$course_id}";
 		$meta_value = get_user_meta($user_id, $meta_key, true);
 
-		return is_array($meta_value) ? $meta_value : [];
+		return \is_array($meta_value) ? $meta_value : [];
 	}
 
 	/**
@@ -182,7 +180,7 @@ abstract class Course {
 	/**
 	 * 取得課程限制條件名稱
 	 *
-	 * @param WC_Product $product 商品
+	 * @param \WC_Product $product 商品
 	 *
 	 * @return string
 	 */
@@ -219,7 +217,7 @@ abstract class Course {
 		$user_id        = $user_id ?? get_current_user_id();
 		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids', false);
 
-		if (!is_array($avl_course_ids)) {
+		if (!\is_array($avl_course_ids)) {
 			$avl_course_ids = [];
 		}
 
@@ -250,7 +248,7 @@ abstract class Course {
 
 
 	/**
-	 * 從用戶訂單中取得用戶已購買的課程商品 WC_Product[]
+	 * 從用戶訂單中取得用戶已購買的課程商品 \WC_Product[]
 	 * 也會查找用戶買的 Bundle Products 裡面有沒有包含課程商品
 	 * 如果你要取得用戶能上的課程，請使用 get_avl_courses_by_user
 	 *
@@ -310,7 +308,7 @@ abstract class Course {
 			'status'      => $statuses,
 		]     = $args;
 
-		if ( is_array( $statuses ) ) {
+		if ( \is_array( $statuses ) ) {
 			$statuses_string  = implode(
 				',',
 				array_map(
@@ -440,7 +438,7 @@ abstract class Course {
 		]     = $args;
 
 		// 構建 status 查詢條件
-		if ( is_array( $statuses ) ) {
+		if ( \is_array( $statuses ) ) {
 			$statuses_string  = implode(
 				',',
 				array_map(
@@ -461,7 +459,7 @@ abstract class Course {
 			);
 		}
 		// 構建 target_product_ids 查詢條件
-		if ( is_array( $target_product_ids ) ) {
+		if ( \is_array( $target_product_ids ) ) {
 			$target_product_ids_string = implode(
 				',',
 				array_map(

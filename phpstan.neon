@@ -3,6 +3,7 @@ parameters:
 	paths:
 		- plugin.php
 		- inc/
+		- modules/
 	excludePaths:
 		- js/*
 		- vendor/*

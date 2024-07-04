@@ -37,7 +37,7 @@ final class Order {
 	public function add_course_item_meta( int $order_id, \WC_Order $order ): void {
 		$items = $order->get_items();
 
-		// 檢查訂單是否有銷售方案商品，如果有將課程存入為 order item
+		// 檢查訂單是否有銷售方案商品，如果有將課程限制條件存入為 order item
 		foreach ( $items as $item ) {
 			/**
 			 * @var \WC_Order_Item_Product $item
@@ -99,6 +99,10 @@ final class Order {
 	 * @return void
 	 */
 	private function handle_add_course_item_meta_by_order_item( $item ): void {
+		if (!( $item instanceof \WC_Order_Item_Product )) {
+			return;
+		}
+
 		$product_id = $item->get_product_id();
 		$product    = \wc_get_product( $product_id );
 
@@ -108,11 +112,13 @@ final class Order {
 
 		// 如果是課程商品
 		if ( CourseUtils::is_course_product( $product_id ) ) {
-			// 將課程限制紀錄到訂單
+			// 將課程限制條件紀錄到訂單
 			$meta_keys = [ 'limit_type', 'limit_value', 'limit_unit' ];
 			foreach ( $meta_keys as $meta_key ) {
 				$meta_value = $product->get_meta( $meta_key );
 				$item->update_meta_data( '_' . $meta_key, $meta_value );
+
+				// TODO 寫入 avl_course_meta table
 			}
 			$item->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
 			$item->save_meta_data();
