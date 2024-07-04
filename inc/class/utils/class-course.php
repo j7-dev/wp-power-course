@@ -207,9 +207,52 @@ abstract class Course {
 		return "{$limit_type_label} {$limit_value} {$limit_unit_label}";
 	}
 
+	/**
+	 * 查詢用戶可以上那些課程 ids
+	 *
+	 * @param int|null $user_id 用户 ID
+	 *
+	 * @return array<string> 課程 ids
+	 */
+	public static function get_avl_course_ids_by_user( ?int $user_id = null ): array {
+
+		$user_id        = $user_id ?? get_current_user_id();
+		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids', false);
+
+		if (!is_array($avl_course_ids)) {
+			$avl_course_ids = [];
+		}
+
+		return $avl_course_ids;
+	}
 
 	/**
-	 * 取得用戶已購買的課程商品 WC_Product[]
+	 * 查詢用戶可以上那些課程
+	 *
+	 * @param int|null $user_id 用户 ID
+	 *
+	 * @return array<\WC_Product>
+	 */
+	public static function get_avl_courses_by_user( ?int $user_id = null ): array {
+
+		$avl_course_ids = self::get_avl_course_ids_by_user($user_id);
+
+		$avl_courses = [];
+		foreach ($avl_course_ids as $avl_course_id) {
+			$course = \wc_get_product($avl_course_id);
+			if (!!$course) {
+				$avl_courses[] = $course;
+			}
+		}
+
+		return $avl_courses;
+	}
+
+
+	/**
+	 * 從用戶訂單中取得用戶已購買的課程商品 WC_Product[]
+	 * 也會查找用戶買的 Bundle Products 裡面有沒有包含課程商品
+	 * 如果你要取得用戶能上的課程，請使用 get_avl_courses_by_user
 	 *
 	 * @param array|null $args 參數
 	 *                         - numberposts int 每頁数量
@@ -219,7 +262,7 @@ abstract class Course {
 	 *
 	 * @return array \WC_Product[]
 	 */
-	public static function get_courses_by_user( ?array $args = [] ): array {
+	public static function get_courses_by_user_orders( ?array $args = [] ): array {
 		$order_item_ids = self::get_course_order_item_ids_by_user( $args );
 
 		$courses = [];
@@ -237,6 +280,7 @@ abstract class Course {
 
 	/**
 	 * 取得用戶已購買的課程 order_item_id[]
+	 * 如果你要取得用戶能上的課程，請使用 get_avl_courses_by_user
 	 *
 	 * @param array|null $args 參數
 	 *                         - numberposts int 每頁数量
