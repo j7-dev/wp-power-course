@@ -46,7 +46,7 @@ if ( 'icon' === $label ) :
 	);
 else :
 	printf(
-		'<div class="%6$s"><a href="#" data-quantity="1" class="text-nowrap button product_type_simple add_to_cart_button ajax_add_to_cart %2$s" data-product_id="%1$s" data-product_sku="%3$s" aria-label="Add to cart: “%4$s”" aria-describedby="" rel="nofollow">%5$s</a></div>',
+		'<div class="%6$s"><a href="#" data-quantity="1" class="text-nowrap button product_type_simple add_to_cart_button ajax_add_to_cart %2$s" data-product_id="%1$s" data-product_sku="%3$s" aria-label="Add to cart: %4$s" aria-describedby="" rel="nofollow">%5$s</a></div>',
 		$product->get_id(),
 		$class,
 		$sku,
