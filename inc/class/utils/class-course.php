@@ -260,7 +260,7 @@ abstract class Course {
 	 *                         - order string 排序
 	 *                         - user_id int 用户 ID 查询
 	 *
-	 * @return array \WC_Product[]
+	 * @return array<\WC_Product>
 	 */
 	public static function get_courses_by_user_orders( ?array $args = [] ): array {
 		$order_item_ids = self::get_course_order_item_ids_by_user( $args );
@@ -402,16 +402,32 @@ abstract class Course {
 	}
 
 	/**
+	 * Checks if a course is available for a given product and user.
+	 *
+	 * @param \WC_Product|null $the_product The product to check availability for.
+	 * @param int|null         $user_id The user ID to check availability for.
+	 * @return bool Returns true if the course is available, false otherwise.
+	 */
+	public static function is_avl( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
+		global $product;
+		$the_product    = $the_product ?? $product;
+		$the_product_id = (string) $the_product->get_id();
+		$user_id        = $user_id ?? \get_current_user_id();
+		$avl_course_ids = self::get_avl_course_ids_by_user($user_id);
+		return in_array($the_product_id, $avl_course_ids, true);
+	}
+
+	/**
 	 * 檢查用戶是否購買過指定商品
 	 *
-	 * @param int|array  $target_product_ids
-	 * @param array|null $args
+	 * @param int|array<int>                                       $target_product_ids 目標商品 id
+	 * @param array{'user_id':int, 'status':string[]|string }|null $args 參數
 	 * - user_id int 使用者 ID，預設 current_user_id
 	 * - status string[]|string 訂單狀態 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed' , 預設 [ 'wc-completed' ]
 	 *
 	 * @return bool
 	 */
-	public static function has_bought( int|array $target_product_ids, ?array $args = [] ): bool {
+	public static function has_bought( int|array $target_product_ids, ?array $args = null ): bool {
 		$defaults = [
 			'user_id' => get_current_user_id(),               // 用户 ID 查询
 			'status'  => [ 'wc-completed' ],                  // 訂單狀態
@@ -463,36 +479,36 @@ abstract class Course {
 		// phpcs:disable
 		$prepare = $wpdb->prepare(
 			"
-	WITH ranked_items AS (
-        SELECT
-            order_items.order_item_id,
-            order_items.order_id,
-            order_items.order_item_name,
-            MAX(CASE WHEN product_id.meta_key = '%1\$s' THEN product_id.meta_value END) AS product_id,
-            posts.post_date,
-            ROW_NUMBER() OVER (PARTITION BY MAX(CASE WHEN product_id.meta_key = '%2\$s' THEN product_id.meta_value END) ORDER BY posts.post_date DESC, order_items.order_item_id) AS rn
-        FROM {$wpdb->prefix}woocommerce_order_items AS order_items
-        LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS qty_meta
-            ON order_items.order_item_id = qty_meta.order_item_id AND qty_meta.meta_key = '%3\$s'
-        LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS product_id
-            ON order_items.order_item_id = product_id.order_item_id
-        LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
-        WHERE qty_meta.meta_value = '%4\$s'
-        AND posts.post_author = %5\$d
-        %6\$s
-        GROUP BY order_items.order_item_id, order_items.order_id, order_items.order_item_name, posts.post_date
-    )
-    SELECT order_item_id, order_id, order_item_name, product_id, post_date
-    FROM ranked_items
-    WHERE rn = 1
-    AND product_id IN ( %7\$s )",
-			'_product_id',                       // %1$s
-			'_product_id',                       // %2$s
-			'_is_course',                        // %3$s - meta_key
-			'yes',                               // %4$s - meta_value
-			$user_id,                            // %5$d - post_author
-			$status_condition,                   // %6$s - status condition
-			$target_product_ids_string           // %7$s - target_product_ids_condition
+			WITH ranked_items AS (
+						SELECT
+								order_items.order_item_id,
+								order_items.order_id,
+								order_items.order_item_name,
+								MAX(CASE WHEN product_id.meta_key = '%1\$s' THEN product_id.meta_value END) AS product_id,
+								posts.post_date,
+								ROW_NUMBER() OVER (PARTITION BY MAX(CASE WHEN product_id.meta_key = '%2\$s' THEN product_id.meta_value END) ORDER BY posts.post_date DESC, order_items.order_item_id) AS rn
+						FROM {$wpdb->prefix}woocommerce_order_items AS order_items
+						LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS qty_meta
+								ON order_items.order_item_id = qty_meta.order_item_id AND qty_meta.meta_key = '%3\$s'
+						LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS product_id
+								ON order_items.order_item_id = product_id.order_item_id
+						LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
+						WHERE qty_meta.meta_value = '%4\$s'
+						AND posts.post_author = %5\$d
+						%6\$s
+						GROUP BY order_items.order_item_id, order_items.order_id, order_items.order_item_name, posts.post_date
+				)
+				SELECT order_item_id, order_id, order_item_name, product_id, post_date
+				FROM ranked_items
+				WHERE rn = 1
+				AND product_id IN ( %7\$s )",
+					'_product_id',                       // %1$s
+					'_product_id',                       // %2$s
+					'_is_course',                        // %3$s - meta_key
+					'yes',                               // %4$s - meta_value
+					$user_id,                            // %5$d - post_author
+					$status_condition,                   // %6$s - status condition
+					$target_product_ids_string           // %7$s - target_product_ids_condition
 		);
 
 		$results = $wpdb->get_results( str_replace( '\"', '"', $prepare ) );

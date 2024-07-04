@@ -7,9 +7,8 @@ use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
- * @var array $args
+ * @var array{'type':string} $args
  */
-
 $default_props = [
 	'type' => 'all', // all, ready, not-ready
 ];
@@ -18,11 +17,11 @@ $props = \wp_parse_args( $args, $default_props );
 
 $course_type = $props['type'];
 
-$current_user_id        = \get_current_user_id();
-$user_available_courses = CourseUtils::get_courses_by_user();
+$current_user_id  = \get_current_user_id();
+$user_avl_courses = CourseUtils::get_avl_courses_by_user();
 
 $filtered_courses = array_filter(
-	$user_available_courses,
+	$user_avl_courses,
 	function ( $course ) use ( $course_type ) {
 		$is_ready = CourseUtils::is_course_ready( $course );
 
