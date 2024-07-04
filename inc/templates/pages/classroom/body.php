@@ -1,15 +1,19 @@
 <?php
+/**
+ * Body of the classroom page.
+ */
 
 use J7\PowerCourse\Templates\Templates;
 
 /**
  * @var WC_Product $product
  */
-global $product, $chapter;
+global $product;
 
+$chapter_id = \get_query_var( 'chapter_id' );
 // TODO
 $library_id = get_option( 'bunny_library_id', '244459' );
-$video_id   = get_post_meta( $chapter->ID, 'bunny_video_id', true );
+$video_id   = get_post_meta( $chapter_id, 'bunny_video_id', true );
 
 echo '<div class="w-full bg-white">';
 

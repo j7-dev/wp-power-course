@@ -24,7 +24,7 @@ final class Templates {
 
 	// 上課頁面
 	public const CLASSROOM_SLUG = 'classroom_slug';
-	public const CHAPTER_SLUG   = 'chapter_slug';
+	public const CHAPTER_ID     = 'chapter_id';
 
 	/**
 	 * Constructor
@@ -144,7 +144,7 @@ final class Templates {
 		$classroom_regex = '^classroom/([^/]+)/?([^/]*)/?'; // '^classroom/?([^/]*)/?';
 		\add_rewrite_rule(
 			$classroom_regex,
-			'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]&' . self::CHAPTER_SLUG . '=$matches[2]',
+			'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]&' . self::CHAPTER_ID . '=$matches[2]',
 			'top'
 		);
 
@@ -163,7 +163,7 @@ final class Templates {
 	public function add_query_var( array $vars ): array {
 		$vars[] = self::COURSE_SLUG;
 		$vars[] = self::CLASSROOM_SLUG;
-		$vars[] = self::CHAPTER_SLUG;
+		$vars[] = self::CHAPTER_ID;
 
 		return $vars;
 	}
@@ -192,21 +192,18 @@ final class Templates {
 		// 使用自定義的模板
 		$items = [
 			[
-				'slug'   => \get_query_var( self::COURSE_SLUG ),
-				'slug_2' => '',
-				'path'   => Plugin::$dir . '/inc/templates/course-entry.php',
+				'slug' => \get_query_var( self::COURSE_SLUG ),
+				'path' => Plugin::$dir . '/inc/templates/course-entry.php',
 			],
 			[
-				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
-				'slug_2' => \get_query_var( self::CHAPTER_SLUG ),
-				'path'   => Plugin::$dir . '/inc/templates/classroom-entry.php',
+				'slug' => \get_query_var( self::CLASSROOM_SLUG ),
+				'path' => Plugin::$dir . '/inc/templates/classroom-entry.php',
 			],
 		];
 
 		foreach ( $items as $item ) {
-			$slug   = $item['slug'];
-			$slug_2 = $item['slug_2'];
-			$path   = $item['path'];
+			$slug = $item['slug'];
+			$path = $item['path'];
 
 			if ( $slug ) {
 				if ( file_exists( $path ) ) {
@@ -224,21 +221,6 @@ final class Templates {
 
 					if ( ! $is_course_product ) {
 						return $template;
-					}
-
-					// $slug_2 就是 chapter id
-					if ( ! ! $slug_2 ) {
-						$maybe_chapters = \get_pages(
-							[
-								'child_of'  => $product_post->ID,
-								'include'   => [ $slug_2 ],
-								'post_type' => RegisterCPT::POST_TYPE,
-							]
-						);
-						if ( ! ! $maybe_chapters ) {
-							global $chapter;
-							$chapter = $maybe_chapters[0];
-						}
 					}
 
 					return $path;
