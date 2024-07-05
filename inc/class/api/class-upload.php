@@ -8,11 +8,6 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\WpUtils\Classes\WP;
-use J7\WpUtils\Classes\WC;
-use J7\PowerBundleProduct\BundleProduct;
-
 
 /**
  * Class Api

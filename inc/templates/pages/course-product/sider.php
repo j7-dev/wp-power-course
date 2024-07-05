@@ -14,7 +14,7 @@ $product = $args;
 
 	<?php Templates::get( 'card/single-product', $product ); ?>
 	<?php
-	$bundle_ids = CourseUtils::get_bundle_ids_by_product( $product->get_id() );
+	$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids:true );
 
 	foreach ( $bundle_ids as $bundle_id ) {
 		$bundle_product = \wc_get_product( $bundle_id );

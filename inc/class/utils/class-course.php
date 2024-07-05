@@ -9,6 +9,7 @@ namespace J7\PowerCourse\Utils;
 
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 
 
 /**
@@ -49,17 +50,21 @@ abstract class Course {
 	/**
 	 * 取得課程章節
 	 *
-	 * @param \WC_Product $product 商品
-	 * @param bool|null   $return_ids 是否只回傳 id
+	 * @param \WC_Product|int $product 商品
+	 * @param bool|null       $return_ids 是否只回傳 id
 	 *
-	 * @return array int[]|WP_Post[]
+	 * @return array<int|\WP_Post>
 	 */
-	public static function get_sub_chapters( \WC_Product $product, ?bool $return_ids = false ): array {
+	public static function get_sub_chapters( \WC_Product|int $product, ?bool $return_ids = false ): array {
+		if (!is_numeric($product)) {
+			$product = $product->get_id();
+		}
+
 		$args = [
 			'posts_per_page' => - 1,
 			'order'          => 'ASC',
 			'orderby'        => 'menu_order',
-			'post_parent'    => $product->get_id(),
+			'post_parent'    => $product,
 			'post_status'    => 'publish',
 			'post_type'      => RegisterCPT::POST_TYPE,
 			'fields'         => 'ids',
@@ -122,8 +127,8 @@ abstract class Course {
 	/**
 	 * 取得課程進度
 	 *
-	 * @param \WC_Product $product
-	 * @param int|null    $user_id
+	 * @param \WC_Product $product 課程商品
+	 * @param int|null    $user_id 用户 ID
 	 *
 	 * @return float
 	 */
@@ -131,50 +136,70 @@ abstract class Course {
 		if (!$user_id) {
 			$user_id = get_current_user_id();
 		}
-
+		$product_id              = $product->get_id();
 		$sub_chapters_count      = count(self::get_sub_chapters($product, true));
-		$finished_chapters_count = count(self::get_finished_chapters($product, $user_id));
+		$finished_chapters_count = count(self::get_finished_chapters($product_id, $user_id));
 
 		return $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
 	}
 	/**
 	 * 取得已完成章節
 	 *
-	 * @param \WC_Product $product 商品
-	 * @param int|null    $user_id 用户 ID
+	 * @param int       $course_id 課程 ID
+	 * @param int|null  $user_id 用户 ID
+	 * @param bool|null $return_ids 是否只回傳 id
 	 *
-	 * @return array int[]|string[]
+	 * @return array<\WP_Post|int>
 	 */
-	public static function get_finished_chapters( \WC_Product $product, ?int $user_id = 0 ): array {
+	public static function get_finished_chapters( int $course_id, ?int $user_id = 0, ?bool $return_ids = false ): array {
 		if (!$user_id) {
 			$user_id = get_current_user_id();
 		}
-		$course_id  = $product->get_id();
-		$meta_key   = "finished_chapter_ids_in_course_{$course_id}";
-		$meta_value = get_user_meta($user_id, $meta_key, true);
+		$finished_chapter_ids = AVLCourseMeta::get($course_id, $user_id, 'finished_chapter_ids');
+		$finished_chapter_ids = \is_array($finished_chapter_ids) ? $finished_chapter_ids : [];
+		if ($return_ids) {
+			/**
+			 * @var array<int> $finished_chapter_ids
+			 */
+			return $finished_chapter_ids;
+		}
 
-		return \is_array($meta_value) ? $meta_value : [];
+		$finished_chapters = get_posts(
+			[
+				'posts_per_page' => -1,
+				'post_type'      => RegisterCPT::POST_TYPE,
+				'post_status'    => 'publish',
+				'post__in'       => $finished_chapter_ids,
+			]
+		);
+
+		return $finished_chapters;
 	}
 
 	/**
-	 * 取得 bundle_ids (銷售方案 ids) by product
+	 * 取得 bundle_ids (銷售方案) by product
 	 * 用商品反查有哪些銷售方案
 	 *
-	 * @param int $product_id 商品 id
+	 * @param int       $product_id 商品 id
+	 * @param bool|null $return_ids 是否只回傳 id
 	 *
-	 * @return array bundle_ids (銷售方案 ids)
+	 * @return array<\WP_Post|int> bundle_ids (銷售方案)
 	 */
-	public static function get_bundle_ids_by_product( int $product_id ): array {
-		return \get_posts(
-			[
-				'post_type'   => 'product',
-				'numberposts' => - 1,
-				'post_status' => [ 'publish', 'draft' ],
-				'fields'      => 'ids', // 只取 id
-				'meta_key'    => 'pbp_product_ids',
-				'meta_value'  => $product_id,
-			]
-		);
+	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false ): array {
+
+		$args = [
+			'post_type'   => 'product',
+			'numberposts' => - 1,
+			'post_status' => [ 'publish', 'draft' ],
+			'meta_key'    => 'pbp_product_ids',
+			'meta_value'  => (string) $product_id,
+		];
+
+		if ($return_ids) {
+			$args['fields'] = 'ids';// 只取 id
+		}
+
+		return \get_posts($args);
 	}
 
 	/**
@@ -210,30 +235,20 @@ abstract class Course {
 	 *
 	 * @param int|null $user_id 用户 ID
 	 *
-	 * @return array<string> 課程 ids
+	 * @return array<\WC_Product|int> 課程 ids
 	 */
-	public static function get_avl_course_ids_by_user( ?int $user_id = null ): array {
+	public static function get_avl_courses_by_user( ?int $user_id = null, ?bool $return_ids = false ): array {
 
 		$user_id        = $user_id ?? get_current_user_id();
 		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids', false);
 
-		if (!\is_array($avl_course_ids)) {
-			$avl_course_ids = [];
+		/**
+		 * @var array<int> $avl_course_ids
+		 */
+		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
+		if ($return_ids) {
+			return $avl_course_ids;
 		}
-
-		return $avl_course_ids;
-	}
-
-	/**
-	 * 查詢用戶可以上那些課程
-	 *
-	 * @param int|null $user_id 用户 ID
-	 *
-	 * @return array<\WC_Product>
-	 */
-	public static function get_avl_courses_by_user( ?int $user_id = null ): array {
-
-		$avl_course_ids = self::get_avl_course_ids_by_user($user_id);
 
 		$avl_courses = [];
 		foreach ($avl_course_ids as $avl_course_id) {
@@ -245,7 +260,6 @@ abstract class Course {
 
 		return $avl_courses;
 	}
-
 
 	/**
 	 * 從用戶訂單中取得用戶已購買的課程商品 \WC_Product[]
@@ -411,7 +425,7 @@ abstract class Course {
 		$the_product    = $the_product ?? $product;
 		$the_product_id = (string) $the_product->get_id();
 		$user_id        = $user_id ?? \get_current_user_id();
-		$avl_course_ids = self::get_avl_course_ids_by_user($user_id);
+		$avl_course_ids = self::get_avl_courses_by_user($user_id, return_ids: true);
 		return in_array($the_product_id, $avl_course_ids, true);
 	}
 

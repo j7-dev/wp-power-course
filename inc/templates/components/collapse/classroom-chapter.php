@@ -1,4 +1,7 @@
 <?php
+/**
+ * Classroom > Sider > Chapters
+ */
 
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Templates\Templates;
@@ -14,8 +17,8 @@ global $product, $chapter;
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'Invalid Product' );
 }
-
-$finished_chapters = CourseUtils::get_finished_chapters( $product );
+$product_id           = $product->get_id();
+$finished_chapter_ids = CourseUtils::get_finished_chapter_ids( $product_id );
 
 $args = [
 	'posts_per_page' => - 1,
@@ -42,7 +45,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$video_length = (int) get_post_meta( $sub_chapter->ID, 'video_length', true );
-		$is_finished  = in_array( $sub_chapter->ID, $finished_chapters );
+		$is_finished  = in_array( $sub_chapter->ID, $finished_chapter_ids );
 		$icon         = $is_finished ? 'icon/check' : 'icon/video';
 
 		/** @noinspection HtmlUnknownTarget */
