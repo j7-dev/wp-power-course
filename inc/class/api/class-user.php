@@ -172,64 +172,60 @@ final class User {
 
 
 	/**
-	 * Patch bundle product callback (bundle product)
-	 * 修改 bundle product
+	 * Post user callback
+	 * 修改 user
 	 * 用 form-data 方式送出
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
 	 */
-	public function post_users_with_id_callback( $request ) {
-		$id          = $request['id'];
-		$body_params = $request->get_body_params() ?? [];
+	public function post_users_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
+		$user_id     = $request['id'];
+		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
-		$product = \wc_get_product( $id );
-		if ( ! $product ) {
+		[
+			'data' => $data,
+			'meta_data' => $meta_data,
+			] = WP::separator( args: $body_params, obj: 'user', files: $file_params['files'] ?? [] );
+
+		$data['ID']         = $user_id;
+		$update_user_result = \wp_update_user( $data );
+
+		$update_success = \is_numeric($update_user_result);
+
+		foreach ( $meta_data as $key => $value ) {
+			$update_success = \update_user_meta($user_id, $key, $value );
+			if (!$update_success) {
+				break;
+			}
+		}
+
+		if ( !!$update_success ) {
 			return new \WP_REST_Response(
 				[
-					'code'    => 'patch_failed',
-					'message' => '修改失敗，找不到商品',
+					'code'    => 'post_user_success',
+					'message' => '修改成功',
 					'data'    => [
-						'id' => (string) $id,
+						'id' => (string) $user_id,
+					],
+				]
+			);
+		} else {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'post_user_error',
+					'message' => '修改失敗',
+					'data'    => [
+						'id' => (string) $user_id,
 					],
 				],
 				400
 			);
 		}
-		$product = new BundleProduct( $product );
-
-		[
-			'data' => $data,
-			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
-
-		foreach ( $data as $key => $value ) {
-			$method_name = 'set_' . $key;
-			$product->$method_name( $value );
-		}
-
-		$product->save();
-
-		$meta_data = self::handle_special_fields( $meta_data, $product );
-
-		foreach ( $meta_data as $key => $value ) {
-			$product->update_meta_data( $key, $value );
-		}
-
-		$product->save_meta_data();
-
-		return new \WP_REST_Response(
-			[
-				'code'    => 'patch_success',
-				'message' => '修改成功',
-				'data'    => [
-					'id' => (string) $id,
-				],
-			]
-		);
 	}
 }
 
