@@ -10,7 +10,7 @@ use J7\PowerCourse\Templates\Templates;
  */
 global $product;
 
-$chapter_id = \get_query_var( 'chapter_id' );
+$chapter_id = \get_query_var( Templates::CHAPTER_ID );
 // TODO
 $library_id = get_option( 'bunny_library_id', '244459' );
 $video_id   = get_post_meta( $chapter_id, 'bunny_video_id', true );

@@ -35,5 +35,5 @@ printf(
 ',
 	$count_all_chapters,
 	$course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : '',
-	Templates::get( 'collapse/classroom-chapter', null, false, false )
+	Templates::get( 'collapse/classroom-chapter', null, false )
 );

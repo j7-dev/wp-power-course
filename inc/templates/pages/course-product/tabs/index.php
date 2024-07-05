@@ -7,8 +7,8 @@ use J7\PowerCourse\Templates\Templates;
  */
 $product     = $args;
 $description = $product->get_description();
-$accordion   = Templates::get( 'collapse/chapter', args: $product, load_once: false, echo: false );
-$qa          = Templates::get( 'collapse/qa', args: $product, load_once: false, echo: false );
+$accordion   = Templates::get( 'collapse/chapter', args: $product, echo: false );
+$qa          = Templates::get( 'collapse/qa', args: $product, echo: false );
 
 $course_tabs = [
 	[

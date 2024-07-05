@@ -138,7 +138,7 @@ abstract class Course {
 		}
 		$product_id              = $product->get_id();
 		$sub_chapters_count      = count(self::get_sub_chapters($product, true));
-		$finished_chapters_count = count(self::get_finished_chapters($product_id, $user_id));
+		$finished_chapters_count = count(self::get_finished_chapters($product_id, $user_id, return_ids: true));
 
 		return $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
 	}
@@ -149,7 +149,7 @@ abstract class Course {
 	 * @param int|null  $user_id 用户 ID
 	 * @param bool|null $return_ids 是否只回傳 id
 	 *
-	 * @return array<\WP_Post|int>
+	 * @return array<\WP_Post|string>
 	 */
 	public static function get_finished_chapters( int $course_id, ?int $user_id = 0, ?bool $return_ids = false ): array {
 		if (!$user_id) {
@@ -159,21 +159,17 @@ abstract class Course {
 		$finished_chapter_ids = \is_array($finished_chapter_ids) ? $finished_chapter_ids : [];
 		if ($return_ids) {
 			/**
-			 * @var array<int> $finished_chapter_ids
+			 * @var array<string> $finished_chapter_ids
 			 */
 			return $finished_chapter_ids;
 		}
 
-		$finished_chapters = get_posts(
-			[
-				'posts_per_page' => -1,
-				'post_type'      => RegisterCPT::POST_TYPE,
-				'post_status'    => 'publish',
-				'post__in'       => $finished_chapter_ids,
-			]
-		);
+		$chapters = [];
+		foreach ($finished_chapter_ids as $chapter_id) {
+			$chapters[] = \get_post($chapter_id);
+		}
 
-		return $finished_chapters;
+		return $chapters;
 	}
 
 	/**

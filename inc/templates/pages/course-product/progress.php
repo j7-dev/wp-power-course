@@ -1,4 +1,7 @@
 <?php
+/**
+ * Classroom > body > Progress
+ */
 
 /**
  * @var WC_Product $product

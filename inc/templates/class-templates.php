@@ -38,7 +38,6 @@ final class Templates {
 		\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
 		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 999999 );
 
-		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
 	}
 
@@ -47,8 +46,8 @@ final class Templates {
 	 *
 	 * @param string $name 指定路徑裡面的文件名
 	 * @param mixed  $args 要渲染到模板中的數據
-	 * @param bool   $load_once 是否只載入一次
 	 * @param bool   $echo 是否輸出
+	 * @param bool   $load_once 是否只載入一次
 	 *
 	 * @return ?string|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -56,10 +55,10 @@ final class Templates {
 	public static function get(
 		string $name,
 		mixed $args = null,
+		?bool $echo = true,
 		?bool $load_once = false,
-		?bool $echo = true
 	): ?string {
-		$result = self::safe_get( $name, $args, $load_once, $echo );
+		$result = self::safe_get( $name, $args, $echo, $load_once );
 		if ( '' === $result ) {
 			throw new \Exception( "模板文件 {$name} 不存在" );
 		}
@@ -72,8 +71,8 @@ final class Templates {
 	 *
 	 * @param string $name 指定路徑裡面的文件名
 	 * @param mixed  $args 要渲染到模板中的數據
-	 * @param bool   $load_once 是否只載入一次
 	 * @param bool   $echo 是否輸出
+	 * @param bool   $load_once 是否只載入一次
 	 *
 	 * @return string|false|null
 	 * @throws \Exception 如果模板文件不存在.
@@ -81,8 +80,8 @@ final class Templates {
 	public static function safe_get(
 		string $name,
 		mixed $args = null,
+		?bool $echo = true,
 		?bool $load_once = false,
-		?bool $echo = true
 	): string|false|null {
 		$page_names = [ 'course-product', 'classroom', 'my-account', '404' ]; // 區域名稱
 
@@ -231,30 +230,6 @@ final class Templates {
 		return $template;
 	}
 
-	/**
-	 * Enqueue assets
-	 *
-	 * @return void
-	 */
-	public function enqueue_assets(): void {
-		\wp_enqueue_script(
-			Plugin::$kebab . '-template',
-			Plugin::$url . '/inc/assets/dist/index.js',
-			[ 'jquery' ],
-			Plugin::$version,
-			[
-				'strategy'  => 'async',
-				'in_footer' => true,
-			]
-		);
-
-		\wp_enqueue_style(
-			Plugin::$kebab . '-template',
-			Plugin::$url . '/inc/assets/dist/css/index.css',
-			[],
-			Plugin::$version
-		);
-	}
 
 	/**
 	 * Add html attr

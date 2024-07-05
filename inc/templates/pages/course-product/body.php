@@ -67,8 +67,8 @@ $product = $args;
 		?>
 	</div>
 	<!-- Tabs -->
-	<?php Templates::get( 'course-product/tabs', $product, true ); ?>
+	<?php Templates::get( 'course-product/tabs', $product, true, true ); ?>
 
 	<!-- Footer -->
-	<?php Templates::get( 'course-product/footer', $product, true ); ?>
+	<?php Templates::get( 'course-product/footer', $product, true, true ); ?>
 </div>

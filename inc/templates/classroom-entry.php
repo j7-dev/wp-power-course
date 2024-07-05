@@ -37,12 +37,12 @@ get_header();
 echo '<div id="pc-classroom-main">';
 
 if ( ! CourseUtils::is_avl() ) {
-	Templates::get( '404/buy', null, false );
+	Templates::get( '404/buy', null );
 } elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-	Templates::get( '404/not-ready', null, false );
+	Templates::get( '404/not-ready', null );
 } else {
-	Templates::get( 'classroom/sider', null, true );
-	Templates::get( 'classroom/body', null, true );
+	Templates::get( 'classroom/sider', null, true, true );
+	Templates::get( 'classroom/body', null, true, true );
 }
 
 echo '</div>';

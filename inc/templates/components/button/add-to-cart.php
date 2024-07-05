@@ -32,7 +32,6 @@ if ( 'icon' === $label ) :
 			'class' => 'h-4 w-4',
 
 		],
-		false,
 		false
 	);
 	printf(

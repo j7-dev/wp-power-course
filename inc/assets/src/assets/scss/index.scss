@@ -53,12 +53,3 @@ div .pc-rating input:checked ~ input, div .pc-rating input[aria-checked="true"] 
 
 }
 
-// classroom 樣式
-header,
-header#header {
-  width: 100%;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  border-bottom: 1px solid #eee;
-}

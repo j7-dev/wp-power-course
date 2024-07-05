@@ -151,7 +151,7 @@ final class User {
 				$avl_courses[ $i ]['chapters'][ $j ]['id']             = (string) $chapter_id;
 				$avl_courses[ $i ]['chapters'][ $j ]['name']           = \get_the_title($chapter_id);
 				$avl_courses[ $i ]['chapters'][ $j ]['bunny_video_id'] = \get_the_title($chapter_id);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']    = \in_array($chapter_id, $finished_chapter_ids);
+				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']    = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
 			}
 		}
 

@@ -1,11 +1,14 @@
 <?php
+/**
+ * Collapse component for chapter.
+ */
 
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 
 /**
- * @var WC_Product $args
+ * @var WC_Product $product
  */
-$product = $args;
+global $product;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'Invalid Product' );
@@ -50,7 +53,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	printf(
 		'
     <div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
-		<input type="checkbox"/>
+			<input type="checkbox" checked="checked"/>
 		<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
 			<span>%1$s</span>
 			<span class="text-xs text-gray-400">共 %2$s 個單元</span>
