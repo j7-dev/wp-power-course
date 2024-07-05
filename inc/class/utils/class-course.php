@@ -192,17 +192,17 @@ abstract class Course {
 			default    => '無限制',
 		};
 
-		$limit_unit       = $product->get_meta( 'limit_unit' );
-		$limit_unit_label = match ( $limit_unit ) {
-			'second' => '秒',
-			'month'  => '月',
-			'year'   => '年',
-			default  => '天',
-		};
-
+		$limit_unit  = $product->get_meta( 'limit_unit' );
 		$limit_value = $product->get_meta( 'limit_value' );
 
-		return "{$limit_type_label} {$limit_value} {$limit_unit_label}";
+		$limit_value_label = match ( $limit_unit ) {
+			'timestamp' => \wp_date( 'Y-m-d H:i:s', $limit_value ),
+			'month'  => "{$limit_value} 月",
+			'year'   => "{$limit_value} 年",
+			default  => "{$limit_value} 天",
+		};
+
+		return "{$limit_type_label} {$limit_value_label}";
 	}
 
 	/**

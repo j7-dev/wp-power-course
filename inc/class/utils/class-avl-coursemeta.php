@@ -32,7 +32,7 @@ abstract class AVLCourseMeta {
 			'course_id'  => $course_id,
 			'user_id'    => $user_id,
 			'meta_key'   => $meta_key,
-			'meta_value' => maybe_serialize( $meta_value ),
+			'meta_value' => \maybe_serialize( $meta_value ),
 		];
 
 		if (!$unique) {
@@ -55,7 +55,7 @@ abstract class AVLCourseMeta {
 			if ($exists) {
 				return $wpdb->update(
 					$table_name,
-					[ 'meta_value' => maybe_serialize( $meta_value ) ],
+					[ 'meta_value' => \maybe_serialize( $meta_value ) ],
 					[ 'meta_id' => $exists ],
 					[ '%s' ],
 					[ '%d' ]
@@ -77,6 +77,7 @@ abstract class AVLCourseMeta {
 	 * @param int    $user_id     The ID of the user.
 	 * @param string $meta_key    The meta key.
 	 * @param mixed  $meta_value  The meta value.
+	 * @param mixed  $prev_value  Optional. The previous value to update. Default is null.
 	 *
 	 * @return int|false The number of rows affected on success, or false on failure.
 	 */
@@ -86,11 +87,34 @@ abstract class AVLCourseMeta {
 
 		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
+		$exists = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_id FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+				$table_name,
+				$course_id,
+				$user_id,
+				$meta_key
+			)
+		);
+
+		if (!$exists) {
+			return $wpdb->insert(
+				$table_name,
+				[
+					'course_id'  => $course_id,
+					'user_id'    => $user_id,
+					'meta_key'   => $meta_key,
+					'meta_value' => \maybe_serialize( $meta_value ),
+				],
+				[ '%d', '%d', '%s', '%s' ]
+			);
+		}
+
 		if (!$prev_value) {
 			return $wpdb->update(
 				$table_name,
 				[ // data
-					'meta_value' => maybe_serialize( $meta_value ),
+					'meta_value' => \maybe_serialize( $meta_value ),
 				],
 				[ // where
 					'course_id' => $course_id,
@@ -110,13 +134,13 @@ abstract class AVLCourseMeta {
 			return $wpdb->update(
 				$table_name,
 				[ // data
-					'meta_value' => maybe_serialize( $meta_value ),
+					'meta_value' => \maybe_serialize( $meta_value ),
 				],
 				[ // where
 					'course_id'  => $course_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
-					'meta_value' => maybe_serialize( $prev_value ),
+					'meta_value' => \maybe_serialize( $prev_value ),
 				],
 				[ // format
 					'%s',
@@ -156,7 +180,7 @@ abstract class AVLCourseMeta {
 					$user_id
 				)
 			);
-			return wp_list_pluck($results, 'meta_value', 'meta_key');
+			return \wp_list_pluck($results, 'meta_value', 'meta_key');
 		}
 
 		$meta_value = $wpdb->get_col(
@@ -170,7 +194,7 @@ abstract class AVLCourseMeta {
 		);
 
 		if ($single) {
-			return maybe_unserialize($meta_value[0]);
+			return \maybe_unserialize($meta_value[0]);
 		} else {
 			return array_map('maybe_unserialize', $meta_value);
 		}
@@ -197,7 +221,7 @@ abstract class AVLCourseMeta {
 					'course_id'  => $course_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
-					'meta_value' => maybe_serialize($meta_value),
+					'meta_value' => \maybe_serialize($meta_value),
 				],
 				[
 					'%d',
