@@ -11,6 +11,7 @@ namespace J7\PowerCourse\Resources\Order;
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 
 /**
  * Class Order

@@ -7,6 +7,8 @@ declare ( strict_types=1 );
 
 namespace J7\PowerCourse\Utils;
 
+use J7\PowerCourse\Plugin;
+
 /**
  * Class Utils
  */
@@ -18,12 +20,13 @@ abstract class AVLCourseMeta {
 	 * @param int    $user_id The ID of the user.
 	 * @param string $meta_key The key of the meta value.
 	 * @param mixed  $meta_value The value of the meta data.
+	 * @param bool   $unique Optional. Whether the same key should not be added. Default is false.
 	 * @return int|false The ID of the newly added meta data, or false on failure.
 	 */
-	public static function add_avl_course_meta( int $course_id, int $user_id, string $meta_key, mixed $meta_value ): int|false {
+	public static function add( int $course_id, int $user_id, string $meta_key, mixed $meta_value, ?bool $unique = false ): int|false {
 		global $wpdb;
 
-		$table_name = $wpdb->avl_coursemeta;
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
 		$data = [
 			'course_id'  => $course_id,
@@ -32,11 +35,39 @@ abstract class AVLCourseMeta {
 			'meta_value' => maybe_serialize( $meta_value ),
 		];
 
-		return $wpdb->insert(
-			$table_name,
-			$data,
-			[ '%d', '%d', '%s', '%s' ]
-		);
+		if (!$unique) {
+			return $wpdb->insert(
+				$table_name,
+				$data,
+				[ '%d', '%d', '%s', '%s' ]
+			);
+		} else {
+			$exists = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_id FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+					$table_name,
+					$course_id,
+					$user_id,
+					$meta_key
+				)
+			);
+
+			if ($exists) {
+				return $wpdb->update(
+					$table_name,
+					[ 'meta_value' => maybe_serialize( $meta_value ) ],
+					[ 'meta_id' => $exists ],
+					[ '%s' ],
+					[ '%d' ]
+				);
+			} else {
+				return $wpdb->insert(
+					$table_name,
+					$data,
+					[ '%d', '%d', '%s', '%s' ]
+				);
+			}
+		}
 	}
 
 	/**
@@ -49,31 +80,56 @@ abstract class AVLCourseMeta {
 	 *
 	 * @return int|false The number of rows affected on success, or false on failure.
 	 */
-	public static function update_avl_course_meta( int $course_id, int $user_id, string $meta_key, mixed $meta_value ): int|false {
+	public static function update( int $course_id, int $user_id, string $meta_key, mixed $meta_value, mixed $prev_value = null ): int|false {
 
 		global $wpdb;
 
-		$table_name = $wpdb->avl_coursemeta;
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
-		return $wpdb->update(
-			$table_name,
-			[ // data
-				'meta_key'   => $meta_key,
-				'meta_value' => maybe_serialize( $meta_value ),
-			],
-			[ // where
-				'course_id' => $course_id,
-				'user_id'   => $user_id,
-			],
-			[ // format
-				'%s',
-				'%s',
-			],
-			[ // where format
-				'%d',
-				'%d',
-			]
-		);
+		if (!$prev_value) {
+			return $wpdb->update(
+				$table_name,
+				[ // data
+					'meta_value' => maybe_serialize( $meta_value ),
+				],
+				[ // where
+					'course_id' => $course_id,
+					'user_id'   => $user_id,
+					'meta_key'  => $meta_key,
+				],
+				[ // format
+					'%s',
+				],
+				[ // where format
+					'%d',
+					'%d',
+					'%s',
+				]
+			);
+		} else {
+			return $wpdb->update(
+				$table_name,
+				[ // data
+					'meta_value' => maybe_serialize( $meta_value ),
+				],
+				[ // where
+					'course_id'  => $course_id,
+					'user_id'    => $user_id,
+					'meta_key'   => $meta_key,
+					'meta_value' => maybe_serialize( $prev_value ),
+				],
+				[ // format
+					'%s',
+				],
+				[ // where format
+					'%d',
+					'%d',
+					'%s',
+					'%s',
+				]
+			);
+
+		}
 	}
 
 	/**
@@ -86,15 +142,16 @@ abstract class AVLCourseMeta {
 	 *
 	 * @return mixed The course meta value(s).
 	 */
-	public static function get_avl_course_meta( int $course_id, int $user_id, string $meta_key, ?bool $single = false ) {
+	public static function get( int $course_id, int $user_id, string $meta_key, ?bool $single = false ) {
 		global $wpdb;
 
-		$table_name = $wpdb->avl_coursemeta;
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
 		if (empty($meta_key)) {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT meta_key, meta_value FROM $table_name WHERE course_id = %1\$d AND user_id = %2\$d",
+					'SELECT meta_key, meta_value FROM %1$s WHERE course_id = %2$d AND user_id = %3$d',
+					$table_name,
 					$course_id,
 					$user_id
 				)
@@ -104,7 +161,8 @@ abstract class AVLCourseMeta {
 
 		$meta_value = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT meta_value FROM $table_name WHERE course_id = %1\$d AND user_id = %2\$d AND meta_key = %3\$s",
+				"SELECT meta_value FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+				$table_name,
 				$course_id,
 				$user_id,
 				$meta_key
@@ -126,11 +184,11 @@ abstract class AVLCourseMeta {
 	 * @param string $meta_key    Optional. The meta key to delete. Default is null.
 	 * @param mixed  $meta_value  Optional. The meta value to delete. Default is an empty string.
 	 *
-	 * @return int|false The number of rows deleted on success, or false on failure.
+	 * @return int|false 移除的數量, or false on error.
 	 */
-	public static function delete_avl_course_meta( int $course_id, int $user_id, string $meta_key = null, mixed $meta_value = '' ): int|false {
+	public static function delete( int $course_id, int $user_id, string $meta_key = null, mixed $meta_value = '' ): int|false {
 		global $wpdb;
-		$table_name = $wpdb->avl_coursemeta;
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
 		if (!empty($meta_value)) {
 			return $wpdb->delete(

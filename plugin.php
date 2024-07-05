@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
@@ -33,9 +33,10 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 	 * Class Plugin
 	 */
 	final class Plugin {
-
 		use \J7\WpUtils\Traits\PluginTrait;
 		use \J7\WpUtils\Traits\SingletonTrait;
+
+		const COURSE_TABLE_NAME = 'pc_avl_coursemeta';
 
 		/**
 		 * Constructor
@@ -69,18 +70,17 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		}
 
 		/**
-	 * Activate
-		* 啟用時創建 avl_coursemeta table
-	 *
-	 * @return void
-	 * @throws \Exception Exception.
-	 */
-		final public function activate(): void {
-			$table_name = 'avl_coursemeta';
+		 * Activate
+		 * 啟用時創建 avl_coursemeta table
+		 *
+		 * @return void
+		 * @throws \Exception Exception.
+		 */
+		public function activate(): void {
 			try {
 				global $wpdb;
 
-				$table_name           = $wpdb->prefix . $table_name;
+				$table_name           = $wpdb->prefix . self::COURSE_TABLE_NAME;
 				$wpdb->avl_coursemeta = $table_name;
 
 				$charset_collate = $wpdb->get_charset_collate();
@@ -98,9 +98,9 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 								) $charset_collate;";
 
 				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-				$result = \dbDelta( $sql );
-			} catch ( \Throwable $th ) {
-				throw new \Exception( $th->getMessage() );
+				$result = \dbDelta($sql);
+			} catch (\Throwable $th) {
+				throw new \Exception($th->getMessage());
 			}
 		}
 	}
