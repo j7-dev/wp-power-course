@@ -158,12 +158,20 @@ final class Order {
 			// 如果是課程商品
 			if ( CourseUtils::is_course_product( $product_id ) ) {
 
-				\add_user_meta( $customer_id, 'avl_course_ids', $product_id );
+				// 先檢查用戶有沒有買過
+				$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
+				if (!\is_array($avl_course_ids)) {
+					$avl_course_ids = [];
+				}
+				// 如果沒買過就新增
+				if (!\in_array($product_id, $avl_course_ids)) {
+					\add_user_meta( $customer_id, 'avl_course_ids', $product_id );
+				}
 
 				// 將課程限制條件紀錄到訂單
-				$limit_type  = $item->get_meta( 'limit_type' );
-				$limit_value = (int) $item->get_meta( 'limit_value' );
-				$limit_unit  = $item->get_meta( 'limit_unit' );
+				$limit_type  = $item->get_meta( '_limit_type' );
+				$limit_value = (int) $item->get_meta( '_limit_value' );
+				$limit_unit  = $item->get_meta( '_limit_unit' );
 
 				/**
 				 * 計算到期日 expire_date
