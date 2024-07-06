@@ -49,19 +49,18 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		);
 	endforeach;
 
-
 	printf(
-		'
+		/*html*/'
     <div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
 			<input type="checkbox" checked="checked"/>
-		<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
-			<span>%1$s</span>
-			<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+			<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
+				<span>%1$s</span>
+				<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+			</div>
+			<div class="pc-collapse-content bg-gray-50 p-0">
+				%3$s
+			</div>
 		</div>
-		<div class="pc-collapse-content bg-gray-50 p-0">
-	        %3$s
-		</div>
-	</div>
     ',
 		$chapter->post_title,
 		count( $sub_chapters ),

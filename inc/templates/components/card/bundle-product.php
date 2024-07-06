@@ -71,8 +71,10 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 		Templates::get(
 			'button/add-to-cart',
 			[
-				'product' => $bundle_product,
-				'class'   => 'px-6',
+				'product'       => $bundle_product,
+				'type'          => 'primary',
+				'class'         => 'px-6 text-white ',
+				'wrapper_class' => '[&_a.wc-forward]:hidden',
 			]
 		);
 		?>

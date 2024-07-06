@@ -46,10 +46,11 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 			$checkout_url
 		);
 		Templates::get(
-			'button/base',
+			'button',
 			[
+				'type'     => 'primary',
 				'children' => '立即購買',
-				'class'    => 'flex-1',
+				'class'    => 'text-white flex-1',
 				'href'     => $url,
 			]
 		);
@@ -58,9 +59,13 @@ $purchase_note = \wpautop( $product->get_purchase_note() );
 			'button/add-to-cart',
 			[
 				'product'       => $product,
-				'label'         => 'icon',
+				'children'      => '',
+				'type'          => 'primary',
+				'outline'       => true,
+				'icon'          => 'shopping-bag',
+				'shape'         => 'square',
 				'wrapper_class' => '[&_a.wc-forward]:hidden',
-				'class'         => 'border-2 border-solid border-blue-500 h-10 w-10 rounded-md flex items-center justify-center',
+				'class'         => '',
 			]
 		);
 		?>

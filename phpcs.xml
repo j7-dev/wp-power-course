@@ -44,6 +44,8 @@
         <exclude name="WordPress.WhiteSpace.ControlStructureSpacing.NoSpaceBeforeCloseParenthesis"/>
         <exclude name="WordPress.DateTime.RestrictedFunctions.date_date"/>
         <exclude name="Generic.Commenting.DocComment.MissingShort"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>
+
     </rule>
 
     <exclude-pattern>.idea/*</exclude-pattern>
