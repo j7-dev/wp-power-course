@@ -5,15 +5,32 @@
 
 use J7\PowerCourse\Templates\Templates;
 
-/**
- * @var WC_Product $product
- */
-global $product;
-
-$chapter_id = \get_query_var( Templates::CHAPTER_ID );
-// TODO
+// TODO 清除預設值
 $library_id = get_option( 'bunny_library_id', '244459' );
-$video_id   = get_post_meta( $chapter_id, 'bunny_video_id', true );
+
+$default_args = [
+	'product' => $GLOBALS['product'],
+	'chapter' => $GLOBALS['chapter'],
+];
+
+/**
+ * @var array $args
+ * @phpstan-ignore-next-line
+ */
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+	'chapter' => $chapter,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
+
+$chapter_id = $chapter->ID;
+
+$video_id = get_post_meta( $chapter_id, 'bunny_video_id', true );
 
 echo '<div class="w-full bg-white">';
 

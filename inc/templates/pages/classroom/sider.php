@@ -1,13 +1,28 @@
 <?php
-
 /**
- * @var WC_Product $args
+ * Sidebar for classroom
  */
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
-global $product;
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
+/**
+ * @var array $args
+ * @phpstan-ignore-next-line
+ */
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
 
 // $chpters = \get_children(
 // [

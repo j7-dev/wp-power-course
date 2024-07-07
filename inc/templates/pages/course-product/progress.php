@@ -32,7 +32,7 @@ printf(
 <div class="flex gap-2 bg-gray-100 px-12 py-4 items-center">
 	<span class="text-gray-400 text-sm text-nowrap">%1$s</span>
 	<span class="text-primary text-sm text-nowrap font-bold">%2$s%%</span>
-	<progress class="pc-progress pc-progress-primary flex-1" value="%1$s" max="100"></progress>
+	<progress class="pc-progress pc-progress-primary flex-1" value="%2$s" max="100"></progress>
 </div>',
 $label,
 	$progress
