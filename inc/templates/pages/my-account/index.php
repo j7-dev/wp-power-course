@@ -25,7 +25,7 @@ $course_tabs = [
 ];
 
 Templates::get(
-	'tabs/base',
+	'tabs',
 	[
 		'course_tabs'        => $course_tabs,
 		'default_active_key' => '1',

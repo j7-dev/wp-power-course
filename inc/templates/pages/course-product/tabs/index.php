@@ -24,8 +24,20 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $description = $product->get_description();
-$accordion   = Templates::get( 'collapse/chapter', args: $product, echo: false );
-$qa          = Templates::get( 'collapse/qa', args: $product, echo: false );
+$accordion   = Templates::get(
+	'collapse/chapter',
+	args: [
+		'product' => $product,
+	],
+	echo: false
+	);
+$qa          = Templates::get(
+	'collapse/qa',
+	args: [
+		'product' => $product,
+	],
+	echo: false
+	);
 
 $course_tabs = [
 	[
@@ -61,7 +73,7 @@ $course_tabs = [
 ];
 
 Templates::get(
-	'tabs/base',
+	'tabs',
 	[
 		'course_tabs'        => $course_tabs,
 		'default_active_key' => '1',

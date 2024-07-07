@@ -1,25 +1,25 @@
 <?php
-
 /**
- * @var array $args
- * - type string error, success, warning, info
- * - message string
+ * Alert component
  */
 
-
-$default_props = [
+$default_args = [
 	'type'    => 'default', // error, success, warning, info
 	'message' => 'OOPS! 🤯 您好像還沒購買此課程，前往購買',
 ];
 
-$props = wp_parse_args( $args, $default_props );
+/**
+ * @var array $args
+ * @phpstan-ignore-next-line
+ */
+$args = wp_parse_args( $args, $default_args );
 
 [
-	'type'    => $type,
+	'type'    => $alert_type,
 	'message' => $message,
-] = $props;
+] = $args;
 
-$color_class = match ( $type ) {
+$color_class = match ( $alert_type ) {
 	'error'   => 'text-red-800 bg-red-50',
 	'success' => 'text-green-800 bg-green-50',
 	'warning' => 'text-orange-800 bg-orange-50',
@@ -27,9 +27,8 @@ $color_class = match ( $type ) {
 	default   => 'text-gray-800 bg-gray-50',
 };
 
-
 printf(
-	'
+	/*html*/'
 	<div
 		class="flex items-center p-4 mb-4 rounded-lg %1$s"
 		role="alert">

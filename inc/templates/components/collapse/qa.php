@@ -3,13 +3,22 @@
  * QA of the course.
  */
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $product
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-global $product;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'Invalid Product' );
+	throw new \Exception( 'product 不是 WC_Product' );
 }
 
 $product_id = $product->get_id();
@@ -21,7 +30,7 @@ if ( ! is_array( $qa_list ) ) {
 }
 foreach ( $qa_list as $qa ) :
 	printf(
-		'
+		/*html*/'
 	<div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
 		<input type="checkbox" checked="checked" />
 		<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">

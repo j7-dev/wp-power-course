@@ -8,19 +8,31 @@ use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+	'chapter' => $GLOBALS['chapter'],
+];
+
 /**
- * @var WC_Product $product
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-global $product;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+	'chapter' => $chapter,
+] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'Invalid Product' );
+	throw new \Exception( 'product 不是 WC_Product' );
 }
+
 $product_id           = $product->get_id();
-$chapter_id           = (int) get_query_var( Templates::CHAPTER_ID );
+$chapter_id           = (int) $chapter->ID;
 $finished_chapter_ids = CourseUtils::get_finished_chapters( $product_id, return_ids: true );
 
-$args = [
+$args2 = [
 	'posts_per_page' => - 1,
 	'order'          => 'ASC',
 	'orderby'        => 'menu_order',
@@ -29,10 +41,10 @@ $args = [
 	'post_type'      => RegisterCPT::POST_TYPE,
 ];
 
-$chapters = get_children( $args );
+$chapters = get_children( $args2 );
 
 foreach ( $chapters as $ch_chapter_id => $chapter ) :
-	$args = [
+	$args3 = [
 		'posts_per_page' => - 1,
 		'order'          => 'ASC',
 		'orderby'        => 'menu_order',
@@ -41,7 +53,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		'post_type'      => RegisterCPT::POST_TYPE,
 	];
 
-	$sub_chapters  = get_children( $args );
+	$sub_chapters  = get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$video_length = (int) get_post_meta( $sub_chapter->ID, 'video_length', true );
@@ -49,7 +61,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		$icon         = $is_finished ? 'icon/check' : 'icon/video';
 
 		$children_html .= sprintf(
-			'
+			/*html*/'
 				<a href="%1$s">
 					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %2$s">
 						<div id="%3$s" class="w-8 flex justify-center items-start">%4$s</div>
@@ -71,17 +83,17 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 
 
 	printf(
-		'
+		/*html*/'
     <div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
-		<input type="checkbox" checked="checked"/>
-		<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
-			<span>%1$s</span>
-			<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+			<input type="checkbox" checked="checked"/>
+			<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
+				<span>%1$s</span>
+				<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+			</div>
+			<div class="pc-collapse-content bg-gray-50 p-0">
+						%3$s
+			</div>
 		</div>
-		<div class="pc-collapse-content bg-gray-50 p-0">
-	        %3$s
-		</div>
-	</div>
     ',
 		$chapter->post_title,
 		count( $sub_chapters ),

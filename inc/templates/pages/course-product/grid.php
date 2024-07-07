@@ -52,6 +52,11 @@ if ( empty( $filtered_courses ) ) {
 
 echo '<div class="grid grid-cols-3 gap-6">';
 foreach ( $filtered_courses as $course ) {
-	Templates::get( 'card/available', $course );
+	Templates::get(
+		'card/available',
+		[
+			'product' => $course,
+		]
+		);
 }
 echo '</div>';

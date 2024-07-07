@@ -5,16 +5,25 @@
 
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $product
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-global $product;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'Invalid Product' );
+	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$args = [
+$args2 = [
 	'posts_per_page' => - 1,
 	'order'          => 'ASC',
 	'orderby'        => 'menu_order',
@@ -23,10 +32,10 @@ $args = [
 	'post_type'      => RegisterCPT::POST_TYPE,
 ];
 
-$chapters = \get_children( $args );
+$chapters = \get_children( $args2 );
 
 foreach ( $chapters as $chapter_id => $chapter ) :
-	$args = [
+	$args3 = [
 		'posts_per_page' => - 1,
 		'order'          => 'ASC',
 		'orderby'        => 'menu_order',
@@ -35,7 +44,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		'post_type'      => RegisterCPT::POST_TYPE,
 	];
 
-	$sub_chapters  = \get_children( $args );
+	$sub_chapters  = \get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$children_html .= sprintf(

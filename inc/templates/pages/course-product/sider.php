@@ -28,7 +28,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 <div class="w-[20rem] flex flex-col gap-6">
 
-	<?php Templates::get( 'card/single-product', $product ); ?>
+	<?php Templates::get( 'card/single-product' ); ?>
 	<?php
 	$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids:true );
 
@@ -42,7 +42,12 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 		if ( 'publish' !== $bundle_product->get_status() ) {
 			continue;
 		}
-		Templates::get( 'card/bundle-product', $bundle_product );
+		Templates::get(
+			'card/bundle-product',
+			[
+				'bundle_product' => $bundle_product,
+			]
+			);
 	}
 	?>
 

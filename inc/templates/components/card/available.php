@@ -7,13 +7,24 @@
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$product = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
+
 $product_id  = $product->get_id();
 $chapter_ids = CourseUtils::get_sub_chapters($product_id, return_ids :true);
 
@@ -30,7 +41,7 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 
 
 printf(
-	'
+	/*html*/'
 <div class="pc-course-card">
 	<a href="%4$s">
 		<div class="pc-course-card__image-wrap group">

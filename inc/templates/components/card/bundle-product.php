@@ -1,16 +1,29 @@
 <?php
+/**
+ * Bundle product card
+ */
 
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Templates\Templates;
 
+$default_args = [
+	'bundle_product' => null, // BundleProduct
+];
+
 /**
- * @var BundleProduct $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$bundle_product = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'bundle_product' => $bundle_product,
+] = $args;
 
 if ( ! ( $bundle_product instanceof BundleProduct ) ) {
 	throw new \Exception( 'product 不是 BundleProduct' );
 }
+
 
 $product_ids = $bundle_product->get_product_ids();
 
@@ -28,7 +41,7 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 	</h6>
 
 	<?php
-	Templates::get( 'divider/base' );
+	Templates::get( 'divider' );
 	?>
 
 	<div class="mb-6 text-sm">
@@ -44,11 +57,16 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 		?>
 		<div>
 		<?php
-		Templates::get( 'course-product/list', null );
+		Templates::get(
+			'course-product/list',
+			[
+				'product' => $product,
+			]
+			);
 		?>
 		</div>
 		<?php
-		Templates::get( 'divider/base' );
+		Templates::get( 'divider' );
 		?>
 
 		<?php
@@ -59,7 +77,7 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 	<div class="flex gap-3 justify-between items-end">
 		<?php
 		Templates::get(
-			'price/base',
+			'price',
 			[
 				'product' => $bundle_product,
 				'size'    => 'small',

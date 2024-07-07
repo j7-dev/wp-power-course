@@ -1,9 +1,22 @@
 <?php
 /**
- * @var \WP_User $args
+ * User component
  */
 
-$user = $args;
+$default_args = [
+	'user' => wp_get_current_user(),
+];
+
+/**
+ * @var array $args
+ * @phpstan-ignore-next-line
+ */
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'user' => $user,
+] = $args;
+
 
 if ( ! ( $user instanceof \WP_User ) ) {
 	throw new \Exception( 'user 不是 WP_User' );

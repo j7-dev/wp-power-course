@@ -41,7 +41,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
 				$teacher = \get_user_by( 'id', $teacher_id );
-				Templates::get( 'user/base', $teacher );
+				Templates::get( 'user', $teacher );
 			}
 			?>
 		</div>
@@ -59,7 +59,7 @@ if ( ! is_array( $teacher_ids ) ) {
 		$rating       = $product->get_average_rating();
 		$review_count = $product->get_review_count();
 		Templates::get(
-			'rate/base',
+			'rate',
 			[
 				'show_before' => true,
 				'value'       => $rating,
