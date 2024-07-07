@@ -30,7 +30,7 @@ if ( ! $current_user_id ) {
 }
 
 
-global $product, $chapter;
+global $product;
 
 get_header();
 

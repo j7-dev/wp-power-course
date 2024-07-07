@@ -1,5 +1,6 @@
 <?php
 /**
+ * MyAccount > grid
  * TODO 分頁
  */
 
@@ -9,13 +10,13 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 /**
  * @var array{'type':string} $args
  */
-$default_props = [
+$default_args = [
 	'type' => 'all', // all, ready, not-ready
 ];
 
-$props = \wp_parse_args( $args, $default_props );
+$args = \wp_parse_args( $args, $default_args );
 
-$course_type = $props['type'];
+$course_type = $args['type'] ?? 'all';
 
 $current_user_id  = \get_current_user_id();
 $user_avl_courses = CourseUtils::get_avl_courses_by_user();

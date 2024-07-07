@@ -1,13 +1,29 @@
 <?php
+/**
+ * Sidebar for course product
+ */
 
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$product = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
 ?>
 
 <div class="w-[20rem] flex flex-col gap-6">

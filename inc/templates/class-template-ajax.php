@@ -111,6 +111,7 @@ final class TemplateAjax {
 		);
 
 		// 重要：總是在 AJAX 函數結束時調用 wp_die()
+		// @phpstan-ignore-next-line
 		\wp_die();
 	}
 }

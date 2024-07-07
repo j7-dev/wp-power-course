@@ -1,5 +1,4 @@
 <?php
-
 /**
  * 覆寫 WooCommerce 模板
  */
@@ -49,7 +48,7 @@ final class Templates {
 	 * @param bool   $echo 是否輸出
 	 * @param bool   $load_once 是否只載入一次
 	 *
-	 * @return ?string|null
+	 * @return ?string
 	 * @throws \Exception 如果模板文件不存在.
 	 */
 	public static function get(
@@ -155,9 +154,9 @@ final class Templates {
 	/**
 	 * Add query var
 	 *
-	 * @param array $vars Vars.
+	 * @param array<string> $vars Vars.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function add_query_var( array $vars ): array {
 		$vars[] = self::COURSE_SLUG;
@@ -173,6 +172,7 @@ final class Templates {
 	 * @param array $rules Rules.
 	 *
 	 * @return array
+	 * @phpstan-ignore-next-line
 	 */
 	public function custom_post_type_rewrite_rules( array $rules ): array {
 		global $wp_rewrite;
@@ -187,33 +187,41 @@ final class Templates {
 	 *
 	 * @param string $template Template.
 	 */
-	public function load_custom_template( string $template ) {
+	public function load_custom_template( string $template ): string {
 		// 使用自定義的模板
 		$items = [
 			[
-				'slug' => \get_query_var( self::COURSE_SLUG ),
-				'path' => Plugin::$dir . '/inc/templates/course-entry.php',
+				'slug'   => \get_query_var( self::COURSE_SLUG ),
+				'slug_2' => \get_query_var( self::CHAPTER_ID ),
+				'path'   => Plugin::$dir . '/inc/templates/course-entry.php',
 			],
 			[
-				'slug' => \get_query_var( self::CLASSROOM_SLUG ),
-				'path' => Plugin::$dir . '/inc/templates/classroom-entry.php',
+				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
+				'slug_2' => \get_query_var( self::CHAPTER_ID ),
+				'path'   => Plugin::$dir . '/inc/templates/classroom-entry.php',
 			],
 		];
 
 		foreach ( $items as $item ) {
-			$slug = $item['slug'];
-			$path = $item['path'];
+			$slug   = $item['slug'];
+			$slug_2 = $item['slug_2'];
+			$path   = $item['path'];
 
 			if ( $slug ) {
 				if ( file_exists( $path ) ) {
 					global $product;
+					// @phpstan-ignore-next-line
 					$product_post = \get_page_by_path( $slug, OBJECT, 'product' );
 					if ( ! $product_post ) {
 						\wp_safe_redirect( \home_url( '/404' ) );
 						exit;
 					}
 
-					$product = \wc_get_product( $product_post->ID );
+					$GLOBALS['product'] = \wc_get_product( $product_post->ID );
+
+					if ( $slug_2 ) {
+						$GLOBALS['chapter'] = \get_post( $slug_2);
+					}
 
 					// 如果商品不是課程，則不要載入模板
 					$is_course_product = CourseUtils::is_course_product( $product );

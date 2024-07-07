@@ -23,5 +23,5 @@ Templates::get(
 	]
 );
 
-Templates::get( 'course-product/header', $product );
+Templates::get( 'course-product/header' );
 echo '</div>';

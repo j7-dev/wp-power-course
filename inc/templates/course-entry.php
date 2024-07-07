@@ -27,18 +27,16 @@ get_header(); ?>
 	<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
 		<!-- Header -->
-		<?php Templates::get( 'course-product/header', $product, true, true ); ?>
+		<?php Templates::get( 'course-product/header', null, true, true ); ?>
 
 		<div class="flex flex-col md:flex-row gap-8">
 			<!-- Body -->
-			<?php Templates::get( 'course-product/body', $product, true, true ); ?>
+			<?php Templates::get( 'course-product/body', null, true, true ); ?>
 
 			<!-- Sider -->
-			<?php Templates::get( 'course-product/sider', $product, true, true ); ?>
+			<?php Templates::get( 'course-product/sider', null, true, true ); ?>
 		</div>
 
 	</div>
 <?php
 get_footer();
-
-/* Omit closing PHP tag at the end of PHP files to avoid "headers already sent" issues. */

@@ -1,9 +1,12 @@
 <?php
+/**
+ * Course Info component
+ */
 
 use J7\PowerCourse\Templates\Templates;
 
 /**
- * @var array $args
+ * @var array{icon:string, label:string, value:string}[] $args
  */
 $items = $args;
 
@@ -15,17 +18,17 @@ if ( ! is_array( $items ) ) {
 echo '<div class="w-full grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">';
 foreach ( $items as $index => $item ) :
 	printf(
-		'
+		/*html*/'
         <div class="flex items-center gap-3">
-			<div class="bg-blue-500 rounded-xl h-8 w-8 flex items-center justify-center">
+					<div class="bg-blue-500 rounded-xl h-8 w-8 flex items-center justify-center">
 		        %1$s
-            </div>
-            <div>
-                %2$s
-            </div>
-            <div class="font-semibold">
-                %3$s
-            </div>
+          </div>
+					<div>
+							%2$s
+					</div>
+					<div class="font-semibold">
+							%3$s
+					</div>
         </div>
         ',
 		Templates::safe_get(

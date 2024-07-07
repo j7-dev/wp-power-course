@@ -1,12 +1,29 @@
 <?php
+/**
+ * Course Product > body
+ */
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$product = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
+
 ?>
 <div class="flex-1">
 
@@ -67,8 +84,8 @@ $product = $args;
 		?>
 	</div>
 	<!-- Tabs -->
-	<?php Templates::get( 'course-product/tabs', $product, true, true ); ?>
+	<?php Templates::get( 'course-product/tabs', null, true, true ); ?>
 
 	<!-- Footer -->
-	<?php Templates::get( 'course-product/footer', $product, true, true ); ?>
+	<?php Templates::get( 'course-product/footer', null, true, true ); ?>
 </div>

@@ -44,7 +44,7 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 		?>
 		<div>
 		<?php
-		Templates::get( 'course-product/list', $product );
+		Templates::get( 'course-product/list', null );
 		?>
 		</div>
 		<?php

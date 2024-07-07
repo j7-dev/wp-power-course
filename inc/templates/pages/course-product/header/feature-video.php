@@ -1,12 +1,28 @@
 <?php
+/**
+ * Feature video for course product
+ */
 
 use J7\PowerCourse\Templates\Templates;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $product
- * @var WC_Product $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$product      = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
+
 $product_id   = $product->get_id();
 $product_name = $product->get_name();
 $teacher_ids  = \get_post_meta( $product_id, 'teacher_ids', false );
@@ -20,7 +36,7 @@ $library_id = \get_option( 'library_id', '244459' );
 
 $feature_video = \get_post_meta( $product_id, 'feature_video', true );
 $image_id      = $product->get_image_id();
-$image_url     = \wp_get_attachment_image_url( $image_id, 'full' );
+$image_url     = \wp_get_attachment_image_url( (int) $image_id, 'full' );
 
 if ( ! ! $feature_video ) {
 	Templates::get(

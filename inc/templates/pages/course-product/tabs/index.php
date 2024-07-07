@@ -1,11 +1,28 @@
 <?php
+/**
+ * Course Tabs component
+ */
 
 use J7\PowerCourse\Templates\Templates;
 
+$default_args = [
+	'product' => $GLOBALS['product'],
+];
+
 /**
- * @var WC_Product $args
+ * @var array $args
+ * @phpstan-ignore-next-line
  */
-$product     = $args;
+$args = wp_parse_args( $args, $default_args );
+
+[
+	'product' => $product,
+] = $args;
+
+if ( ! ( $product instanceof \WC_Product ) ) {
+	throw new \Exception( 'product 不是 WC_Product' );
+}
+
 $description = $product->get_description();
 $accordion   = Templates::get( 'collapse/chapter', args: $product, echo: false );
 $qa          = Templates::get( 'collapse/qa', args: $product, echo: false );
