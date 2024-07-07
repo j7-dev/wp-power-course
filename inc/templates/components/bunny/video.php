@@ -49,13 +49,13 @@ $iframe_url = add_query_arg(
 	$base_url
 );
 
+echo '<div style="position:relative;padding-top:56.25%;">';
 printf(
 	/*html*/'
-	<div style="position:relative;padding-top:56.25%;">
-		<iframe class="border-0 absolute top-0 left-0 w-full h-full %2$s" src="%1$s" loading="lazy"
+	<iframe class="border-0 absolute top-0 left-0 w-full h-full %2$s" src="%1$s" loading="lazy"
 			allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
-			allowfullscreen="true"></iframe>
-	</div>',
+			allowfullscreen="true"></iframe>',
 	$iframe_url,
 	$class
 );
+echo '</div>';
