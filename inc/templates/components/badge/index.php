@@ -8,18 +8,13 @@ use J7\PowerCourse\Templates\Templates;
 $default_props = [
 	'type'          => '', // primary | secondary | neutral | link | ghost | accent | info | success | warning | error
 	'outline'       => false,
-	'size'          => '', // xs | sm  | lg
-	'children'      => '按鈕',
+	'size'          => 'md', // xs | sm | md | lg
+	'children'      => '',
 	'icon'          => '',
 	'icon_class'    => ' h-4 w-4 fill-current group-hover:fill-white transition-fill duration-300 ease-in-out ',
 	'icon_position' => 'start', // start | end
-	'disabled'      => false,
-	'href'          => '',
 	'class'         => '',
-	'active'        => false,
-	'glass'         => false,
 	'attr'          => '',
-	'shape'         => '', // square | circle
 	'loading'       => false,
 ];
 
@@ -37,33 +32,23 @@ $args = wp_parse_args( $args, $default_props );
 	'icon'     => $icon,
 	'icon_class'     => $icon_class,
 	'icon_position'     => $icon_position,
-	'disabled' => $disabled,
-	'href'     => $href,
 	'class'    => $class,
-	'active'   => $active,
-	'glass'     => $glass,
 	'attr'   => $attr,
-	'shape'    => $shape,
 	'loading'  => $loading,
 ] = $args;
 
-$href = $href ? esc_url( $href ) : '';
 
 $class_arr = [
 	$btn_type,
 	$outline ? 'outline' : '',
 	$size,
-	$disabled ? 'disabled' : '',
-	$active ? 'active' : '',
-	$glass ? 'glass' : '',
-	$shape,
 ];
 
 $class_arr = array_filter( $class_arr );
-$class_arr = array_map( fn( $class_name ) => "pc-btn-$class_name", $class_arr);
+$class_arr = array_map( fn( $class_name ) => "pc-badge-$class_name", $class_arr);
 $classes   = $class . ' ' . implode( ' ', $class_arr ) . ( $outline ? ' border-solid ' : '' );
 
-$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out"></span>' : Templates::safe_get(
+$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out "></span>' : Templates::safe_get(
 	"icon/{$icon}",
 	[
 		'class' => $icon_class,
@@ -78,9 +63,7 @@ $content = sprintf(
 );
 
 printf(
-	'<%1$s class="group pc-btn %3$s" %4$s>%5$s</%2$s>',
-$href ? "a href=\"{$href}\"" : 'button type="button"',
-$href ? 'a' : 'button',
+	'<div class="pc-badge %1$s" %2$s>%3$s</div>',
 $classes,
 $attr,
 $content
