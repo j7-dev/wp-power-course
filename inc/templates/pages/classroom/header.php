@@ -28,6 +28,7 @@ if (!$is_this_chapter_finished) {
 	$finish_chapter_button_html = sprintf(
 		'<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4">
 			我已完成此單元
+			<span class="pc-loading pc-loading-spinner w-4 h-4 hidden"></span>
 		</button>
 		<dialog id="finish-chapter__dialog" class="pc-modal">
 			<div class="pc-modal-box">
@@ -90,14 +91,28 @@ if (count($chapter_ids) > 0) {
 printf(
 	'
 <div class="py-4 px-6 flex justify-between items-center">
-	<h2 class="text-base text-bold tracking-wide my-0">%1$s</h2>
-	<div class="flex gap-4">
+  <div class="flex gap-4 items-end">
+		<h2 id="classroom-chapter_title" class="text-base text-bold tracking-wide my-0">%1$s</h2>
 		%2$s
+	</div>
+	<div class="flex gap-4">
 		%3$s
+		%4$s
 	</div>
 </div>
 ',
 	$name,
+	Templates::get(
+		'badge',
+		[
+			'type'     => $is_this_chapter_finished ? 'secondary' : 'accent',
+			'children' => $is_this_chapter_finished ? '已完成' : '未完成',
+			'size'     => 'sm',
+			'class'    => 'text-white text-xs',
+			'attr'     => ' id="classroom-chapter_title-badge" ',
+		],
+		false
+		),
 	$finish_chapter_button_html,
 	$next_chapter_button_html
 );

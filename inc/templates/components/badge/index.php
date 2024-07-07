@@ -1,15 +1,19 @@
 <?php
 /**
  * Button component
+ * reserve class
+ * pc-badge-primary pc-badge-secondary pc-badge-neutral pc-badge-link pc-badge-ghost pc-badge-accent pc-badge-info pc-badge-success pc-badge-warning pc-badge-error
+ * pc-badge-outline
+ * pc-badge-xs pc-badge-sm pc-badge-md pc-badge-lg
  */
 
 use J7\PowerCourse\Templates\Templates;
 
 $default_props = [
-	'type'          => '', // primary | secondary | neutral | link | ghost | accent | info | success | warning | error
+	'type'          => 'primary', // primary | secondary | neutral | link | ghost | accent | info | success | warning | error
 	'outline'       => false,
 	'size'          => 'md', // xs | sm | md | lg
-	'children'      => '',
+	'children'      => 'badge',
 	'icon'          => '',
 	'icon_class'    => ' h-4 w-4 fill-current group-hover:fill-white transition-fill duration-300 ease-in-out ',
 	'icon_position' => 'start', // start | end
@@ -43,6 +47,7 @@ $class_arr = [
 	$outline ? 'outline' : '',
 	$size,
 ];
+
 
 $class_arr = array_filter( $class_arr );
 $class_arr = array_map( fn( $class_name ) => "pc-badge-$class_name", $class_arr);

@@ -1,6 +1,14 @@
 <?php
 /**
  * Button component
+ * reserve class
+ * pc-btn-primary pc-btn-secondary pc-btn-neutral pc-btn-link pc-btn-ghost pc-btn-accent pc-btn-info pc-btn-success pc-btn-warning pc-btn-error
+ * pc-btn-outline
+ * pc-btn-xs pc-btn-sm pc-btn-lg
+ * pc-btn-disabled
+ * pc-btn-active
+ * pc-btn-glass
+ * pc-btn-square pc-btn-circle
  */
 
 use J7\PowerCourse\Templates\Templates;

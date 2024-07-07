@@ -10,14 +10,14 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * @var WC_Product $product
- * @var WP_Post $chapter
  */
-global $product, $chapter;
+global $product;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'Invalid Product' );
 }
 $product_id           = $product->get_id();
+$chapter_id           = (int) get_query_var( Templates::CHAPTER_ID );
 $finished_chapter_ids = CourseUtils::get_finished_chapters( $product_id, return_ids: true );
 
 $args = [
@@ -31,12 +31,12 @@ $args = [
 
 $chapters = get_children( $args );
 
-foreach ( $chapters as $chapter_id => $chapter ) :
+foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$args = [
 		'posts_per_page' => - 1,
 		'order'          => 'ASC',
 		'orderby'        => 'menu_order',
-		'post_parent'    => $chapter_id,
+		'post_parent'    => $ch_chapter_id,
 		'post_status'    => 'publish',
 		'post_type'      => RegisterCPT::POST_TYPE,
 	];
@@ -48,20 +48,21 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		$is_finished  = in_array( (string) $sub_chapter->ID, $finished_chapter_ids, true);
 		$icon         = $is_finished ? 'icon/check' : 'icon/video';
 
-		/** @noinspection HtmlUnknownTarget */
 		$children_html .= sprintf(
 			'
 				<a href="%1$s">
-					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer">
-						<div class="w-8 flex justify-center items-start">%2$s</div>
+					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %2$s">
+						<div id="%3$s" class="w-8 flex justify-center items-start">%4$s</div>
 						<div class="flex-1 text-gray-800 hover:text-gray-600">
-							<p class="mb-1 font-medium">%3$s</p>
-							<p class="text-gray-400 text-xs m-0 font-light">%4$s</p>
+							<p class="mb-1 font-medium">%5$s</p>
+							<p class="text-gray-400 text-xs m-0 font-light">%6$s</p>
 						</div>
 					</div>
 				</a>
                     ',
 			site_url( "classroom/{$product->get_slug()}/{$sub_chapter->ID}" ),
+			$sub_chapter->ID === $chapter_id ? 'bg-primary/10' : '',
+			"classroom__sider-collapse__chapter-{$sub_chapter->ID}",
 			Templates::get( $icon, null, false ),
 			$sub_chapter->post_title,
 			Base::get_video_length_by_seconds( $video_length )
