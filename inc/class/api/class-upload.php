@@ -105,15 +105,34 @@ final class Upload {
 
 		$_FILES['0'] = $file;
 
+		// 獲取圖片尺寸
+		$image_info = getimagesize($file['tmp_name']);
+
+		if ($image_info === false) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'upload_error',
+					'message' => '無法取得圖片尺寸',
+					'data'    => $file,
+				],
+				400
+			);
+		}
+		$width  = $image_info[0];
+		$height = $image_info[1];
+
 		if ( $upload_only ) {
 			// 直接上傳到 wp-content/uploads 不會新增到媒體庫
 			$upload_overrides = [ 'test_form' => false ];
 			$upload_result    = \wp_handle_upload( $file, $upload_overrides );
+
 			unset( $upload_result['file'] );
-			$upload_result['id']   = null;
-			$upload_result['type'] = $file['type'];
-			$upload_result['name'] = $file['name'];
-			$upload_result['size'] = $file['size'];
+			$upload_result['id']     = null;
+			$upload_result['type']   = $file['type'];
+			$upload_result['name']   = $file['name'];
+			$upload_result['size']   = $file['size'];
+			$upload_result['width']  = $width;
+			$upload_result['height'] = $height;
 			if ( isset( $upload_result['error'] ) ) {
 				return new \WP_REST_Response(
 					[
@@ -144,11 +163,13 @@ final class Upload {
 			}
 
 			$upload_result = [
-				'id'   => (string) $attachment_id,
-				'url'  => \wp_get_attachment_url( $attachment_id ),
-				'type' => $file['type'],
-				'name' => $file['name'],
-				'size' => $file['size'],
+				'id'     => (string) $attachment_id,
+				'url'    => \wp_get_attachment_url( $attachment_id ),
+				'type'   => $file['type'],
+				'name'   => $file['name'],
+				'size'   => $file['size'],
+				'width'  => $width,
+				'height' => $height,
 			];
 		}
 
@@ -186,16 +207,34 @@ final class Upload {
 					'size'     =>$files['size'][ $key ],
 				];
 
+				// 獲取圖片尺寸
+				$image_info = getimagesize($file['tmp_name']);
+
+				if ($image_info === false) {
+					return new \WP_REST_Response(
+						[
+							'code'    => 'upload_error',
+							'message' => '無法取得圖片尺寸',
+							'data'    => $file,
+						],
+						400
+					);
+				}
+				$width  = $image_info[0];
+				$height = $image_info[1];
+
 				$_FILES[ $key ] = $file;
 
 				if ( $upload_only ) {
 					// 直接上傳到 wp-content/uploads 不會新增到媒體庫
 					$upload_result = \wp_handle_upload( $file, $upload_overrides );
 					unset( $upload_result['file'] );
-					$upload_result['id']   = null;
-					$upload_result['type'] = $file['type'];
-					$upload_result['name'] = $file['name'];
-					$upload_result['size'] = $file['size'];
+					$upload_result['id']     = null;
+					$upload_result['type']   = $file['type'];
+					$upload_result['name']   = $file['name'];
+					$upload_result['size']   = $file['size'];
+					$upload_result['width']  = $width;
+					$upload_result['height'] = $height;
 					if ( isset( $upload_result['error'] ) ) {
 						return new \WP_REST_Response(
 							[
@@ -226,11 +265,13 @@ final class Upload {
 					}
 
 					$upload_result = [
-						'id'   => (string) $attachment_id,
-						'url'  => \wp_get_attachment_url( $attachment_id ),
-						'type' => $file['type'],
-						'name' => $file['name'],
-						'size' => $file['size'],
+						'id'     => (string) $attachment_id,
+						'url'    => \wp_get_attachment_url( $attachment_id ),
+						'type'   => $file['type'],
+						'name'   => $file['name'],
+						'size'   => $file['size'],
+						'width'  => $width,
+						'height' => $height,
 					];
 				}
 
