@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+
 use J7\PowerCourse\Templates\Templates;
 
 global $product;

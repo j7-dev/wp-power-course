@@ -6,7 +6,7 @@
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 	'label'   => '上課進度',
 ];
 
@@ -29,11 +29,13 @@ $progress = CourseUtils::get_course_progress( $product );
 
 printf(
 	/*html*/'
-<div class="flex gap-2 bg-gray-100 px-12 py-4 items-center">
-	<span class="text-gray-400 text-sm text-nowrap">%1$s</span>
-	<span class="text-primary text-sm text-nowrap font-bold">%2$s%%</span>
 	<progress class="pc-progress pc-progress-primary flex-1" value="%2$s" max="100"></progress>
-</div>',
+	<div class="flex gap-2 items-center">
+		<span class="text-gray-400 text-xs text-nowrap">%1$s</span>
+		<span class="text-primary text-xs text-nowrap font-bold">%2$s%%</span>
+	</div>
+
+',
 $label,
 	$progress
 );

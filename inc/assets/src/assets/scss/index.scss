@@ -2,12 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-// daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
-div .pc-rating input:checked~input,
-div .pc-rating input[aria-checked="true"]~input {
-	--tw-bg-opacity: .2 !important;
-}
+@import "reset";
 
+// daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
+div .pc-rating input:checked ~ input,
+div .pc-rating input[aria-checked="true"] ~ input {
+	--tw-bg-opacity: 0.2 !important;
+}
 
 .ajax_add_to_cart.loading {
 	svg {
@@ -15,23 +16,18 @@ div .pc-rating input[aria-checked="true"]~input {
 		display: none !important;
 	}
 
-
 	&:hover {
-
 		// hover 時 loading 顯示為白色
 		&:after {
 			color: #fff;
 		}
 	}
-
 }
 
 // 不知道為什麼背景有填色
 .pc-btn-outline {
-	background-color: transparent
+	background-color: transparent;
 }
-
-
 
 // My Account 頁面的課程卡片樣式
 .pc-course-card {
@@ -44,10 +40,9 @@ div .pc-rating input[aria-checked="true"]~input {
 		}
 
 		&::after {
-			content: url('../svg/play.svg');
+			content: url("../svg/play.svg");
 			@apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-50 tracking-wide cursor-pointer transition duration-300 ease-in-out;
 		}
-
 	}
 
 	&__image {
@@ -66,9 +61,41 @@ div .pc-rating input[aria-checked="true"]~input {
 	}
 
 	&__teachers {
-		margin: 0rem 0rem 0.5rem 0rem !important;
+		margin: 0rem 0rem 0rem 0rem !important;
 		font-weight: 300 !important;
 		font-size: 0.75rem !important;
 	}
+}
 
+// My Account 我的學習 icon
+
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
+	a {
+		&::before {
+			content: "";
+			aspect-ratio: 0.7576;
+			background: url("../svg/learn.svg") no-repeat center center;
+			background-size: contain;
+		}
+	}
+
+	&.is-active {
+		a {
+			&::before {
+				background: url("../svg/learn-white.svg") no-repeat center center;
+			}
+		}
+	}
+
+	&:hover {
+		&::before {
+			background: url("../svg/learn-white.svg") no-repeat center center;
+		}
+	}
+}
+
+// 水平翻轉
+.flip-horizontal {
+	transform: scale(-1, 1);
+	transition: transform 0.3s ease;
 }

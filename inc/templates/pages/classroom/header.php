@@ -6,9 +6,11 @@
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
+	'chapter' => $GLOBALS['chapter'],
 ];
 
 /**
@@ -19,15 +21,28 @@ $args = wp_parse_args( $args, $default_args );
 
 [
 	'product' => $product,
+	'chapter'    => $chapter,
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$name               = $product->get_name();
 $product_id         = $product->get_id();
 $current_chapter_id = (int) \get_query_var( Templates::CHAPTER_ID );
+
+$back_to_my_course_html = sprintf(
+	/*html*/'
+		<a
+			href="%1$s"
+			class="hover:opacity-75 transition duration-300 contents lg:hidden"
+		>
+			<img class="w-6 h-6" src="%2$s" />
+		</a>
+',
+	\wc_get_account_endpoint_url( 'courses' ),
+	Plugin::$url . '/inc/assets/src/assets/svg/learn.svg',
+);
 
 // finish button html
 $user_id                    = \get_current_user_id();
@@ -36,24 +51,11 @@ $is_this_chapter_finished   = in_array( (string) $current_chapter_id, $finished_
 $finish_chapter_button_html = '';
 if (!$is_this_chapter_finished) {
 	$finish_chapter_button_html = sprintf(
-		'<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4">
+		/*html*/'
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base">
 			我已完成此單元
-			<span class="pc-loading pc-loading-spinner w-4 h-4 hidden"></span>
+			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 hidden"></span>
 		</button>
-		<dialog id="finish-chapter__dialog" class="pc-modal">
-			<div class="pc-modal-box">
-				<h3 id="finish-chapter__dialog__title" class="text-lg font-bold"></h3>
-				<p id="finish-chapter__dialog__message" class="py-4"></p>
-				<div class="pc-modal-action">
-					<form method="dialog">
-						<button class="pc-btn pc-btn-sm pc-btn-primary text-white px-4">關閉</button>
-					</form>
-				</div>
-			</div>
-			<form method="dialog" class="pc-modal-backdrop">
-				<button class="opacity-0">close</button>
-			</form>
-		</dialog>
 		',
 		$product_id,
 		$current_chapter_id
@@ -70,14 +72,13 @@ $next_chapter_id = $chapter_ids[ $index + 1 ] ?? false;
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
-		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-4  text-white cursor-not-allowed opacity-70" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
+		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
-			'
-		<a href="%1$s">
-				<button class="pc-btn pc-btn-primary pc-btn-sm px-4 text-white">
+			/*html*/'
+		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
 					前往下一單元
-					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg class="w-3 sm:w-4 h-3 sm:h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
 						<g id="SVGRepo_iconCarrier">
@@ -85,7 +86,6 @@ if (count($chapter_ids) > 0) {
 							<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
 						</g>
 					</svg>
-				</button>
 		</a>
 ',
 			site_url( 'classroom' ) . sprintf(
@@ -99,19 +99,20 @@ if (count($chapter_ids) > 0) {
 
 // render
 printf(
-	'
-<div class="py-4 px-6 flex justify-between items-center">
-  <div class="flex gap-4 items-end">
-		<h2 id="classroom-chapter_title" class="text-base text-bold tracking-wide my-0">%1$s</h2>
+	/*html*/'
+<div id="pc-classroom-header" class="bg-white py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-10" style="position:fixed;">
+  <div class="flex flex-nowrap gap-4 items-end">
+		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1">%1$s</h2>
 		%2$s
 	</div>
-	<div class="flex gap-4">
+	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
 		%3$s
 		%4$s
+		%5$s
 	</div>
 </div>
 ',
-	$name,
+$chapter->post_title,
 	Templates::get(
 		'badge',
 		[
@@ -124,5 +125,6 @@ printf(
 		false
 		),
 	$finish_chapter_button_html,
+	$back_to_my_course_html,
 	$next_chapter_button_html
 );

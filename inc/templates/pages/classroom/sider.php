@@ -4,10 +4,11 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Plugin;
+
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 ];
 
 /**
@@ -24,31 +25,34 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-// $chpters = \get_children(
-// [
-// 'post_parent' => $product->get_id(),
-// 'post_type'   => RegisterCPT::POST_TYPE,
-// 'numberposts' => - 1,
-// 'post_status' => 'any',
-// 'orderby'     => 'menu_order',
-// 'order'       => 'ASC',
-// ]
-// );
-$count_all_chapters       = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
-$course_length_in_minutes = CourseUtils::get_course_length( $product, 'minute' );
 
 printf(
-	'
-<div id="pc-classroom-sider" class="fixed w-[25rem] left-0 overflow-x-scroll bg-white z-[99999]"
-	style="border-right: 1px solid #eee;">
-	<div class="flex justify-between items-center p-4">
-		<span class="text-base tracking-wide font-bold">課程單元</span>
-		<span class="text-sm text-gray-400">%1$s 個單元%2$s</span>
+	/*html*/'
+<div id="pc-classroom-sider" class="hidden lg:block w-[25rem] bg-white z-20 left-0 h-screen expended"
+	style="border-right: 1px solid #eee;position:fixed;left:0px">
+	<div id="pc-classroom-sider__main">
+		%1$s
+		<a
+			href="%2$s"
+			class="hover:opacity-75 transition duration-300"
+		>
+			<div class="flex gap-4 items-center py-4 pl-9 absolute bottom-0 w-full">
+				<img class="w-6 h-6" src="%3$s" />
+				<span class="text-gray-600 font-light">
+						回《我的學習》
+				</span>
+			</div>
+		</a>
 	</div>
-	%3$s
 </div>
 ',
-	$count_all_chapters,
-	$course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : '',
-	Templates::get( 'collapse/classroom-chapter', null, false )
+	Templates::get(
+		'classroom/chapters',
+		[
+			'product' => $product,
+		],
+		false
+		),
+	\wc_get_account_endpoint_url( 'courses' ),
+	Plugin::$url . '/inc/assets/src/assets/svg/wp.svg',
 );

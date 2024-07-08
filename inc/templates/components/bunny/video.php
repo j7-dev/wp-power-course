@@ -49,7 +49,7 @@ $iframe_url = add_query_arg(
 	$base_url
 );
 
-echo '<div style="position:relative;padding-top:56.25%;">';
+echo '<div class="relative" style="padding-top:56.25%;">';
 printf(
 	/*html*/'
 	<iframe class="border-0 absolute top-0 left-0 w-full h-full %2$s" src="%1$s" loading="lazy"

@@ -29,7 +29,7 @@ final class TemplateAjax {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_assets' ] );
 
 		$actions = $this->actions;
 		foreach ( $actions as $action ) {
@@ -43,7 +43,7 @@ final class TemplateAjax {
 	 *
 	 * @return void
 	 */
-	public function enqueue_assets(): void {
+	public static function enqueue_assets(): void {
 		\wp_enqueue_script(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/index.js',

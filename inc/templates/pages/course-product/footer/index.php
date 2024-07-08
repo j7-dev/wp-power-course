@@ -10,7 +10,7 @@ $library_id = \get_option( 'library_id', '244459' );
 
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 ];
 
 /**

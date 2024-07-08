@@ -62,7 +62,6 @@ final class Bootstrap {
 	 * @return void
 	 */
 	public static function enqueue_script(): void {
-
 		Vite\enqueue_asset(
 			Plugin::$dir . '/js/dist',
 			'js/src/main.tsx',
