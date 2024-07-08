@@ -14,7 +14,7 @@ $course_tabs        = $props['course_tabs'];
 $default_active_key = $props['default_active_key'];
 
 echo '<div class="mb-12">';
-echo '<div class="flex gap-0 text-gray-400 justify-between [&_.active]:!border-gray-500 [&_.active]:text-gray-500 [&_div:hover]:!border-gray-500 [&_div:hover]:text-gray-500" style="border-bottom: 3px solid #eee;">';
+echo '<div class="flex gap-0 text-gray-400 justify-between [&_.active]:!border-gray-600 [&_.active]:text-gray-600 [&_div:hover]:!border-gray-600 [&_div:hover]:text-gray-600" style="border-bottom: 3px solid #eee;">';
 
 foreach ( $course_tabs as $course_tab ) {
 	printf(
