@@ -8,7 +8,7 @@ use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 ];
 
 /**

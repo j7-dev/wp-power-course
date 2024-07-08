@@ -4,7 +4,7 @@
  */
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 ];
 
 /**

@@ -9,7 +9,7 @@ use J7\PowerCourse\Templates\Templates;
 $library_id = get_option( 'bunny_library_id', '244459' );
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
 ];
 
@@ -45,7 +45,9 @@ Templates::get(
 	]
 );
 
-Templates::get( 'course-product/progress' );
+echo '<div class="bg-gray-100 px-12 py-4">';
+Templates::get( 'progress' );
+echo '</div>';
 
 $course_tabs = [
 	[

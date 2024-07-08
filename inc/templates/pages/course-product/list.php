@@ -6,7 +6,7 @@
 use J7\PowerCourse\Utils\Base;
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 ];
 
 /**

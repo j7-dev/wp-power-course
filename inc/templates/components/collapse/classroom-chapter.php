@@ -9,7 +9,7 @@ use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
-	'product' => $GLOBALS['product'],
+	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
 ];
 
