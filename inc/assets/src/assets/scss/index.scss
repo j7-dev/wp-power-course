@@ -93,3 +93,9 @@ div .pc-rating input[aria-checked="true"] ~ input {
 		}
 	}
 }
+
+// 水平翻轉
+.flip-horizontal {
+	transform: scale(-1, 1);
+	transition: transform 0.3s ease;
+}

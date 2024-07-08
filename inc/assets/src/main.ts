@@ -1,9 +1,11 @@
 import jQuery from 'jquery'
 import '@/assets/scss/index.scss'
-import { finishChapter, dynamicWidth } from './events'
+import { finishChapter, dynamicWidth, toggleSider } from './events'
 	; (function ($) {
 
-		dynamicWidth()
 		// events
+		toggleSider()
 		finishChapter()
+
+		dynamicWidth()
 	})(jQuery)

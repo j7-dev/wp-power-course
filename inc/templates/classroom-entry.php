@@ -42,7 +42,7 @@ if ( ! $current_user_id ) {
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0">
+		<body class="!m-0 min-h-screen">
 			<?php
 			global $product;
 			echo '<div id="pc-classroom-main">';

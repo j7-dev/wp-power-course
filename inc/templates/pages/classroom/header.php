@@ -102,7 +102,7 @@ if (count($chapter_ids) > 0) {
 printf(
 	/*html*/'
 <div id="pc-classroom-header" class="bg-white py-4 px-6 flex justify-between items-center top-0 z-50" style="position:fixed;">
-  <div class="flex gap-4 items-end">
+  <div class="flex gap-4 items-end pl-4">
 		<h2 id="classroom-chapter_title" class="text-base text-bold tracking-wide my-0">%1$s</h2>
 		%2$s
 	</div>
