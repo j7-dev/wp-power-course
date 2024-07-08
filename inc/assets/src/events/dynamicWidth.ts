@@ -15,7 +15,6 @@ export const dynamicWidth = () => {
 	store.set(windowAtom, () => ({
 		windowWidth: window.innerWidth,
 		isMobile: window.innerWidth < 1080,
-		isSiderExpended: true,
 	}))
 
 	$(window).on('resize', debounce(() => adjustWidth(), 300))

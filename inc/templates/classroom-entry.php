@@ -52,12 +52,11 @@ if ( ! $current_user_id ) {
 			} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
 				Templates::get( '404/not-ready', null );
 			} else {
-				Templates::get( 'classroom/sider', null, true, true );
+				Templates::get( 'classroom/sider', null, true, false );
 				Templates::get( 'classroom/body', null, true, true );
 			}
 
 			echo '</div>';
-
 			?>
 	<script id="wp-power-course-js" src="<?php echo Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version; ?>" ></script>
 </body>

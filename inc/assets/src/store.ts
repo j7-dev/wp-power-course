@@ -13,5 +13,4 @@ export const finishChapterAtom = atom({
 export const windowAtom = atom({
 	windowWidth: window.innerWidth,
 	isMobile: window.innerWidth < 1080,
-	isSiderExpended: true,
 })

@@ -8,7 +8,6 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**

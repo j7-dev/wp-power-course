@@ -32,9 +32,44 @@ $chapter_id = $chapter->ID;
 
 $video_id = get_post_meta( $chapter_id, 'bunny_video_id', true );
 
-echo '<div class="w-full bg-white pt-16">';
+
+$course_tabs = [
+	[
+		'key'     => '0',
+		'label'   => '章節',
+		'content' => Templates::get( 'classroom/chapters', null, false ),
+	],
+
+	/*
+	[
+		'key'     => '1',
+		'label'   => '討論',
+		'content' => '🚧 施工中... 🚧',
+	],
+	[
+		'key'     => '2',
+		'label'   => '教材',
+		'content' => '🚧 施工中... 🚧',
+	],
+	[
+		'key'     => '3',
+		'label'   => '公告',
+		'content' => '🚧 施工中... 🚧',
+	],
+	[
+		'key'     => '4',
+		'label'   => '評價',
+		'content' => '🚧 施工中... 🚧',
+	],
+	*/
+
+];
+
+echo '<div class="w-full bg-white pt-[3.25rem] lg:pt-16">';
 
 Templates::get( 'classroom/header' );
+
+echo '<div class="z-[15] sticky lg:relative top-0">';
 
 Templates::get(
 	'bunny/video',
@@ -44,44 +79,49 @@ Templates::get(
 		'class'      => 'rounded-none',
 	]
 );
-
 echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
 Templates::get( 'progress' );
 echo '</div>';
 
-/*
-TODO  🚧 施工中... 🚧
-
-$course_tabs = [
-[
-'key'     => '1',
-'label'   => '討論',
-'content' => '🚧 施工中... 🚧',
-],
-[
-'key'     => '2',
-'label'   => '教材',
-'content' => '🚧 施工中... 🚧',
-],
-[
-'key'     => '3',
-'label'   => '公告',
-'content' => '🚧 施工中... 🚧',
-],
-[
-'key'     => '4',
-'label'   => '評價',
-'content' => '🚧 施工中... 🚧',
-],
-];
-
 Templates::get(
-'tabs',
-[
-'course_tabs'        => $course_tabs,
-'default_active_key' => '1',
-]
-);
-*/
+	'tabs/nav',
+	[
+		'course_tabs'        => $course_tabs,
+		'default_active_key' => '0',
+	]
+	);
 
 echo '</div>';
+
+
+
+
+
+Templates::get(
+'tabs/content',
+[
+	'course_tabs'        => $course_tabs,
+	'default_active_key' => '0',
+]
+);
+
+echo '</div>';
+
+printf(
+/*html*/'
+<dialog id="finish-chapter__dialog" class="pc-modal">
+	<div class="pc-modal-box">
+		<h3 id="finish-chapter__dialog__title" class="text-lg font-bold"></h3>
+		<p id="finish-chapter__dialog__message" class="py-4"></p>
+		<div class="pc-modal-action">
+			<form method="dialog">
+				<button class="pc-btn pc-btn-sm pc-btn-primary text-white px-4">關閉</button>
+			</form>
+		</div>
+	</div>
+	<form method="dialog" class="pc-modal-backdrop">
+		<button class="opacity-0">close</button>
+	</form>
+</dialog>
+'
+);
