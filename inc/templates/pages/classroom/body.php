@@ -45,7 +45,7 @@ Templates::get(
 	]
 );
 
-echo '<div class="bg-gray-100 px-12 py-4">';
+echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
 Templates::get( 'progress' );
 echo '</div>';
 

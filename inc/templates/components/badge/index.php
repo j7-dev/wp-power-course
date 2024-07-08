@@ -68,7 +68,7 @@ $content = sprintf(
 );
 
 printf(
-	'<div class="pc-badge %1$s" %2$s>%3$s</div>',
+	'<div class="pc-badge whitespace-nowrap %1$s" %2$s>%3$s</div>',
 $classes,
 $attr,
 $content

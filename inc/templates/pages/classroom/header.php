@@ -37,7 +37,8 @@ $is_this_chapter_finished   = in_array( (string) $current_chapter_id, $finished_
 $finish_chapter_button_html = '';
 if (!$is_this_chapter_finished) {
 	$finish_chapter_button_html = sprintf(
-		/*html*/'<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4">
+		/*html*/'
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4 w-1/2 lg:w-auto">
 			我已完成此單元
 			<span class="pc-loading pc-loading-spinner w-4 h-4 hidden"></span>
 		</button>
@@ -71,12 +72,11 @@ $next_chapter_id = $chapter_ids[ $index + 1 ] ?? false;
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
-		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-4  text-white cursor-not-allowed opacity-70" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
+		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-4  text-white cursor-not-allowed opacity-70 w-1/2 lg:w-auto" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'
-		<a href="%1$s">
-				<button class="pc-btn pc-btn-primary pc-btn-sm px-4 text-white">
+		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-4 text-white w-1/2 lg:w-auto">
 					前往下一單元
 					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -86,7 +86,6 @@ if (count($chapter_ids) > 0) {
 							<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
 						</g>
 					</svg>
-				</button>
 		</a>
 ',
 			site_url( 'classroom' ) . sprintf(
@@ -101,12 +100,12 @@ if (count($chapter_ids) > 0) {
 // render
 printf(
 	/*html*/'
-<div id="pc-classroom-header" class="bg-white py-4 px-6 flex justify-between items-center top-0 z-50" style="position:fixed;">
-  <div class="flex gap-4 items-end pl-4">
+<div id="pc-classroom-header" class="bg-white py-4 px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-50" style="position:fixed;">
+  <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-end pl-4">
 		<h2 id="classroom-chapter_title" class="text-base text-bold tracking-wide my-0">%1$s</h2>
 		%2$s
 	</div>
-	<div class="flex gap-4">
+	<div class="flex gap-4 justify-between lg:justify-normal mt-4 lg:mt-0">
 		%3$s
 		%4$s
 	</div>
