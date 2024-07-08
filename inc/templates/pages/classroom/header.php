@@ -52,9 +52,9 @@ $finish_chapter_button_html = '';
 if (!$is_this_chapter_finished) {
 	$finish_chapter_button_html = sprintf(
 		/*html*/'
-		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4 w-full lg:w-auto">
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base">
 			我已完成此單元
-			<span class="pc-loading pc-loading-spinner w-4 h-4 hidden"></span>
+			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 hidden"></span>
 		</button>
 		',
 		$product_id,
@@ -72,13 +72,13 @@ $next_chapter_id = $chapter_ids[ $index + 1 ] ?? false;
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
-		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
+		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'
-		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-4 text-white w-full lg:w-auto">
+		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
 					前往下一單元
-					<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg class="w-3 sm:w-4 h-3 sm:h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
 						<g id="SVGRepo_iconCarrier">
@@ -105,7 +105,7 @@ printf(
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1">%1$s</h2>
 		%2$s
 	</div>
-	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
+	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
 		%3$s
 		%4$s
 		%5$s
