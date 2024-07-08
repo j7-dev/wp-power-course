@@ -32,7 +32,7 @@ $chapter_id = $chapter->ID;
 
 $video_id = get_post_meta( $chapter_id, 'bunny_video_id', true );
 
-echo '<div class="w-full bg-white">';
+echo '<div class="w-full bg-white pt-16">';
 
 Templates::get( 'classroom/header' );
 
@@ -49,35 +49,39 @@ echo '<div class="bg-gray-100 px-12 py-4">';
 Templates::get( 'progress' );
 echo '</div>';
 
+/*
+TODO  🚧 施工中... 🚧
+
 $course_tabs = [
-	[
-		'key'     => '1',
-		'label'   => '討論',
-		'content' => '🚧 施工中... 🚧',
-	],
-	[
-		'key'     => '2',
-		'label'   => '教材',
-		'content' => '🚧 施工中... 🚧',
-	],
-	[
-		'key'     => '3',
-		'label'   => '公告',
-		'content' => '🚧 施工中... 🚧',
-	],
-	[
-		'key'     => '4',
-		'label'   => '評價',
-		'content' => '🚧 施工中... 🚧',
-	],
+[
+'key'     => '1',
+'label'   => '討論',
+'content' => '🚧 施工中... 🚧',
+],
+[
+'key'     => '2',
+'label'   => '教材',
+'content' => '🚧 施工中... 🚧',
+],
+[
+'key'     => '3',
+'label'   => '公告',
+'content' => '🚧 施工中... 🚧',
+],
+[
+'key'     => '4',
+'label'   => '評價',
+'content' => '🚧 施工中... 🚧',
+],
 ];
 
 Templates::get(
-	'tabs',
-	[
-		'course_tabs'        => $course_tabs,
-		'default_active_key' => '1',
-	]
+'tabs',
+[
+'course_tabs'        => $course_tabs,
+'default_active_key' => '1',
+]
 );
+*/
 
 echo '</div>';

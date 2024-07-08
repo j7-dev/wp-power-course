@@ -17,6 +17,7 @@
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -28,23 +29,37 @@ if ( ! $current_user_id ) {
 	wp_safe_redirect( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 	exit;
 }
+// phpcs:disable
+?>
+<!doctype html>
+		<html lang="zh_tw">
 
+		<head>
+			<meta charset="UTF-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<title>Power Course | 可能是 WordPress 最好用的課程外掛</title>
+			<link rel="stylesheet" id="wp-power-course-css" href="<?php echo Plugin::$url . '/inc/assets/dist/css/index.css?ver=' . Plugin::$version; ?>"  media='all' />
+			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+		</head>
 
-global $product;
+		<body class="!m-0">
+			<?php
+			global $product;
+			echo '<div id="pc-classroom-main">';
 
-get_header();
+			if ( ! CourseUtils::is_avl() ) {
+				Templates::get( '404/buy', null );
+			} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
+				Templates::get( '404/not-ready', null );
+			} else {
+				Templates::get( 'classroom/sider', null, true, true );
+				Templates::get( 'classroom/body', null, true, true );
+			}
 
-echo '<div id="pc-classroom-main">';
+			echo '</div>';
 
-if ( ! CourseUtils::is_avl() ) {
-	Templates::get( '404/buy', null );
-} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-	Templates::get( '404/not-ready', null );
-} else {
-	Templates::get( 'classroom/sider', null, true, true );
-	Templates::get( 'classroom/body', null, true, true );
-}
-
-echo '</div>';
-
-get_footer();
+			?>
+	<script id="wp-power-course-js" src="<?php echo Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version; ?>" ></script>
+</body>
+</html>
+<?php // phpcs:enabled

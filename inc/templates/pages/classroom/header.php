@@ -9,6 +9,7 @@ use J7\PowerCourse\Utils\AVLCourseMeta;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
+	'chapter' => $GLOBALS['chapter'],
 ];
 
 /**
@@ -19,13 +20,13 @@ $args = wp_parse_args( $args, $default_args );
 
 [
 	'product' => $product,
+	'chapter'    => $chapter,
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$name               = $product->get_name();
 $product_id         = $product->get_id();
 $current_chapter_id = (int) \get_query_var( Templates::CHAPTER_ID );
 
@@ -36,7 +37,7 @@ $is_this_chapter_finished   = in_array( (string) $current_chapter_id, $finished_
 $finish_chapter_button_html = '';
 if (!$is_this_chapter_finished) {
 	$finish_chapter_button_html = sprintf(
-		'<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4">
+		/*html*/'<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-4">
 			我已完成此單元
 			<span class="pc-loading pc-loading-spinner w-4 h-4 hidden"></span>
 		</button>
@@ -73,7 +74,7 @@ if (count($chapter_ids) > 0) {
 		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-4  text-white cursor-not-allowed opacity-70" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
-			'
+			/*html*/'
 		<a href="%1$s">
 				<button class="pc-btn pc-btn-primary pc-btn-sm px-4 text-white">
 					前往下一單元
@@ -99,8 +100,8 @@ if (count($chapter_ids) > 0) {
 
 // render
 printf(
-	'
-<div class="py-4 px-6 flex justify-between items-center">
+	/*html*/'
+<div id="pc-classroom-header" class="bg-white py-4 px-6 flex justify-between items-center top-0 z-50" style="position:fixed;">
   <div class="flex gap-4 items-end">
 		<h2 id="classroom-chapter_title" class="text-base text-bold tracking-wide my-0">%1$s</h2>
 		%2$s
@@ -111,7 +112,7 @@ printf(
 	</div>
 </div>
 ',
-	$name,
+$chapter->post_title,
 	Templates::get(
 		'badge',
 		[

@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "reset";
+
 // daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
 div .pc-rating input:checked ~ input,
 div .pc-rating input[aria-checked="true"] ~ input {

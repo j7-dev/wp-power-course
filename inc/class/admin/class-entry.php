@@ -82,7 +82,7 @@ final class Entry {
 	 */
 	public function render_page() {
 		// Output header HTML.
-		Bootstrap::enqueue_script();
+		// Bootstrap::enqueue_script();
 
 		?>
 		<!doctype html>
