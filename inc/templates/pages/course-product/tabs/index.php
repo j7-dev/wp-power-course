@@ -72,7 +72,7 @@ $course_tabs = [
 	],
 ];
 
-echo '<div id="courses-product__tabs-nav">';
+echo '<div id="courses-product__tabs-nav" class="z-[999999] w-full">';
 Templates::get(
 	'tabs/nav',
 	[

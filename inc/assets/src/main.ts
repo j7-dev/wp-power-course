@@ -13,5 +13,8 @@ import { finishChapter, dynamicWidth, responsive, tabs, coursesProduct } from '.
 
 		// 添加 tabs 組件事件
 		tabs()
-		coursesProduct()
+		setTimeout(() => {
+			coursesProduct()
+		}, 3000);
+
 	})(jQuery)
