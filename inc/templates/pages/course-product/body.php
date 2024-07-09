@@ -25,7 +25,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 ?>
-<div class="flex-1">
+<div class="flex-1 px-4 md:px-0">
 
 	<div class="mb-12">
 		<?php

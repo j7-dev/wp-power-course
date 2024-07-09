@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 ?>
 
-<div class="w-[20rem] flex flex-col gap-6">
+<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">
 
 	<?php Templates::get( 'card/single-product' ); ?>
 	<?php

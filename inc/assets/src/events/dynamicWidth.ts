@@ -1,21 +1,13 @@
 import $ from 'jquery'
-import { store, windowAtom } from '../store'
+import { store, windowWidthAtom } from '../store'
 import { debounce } from 'lodash-es'
 
 const adjustWidth = () => {
-	store.set(windowAtom, (prev) => ({
-		...prev,
-		windowWidth: window.innerWidth,
-		isMobile: window.innerWidth < 1080,
-	}))
+	store.set(windowWidthAtom, () => window.innerWidth)
 }
 
 
 export const dynamicWidth = () => {
-	store.set(windowAtom, () => ({
-		windowWidth: window.innerWidth,
-		isMobile: window.innerWidth < 1080,
-	}))
-
+	store.set(windowWidthAtom, () => window.innerWidth)
 	$(window).on('resize', debounce(() => adjustWidth(), 300))
 }

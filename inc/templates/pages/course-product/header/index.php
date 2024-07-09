@@ -32,11 +32,11 @@ if ( ! is_array( $teacher_ids ) ) {
 
 ?>
 <div class="flex gap-6 flex-col md:flex-row mb-20">
-	<div class="w-full md:w-[55%] px-8 md:px-0">
+	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0">
 		<?php Templates::get( 'course-product/header/feature-video' ); ?>
 	</div>
 
-	<div class="w-full md:w-[45%]">
+	<div class="w-full md:w-[45%] px-4 md:px-0">
 		<div class="mb-2 flex gap-x-4 gap-y-2 flex-wrap">
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {

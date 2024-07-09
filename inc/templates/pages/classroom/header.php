@@ -105,14 +105,14 @@ printf(
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1">%1$s</h2>
 		%2$s
 	</div>
-	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
+	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 lg:grid-flow-row lg:rtl w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
 		%3$s
 		%4$s
 		%5$s
 	</div>
 </div>
 ',
-$chapter->post_title,
+$chapter->post_title ?: $product->get_title(),
 	Templates::get(
 		'badge',
 		[

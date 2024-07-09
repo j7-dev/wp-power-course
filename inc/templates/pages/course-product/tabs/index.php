@@ -72,8 +72,18 @@ $course_tabs = [
 	],
 ];
 
+echo '<div id="courses-product__tabs-nav">';
 Templates::get(
-	'tabs',
+	'tabs/nav',
+	[
+		'course_tabs'        => $course_tabs,
+		'default_active_key' => '1',
+	]
+);
+echo '</div>';
+
+Templates::get(
+	'tabs/content',
 	[
 		'course_tabs'        => $course_tabs,
 		'default_active_key' => '1',

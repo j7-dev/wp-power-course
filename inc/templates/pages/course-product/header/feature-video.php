@@ -44,11 +44,12 @@ if ( ! ! $feature_video ) {
 		[
 			'library_id' => $library_id,
 			'video_id'   => $feature_video,
+			'class'      => 'md:rounded-2xl',
 		]
 	);
 } else {
 	printf(
-		'<div class="group w-full rounded-2xl aspect-video overflow-hidden">
+		'<div class="group w-full md:rounded-2xl aspect-video overflow-hidden">
 			<img src="%1$s" class="h-full w-full object-cover group-hover:scale-125 duration-300 transition ease-in-out" alt="%2$s" loading="lazy">
 			</div>',
 		$image_url,
