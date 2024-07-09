@@ -1,10 +1,11 @@
 import React, { FC } from 'react'
-import { Button, Popconfirm, PopconfirmProps } from 'antd'
+import { Button, Popconfirm, PopconfirmProps, ButtonProps } from 'antd'
 import { DeleteOutlined } from '@ant-design/icons'
 
 type PopconfirmDeleteProps = {
   popconfirmProps: Omit<PopconfirmProps, 'title'> & { title?: React.ReactNode }
   type?: 'icon' | 'button'
+  buttonProps?: ButtonProps
 }
 
 const DEFAULT_PROPS: PopconfirmProps = {
@@ -16,6 +17,7 @@ const DEFAULT_PROPS: PopconfirmProps = {
 export const PopconfirmDelete: FC<PopconfirmDeleteProps> = ({
   popconfirmProps,
   type = 'icon',
+  buttonProps,
 }) => {
   const mergedPopconfirmProps: PopconfirmProps = {
     ...DEFAULT_PROPS,
@@ -25,10 +27,14 @@ export const PopconfirmDelete: FC<PopconfirmDeleteProps> = ({
   return (
     <Popconfirm {...mergedPopconfirmProps}>
       {'icon' === type && (
-        <Button danger type="link" icon={<DeleteOutlined />} />
+        <Button danger type="link" icon={<DeleteOutlined />} {...buttonProps} />
       )}
 
-      {'button' === type && <Button danger>刪除</Button>}
+      {'button' === type && (
+        <Button type="primary" danger {...buttonProps}>
+          {buttonProps?.children ?? '刪除'}
+        </Button>
+      )}
     </Popconfirm>
   )
 }

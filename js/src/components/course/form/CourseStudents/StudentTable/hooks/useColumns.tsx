@@ -28,12 +28,6 @@ const useColumns = () => {
       width: 180,
       render: (_, record) => <UserWatchLimit record={record} />,
     },
-    {
-      title: '動作',
-      dataIndex: 'action',
-      width: 48,
-      render: (_, record) => <Remove record={record} />,
-    },
   ]
 
   return columns

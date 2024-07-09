@@ -55,10 +55,10 @@ final class Course {
 		// 'endpoint' => 'update-students/(?P<id>\d+)',
 		// 'method'   => 'post',
 		// ],
-		// TODO [
-		// 'endpoint' => 'remove-students/(?P<id>\d+)',
-		// 'method'   => 'post',
-		// ],
+		[
+			'endpoint' => 'remove-students/(?P<id>\d+)',
+			'method'   => 'post',
+		],
 		[
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'delete',
@@ -454,7 +454,40 @@ final class Course {
 		return new \WP_REST_Response(
 			[
 				'code'    => $success ? 'add_students_success' : 'add_students_failed',
-				'message' => $success ? '新增成功' : '新增失敗',
+				'message' => $success ? '新增學員成功' : '新增學員失敗',
+				'data'    => [
+					'user_ids' => \implode(',', $user_ids),
+				],
+			],
+			$success ? 200 : 400
+		);
+	}
+
+	/**
+	 * 移除學員
+	 *
+	 * @param \WP_REST_Request<array{'id': string}> $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function post_remove_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+		$course_id   = (int) $request['id'];
+		$body_params = $request->get_body_params();
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$user_ids    = $body_params['user_ids'] ?? [];
+
+		$success = true;
+		foreach ($user_ids as  $user_id) {
+			$success = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
+			if (false === $success) {
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',
+				'message' => $success ? '移除學員成功' : '移除學員失敗',
 				'data'    => [
 					'user_ids' => \implode(',', $user_ids),
 				],
