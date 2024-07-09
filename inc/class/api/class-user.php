@@ -9,7 +9,6 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
-use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
@@ -95,7 +94,7 @@ final class User {
 			$default_args,
 		);
 
-		if (isset($args['search'])) {
+		if (!empty($args['search'])) {
 			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
 		}
 
@@ -144,7 +143,7 @@ final class User {
 			$course_id                        = (int) $course_id;
 			$avl_courses[ $i ]['id']          = (string) $course_id;
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
-			$avl_courses[ $i ]['expire_date'] = AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
+			$avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
 			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, return_ids :true);
 			$finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
 			foreach ($all_chapter_ids as $j => $chapter_id) {

@@ -30,6 +30,7 @@ final class Course {
 	 * - endpoint: string
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
+	 * @phpstan-ignore-next-line
 	 */
 	protected $apis = [
 		[
@@ -44,6 +45,18 @@ final class Course {
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'post',
 		],
+		[
+			'endpoint' => 'add-students/(?P<id>\d+)',
+			'method'   => 'post',
+		],
+		// TODO [
+		// 'endpoint' => 'update-students/(?P<id>\d+)',
+		// 'method'   => 'post',
+		// ],
+		// TODO [
+		// 'endpoint' => 'remove-students/(?P<id>\d+)',
+		// 'method'   => 'post',
+		// ],
 		[
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'delete',

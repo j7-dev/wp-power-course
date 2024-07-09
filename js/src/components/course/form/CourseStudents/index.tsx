@@ -1,33 +1,29 @@
 import React, { Fragment } from 'react'
 import UserSelector from './UserSelector'
+import StudentTable from './StudentTable'
+import { Alert } from 'antd'
 
 export const CourseStudents = () => {
   return (
     <>
-      <UserSelector />
-
-      <p>默認排序:由新排到舊，最新的學員在最上方</p>
-      <div className="bg-slate-100 w-full h-[40rem]">
-        <div className="grid  gap-2 grid-cols-3 [&_div]:border [&_div]:border-solid [&_div]:border-gray-800">
-          <div>學員名稱 + EMAIL</div>
-          <div>觀看權限</div>
-          <div>動作</div>
-
-          {/* values */}
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Fragment key={i}>
-              <div>
-                <p className="my-0 text-sm">j7devgg</p>
-                <p className="my-0 text-xs text-gray-400">
-                  j7.dev.gg@gmail.com
-                </p>
-              </div>
-              <div>至 2024/12/31 (輸入框)</div>
-              <div>[移除] </div>
-            </Fragment>
-          ))}
+      <div className="mb-12">
+        <div className="max-w-[30rem]">
+          <Alert
+            className="mb-4"
+            message="注意事項"
+            description={
+              <ol>
+                <li>請搜尋關鍵字尋找用戶(每次顯示20筆結果)</li>
+                <li>此處的變更不需要點按儲存，變更立即生效</li>
+              </ol>
+            }
+            type="warning"
+            showIcon
+          />
+          <UserSelector />
         </div>
       </div>
+      <StudentTable />
     </>
   )
 }

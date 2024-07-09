@@ -1,77 +1,50 @@
-import React from 'react'
-import { useList } from '@refinedev/core'
 import { useSelect } from '@refinedev/antd'
-import { Select, Space, Button } from 'antd'
+import { Select, Space, Button, Form } from 'antd'
+import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
-type TUserRecord = any //TYPE
 const index = () => {
-  // const { data, loading } = useList<TUserRecord>({
-  //   resource: 'users',
-  //   filters: [
-  //     {
-  //       field: 's',
-  //       operator: 'eq',
-  //       value: '',
-  //     },
-
-  //     {
-  //       field: 'status',
-  //       operator: 'eq',
-  //       value: 'any',
-  //     },
-  //     {
-  //       field: 'posts_per_page',
-  //       operator: 'eq',
-  //       value: '100',
-  //     },
-  //     {
-  //       field: 'type',
-  //       operator: 'eq',
-  //       value: 'power_bundle_product',
-  //     },
-  //   ],
-  //   queryOptions: {
-  //     enabled: true,
-  //   },
-  // })
+  const form = Form.useFormInstance()
+  const watchId = Form.useWatch(['id'], form)
 
   const { selectProps } = useSelect<TUserRecord>({
     resource: 'users',
+    optionLabel: 'display_name',
+    optionValue: 'id',
     filters: [
       {
-        field: 's',
+        field: 'search',
         operator: 'eq',
         value: '',
       },
-
       {
-        field: 'status',
+        field: 'number',
         operator: 'eq',
-        value: 'any',
+        value: '20',
       },
+    ],
+    onSearch: (value) => [
       {
-        field: 'posts_per_page',
+        field: 'search',
         operator: 'eq',
-        value: '100',
-      },
-      {
-        field: 'type',
-        operator: 'eq',
-        value: 'power_bundle_product',
+        value,
       },
     ],
     queryOptions: {
-      enabled: true,
+      enabled: !!watchId,
     },
   })
 
   return (
-    <>
-      <Space.Compact>
-        <Button type="primary">新增學員</Button>
-        <Select {...selectProps} className="w-[25rem]" />
-      </Space.Compact>
-    </>
+    <Space.Compact className="w-full">
+      <Button type="primary">新增學員</Button>
+      <Select
+        {...selectProps}
+        className="w-full"
+        placeholder="試試看搜尋 Email, 名稱, ID"
+        mode="multiple"
+        allowClear
+      />
+    </Space.Compact>
   )
 }
 
