@@ -89,6 +89,8 @@ export type TCourseRecord = {
   parent_id?: string
   hours: number
   is_free: 'yes' | 'no' | ''
+  feature_video: string
+  trial_video: string
 }
 
 export type TChapterRecord = {

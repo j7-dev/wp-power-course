@@ -10,7 +10,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
-	'chapter' => $GLOBALS['chapter'],
+	'chapter' => $GLOBALS['chapter'] ?? null,
 ];
 
 /**
@@ -26,6 +26,10 @@ $args = wp_parse_args( $args, $default_args );
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
+}
+
+if ( ! ( $chapter instanceof \WP_Post ) ) {
+	throw new \Exception( 'chapter 不是 WP_Post' );
 }
 
 $product_id           = $product->get_id();

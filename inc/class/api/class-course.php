@@ -280,6 +280,8 @@ final class Course {
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'limit_value'         => (int) $product->get_meta( 'limit_value' ),
 			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
+			'feature_video'       => (string) $product->get_meta( 'feature_video' ),
+			'trial_video'         => (string) $product->get_meta( 'trial_video' ),
 			// bundle product
 			'bundle_ids'          => $bundle_ids,
 		] + $children;

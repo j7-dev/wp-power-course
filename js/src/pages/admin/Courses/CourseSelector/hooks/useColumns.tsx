@@ -14,6 +14,7 @@ import {
   ProductAction,
 } from '@/components/product'
 import { getPostStatus } from '@/utils'
+import { DateTime } from 'antd-toolkit'
 
 const useColumns = ({
   showCourseDrawer,
@@ -49,17 +50,11 @@ const useColumns = ({
       ),
     },
     {
-      title: '時數',
-      dataIndex: 'hours',
-      width: 180,
-      key: 'hours',
-    },
-    {
-      title: '商品類型',
-      dataIndex: 'type',
-      width: 180,
-      key: 'type',
-      render: (_, record) => <ProductType record={record} />,
+      title: '總銷量',
+      dataIndex: 'total_sales',
+      width: 150,
+      key: 'total_sales',
+      render: (_, record) => <ProductTotalSales record={record} />,
     },
     {
       title: '價格',
@@ -69,18 +64,27 @@ const useColumns = ({
       render: (_, record) => <ProductPrice record={record} />,
     },
     {
-      title: '總銷量',
-      dataIndex: 'total_sales',
-      width: 150,
-      key: 'total_sales',
-      render: (_, record) => <ProductTotalSales record={record} />,
+      title: '開課時間',
+      dataIndex: 'course_schedule',
+      width: 180,
+      key: 'type',
+      render: (course_schedule: number) =>
+        course_schedule ? (
+          <DateTime
+            date={course_schedule * 1000}
+            timeProps={{
+              format: 'HH:mm',
+            }}
+          />
+        ) : (
+          '-'
+        ),
     },
     {
-      title: '庫存',
-      dataIndex: 'stock',
-      width: 150,
-      key: 'stock',
-      render: (_, record) => <ProductStock record={record} />,
+      title: '時數',
+      dataIndex: 'hours',
+      width: 180,
+      key: 'hours',
     },
     {
       title: '商品分類 / 商品標籤',
