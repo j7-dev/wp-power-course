@@ -9,7 +9,7 @@ const index = () => {
   const watchId = Form.useWatch(['id'], form)
   const columns = useColumns()
   const { tableProps } = useTable<TUserRecord>({
-    resource: 'users',
+    resource: 'students',
     filters: {
       permanent: [
         {
@@ -26,6 +26,9 @@ const index = () => {
     },
     pagination: {
       pageSize: 20,
+    },
+    queryOptions: {
+      enabled: !!watchId,
     },
   })
 

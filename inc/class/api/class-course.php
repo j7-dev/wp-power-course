@@ -12,8 +12,10 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
+
 
 
 /**
@@ -99,10 +101,11 @@ final class Course {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
 	 */
 	public function get_courses_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? [];
+		$params = $request->get_query_params();
 
 		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
@@ -126,7 +129,7 @@ final class Course {
 				'relation' => 'AND',
 				[
 					'key'     => '_price',                                // 價格自定義欄位
-					'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
+					'value'   => $args['price_range'], // 設定價格範圍
 					'compare' => 'BETWEEN',                               // 在此範圍之間
 					'type'    => 'DECIMAL',                               // 處理為數值
 				],
@@ -161,6 +164,7 @@ final class Course {
 	 * @param bool        $with_description With description.
 	 *
 	 * @return array
+	 * @phpstan-ignore-next-line
 	 */
 	public function format_product_details( $product, $with_description = true ) { // phpcs:ignore
 
@@ -313,9 +317,10 @@ final class Course {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
 	 */
 	public function post_courses_callback( $request ) {
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
@@ -424,6 +429,40 @@ final class Course {
 		);
 	}
 
+	/**
+	 * 新增學員
+	 *
+	 * @param \WP_REST_Request<array{'id': string}> $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function post_add_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+		$course_id   = (int) $request['id'];
+		$body_params = $request->get_body_params();
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$user_ids    = $body_params['user_ids'] ?? [];
+
+		$success = true;
+		foreach ($user_ids as  $user_id) {
+			$mid = \add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
+			if (false === $mid) {
+				$success = false;
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => $success ? 'add_students_success' : 'add_students_failed',
+				'message' => $success ? '新增成功' : '新增失敗',
+				'data'    => [
+					'user_ids' => \implode(',', $user_ids),
+				],
+			],
+			$success ? 200 : 400
+		);
+	}
+
 
 	/**
 	 * Delete courses with id callback
@@ -431,6 +470,7 @@ final class Course {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
 	 */
 	public function delete_courses_with_id_callback( $request ) {
 		$id = $request['id'];
@@ -477,10 +517,11 @@ final class Course {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return array
+	 * @phpstan-ignore-next-line
 	 */
 	public function get_terms_callback( $request ) { // phpcs:ignore
 
-		$params = $request?->get_query_params() ?? [];
+		$params = $request->get_query_params();
 
 		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
 
@@ -511,7 +552,7 @@ final class Course {
 	 * @param string $key Key.
 	 * @param string $value Value.
 	 *
-	 * @return array
+	 * @return array{id:string, name:string}
 	 */
 	public function format_terms( $key, $value ) {
 		return [
@@ -527,6 +568,7 @@ final class Course {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return array
+	 * @phpstan-ignore-next-line
 	 */
 	public function get_options_callback( $request ) { // phpcs:ignore
 
@@ -573,7 +615,7 @@ final class Course {
 	/**
 	 * Get Max Min Price
 	 *
-	 * @return array
+	 * @return array{max_price:int, min_price:int}
 	 */
 	public static function get_max_min_prices(): array {
 		$transient_key = 'max_min_prices';
@@ -621,6 +663,7 @@ final class Course {
 			'min_price' => $min_price,
 		];
 
+		// @phpstan-ignore-next-line
 		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
 
 		return $max_min_prices;

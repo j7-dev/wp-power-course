@@ -34,6 +34,11 @@ final class User {
 			'permission_callback' => null,
 		],
 		[
+			'endpoint'            => 'students',
+			'method'              => 'get',
+			'permission_callback' => null,
+		],
+		[
 			'endpoint'            => 'users/(?P<id>\d+)',
 			'method'              => 'post',
 			'permission_callback' => null,
@@ -107,6 +112,114 @@ final class User {
 		$users = $wp_user_query->get_results();
 
 		$total       = $wp_user_query->get_total();
+		$total_pages = \floor( $total / $args['number'] ) + 1;
+
+		$formatted_users = array_map( [ $this, 'format_user_details' ], $users );
+
+		$response = new \WP_REST_Response( $formatted_users );
+
+		// // set pagination in header
+		$response->header( 'X-WP-Total', (string) $total );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
+
+		return $response;
+	}
+
+	/**
+	 * Get users callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * $params
+	 *  - meta_key avl_course_ids 如果要找用戶可以上的課程
+	 *  - meta_value
+	 * - count_total 是否要計算總數
+	 *
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_students_callback( $request ): \WP_REST_Response {
+
+		$params = $request->get_query_params();
+
+		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+
+		$default_args = [
+			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
+			'number'         => 10,
+			'order'          => 'DESC',
+			'offset'         => 0,
+			'paged'          => 1,
+			'count_total'    => true,
+			'meta_key'       => 'avl_course_ids',
+			'meta_value'     => '',
+		];
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		if ( empty($args['meta_value']) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'get_students_error',
+					'message' => 'meta_value 不能為空',
+				],
+				400
+			);
+		}
+
+		global $wpdb;
+
+		$sql = sprintf(
+			'SELECT DISTINCT u.ID
+			FROM %1$s u
+			INNER JOIN %2$s um ON u.ID = um.user_id',
+				$wpdb->users,
+				$wpdb->usermeta,
+		);
+
+		$where = sprintf(
+			" WHERE um.meta_key = '%1\$s'
+			AND um.meta_value = '%2\$s'",
+			$args['meta_key'],
+			$args['meta_value']
+		);
+
+		if (!empty($args['search'])) {
+			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
+			$where         .= sprintf(
+				" AND (u.ID LIKE '%1\$s'
+					OR u.user_login LIKE '%1\$s'
+					OR u.user_email LIKE '%1\$s'
+					OR u.user_nicename LIKE '%1\$s'
+					OR u.display_name LIKE '%1\$s')",
+				$args['search']
+			);
+		}
+
+		$sql .= $where;
+		$sql .= sprintf(
+			' ORDER BY um.umeta_id DESC
+			LIMIT %1$d OFFSET %2$d',
+			$args['number'],
+			$args['offset']
+		);
+
+		$user_ids = $wpdb->get_col( $wpdb->prepare($sql));
+
+		$users = array_map( fn( $user_id ) => get_user_by('id', $user_id), $user_ids );
+
+		$count_query = sprintf(
+			'SELECT DISTINCT COUNT(DISTINCT u.ID)
+			FROM %1$s u
+			INNER JOIN %2$s um ON u.ID = um.user_id',
+				$wpdb->users,
+				$wpdb->usermeta,
+		) . $where;
+
+		$total = $wpdb->get_var($wpdb->prepare($count_query)); // phpcs:ignore
+
 		$total_pages = \floor( $total / $args['number'] ) + 1;
 
 		$formatted_users = array_map( [ $this, 'format_user_details' ], $users );

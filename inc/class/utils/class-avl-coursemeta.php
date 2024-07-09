@@ -194,6 +194,9 @@ abstract class AVLCourseMeta {
 		);
 
 		if ($single) {
+			if (empty($meta_value)) {
+				return '';
+			}
 			return \maybe_unserialize($meta_value[0]);
 		} else {
 			return array_map('maybe_unserialize', $meta_value);
