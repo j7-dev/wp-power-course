@@ -95,7 +95,38 @@ div .pc-rating input[aria-checked="true"] ~ input {
 }
 
 // 水平翻轉
-.flip-horizontal {
-	transform: scale(-1, 1);
-	transition: transform 0.3s ease;
+// .flip-horizontal {
+// 	transform: scale(-1, 1);
+// 	transition: transform 0.3s ease;
+// }
+
+// course product tab
+// Notion 編輯器 HTML 內容
+div[id^="tab-content"] {
+	#yoopta-clipboard {
+		img {
+			max-width: 100%;
+		}
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		p {
+			margin-bottom: 0rem !important;
+			margin-top: 0.5rem !important;
+			&:empty {
+				// 空白行
+				min-height: 1.75em;
+			}
+		}
+		blockquote {
+			border-left-color: #e5e7eb !important;
+			border-left-width: 2px !important;
+			line-height: 1.75rem !important;
+			margin: 8px 0 0 !important;
+			padding-left: 1.5rem !important;
+		}
+	}
 }
