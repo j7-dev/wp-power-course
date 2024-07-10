@@ -21,7 +21,7 @@ const useColumns = () => {
     },
     {
       title: (
-        <Tooltip title="學員可以看的期限，如果空白代表無期限">觀看權限</Tooltip>
+        <Tooltip title="學員可以看的期限，如果空白代表無期限">觀看期限</Tooltip>
       ),
       dataIndex: 'avl_courses',
       key: 'avl_courses',

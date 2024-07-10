@@ -1,11 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { Table, Form, message } from 'antd'
+import { Table, Form, message, DatePicker, Space, Button } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { Dayjs } from 'dayjs'
 
 const index = () => {
   const apiUrl = useApiUrl()
@@ -46,10 +47,10 @@ const index = () => {
     })
 
   // remove student mutation
-  const { mutate: removeStudent, isLoading } = useCustomMutation()
+  const { mutate, isLoading } = useCustomMutation()
 
   const handleRemove = () => {
-    removeStudent(
+    mutate(
       {
         url: `${apiUrl}/remove-students/${watchId}`,
         method: 'post',
@@ -84,9 +85,78 @@ const index = () => {
     )
   }
 
+  // update student mutation
+  const [time, setTime] = useState<Dayjs | undefined>(undefined)
+  const handleUpdate = (timestamp?: number) => () => {
+    mutate(
+      {
+        url: `${apiUrl}/update-students/${watchId}`,
+        method: 'post',
+        values: {
+          user_ids: selectedRowKeys,
+          timestamp: timestamp ?? time?.unix(),
+        },
+        config: {
+          headers: {
+            'Content-Type': 'multipart/form-data;',
+          },
+        },
+      },
+      {
+        onSuccess: () => {
+          message.success({
+            content: '批量修改觀看期限成功！',
+            key: 'update-students',
+          })
+          invalidate({
+            resource: 'students',
+            invalidates: ['list'],
+          })
+          setSelectedRowKeys([])
+          setTime(undefined)
+        },
+        onError: () => {
+          message.error({
+            content: '批量修改觀看期限失敗！',
+            key: 'update-students',
+          })
+        },
+      },
+    )
+  }
+
   return (
     <>
-      <div className="mb-4">
+      <div className="mb-4 flex justify-between gap-4">
+        <div className="flex gap-4">
+          <Button
+            type="primary"
+            disabled={!selectedRowKeys.length}
+            onClick={handleUpdate(0)}
+          >
+            修改為無期限
+          </Button>
+
+          <Space.Compact>
+            <DatePicker
+              value={time}
+              showTime
+              format="YYYY-MM-DD HH:mm"
+              onChange={(value: Dayjs) => {
+                setTime(value)
+              }}
+            />
+            <Button
+              type="primary"
+              disabled={!selectedRowKeys.length}
+              onClick={handleUpdate()}
+              ghost
+            >
+              修改觀看期限
+            </Button>
+          </Space.Compact>
+        </div>
+
         <PopconfirmDelete
           type="button"
           popconfirmProps={{

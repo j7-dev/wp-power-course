@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 import { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, Form, message } from 'antd'
@@ -8,11 +11,13 @@ const index = () => {
   const apiUrl = useApiUrl()
   const invalidate = useInvalidate()
   const [userIds, setUserIds] = useState<string[]>([])
+  const [keyword, setKeyword] = useState<string>('')
+
   const form = Form.useFormInstance()
   const watchId = Form.useWatch(['id'], form)
 
   const { selectProps } = useSelect<TUserRecord>({
-    resource: 'users',
+    resource: 'students',
     optionLabel: 'display_name',
     optionValue: 'id',
     filters: [
@@ -26,16 +31,29 @@ const index = () => {
         operator: 'eq',
         value: '20',
       },
-    ],
-    onSearch: (value) => [
       {
-        field: 'search',
+        field: 'meta_key',
         operator: 'eq',
-        value,
+        value: 'avl_course_ids',
+      },
+      {
+        field: 'meta_value',
+        operator: 'ne',
+        value: '2030',
       },
     ],
+    onSearch: (value) => {
+      setKeyword(value)
+      return [
+        {
+          field: 'search',
+          operator: 'eq',
+          value,
+        },
+      ]
+    },
     queryOptions: {
-      enabled: !!watchId,
+      enabled: !!watchId && !!keyword,
     },
   })
 
@@ -66,6 +84,7 @@ const index = () => {
             resource: 'students',
             invalidates: ['list'],
           })
+          setUserIds([])
         },
         onError: () => {
           message.error({
@@ -79,7 +98,12 @@ const index = () => {
 
   return (
     <Space.Compact className="w-full">
-      <Button type="primary" onClick={handleAdd} loading={isLoading}>
+      <Button
+        type="primary"
+        onClick={handleAdd}
+        loading={isLoading}
+        disabled={!userIds.length}
+      >
         新增學員
       </Button>
       <Select
@@ -88,9 +112,10 @@ const index = () => {
         placeholder="試試看搜尋 Email, 名稱, ID"
         mode="multiple"
         allowClear
-        onChange={(value) => {
-          setUserIds(value as unknown as string[])
+        onChange={(value: string[]) => {
+          setUserIds(value)
         }}
+        value={userIds}
       />
     </Space.Compact>
   )

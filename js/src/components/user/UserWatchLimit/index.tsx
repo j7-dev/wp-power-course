@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { Form, DatePicker } from 'antd'
-import dayjs, { Dayjs } from 'dayjs'
+import { Form } from 'antd'
+import { DateTime } from 'antd-toolkit'
 
 export const UserWatchLimit: FC<{
   record: TUserRecord
@@ -15,18 +15,20 @@ export const UserWatchLimit: FC<{
   if (!currentCourse) return <>出錯了！找不到課程</>
 
   const expireDate = currentCourse?.expire_date
-    ? dayjs.unix(Number(currentCourse?.expire_date))
+    ? Number(currentCourse?.expire_date) * 1000 // 換成毫秒
     : undefined
 
-  const handleUpdate = (value: Dayjs, dateString: string | string[]) => {}
+  if (!expireDate) {
+    return ''
+  }
 
   return (
     <>
-      <DatePicker
-        value={expireDate}
-        showTime
-        format="YYYY-MM-DD HH:mm"
-        onChange={handleUpdate}
+      <DateTime
+        date={expireDate}
+        timeProps={{
+          format: 'HH:mm',
+        }}
       />
     </>
   )

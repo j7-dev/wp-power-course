@@ -68,6 +68,7 @@ final class User {
 
 	/**
 	 * Get users callback
+	 * 通用的用戶查詢
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * $params
@@ -126,7 +127,7 @@ final class User {
 	}
 
 	/**
-	 * Get users callback
+	 * Get student callback
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * $params
@@ -150,8 +151,8 @@ final class User {
 			'offset'         => 0,
 			'paged'          => 1,
 			'count_total'    => true,
-			'meta_key'       => 'avl_course_ids',
-			'meta_value'     => '',
+			'meta_key'       => 'avl_course_ids', // phpcs:ignore
+			'meta_value'     => '', // phpcs:ignore
 		];
 
 		$args = \wp_parse_args(
@@ -162,29 +163,57 @@ final class User {
 		if ( empty($args['meta_value']) ) {
 			return new \WP_REST_Response(
 				[
-					'code'    => 'get_students_error',
-					'message' => 'meta_value 不能為空',
+					'code'    => 'empty_meta_value',
+					'message' => 'meta_value 不能為空，找不到 course_id',
 				],
 				400
 			);
 		}
 
+		// 如果 $args['meta_value'] 有包含 ! 開頭，就用反查詢
+		if (\str_starts_with($args['meta_value'], '!')) {
+			$reverse   = true;
+			$course_id = substr($args['meta_value'], 1);
+		} else {
+			$reverse   = false;
+			$course_id = $args['meta_value'];
+		}
+
 		global $wpdb;
 
-		$sql = sprintf(
-			'SELECT DISTINCT u.ID
+		if (!$reverse) {
+			$sql = sprintf(
+			'SELECT u.ID
 			FROM %1$s u
 			INNER JOIN %2$s um ON u.ID = um.user_id',
 				$wpdb->users,
 				$wpdb->usermeta,
-		);
+			);
+		} else {
+			$sql = sprintf(
+			"SELECT u.ID
+			FROM %1\$s u
+			LEFT JOIN %2\$s um ON u.ID = um.user_id AND um.meta_key = '%3\$s'",
+				$wpdb->users,
+				$wpdb->usermeta,
+				$args['meta_key'],
+			);
+		}
 
-		$where = sprintf(
+		if (!$reverse) {
+			$where = sprintf(
 			" WHERE um.meta_key = '%1\$s'
 			AND um.meta_value = '%2\$s'",
 			$args['meta_key'],
 			$args['meta_value']
-		);
+			);
+		} else {
+			$where = sprintf(
+			" WHERE um.user_id IS NULL OR (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s')",
+			$args['meta_key'],
+			$course_id
+			);
+		}
 
 		if (!empty($args['search'])) {
 			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
@@ -206,10 +235,12 @@ final class User {
 			$args['offset']
 		);
 
-		$user_ids = $wpdb->get_col( $wpdb->prepare($sql));
+		$user_ids = $wpdb->get_col( $wpdb->prepare($sql)); // phpcs:ignore
+		$user_ids = \array_unique($user_ids);
 
 		$users = array_map( fn( $user_id ) => get_user_by('id', $user_id), $user_ids );
 
+		// 查找總數
 		$count_query = sprintf(
 			'SELECT DISTINCT COUNT(DISTINCT u.ID)
 			FROM %1$s u

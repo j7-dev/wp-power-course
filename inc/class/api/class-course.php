@@ -51,10 +51,10 @@ final class Course {
 			'endpoint' => 'add-students/(?P<id>\d+)',
 			'method'   => 'post',
 		],
-		// TODO [
-		// 'endpoint' => 'update-students/(?P<id>\d+)',
-		// 'method'   => 'post',
-		// ],
+		[
+			'endpoint' => 'update-students/(?P<id>\d+)',
+			'method'   => 'post',
+		],
 		[
 			'endpoint' => 'remove-students/(?P<id>\d+)',
 			'method'   => 'post',
@@ -464,6 +464,41 @@ final class Course {
 	}
 
 	/**
+	 * 更新學員觀看時間
+	 *
+	 * @param \WP_REST_Request<array{'id': string}> $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function post_update_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+		$course_id   = (int) $request['id'];
+		$body_params = $request->get_body_params();
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$user_ids    = $body_params['user_ids'] ?? [];
+		$timestamp   = $body_params['timestamp'] ?? 0; // 一般為 10 位數字，如果是0就是無期限
+
+		$success = true;
+		foreach ($user_ids as  $user_id) {
+			$success = AVLCourseMeta::update( $course_id, (int) $user_id, 'expire_date', $timestamp );
+			if (false === $success ) {
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => $success ? 'update_students_success' : 'update_students_failed',
+				'message' => $success ? '批量調整觀看期限成功' : '批量調整觀看期限失敗',
+				'data'    => [
+					'user_ids'  => \implode(',', $user_ids),
+					'timestamp' => $timestamp,
+				],
+			],
+			$success ? 200 : 400
+		);
+	}
+
+	/**
 	 * 移除學員
 	 *
 	 * @param \WP_REST_Request<array{'id': string}> $request Request.
@@ -477,9 +512,11 @@ final class Course {
 		$user_ids    = $body_params['user_ids'] ?? [];
 
 		$success = true;
-		foreach ($user_ids as  $user_id) {
-			$success = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
-			if (false === $success) {
+		foreach ($user_ids as $user_id) {
+			$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
+			$success2 = AVLCourseMeta::delete( $course_id, (int) $user_id, 'expire_date' );
+			if (false === $success1 || false === $success2) {
+				$success = false;
 				break;
 			}
 		}
