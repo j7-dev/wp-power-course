@@ -78,6 +78,32 @@ final class Course {
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_course' ] );
+		\add_filter( 'wp_kses_allowed_html', [ $this, 'extend_wpkses_post_tags' ], 10, 2 );
+	}
+
+	/**
+	 * 擴展 WordPress 內容安全政策，允許在特定上下文中使用 iframe 標籤。
+	 *
+	 * 此方法修改了 WordPress 允許的 HTML 標籤列表，專門針對 'product' 上下文，允許在產品描述等地方使用 iframe 標籤。
+	 * 這使得用戶可以嵌入例如視頻等外部內容。此方法應該與 'wp_kses_allowed_html' 過濾器一起使用。
+	 *
+	 * @param array  $tags    原始允許的 HTML 標籤和屬性的列表。
+	 * @param string $context 使用場景的上下文標識符。
+	 *
+	 * @return array 修改後的標籤和屬性列表。
+	 */
+	public function extend_wpkses_post_tags( $tags, $context ) {
+
+		if ( 'post' === $context ) {
+			$tags['iframe'] = [
+				'src'             => true,
+				'height'          => true,
+				'width'           => true,
+				'frameborder'     => true,
+				'allowfullscreen' => true,
+			];
+		}
+		return $tags;
 	}
 
 	/**
