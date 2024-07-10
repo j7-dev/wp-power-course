@@ -43,7 +43,7 @@ $course_tabs = [
 	[
 		'key'     => '1',
 		'label'   => '簡介',
-		'content' => \wpautop( $description ),
+		'content' => \do_shortcode( \wpautop($description) ),
 	],
 	[
 		'key'     => '2',

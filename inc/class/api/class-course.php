@@ -381,7 +381,11 @@ final class Course {
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
+		$sanitize_description = \wp_kses_post( $body_params['description'] ?? '' );
+
+		$body_params                = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params['description'] = $sanitize_description;
 
 		$product = \wc_get_product( $id );
 

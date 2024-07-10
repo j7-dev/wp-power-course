@@ -1,14 +1,9 @@
-import React from 'react'
 import { Button, Form, Drawer, Input } from 'antd'
-import { PlusOutlined, EditOutlined } from '@ant-design/icons'
+import { PlusOutlined } from '@ant-design/icons'
 import { useBundleFormDrawer } from '@/hooks'
-import { CheckCard } from '@ant-design/pro-components'
 import BundleForm from './BundleForm'
 import { useList } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
-import defaultImage from '@/assets/images/defaultImage.jpg'
-import { renderHTML } from 'antd-toolkit'
-import { SaleRange } from '@/components/general'
 import ProductCheckCard from './ProductCheckCard'
 
 const { Item } = Form

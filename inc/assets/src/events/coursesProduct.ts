@@ -4,7 +4,7 @@ import { throttle } from 'lodash-es';
 
 // 判斷元素距離可視區域頂部的距離
 function getDistanceFromViewportTop($element) {
-	var elementTop = $element.offset().top;
+	var elementTop = $element?.offset()?.top || 0;
 	var scrollTop = $(window).scrollTop();
 	return elementTop - scrollTop;
 }
@@ -14,8 +14,8 @@ export const coursesProduct = () => {
 	const video = $('#courses-product__feature-video')
 	const tabsNav = $('#courses-product__tabs-nav');
 	const videoH = video.outerHeight();
-	const tabsOffset = tabsNav[0].offsetTop; // 獲取 tabsNav 元素的初始頂部位置
-	const videoOffset = video.offset().top; // 獲取 video 元素的初始頂部位置
+	const tabsOffset = tabsNav?.[0]?.offsetTop || 0; // 獲取 tabsNav 元素的初始頂部位置
+	const videoOffset = video?.offset()?.top || 0; // 獲取 video 元素的初始頂部位置
 
 	$(window).scroll(throttle(() => {
 		if (window.innerWidth > SCREEN.MD) return;

@@ -50,8 +50,7 @@ final class TemplateAjax {
 			[ 'jquery' ],
 			Plugin::$version,
 			[
-				'strategy'  => 'async',
-				'in_footer' => true,
+				'strategy' => 'defer',
 			]
 		);
 
