@@ -26,14 +26,14 @@ export const dataProvider = (
     const queryFilters = generateFilter(filters)
 
     const query: {
-      page?: number
+      paged?: number
       posts_per_page?: number
       orderby?: TOrderBy
       order?: TOrder
     } = {}
 
     if (mode === 'server') {
-      query.page = current
+      query.paged = current
       query.posts_per_page = pageSize
     }
 

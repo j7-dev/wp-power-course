@@ -69,6 +69,7 @@ final class User {
 	/**
 	 * Get users callback
 	 * 通用的用戶查詢
+	 * TODO 還沒測過分頁功能
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * $params
@@ -87,7 +88,7 @@ final class User {
 
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'number'         => 10,
+			'posts_per_page' => 10,
 			'orderby'        => 'registered',
 			'order'          => 'DESC',
 			'offset'         => 0,
@@ -113,7 +114,7 @@ final class User {
 		$users = $wp_user_query->get_results();
 
 		$total       = $wp_user_query->get_total();
-		$total_pages = \floor( $total / $args['number'] ) + 1;
+		$total_pages = \floor( $total / $args['posts_per_page'] ) + 1;
 
 		$formatted_users = array_map( [ $this, 'format_user_details' ], $users );
 
@@ -146,7 +147,7 @@ final class User {
 
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'number'         => 10,
+			'posts_per_page' => 10,
 			'order'          => 'DESC',
 			'offset'         => 0,
 			'paged'          => 1,
@@ -231,8 +232,8 @@ final class User {
 		$sql .= sprintf(
 			' ORDER BY um.umeta_id DESC
 			LIMIT %1$d OFFSET %2$d',
-			$args['number'],
-			$args['offset']
+			$args['posts_per_page'],
+			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
 		);
 
 		$user_ids = $wpdb->get_col( $wpdb->prepare($sql)); // phpcs:ignore
@@ -251,7 +252,7 @@ final class User {
 
 		$total = $wpdb->get_var($wpdb->prepare($count_query)); // phpcs:ignore
 
-		$total_pages = \floor( $total / $args['number'] ) + 1;
+		$total_pages = \floor( $total / $args['posts_per_page'] ) + 1;
 
 		$formatted_users = array_map( [ $this, 'format_user_details' ], $users );
 

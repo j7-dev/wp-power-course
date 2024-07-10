@@ -80,7 +80,7 @@ final class Product {
 			'status'         => [ 'publish', 'draft' ],
 			'paginate'       => true,
 			'posts_per_page' => 10,
-			'page'           => 1,
+			'paged'          => 1,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 		];

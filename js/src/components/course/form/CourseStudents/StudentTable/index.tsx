@@ -7,6 +7,10 @@ import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { Dayjs } from 'dayjs'
+import {
+  defaultPaginationProps,
+  defaultTableProps,
+} from '@/pages/admin/Courses/CourseSelector/utils'
 
 const index = () => {
   const apiUrl = useApiUrl()
@@ -171,11 +175,14 @@ const index = () => {
         />
       </div>
       <Table
+        {...defaultTableProps}
         {...tableProps}
-        rowKey="id"
         columns={columns}
         rowSelection={rowSelection}
-        size="small"
+        pagination={{
+          ...tableProps.pagination,
+          ...defaultPaginationProps,
+        }}
       />
     </>
   )
