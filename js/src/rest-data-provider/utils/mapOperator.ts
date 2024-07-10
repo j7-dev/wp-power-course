@@ -90,6 +90,11 @@ function dateMapOperator(filter: TFilter): TMapOperatorReturn {
 function normalMapOperator(filter: TFilter): TMapOperatorReturn {
   const { field, operator, value } = filter
   switch (operator) {
+    case 'ne':
+      return {
+        formattedField: field,
+        formattedValue: `!${value}`,
+      }
     case 'in': // because query-string help us to handle array values
     case 'eq':
     default:
