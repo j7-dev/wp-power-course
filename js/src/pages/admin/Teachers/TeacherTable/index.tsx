@@ -19,7 +19,7 @@ import { UserDrawer } from '@/components/user'
 const index = () => {
   const apiUrl = useApiUrl()
   const invalidate = useInvalidate()
-  const columns = useColumns()
+
   const { tableProps } = useTable<TUserRecord>({
     resource: 'users',
     filters: {
@@ -130,6 +130,9 @@ const index = () => {
 
   const [form] = Form.useForm()
   const { show, drawerProps } = useUserFormDrawer({ form, resource: 'users' })
+  const columns = useColumns({
+    onClick: show,
+  })
 
   return (
     <>

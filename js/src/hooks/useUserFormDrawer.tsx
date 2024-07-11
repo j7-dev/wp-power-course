@@ -61,9 +61,8 @@ export function useUserFormDrawer({
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
 
-      const formData = toFormData(values)
-
       if (isUpdate) {
+        const formData = toFormData(values)
         update(
           {
             id: record?.id,
@@ -80,6 +79,10 @@ export function useUserFormDrawer({
           },
         )
       } else {
+        const formData = toFormData({
+          ...values,
+          is_teacher: 'yes',
+        })
         create(
           {
             resource,
@@ -136,12 +139,12 @@ export function useUserFormDrawer({
   }
 
   useEffect(() => {
-    if (record?.id) {
+    if (record?.id && open) {
       form.setFieldsValue(record)
     } else {
       form.resetFields()
     }
-  }, [record])
+  }, [record, open])
 
   return {
     open,

@@ -34,8 +34,8 @@ final class User {
 			'permission_callback' => null,
 		],
 		[
-			'endpoint'            => 'users/students',
-			'method'              => 'get',
+			'endpoint'            => 'users',
+			'method'              => 'post',
 			'permission_callback' => null,
 		],
 		[
@@ -43,6 +43,12 @@ final class User {
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
+		[
+			'endpoint'            => 'users/students',
+			'method'              => 'get',
+			'permission_callback' => null,
+		],
+
 		[
 			'endpoint'            => 'users/add-teachers', // 設定為講師
 			'method'              => 'post',
@@ -276,6 +282,56 @@ final class User {
 	}
 
 	/**
+	 * 新增用戶
+	 *
+	 * @param \WP_REST_Request $request 包含新增用戶所需資料的REST請求對象。
+	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_users_callback( \WP_REST_Request $request ): \WP_REST_Response {
+		$body_params = $request->get_body_params();
+
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+
+		[
+		'data' => $data,
+		'meta_data' => $meta_data,
+		] = WP::separator( args: $body_params, obj: 'user' );
+
+		$user_id = \wp_insert_user( $data );
+
+		if (\is_wp_error($user_id)) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 'create_user_error',
+				'message' => $user_id->get_error_message(),
+				'data'    => null,
+			],
+			400
+			);
+		}
+
+		$update_success = false;
+		foreach ( $meta_data as $key => $value ) {
+			$update_success = (bool) \update_user_meta($user_id, $key, $value );
+			if (!$update_success) {
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => $update_success ? 'post_user_success' : 'post_user_error',
+				'message' => $update_success ? '修改成功' : '修改失敗',
+				'data'    => [
+					'id' => (string) $user_id,
+				],
+			],
+			$update_success ? 200 : 400
+			);
+	}
+
+	/**
 	 * Format user details
 	 *
 	 * @param \WP_User $user  User.
@@ -288,7 +344,8 @@ final class User {
 		}
 		$user_id         = (int) $user->get( 'ID' );
 		$user_registered = $user->get( 'user_registered' );
-		$user_avatar_url = \get_avatar_url( $user_id  );
+		$user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
+		$user_avatar_url = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 
 		$avl_course_ids =\get_user_meta($user_id, 'avl_course_ids');
 		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
@@ -311,13 +368,14 @@ final class User {
 
 		$base_array = [
 			'id'                    => (string) $user_id,
-			'user_login'            => $user->get( 'user_login' ),
-			'user_email'            => $user->get( 'user_email' ),
-			'display_name'          => $user->get( 'display_name' ),
+			'user_login'            => $user->user_login,
+			'user_email'            =>$user->user_email,
+			'display_name'          => $user->display_name,
 			'user_registered'       => $user_registered,
 			'user_registered_human' => \human_time_diff( \strtotime( $user_registered ) ),
 			'user_avatar_url'       => $user_avatar_url,
 			'avl_courses'           => $avl_courses,
+			'description'           => $user->description,
 		];
 
 		return $base_array;
@@ -416,6 +474,13 @@ final class User {
 		);
 	}
 
+	/**
+	 * 將指定用戶批量移除講師身分
+	 *
+	 * @param \WP_REST_Request $request 包含用戶ID的REST請求。
+	 * @return \WP_REST_Response 包含操作結果的響應對象。
+	 * @phpstan-ignore-next-line
+	 */
 	public function post_users_remove_teachers_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
 		$body_params = $request->get_body_params();

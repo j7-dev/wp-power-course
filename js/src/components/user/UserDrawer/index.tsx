@@ -6,6 +6,8 @@ const { Item } = Form
 
 export const UserDrawer: FC<DrawerProps> = (drawerProps) => {
   const form = Form.useFormInstance()
+  const watchId = Form.useWatch(['id'], form)
+  const isUpdate = !!watchId
 
   return (
     <>
@@ -18,14 +20,42 @@ export const UserDrawer: FC<DrawerProps> = (drawerProps) => {
           </Item>
           <UserAvatarUpload />
 
-          <Item name={['user_login']} label="帳號名稱(username)">
-            <Input />
+          <Item
+            name={['user_login']}
+            label="帳號名稱(username)"
+            rules={[
+              {
+                required: true,
+                message: '帳號名稱為必填欄位',
+              },
+            ]}
+          >
+            <Input disabled={isUpdate} />
           </Item>
-          <Item name={['user_pass']} label="密碼">
+          <Item
+            name={['user_pass']}
+            label="密碼"
+            initialValue={undefined}
+            rules={[
+              {
+                required: !isUpdate,
+                message: '密碼為必填欄位',
+              },
+            ]}
+          >
             <Input.Password />
           </Item>
-          <Item name={['user_email']} label="Email">
-            <Input />
+          <Item
+            name={['user_email']}
+            label="Email"
+            rules={[
+              {
+                required: true,
+                message: 'Email為必填欄位',
+              },
+            ]}
+          >
+            <Input disabled={isUpdate} />
           </Item>
           <Item name={['display_name']} label="顯示名稱">
             <Input />

@@ -1,13 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ImgCrop from 'antd-img-crop'
-import { Upload, UploadProps, Form, Input, UploadFile } from 'antd'
+import {
+  Upload,
+  UploadProps,
+  Form,
+  Input,
+  UploadFile,
+  message,
+  GetProp,
+} from 'antd'
 import { useApiUrl } from '@refinedev/core'
 
 const { Item } = Form
 
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
+
 export const UserAvatarUpload = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const form = Form.useFormInstance()
+  const watchId = Form.useWatch(['id'], form)
 
   const apiUrl = useApiUrl()
 
@@ -15,14 +26,36 @@ export const UserAvatarUpload = () => {
     file,
     fileList: newFileList,
   }) => {
-    setFileList(newFileList)
     const { status } = file
+    setFileList(newFileList)
     if ('done' !== status) return
 
-    const attachmentId = file?.response?.data?.id
+    const url = file?.response?.data?.url
 
-    form.setFieldValue('pc_user_avatar', attachmentId)
+    form.setFieldValue('user_avatar_url', url)
   }
+
+  // const beforeUpload = (file: FileType) => {
+  //   const isLt2M = file.size / 1024 / 1024 < 2
+  //   if (!isLt2M) {
+  //     message.error('圖片大小必須小於 2MB!')
+  //   }
+  //   return false
+  // }
+
+  useEffect(() => {
+    if (watchId) {
+      const url = form.getFieldValue(['user_avatar_url'])
+      setFileList([
+        {
+          uid: '-1',
+          name: 'user_avatar_url.png',
+          status: 'done',
+          url,
+        },
+      ])
+    }
+  }, [watchId])
 
   return (
     <div className="flex justify-center w-full mb-4">
@@ -33,6 +66,9 @@ export const UserAvatarUpload = () => {
         resetText="重置"
         cropShape="round"
         showGrid
+        onModalCancel={(resolve) => {
+          resolve(Upload.LIST_IGNORE)
+        }}
       >
         <Upload
           name="files"
@@ -46,12 +82,22 @@ export const UserAvatarUpload = () => {
           withCredentials
           fileList={fileList}
           onChange={onChange}
-          onPreview={undefined}
+          previewFile={async (file) => {
+            return 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
+          }}
+
+          // beforeUpload={beforeUpload}
         >
-          {fileList.length < 1 && '上傳'}
+          {fileList.length < 1 && (
+            <p className="text-xs">
+              建議尺寸
+              <br />
+              400x400
+            </p>
+          )}
         </Upload>
       </ImgCrop>
-      <Item name={['pc_user_avatar']} hidden>
+      <Item name={['user_avatar_url']} hidden>
         <Input />
       </Item>
     </div>
