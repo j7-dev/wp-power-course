@@ -3,15 +3,15 @@
  * @var mixed $args
  */
 
-$default_props = [
+$default_args = [
 	'course_tabs'        => [],
 	'default_active_key' => '0',
 ];
 
-$props = wp_parse_args( $args, $default_props );
+$args = wp_parse_args( $args, $default_args );
 
-$course_tabs        = $props['course_tabs'];
-$default_active_key = $props['default_active_key'];
+$course_tabs        = $args['course_tabs'];
+$default_active_key = $args['default_active_key'];
 
 echo '<div class="[&_.active]:!block mb-12">';
 
