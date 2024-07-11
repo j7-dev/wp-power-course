@@ -35,7 +35,7 @@ $back_to_my_course_html = sprintf(
 	/*html*/'
 		<a
 			href="%1$s"
-			class="hover:opacity-75 transition duration-300 contents lg:hidden"
+			class="hover:opacity-75 transition duration-300 contents lg:tw-hidden"
 		>
 			<img class="w-6 h-6" src="%2$s" />
 		</a>
@@ -54,7 +54,7 @@ if (!$is_this_chapter_finished) {
 		/*html*/'
 		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base">
 			我已完成此單元
-			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 hidden"></span>
+			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 tw-hidden"></span>
 		</button>
 		',
 		$product_id,
@@ -105,7 +105,7 @@ printf(
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1">%1$s</h2>
 		%2$s
 	</div>
-	<div class="fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 lg:grid-flow-row lg:rtl w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
+	<div class="tw-fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-[1fr_1.5rem_1fr] lg:grid-cols-2 lg:grid-flow-row lg:rtl w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
 		%3$s
 		%4$s
 		%5$s

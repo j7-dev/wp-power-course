@@ -68,7 +68,7 @@ const index = () => {
       const isVariation = getIsVariation(record?.type)
       return {
         disabled: isVariation,
-        className: isVariation ? 'hidden' : '',
+        className: isVariation ? 'tw-hidden' : '',
       }
     },
     onChange: (currentSelectedRowKeys: React.Key[]) => {

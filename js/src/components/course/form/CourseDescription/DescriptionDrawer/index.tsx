@@ -51,7 +51,7 @@ const DescriptionDrawer = () => {
 			<Button type="primary" icon={<EditOutlined />} onClick={show}>
 				編輯課程重點介紹
 			</Button>
-			<Item name={['description']} label="課程重點介紹" hidden>
+			<Item name={['description']} label="課程重點介紹">
 				<Input.TextArea rows={8} disabled />
 			</Item>
 			<Drawer

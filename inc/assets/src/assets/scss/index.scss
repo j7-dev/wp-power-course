@@ -104,8 +104,9 @@ div .pc-rating input[aria-checked="true"] ~ input {
 // Notion 編輯器 HTML 內容
 div[id^="tab-content"] {
 	#yoopta-clipboard {
-		img {
+		img:not([class]) {
 			max-width: 100%;
+			width: 46rem;
 		}
 		h1,
 		h2,

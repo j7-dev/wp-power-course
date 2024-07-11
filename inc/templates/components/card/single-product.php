@@ -70,7 +70,7 @@ Templates::get(
 		'outline'       => true,
 		'icon'          => 'shopping-bag',
 		'shape'         => 'square',
-		'wrapper_class' => '[&_a.wc-forward]:hidden',
+		'wrapper_class' => '[&_a.wc-forward]:tw-hidden',
 		'class'         => '',
 	],
 	false

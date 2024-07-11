@@ -42,7 +42,7 @@ export const Gallery: React.FC<{
       {images.map((image, i) => (
         <img
           key={`main-${image}-${i}`}
-          className={`aspect-square w-full object-cover ${image === selected ? 'block' : 'hidden'}`}
+          className={`aspect-square w-full object-cover ${image === selected ? 'block' : 'tw-hidden'}`}
           src={image || defaultImage}
         />
       ))}

@@ -28,7 +28,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 printf(
 	/*html*/'
-<div id="pc-classroom-sider" class="hidden lg:block w-[25rem] bg-white z-20 left-0 h-screen expended"
+<div id="pc-classroom-sider" class="tw-hidden lg:block w-[25rem] bg-white z-20 left-0 h-screen expended"
 	style="border-right: 1px solid #eee;position:fixed;left:0px">
 	<div id="pc-classroom-sider__main">
 		%1$s

@@ -238,7 +238,7 @@ const BundleForm: FC<{
             onClick={() => setShowList(!showList)}
           />
           <div
-            className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 h-[30rem] overflow-y-auto ${showList ? 'block' : 'hidden'}`}
+            className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 h-[30rem] overflow-y-auto ${showList ? 'block' : 'tw-hidden'}`}
             onMouseLeave={() => setShowList(false)}
           >
             <List

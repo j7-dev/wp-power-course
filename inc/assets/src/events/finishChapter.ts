@@ -15,9 +15,9 @@ export function finishChapter() {
     const { isLoading, showDialog, isSuccess, chapter_id } =
       store.get(finishChapterAtom)
     if (isLoading) {
-      FinishButton.find('.pc-loading-spinner').removeClass('hidden')
+      FinishButton.find('.pc-loading-spinner').removeClass('tw-hidden')
     } else {
-      FinishButton.find('.pc-loading-spinner').addClass('hidden')
+      FinishButton.find('.pc-loading-spinner').addClass('tw-hidden')
     }
 
     if (isSuccess) {

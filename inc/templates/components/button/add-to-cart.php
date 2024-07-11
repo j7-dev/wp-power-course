@@ -22,7 +22,7 @@ $default_props = [
 	'loading'       => false,
 	'product'       => null, // 🆕  WC_Product
 	'qty'           => 1, // 🆕
-	'wrapper_class' => '[&_.added]:hidden', // 🆕
+	'wrapper_class' => '[&_.added]:tw-hidden', // 🆕
 ];
 
 /**

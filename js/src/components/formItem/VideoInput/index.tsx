@@ -53,7 +53,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
       {recordId && !preview && (
         <div className={'mt-8'}>
           <div
-            className={`rounded-xl bg-gray-200 ${!isEmpty ? 'block' : 'hidden'}`}
+            className={`rounded-xl bg-gray-200 ${!isEmpty ? 'block' : 'tw-hidden'}`}
             style={{
               position: 'relative',
               paddingTop: '56.25%',

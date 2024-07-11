@@ -92,7 +92,7 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 				'product'       => $bundle_product,
 				'type'          => 'primary',
 				'class'         => 'px-6 text-white ',
-				'wrapper_class' => '[&_a.wc-forward]:hidden',
+				'wrapper_class' => '[&_a.wc-forward]:tw-hidden',
 			]
 		);
 		?>

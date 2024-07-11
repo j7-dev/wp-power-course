@@ -126,7 +126,9 @@ const index: FC<{
             )}
           </Button>
         </Divider>
-        <div className={`grid-cols-4 gap-x-4 ${isExpand ? 'grid' : 'hidden'}`}>
+        <div
+          className={`grid-cols-4 gap-x-4 ${isExpand ? 'grid' : 'tw-hidden'}`}
+        >
           {(
             [
               'featured',
