@@ -1,4 +1,8 @@
-import { LineChartOutlined, TableOutlined } from '@ant-design/icons'
+import {
+  LineChartOutlined,
+  TableOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
 
 export const resources = [
   {
@@ -15,6 +19,14 @@ export const resources = [
     meta: {
       label: '課程列表',
       icon: <TableOutlined />,
+    },
+  },
+  {
+    name: 'teachers',
+    list: '/teachers',
+    meta: {
+      label: '講師管理',
+      icon: <UserOutlined />,
     },
   },
 ]

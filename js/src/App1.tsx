@@ -1,8 +1,5 @@
 /* eslint-disable quote-props */
 import '@/assets/scss/index.scss'
-import DefaultPage from '@/pages'
-import About from '@/pages/about'
-
 import { Refine } from '@refinedev/core'
 
 import {
@@ -23,7 +20,9 @@ import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bu
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab, siteUrl } from '@/utils'
 import { resources } from '@/resources'
+import Dashboard from '@/pages/admin/Dashboard'
 import Courses from '@/pages/admin/Courses'
+import Teachers from '@/pages/admin/Teachers'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { WpLogo } from '@/components/general'
@@ -96,9 +95,10 @@ function App() {
               </ConfigProvider>
             }
           >
-            <Route index element={<DefaultPage />} />
-            <Route path="/dashboard" element={<About />} />
+            <Route index element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courses" element={<Courses />} />
+            <Route path="/teachers" element={<Teachers />} />
 
             <Route path="*" element={<ErrorComponent />} />
           </Route>

@@ -89,7 +89,7 @@ final class User {
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
 			'posts_per_page' => 10,
-			'orderby'        => 'registered',
+			'orderby'        => 'ID',
 			'order'          => 'DESC',
 			'offset'         => 0,
 			'paged'          => 1,
