@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { Table, message } from 'antd'
+import { Table, message, Button, Form } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
@@ -11,8 +11,10 @@ import {
   defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import UserSelector from '../UserSelector'
-import { AddTeacherButton } from '@/components/teacher'
 import { PopconfirmDelete } from '@/components/general'
+import { useUserFormDrawer } from '@/hooks'
+import { PlusOutlined } from '@ant-design/icons'
+import { UserDrawer } from '@/components/user'
 
 const index = () => {
   const apiUrl = useApiUrl()
@@ -22,16 +24,16 @@ const index = () => {
     resource: 'users',
     filters: {
       permanent: [
-        // {
-        //   field: 'meta_key',
-        //   operator: 'eq',
-        //   value: 'is_teacher',
-        // },
-        // {
-        //   field: 'meta_value',
-        //   operator: 'eq',
-        //   value: 'yes',
-        // },
+        {
+          field: 'meta_key',
+          operator: 'eq',
+          value: 'is_teacher',
+        },
+        {
+          field: 'meta_value',
+          operator: 'eq',
+          value: 'yes',
+        },
       ],
     },
     pagination: {
@@ -53,7 +55,7 @@ const index = () => {
   const handleRemove = () => {
     mutate(
       {
-        url: `${apiUrl}/courses/remove-students`,
+        url: `${apiUrl}/users/remove-teachers`,
         method: 'post',
         values: {
           user_ids: selectedRowKeys,
@@ -71,7 +73,7 @@ const index = () => {
             key: 'remove-students',
           })
           invalidate({
-            resource: 'users/students',
+            resource: 'users',
             invalidates: ['list'],
           })
           setSelectedRowKeys([])
@@ -126,10 +128,20 @@ const index = () => {
     )
   }
 
+  const [form] = Form.useForm()
+  const { show, drawerProps } = useUserFormDrawer({ form, resource: 'users' })
+
   return (
     <>
-      <div className="flex gap-4">
-        <AddTeacherButton />
+      <div className="flex gap-4 mb-4">
+        <Button
+          type="primary"
+          className="mb-4"
+          icon={<PlusOutlined />}
+          onClick={show()}
+        >
+          創建講師
+        </Button>
         <div className="flex-1">
           <UserSelector />
         </div>
@@ -156,6 +168,9 @@ const index = () => {
           ...defaultPaginationProps,
         }}
       />
+      <Form layout="vertical" form={form}>
+        <UserDrawer {...drawerProps} />
+      </Form>
     </>
   )
 }

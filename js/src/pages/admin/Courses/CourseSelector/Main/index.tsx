@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Form } from 'antd'
+import { Table, FormInstance, Spin, Form, Button } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
   initialFilteredValues,
@@ -22,11 +22,12 @@ import useValueLabelMapper from '@/pages/admin/Courses/CourseSelector/hooks/useV
 import { useWindowSize } from '@uidotdev/usehooks'
 import { useAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
-import { AddCourseButton, SortableChapter } from '@/components/course'
+import { SortableChapter } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
 import { useCourseFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 import useColumns from '@/pages/admin/Courses/CourseSelector/hooks/useColumns'
+import { PlusOutlined } from '@ant-design/icons'
 
 const index = () => {
   const { width = 1920 } = useWindowSize()
@@ -145,7 +146,14 @@ const index = () => {
               ]}
             />
           </div>
-          <AddCourseButton />
+          <Button
+            type="primary"
+            className="mb-4"
+            icon={<PlusOutlined />}
+            onClick={showCourseDrawer()}
+          >
+            新增課程
+          </Button>
 
           <Table
             {...defaultTableProps}

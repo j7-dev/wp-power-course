@@ -80,7 +80,7 @@ const index = () => {
   const handleAdd = () => {
     addStudent(
       {
-        url: `${apiUrl}/add-teachers`,
+        url: `${apiUrl}/users/add-teachers`,
         method: 'post',
         values: {
           user_ids: userIds,
@@ -98,7 +98,7 @@ const index = () => {
             key: 'add-teachers',
           })
           invalidate({
-            resource: 'teachers',
+            resource: 'users',
             invalidates: ['list'],
           })
           setUserIds([])
