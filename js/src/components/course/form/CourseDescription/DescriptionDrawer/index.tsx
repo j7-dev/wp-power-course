@@ -3,13 +3,16 @@ import { Button, Form, Drawer, Input, Alert } from 'antd'
 import { EditOutlined, GithubOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
 import { Editor, useEditor } from 'antd-toolkit'
+import { YooptaEditorProps } from 'antd-toolkit/dist/components/Editor/types'
 import { useApiUrl } from '@refinedev/core'
+import { SlateElement } from '@yoopta/editor'
 
 const { Item } = Form
 
 /**
  * TODO 取消圖片的預設 align
  * https://github.com/Darginec05/Yoopta-Editor/issues/205
+ * BUG 還沒解決時，先用 fixedYooptaEditorProps
  */
 
 const DescriptionDrawer = () => {
@@ -24,6 +27,8 @@ const DescriptionDrawer = () => {
       } as any,
     },
   )
+
+  const fixedYooptaEditorProps = fixedYooptaEditor(yooptaEditorProps)
 
   const { drawerProps, show, close, open } = useEditorDrawer()
 
@@ -90,10 +95,67 @@ const DescriptionDrawer = () => {
           closable
         />
 
-        <Editor {...yooptaEditorProps} />
+        <Editor {...fixedYooptaEditorProps} />
       </Drawer>
     </>
   )
 }
 
 export default DescriptionDrawer
+
+function fixedYooptaEditor(props: YooptaEditorProps): YooptaEditorProps {
+  const { plugins } = props
+
+  const Embed = plugins.find((obj) => obj?.plugin?.type === 'Embed')
+  if (!!Embed) {
+    /**
+     * 解決 Embed 沒有 iframe close tag 的問題
+     * @see https://github.com/Darginec05/Yoopta-Editor/issues/207
+     */
+
+    Embed.plugin.parsers.html.serialize = (
+      element: SlateElement,
+      text: string,
+    ) => {
+      const URL_BUILDERS = {
+        youtube: (id: string) => `https://www.youtube.com/embed/${id}`,
+        vimeo: (id: string) => `https://player.vimeo.com/embed/${id}`,
+        dailymotion: (id: string) =>
+          `https://www.dailymotion.com/embed/embed/${id}`,
+        figma: (id: string) =>
+          `https://www.figma.com/embed?embed_host=share&url=${id}`,
+      }
+
+      let url = element.props.provider.url
+
+      if (URL_BUILDERS[element.props.provider.type]) {
+        url = URL_BUILDERS[element.props.provider.type](
+          element.props.provider.id,
+        )
+      }
+
+      return `<div style="display: flex; width: 100%; justify-content: center">
+		<iframe src="${url}" width="${element.props.sizes.width}" height="${element.props.sizes.height}"></iframe></div>`
+    }
+  }
+
+  const Image = plugins.find((obj) => obj?.plugin?.type === 'Image')
+  if (!!Image) {
+    /**
+     * 解決 Image 對齊的問題
+     * @param element
+     * @param text
+     */
+
+    Image.plugin.parsers.html.serialize = (
+      element: SlateElement,
+      text: string,
+    ) => {
+      return `<div style="display: flex; width: 100%; justify-content: start">
+        <img src="${element.props.src}" alt="${element.props.alt}" width="${element.props.sizes.width}" height="${element.props.sizes.height}"  />
+        </div>`
+    }
+  }
+
+  return props
+}
