@@ -91,6 +91,7 @@ final class Course {
 	 * @param string $context 使用場景的上下文標識符。
 	 *
 	 * @return array 修改後的標籤和屬性列表。
+	 * @phpstan-ignore-next-line
 	 */
 	public function extend_wpkses_post_tags( $tags, $context ) {
 

@@ -43,6 +43,16 @@ final class User {
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
+		[
+			'endpoint'            => 'users/add-teachers', // 設定為講師
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
+		[
+			'endpoint'            => 'users/remove-teachers', // 解除講師身分
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
 	];
 
 	/**
@@ -59,9 +69,9 @@ final class User {
 	 */
 	public function register_api_products(): void {
 		$this->register_apis(
-			apis: $this->apis,
-			namespace: Plugin::$kebab,
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
+		apis: $this->apis,
+		namespace: Plugin::$kebab,
+		default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
 	}
 
@@ -97,8 +107,8 @@ final class User {
 		];
 
 		$args = \wp_parse_args(
-			$params,
-			$default_args,
+		$params,
+		$default_args,
 		);
 
 		if (!empty($args['search'])) {
@@ -152,22 +162,22 @@ final class User {
 			'offset'         => 0,
 			'paged'          => 1,
 			'count_total'    => true,
-			'meta_key'       => 'avl_course_ids', // phpcs:ignore
-			'meta_value'     => '', // phpcs:ignore
+		'meta_key'       => 'avl_course_ids', // phpcs:ignore
+		'meta_value'     => '', // phpcs:ignore
 		];
 
 		$args = \wp_parse_args(
-			$params,
-			$default_args,
+		$params,
+		$default_args,
 		);
 
 		if ( empty($args['meta_value']) ) {
 			return new \WP_REST_Response(
-				[
-					'code'    => 'empty_meta_value',
-					'message' => 'meta_value 不能為空，找不到 course_id',
-				],
-				400
+			[
+				'code'    => 'empty_meta_value',
+				'message' => 'meta_value 不能為空，找不到 course_id',
+			],
+			400
 			);
 		}
 
@@ -187,17 +197,17 @@ final class User {
 			'SELECT u.ID
 			FROM %1$s u
 			INNER JOIN %2$s um ON u.ID = um.user_id',
-				$wpdb->users,
-				$wpdb->usermeta,
+			$wpdb->users,
+			$wpdb->usermeta,
 			);
 		} else {
 			$sql = sprintf(
 			"SELECT u.ID
 			FROM %1\$s u
 			LEFT JOIN %2\$s um ON u.ID = um.user_id AND um.meta_key = '%3\$s'",
-				$wpdb->users,
-				$wpdb->usermeta,
-				$args['meta_key'],
+			$wpdb->users,
+			$wpdb->usermeta,
+			$args['meta_key'],
 			);
 		}
 
@@ -219,21 +229,21 @@ final class User {
 		if (!empty($args['search'])) {
 			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
 			$where         .= sprintf(
-				" AND (u.ID LIKE '%1\$s'
+			" AND (u.ID LIKE '%1\$s'
 					OR u.user_login LIKE '%1\$s'
 					OR u.user_email LIKE '%1\$s'
 					OR u.user_nicename LIKE '%1\$s'
 					OR u.display_name LIKE '%1\$s')",
-				$args['search']
+			$args['search']
 			);
 		}
 
 		$sql .= $where;
 		$sql .= sprintf(
-			' ORDER BY um.umeta_id DESC
+		' ORDER BY um.umeta_id DESC
 			LIMIT %1$d OFFSET %2$d',
-			$args['posts_per_page'],
-			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
+		$args['posts_per_page'],
+		( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
 		);
 
 		$user_ids = $wpdb->get_col( $wpdb->prepare($sql)); // phpcs:ignore
@@ -243,11 +253,11 @@ final class User {
 
 		// 查找總數
 		$count_query = sprintf(
-			'SELECT DISTINCT COUNT(DISTINCT u.ID)
+		'SELECT DISTINCT COUNT(DISTINCT u.ID)
 			FROM %1$s u
 			INNER JOIN %2$s um ON u.ID = um.user_id',
-				$wpdb->users,
-				$wpdb->usermeta,
+			$wpdb->users,
+			$wpdb->usermeta,
 		) . $where;
 
 		$total = $wpdb->get_var($wpdb->prepare($count_query)); // phpcs:ignore
@@ -332,9 +342,9 @@ final class User {
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 
 		[
-			'data' => $data,
-			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'user', files: $file_params['files'] ?? [] );
+		'data' => $data,
+		'meta_data' => $meta_data,
+		] = WP::separator( args: $body_params, obj: 'user', files: $file_params['files'] ?? [] );
 
 		$data['ID']         = $user_id;
 		$update_user_result = \wp_update_user( $data );
@@ -350,26 +360,87 @@ final class User {
 
 		if ( !!$update_success ) {
 			return new \WP_REST_Response(
-				[
-					'code'    => 'post_user_success',
-					'message' => '修改成功',
-					'data'    => [
-						'id' => (string) $user_id,
-					],
-				]
+			[
+				'code'    => 'post_user_success',
+				'message' => '修改成功',
+				'data'    => [
+					'id' => (string) $user_id,
+				],
+			]
 			);
 		} else {
 			return new \WP_REST_Response(
-				[
-					'code'    => 'post_user_error',
-					'message' => '修改失敗',
-					'data'    => [
-						'id' => (string) $user_id,
-					],
+			[
+				'code'    => 'post_user_error',
+				'message' => '修改失敗',
+				'data'    => [
+					'id' => (string) $user_id,
 				],
-				400
+			],
+			400
 			);
 		}
+	}
+
+	/**
+	 * 處理批量將用戶設定為講師的請求。
+	 *
+	 * @param \WP_REST_Request $request REST請求對象，包含需要處理的用戶ID。
+	 * @return \WP_REST_Response 返回REST響應對象，包含操作結果的狀態碼和訊息。
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_users_add_teachers_callback( \WP_REST_Request $request ): \WP_REST_Response {
+
+		$body_params = $request->get_body_params();
+
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$user_ids    = $body_params['user_ids'] ?? [];
+
+		$update_success = false;
+		foreach ( $user_ids as $user_id ) {
+			$update_success = (bool) \update_user_meta($user_id, 'is_teacher', 'yes' );
+			if (!$update_success) {
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+		[
+			'code'    => $update_success ? 'update_users_to_teachers_success' : 'update_users_to_teachers_failed',
+			'message' => $update_success ? '批量將用戶轉為講師成功' : '批量將用戶轉為講師失敗',
+			'data'    => [
+				'user_ids' => \implode(',', $user_ids),
+			],
+		],
+		$update_success ? 200 : 400
+		);
+	}
+
+	public function post_users_remove_teachers_callback( \WP_REST_Request $request ): \WP_REST_Response {
+
+		$body_params = $request->get_body_params();
+
+		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$user_ids    = $body_params['user_ids'] ?? [];
+
+		$update_success = false;
+		foreach ( $user_ids as $user_id ) {
+			$update_success = (bool) \delete_user_meta($user_id, 'is_teacher' );
+			if (!$update_success) {
+				break;
+			}
+		}
+
+		return new \WP_REST_Response(
+		[
+			'code'    => $update_success ? 'remove_teachers_success' : 'remove_teachers_failed',
+			'message' => $update_success ? '批量移除講師成功' : '批量移除講師失敗',
+			'data'    => [
+				'user_ids' => \implode(',', $user_ids),
+			],
+		],
+		$update_success ? 200 : 400
+		);
 	}
 }
 
