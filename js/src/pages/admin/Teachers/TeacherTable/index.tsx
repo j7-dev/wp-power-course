@@ -53,7 +53,7 @@ const index = () => {
   const handleRemove = () => {
     mutate(
       {
-        url: `${apiUrl}/remove-students`,
+        url: `${apiUrl}/courses/remove-students`,
         method: 'post',
         values: {
           user_ids: selectedRowKeys,
@@ -71,7 +71,7 @@ const index = () => {
             key: 'remove-students',
           })
           invalidate({
-            resource: 'students',
+            resource: 'users/students',
             invalidates: ['list'],
           })
           setSelectedRowKeys([])
@@ -91,7 +91,7 @@ const index = () => {
   const handleUpdate = (timestamp?: number) => () => {
     mutate(
       {
-        url: `${apiUrl}/update-students/`,
+        url: `${apiUrl}/courses/update-students/`,
         method: 'post',
         values: {
           user_ids: selectedRowKeys,
@@ -110,7 +110,7 @@ const index = () => {
             key: 'update-students',
           })
           invalidate({
-            resource: 'students',
+            resource: 'users/students',
             invalidates: ['list'],
           })
           setSelectedRowKeys([])

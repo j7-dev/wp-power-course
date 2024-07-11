@@ -19,7 +19,7 @@ const index = () => {
   const watchId = Form.useWatch(['id'], form)
   const columns = useColumns()
   const { tableProps } = useTable<TUserRecord>({
-    resource: 'students',
+    resource: 'users/students',
     filters: {
       permanent: [
         {
@@ -56,7 +56,7 @@ const index = () => {
   const handleRemove = () => {
     mutate(
       {
-        url: `${apiUrl}/remove-students/${watchId}`,
+        url: `${apiUrl}/courses/${watchId}/remove-students`,
         method: 'post',
         values: {
           user_ids: selectedRowKeys,
@@ -74,7 +74,7 @@ const index = () => {
             key: 'remove-students',
           })
           invalidate({
-            resource: 'students',
+            resource: 'users/students',
             invalidates: ['list'],
           })
           setSelectedRowKeys([])
@@ -94,7 +94,7 @@ const index = () => {
   const handleUpdate = (timestamp?: number) => () => {
     mutate(
       {
-        url: `${apiUrl}/update-students/${watchId}`,
+        url: `${apiUrl}/courses/${watchId}/update-students`,
         method: 'post',
         values: {
           user_ids: selectedRowKeys,
@@ -113,7 +113,7 @@ const index = () => {
             key: 'update-students',
           })
           invalidate({
-            resource: 'students',
+            resource: 'users/students',
             invalidates: ['list'],
           })
           setSelectedRowKeys([])

@@ -17,7 +17,7 @@ const index = () => {
   const watchId = Form.useWatch(['id'], form)
 
   const { selectProps } = useSelect<TUserRecord>({
-    resource: 'students',
+    resource: 'users/students',
     optionLabel: 'display_name',
     optionValue: 'id',
     filters: [
@@ -63,7 +63,7 @@ const index = () => {
   const handleAdd = () => {
     addStudent(
       {
-        url: `${apiUrl}/add-students/${watchId}`,
+        url: `${apiUrl}/courses/${watchId}/add-students`,
         method: 'post',
         values: {
           user_ids: userIds,
@@ -81,7 +81,7 @@ const index = () => {
             key: 'add-students',
           })
           invalidate({
-            resource: 'students',
+            resource: 'users/students',
             invalidates: ['list'],
           })
           setUserIds([])

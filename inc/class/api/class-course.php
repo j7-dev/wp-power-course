@@ -48,15 +48,15 @@ final class Course {
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'add-students/(?P<id>\d+)',
+			'endpoint' => 'courses/(?P<id>\d+)/add-students',
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'update-students/(?P<id>\d+)',
+			'endpoint' => 'courses/(?P<id>\d+)/update-students',
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'remove-students/(?P<id>\d+)',
+			'endpoint' => 'courses/(?P<id>\d+)/remove-students',
 			'method'   => 'post',
 		],
 		[
@@ -466,7 +466,7 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_add_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+	public function post_courses_with_id_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
@@ -500,7 +500,7 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_update_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+	public function post_courses_with_id_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
@@ -535,7 +535,7 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_remove_students_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+	public function post_courses_with_id_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );

@@ -34,7 +34,7 @@ final class User {
 			'permission_callback' => null,
 		],
 		[
-			'endpoint'            => 'students',
+			'endpoint'            => 'users/students',
 			'method'              => 'get',
 			'permission_callback' => null,
 		],
@@ -139,7 +139,7 @@ final class User {
 	 * @return \WP_REST_Response
 	 * @phpstan-ignore-next-line
 	 */
-	public function get_students_callback( $request ): \WP_REST_Response {
+	public function get_users_students_callback( $request ): \WP_REST_Response {
 
 		$params = $request->get_query_params();
 
