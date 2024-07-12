@@ -56,12 +56,15 @@ if ( ! is_array( $teacher_ids ) ) {
 			<?php echo $product->get_name(); ?>
 		</h1>
 
-		<div class="text-gray-400">
-			<?php echo \wpautop( $product->get_short_description() ); ?>
-		</div>
-
-
 		<?php
+
+		Templates::get(
+			'typography/paragraph/expandable',
+			[
+				'children' => \wpautop( $product->get_short_description() ),
+			]
+			);
+
 		$rating       = $product->get_average_rating();
 		$review_count = $product->get_review_count();
 		Templates::get(

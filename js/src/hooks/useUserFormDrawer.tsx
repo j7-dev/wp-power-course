@@ -35,9 +35,7 @@ export function useUserFormDrawer({
     )
     const isEquals = fieldNames.every((fieldName) => {
       const originValue = record?.[fieldName as keyof typeof record]
-      console.log('⭐  originValue:', originValue)
       const newValue = newValues[fieldName]
-      console.log('⭐  newValue:', newValue)
 
       return isEqual(originValue, newValue)
     })

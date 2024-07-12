@@ -6,6 +6,7 @@ import {
   responsive,
   tabs,
   coursesProduct,
+  toggleContent,
 } from './events'
 ;(function ($) {
   // 訂閱放前面
@@ -20,4 +21,5 @@ import {
   // 添加 tabs 組件事件
   tabs()
   coursesProduct()
+  toggleContent()
 })(jQuery)
