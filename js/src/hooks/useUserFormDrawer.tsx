@@ -35,7 +35,9 @@ export function useUserFormDrawer({
     )
     const isEquals = fieldNames.every((fieldName) => {
       const originValue = record?.[fieldName as keyof typeof record]
+      console.log('⭐  originValue:', originValue)
       const newValue = newValues[fieldName]
+      console.log('⭐  newValue:', newValue)
 
       return isEqual(originValue, newValue)
     })
@@ -75,6 +77,9 @@ export function useUserFormDrawer({
           {
             onSuccess: () => {
               invalidateUser()
+              if (record) {
+                setRecord({ ...(record as TUserRecord) })
+              }
             },
           },
         )
@@ -96,12 +101,23 @@ export function useUserFormDrawer({
               setOpen(false)
               form.resetFields()
               invalidateUser()
+              if (record) {
+                setRecord({ ...(record as TUserRecord) })
+              }
             },
           },
         )
       }
     })
   }
+
+  useEffect(() => {
+    if (record?.id && open) {
+      form.setFieldsValue(record)
+    } else {
+      form.resetFields()
+    }
+  }, [record, open])
 
   const mergedDrawerProps: DrawerProps = {
     title: `${isUpdate ? '編輯' : '新增'}講師`,
@@ -137,14 +153,6 @@ export function useUserFormDrawer({
     ),
     ...drawerProps,
   }
-
-  useEffect(() => {
-    if (record?.id && open) {
-      form.setFieldsValue(record)
-    } else {
-      form.resetFields()
-    }
-  }, [record, open])
 
   return {
     open,

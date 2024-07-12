@@ -75,6 +75,11 @@ if ( ! ! $teacher_ids ) {
 foreach ( $teacher_ids as $teacher_id ) {
 	$teacher = \get_user_by( 'id', $teacher_id );
 	echo '<div class="mb-12">';
-	Templates::get( 'user/about', $teacher );
+	Templates::get(
+		'user/about',
+		[
+			'user' => $teacher,
+		]
+		);
 	echo '</div>';
 }

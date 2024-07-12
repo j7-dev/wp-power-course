@@ -234,7 +234,7 @@ const BundleForm: FC<{
             onSearch={onSearch}
             enterButton
             loading={searchProductsResult.isFetching}
-            onFocus={() => setShowList(true)}
+            // onFocus={() => setShowList(true)}
             onClick={() => setShowList(!showList)}
           />
           <div

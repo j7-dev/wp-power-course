@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { Table, message, Button, Form } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
-import { Dayjs } from 'dayjs'
 import {
   defaultPaginationProps,
   defaultTableProps,
@@ -49,7 +48,7 @@ const index = () => {
       },
     })
 
-  // remove student mutation
+  // remove teacher mutation
   const { mutate, isLoading } = useCustomMutation()
 
   const handleRemove = () => {
@@ -69,8 +68,8 @@ const index = () => {
       {
         onSuccess: () => {
           message.success({
-            content: '移除學員成功！',
-            key: 'remove-students',
+            content: '移除講師成功！',
+            key: 'remove-teachers',
           })
           invalidate({
             resource: 'users',
@@ -80,48 +79,8 @@ const index = () => {
         },
         onError: () => {
           message.error({
-            content: '移除學員失敗！',
-            key: 'remove-students',
-          })
-        },
-      },
-    )
-  }
-
-  // update student mutation
-  const [time, setTime] = useState<Dayjs | undefined>(undefined)
-  const handleUpdate = (timestamp?: number) => () => {
-    mutate(
-      {
-        url: `${apiUrl}/courses/update-students/`,
-        method: 'post',
-        values: {
-          user_ids: selectedRowKeys,
-          timestamp: timestamp ?? time?.unix(),
-        },
-        config: {
-          headers: {
-            'Content-Type': 'multipart/form-data;',
-          },
-        },
-      },
-      {
-        onSuccess: () => {
-          message.success({
-            content: '批量修改觀看期限成功！',
-            key: 'update-students',
-          })
-          invalidate({
-            resource: 'users/students',
-            invalidates: ['list'],
-          })
-          setSelectedRowKeys([])
-          setTime(undefined)
-        },
-        onError: () => {
-          message.error({
-            content: '批量修改觀看期限失敗！',
-            key: 'update-students',
+            content: '移除講師失敗！',
+            key: 'remove-teachers',
           })
         },
       },

@@ -404,7 +404,8 @@ final class User {
 		'meta_data' => $meta_data,
 		] = WP::separator( args: $body_params, obj: 'user', files: $file_params['files'] ?? [] );
 
-		$data['ID']         = $user_id;
+		$data['ID'] = $user_id;
+		unset($meta_data['id']);
 		$update_user_result = \wp_update_user( $data );
 
 		$update_success = \is_numeric($update_user_result);

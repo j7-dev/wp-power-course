@@ -54,12 +54,12 @@ const DescriptionDrawer = () => {
 
   return (
     <>
-      <Button type="primary" icon={<EditOutlined />} onClick={show}>
+      {/* TODO <Button type="primary" icon={<EditOutlined />} onClick={show} >
         編輯課程重點介紹
       </Button>
       <Item name={['description']} label="課程重點介紹">
         <Input.TextArea rows={8} disabled />
-      </Item>
+      </Item> */}
       <Drawer
         {...drawerProps}
         extra={

@@ -82,9 +82,6 @@ export const UserAvatarUpload = () => {
           withCredentials
           fileList={fileList}
           onChange={onChange}
-          previewFile={async (file) => {
-            return 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-          }}
 
           // beforeUpload={beforeUpload}
         >

@@ -14,12 +14,18 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
-import { Heading, Upload } from '@/components/general'
+import {
+  Heading,
+  Upload,
+  ListSelect,
+  useListSelect,
+} from '@/components/general'
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import dayjs from 'dayjs'
 import { useUpload } from '@/bunny'
 import DescriptionDrawer from './DescriptionDrawer'
+import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 
 const { Item } = Form
 
@@ -33,7 +39,7 @@ export const CourseDescription = () => {
   const { fileList } = bunnyUploadProps
   const watchLimitType: string = Form.useWatch(['limit_type'], form)
   const watchId = Form.useWatch(['id'], form)
-  const isEdit = !!watchId
+  const isUpdate = !!watchId
 
   useEffect(() => {
     form.setFieldValue(['files'], fileList)
@@ -53,6 +59,37 @@ export const CourseDescription = () => {
       })
     }
   }
+
+  const { listSelectProps } = useListSelect<TUserRecord>({
+    resource: 'users',
+    searchField: 'search',
+    filters: [
+      {
+        field: 'meta_key',
+        operator: 'eq',
+        value: 'is_teacher',
+      },
+      {
+        field: 'meta_value',
+        operator: 'eq',
+        value: 'yes',
+      },
+      {
+        field: 'posts_per_page',
+        operator: 'eq',
+        value: 20,
+      },
+    ],
+  })
+
+  const { selectedItems: selectedTeachers } = listSelectProps
+
+  useEffect(() => {
+    form.setFieldValue(
+      ['teacher_ids'],
+      selectedTeachers.map((item) => item.id),
+    )
+  }, [selectedTeachers.length])
 
   return (
     <>
@@ -226,6 +263,16 @@ export const CourseDescription = () => {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mb-12">
+        <Heading>講師資訊</Heading>
+        <ListSelect<TUserRecord>
+          listSelectProps={listSelectProps}
+          rowName="display_name"
+          rowUrl="user_avatar_url"
+        />
+        <Item name={['teacher_ids']} hidden />
       </div>
 
       <div className="mb-12">

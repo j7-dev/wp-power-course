@@ -26,7 +26,7 @@ $user_id = $user->ID;
 
 $display_name = $user->display_name;
 
-$user_avatar_url = \get_user_meta( $user_id, 'avatar_url', true );
+$user_avatar_url = \get_user_meta( $user_id, 'user_avatar_url', true );
 
 $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url(
 	$user->ID,

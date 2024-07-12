@@ -26,6 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $product_id   = $product->get_id();
 $product_name = $product->get_name();
 $teacher_ids  = \get_post_meta( $product_id, 'teacher_ids', false );
+
 if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
 }
@@ -41,7 +42,12 @@ if ( ! is_array( $teacher_ids ) ) {
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
 				$teacher = \get_user_by( 'id', $teacher_id );
-				Templates::get( 'user', $teacher );
+				Templates::get(
+					'user',
+					[
+						'user' => $teacher,
+					]
+					);
 			}
 			?>
 		</div>

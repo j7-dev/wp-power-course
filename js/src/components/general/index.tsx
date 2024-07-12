@@ -9,6 +9,7 @@ export * from './SaleRange'
 export * from './Heading'
 export * from './FileUploadProgress'
 export * from './FileEncodeProgress'
+export * from './ListSelect'
 
 export const WpLogo: FC<{ className?: string; color?: string }> = ({
   className = 'w-6 h-6',
