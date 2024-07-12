@@ -311,23 +311,19 @@ final class User {
 			);
 		}
 
-		$update_success = false;
 		foreach ( $meta_data as $key => $value ) {
-			$update_success = (bool) \update_user_meta($user_id, $key, $value );
-			if (!$update_success) {
-				break;
-			}
+			\update_user_meta($user_id, $key, $value );
 		}
 
 		return new \WP_REST_Response(
 			[
-				'code'    => $update_success ? 'post_user_success' : 'post_user_error',
-				'message' => $update_success ? '修改成功' : '修改失敗',
+				'code'    => 'post_user_success',
+				'message' => '修改成功',
 				'data'    => [
 					'id' => (string) $user_id,
 				],
 			],
-			$update_success ? 200 : 400
+			200
 			);
 	}
 
@@ -406,39 +402,26 @@ final class User {
 
 		$data['ID'] = $user_id;
 		unset($meta_data['id']);
+
 		$update_user_result = \wp_update_user( $data );
 
 		$update_success = \is_numeric($update_user_result);
 
 		foreach ( $meta_data as $key => $value ) {
-			$update_success = \update_user_meta($user_id, $key, $value );
-			if (!$update_success) {
-				break;
-			}
+			\update_user_meta($user_id, $key, $value );
 		}
 
-		if ( !!$update_success ) {
-			return new \WP_REST_Response(
+		return new \WP_REST_Response(
 			[
-				'code'    => 'post_user_success',
-				'message' => '修改成功',
+				'code'    => $update_success ? 'post_user_success' : 'post_user_error',
+				'message' => $update_success ? '修改成功' : '修改失敗',
 				'data'    => [
-					'id' => (string) $user_id,
-				],
-			]
-			);
-		} else {
-			return new \WP_REST_Response(
-			[
-				'code'    => 'post_user_error',
-				'message' => '修改失敗',
-				'data'    => [
-					'id' => (string) $user_id,
+					'id'                 => (string) $user_id,
+					'update_user_result' => $update_user_result,
 				],
 			],
-			400
+			$update_success ? 200 : 400
 			);
-		}
 	}
 
 	/**
@@ -455,23 +438,19 @@ final class User {
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 		$user_ids    = $body_params['user_ids'] ?? [];
 
-		$update_success = false;
 		foreach ( $user_ids as $user_id ) {
-			$update_success = (bool) \update_user_meta($user_id, 'is_teacher', 'yes' );
-			if (!$update_success) {
-				break;
-			}
+			\update_user_meta($user_id, 'is_teacher', 'yes' );
 		}
 
 		return new \WP_REST_Response(
 		[
-			'code'    => $update_success ? 'update_users_to_teachers_success' : 'update_users_to_teachers_failed',
-			'message' => $update_success ? '批量將用戶轉為講師成功' : '批量將用戶轉為講師失敗',
+			'code'    =>'update_users_to_teachers_success',
+			'message' =>'批量將用戶轉為講師成功',
 			'data'    => [
 				'user_ids' => \implode(',', $user_ids),
 			],
 		],
-		$update_success ? 200 : 400
+		200
 		);
 	}
 
