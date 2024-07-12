@@ -37,7 +37,7 @@ if (!( $product instanceof \WC_Product )) {
 
 $wrapper_class  = $args['wrapper_class'];
 $args['href']   = '#';
-$args['class'] .= ' product_type_simple add_to_cart_button ajax_add_to_cart ';
+$args['class'] .= ' product_type_simple add_to_cart_button ajax_add_to_cart cursor-pointer ';
 $args['attr']  .= sprintf(
 	' data-product_id="%1$s" data-quantity="%2$s" data-product_sku="%3$s" aria-label="Add to cart: “%4$s”" aria-describedby="" rel="nofollow" ',
 	$product->get_id(),
