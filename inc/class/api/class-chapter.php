@@ -208,19 +208,16 @@ final class Chapter {
 	 */
 	public function post_finish_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$chapter_id  = $request['id'];
-		$body_params = $request->get_json_params();
+		$chapter_id = $request['id'];
+		// @phpstan-ignore-next-line
+		$body_params = $request->get_body_params() ?? [];
 		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
-
-		ob_start();
-		var_dump($body_params);
-		\J7\WpUtils\Classes\Log::info('' . ob_get_clean());
 
 		WP::include_required_params( $body_params, [ 'course_id' ]);
 
 		$course_id = (int) $body_params['course_id'];
 
-		AVLCourseMeta::add(
+		$success = AVLCourseMeta::add(
 			$course_id,
 			\get_current_user_id(),
 			'finished_chapter_ids',
@@ -229,13 +226,14 @@ final class Chapter {
 
 		return new \WP_REST_Response(
 			[
-				'code'    => '200',
-				'message' => '章節已完成',
+				'code'    => $success ? '200' : '400',
+				'message' => $success ? '章節已完成' : '章節完成失敗',
 				'data'    => [
 					'chapter_id' => $chapter_id,
 					'course_id'  => $course_id,
 				],
-			]
+			],
+			$success ? 200 : 400
 		);
 	}
 }

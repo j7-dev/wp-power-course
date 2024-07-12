@@ -60,15 +60,6 @@ final class TemplateAjax {
 			[],
 			Plugin::$version
 		);
-
-		\wp_localize_script(
-			Plugin::$kebab . '-template',
-			'pc_data',
-			[
-				'ajax_url' => \admin_url('admin-ajax.php'),
-				'nonce'    => \wp_create_nonce(Plugin::$snake),
-			]
-		);
 	}
 
 	/**

@@ -57,6 +57,17 @@ if ( ! $current_user_id ) {
 			}
 
 			echo '</div>';
+
+			printf(
+			/*html*/'
+			<script>
+				window.pc_data = {
+					"nonce": "%1$s",
+				}
+			</script>
+			',
+			\wp_create_nonce( 'wp_rest' )
+			);
 			?>
 	<script id="wp-power-course-js" src="<?php echo Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version; ?>" ></script>
 </body>
