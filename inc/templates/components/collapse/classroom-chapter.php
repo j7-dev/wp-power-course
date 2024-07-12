@@ -70,7 +70,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %2$s">
 						<div id="%3$s" class="w-8 flex justify-center items-start">%4$s</div>
 						<div class="flex-1 text-gray-800 hover:text-gray-600">
-							<p class="mb-1 font-medium">%5$s</p>
+							<p class="my-1 font-medium">%5$s</p>
 							<p class="text-gray-400 text-xs m-0 font-light">%6$s</p>
 						</div>
 					</div>

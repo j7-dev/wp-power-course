@@ -38,7 +38,7 @@ abstract class Base {
 
 	public static function get_video_length_by_seconds( int $seconds ): string {
 		if (!$seconds) {
-			return '-- : -- : --';
+			return '';
 		}
 		$video_length_h = sprintf('%02d', floor($seconds / 3600));
 		$video_length_m = sprintf('%02d', floor(( $seconds - $video_length_h * 3600 ) / 60));
