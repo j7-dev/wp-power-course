@@ -8,6 +8,13 @@
 *::after {
 	box-sizing: border-box;
 }
+*:focus-visible {
+	outline: none;
+}
+*:visited {
+	text-decoration: none;
+	color: inherit;
+}
 
 html {
 	font-size: 16px;
@@ -52,4 +59,7 @@ select {
 
 button {
 	border: unset;
+	span {
+		outline: none !important;
+	}
 }

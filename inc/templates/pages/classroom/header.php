@@ -49,20 +49,19 @@ $user_id                    = \get_current_user_id();
 $finished_chapter_ids       = AVLCourseMeta::get($product_id, $user_id, 'finished_chapter_ids');
 $is_this_chapter_finished   = in_array( (string) $current_chapter_id, $finished_chapter_ids, true);
 $finish_chapter_button_html = '';
-if (!$is_this_chapter_finished) {
-	$finish_chapter_button_html = sprintf(
+$finish_chapter_button_html = sprintf(
 		/*html*/'
-		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base">
-			我已完成此單元
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base %3$s">
+			<span>%4$s</span>
 			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 tw-hidden"></span>
 		</button>
 		',
 		$product_id,
-		$current_chapter_id
+		$current_chapter_id,
+		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : '',
+		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成'
 	);
 
-
-}
 
 // next chapter button html
 $chapter_ids     = CourseUtils::get_sub_chapters($product_id, return_ids :true);

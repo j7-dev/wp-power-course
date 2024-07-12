@@ -11,6 +11,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * Class Course
@@ -44,7 +45,7 @@ final class Chapter {
 			'permission_callback' => null,
 		],
 		[
-			'endpoint'            => 'finish-chapters/(?P<id>\d+)',
+			'endpoint'            => 'toggle-finish-chapters/(?P<id>\d+)',
 			'method'              => 'post',
 			'permission_callback' => 'is_user_logged_in',
 		],
@@ -206,7 +207,7 @@ final class Chapter {
 	 *
 	 * @phpstan-ignore-next-line
 	 */
-	public function post_finish_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
+	public function post_toggle_finish_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
 		$chapter_id = $request['id'];
 		// @phpstan-ignore-next-line
@@ -216,25 +217,62 @@ final class Chapter {
 		WP::include_required_params( $body_params, [ 'course_id' ]);
 
 		$course_id = (int) $body_params['course_id'];
+		$user_id   = \get_current_user_id();
 
-		$success = AVLCourseMeta::add(
+		$finished_chapters = AVLCourseMeta::get(
 			$course_id,
-			\get_current_user_id(),
-			'finished_chapter_ids',
-			$chapter_id
+			$user_id,
+			'finished_chapter_ids'
 		);
 
-		return new \WP_REST_Response(
-			[
-				'code'    => $success ? '200' : '400',
-				'message' => $success ? '章節已完成' : '章節完成失敗',
-				'data'    => [
-					'chapter_id' => $chapter_id,
-					'course_id'  => $course_id,
+		$is_this_chapter_finished = in_array( (string) $chapter_id, $finished_chapters, true );
+		$title                    = \get_the_title( $chapter_id);
+		$product                  = \wc_get_product( $course_id );
+
+		if ($is_this_chapter_finished) {
+			$success  = AVLCourseMeta::delete(
+				$course_id,
+				$user_id,
+				'finished_chapter_ids',
+				$chapter_id
+			);
+			$progress = CourseUtils::get_course_progress( $product );
+
+			return new \WP_REST_Response(
+				[
+					'code'    => $success ? '200' : '400',
+					'message' => $success ? "單元 {$title} 已標示為未完成！" : "單元 {$title} 標示為未完成時出錯了！",
+					'data'    => [
+						'chapter_id'               => $chapter_id,
+						'course_id'                => $course_id,
+						'is_this_chapter_finished' => $success ? false : true,
+						'progress'                 => $progress,
+					],
 				],
-			],
-			$success ? 200 : 400
-		);
+				$success ? 200 : 400
+			);
+		}
+
+		$success  = AVLCourseMeta::add(
+				$course_id,
+				$user_id,
+				'finished_chapter_ids',
+				$chapter_id
+			);
+		$progress = CourseUtils::get_course_progress( $product );
+		return new \WP_REST_Response(
+				[
+					'code'    => $success ? '200' : '400',
+					'message' => $success ? "單元 {$title} 已標示為完成！" : "單元 {$title} 標示為未完成時出錯了！",
+					'data'    => [
+						'chapter_id'               => $chapter_id,
+						'course_id'                => $course_id,
+						'is_this_chapter_finished' => $success ? true : false,
+						'progress'                 => $progress,
+					],
+				],
+				$success ? 200 : 400
+			);
 	}
 }
 

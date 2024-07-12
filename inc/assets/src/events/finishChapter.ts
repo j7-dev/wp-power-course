@@ -1,4 +1,3 @@
-import { message } from 'antd'
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import $ from 'jquery'
 import { store, finishChapterAtom } from '../store'
@@ -12,8 +11,16 @@ export function finishChapter() {
   const FinishButton = $('#finish-chapter__button')
 
   store.sub(finishChapterAtom, () => {
-    const { isLoading, showDialog, isSuccess, chapter_id, isError } =
-      store.get(finishChapterAtom)
+    const {
+      isLoading,
+      showDialog,
+      isSuccess,
+      chapter_id,
+      isError,
+      dialogMessage,
+      isFinished,
+      progress,
+    } = store.get(finishChapterAtom)
     if (isLoading) {
       FinishButton.find('.pc-loading-spinner').removeClass('tw-hidden')
     } else {
@@ -22,22 +29,42 @@ export function finishChapter() {
 
     if (isSuccess) {
       Dialog.find('#finish-chapter__dialog__title').text('成功')
-      Dialog.find('#finish-chapter__dialog__message').text(
-        `已完成 ${$('#classroom-chapter_title').text()} ！`,
-      )
-      FinishButton.hide()
+      Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
+
+      // FinishButton.hide()
+      if (isFinished === true) {
+        FinishButton.addClass('pc-btn-outline border-solid')
+          .find('span:first-child')
+          .text('標示為未完成')
+
+        $('#classroom-chapter_title-badge')
+          .removeClass('pc-badge-accent')
+          .addClass('pc-badge-secondary')
+          .text('已完成')
+      }
+
+      if (isFinished === false) {
+        FinishButton.removeClass('pc-btn-outline border-solid')
+          .find('span:first-child')
+          .text('標示為已完成')
+
+        $('#classroom-chapter_title-badge')
+          .removeClass('pc-badge-secondary')
+          .addClass('pc-badge-accent')
+          .text('未完成')
+      }
+
+      // 調整進度條
+      if (progress !== undefined) {
+        $('progress').attr('value', progress).prev().text(`${progress}%`)
+      }
+
       $(`#classroom__sider-collapse__chapter-${chapter_id}`).html(CheckIcon)
-      $('#classroom-chapter_title-badge')
-        .removeClass('pc-badge-accent')
-        .addClass('pc-badge-secondary')
-        .text('已完成')
     }
 
     if (isError) {
       Dialog.find('#finish-chapter__dialog__title').text('錯誤')
-      Dialog.find('#finish-chapter__dialog__message').text(
-        '發生錯誤，請稍後再試',
-      )
+      Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
     }
 
     if (showDialog) {
@@ -64,7 +91,7 @@ export function finishChapter() {
     const site_url = window.location.origin
 
     $.ajax({
-      url: `${site_url}/wp-json/power-course/finish-chapters/${chapter_id}`,
+      url: `${site_url}/wp-json/power-course/toggle-finish-chapters/${chapter_id}`,
       type: 'post',
       data: {
         course_id,
@@ -72,6 +99,7 @@ export function finishChapter() {
       headers: {
         'X-WP-Nonce': (window as any).pc_data?.nonce,
       },
+      timeout: 30000,
       success(response) {
         const { code } = response
         store.set(finishChapterAtom, (prev) => ({
@@ -87,11 +115,19 @@ export function finishChapter() {
           isError: true,
         }))
       },
-      complete() {
+      complete(xhr) {
+        const message = xhr?.responseJSON?.message || '發生錯誤，請稍後再試'
+        const is_this_chapter_finished =
+          xhr?.responseJSON?.data?.is_this_chapter_finished
+        const progress = xhr?.responseJSON?.data?.progress
+
         store.set(finishChapterAtom, (prev) => ({
           ...prev,
           isLoading: false,
           showDialog: true,
+          dialogMessage: message,
+          isFinished: is_this_chapter_finished,
+          progress,
         }))
       },
     })

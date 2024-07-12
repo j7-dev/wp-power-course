@@ -9,6 +9,9 @@ export const finishChapterAtom = atom({
   isSuccess: false,
   isLoading: false,
   showDialog: false,
+  dialogMessage: '',
+  isFinished: undefined,
+  progress: undefined,
 })
 
 export const windowWidthAtom = atom(0)
