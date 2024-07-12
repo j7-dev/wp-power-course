@@ -337,6 +337,95 @@ final class Course {
 	}
 
 	/**
+	 * 處理並分離產品資訊
+	 *
+	 * 根據請求分離產品資訊，並處理描述欄位。
+	 *
+	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
+	 * @throws \Exception 當找不到商品時拋出異常。.
+	 * @return array{product:\WC_Product, data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
+	 * @phpstan-ignore-next-line
+	 */
+	private function separator( $request ): array {
+		$id          = $request['id'] ?? '';
+		$body_params = $request->get_body_params();
+		$file_params = $request->get_file_params();
+
+		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
+		$sanitize_description = \wp_kses_post( $body_params['description'] ?? '' );
+
+		$body_params                = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params['description'] = $sanitize_description;
+
+		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();
+
+		[
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+
+		if ( ! $product ) {
+			throw new \Exception( '找不到商品' );
+		}
+
+		return [
+			'product'   => $product,
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		];
+	}
+
+	/**
+	 * 處理儲存課程資料
+	 *
+	 * @param \WC_Product          $product 產品物件
+	 * @param array<string, mixed> $data 要更新的資料
+	 * @return void
+	 */
+	private function handle_save_course_data( \WC_Product $product, array $data ): void {
+		foreach ( $data as $key => $value ) {
+			$method_name = 'set_' . $key;
+			$product->$method_name( $value );
+		}
+
+		$product->save();
+	}
+
+	/**
+	 * 儲存課程的元資料
+	 *
+	 * @param \WC_Product          $product 代表 WooCommerce 產品的物件
+	 * @param array<string, mixed> $meta_data 需要更新的元資料陣列
+	 * @return void
+	 */
+	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): void {
+
+		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 array 進 db
+		$teacher_ids = [];
+		if (isset($meta_data['teacher_ids'])) {
+			$teacher_ids = $meta_data['teacher_ids'];
+			unset($meta_data['teacher_ids']);
+		}
+
+		if (!!$teacher_ids) {
+			// 先刪除現有的 teacher_ids
+			$product->delete_meta_data('teacher_ids');
+			foreach ($teacher_ids as $teacher_id) {
+				$product->add_meta_data('teacher_ids', $teacher_id);
+			}
+		}
+
+		// 最後再來處理剩餘的 meta_data
+		foreach ( $meta_data as $key => $value ) {
+			$product->update_meta_data( $key, $value );
+		}
+
+		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
+
+		$product->save_meta_data();
+	}
+
+	/**
 	 * Post courses callback
 	 *
 	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
@@ -347,32 +436,13 @@ final class Course {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_courses_callback( $request ) {
-		$body_params = $request->get_body_params();
-		$file_params = $request->get_file_params();
-
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
-
-		$product = new \WC_Product_Simple();
-
 		[
+			'product' => $product,
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
-
-		foreach ( $data as $key => $value ) {
-			$method_name = 'set_' . $key;
-			$product->$method_name( $value );
-		}
-
-		$product->save();
-
-		foreach ( $meta_data as $key => $value ) {
-			$product->update_meta_data( $key, $value );
-		}
-
-		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
-
-		$product->save_meta_data();
+		] = $this->separator($request);
+		$this->handle_save_course_data($product, $data );
+		$this->handle_save_course_meta_data($product, $meta_data );
 
 		return new \WP_REST_Response(
 			[
@@ -385,6 +455,7 @@ final class Course {
 		);
 	}
 
+
 	/**
 	 * Post courses with id callback
 	 * 更新課程
@@ -394,67 +465,20 @@ final class Course {
 	 * @return \WP_REST_Response
 	 */
 	public function post_courses_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
-		$id = $request['id'];
-		if ( !$id ) {
-			return new \WP_REST_Response(
-				[
-					'code'    => 'id_not_provided',
-					'message' => '更新失敗，請提供ID',
-					'data'    => null,
-				],
-				400
-			);
-		}
-		$body_params = $request->get_body_params();
-		$file_params = $request->get_file_params();
-
-		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
-		$sanitize_description = \wp_kses_post( $body_params['description'] ?? '' );
-
-		$body_params                = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
-		$body_params['description'] = $sanitize_description;
-
-		$product = \wc_get_product( $id );
-
-		if ( ! $product ) {
-			return new \WP_REST_Response(
-				[
-					'code'    => 'product_not_found',
-					'message' => '更新失敗，找不到商品',
-					'data'    => [
-						'id' => $id,
-					],
-				],
-				400
-			);
-		}
-
 		[
+			'product' => $product,
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
-
-		foreach ( $data as $key => $value ) {
-			$method_name = 'set_' . $key;
-			$product->$method_name( $value );
-		}
-
-		$product->save();
-
-		foreach ( $meta_data as $key => $value ) {
-			$product->update_meta_data( $key, $value );
-		}
-
-		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
-
-		$product->save_meta_data();
+		] = $this->separator($request);
+		$this->handle_save_course_data($product, $data );
+		$this->handle_save_course_meta_data($product, $meta_data );
 
 		return new \WP_REST_Response(
 			[
 				'code'    => 'update_success',
 				'message' => '更新成功',
 				'data'    => [
-					'id' => $id,
+					'id' => $product->get_id(),
 				],
 			]
 		);
