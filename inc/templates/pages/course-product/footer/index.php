@@ -40,7 +40,7 @@ if ( ! ! $trial_video ) {
 	/*html*/'
 <div class="mb-12">
 	%1$s
-	<div class="max-w-[20rem]">
+	<div class="max-w-[30rem]">
 		%2$s
 	</div>
 </div>

@@ -48,9 +48,9 @@ printf(
 	<h4 class="text-xl font-semibold">%2$s</h4>
 </div>
 
-<div class="mb-6">%3$s</div>
+<div class="mb-6 max-w-[40rem] text-justify">%3$s</div>
 
-<div>
+<div class="hidden">
 	<a target="_blank" href="%4$s"
 		class="flex hover:opacity-75 whitespace-nowrap items-center text-sm text-gray-800 hover:text-gray-800 transition duration-300 ease-in-out">
 		<span style="border-bottom: 1px solid #333">前往講師個人頁</span>
@@ -63,5 +63,5 @@ printf(
 $user_avatar_url,
 $display_name,
 $description,
-$user_link
+$user_link // TODO 等講師頁做好再開放，目前先 hidden 隱藏
 );
