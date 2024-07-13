@@ -34,15 +34,16 @@ final class MyAccount {
 	 * Custom account endpoint 我的學習
 	 */
 	public function custom_account_endpoint(): void {
+		// @phpstan-ignore-next-line
 		\add_rewrite_endpoint( self::COURSES_ENDPOINT, EP_ROOT | EP_PAGES );
 	}
 
 	/**
 	 * Add menu item 我的學習
 	 *
-	 * @param array $items Menu items.
+	 * @param array<string> $items Menu items.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function courses_menu_items( array $items ): array {
 		// 重新排序，排在控制台後
