@@ -81,6 +81,17 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 			],
 		);
 
+		echo '<div class="mt-8 flex items-end gap-4">';
+		Templates::get(
+			'countdown',
+			[
+				'type'       => 'lg',
+				'item_class' => '',
+			]
+		);
+		echo '<h2>後課程即將停賣</h2>';
+		echo '</div>';
+
 		?>
 	</div>
 	<!-- Tabs -->

@@ -19,6 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+\add_filter(
+	'body_class',
+	function ( $classes ) {
+		$classes[] = 'bg-gray-50';
+		return $classes;
+	}
+);
+
 
 use J7\PowerCourse\Templates\Templates;
 

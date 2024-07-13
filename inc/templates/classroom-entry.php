@@ -29,6 +29,14 @@ if ( ! $current_user_id ) {
 	wp_safe_redirect( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
 	exit;
 }
+global $product, $chapter;
+$doc_title = sprintf(
+/*html*/'<title>%1$s | %2$s - %3$s</title>',
+$chapter->post_title,
+$product->get_name(),
+get_bloginfo( 'name' )
+);
+
 // phpcs:disable
 ?>
 <!doctype html>
@@ -37,14 +45,14 @@ if ( ! $current_user_id ) {
 		<head>
 			<meta charset="UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-			<title>Power Course | 可能是 WordPress 最好用的課程外掛</title>
+			<?php echo $doc_title; ?>
 			<link rel="stylesheet" id="wp-power-course-css" href="<?php echo Plugin::$url . '/inc/assets/dist/css/index.css?ver=' . Plugin::$version; ?>"  media='all' />
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0 min-h-screen">
+		<body class="!m-0 min-h-screen bg-gray-50">
 			<?php
-			global $product;
+
 			echo '<div id="pc-classroom-main">';
 
 			if ( ! CourseUtils::is_avl() ) {
