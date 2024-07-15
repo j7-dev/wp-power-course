@@ -11,7 +11,7 @@
  * @see https://github.com/release-it/release-it/blob/main/docs/configuration.md
  */
 
-const releasedPluginName = 'wp-power-course'
+const releasedPluginName = 'power-course'
 
 const args = process.argv.slice(2) // remove 2 default args
 
