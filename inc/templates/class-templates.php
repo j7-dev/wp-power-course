@@ -57,7 +57,7 @@ final class Templates {
 		?bool $load_once = false,
 	): ?string {
 		$result = self::safe_get( $name, $args, $echo, $load_once );
-		if ( 'NOT_FOUND' === $result ) {
+		if ( false === $result ) {
 			throw new \Exception( "模板文件 {$name} 不存在" );
 		}
 
@@ -121,7 +121,7 @@ final class Templates {
 			return ob_get_clean();
 		}
 
-		return 'NOT_FOUND';
+		return false;
 	}
 
 
