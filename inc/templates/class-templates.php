@@ -220,6 +220,16 @@ final class Templates {
 
 					if ( $slug_2 ) {
 						$GLOBALS['chapter'] = \get_post( $slug_2);
+					} else {
+						$sub_chapter_ids = CourseUtils::get_sub_chapters( $GLOBALS['product'], true );
+						if (count($sub_chapter_ids) < 1) {
+							\wp_safe_redirect( \home_url( '/404' ) );
+							exit;
+						} else {
+							$first_sub_chapter_id = $sub_chapter_ids[0];
+							\wp_safe_redirect( site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
+							exit;
+						}
 					}
 
 					// 如果商品不是課程，則不要載入模板
