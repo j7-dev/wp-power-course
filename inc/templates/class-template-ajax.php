@@ -44,6 +44,7 @@ final class TemplateAjax {
 	 * @return void
 	 */
 	public static function enqueue_assets(): void {
+		\wp_enqueue_script( 'wc-add-to-cart' );
 		\wp_enqueue_script(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/index.js',
