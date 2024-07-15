@@ -6,7 +6,8 @@
 use J7\PowerCourse\Templates\Templates;
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product'   => $GLOBALS['product'] ?? null,
+	'show_link' => false,
 ];
 
 /**
@@ -17,6 +18,7 @@ $args = wp_parse_args( $args, $default_args );
 
 [
 	'product' => $product,
+	'show_link' => $show_link,
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
@@ -75,6 +77,22 @@ if ( ! is_array( $teacher_ids ) ) {
 				'total'       => $review_count,
 			]
 		);
+
+		if ( $show_link ) {
+			echo '<div class="mt-6">';
+			Templates::get(
+				'button',
+				[
+					'href'     => site_url( 'courses' ) . '/' . $product->get_slug(),
+					'children' => '查看課程',
+					'class'    => 'w-full text-white',
+					'type'     => 'primary',
+				]
+				);
+			echo '</div>';
+		}
+
+
 		?>
 	</div>
 </div>

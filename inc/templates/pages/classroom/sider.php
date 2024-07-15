@@ -54,5 +54,5 @@ printf(
 		false
 		),
 	\wc_get_account_endpoint_url( 'courses' ),
-	Plugin::$url . '/inc/assets/src/assets/svg/wp.svg',
+	Plugin::$url . '/inc/assets/src/assets/svg/learn.svg',
 );

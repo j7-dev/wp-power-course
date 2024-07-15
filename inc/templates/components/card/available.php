@@ -40,28 +40,40 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 	$teacher       = \get_user_by( 'id', $teacher_id );
 	$teacher_name .= $teacher->display_name . $connect;
 }
+$current_user_id   = get_current_user_id();
+$limit_labels      = CourseUtils::get_limit_label_by_product( $product );
+$expire_date       = AVLCourseMeta::get( $product_id, $current_user_id, 'expire_date', true );
+$expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d H:i', $expire_date);
+$is_expired        = CourseUtils::is_expired($product, $current_user_id);
+$avl_status        = CourseUtils::get_avl_status($product, $current_user_id);
 
-$limit_labels = CourseUtils::get_limit_label_by_product( $product );
-$expire_date  = AVLCourseMeta::get( $product_id, get_current_user_id(), 'expire_date', true );
-
-$expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d', $expire_date);
+$badge_html = Templates::get(
+	'badge',
+	[
+		'type'     => $avl_status['badge_color'],
+		'children' => $avl_status['label'],
+		'class'    => 'absolute top-2 right-2 text-white text-xs z-20',
+	],
+	false
+	);
 
 printf(
 	/*html*/'
 <div class="pc-course-card">
 	<a href="%1$s">
 		<div class="pc-course-card__image-wrap group">
-	         <img class="pc-course-card__image group-hover:scale-125 transition duration-300 ease-in-out" src="%2$s" alt="%3$s" loading="lazy">
-	    </div>
+			%2$s
+			<img class="pc-course-card__image group-hover:scale-125 transition duration-300 ease-in-out" src="%3$s" alt="%4$s" loading="lazy">
+	  </div>
   </a>
 	<a href="%1$s">
-		<h3 class="pc-course-card__name">%3$s</h3>
+		<h3 class="pc-course-card__name">%4$s</h3>
 	</a>
-	<p class="pc-course-card__teachers">by %4$s</p>
-	<div>%5$s</div>
+	<p class="pc-course-card__teachers">by %5$s</p>
+	<div>%6$s</div>
 	<div class="flex gap-2 items-center">
 		<span class="text-gray-400 text-xs text-nowrap">觀看期限</span>
-		<span class="text-primary text-xs text-nowrap font-bold">%6$s</span>
+		<span class="text-primary text-xs text-nowrap font-bold">%7$s</span>
 	</div>
 </div>
 ',
@@ -70,6 +82,7 @@ site_url( 'classroom' ) . sprintf(
 	$product->get_slug(),
 	count($chapter_ids) > 0 ? $chapter_ids[0] : ''
 ),
+$badge_html,
 	$product_image_url,
 	$name,
 	$teacher_name,

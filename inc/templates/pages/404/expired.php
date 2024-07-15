@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -23,11 +24,11 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$course_schedule_timestamp = $product->get_meta( 'course_schedule' );
+$expire_date = AVLCourseMeta::get( $product->get_id(), get_current_user_id(), 'expire_date', true );
 
 $message = sprintf(
-	'課程還沒開始，課程預計於 %1$s，開始',
-	\wp_date( 'Y/m/d H:i', $course_schedule_timestamp )
+	'您的課程觀看期限已於 %1$s 到期',
+	\wp_date( 'Y/m/d H:i', $expire_date )
 );
 
 

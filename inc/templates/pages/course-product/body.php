@@ -37,7 +37,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 		);
 
 		$course_schedule_in_timestamp = $product->get_meta( 'course_schedule' );
-		$course_schedule              = $course_schedule_in_timestamp ? \date(
+		$course_schedule              = $course_schedule_in_timestamp ? \wp_date(
 			'Y/m/d H:i',
 			$course_schedule_in_timestamp
 		) : '未設定';

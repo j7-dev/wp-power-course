@@ -24,7 +24,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $message = sprintf(
-	'OOPS! 🤯 您好像還沒購買此課程，<a target="_blank" href="%1$s" class="font-semibold underline hover:no-underline">前往購買</a>',
+	'您好像還沒購買此課程，<a target="_blank" href="%1$s" class="font-semibold underline hover:no-underline">前往購買</a>',
 	site_url( 'courses' ) . '/' . $product->get_slug()
 );
 
@@ -37,5 +37,10 @@ Templates::get(
 		'message' => $message,
 	]
 );
-Templates::get( 'course-product/header' );
+Templates::get(
+	'course-product/header',
+	[
+		'show_link' => true,
+	]
+	);
 echo '</div>';

@@ -5,7 +5,7 @@
 
 $default_args = [
 	'type'    => 'default', // error, success, warning, info
-	'message' => 'OOPS! 🤯 您好像還沒購買此課程，前往購買',
+	'message' => '您好像還沒購買此課程，前往購買',
 ];
 
 /**

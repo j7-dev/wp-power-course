@@ -36,12 +36,12 @@ div .pc-rating input[aria-checked="true"] ~ input {
 
 		&::before {
 			content: "進入上課教室";
-			@apply opacity-0 hover:opacity-100 absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold text-base z-50 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+			@apply opacity-0 hover:opacity-100 absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold text-base z-10 tracking-wide cursor-pointer transition duration-300 ease-in-out;
 		}
 
 		&::after {
 			content: url("../svg/play.svg");
-			@apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-50 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+			@apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-10 tracking-wide cursor-pointer transition duration-300 ease-in-out;
 		}
 	}
 

@@ -234,7 +234,7 @@ abstract class Course {
 	 *
 	 * @param int|null $user_id 用户 ID
 	 *
-	 * @return array<\WC_Product|int> 課程 ids
+	 * @return array<\WC_Product|string> 課程 ids
 	 */
 	public static function get_avl_courses_by_user( ?int $user_id = null, ?bool $return_ids = false ): array {
 
@@ -242,7 +242,7 @@ abstract class Course {
 		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids', false);
 
 		/**
-		 * @var array<int> $avl_course_ids
+		 * @var array<string> $avl_course_ids
 		 */
 		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
 		if ($return_ids) {
@@ -426,6 +426,66 @@ abstract class Course {
 		$user_id        = $user_id ?? \get_current_user_id();
 		$avl_course_ids = self::get_avl_courses_by_user($user_id, return_ids: true);
 		return in_array($the_product_id, $avl_course_ids, true);
+	}
+
+	/**
+	 * 檢查課程是否已過期。
+	 *
+	 * 根據產品ID和用戶ID，從AVLCourseMeta中獲取課程的過期日期，
+	 * 然後判斷當前時間是否超過該過期日期。
+	 *
+	 * @param \WC_Product|null $the_product 產品實例，預設為null。
+	 * @param int|null         $user_id 用戶ID，預設為null。
+	 * @return bool 如果課程已過期，返回true；否則返回false。
+	 */
+	public static function is_expired( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
+		global $product;
+		$the_product    = $the_product ?? $product;
+		$the_product_id = $the_product->get_id();
+		$user_id        = $user_id ?? \get_current_user_id();
+		$expire_date    = AVLCourseMeta::get($the_product_id, $user_id, 'expire_date', true);
+		return empty($expire_date) ? false : $expire_date < time();
+	}
+
+	/**
+	 * 獲取課程可用狀態。
+	 *
+	 * 根據產品和用戶ID判斷課程的可用狀態，返回狀態標籤和顏色。
+	 *
+	 * @param \WC_Product|null $the_product 產品實例，預設為當前產品。
+	 * @param int|null         $user_id 用戶ID，預設為當前登入用戶。
+	 * @return array{label:string,badge_color:string } 包含'label'和'badge_color'的狀態數組。
+	 */
+	public static function get_avl_status( ?\WC_Product $the_product = null, ?int $user_id = null ): array {
+		global $product;
+		$the_product = $the_product ?? $product;
+		$user_id     = $user_id ?? \get_current_user_id();
+
+		if ( ! self::is_avl($the_product, $user_id) ) {
+			return [
+				'label'       => '未購買',
+				'badge_color' => 'ghost',
+			];
+		}
+
+		if ( ! self::is_course_ready( $the_product ) ) {
+			return [
+				'label'       => '未開課',
+				'badge_color' => 'neutral',
+			];
+		}
+
+		if ( self::is_expired( $the_product, $user_id ) ) {
+			return [
+				'label'       => '已到期',
+				'badge_color' => 'accent',
+			];
+		}
+
+		return [
+			'label'       => '可觀看',
+			'badge_color' => 'primary',
+		];
 	}
 
 	/**

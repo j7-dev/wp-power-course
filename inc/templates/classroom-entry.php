@@ -17,6 +17,7 @@
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -37,6 +38,27 @@ $product->get_name(),
 get_bloginfo( 'name' )
 );
 
+$expire_date = AVLCourseMeta::get($product->get_id(), $current_user_id, 'expire_date', true);
+$is_expired  = CourseUtils::is_expired($product, $current_user_id);
+
+
+if ( ! CourseUtils::is_avl() ) {
+	get_header();
+	Templates::get( '404/buy', null );
+	get_footer();
+	exit;
+} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
+	get_header();
+	Templates::get( '404/not-ready', null );
+	get_footer();
+	exit;
+} elseif ( $is_expired ) {
+	get_header();
+	Templates::get( '404/expired', null );
+	get_footer();
+	exit;
+}
+
 // phpcs:disable
 ?>
 <!doctype html>
@@ -54,16 +76,8 @@ get_bloginfo( 'name' )
 			<?php
 
 			echo '<div id="pc-classroom-main">';
-
-			if ( ! CourseUtils::is_avl() ) {
-				Templates::get( '404/buy', null );
-			} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-				Templates::get( '404/not-ready', null );
-			} else {
-				Templates::get( 'classroom/sider', null, true, false );
-				Templates::get( 'classroom/body', null, true, true );
-			}
-
+			Templates::get( 'classroom/sider', null, true, false );
+			Templates::get( 'classroom/body', null, true, true );
 			echo '</div>';
 
 			printf(
