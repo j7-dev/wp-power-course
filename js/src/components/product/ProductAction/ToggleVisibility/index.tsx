@@ -39,7 +39,9 @@ const ToggleVisibility: FC<{
   }
 
   return (
-    <Tooltip title={`調整可見度，目前為${isVisible ? '可見' : '隱藏'}`}>
+    <Tooltip
+      title={`調整商品型錄可見度隱藏，目前為${isVisible ? '可見' : '隱藏'}`}
+    >
       {isVisible ? (
         <EyeOutlined
           className="text-gray-400 cursor-pointer"

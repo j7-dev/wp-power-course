@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   BaseRecord,
   useList,
@@ -94,7 +94,7 @@ export const useListSelect = <T extends BaseRecord>({
   }
 
   // 初始值
-  const initItemsResult = useList<T>({
+  const { data: initData, isFetching: initIsFetching } = useList<T>({
     resource,
     filters: [
       {
@@ -108,9 +108,16 @@ export const useListSelect = <T extends BaseRecord>({
     },
   })
 
+  useEffect(() => {
+    if (!initIsFetching) {
+      const initItems = initData?.data || []
+      setSelectedItems(initItems)
+    }
+  }, [initIsFetching])
+
   const listSelectProps: TListSelectProps<T> = {
     loading: searchItemsResult.isFetching,
-    initLoading: initItemsResult.isFetching,
+    initLoading: initIsFetching,
     onSearch,
     dataSource: searchItemsResult.data?.data || [],
     onListClick,

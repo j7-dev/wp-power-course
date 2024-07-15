@@ -416,6 +416,7 @@ const BundleForm: FC<{
         formItemProps={{
           name: ['status'],
           label: '發佈',
+          initialValue: 'publish',
           getValueProps: (value) => ({ value: value === 'publish' }),
           normalize: (value) => (value ? 'publish' : 'draft'),
         }}

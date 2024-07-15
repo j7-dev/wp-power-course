@@ -206,8 +206,8 @@ final class Course {
 		$image_id          = $product->get_image_id();
 		$gallery_image_ids = $product->get_gallery_image_ids();
 
-		$image_ids = [ $image_id, ...$gallery_image_ids ];
-		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
+		$image_ids = $image_id ? [ $image_id, ...$gallery_image_ids ] : [];
+		$images    = $image_ids ? array_map( [ WP::class, 'get_image_info' ], $image_ids ) : [];
 
 		$description_array = $with_description ? [
 			'description'       => $product->get_description(),
@@ -327,8 +327,10 @@ final class Course {
 			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
 			'feature_video'       => (string) $product->get_meta( 'feature_video' ),
 			'trial_video'         => (string) $product->get_meta( 'trial_video' ),
+			'teacher_ids'         => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
 			// bundle product
 			'bundle_ids'          => $bundle_ids,
+
 		] + $children;
 
 		return array_merge(

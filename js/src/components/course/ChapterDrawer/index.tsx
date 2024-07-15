@@ -36,6 +36,7 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
           <Item
             name={['status']}
             label="發佈"
+            initialValue="publish"
             getValueProps={(value) => ({ value: value === 'publish' })}
             normalize={(value) => (value ? 'publish' : 'draft')}
           >

@@ -74,6 +74,8 @@ export function useCourseFormDrawer({
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
 
+      // BUG 要防止空 [] 被濾掉
+
       const formData = toFormData(values)
 
       if (isUpdate) {

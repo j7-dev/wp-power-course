@@ -46,7 +46,7 @@ final class ChapterFactory {
 		);
 
 		$args['post_title']    = $args['post_title'] ?? '新章節';
-		$args['post_status']   = 'draft';
+		$args['post_status']   = 'publish';
 		$args['post_author']   = \get_current_user_id();
 		$args['post_type']     = RegisterCPT::POST_TYPE;
 		$args['page_template'] = self::TEMPLATE;

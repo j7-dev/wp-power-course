@@ -50,7 +50,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
         <Input />
       </Item>
       {/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
-      {recordId && !preview && (
+      {recordId && !preview && !isEmpty && (
         <>
           <div className="absolute w-full h-full top-0 left-0 p-2">
             <div className="w-full h-full rounded-xl overflow-hidden">

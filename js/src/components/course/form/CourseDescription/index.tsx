@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   DatePicker,
   Form,
@@ -14,12 +14,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
-import {
-  Heading,
-  Upload,
-  ListSelect,
-  useListSelect,
-} from '@/components/general'
+import { Heading, ListSelect, useListSelect } from '@/components/general'
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import dayjs from 'dayjs'
@@ -41,6 +36,7 @@ export const CourseDescription = () => {
   const watchLimitType: string = Form.useWatch(['limit_type'], form)
   const watchId = Form.useWatch(['id'], form)
   const isUpdate = !!watchId
+  const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
 
   useEffect(() => {
     form.setFieldValue(['files'], fileList)
@@ -81,6 +77,7 @@ export const CourseDescription = () => {
         value: 20,
       },
     ],
+    initKeys: initTeacherIds,
   })
 
   const { selectedItems: selectedTeachers } = listSelectProps
@@ -91,6 +88,15 @@ export const CourseDescription = () => {
       selectedTeachers.map((item) => item.id),
     )
   }, [selectedTeachers.length])
+
+  useEffect(() => {
+    if (watchId) {
+      const teacherIds = form.getFieldValue(['teacher_ids'])
+      setInitTeacherIds(teacherIds || [])
+    } else {
+      setInitTeacherIds([])
+    }
+  }, [watchId])
 
   return (
     <>
@@ -290,6 +296,7 @@ export const CourseDescription = () => {
           formItemProps={{
             name: ['status'],
             label: '發佈',
+            initialValue: 'publish',
             getValueProps: (value) => ({ value: value === 'publish' }),
             normalize: (value) => (value ? 'publish' : 'draft'),
           }}

@@ -25,10 +25,15 @@ $product_id = $product->get_id();
 
 $qa_list = \get_post_meta( $product_id, 'qa_list', true );
 
+
 if ( ! is_array( $qa_list ) ) {
 	$qa_list = [];
 }
-foreach ( $qa_list as $qa ) :
+foreach ( $qa_list as $qa ) {
+	if (!isset($qa['question']) || !isset($qa['answer'])) {
+		continue;
+	}
+
 	printf(
 		/*html*/'
 	<div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
@@ -46,8 +51,4 @@ foreach ( $qa_list as $qa ) :
 		$qa['question'],
 		\wpautop( $qa['answer'])
 	);
-
-	?>
-
-	<?php
-endforeach;
+}

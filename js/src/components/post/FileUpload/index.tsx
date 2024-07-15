@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import ImgCrop from 'antd-img-crop'
-import { Upload, UploadProps, Form, Input, UploadFile, GetProp } from 'antd'
+import { Upload, UploadProps, Form, UploadFile, GetProp } from 'antd'
 import { InboxOutlined, DeleteOutlined } from '@ant-design/icons'
-import defaultImage from '@/assets/images/defaultImage.jpg'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
-
-const { Item } = Form
 
 const { Dragger } = Upload
 
@@ -41,14 +38,16 @@ export const FileUpload = () => {
   useEffect(() => {
     if (watchId) {
       const images = form.getFieldValue(['images'])
-      setFileList([
-        {
-          uid: '-1',
-          name: 'feature_image_url.png',
-          status: 'done',
-          url: images[0]?.url || defaultImage,
-        },
-      ])
+      if (images?.length) {
+        setFileList([
+          {
+            uid: '-1',
+            name: 'feature_image_url.png',
+            status: 'done',
+            url: images[0]?.url,
+          },
+        ])
+      }
     }
   }, [watchId])
 
