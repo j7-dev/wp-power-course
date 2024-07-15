@@ -55,7 +55,6 @@ module.exports = {
   },
   allowedItems: [
     'inc',
-    'modules',
     'js/dist',
     'composer.json',
     'composer.lock',
