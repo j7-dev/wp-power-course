@@ -26,6 +26,7 @@ import dayjs from 'dayjs'
 import { useUpload } from '@/bunny'
 import DescriptionDrawer from './DescriptionDrawer'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { FileUpload } from '@/components/post'
 
 const { Item } = Form
 
@@ -130,8 +131,11 @@ export const CourseDescription = () => {
         <div className="grid grid-cols-2 gap-6 mb-12 mt-12">
           <div className="mb-8">
             <p className="mb-3">課程封面圖</p>
-            <Upload {...bunnyUploadProps} />
+            <FileUpload />
             <Item hidden name={['files']} label="課程封面圖">
+              <Input />
+            </Item>
+            <Item hidden name={['images']}>
               <Input />
             </Item>
           </div>

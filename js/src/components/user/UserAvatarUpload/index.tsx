@@ -1,19 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import ImgCrop from 'antd-img-crop'
-import {
-  Upload,
-  UploadProps,
-  Form,
-  Input,
-  UploadFile,
-  message,
-  GetProp,
-} from 'antd'
+import { Upload, UploadProps, Form, Input, UploadFile } from 'antd'
 import { useApiUrl } from '@refinedev/core'
 
 const { Item } = Form
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
 export const UserAvatarUpload = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -68,6 +58,9 @@ export const UserAvatarUpload = () => {
         showGrid
         onModalCancel={(resolve) => {
           resolve(Upload.LIST_IGNORE)
+        }}
+        modalProps={{
+          zIndex: 999999,
         }}
       >
         <Upload

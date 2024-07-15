@@ -400,6 +400,8 @@ final class Course {
 	 */
 	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): void {
 
+		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
+
 		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 array 進 db
 		$teacher_ids = [];
 		if (isset($meta_data['teacher_ids'])) {

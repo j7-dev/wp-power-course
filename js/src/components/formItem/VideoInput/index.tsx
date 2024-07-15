@@ -44,38 +44,42 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
   }
 
   return (
-    <>
+    <div className="relative">
       <Upload {...bunnyUploadProps} />
       <Item hidden {...formItemProps}>
         <Input />
       </Item>
       {/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
       {recordId && !preview && (
-        <div className={'mt-8'}>
-          <div
-            className={`rounded-xl bg-gray-200 ${!isEmpty ? 'block' : 'tw-hidden'}`}
-            style={{
-              position: 'relative',
-              paddingTop: '56.25%',
-            }}
-          >
-            <iframe
-              className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
-              src={videoUrl}
-              loading="lazy"
-              allow="encrypted-media;picture-in-picture;"
-              allowFullScreen={true}
-            ></iframe>
+        <>
+          <div className="absolute w-full h-full top-0 left-0 p-2">
+            <div className="w-full h-full rounded-xl overflow-hidden">
+              <div
+                className={`rounded-xl bg-gray-200 ${!isEmpty ? 'block' : 'tw-hidden'}`}
+                style={{
+                  position: 'relative',
+                  paddingTop: '56.25%',
+                }}
+              >
+                <iframe
+                  className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
+                  src={videoUrl}
+                  loading="lazy"
+                  allow="encrypted-media;picture-in-picture;"
+                  allowFullScreen={true}
+                ></iframe>
 
-            <div
-              onClick={handleDelete}
-              className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
-            >
-              <DeleteOutlined className="text-red-500 group-hover:text-white" />
+                <div
+                  onClick={handleDelete}
+                  className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+                >
+                  <DeleteOutlined className="text-red-500 group-hover:text-white" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
-    </>
+    </div>
   )
 }
