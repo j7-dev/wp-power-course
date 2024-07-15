@@ -44,7 +44,7 @@ export const ProductName: FC<{
               maskClassName: 'rounded-md',
               forceRender: true,
             }}
-            width={40}
+            width={72}
             height={40}
             src={image_url || defaultImage}
             fallback={defaultImage}

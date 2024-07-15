@@ -1,12 +1,11 @@
-import React, { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
 import {
   TCourseRecord,
   TChapterRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
-import { message, Button } from 'antd'
+import { message } from 'antd'
 import NodeRender from './NodeRender'
-import { nanoid } from 'nanoid'
 import { chapterToTreeNode, treeToParams } from './utils'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 
@@ -89,6 +88,7 @@ export const SortableChapter: FC<{
             return (
               theRecord && (
                 <NodeRender
+                  node={node}
                   record={theRecord}
                   show={show}
                   loading={isLoading}
