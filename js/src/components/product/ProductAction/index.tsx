@@ -7,6 +7,9 @@ import AddChapter from '@/components/product/ProductAction/AddChapter'
 import ToggleVisibility from './ToggleVisibility'
 import { DeleteButton } from '@refinedev/antd'
 import { useInvalidate } from '@refinedev/core'
+import { ExportOutlined } from '@ant-design/icons'
+import { Tooltip } from 'antd'
+import { siteUrl } from '@/utils'
 
 export const ProductAction: FC<{
   record: TCourseRecord | TChapterRecord
@@ -17,6 +20,16 @@ export const ProductAction: FC<{
 
   return (
     <div className="flex gap-2">
+      <Tooltip title="開啟課程網址">
+        <a
+          href={`${siteUrl}/courses/${record?.slug}`}
+          className="text-gray-400"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExportOutlined />
+        </a>
+      </Tooltip>
       <AddChapter record={record} />
       <ToggleVisibility record={record} />
       <DeleteButton
