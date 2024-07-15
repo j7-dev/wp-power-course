@@ -220,7 +220,7 @@ abstract class Course {
 			'timestamp' => \wp_date( 'Y-m-d H:i:s', $limit_value ),
 			'month'  => "{$limit_value} 月",
 			'year'   => "{$limit_value} 年",
-			default  => "{$limit_value} 天",
+			default  => $limit_value ? "{$limit_value} 天" : '',
 		};
 
 		return [
