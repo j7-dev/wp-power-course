@@ -32,22 +32,6 @@ export const SortableChapter: FC<{
     }
   }, [record])
 
-  const handleAdd = () => {
-    const newChapter: TChapterRecord = {
-      id: `new-${nanoid(5)}`, // 不會存入DB，真正的ID是後端產生的
-      name: '新章節',
-      status: 'draft',
-      type: 'chapter',
-      depth: 0,
-      parent_id: record.id,
-    }
-
-    const newTreeData = [...treeData, chapterToTreeNode(newChapter)]
-
-    setTreeData(newTreeData)
-    handleSave(newTreeData)
-  }
-
   const handleSave = (data: TreeData<TChapterRecord>) => {
     // 這個儲存只存新增，不存章節的細部資料
     message.loading({
@@ -120,14 +104,6 @@ export const SortableChapter: FC<{
             return sortable
           }}
         />
-      </div>
-      <div className="flex gap-1">
-        <Button block onClick={handleAdd} type="primary" disabled={isLoading}>
-          新增章節
-        </Button>
-        {/* <Button type="primary" block onClick={handleSave} loading={isLoading}>
-          儲存
-        </Button> */}
       </div>
     </>
   )

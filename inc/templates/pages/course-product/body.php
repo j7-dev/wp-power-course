@@ -47,8 +47,8 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 		$count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 
 
-		$total_sales = ( $product->get_total_sales() ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-		$limit_label = CourseUtils::get_limit_label_by_product( $product );
+		$total_sales  = ( $product->get_total_sales() ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+		$limit_labels = CourseUtils::get_limit_label_by_product( $product );
 
 		Templates::get(
 			'course-product/info',
@@ -71,7 +71,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 				[
 					'icon'  => 'eye',
 					'label' => '觀看時間',
-					'value' => $limit_label,
+					'value' =>"{$limit_labels['type']} {$limit_labels['value']}",
 				],
 				[
 					'icon'  => 'team',

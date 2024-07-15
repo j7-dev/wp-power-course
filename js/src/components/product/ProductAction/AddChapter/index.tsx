@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusCircleFilled } from '@ant-design/icons'
 import { Tooltip, Button } from 'antd'
 import {
   TCourseRecord,
@@ -23,6 +23,7 @@ const AddChapter: FC<{
         values: {
           post_parent: record.id,
           post_title: `新${itemLabel}`,
+          menu_order: (record?.chapters || []).length + 1,
         },
       },
       {
@@ -46,7 +47,7 @@ const AddChapter: FC<{
           type="link"
           size="small"
           className="mx-0"
-          icon={<PlusOutlined className="text-gray-400 cursor-pointer" />}
+          icon={<PlusCircleFilled className="text-gray-400 cursor-pointer" />}
           onClick={handleCreate}
         />
       </Tooltip>

@@ -190,11 +190,13 @@ final class Templates {
 		// 使用自定義的模板
 		$items = [
 			[
+				'key'    => 'course-product',
 				'slug'   => \get_query_var( self::COURSE_SLUG ),
 				'slug_2' => \get_query_var( self::CHAPTER_ID ),
 				'path'   => Plugin::$dir . '/inc/templates/course-entry.php',
 			],
 			[
+				'key'    => 'classroom',
 				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
 				'slug_2' => \get_query_var( self::CHAPTER_ID ),
 				'path'   => Plugin::$dir . '/inc/templates/classroom-entry.php',
@@ -202,6 +204,7 @@ final class Templates {
 		];
 
 		foreach ( $items as $item ) {
+			$key    = $item['key'];
 			$slug   = $item['slug'];
 			$slug_2 = $item['slug_2'];
 			$path   = $item['path'];
@@ -218,25 +221,27 @@ final class Templates {
 
 					$GLOBALS['product'] = \wc_get_product( $product_post->ID );
 
-					if ( $slug_2 ) {
-						$GLOBALS['chapter'] = \get_post( $slug_2);
-					} else {
-						$sub_chapter_ids = CourseUtils::get_sub_chapters( $GLOBALS['product'], true );
-						if (count($sub_chapter_ids) < 1) {
-							\wp_safe_redirect( \home_url( '/404' ) );
-							exit;
-						} else {
-							$first_sub_chapter_id = $sub_chapter_ids[0];
-							\wp_safe_redirect( site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
-							exit;
-						}
-					}
-
 					// 如果商品不是課程，則不要載入模板
 					$is_course_product = CourseUtils::is_course_product( $product );
 
 					if ( ! $is_course_product ) {
 						return $template;
+					}
+
+					if ('classroom' === $key) {
+						if ( $slug_2 ) {
+							$GLOBALS['chapter'] = \get_post( $slug_2);
+						} else {
+							$sub_chapter_ids = CourseUtils::get_sub_chapters( $GLOBALS['product'], true );
+							if (count($sub_chapter_ids) < 1) {
+								\wp_safe_redirect( \home_url( '/404' ) );
+								exit;
+							} else {
+								$first_sub_chapter_id = $sub_chapter_ids[0];
+								\wp_safe_redirect( site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
+								exit;
+							}
+						}
 					}
 
 					return $path;

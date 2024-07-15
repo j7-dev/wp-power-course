@@ -203,9 +203,9 @@ abstract class Course {
 	 *
 	 * @param \WC_Product $product 商品
 	 *
-	 * @return string
+	 * @return array{type:string, value:string}
 	 */
-	public static function get_limit_label_by_product( \WC_Product $product ): string {
+	public static function get_limit_label_by_product( \WC_Product $product ): array {
 		$limit_type       = $product->get_meta( 'limit_type' );
 		$limit_type_label = match ( $limit_type ) {
 			'fixed'    => '固定時間',
@@ -223,7 +223,10 @@ abstract class Course {
 			default  => "{$limit_value} 天",
 		};
 
-		return "{$limit_type_label} {$limit_value_label}";
+		return [
+			'type'  => $limit_type_label,
+			'value' => $limit_value_label,
+		];
 	}
 
 	/**

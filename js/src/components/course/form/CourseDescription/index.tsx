@@ -102,9 +102,6 @@ export const CourseDescription = () => {
         <Item name={['name']} label="課程名稱">
           <Input allowClear />
         </Item>
-        <Item name={['sub_title']} label="課程副標題">
-          <Input allowClear />
-        </Item>
         <Item
           name={['category_ids']}
           label={keyLabelMapper('product_category_id')}

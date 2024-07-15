@@ -23,6 +23,7 @@ export function useCourseFormDrawer({
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const closeRef = useRef<HTMLDivElement>(null)
+  const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 
   // const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
@@ -33,6 +34,11 @@ export function useCourseFormDrawer({
   }
 
   const close = () => {
+    if (!unsavedChangesCheck) {
+      setOpen(false)
+      return
+    }
+
     // 與原本的值相比是否有變更
     const newValues = form.getFieldsValue()
     const fieldNames = Object.keys(newValues).filter(
@@ -83,6 +89,7 @@ export function useCourseFormDrawer({
           {
             onSuccess: () => {
               invalidateCourse()
+              setUnsavedChangesCheck(false)
             },
           },
         )
@@ -100,6 +107,7 @@ export function useCourseFormDrawer({
               setOpen(false)
               form.resetFields()
               invalidateCourse()
+              setUnsavedChangesCheck(false)
             },
           },
         )
@@ -146,9 +154,13 @@ export function useCourseFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
+      // update
       form.setFieldsValue(record)
+      setUnsavedChangesCheck(true)
     } else {
+      // create
       form.resetFields()
+      setUnsavedChangesCheck(false)
     }
   }, [record])
 

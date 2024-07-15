@@ -19,6 +19,7 @@ export function useUserFormDrawer({
   const [record, setRecord] = useState<TUserRecord | undefined>(undefined)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const closeRef = useRef<HTMLDivElement>(null)
+  const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 
   const invalidate = useInvalidate()
 
@@ -28,6 +29,11 @@ export function useUserFormDrawer({
   }
 
   const close = () => {
+    if (!unsavedChangesCheck) {
+      setOpen(false)
+      return
+    }
+
     // 與原本的值相比是否有變更
     const newValues = form.getFieldsValue()
     const fieldNames = Object.keys(newValues).filter(
@@ -78,6 +84,7 @@ export function useUserFormDrawer({
               if (record) {
                 setRecord({ ...(record as TUserRecord) })
               }
+              setUnsavedChangesCheck(false)
             },
           },
         )
@@ -102,6 +109,7 @@ export function useUserFormDrawer({
               if (record) {
                 setRecord({ ...(record as TUserRecord) })
               }
+              setUnsavedChangesCheck(false)
             },
           },
         )

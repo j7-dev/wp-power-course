@@ -2,6 +2,8 @@ import {
   LineChartOutlined,
   TableOutlined,
   UserOutlined,
+  CodeOutlined,
+  SettingOutlined,
 } from '@ant-design/icons'
 
 export const resources = [
@@ -27,6 +29,22 @@ export const resources = [
     meta: {
       label: '講師管理',
       icon: <UserOutlined />,
+    },
+  },
+  {
+    name: 'shortcodes',
+    list: '/shortcodes',
+    meta: {
+      label: '短代碼',
+      icon: <CodeOutlined />,
+    },
+  },
+  {
+    name: 'settings',
+    list: '/settings',
+    meta: {
+      label: '設定',
+      icon: <SettingOutlined />,
     },
   },
 ]

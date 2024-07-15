@@ -6,11 +6,9 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/types'
 import {
   ProductName,
-  ProductType,
   ProductPrice,
   ProductTotalSales,
   ProductCat,
-  ProductStock,
   ProductAction,
 } from '@/components/product'
 import { getPostStatus } from '@/utils'

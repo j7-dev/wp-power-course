@@ -7,6 +7,7 @@
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -40,6 +41,10 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 	$teacher_name .= $teacher->display_name . $connect;
 }
 
+$limit_labels = CourseUtils::get_limit_label_by_product( $product );
+$expire_date  = AVLCourseMeta::get( $product_id, get_current_user_id(), 'expire_date', true );
+
+$expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d', $expire_date);
 
 printf(
 	/*html*/'
@@ -54,6 +59,10 @@ printf(
 	</a>
 	<p class="pc-course-card__teachers">by %4$s</p>
 	<div>%5$s</div>
+	<div class="flex gap-2 items-center">
+		<span class="text-gray-400 text-xs text-nowrap">觀看期限</span>
+		<span class="text-primary text-xs text-nowrap font-bold">%6$s</span>
+	</div>
 </div>
 ',
 site_url( 'classroom' ) . sprintf(
@@ -70,5 +79,6 @@ site_url( 'classroom' ) . sprintf(
 			'product' => $product,
 		],
 		false
-		)
+	),
+	$expire_date_label
 );

@@ -23,6 +23,8 @@ import { resources } from '@/resources'
 import Dashboard from '@/pages/admin/Dashboard'
 import Courses from '@/pages/admin/Courses'
 import Teachers from '@/pages/admin/Teachers'
+import Settings from '@/pages/admin/Settings'
+import Shortcodes from '@/pages/admin/Shortcodes'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { WpLogo } from '@/components/general'
@@ -99,6 +101,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/teachers" element={<Teachers />} />
+            <Route path="/shortcodes" element={<Shortcodes />} />
+            <Route path="/settings" element={<Settings />} />
 
             <Route path="*" element={<ErrorComponent />} />
           </Route>
