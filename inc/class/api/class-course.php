@@ -143,7 +143,8 @@ final class Course {
 			'paged'          => 1,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
-			'is_course'      => true,
+			'meta_key'       => '_is_course',
+			'meta_value'     => 'yes',
 		];
 
 		$args = \wp_parse_args(
@@ -151,18 +152,18 @@ final class Course {
 			$default_args,
 		);
 
-		if ( isset( $args['price_range'] ) ) {
-			$args['meta_query'] = [
-				'relation' => 'AND',
-				[
-					'key'     => '_price',                                // 價格自定義欄位
-					'value'   => $args['price_range'], // 設定價格範圍
-					'compare' => 'BETWEEN',                               // 在此範圍之間
-					'type'    => 'DECIMAL',                               // 處理為數值
-				],
-			];
-			unset( $args['price_range'] );
-		}
+		// if ( isset( $args['price_range'] ) ) {
+		// $args['meta_query'] = [
+		// 'relation' => 'AND',
+		// [
+		// 'key'     => '_price',                                // 價格自定義欄位
+		// 'value'   => $args['price_range'], // 設定價格範圍
+		// 'compare' => 'BETWEEN',                               // 在此範圍之間
+		// 'type'    => 'DECIMAL',                               // 處理為數值
+		// ],
+		// ];
+		// unset( $args['price_range'] );
+		// }
 
 		$results     = \wc_get_products( $args );
 		$total       = $results->total;
