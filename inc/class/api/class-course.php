@@ -384,6 +384,7 @@ final class Course {
 	 * @return void
 	 */
 	private function handle_save_course_data( \WC_Product $product, array $data ): void {
+		$data['virtual'] = true; // 課程固定為虛擬商品
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
 			$product->$method_name( $value );
