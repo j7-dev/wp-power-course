@@ -41,13 +41,6 @@ const index = () => {
     resource: 'courses',
     onSearch,
     filters: {
-      permanent: [
-        {
-          field: 'status',
-          operator: 'eq',
-          value: ['publish'],
-        },
-      ],
       initial: getInitialFilters(initialFilteredValues),
     },
     queryOptions: {

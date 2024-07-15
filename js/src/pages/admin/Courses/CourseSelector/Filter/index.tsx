@@ -26,7 +26,7 @@ const { Item } = Form
 const { RangePicker } = DatePicker
 
 export const initialFilteredValues = {
-  status: ['publish'],
+  status: [],
   featured: '',
   downloadable: '',
   virtual: '',
