@@ -31,6 +31,9 @@ if ( ! $current_user_id ) {
 	exit;
 }
 global $product, $chapter;
+$keep_product = $product;
+$keep_chapter = $chapter;
+
 $doc_title = sprintf(
 /*html*/'<title>%1$s | %2$s - %3$s</title>',
 $chapter->post_title,
@@ -44,16 +47,22 @@ $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 
 if ( ! CourseUtils::is_avl() ) {
 	get_header();
+	$GLOBALS['product'] = $keep_product;
+	$GLOBALS['chapter'] = $keep_chapter;
 	Templates::get( '404/buy', null );
 	get_footer();
 	exit;
 } elseif ( ! CourseUtils::is_course_ready( $product ) ) {
 	get_header();
+	$GLOBALS['product'] = $keep_product;
+	$GLOBALS['chapter'] = $keep_chapter;
 	Templates::get( '404/not-ready', null );
 	get_footer();
 	exit;
 } elseif ( $is_expired ) {
 	get_header();
+	$GLOBALS['product'] = $keep_product;
+	$GLOBALS['chapter'] = $keep_chapter;
 	Templates::get( '404/expired', null );
 	get_footer();
 	exit;
@@ -74,6 +83,8 @@ if ( ! CourseUtils::is_avl() ) {
 
 		<body class="!m-0 min-h-screen bg-gray-50">
 			<?php
+			$GLOBALS['product'] = $keep_product;
+			$GLOBALS['chapter'] = $keep_chapter;
 
 			echo '<div id="pc-classroom-main">';
 			Templates::get( 'classroom/sider', null, true, false );

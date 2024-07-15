@@ -22,7 +22,16 @@ export const CoursePrice = () => {
   }, [watchIsFree])
   return (
     <div className="grid grid-cols-2 gap-4">
-      <Item name={['regular_price']} label="原價">
+      <Item
+        name={['regular_price']}
+        label="原價"
+        rules={[
+          {
+            required: true,
+            message: '請輸入原價',
+          },
+        ]}
+      >
         <InputNumber className="w-full" min={0} disabled={watchIsFree} />
       </Item>
       <Item

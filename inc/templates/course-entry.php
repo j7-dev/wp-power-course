@@ -31,8 +31,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 use J7\PowerCourse\Templates\Templates;
 
 global $product;
+$keep_product = $product;
 
-get_header(); ?>
+get_header();
+$GLOBALS['product'] = $keep_product;
+?>
 	<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
 		<!-- Header -->

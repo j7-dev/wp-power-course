@@ -135,7 +135,7 @@ export const CourseDescription = () => {
             <Item hidden name={['files']} label="課程封面圖">
               <Input />
             </Item>
-            <Item hidden name={['images']}>
+            <Item hidden name={['images']} initialValue={[]}>
               <Input />
             </Item>
           </div>
