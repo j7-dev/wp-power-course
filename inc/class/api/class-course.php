@@ -278,8 +278,8 @@ final class Course {
 			'regular_price'       => (int) $product->get_regular_price(),
 			'sale_price'          => (int) $product->get_sale_price(),
 			'on_sale'             => $product->is_on_sale(),
-			'date_on_sale_from'   => $product->get_date_on_sale_from(),
-			'date_on_sale_to'     => $product->get_date_on_sale_to(),
+			'date_on_sale_from'   => $product->get_date_on_sale_from()?->getTimestamp(),
+			'date_on_sale_to'     => $product->get_date_on_sale_to()?->getTimestamp(),
 			'total_sales'         => $product->get_total_sales(),
 
 			// Get Product Stock
