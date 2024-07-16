@@ -35,6 +35,7 @@ $product_image_url = Base::get_image_url_by_product( $product, 'full' );
 $teacher_ids       = \get_post_meta( $product_id, 'teacher_ids', false );
 $teacher_name      = '';
 foreach ( $teacher_ids as $key => $teacher_id ) {
+	$teacher_name .= 'by ';
 	$is_last       = $key === count( $teacher_ids ) - 1;
 	$connect       = $is_last ? '' : ' & ';
 	$teacher       = \get_user_by( 'id', $teacher_id );
@@ -69,7 +70,7 @@ printf(
 	<a href="%1$s">
 		<h3 class="pc-course-card__name">%4$s</h3>
 	</a>
-	<p class="pc-course-card__teachers">by %5$s</p>
+	<p class="pc-course-card__teachers">%5$s</p>
 	<div>%6$s</div>
 	<div class="flex gap-2 items-center">
 		<span class="text-gray-400 text-xs text-nowrap">觀看期限</span>
