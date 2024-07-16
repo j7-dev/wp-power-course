@@ -12,7 +12,7 @@ export const CourseBundle = () => {
   const form = Form.useFormInstance()
   const watchBundleIds: string[] = Form.useWatch(['bundle_ids'], form) || []
   const [bundleProductForm] = Form.useForm()
-  const { drawerProps, show } = useBundleFormDrawer({
+  const { drawerProps, show, open } = useBundleFormDrawer({
     form: bundleProductForm,
     resource: 'bundle_products',
   })
@@ -84,7 +84,7 @@ export const CourseBundle = () => {
       </Item>
 
       <Drawer {...drawerProps}>
-        <BundleForm form={bundleProductForm} />
+        <BundleForm form={bundleProductForm} open={open} />
       </Drawer>
     </>
   )

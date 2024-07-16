@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { DrawerProps, Button, FormInstance } from 'antd'
+import { DrawerProps, Button, FormInstance, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import { toFormData } from 'axios'
@@ -105,8 +105,11 @@ export function useBundleFormDrawer({
     })
   }
 
+  const watchName = Form.useWatch(['name'], form) || '新方案'
+  const watchId = Form.useWatch(['id'], form)
+
   const mergedDrawerProps: DrawerProps = {
-    title: `${isUpdate ? '編輯' : '新增'}銷售方案`,
+    title: `${isUpdate ? '編輯' : '新增'}銷售方案 - ${watchName} ${watchId ? `#${watchId}` : ''}`,
     forceRender: false,
     mask: false,
     placement: 'left',

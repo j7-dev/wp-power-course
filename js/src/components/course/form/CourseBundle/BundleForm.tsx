@@ -47,7 +47,8 @@ const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
 const BundleForm: FC<{
   form: FormInstance
-}> = ({ form: bundleProductForm }) => {
+  open: boolean
+}> = ({ form: bundleProductForm, open }) => {
   const selectedCourse = useAtomValue(selectedRecordAtom) as TCourseRecord
 
   const watchRegularPrice = Form.useWatch(['regular_price'], bundleProductForm)
@@ -142,6 +143,12 @@ const BundleForm: FC<{
       }),
     )
   }, [selectedProducts.length])
+
+  useEffect(() => {
+    if (open) {
+      setSelectedProducts([])
+    }
+  }, [open])
 
   // 如果是編輯，要將 included 商品資料顯示在畫面上
 
