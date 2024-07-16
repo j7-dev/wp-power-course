@@ -11,6 +11,7 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
+use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
@@ -360,6 +361,9 @@ final class Course {
 		$body_params                = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
 		$body_params['description'] = $sanitize_description;
 
+		// 將 '[]' 轉為 []
+		$body_params = Base::format_empty_array( $body_params );
+
 		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();
 
 		[
@@ -406,18 +410,22 @@ final class Course {
 
 		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
 
-		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 array 進 db
-		$teacher_ids = [];
-		if (isset($meta_data['teacher_ids'])) {
-			$teacher_ids = $meta_data['teacher_ids'];
-			unset($meta_data['teacher_ids']);
-		}
+		// 將 teacher_ids, bundle_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
+		$array_keys = [ 'teacher_ids', 'bundle_ids' ];
+		foreach ($array_keys as $meta_key) {
+			$array_value = [];
+			if (isset($meta_data[ $meta_key ])) {
+				$array_value = $meta_data[ $meta_key ];
+				unset($meta_data[ $meta_key ]);
+			}
 
-		if (!!$teacher_ids) {
-			// 先刪除現有的 teacher_ids
-			$product->delete_meta_data('teacher_ids');
-			foreach ($teacher_ids as $teacher_id) {
-				$product->add_meta_data('teacher_ids', $teacher_id);
+			if (\is_array($array_value)) {
+				// 先刪除現有的 teacher_ids
+				$product->delete_meta_data($meta_key);
+
+				foreach ($array_value as $meta_value) {
+					$product->add_meta_data($meta_key, $meta_value);
+				}
 			}
 		}
 

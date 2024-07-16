@@ -40,7 +40,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		}
 
 		/**
-		 * is_bundle_product
+		 * 是否為 bundle_product
 		 *
 		 * @param \WC_Product|int $product product.
 		 *
