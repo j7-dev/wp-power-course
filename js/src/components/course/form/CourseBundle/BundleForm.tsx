@@ -16,7 +16,11 @@ import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { useList } from '@refinedev/core'
 import { PopconfirmDelete } from '@/components/general'
-import { CheckOutlined, PlusOutlined } from '@ant-design/icons'
+import {
+  CheckOutlined,
+  PlusOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtomValue } from 'jotai'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
@@ -201,11 +205,30 @@ const BundleForm: FC<{
 
       <Item
         name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]}
-        label="請選擇要加入的商品"
-        tooltip="請輸入 2 個字以上才會搜尋，每次最多返回 20 筆資料"
-        hidden
+        className="mb-0 -mt-8"
+        rules={[
+          {
+            required: true,
+            message: (
+              <>
+                <ExclamationCircleOutlined className="mr-2" />
+                請至少加入一款產品
+              </>
+            ),
+          },
+          {
+            len: 2,
+            type: 'array',
+            message: (
+              <>
+                <ExclamationCircleOutlined className="mr-2" />
+                請至少加入一款產品
+              </>
+            ),
+          },
+        ]}
       >
-        <Input />
+        <Select className="tw-hidden" mode="multiple" options={[]} />
       </Item>
 
       <p className="mb-3">搭配你的銷售方案，請選擇要加入的商品</p>
@@ -235,7 +258,6 @@ const BundleForm: FC<{
             onSearch={onSearch}
             enterButton
             loading={searchProductsResult.isFetching}
-            // onFocus={() => setShowList(true)}
             onClick={() => setShowList(!showList)}
           />
           <div
