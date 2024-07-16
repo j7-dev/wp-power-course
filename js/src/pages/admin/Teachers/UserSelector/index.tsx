@@ -69,9 +69,10 @@ const index = () => {
         },
       ]
     },
-    queryOptions: {
-      enabled: !!keyword,
-    },
+
+    // queryOptions: {
+    //   enabled: !!keyword,
+    // },
   })
 
   // add student mutation
