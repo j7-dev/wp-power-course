@@ -255,6 +255,10 @@ final class Course {
 
 		$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids: true);
 
+		$regular_price = (int) $product->get_regular_price();
+		$sale_price    = (int) $product->get_sale_price();
+		$price_html    = Base::get_price_html( $product );
+
 		$base_array = [
 			// Get Product General Info
 			'id'                  => (string) $product->get_id(),
@@ -276,9 +280,9 @@ final class Course {
 			'review_count'        => (int) $product->get_review_count(),
 
 			// Get Product Prices
-			'price_html'          => $product->get_price_html(),
-			'regular_price'       => (int) $product->get_regular_price(),
-			'sale_price'          => (int) $product->get_sale_price(),
+			'price_html'          => $price_html,
+			'regular_price'       => $regular_price,
+			'sale_price'          => $sale_price,
 			'on_sale'             => $product->is_on_sale(),
 			'date_on_sale_from'   => $product->get_date_on_sale_from()?->getTimestamp(),
 			'date_on_sale_to'     => $product->get_date_on_sale_to()?->getTimestamp(),
