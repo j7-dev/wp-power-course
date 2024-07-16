@@ -5,7 +5,7 @@ import {
   TChapterRecord,
   TCourseRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
-import { toFormData } from 'axios'
+import { toFormData } from '@/utils'
 import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtom } from 'jotai'
 import { isEqual } from 'lodash-es'
