@@ -73,9 +73,6 @@ export function useCourseFormDrawer({
   const handleSave = () => {
     form.validateFields().then(() => {
       const values = form.getFieldsValue()
-
-      // BUG 要防止空 [] 被濾掉
-
       const formData = toFormData(values)
 
       if (isUpdate) {
@@ -156,6 +153,8 @@ export function useCourseFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
+      console.log('⭐  重新設定了')
+
       // update
       form.setFieldsValue(record)
       setUnsavedChangesCheck(true)

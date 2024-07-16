@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DrawerProps, Button, FormInstance, Popconfirm } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { toFormData } from 'axios'
+import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 
 export function useUserFormDrawer({
@@ -14,7 +14,6 @@ export function useUserFormDrawer({
   resource?: string
   drawerProps?: DrawerProps
 }) {
-  // const [record, setRecord] = useAtom(selectedRecordAtom)
   const [open, setOpen] = useState(false)
   const [record, setRecord] = useState<TUserRecord | undefined>(undefined)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程

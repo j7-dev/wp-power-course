@@ -40,7 +40,7 @@ const { Search } = Input
 
 const OPTIONS = [
   { label: '合購優惠', value: 'bundle' },
-  { label: '團購優惠', value: 'groupbuy', disabled: true },
+  { label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
 const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids

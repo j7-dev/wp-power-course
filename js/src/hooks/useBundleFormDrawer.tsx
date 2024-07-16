@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
-import { toFormData } from 'axios'
+import { toFormData } from '@/utils'
 import dayjs, { Dayjs } from 'dayjs'
 
 export function useBundleFormDrawer({

@@ -11,6 +11,7 @@ const { Item } = Form
 export const CourseBundle = () => {
   const form = Form.useFormInstance()
   const watchBundleIds: string[] = Form.useWatch(['bundle_ids'], form) || []
+  console.log('⭐  watchBundleIds:', watchBundleIds)
   const [bundleProductForm] = Form.useForm()
   const { drawerProps, show, open } = useBundleFormDrawer({
     form: bundleProductForm,

@@ -10,7 +10,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { Tooltip } from 'antd'
 import { useUpdate } from '@refinedev/core'
-import { toFormData } from 'axios'
+import { toFormData } from '@/utils'
 
 const ToggleVisibility: FC<{
   record: TCourseRecord | TChapterRecord
