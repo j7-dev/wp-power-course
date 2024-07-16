@@ -278,6 +278,7 @@ final class Course {
 			'permalink'           => \get_permalink( $product->get_id() ),
 			'average_rating'      => (float) $product->get_average_rating(),
 			'review_count'        => (int) $product->get_review_count(),
+			'purchase_note'       => $product->get_purchase_note(),
 
 			// Get Product Prices
 			'price_html'          => $price_html,

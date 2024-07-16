@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import { Form, InputNumber, DatePicker } from 'antd'
+import { Form, InputNumber, DatePicker, Input } from 'antd'
 import { FiSwitch } from '@/components/formItem'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 
 const { Item } = Form
 
@@ -62,6 +62,7 @@ export const CoursePrice = () => {
           className="w-full"
           showTime={{ defaultValue: dayjs() }}
           disabled={watchIsFree}
+          format="YYYY-MM-DD HH:mm"
         />
       </Item>
 
@@ -79,6 +80,7 @@ export const CoursePrice = () => {
           className="w-full"
           showTime={{ defaultValue: dayjs() }}
           disabled={watchIsFree}
+          format="YYYY-MM-DD HH:mm"
         />
       </Item>
 
@@ -88,6 +90,10 @@ export const CoursePrice = () => {
           label: '這是免費課程',
         }}
       />
+
+      <Item name={['purchase_note']} label="購買備註">
+        <Input.TextArea rows={4} />
+      </Item>
     </div>
   )
 }

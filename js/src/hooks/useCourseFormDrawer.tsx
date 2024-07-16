@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { DrawerProps, Button, FormInstance, Popconfirm } from 'antd'
+import { DrawerProps, Button, FormInstance, Popconfirm, Switch } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import {
   TChapterRecord,
@@ -24,6 +24,7 @@ export function useCourseFormDrawer({
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const closeRef = useRef<HTMLDivElement>(null)
   const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
+  const [publish, setPublish] = useState(true)
 
   // const isChapter = resource === 'chapters'
   const invalidate = useInvalidate()
@@ -124,28 +125,36 @@ export function useCourseFormDrawer({
     open,
     width: '50%',
     extra: (
-      <div className="flex">
-        <Popconfirm
-          title="你儲存了嗎?"
-          description="確認關閉後，你的編輯可能會遺失，請確認操作"
-          placement="leftTop"
-          okText="確認關閉"
-          cancelText="取消"
-          onConfirm={() => {
-            setOpen(false)
-          }}
-        >
-          <p ref={closeRef} className="">
-            &nbsp;
-          </p>
-        </Popconfirm>
-        <Button
-          type="primary"
-          onClick={handleSave}
-          loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
-        >
-          儲存
-        </Button>
+      <div className="flex gap-6 items-center">
+        <Switch
+          checkedChildren="發佈"
+          unCheckedChildren="草稿"
+          value={publish}
+          onChange={(checked) => setPublish(checked)}
+        />
+        <div className="flex">
+          <Popconfirm
+            title="你儲存了嗎?"
+            description="確認關閉後，你的編輯可能會遺失，請確認操作"
+            placement="leftTop"
+            okText="確認關閉"
+            cancelText="取消"
+            onConfirm={() => {
+              setOpen(false)
+            }}
+          >
+            <p ref={closeRef} className="">
+              &nbsp;
+            </p>
+          </Popconfirm>
+          <Button
+            type="primary"
+            onClick={handleSave}
+            loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
+          >
+            儲存
+          </Button>
+        </div>
       </div>
     ),
     ...drawerProps,
@@ -156,12 +165,17 @@ export function useCourseFormDrawer({
       // update
       form.setFieldsValue(record)
       setUnsavedChangesCheck(true)
+      setPublish(record?.status === 'publish')
     } else {
       // create
       form.resetFields()
       setUnsavedChangesCheck(false)
     }
   }, [record])
+
+  useEffect(() => {
+    form.setFieldValue(['status'], publish ? 'publish' : 'draft')
+  }, [publish])
 
   return {
     open,

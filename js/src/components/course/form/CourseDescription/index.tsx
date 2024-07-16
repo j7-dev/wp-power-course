@@ -101,6 +101,31 @@ export const CourseDescription = () => {
   return (
     <>
       <div className="mb-12">
+        <Heading>課程發佈</Heading>
+
+        <Item name={['slug']} label="銷售網址">
+          <Input
+            addonBefore={productUrl}
+            addonAfter={<CopyText text={`${productUrl}${slug}`} />}
+          />
+        </Item>
+
+        <FiSwitch
+          formItemProps={{
+            name: ['status'],
+            label: '發佈',
+            initialValue: 'publish',
+            getValueProps: (value) => ({ value: value === 'publish' }),
+            normalize: (value) => (value ? 'publish' : 'draft'),
+            hidden: true,
+          }}
+          switchProps={{
+            checkedChildren: '發佈',
+            unCheckedChildren: '草稿',
+          }}
+        />
+      </div>
+      <div className="mb-12">
         <Heading>課程描述</Heading>
 
         <Item name={['id']} hidden normalize={() => undefined}>
@@ -280,31 +305,6 @@ export const CourseDescription = () => {
           rowUrl="user_avatar_url"
         />
         <Item name={['teacher_ids']} hidden />
-      </div>
-
-      <div className="mb-12">
-        <Heading>課程發佈</Heading>
-
-        <Item name={['slug']} label="銷售網址">
-          <Input
-            addonBefore={productUrl}
-            addonAfter={<CopyText text={`${productUrl}${slug}`} />}
-          />
-        </Item>
-
-        <FiSwitch
-          formItemProps={{
-            name: ['status'],
-            label: '發佈',
-            initialValue: 'publish',
-            getValueProps: (value) => ({ value: value === 'publish' }),
-            normalize: (value) => (value ? 'publish' : 'draft'),
-          }}
-          switchProps={{
-            checkedChildren: '發佈',
-            unCheckedChildren: '草稿',
-          }}
-        />
       </div>
     </>
   )

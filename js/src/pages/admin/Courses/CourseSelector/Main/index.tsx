@@ -166,6 +166,7 @@ const index = () => {
             rowSelection={rowSelection}
             columns={columns}
             expandable={{
+              expandedRowKeys: ['2030'],
               expandedRowRender: (record) => (
                 <SortableChapter
                   record={record}
