@@ -308,9 +308,6 @@ final class Course {
 			// Get Product Images
 			'images'              => $images,
 
-			// PENDING meta data
-			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
-
 			'is_course'           => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
 			'parent_id'           => (string) $product->get_parent_id(),
 			'is_free'             => (string) $product->get_meta( 'is_free' ),
