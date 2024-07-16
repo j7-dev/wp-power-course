@@ -153,8 +153,6 @@ export function useCourseFormDrawer({
 
   useEffect(() => {
     if (record?.id) {
-      console.log('⭐  重新設定了')
-
       // update
       form.setFieldsValue(record)
       setUnsavedChangesCheck(true)

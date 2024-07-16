@@ -91,8 +91,25 @@ export type TCourseRecord = {
   parent_id?: string
   hours: number
   is_free: 'yes' | 'no' | ''
+  qa_list: {
+    question: string
+    answer: string
+  }[]
+  course_schedule: number
+  course_hour: number
+  course_minute: number
+  limit_type: string
+  limit_value: number
+  limit_unit: string
+  is_popular: 'yes' | 'no' | ''
+  is_featured: 'yes' | 'no' | ''
+  show_review: 'yes' | 'no' | ''
+  enable_review: 'yes' | 'no' | ''
+  enable_comment: 'yes' | 'no' | ''
+  extra_student_count: number
   feature_video: string
   trial_video: string
+  teacher_ids: string[]
   bundle_ids: string[]
 }
 

@@ -28,6 +28,9 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $product_id   = $product->get_id();
 $product_name = $product->get_name();
 $teacher_ids  = \get_post_meta( $product_id, 'teacher_ids', false );
+$is_popular   = \get_post_meta( $product_id, 'is_popular', true ) === 'yes';
+$is_featured  = \get_post_meta( $product_id, 'is_featured', true ) === 'yes';
+$show_review  = \get_post_meta( $product_id, 'show_review', true ) === 'yes';
 
 if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
@@ -59,6 +62,15 @@ if ( ! is_array( $teacher_ids ) ) {
 		</h1>
 
 		<?php
+		echo '<div class="flex gap-2 items-center mb-[10px]">';
+		if ($is_popular) {
+			Templates::get('badge/popular');
+		}
+		if ($is_featured) {
+			Templates::get('badge/feature');
+		}
+		echo '</div>';
+
 
 		Templates::get(
 			'typography/paragraph/expandable',
@@ -67,16 +79,18 @@ if ( ! is_array( $teacher_ids ) ) {
 			]
 			);
 
-		$rating       = $product->get_average_rating();
-		$review_count = $product->get_review_count();
-		Templates::get(
+		if ($show_review) {
+			$rating       = $product->get_average_rating();
+			$review_count = $product->get_review_count();
+			Templates::get(
 			'rate',
 			[
 				'show_before' => true,
 				'value'       => $rating,
 				'total'       => $review_count,
 			]
-		);
+			);
+		}
 
 		if ( $show_link ) {
 			echo '<div class="mt-6">';

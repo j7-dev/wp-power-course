@@ -315,20 +315,22 @@ final class Course {
 			'parent_id'           => (string) $product->get_parent_id(),
 			'is_free'             => (string) $product->get_meta( 'is_free' ),
 			'qa_list'             => (array) $product->get_meta( 'qa_list' ),
-			'sub_title'           => (string) $product->get_meta( 'sub_title' ),
 			'course_schedule'     => (int) $product->get_meta( 'course_schedule' ),
 			'course_hour'         => (int) $product->get_meta( 'course_hour' ),
 			'course_minute'       => (int) $product->get_meta( 'course_minute' ),
 			'limit_type'          => (string) $product->get_meta( 'limit_type' ),
-			'is_popular'          => (string) $product->get_meta( 'is_popular' ),
-			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
-			'enable_review'       => (string) $product->get_meta( 'enable_review' ),
-			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'limit_value'         => (int) $product->get_meta( 'limit_value' ),
 			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
+			'is_popular'          => (string) $product->get_meta( 'is_popular' ),
+			'is_featured'         => (string) $product->get_meta( 'is_featured' ),
+			'show_review'         => (string) $product->get_meta( 'show_review' ),
+			'enable_review'       => (string) $product->get_meta( 'enable_review' ),
+			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
+			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'       => (string) $product->get_meta( 'feature_video' ),
 			'trial_video'         => (string) $product->get_meta( 'trial_video' ),
 			'teacher_ids'         => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
+
 			// bundle product
 			'bundle_ids'          => $bundle_ids,
 
@@ -409,6 +411,7 @@ final class Course {
 	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): void {
 
 		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
+		unset( $meta_data['files'] ); // files 會上傳，不用存
 
 		// 將 teacher_ids, bundle_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
 		$array_keys = [ 'teacher_ids', 'bundle_ids' ];
