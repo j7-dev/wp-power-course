@@ -14,7 +14,7 @@ const AddChapter: FC<{
   const invalidate = useInvalidate()
   const { type, depth } = record
   const isChapter = type === 'chapter'
-  const itemLabel = isChapter ? '段落' : '章節'
+  const itemLabel = !isChapter ? '章節' : '單元'
 
   const handleCreate = () => {
     mutate(

@@ -27,7 +27,7 @@ import Settings from '@/pages/admin/Settings'
 import Shortcodes from '@/pages/admin/Shortcodes'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { WpLogo } from '@/components/general'
+import { Logo } from '@/components/general'
 
 function App() {
   return (
@@ -82,10 +82,10 @@ function App() {
                       className="hover:opacity-75 transition duration-300"
                     >
                       <div className="flex gap-4 items-center">
-                        <WpLogo />
+                        <Logo />
                         {!collapsed && (
                           <span className="text-gray-600 font-light">
-                            回 wp-admin
+                            回網站後台
                           </span>
                         )}
                       </div>

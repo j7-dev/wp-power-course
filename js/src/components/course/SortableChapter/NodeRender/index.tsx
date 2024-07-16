@@ -7,6 +7,7 @@ import { getPostStatus } from '@/utils'
 import { Tag } from 'antd'
 import { FlattenNode } from '@ant-design/pro-editor'
 import { ChapterName } from '@/components/course'
+import AddChapter from '@/components/product/ProductAction/AddChapter'
 
 const NodeRender: FC<{
   node: FlattenNode<TChapterRecord>
@@ -17,6 +18,7 @@ const NodeRender: FC<{
   }
   loading: boolean
 }> = ({ node, record, show, loading }) => {
+  const depth = node?.depth || 0
   const showPlaceholder = node?.children?.length === 0
   return (
     <div className="flex gap-4 justify-start items-center">
@@ -29,7 +31,8 @@ const NodeRender: FC<{
           {getPostStatus(record?.status)?.label}
         </Tag>
       </div>
-      <div>{record?.hours}</div>
+      {depth === 0 && <AddChapter record={record} />}
+      {/* <div>{record?.hours}</div> */}
       {/* <ProductType record={record} /> */}
       {/* <ProductPrice record={record} />
       <ProductTotalSales record={record} />

@@ -174,5 +174,5 @@ export function useCourseFormDrawer({
 
 function getItemLabel(resource: string, depth: number | undefined) {
   if (resource === 'courses') return '課程'
-  return depth === 0 ? '章節' : '段落'
+  return depth === 0 ? '章節' : '單元'
 }
