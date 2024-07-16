@@ -19,18 +19,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+global $product;
+
 \add_filter(
 	'body_class',
 	function ( $classes ) {
-		$classes[] = 'bg-gray-50';
+		$classes[] = 'bg-gray-50'; // 添加背景色
 		return $classes;
 	}
 );
 
+\add_filter(
+	'document_title_parts',
+	function ( $title_parts_array ) use ( $product ) {
+		$title_parts_array['title'] = $product->get_name(); // 修改 doc title
+		return $title_parts_array;
+	}
+	);
+
 
 use J7\PowerCourse\Templates\Templates;
 
-global $product;
+
 $keep_product = $product;
 
 get_header();
