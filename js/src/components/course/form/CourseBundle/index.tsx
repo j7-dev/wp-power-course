@@ -5,13 +5,17 @@ import BundleForm from './BundleForm'
 import { useList } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import ProductCheckCard from './ProductCheckCard'
+import { coursesAtom } from '@/pages/admin/Courses/CourseSelector'
+import { useAtomValue } from 'jotai'
 
 const { Item } = Form
 
 export const CourseBundle = () => {
   const form = Form.useFormInstance()
-  const watchBundleIds: string[] = Form.useWatch(['bundle_ids'], form) || []
-  console.log('⭐  watchBundleIds:', watchBundleIds)
+  const watchCourseId: string = Form.useWatch(['id'], form) || []
+  const courses = useAtomValue(coursesAtom)
+  const selectedCourse = courses.find(({ id }) => id === watchCourseId)
+  const bundleIds: string[] = selectedCourse?.bundle_ids || []
   const [bundleProductForm] = Form.useForm()
   const { drawerProps, show, open } = useBundleFormDrawer({
     form: bundleProductForm,
@@ -24,7 +28,7 @@ export const CourseBundle = () => {
       {
         field: 'include',
         operator: 'eq',
-        value: watchBundleIds,
+        value: bundleIds,
       },
 
       {
@@ -44,7 +48,7 @@ export const CourseBundle = () => {
       },
     ],
     queryOptions: {
-      enabled: !!watchBundleIds.length,
+      enabled: !!bundleIds.length,
     },
   })
 
@@ -55,7 +59,7 @@ export const CourseBundle = () => {
       <Button type="primary" icon={<PlusOutlined />} onClick={show()}>
         新增銷售方案
       </Button>
-      {!isFetching && !!watchBundleIds.length && (
+      {!isFetching && !!bundleIds.length && (
         <div className="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-x-4">
           {bundleProducts?.map((bundleProduct) => (
             <ProductCheckCard
@@ -65,7 +69,7 @@ export const CourseBundle = () => {
             />
           ))}
           {isFetching &&
-            watchBundleIds.map((id) => (
+            bundleIds.map((id) => (
               <div
                 key={id}
                 className="p-4 border border-solid border-gray-200 rounded-md animate-pulse"
@@ -85,7 +89,11 @@ export const CourseBundle = () => {
       </Item>
 
       <Drawer {...drawerProps}>
-        <BundleForm form={bundleProductForm} open={open} />
+        <BundleForm
+          form={bundleProductForm}
+          open={open}
+          course={selectedCourse}
+        />
       </Drawer>
     </>
   )

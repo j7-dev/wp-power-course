@@ -93,6 +93,7 @@ export type TCourseRecord = {
   is_free: 'yes' | 'no' | ''
   feature_video: string
   trial_video: string
+  bundle_ids: string[]
 }
 
 export type TChapterRecord = {

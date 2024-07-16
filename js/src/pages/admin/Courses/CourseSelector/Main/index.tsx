@@ -20,7 +20,7 @@ import {
 import { getInitialFilters, getIsVariation } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Courses/CourseSelector/hooks/useValueLabelMapper'
 import { useWindowSize } from '@uidotdev/usehooks'
-import { useAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
 import { SortableChapter } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
@@ -28,6 +28,7 @@ import { useCourseFormDrawer } from '@/hooks'
 import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 import useColumns from '@/pages/admin/Courses/CourseSelector/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
+import { coursesAtom } from '@/pages/admin/Courses/CourseSelector'
 
 const index = () => {
   const { width = 1920 } = useWindowSize()
@@ -84,7 +85,10 @@ const index = () => {
 
   /*
    * 換頁時，將已加入的商品全局狀態同步到當前頁面的 selectedRowKeys 狀態
+   * 這樣在換頁時，已加入的商品就會被選中
    */
+
+  const setCourses = useSetAtom(coursesAtom)
 
   useEffect(() => {
     if (!tableProps?.loading) {
@@ -97,6 +101,10 @@ const index = () => {
     JSON.stringify(tableProps?.pagination),
     tableProps?.loading,
   ])
+
+  useEffect(() => {
+    setCourses([...(tableProps?.dataSource || [])])
+  }, [tableProps?.dataSource])
 
   // Drawer
 

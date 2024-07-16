@@ -21,8 +21,6 @@ import {
   PlusOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
-import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
-import { useAtomValue } from 'jotai'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FiSwitch } from '@/components/formItem'
 import { useUpload } from '@/bunny'
@@ -48,12 +46,10 @@ const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 const BundleForm: FC<{
   form: FormInstance
   open: boolean
-}> = ({ form: bundleProductForm, open }) => {
-  const selectedCourse = useAtomValue(selectedRecordAtom) as TCourseRecord
-
+  course: TCourseRecord | undefined
+}> = ({ form: bundleProductForm, open, course: selectedCourse }) => {
   const watchRegularPrice = Form.useWatch(['regular_price'], bundleProductForm)
   const watchId = Form.useWatch(['id'], bundleProductForm)
-
   const [selectedProducts, setSelectedProducts] = useState<TProductRecord[]>([])
   const [searchKeyWord, setSearchKeyWord] = useState<string>('')
   const [showList, setShowList] = useState<boolean>(false)

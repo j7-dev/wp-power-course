@@ -6,8 +6,6 @@ import {
   TCourseRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { toFormData } from '@/utils'
-import { selectedRecordAtom } from '@/pages/admin/Courses/CourseSelector'
-import { useAtom } from 'jotai'
 import { isEqual } from 'lodash-es'
 
 export function useCourseFormDrawer({
@@ -19,7 +17,9 @@ export function useCourseFormDrawer({
   resource?: string
   drawerProps?: DrawerProps
 }) {
-  const [record, setRecord] = useAtom(selectedRecordAtom)
+  const [record, setRecord] = useState<
+    TCourseRecord | TChapterRecord | undefined
+  >(undefined)
   const [open, setOpen] = useState(false)
   const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
   const closeRef = useRef<HTMLDivElement>(null)
