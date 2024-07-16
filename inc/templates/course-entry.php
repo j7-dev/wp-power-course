@@ -1,18 +1,6 @@
 <?php
 /**
- * The Template for displaying all single products
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/single-product.php.
- *
- * HOWEVER, on occasion WooCommerce will need to update template files and you
- * (the theme developer) will need to copy the new files to your theme to
- * maintain compatibility. We try to do this as little as possible, but it does
- * happen. When this occurs the version of the template file will be bumped and
- * the readme will list any important changes.
- *
- * @see         https://woo.com/document/template-structure/
- * @package     WooCommerce\Templates
- * @version     1.6.4
+ * 課程銷售頁
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -37,14 +25,40 @@ global $product;
 	}
 	);
 
-
 use J7\PowerCourse\Templates\Templates;
 
+$product_status = $product->get_status();
+$can_edit       = \current_user_can( 'edit_product', $product->get_id() );
 
-$keep_product = $product;
 
+if ('draft' === $product_status && !$can_edit) {
+	// 如果商品為草稿且用戶沒有權限編輯，就 redirect
+	\wp_safe_redirect( home_url('/404') );
+}
+
+$keep_product = $product; // 某些情況下，全域變數在 get_header 後會莫名消失，所以先存起來
 get_header();
 $GLOBALS['product'] = $keep_product;
+
+
+if ('draft' === $product_status) {
+	echo /*html*/'
+	<div role="alert" class="flex justify-center items-center text-white text-xs bg-primary py-2">
+		<svg
+		xmlns="http://www.w3.org/2000/svg"
+		fill="none"
+		viewBox="0 0 24 24"
+		class="h-4 w-4 shrink-0 stroke-current mr-2">
+		<path
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="2"
+			d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+		</svg>
+		<span>課程尚未發布，目前為預覽模式</span>
+	</div>';
+}
+
 ?>
 	<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">
 
