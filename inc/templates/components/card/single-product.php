@@ -37,9 +37,10 @@ printf(
 <div class="w-full bg-white shadow-lg rounded p-6">
 	<h6 class="text-base font-semibold text-center">購買單堂課</h6>
 	%1$s
-	<div class="my-8">%2$s</div>
-	<div class="mb-6 text-sm">%3$s</div>
-	<div class="flex gap-3">%4$s %5$s</div>
+	<div class="mt-8">%2$s</div>
+	<div class="mt-2">%3$s</div>
+	<div class="mt-8 mb-6 text-sm">%4$s</div>
+	<div class="flex gap-3">%5$s %6$s</div>
 </div>
 ',
 Templates::get( 'divider', null, false ),
@@ -50,6 +51,13 @@ Templates::get(
 	],
 	false
 ),
+Templates::get(
+	'countdown/sales',
+	[
+		'product' => $product,
+	],
+	false
+	),
 $purchase_note,
 Templates::get(
 	'button',

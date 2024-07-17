@@ -9,7 +9,7 @@ export const countdown = () => {
   Countdown.each((index, element) => {
     const t = Number($(element).data('timestamp'))
 
-    setInterval(() => {
+    const timer = setInterval(() => {
       //current timestamp
       const now = Math.floor(Date.now() / 1000)
       const rest = t - now
@@ -30,6 +30,25 @@ export const countdown = () => {
       $(element)
         .find('.pc-countdown-component__sec')
         .attr('style', `--value:${rest_in_sec};`)
+
+      // if rest < 0, reload the page
+      if (rest < 0) {
+        clearInterval(timer)
+        $(element)
+          .find('.pc-countdown-component__day')
+          .attr('style', '--value:0;')
+        $(element)
+          .find('.pc-countdown-component__hour')
+          .attr('style', '--value:0;')
+        $(element)
+          .find('.pc-countdown-component__min')
+          .attr('style', '--value:0;')
+        $(element)
+          .find('.pc-countdown-component__sec')
+          .attr('style', '--value:0;')
+
+        location.reload()
+      }
     }, 1000)
   })
 }
