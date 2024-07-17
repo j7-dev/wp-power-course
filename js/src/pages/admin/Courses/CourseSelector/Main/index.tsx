@@ -33,7 +33,6 @@ import { coursesAtom } from '@/pages/admin/Courses/CourseSelector'
 const index = () => {
   const { width = 1920 } = useWindowSize()
   const isMobile = width ? width < 810 : false
-
   const { tableProps, searchFormProps, filters } = useTable<
     TCourseRecord,
     HttpError,
@@ -166,7 +165,6 @@ const index = () => {
             rowSelection={rowSelection}
             columns={columns}
             expandable={{
-              expandedRowKeys: ['2030'],
               expandedRowRender: (record) => (
                 <SortableChapter
                   record={record}
