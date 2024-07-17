@@ -37,6 +37,7 @@ final class Templates {
 		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 999999 );
 
 		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
+		\add_action( 'admin_bar_menu', [ $this, 'admin_bar_item' ], 210 );
 	}
 
 	/**
@@ -265,6 +266,32 @@ final class Templates {
 	public function add_html_attr( string $output, string $doctype ): string {
 		// ["light", "dark", "cupcake"]
 		return $output . ' data-theme="power"';
+	}
+
+	/**
+	 * 在管理員工具列中新增項目
+	 *
+	 * @param \WP_Admin_Bar $admin_bar 管理員工具列物件
+	 *
+	 * @return void
+	 */
+	public function admin_bar_item( \WP_Admin_Bar $admin_bar ): void {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$admin_bar->add_menu(
+			[
+				'id'     => Plugin::$kebab,
+				'parent' => null,
+				'group'  => null,
+				'title'  => '課程列表', // you can use img tag with image link. it will show the image icon Instead of the title.
+				'href'   => \admin_url('admin.php?page=' . Plugin::$kebab),
+				'meta'   => [
+					'title' => \__( '課程列表', 'power_course' ), // This title will show on hover
+				],
+			]
+		);
 	}
 }
 
