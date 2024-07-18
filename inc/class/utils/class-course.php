@@ -217,7 +217,7 @@ abstract class Course {
 		$limit_value = $product->get_meta( 'limit_value' );
 
 		$limit_value_label = match ( $limit_unit ) {
-			'timestamp' => \wp_date( 'Y-m-d H:i:s', $limit_value ),
+			'timestamp' => strlen($limit_value) !== 10 ? '' : \wp_date( 'Y-m-d H:i', $limit_value ),
 			'month'  => "{$limit_value} 月",
 			'year'   => "{$limit_value} 年",
 			default  => $limit_value ? "{$limit_value} 天" : '',
@@ -233,8 +233,9 @@ abstract class Course {
 	 * 查詢用戶可以上那些課程 ids
 	 *
 	 * @param int|null $user_id 用户 ID
+	 * @param bool     $return_ids 是否只回傳 id
 	 *
-	 * @return array<\WC_Product|string> 課程 ids
+	 * @return array<\WC_Product|string>  課程 ids
 	 */
 	public static function get_avl_courses_by_user( ?int $user_id = null, ?bool $return_ids = false ): array {
 

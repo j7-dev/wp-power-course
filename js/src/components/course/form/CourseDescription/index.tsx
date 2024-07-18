@@ -1,13 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Space,
-} from 'antd'
+import { Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import {
   keyLabelMapper,
   termFormatter,
@@ -15,7 +7,7 @@ import {
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
-import { FiSwitch, VideoInput } from '@/components/formItem'
+import { FiSwitch, VideoInput, DatePicker } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import dayjs from 'dayjs'
 import { useUpload } from '@/bunny'
@@ -188,21 +180,13 @@ export const CourseDescription = () => {
         <Heading>課程資訊</Heading>
 
         <div className="grid 2xl:grid-cols-3 gap-6">
-          <Item
-            name={['course_schedule']}
-            label="開課時間"
-            className="mb-0"
-            getValueProps={(value) => ({
-              value: value ? dayjs.unix(value) : null,
-            })}
-            normalize={(value) => value?.unix()}
-          >
-            <DatePicker
-              className="w-full"
-              format="YYYY-MM-DD HH:mm"
-              showTime={{ defaultValue: dayjs() }}
-            />
-          </Item>
+          <DatePicker
+            formItemProps={{
+              name: ['course_schedule'],
+              label: '開課時間',
+              className: 'mb-0',
+            }}
+          />
 
           <div>
             <p className="mb-2">預計時長</p>
@@ -264,7 +248,17 @@ export const CourseDescription = () => {
                 <Item name={['limit_value']} initialValue="" hidden>
                   <Input />
                 </Item>
-                <Item name={['limit_unit']} initialValue="" hidden>
+                <Item
+                  name={['limit_unit']}
+                  initialValue=""
+                  hidden
+                  rules={[
+                    {
+                      required: true,
+                      message: '請填寫觀看期限',
+                    },
+                  ]}
+                >
                   <Input />
                 </Item>
               </>
@@ -272,22 +266,18 @@ export const CourseDescription = () => {
 
             {'assigned' === watchLimitType && (
               <>
-                <Item
-                  name={['limit_value']}
-                  label="指定時間"
-                  noStyle
-                  className="mb-0"
-                  getValueProps={(value) => ({
-                    value: value ? dayjs.unix(value) : undefined,
-                  })}
-                  normalize={(value) => (value ? value?.unix() : '')}
-                >
-                  <DatePicker
-                    className="w-full"
-                    format="YYYY-MM-DD HH:mm"
-                    showTime={{ defaultValue: dayjs() }}
-                  />
-                </Item>
+                <DatePicker
+                  formItemProps={{
+                    name: ['limit_value'],
+                    className: 'mb-0',
+                    rules: [
+                      {
+                        required: true,
+                        message: '請填寫指定時間',
+                      },
+                    ],
+                  }}
+                />
                 <Item name={['limit_unit']} initialValue="timestamp" hidden>
                   <Input />
                 </Item>
