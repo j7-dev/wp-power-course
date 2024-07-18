@@ -1,14 +1,5 @@
 import { useEffect, useState, FC } from 'react'
-import {
-  Form,
-  InputNumber,
-  DatePicker,
-  Select,
-  Input,
-  FormInstance,
-  List,
-  Tag,
-} from 'antd'
+import { Form, InputNumber, Select, Input, FormInstance, List, Tag } from 'antd'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import dayjs from 'dayjs'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
@@ -22,7 +13,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { FiSwitch } from '@/components/formItem'
+import { FiSwitch, RangePicker } from '@/components/formItem'
 import { useUpload } from '@/bunny'
 import { FileUpload } from '@/components/post'
 
@@ -30,8 +21,6 @@ import { FileUpload } from '@/components/post'
 // TODO 如何結合可變商品?
 
 dayjs.extend(customParseFormat)
-
-const { RangePicker } = DatePicker
 
 const { Item } = Form
 const { Search } = Input
@@ -195,7 +184,16 @@ const BundleForm: FC<{
       >
         <Select options={OPTIONS} />
       </Item>
-      <Item name={['name']} label="銷售方案名稱">
+      <Item
+        name={['name']}
+        label="銷售方案名稱"
+        rules={[
+          {
+            required: true,
+            message: '請輸入銷售方案名稱',
+          },
+        ]}
+      >
         <Input />
       </Item>
       <Item
@@ -399,30 +397,13 @@ const BundleForm: FC<{
         />
       </Item>
 
-      <Item
-        name={['sale_date_range']}
-        label="銷售期間"
-        getValueProps={(value) => ({
-          value: [
-            value?.[0] ? dayjs.unix(value[0]) : null,
-            value?.[1] ? dayjs.unix(value[1]) : null,
-          ],
-        })}
-      >
-        <RangePicker
-          className="w-full"
-          showTime={{
-            defaultValue: [
-              dayjs('00:00', 'HH:mm'),
-              dayjs('11:59', 'HH:mm'),
-            ],
-          }}
-          allowEmpty={[true, true]}
-          format="YYYY-MM-DD HH:mm"
-        />
-      </Item>
-
-      <div className="grid grid-cols-2 gap-4">
+      <RangePicker
+        formItemProps={{
+          name: ['sale_date_range'],
+          label: '銷售期間',
+        }}
+      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
           <p className="mb-3">課程封面圖</p>
           <div className="mb-8">

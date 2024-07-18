@@ -1,14 +1,24 @@
 import React, { useEffect } from 'react'
-import { Form, InputNumber, DatePicker, Input } from 'antd'
-import { FiSwitch } from '@/components/formItem'
+import { Form, InputNumber, Input, DatePickerProps } from 'antd'
+import { FiSwitch, DatePicker } from '@/components/formItem'
 import dayjs from 'dayjs'
 
 const { Item } = Form
+
+// TODO 把日期改成 Range Picker
 
 export const CoursePrice = () => {
   const form = Form.useFormInstance()
   const watchRegularPrice = Form.useWatch(['regular_price'], form)
   const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
+  const watchDateOnSaleFrom = Form.useWatch(['date_on_sale_from'], form)
+
+  const disabledDate: DatePickerProps['disabledDate'] = (current) => {
+    if (watchDateOnSaleFrom) {
+      return current && current < dayjs.unix(watchDateOnSaleFrom).startOf('day')
+    }
+    return false
+  }
 
   useEffect(() => {
     if (watchIsFree) {
@@ -48,41 +58,26 @@ export const CoursePrice = () => {
         <InputNumber className="w-full" min={0} disabled={watchIsFree} />
       </Item>
 
-      <Item
-        name={['date_on_sale_from']}
-        label="折扣價開始時間"
-        normalize={(value) => value?.unix()}
-        getValueProps={(value) => {
-          return {
-            value: value ? dayjs.unix(value) : undefined,
-          }
+      <DatePicker
+        formItemProps={{
+          name: ['date_on_sale_from'],
+          label: '折扣價開始時間',
         }}
-      >
-        <DatePicker
-          className="w-full"
-          showTime={{ defaultValue: dayjs() }}
-          disabled={watchIsFree}
-          format="YYYY-MM-DD HH:mm"
-        />
-      </Item>
+        datePickerProps={{
+          disabled: watchIsFree,
+        }}
+      />
 
-      <Item
-        name={['date_on_sale_to']}
-        label="折扣價結束時間"
-        normalize={(value) => value?.unix()}
-        getValueProps={(value) => {
-          return {
-            value: value ? dayjs.unix(value) : undefined,
-          }
+      <DatePicker
+        formItemProps={{
+          name: ['date_on_sale_to'],
+          label: '折扣價結束時間',
         }}
-      >
-        <DatePicker
-          className="w-full"
-          showTime={{ defaultValue: dayjs() }}
-          disabled={watchIsFree}
-          format="YYYY-MM-DD HH:mm"
-        />
-      </Item>
+        datePickerProps={{
+          disabled: watchIsFree,
+          disabledDate,
+        }}
+      />
 
       <FiSwitch
         formItemProps={{

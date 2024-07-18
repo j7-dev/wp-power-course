@@ -134,7 +134,7 @@ export function useBundleFormDrawer({
     } else {
       form.resetFields()
     }
-  }, [record?.id])
+  }, [record])
 
   return {
     open,

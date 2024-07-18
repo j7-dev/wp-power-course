@@ -2,8 +2,8 @@ import { CrudFilter } from '@refinedev/core'
 import dayjs, { Dayjs } from 'dayjs'
 import {
   dateRelatedFields,
-  parseRangePickerValue,
-  parseDatePickerValue,
+  formatRangePickerValue,
+  formatDatePickerValue,
 } from '@/utils'
 
 type TMapOperatorReturn = {
@@ -48,32 +48,32 @@ function dateMapOperator(filter: TFilter): TMapOperatorReturn {
     case 'between':
       return {
         formattedField: field,
-        formattedValue: parseRangePickerValue(value).join('...'),
+        formattedValue: formatRangePickerValue(value).join('...'),
       }
     case 'gt':
       return {
         formattedField: field,
-        formattedValue: `>${parseDatePickerValue(value)}`,
+        formattedValue: `>${formatDatePickerValue(value)}`,
       }
     case 'gte':
       return {
         formattedField: field,
-        formattedValue: `>=${parseDatePickerValue(value)}`,
+        formattedValue: `>=${formatDatePickerValue(value)}`,
       }
     case 'lt':
       return {
         formattedField: field,
-        formattedValue: `<${parseDatePickerValue(value)}`,
+        formattedValue: `<${formatDatePickerValue(value)}`,
       }
     case 'lte':
       return {
         formattedField: field,
-        formattedValue: `<=${parseDatePickerValue(value)}`,
+        formattedValue: `<=${formatDatePickerValue(value)}`,
       }
     case 'eq':
       return {
         formattedField: field,
-        formattedValue: parseDatePickerValue(value),
+        formattedValue: formatDatePickerValue(value),
       }
     default:
       return {
