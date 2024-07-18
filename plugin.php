@@ -3,7 +3,7 @@
  * Plugin Name:       Power Course | 可能是 WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
  * Description:       可能是 WordPress 最好用的課程外掛
- * Version:           0.0.18
+ * Version:           0.0.19
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            J7
