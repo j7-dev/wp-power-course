@@ -588,4 +588,48 @@ abstract class Course {
 
 		return ! ! $results;
 	}
+
+	/**
+	 * 取得最暢銷的課程
+	 *
+	 * @param int $limit 限制數量
+	 *
+	 * @return array{id:string, name:string, total_sales: float}[]
+	 */
+	public static function get_top_sales_courses( int $limit = 10 ): array {
+		global $wpdb;
+		// 执行查询
+		$top_selling_products = $wpdb->get_results(
+			$wpdb->prepare(
+				"
+    SELECT pm.post_id, CAST(pm.meta_value AS UNSIGNED) AS total_sales
+		FROM  %1\$s pm
+    JOIN  %1\$s pm2 ON pm.post_id = pm2.post_id
+    WHERE pm.meta_key = 'total_sales'
+		AND pm2.meta_key = '_is_course' AND pm2.meta_value = 'yes'
+    ORDER BY total_sales DESC
+    LIMIT %2\$d
+",
+		$wpdb->postmeta,
+				$limit
+			)
+		);
+
+		$formatted_top_selling_products = array_map(
+			function ( $product ) {
+				$product_id   = $product->post_id;
+				$product_name = \get_the_title($product_id);
+				$total_sales  = $product->total_sales;
+
+				return [
+					'id'          => (string) $product_id,
+					'name'        => $product_name,
+					'total_sales' => (float) $total_sales,
+				];
+			},
+			$top_selling_products
+		);
+
+		return $formatted_top_selling_products;
+	}
 }

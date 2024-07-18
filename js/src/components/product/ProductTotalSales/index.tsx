@@ -42,25 +42,25 @@ function get_tier(total_sales: number, max_sales: number) {
     return {
       color: ColorGrade['tier-2'],
       tier: 'tier-2',
-      label: '還不錯的暢銷產品 (前40%)',
+      label: '暢銷產品 (前40%)',
     }
   } else if (total_sales > max_sales * 0.4) {
     return {
       color: ColorGrade['tier-3'],
       tier: 'tier-3',
-      label: '一般銷量產品 (前60%)',
+      label: '銷售量 (前60%)',
     }
   } else if (total_sales > max_sales * 0.2) {
     return {
       color: ColorGrade['tier-4'],
       tier: 'tier-4',
-      label: '有點不暢銷產品 (後40%)',
+      label: '銷售量 (前80%)',
     }
   } else {
     return {
       color: ColorGrade['tier-5'],
       tier: 'tier-5',
-      label: '最不暢銷產品 (後20%)',
+      label: '銷售量 (前100%)',
     }
   }
 }

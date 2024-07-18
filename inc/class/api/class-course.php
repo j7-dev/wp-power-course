@@ -740,7 +740,7 @@ final class Course {
 
 		$formatted_tags = array_map( [ $this, 'format_terms' ], array_keys( $tags ), array_values( $tags ) );
 
-		$top_sales_products = WC::get_top_sales_products( 5 );
+		$top_sales_products = CourseUtils::get_top_sales_courses( 5 );
 
 		[
 			'max_price' => $max_price,
