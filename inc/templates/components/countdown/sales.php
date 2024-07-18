@@ -24,14 +24,20 @@ $sale_price    = $product->get_sale_price();
 $from          = $product->get_date_on_sale_from()?->getTimestamp();
 $to            = $product->get_date_on_sale_to()?->getTimestamp();
 
+if ($sale_price) {
+	$discount = round($sale_price / $regular_price * 100);
+	$discount = $discount % 10 === 0 ? $discount/10 : $discount;
+} else {
+	$discount = 0;
+}
 
 echo '<div class="flex gap-2 items-center text-sm">';
-if ('' !== $sale_price) { // 沒有折扣價就不顯示
+if ('' !== $sale_price && $regular_price) { // 沒有折扣價就不顯示 或 沒有一般價就不顯示
 	printf(
 	/*html*/'
 		<span class="px-2 py-1 bg-red-100 text-red-500 text-xs rounded-md font-bold">%1$s</span>
 	',
-	$sale_price ? round($sale_price / $regular_price * 100) . '折' : '免費',
+	$sale_price ? $discount . '折' : '免費',
 	);
 }
 
