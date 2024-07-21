@@ -181,8 +181,8 @@ final class Product {
 				$attributes_arr[ urldecode( $key ) ] = $attribute;
 			}
 		}
-
-		$include_product_ids = \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
+		$include_product_ids        = (array) \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
+		$unique_include_product_ids = array_unique( $include_product_ids );
 
 		$base_array = [
 			// Get Product General Info
@@ -241,7 +241,7 @@ final class Product {
 			'parent_id'                                 => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $include_product_ids,
+			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $unique_include_product_ids,
 
 			'sale_date_range'                           => [ (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),

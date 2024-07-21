@@ -24,6 +24,9 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * @param object $product product.
 		 */
 		public function __construct( $product = 0 ) {
+			/**
+			 * @var \WC_Product $this
+			 */
 			$this->product_type = Plugin::PRODUCT_TYPE;
 			$this->supports[]   = 'ajax_add_to_cart';
 
@@ -61,9 +64,11 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 * @return array string[] 被綑綁的 product_ids
 		 */
 		public function get_product_ids(): array {
-			$id = $this->get_id();
+			$id                 = $this->get_id();
+			$product_ids        = (array) \get_post_meta( $id, self::INCLUDE_PRODUCT_IDS_META_KEY );
+			$unique_product_ids = array_unique( $product_ids );
 
-			return (array) \get_post_meta( $id, self::INCLUDE_PRODUCT_IDS_META_KEY );
+			return $unique_product_ids;
 		}
 
 		/**
