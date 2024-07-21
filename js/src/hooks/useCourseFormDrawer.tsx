@@ -1,5 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
-import { DrawerProps, Button, FormInstance, Popconfirm, Switch } from 'antd'
+import {
+  DrawerProps,
+  Button,
+  FormInstance,
+  Popconfirm,
+  Switch,
+  Form,
+} from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import {
   TChapterRecord,
@@ -116,9 +123,11 @@ export function useCourseFormDrawer({
   }
 
   const itemLabel = getItemLabel(resource, record?.depth)
+  const watchName = Form.useWatch(['name'], form) || '新課程'
+  const watchId = Form.useWatch(['id'], form)
 
   const mergedDrawerProps: DrawerProps = {
-    title: `${isUpdate ? '編輯' : '新增'}${itemLabel}`,
+    title: `${isUpdate ? '編輯' : '新增'}${itemLabel} - ${watchName} ${watchId ? `#${watchId}` : ''}`,
     forceRender: true,
     push: false,
     onClose: close,
