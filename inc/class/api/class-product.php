@@ -182,7 +182,7 @@ final class Product {
 			}
 		}
 		$include_product_ids        = (array) \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
-		$unique_include_product_ids = array_unique( $include_product_ids );
+		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$base_array = [
 			// Get Product General Info
@@ -241,7 +241,7 @@ final class Product {
 			'parent_id'                                 => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => $unique_include_product_ids,
+			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => (array) $unique_include_product_ids,
 
 			'sale_date_range'                           => [ (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
