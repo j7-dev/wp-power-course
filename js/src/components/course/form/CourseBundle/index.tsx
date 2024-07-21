@@ -49,6 +49,8 @@ export const CourseBundle = () => {
     ],
     queryOptions: {
       enabled: !!bundleIds.length,
+      staleTime: 0,
+      cacheTime: 0,
     },
   })
 

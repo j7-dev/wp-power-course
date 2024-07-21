@@ -37,7 +37,9 @@ const BundleForm: FC<{
   open: boolean
   course: TCourseRecord | undefined
 }> = ({ form: bundleProductForm, open, course: selectedCourse }) => {
-  const watchRegularPrice = Form.useWatch(['regular_price'], bundleProductForm)
+  const watchRegularPrice = Number(
+    Form.useWatch(['regular_price'], bundleProductForm),
+  )
   const watchId = Form.useWatch(['id'], bundleProductForm)
   const [selectedProducts, setSelectedProducts] = useState<TProductRecord[]>([])
   const [searchKeyWord, setSearchKeyWord] = useState<string>('')
@@ -108,32 +110,40 @@ const BundleForm: FC<{
     bundleProductForm.setFieldValue(['files'], fileList)
   }, [fileList])
 
+  const watchPIds = Form.useWatch(
+    [INCLUDED_PRODUCT_IDS_FIELD_NAME],
+    bundleProductForm,
+  ) as string[]
+  console.log('⭐  watchPIds:', { watchPIds, watchRegularPrice })
+
   useEffect(() => {
     // 選擇商品改變時，同步更新到表單上
 
-    bundleProductForm.setFieldValue(
-      [INCLUDED_PRODUCT_IDS_FIELD_NAME],
-      [
-        selectedCourse?.id,
-        ...selectedProducts.map(({ id }) => id),
-      ],
-    )
+    if (selectedProducts.length) {
+      bundleProductForm.setFieldValue(
+        [INCLUDED_PRODUCT_IDS_FIELD_NAME],
+        [
+          selectedCourse?.id,
+          ...selectedProducts.map(({ id }) => id),
+        ],
+      )
 
-    bundleProductForm.setFieldValue(
-      ['regular_price'],
-      getPrice({
-        type: 'regular_price',
-        products: selectedProducts,
-        selectedCourse,
-      }),
-    )
+      bundleProductForm.setFieldValue(
+        ['regular_price'],
+        getPrice({
+          type: 'regular_price',
+          products: selectedProducts,
+          selectedCourse,
+        }),
+      )
+    }
   }, [selectedProducts.length])
 
-  useEffect(() => {
-    if (open) {
-      setSelectedProducts([])
-    }
-  }, [open])
+  // useEffect(() => {
+  //   if (open) {
+  //     setSelectedProducts([])
+  //   }
+  // }, [open])
 
   // 如果是編輯，要將 included 商品資料顯示在畫面上
 
@@ -141,6 +151,7 @@ const BundleForm: FC<{
     [INCLUDED_PRODUCT_IDS_FIELD_NAME],
     bundleProductForm,
   ) as string[]
+  console.log('⭐  watchIncludedProductIds:', watchIncludedProductIds)
 
   // 將當前商品移除
 
@@ -166,6 +177,11 @@ const BundleForm: FC<{
 
   useEffect(() => {
     // 有 id = 編輯模式，要將資料填入表單
+    console.log('⭐  IPIsFetching:', {
+      watchId,
+      IPIsFetching,
+      includedProductIdsLength: includedProductIds.length,
+    })
 
     if (!!watchId && !!includedProductIds.length && !IPIsFetching) {
       setSelectedProducts(includedProducts)
