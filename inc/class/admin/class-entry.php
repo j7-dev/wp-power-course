@@ -95,7 +95,7 @@ final class Entry {
 		</head>
 
 		<body>
-			<main id="power_course">
+			<main id="power_course" class="pc">
 
 			</main>
 		<?php

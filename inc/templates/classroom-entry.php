@@ -44,6 +44,13 @@ get_bloginfo( 'name' )
 $expire_date = AVLCourseMeta::get($product->get_id(), $current_user_id, 'expire_date', true);
 $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 
+\add_filter(
+	'body_class',
+	function ( $classes ) {
+		$classes[] = 'pc'; // 添加背景色, pc 代表 power course
+		return $classes;
+	}
+);
 
 if ( ! CourseUtils::is_avl() ) {
 	get_header();
@@ -81,7 +88,7 @@ if ( ! CourseUtils::is_avl() ) {
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0 min-h-screen bg-gray-50">
+		<body class="!m-0 min-h-screen bg-gray-50 pc">
 			<?php
 			$GLOBALS['product'] = $keep_product;
 			$GLOBALS['chapter'] = $keep_chapter;
