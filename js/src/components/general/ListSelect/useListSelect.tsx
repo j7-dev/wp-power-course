@@ -64,11 +64,7 @@ export const useListSelect = <T extends BaseRecord>({
       } as CrudFilter,
       ...(filters || []),
     ],
-    queryOptions: {
-      staleTime: 1000 * 60 * 60 * 24,
-      cacheTime: 1000 * 60 * 60 * 24,
-      ...queryOptions,
-    },
+    queryOptions,
   })
 
   // 處理點擊商品，有可能是加入也可能是移除

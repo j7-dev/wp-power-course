@@ -30,20 +30,22 @@ const OPTIONS = [
   { label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
-const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
+export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
 const BundleForm: FC<{
   form: FormInstance
-  open: boolean
-  course: TCourseRecord | undefined
-}> = ({ form: bundleProductForm, open, course: selectedCourse }) => {
-  const watchRegularPrice = Number(
-    Form.useWatch(['regular_price'], bundleProductForm),
-  )
-  const watchId = Form.useWatch(['id'], bundleProductForm)
+  course: TCourseRecord | undefined // 課程
+  record: TProductRecord | undefined // 銷售方案
+}> = ({ form: bundleProductForm, course: selectedCourse, record }) => {
   const [selectedProducts, setSelectedProducts] = useState<TProductRecord[]>([])
   const [searchKeyWord, setSearchKeyWord] = useState<string>('')
   const [showList, setShowList] = useState<boolean>(false)
+  const watchRegularPrice = Number(
+    Form.useWatch(['regular_price'], bundleProductForm),
+  )
+  const watchSalePrice = Number(
+    Form.useWatch(['sale_price'], bundleProductForm),
+  )
 
   const bunnyUploadProps = useUpload()
   const { fileList } = bunnyUploadProps
@@ -81,10 +83,6 @@ const BundleForm: FC<{
         value: 'simple',
       },
     ],
-    queryOptions: {
-      staleTime: 1000 * 60 * 60 * 24,
-      cacheTime: 1000 * 60 * 60 * 24,
-    },
   })
 
   const searchProducts = searchProductsResult.data?.data || []
@@ -110,83 +108,63 @@ const BundleForm: FC<{
     bundleProductForm.setFieldValue(['files'], fileList)
   }, [fileList])
 
-  const watchPIds = Form.useWatch(
-    [INCLUDED_PRODUCT_IDS_FIELD_NAME],
-    bundleProductForm,
-  ) as string[]
-  console.log('⭐  watchPIds:', { watchPIds, watchRegularPrice })
-
   useEffect(() => {
     // 選擇商品改變時，同步更新到表單上
+    bundleProductForm.setFieldValue(
+      [INCLUDED_PRODUCT_IDS_FIELD_NAME],
+      [
+        selectedCourse?.id,
+        ...selectedProducts.map(({ id }) => id),
+      ],
+    )
 
-    if (selectedProducts.length) {
-      bundleProductForm.setFieldValue(
-        [INCLUDED_PRODUCT_IDS_FIELD_NAME],
-        [
-          selectedCourse?.id,
-          ...selectedProducts.map(({ id }) => id),
-        ],
-      )
-
-      bundleProductForm.setFieldValue(
-        ['regular_price'],
-        getPrice({
-          type: 'regular_price',
-          products: selectedProducts,
-          selectedCourse,
-        }),
-      )
-    }
+    bundleProductForm.setFieldValue(
+      ['regular_price'],
+      getPrice({
+        type: 'regular_price',
+        products: selectedProducts,
+        selectedCourse,
+      }),
+    )
   }, [selectedProducts.length])
-
-  // useEffect(() => {
-  //   if (open) {
-  //     setSelectedProducts([])
-  //   }
-  // }, [open])
-
-  // 如果是編輯，要將 included 商品資料顯示在畫面上
-
-  const watchIncludedProductIds = Form.useWatch(
-    [INCLUDED_PRODUCT_IDS_FIELD_NAME],
-    bundleProductForm,
-  ) as string[]
-  console.log('⭐  watchIncludedProductIds:', watchIncludedProductIds)
 
   // 將當前商品移除
 
-  const includedProductIds =
-    watchIncludedProductIds?.filter((id) => id !== selectedCourse?.id) || []
+  const initPIdsExcludedCourseId = (
+    record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
+  ).filter((id) => id !== selectedCourse?.id)
 
-  const { data: includedProductsData, isFetching: IPIsFetching } =
+  // 初始狀態
+  const { data: initProductsData, isFetching: initIsFetching } =
     useList<TProductRecord>({
       resource: 'products',
       filters: [
         {
           field: 'include',
           operator: 'eq',
-          value: includedProductIds,
+          value: initPIdsExcludedCourseId,
         },
       ],
       queryOptions: {
-        enabled: !!watchId && !!includedProductIds.length,
+        // 剛進來的時候才需要 fetch
+        enabled: !!initPIdsExcludedCourseId,
       },
     })
 
-  const includedProducts = includedProductsData?.data || []
+  const includedProducts = initProductsData?.data || []
 
   useEffect(() => {
-    // 有 id = 編輯模式，要將資料填入表單
-    console.log('⭐  IPIsFetching:', {
-      watchId,
-      IPIsFetching,
-      includedProductIdsLength: includedProductIds.length,
-    })
-
-    if (!!watchId && !!includedProductIds.length && !IPIsFetching) {
+    // 有 id = 編輯方案，要將資料填入表單
+    if (!!record && !initIsFetching) {
+      // 初始化商品
       setSelectedProducts(includedProducts)
     }
-  }, [watchId, IPIsFetching])
+
+    if (!record) {
+      // 新增方案，清空選擇商品
+      setSelectedProducts([])
+    }
+  }, [record, initIsFetching])
 
   return (
     <Form form={bundleProductForm} layout="vertical">
@@ -220,33 +198,13 @@ const BundleForm: FC<{
         <Input.TextArea rows={8} />
       </Item>
 
-      <Item
-        name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]}
-        className="mb-0 -mt-8"
-        rules={[
-          {
-            required: true,
-            message: (
-              <>
-                <ExclamationCircleOutlined className="mr-2" />
-                請至少加入一款產品
-              </>
-            ),
-          },
-          {
-            len: 2,
-            type: 'array',
-            message: (
-              <>
-                <ExclamationCircleOutlined className="mr-2" />
-                請至少加入一款產品
-              </>
-            ),
-          },
-        ]}
-      >
-        <Select className="tw-hidden" mode="multiple" options={[]} />
-      </Item>
+      <Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
+      {!selectedProducts.length && !initIsFetching && (
+        <div className="text-red-500">
+          <ExclamationCircleOutlined className="mr-2" />
+          請至少加入一款產品
+        </div>
+      )}
 
       <p className="mb-3">搭配你的銷售方案，請選擇要加入的商品</p>
       <div className="border-2 border-dashed border-blue-500 rounded-xl p-4 mb-8">
@@ -312,7 +270,7 @@ const BundleForm: FC<{
           </div>
         </div>
 
-        {!IPIsFetching &&
+        {!initIsFetching &&
           selectedProducts?.map(({ id, images, name, price_html }) => (
             <div
               key={id}
@@ -344,8 +302,8 @@ const BundleForm: FC<{
           ))}
 
         {/* Loading */}
-        {IPIsFetching &&
-          includedProductIds.map((id) => (
+        {initIsFetching &&
+          initPIdsExcludedCourseId.map((id) => (
             <div
               key={id}
               className="flex items-center justify-start gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2 animate-pulse"
@@ -371,20 +329,13 @@ const BundleForm: FC<{
         name={['sale_price']}
         label="方案折扣價"
         tooltip="折扣價不能超過原價"
-        rules={[
-          {
-            type: 'number',
-            max: watchRegularPrice,
-            message: '折扣價不能超過原價',
-          },
-        ]}
         help={
-          <>
-            <div className="grid grid-cols-2 gap-x-4 mb-4">
+          <div className="mb-4">
+            <div className="grid grid-cols-2 gap-x-4">
               <div>此銷售組合原訂原價</div>
               <div className="text-right pr-0">
                 {getPrice({
-                  isFetching: IPIsFetching,
+                  isFetching: initIsFetching,
                   type: 'regular_price',
                   products: selectedProducts,
                   selectedCourse,
@@ -394,7 +345,7 @@ const BundleForm: FC<{
               <div>此銷售組合原訂折扣價</div>
               <div className="text-right pr-0">
                 {getPrice({
-                  isFetching: IPIsFetching,
+                  isFetching: initIsFetching,
                   type: 'sale_price',
                   products: selectedProducts,
                   selectedCourse,
@@ -402,7 +353,10 @@ const BundleForm: FC<{
                 })}
               </div>
             </div>
-          </>
+            {watchSalePrice > watchRegularPrice && (
+              <p className="text-red-500 m-0">折扣價不能超過原價</p>
+            )}
+          </div>
         }
       >
         <InputNumber

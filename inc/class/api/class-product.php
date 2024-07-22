@@ -369,7 +369,8 @@ final class Product {
 
 	/**
 	 * 針對特殊欄位處理
-	 * 'pbp_product_ids', 'product_type'
+	 * 'pbp_product_ids'
+	 * TODO 'product_type'
 	 * 前端送出資料後，要存入 WP 前處理
 	 *
 	 * @param array $meta_data Meta data.
@@ -377,12 +378,17 @@ final class Product {
 	 * @return array
 	 */
 	public static function handle_special_fields( $meta_data, $product ) {
-		if ( isset( $meta_data['pbp_product_ids'] ) && is_array( $meta_data['pbp_product_ids'] ) ) {
-			foreach ( $meta_data['pbp_product_ids'] as $pbp_product_id ) {
+
+		$meta_key = BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY;
+
+		if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
+			// 先刪除原本的 meta data
+			$product->delete_meta_data( $meta_key );
+			foreach ( $meta_data[ $meta_key ] as $pbp_product_id ) {
 				$product->add_meta_data( BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY, $pbp_product_id, unique:false );
 			}
 			$product->save_meta_data();
-			unset( $meta_data['pbp_product_ids'] );
+			unset( $meta_data[ $meta_key ] );
 		}
 
 		if ( isset( $meta_data['product_type'] ) ) {

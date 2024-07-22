@@ -16,8 +16,9 @@ export const CourseBundle = () => {
   const courses = useAtomValue(coursesAtom)
   const selectedCourse = courses.find(({ id }) => id === watchCourseId)
   const bundleIds: string[] = selectedCourse?.bundle_ids || []
+  console.log('⭐  bundleIds:', bundleIds)
   const [bundleProductForm] = Form.useForm()
-  const { drawerProps, show, open } = useBundleFormDrawer({
+  const { drawerProps, show, open, record } = useBundleFormDrawer({
     form: bundleProductForm,
     resource: 'bundle_products',
   })
@@ -61,30 +62,31 @@ export const CourseBundle = () => {
       <Button type="primary" icon={<PlusOutlined />} onClick={show()}>
         新增銷售方案
       </Button>
-      {!isFetching && !!bundleIds.length && (
-        <div className="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-x-4">
-          {bundleProducts?.map((bundleProduct) => (
+      <div className="mt-8 grid grid-cols-1 xl:grid-cols-3 gap-x-4">
+        {!isFetching &&
+          !!bundleIds.length &&
+          bundleProducts?.map((bundleProduct) => (
             <ProductCheckCard
               key={bundleProduct.id}
               product={bundleProduct}
               show={show}
             />
           ))}
-          {isFetching &&
-            bundleIds.map((id) => (
-              <div
-                key={id}
-                className="p-4 border border-solid border-gray-200 rounded-md animate-pulse"
-              >
-                <div className="aspect-video w-full rounded bg-slate-300 mb-2" />
-                <div className="mb-2 h-3 bg-slate-300 w-3/4" />
-                <div className="mb-2 h-2 bg-slate-300 w-12" />
-                <div className="mb-2 h-3 bg-slate-300 w-1/2" />
-                <div className="mb-2 h-3 bg-slate-300 w-full" />
-              </div>
-            ))}
-        </div>
-      )}
+
+        {isFetching &&
+          bundleIds.map((id) => (
+            <div
+              key={id}
+              className="p-4 border border-solid border-gray-200 rounded-md animate-pulse"
+            >
+              <div className="aspect-video w-full rounded bg-slate-300 mb-2" />
+              <div className="mb-2 h-3 bg-slate-300 w-3/4" />
+              <div className="mb-2 h-2 bg-slate-300 w-12" />
+              <div className="mb-2 h-3 bg-slate-300 w-1/2" />
+              <div className="mb-2 h-3 bg-slate-300 w-full" />
+            </div>
+          ))}
+      </div>
 
       <Item name={['bundle_ids']} hidden>
         <Input />
@@ -93,8 +95,8 @@ export const CourseBundle = () => {
       <Drawer {...drawerProps}>
         <BundleForm
           form={bundleProductForm}
-          open={open}
           course={selectedCourse}
+          record={record}
         />
       </Drawer>
     </>

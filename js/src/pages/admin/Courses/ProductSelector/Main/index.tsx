@@ -52,9 +52,6 @@ const index = () => {
       ],
       initial: getInitialFilters(initialFilteredValues),
     },
-    queryOptions: {
-      staleTime: 1000 * 60 * 60 * 24,
-    },
   })
 
   const currentAllKeys =

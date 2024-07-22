@@ -23,9 +23,6 @@ const useOptions: () => QueryObserverResult<any> & {
   const result = useCustom<TOptions>({
     url: `${apiUrl}/options`,
     method: 'get',
-    queryOptions: {
-      staleTime: 1000 * 60 * 60 * 24,
-    },
   })
 
   const options: TOptions = result?.data?.data || {

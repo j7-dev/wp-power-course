@@ -4,6 +4,7 @@ import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import { toFormData } from '@/utils'
 import dayjs, { Dayjs } from 'dayjs'
+import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '@/components/course/form/CourseBundle/BundleForm'
 
 export function useBundleFormDrawer({
   form,
@@ -81,6 +82,7 @@ export function useBundleFormDrawer({
           {
             onSuccess: () => {
               invalidateCourse()
+              close()
             },
           },
         )
@@ -95,9 +97,9 @@ export function useBundleFormDrawer({
           },
           {
             onSuccess: () => {
-              close()
               form.resetFields()
               invalidateCourse()
+              close()
             },
           },
         )
@@ -107,11 +109,17 @@ export function useBundleFormDrawer({
 
   const watchName = Form.useWatch(['name'], form) || '新方案'
   const watchId = Form.useWatch(['id'], form)
+  const watchIncludedProductIds = (Form.useWatch(
+    [INCLUDED_PRODUCT_IDS_FIELD_NAME],
+    form,
+  ) ?? []) as string[]
+  const watchRegularPrice = Number(Form.useWatch(['regular_price'], form))
+  const watchSalePrice = Number(Form.useWatch(['sale_price'], form))
 
   const mergedDrawerProps: DrawerProps = {
     title: `${isUpdate ? '編輯' : '新增'}銷售方案 - ${watchName} ${watchId ? `#${watchId}` : ''}`,
     forceRender: false,
-    mask: false,
+    mask: true,
     placement: 'left',
     onClose: close,
     open,
@@ -121,6 +129,10 @@ export function useBundleFormDrawer({
         type="primary"
         onClick={handleSave}
         loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
+        disabled={
+          watchIncludedProductIds?.length < 2 ||
+          watchSalePrice > watchRegularPrice
+        }
       >
         儲存
       </Button>
@@ -137,6 +149,7 @@ export function useBundleFormDrawer({
   }, [record])
 
   return {
+    record,
     open,
     setOpen,
     show,
