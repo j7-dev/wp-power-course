@@ -94,8 +94,8 @@ final class Entry {
 			<title>Power Course | 可能是 WordPress 最好用的課程外掛</title>
 		</head>
 
-		<body>
-			<main id="power_course" class="pc">
+		<body  class="pc">
+			<main id="power_course">
 
 			</main>
 		<?php

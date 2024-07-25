@@ -13,9 +13,9 @@ export const Heading: FC<
 		<Divider orientation="left" orientationMargin={0} plain {...rest}>
 			<Title
 				level={2}
-				className="border-blue-400 font-bold text-lg pl-2"
+				className="font-bold text-lg pl-2"
 				style={{
-					borderLeft: '4px solid',
+					borderLeft: '4px solid #60a5fa',
 					lineHeight: '1',
 				}}
 				{...titleProps}

@@ -92,8 +92,16 @@ final class Bootstrap {
 					'APP2_SELECTOR'    => Base::APP2_SELECTOR,
 					'API_TIMEOUT'      => Base::API_TIMEOUT,
 					'nonce'            => \wp_create_nonce( Plugin::$kebab ),
-					'bunny_library_id' => get_option( 'bunny_library_id', '244459' ),
-
+					'bunny_library_id' => \get_option( 'bunny_library_id', '' ),
+					/*
+					TODO 下面的資料稍後補上
+					{
+						libraryId: 244459,
+						name: 'cloud luke',
+						apiKey: '192d0f46-75b7-4148-8645a8530673-9081-40fb',
+						enabledResolutions: ['1080p', '720p', '480p', '360p'],
+					}
+					 */
 				],
 			]
 		);

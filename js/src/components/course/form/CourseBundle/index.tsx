@@ -16,7 +16,6 @@ export const CourseBundle = () => {
 	const courses = useAtomValue(coursesAtom)
 	const selectedCourse = courses.find(({ id }) => id === watchCourseId)
 	const bundleIds: string[] = selectedCourse?.bundle_ids || []
-	console.log('⭐  bundleIds:', bundleIds)
 	const [bundleProductForm] = Form.useForm()
 	const { drawerProps, show, open, record } = useBundleFormDrawer({
 		form: bundleProductForm,
