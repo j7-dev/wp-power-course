@@ -100,7 +100,7 @@ final class Option {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
-		$body_params = $request->get_body_params();
+		$body_params = $request->get_json_params();
 
 		$body_params = array_map( fn( $param ) => WP::sanitize_text_field_deep( $param, false ), $body_params );
 
