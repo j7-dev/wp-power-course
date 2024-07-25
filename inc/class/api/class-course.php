@@ -65,11 +65,11 @@ final class Course {
 			'method'   => 'delete',
 		],
 		[
-			'endpoint' => 'terms',
+			'endpoint' => 'courses/terms',
 			'method'   => 'get',
 		],
 		[
-			'endpoint' => 'options',
+			'endpoint' => 'courses/options',
 			'method'   => 'get',
 		],
 	];
@@ -663,7 +663,7 @@ final class Course {
 	 * @return array
 	 * @phpstan-ignore-next-line
 	 */
-	public function get_terms_callback( $request ) { // phpcs:ignore
+	public function get_courses_terms_callback( $request ) { // phpcs:ignore
 
 		$params = $request->get_query_params();
 
@@ -714,7 +714,7 @@ final class Course {
 	 * @return array
 	 * @phpstan-ignore-next-line
 	 */
-	public function get_options_callback( $request ) { // phpcs:ignore
+	public function get_courses_options_callback( $request ) { // phpcs:ignore
 
 		// it seems no need to add post_per_page, get_terms will return all terms
 		$cat_args = [
