@@ -4,6 +4,7 @@ import { FC, useEffect } from 'react'
 import { Upload } from '@/components/general'
 import { bunny_library_id } from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
+import NoLibraryId from './NoLibraryId'
 
 const { Item } = Form
 export const VideoInput: FC<FormItemProps> = (formItemProps) => {
@@ -28,6 +29,10 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 
 	if (!name) {
 		throw new Error('name is required')
+	}
+
+	if (!bunny_library_id) {
+		return <NoLibraryId />
 	}
 
 	const recordId = Form.useWatch(['id'], form)
