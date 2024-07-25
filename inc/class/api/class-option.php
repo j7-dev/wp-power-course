@@ -79,7 +79,7 @@ final class Option {
 		$fields  = $this->fields;
 
 		foreach ( $fields as $option_name ) {
-			$options[ $option_name ] = \get_option( $option_name );
+			$options[ $option_name ] = \get_option( $option_name, '' );
 		}
 
 		return new \WP_REST_Response(
