@@ -15,7 +15,7 @@ const index = () => {
 		<Form layout="vertical" form={form} onFinish={handleSave}>
 			<div className="grid grid-cols-4">
 				<Item name={['bunny_library_id']} label="Bunny Library ID">
-					<Input disabled={isGetLoading || isSaveLoading} />
+					<Input disabled={isGetLoading || isSaveLoading} allowClear />
 				</Item>
 			</div>
 			<div className="grid grid-cols-4">
