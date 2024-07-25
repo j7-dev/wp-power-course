@@ -93,10 +93,11 @@ final class Templates {
 			}
 		}
 
+		// 不是頁面名稱就去 components 裡面找
+		$template_path = Plugin::$dir . '/inc/templates/components/' . $name;
+
 		if ( $is_page ) {
 			$template_path = Plugin::$dir . '/inc/templates/pages/' . $name;
-		} else { // 不是區域名稱就去 components 裡面找
-			$template_path = Plugin::$dir . '/inc/templates/components/' . $name;
 		}
 
 		// 檢查模板文件是否存在

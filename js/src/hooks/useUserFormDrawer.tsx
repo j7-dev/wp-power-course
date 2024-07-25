@@ -6,164 +6,164 @@ import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 
 export function useUserFormDrawer({
-  form,
-  resource = 'users',
-  drawerProps,
+	form,
+	resource = 'users',
+	drawerProps,
 }: {
-  form: FormInstance
-  resource?: string
-  drawerProps?: DrawerProps
+	form: FormInstance
+	resource?: string
+	drawerProps?: DrawerProps
 }) {
-  const [open, setOpen] = useState(false)
-  const [record, setRecord] = useState<TUserRecord | undefined>(undefined)
-  const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
-  const closeRef = useRef<HTMLDivElement>(null)
-  const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
+	const [open, setOpen] = useState(false)
+	const [record, setRecord] = useState<TUserRecord | undefined>(undefined)
+	const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+	const closeRef = useRef<HTMLDivElement>(null)
+	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 
-  const invalidate = useInvalidate()
+	const invalidate = useInvalidate()
 
-  const show = (theRecord?: TUserRecord) => () => {
-    setRecord(theRecord)
-    setOpen(true)
-  }
+	const show = (theRecord?: TUserRecord) => () => {
+		setRecord(theRecord)
+		setOpen(true)
+	}
 
-  const close = () => {
-    if (!unsavedChangesCheck) {
-      setOpen(false)
-      return
-    }
+	const close = () => {
+		if (!unsavedChangesCheck) {
+			setOpen(false)
+			return
+		}
 
-    // 與原本的值相比是否有變更
-    const newValues = form.getFieldsValue()
-    const fieldNames = Object.keys(newValues).filter(
-      (fieldName) => !['files'].includes(fieldName),
-    )
-    const isEquals = fieldNames.every((fieldName) => {
-      const originValue = record?.[fieldName as keyof typeof record]
-      const newValue = newValues[fieldName]
+		// 與原本的值相比是否有變更
+		const newValues = form.getFieldsValue()
+		const fieldNames = Object.keys(newValues).filter(
+			(fieldName) => !['files'].includes(fieldName),
+		)
+		const isEquals = fieldNames.every((fieldName) => {
+			const originValue = record?.[fieldName as keyof typeof record]
+			const newValue = newValues[fieldName]
 
-      return isEqual(originValue, newValue)
-    })
+			return isEqual(originValue, newValue)
+		})
 
-    if (!isEquals) {
-      closeRef?.current?.click()
-    } else {
-      setOpen(false)
-    }
-  }
+		if (!isEquals) {
+			closeRef?.current?.click()
+		} else {
+			setOpen(false)
+		}
+	}
 
-  const { mutate: create, isLoading: isLoadingCreate } = useCreate()
-  const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
+	const { mutate: create, isLoading: isLoadingCreate } = useCreate()
+	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
 
-  const invalidateUser = () => {
-    invalidate({
-      resource,
-      invalidates: ['list'],
-    })
-  }
+	const invalidateUser = () => {
+		invalidate({
+			resource,
+			invalidates: ['list'],
+		})
+	}
 
-  const handleSave = () => {
-    form.validateFields().then(() => {
-      const values = form.getFieldsValue()
+	const handleSave = () => {
+		form.validateFields().then(() => {
+			const values = form.getFieldsValue()
 
-      if (isUpdate) {
-        const formData = toFormData(values)
-        update(
-          {
-            id: record?.id,
-            resource,
-            values: formData,
-            meta: {
-              headers: { 'Content-Type': 'multipart/form-data;' },
-            },
-          },
-          {
-            onSuccess: () => {
-              invalidateUser()
-              if (record) {
-                setRecord({ ...(record as TUserRecord) })
-              }
-              setUnsavedChangesCheck(false)
-            },
-          },
-        )
-      } else {
-        const formData = toFormData({
-          ...values,
-          is_teacher: 'yes',
-        })
-        create(
-          {
-            resource,
-            values: formData,
-            meta: {
-              headers: { 'Content-Type': 'multipart/form-data;' },
-            },
-          },
-          {
-            onSuccess: () => {
-              setOpen(false)
-              form.resetFields()
-              invalidateUser()
-              if (record) {
-                setRecord({ ...(record as TUserRecord) })
-              }
-              setUnsavedChangesCheck(false)
-            },
-          },
-        )
-      }
-    })
-  }
+			if (isUpdate) {
+				const formData = toFormData(values)
+				update(
+					{
+						id: record?.id,
+						resource,
+						values: formData,
+						meta: {
+							headers: { 'Content-Type': 'multipart/form-data;' },
+						},
+					},
+					{
+						onSuccess: () => {
+							invalidateUser()
+							if (record) {
+								setRecord({ ...(record as TUserRecord) })
+							}
+							setUnsavedChangesCheck(false)
+						},
+					},
+				)
+			} else {
+				const formData = toFormData({
+					...values,
+					is_teacher: 'yes',
+				})
+				create(
+					{
+						resource,
+						values: formData,
+						meta: {
+							headers: { 'Content-Type': 'multipart/form-data;' },
+						},
+					},
+					{
+						onSuccess: () => {
+							setOpen(false)
+							form.resetFields()
+							invalidateUser()
+							if (record) {
+								setRecord({ ...(record as TUserRecord) })
+							}
+							setUnsavedChangesCheck(false)
+						},
+					},
+				)
+			}
+		})
+	}
 
-  useEffect(() => {
-    if (record?.id && open) {
-      form.setFieldsValue(record)
-    } else {
-      form.resetFields()
-    }
-  }, [record, open])
+	useEffect(() => {
+		if (record?.id && open) {
+			form.setFieldsValue(record)
+		} else {
+			form.resetFields()
+		}
+	}, [record, open])
 
-  const mergedDrawerProps: DrawerProps = {
-    title: `${isUpdate ? '編輯' : '新增'}講師`,
-    forceRender: true,
-    push: false,
-    onClose: close,
-    open,
-    width: '50%',
-    extra: (
-      <div className="flex">
-        <Popconfirm
-          title="你儲存了嗎?"
-          description="確認關閉後，你的編輯可能會遺失，請確認操作"
-          placement="leftTop"
-          okText="確認關閉"
-          cancelText="取消"
-          onConfirm={() => {
-            setOpen(false)
-          }}
-        >
-          <p ref={closeRef} className="">
-            &nbsp;
-          </p>
-        </Popconfirm>
-        <Button
-          type="primary"
-          onClick={handleSave}
-          loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
-        >
-          儲存
-        </Button>
-      </div>
-    ),
-    ...drawerProps,
-  }
+	const mergedDrawerProps: DrawerProps = {
+		title: `${isUpdate ? '編輯' : '新增'}講師`,
+		forceRender: true,
+		push: false,
+		onClose: close,
+		open,
+		width: '50%',
+		extra: (
+			<div className="flex">
+				<Popconfirm
+					title="你儲存了嗎?"
+					description="確認關閉後，你的編輯可能會遺失，請確認操作"
+					placement="leftTop"
+					okText="確認關閉"
+					cancelText="取消"
+					onConfirm={() => {
+						setOpen(false)
+					}}
+				>
+					<p ref={closeRef} className="">
+						&nbsp;
+					</p>
+				</Popconfirm>
+				<Button
+					type="primary"
+					onClick={handleSave}
+					loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
+				>
+					儲存
+				</Button>
+			</div>
+		),
+		...drawerProps,
+	}
 
-  return {
-    open,
-    setOpen,
-    show,
-    close,
-    drawerProps: mergedDrawerProps,
-  }
+	return {
+		open,
+		setOpen,
+		show,
+		close,
+		drawerProps: mergedDrawerProps,
+	}
 }

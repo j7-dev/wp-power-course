@@ -33,10 +33,10 @@ module.exports = {
 				'.tw-hidden': {
 					display: 'none',
 				},
-				'.tw-column-1': {
+				'.tw-columns-1': {
 					columnCount: 1,
 				},
-				'.tw-column-2': {
+				'.tw-columns-2': {
 					columnCount: 2,
 				},
 				'.tw-fixed': {
@@ -47,7 +47,7 @@ module.exports = {
 		},
 	],
 	safelist: [],
-	blocklist: ['hidden', 'column-1', 'column-2', 'fixed'],
+	blocklist: ['hidden', 'columns-1', 'columns-2', 'fixed'],
 	daisyui: {
 		themes: [
 			{
