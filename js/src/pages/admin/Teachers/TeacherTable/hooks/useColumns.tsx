@@ -4,20 +4,20 @@ import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { UserName } from '@/components/user'
 
 const useColumns = ({
-  onClick: show,
+	onClick: show,
 }: {
-  onClick?: (_record: TUserRecord | undefined) => () => void
+	onClick?: (_record: TUserRecord | undefined) => () => void
 }) => {
-  const columns: TableProps<TUserRecord>['columns'] = [
-    {
-      title: '講師',
-      dataIndex: 'id',
-      width: 180,
-      render: (_, record) => <UserName record={record} onClick={show} />,
-    },
-  ]
+	const columns: TableProps<TUserRecord>['columns'] = [
+		{
+			title: '講師',
+			dataIndex: 'id',
+			width: 180,
+			render: (_, record) => <UserName record={record} onClick={show} />,
+		},
+	]
 
-  return columns
+	return columns
 }
 
 export default useColumns

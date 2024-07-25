@@ -2,11 +2,11 @@ import { useList } from '@refinedev/core'
 import { useVideoLibrary } from '@/bunny'
 
 export const useListVideo = () => {
-  const { libraryId } = useVideoLibrary()
-  const result = useList({
-    resource: `${libraryId}/videos`,
-    dataProviderName: 'bunny-stream',
-  })
+	const { libraryId } = useVideoLibrary()
+	const result = useList({
+		resource: `${libraryId}/videos`,
+		dataProviderName: 'bunny-stream',
+	})
 
-  return result
+	return result
 }

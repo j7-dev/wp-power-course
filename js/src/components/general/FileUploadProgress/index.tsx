@@ -17,65 +17,65 @@ const { Paragraph } = Typography
  */
 
 export const FileUploadProgress: FC<{
-  fileInQueue: TFileInQueue
+	fileInQueue: TFileInQueue
 }> = ({ fileInQueue }) => {
-  const [percent, setPercent] = useState(0)
-  const { file, status = 'active', encodeProgress } = fileInQueue
+	const [percent, setPercent] = useState(0)
+	const { file, status = 'active', encodeProgress } = fileInQueue
 
-  // 估計上傳時間
-  const estimatedTimeInSeconds = getEstimateUploadTimeInSeconds(file.size)
+	// 估計上傳時間
+	const estimatedTimeInSeconds = getEstimateUploadTimeInSeconds(file.size)
 
-  // 每 3 秒增加 XX %
-  const step = (100 / estimatedTimeInSeconds) * 3
+	// 每 3 秒增加 XX %
+	const step = (100 / estimatedTimeInSeconds) * 3
 
-  useEffect(() => {
-    // 用來模擬上傳進度
-    let timer: any = null
+	useEffect(() => {
+		// 用來模擬上傳進度
+		let timer: any = null
 
-    if (['success'].includes(status)) {
-      setPercent(100)
-      return () => {
-        clearInterval(timer)
-      }
-    }
+		if (['success'].includes(status)) {
+			setPercent(100)
+			return () => {
+				clearInterval(timer)
+			}
+		}
 
-    if (!file.size) {
-      return () => {
-        clearInterval(timer)
-      }
-    }
+		if (!file.size) {
+			return () => {
+				clearInterval(timer)
+			}
+		}
 
-    // 新的百分比
-    const newPercent = percent + step
+		// 新的百分比
+		const newPercent = percent + step
 
-    // 如果新的百分比 >= 100 則返回
-    if (newPercent >= 100) {
-      return () => {
-        clearInterval(timer)
-      }
-    }
+		// 如果新的百分比 >= 100 則返回
+		if (newPercent >= 100) {
+			return () => {
+				clearInterval(timer)
+			}
+		}
 
-    // 設定定時器新的百分比
-    timer = setInterval(() => {
-      setPercent(Number(newPercent.toFixed(1)))
-    }, 3000)
+		// 設定定時器新的百分比
+		timer = setInterval(() => {
+			setPercent(Number(newPercent.toFixed(1)))
+		}, 3000)
 
-    // 清除定時器
-    return () => {
-      clearInterval(timer)
-    }
-  }, [percent, file.size, status])
+		// 清除定時器
+		return () => {
+			clearInterval(timer)
+		}
+	}, [percent, file.size, status])
 
-  return (
-    <>
-      <Paragraph className="mb-0 text-xs" ellipsis>
-        <BiMoviePlay className="relative top-[2px] mr-1" />
-        {100 === encodeProgress ? '影片已處理完畢' : '影片上傳中'} {file.name}
-      </Paragraph>
-      {100 !== encodeProgress && (
-        <p className="text-xs my-0 ml-4">課程還在上傳中，請不要關閉視窗</p>
-      )}
-      <Progress percent={percent} status={status} />
-    </>
-  )
+	return (
+		<>
+			<Paragraph className="mb-0 text-xs" ellipsis>
+				<BiMoviePlay className="relative top-[2px] mr-1" />
+				{100 === encodeProgress ? '影片已處理完畢' : '影片上傳中'} {file.name}
+			</Paragraph>
+			{100 !== encodeProgress && (
+				<p className="text-xs my-0 ml-4">課程還在上傳中，請不要關閉視窗</p>
+			)}
+			<Progress percent={percent} status={status} />
+		</>
+	)
 }

@@ -1,18 +1,18 @@
 import { CrudFilter } from '@refinedev/core'
 import dayjs, { Dayjs } from 'dayjs'
 import {
-  dateRelatedFields,
-  formatRangePickerValue,
-  formatDatePickerValue,
+	dateRelatedFields,
+	formatRangePickerValue,
+	formatDatePickerValue,
 } from '@/utils'
 
 type TMapOperatorReturn = {
-  formattedField: string
-  formattedValue: string
+	formattedField: string
+	formattedValue: string
 }
 
 type TFilter = CrudFilter & {
-  field: string
+	field: string
 }
 
 const dateRelatedFieldValues = dateRelatedFields.map((field) => field.value)
@@ -29,13 +29,13 @@ const dateRelatedFieldValues = dateRelatedFields.map((field) => field.value)
  */
 
 export function mapOperator(filter: TFilter): TMapOperatorReturn {
-  const { field } = filter
+	const { field } = filter
 
-  if (dateRelatedFieldValues.includes(field)) {
-    return dateMapOperator(filter)
-  }
+	if (dateRelatedFieldValues.includes(field)) {
+		return dateMapOperator(filter)
+	}
 
-  return normalMapOperator(filter)
+	return normalMapOperator(filter)
 }
 
 /**
@@ -43,44 +43,44 @@ export function mapOperator(filter: TFilter): TMapOperatorReturn {
  */
 
 function dateMapOperator(filter: TFilter): TMapOperatorReturn {
-  const { field, operator, value } = filter
-  switch (operator) {
-    case 'between':
-      return {
-        formattedField: field,
-        formattedValue: formatRangePickerValue(value).join('...'),
-      }
-    case 'gt':
-      return {
-        formattedField: field,
-        formattedValue: `>${formatDatePickerValue(value)}`,
-      }
-    case 'gte':
-      return {
-        formattedField: field,
-        formattedValue: `>=${formatDatePickerValue(value)}`,
-      }
-    case 'lt':
-      return {
-        formattedField: field,
-        formattedValue: `<${formatDatePickerValue(value)}`,
-      }
-    case 'lte':
-      return {
-        formattedField: field,
-        formattedValue: `<=${formatDatePickerValue(value)}`,
-      }
-    case 'eq':
-      return {
-        formattedField: field,
-        formattedValue: formatDatePickerValue(value),
-      }
-    default:
-      return {
-        formattedField: field,
-        formattedValue: value,
-      }
-  }
+	const { field, operator, value } = filter
+	switch (operator) {
+		case 'between':
+			return {
+				formattedField: field,
+				formattedValue: formatRangePickerValue(value).join('...'),
+			}
+		case 'gt':
+			return {
+				formattedField: field,
+				formattedValue: `>${formatDatePickerValue(value)}`,
+			}
+		case 'gte':
+			return {
+				formattedField: field,
+				formattedValue: `>=${formatDatePickerValue(value)}`,
+			}
+		case 'lt':
+			return {
+				formattedField: field,
+				formattedValue: `<${formatDatePickerValue(value)}`,
+			}
+		case 'lte':
+			return {
+				formattedField: field,
+				formattedValue: `<=${formatDatePickerValue(value)}`,
+			}
+		case 'eq':
+			return {
+				formattedField: field,
+				formattedValue: formatDatePickerValue(value),
+			}
+		default:
+			return {
+				formattedField: field,
+				formattedValue: value,
+			}
+	}
 }
 
 /**
@@ -88,19 +88,19 @@ function dateMapOperator(filter: TFilter): TMapOperatorReturn {
  */
 
 function normalMapOperator(filter: TFilter): TMapOperatorReturn {
-  const { field, operator, value } = filter
-  switch (operator) {
-    case 'ne':
-      return {
-        formattedField: field,
-        formattedValue: `!${value}`,
-      }
-    case 'in': // because query-string help us to handle array values
-    case 'eq':
-    default:
-      return {
-        formattedField: field,
-        formattedValue: value,
-      }
-  }
+	const { field, operator, value } = filter
+	switch (operator) {
+		case 'ne':
+			return {
+				formattedField: field,
+				formattedValue: `!${value}`,
+			}
+		case 'in': // because query-string help us to handle array values
+		case 'eq':
+		default:
+			return {
+				formattedField: field,
+				formattedValue: value,
+			}
+	}
 }

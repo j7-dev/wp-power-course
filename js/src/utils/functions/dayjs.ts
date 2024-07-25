@@ -9,23 +9,23 @@ import dayjs, { Dayjs } from 'dayjs'
  * @return {Array} 格式化後的日期陣列或回退值
  */
 export function formatRangePickerValue(
-  values: unknown,
-  format = 'YYYY-MM-DD',
-  fallback = [],
+	values: unknown,
+	format = 'YYYY-MM-DD',
+	fallback = [],
 ) {
-  if (!Array.isArray(values)) {
-    return fallback
-  }
+	if (!Array.isArray(values)) {
+		return fallback
+	}
 
-  if (values.length !== 2) {
-    return fallback
-  }
+	if (values.length !== 2) {
+		return fallback
+	}
 
-  if (!values.every((value) => value instanceof dayjs)) {
-    return fallback
-  }
+	if (!values.every((value) => value instanceof dayjs)) {
+		return fallback
+	}
 
-  return (values as [Dayjs, Dayjs]).map((value) => value.format(format))
+	return (values as [Dayjs, Dayjs]).map((value) => value.format(format))
 }
 
 /**
@@ -35,29 +35,29 @@ export function formatRangePickerValue(
  * @return {(Array<Dayjs | undefined>)} 格式化後的日期陣列或未定義
  */
 export function parseRangePickerValue(values: unknown) {
-  if (!Array.isArray(values)) {
-    return [undefined, undefined]
-  }
+	if (!Array.isArray(values)) {
+		return [undefined, undefined]
+	}
 
-  if (values.length !== 2) {
-    return [undefined, undefined]
-  }
+	if (values.length !== 2) {
+		return [undefined, undefined]
+	}
 
-  if (values.every((value) => value instanceof dayjs)) {
-    return values
-  }
+	if (values.every((value) => value instanceof dayjs)) {
+		return values
+	}
 
-  if (values.every((value) => typeof value === 'number')) {
-    return values.map((value) => {
-      if (value.toString().length === 13) {
-        return dayjs(value)
-      }
-      if (value.toString().length === 10) {
-        return dayjs(value * 1000)
-      }
-    })
-  }
-  return [undefined, undefined]
+	if (values.every((value) => typeof value === 'number')) {
+		return values.map((value) => {
+			if (value.toString().length === 13) {
+				return dayjs(value)
+			}
+			if (value.toString().length === 10) {
+				return dayjs(value * 1000)
+			}
+		})
+	}
+	return [undefined, undefined]
 }
 
 /**
@@ -69,15 +69,15 @@ export function parseRangePickerValue(values: unknown) {
  * @return {string} 格式化後的日期或回退值
  */
 export function formatDatePickerValue(
-  value: unknown,
-  format = 'YYYY-MM-DD',
-  fallback = '',
+	value: unknown,
+	format = 'YYYY-MM-DD',
+	fallback = '',
 ) {
-  if (!(value instanceof dayjs)) {
-    return fallback
-  }
+	if (!(value instanceof dayjs)) {
+		return fallback
+	}
 
-  return (value as Dayjs).format(format)
+	return (value as Dayjs).format(format)
 }
 
 /**
@@ -87,17 +87,17 @@ export function formatDatePickerValue(
  * @return {(Dayjs | undefined)} 格式化後的日期或未定義
  */
 export function parseDatePickerValue(value: unknown) {
-  if (value instanceof dayjs) {
-    return value
-  }
+	if (value instanceof dayjs) {
+		return value
+	}
 
-  if (typeof value === 'number') {
-    if (value.toString().length === 13) {
-      return dayjs(value)
-    }
-    if (value.toString().length === 10) {
-      return dayjs(value * 1000)
-    }
-  }
-  return undefined
+	if (typeof value === 'number') {
+		if (value.toString().length === 13) {
+			return dayjs(value)
+		}
+		if (value.toString().length === 10) {
+			return dayjs(value * 1000)
+		}
+	}
+	return undefined
 }

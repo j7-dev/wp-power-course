@@ -9,19 +9,19 @@ import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
  */
 
 export function chapterToTreeNode(
-  chapter: TChapterRecord,
+	chapter: TChapterRecord,
 ): TreeNode<TChapterRecord> {
-  const { id, chapters, ...rest } = chapter
-  return {
-    id,
-    content: {
-      id,
-      ...rest,
-    },
-    children: chapters?.map(chapterToTreeNode) || [],
-    showExtra: false,
-    collapsed: false,
-  }
+	const { id, chapters, ...rest } = chapter
+	return {
+		id,
+		content: {
+			id,
+			...rest,
+		},
+		children: chapters?.map(chapterToTreeNode) || [],
+		showExtra: false,
+		collapsed: false,
+	}
 }
 
 /**
@@ -33,42 +33,42 @@ export function chapterToTreeNode(
  */
 
 export type TParam = {
-  id: string
-  depth: number
-  menu_order: number
-  parent_id?: string
-  name?: string
+	id: string
+	depth: number
+	menu_order: number
+	parent_id?: string
+	name?: string
 }
 
 export function treeToParams(
-  treeData: TreeData<TChapterRecord>,
-  topParentId: string,
+	treeData: TreeData<TChapterRecord>,
+	topParentId: string,
 ): TParam[] {
-  const depth0 = treeData.map((node, index) => {
-    return {
-      id: node.id as string,
-      depth: 0,
-      menu_order: index,
-      name: node?.content?.name,
-      parent_id: topParentId,
-    }
+	const depth0 = treeData.map((node, index) => {
+		return {
+			id: node.id as string,
+			depth: 0,
+			menu_order: index,
+			name: node?.content?.name,
+			parent_id: topParentId,
+		}
 
-    // parent_id 不帶就不變更
-  })
-  const depth1 = treeData
-    .map((parentNode) => {
-      const nodes = parentNode.children.map((node, index) => {
-        return {
-          id: node.id as string,
-          depth: 1,
-          menu_order: index,
-          parent_id: parentNode.id as string,
-          name: node?.content?.name,
-        }
-      })
-      return nodes
-    })
-    .flat()
+		// parent_id 不帶就不變更
+	})
+	const depth1 = treeData
+		.map((parentNode) => {
+			const nodes = parentNode.children.map((node, index) => {
+				return {
+					id: node.id as string,
+					depth: 1,
+					menu_order: index,
+					parent_id: parentNode.id as string,
+					name: node?.content?.name,
+				}
+			})
+			return nodes
+		})
+		.flat()
 
-  return [...depth0, ...depth1]
+	return [...depth0, ...depth1]
 }
