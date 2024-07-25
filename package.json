@@ -23,9 +23,6 @@
 		"sync:version": "wp-update-project-version -s package.json -p plugin.php",
 		"replace-string": "node ./replace-string.cjs"
 	},
-	"pre-commit": [
-		"lint:fix"
-	],
 	"dependencies": {
 		"@ant-design/pro-components": "^2.7.10",
 		"@ant-design/pro-editor": "^1.2.1",
@@ -79,7 +76,6 @@
 		"postcss": "^8.4.38",
 		"postcss-import": "^16.1.0",
 		"postcss-nesting": "^12.1.1",
-		"pre-commit": "^1.2.2",
 		"prettier": "^3.2.5",
 		"prettier-eslint": "^16.3.0",
 		"prettier-eslint-cli": "^8.0.1",
