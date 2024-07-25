@@ -129,7 +129,6 @@ const BundleForm: FC<{
 	}, [selectedProducts.length])
 
 	// 將當前商品移除
-
 	const initPIdsExcludedCourseId = (
 		record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
 	).filter((id) => id !== selectedCourse?.id)

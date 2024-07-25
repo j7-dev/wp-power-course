@@ -33,7 +33,7 @@ const index: FC<TTermSelector> = ({
 	const name = formName[0]
 	const label = keyLabelMapper(name)
 	const { selectProps: selectPropsFetched } = useSelect<TTerm>({
-		resource: 'terms',
+		resource: 'courses/terms',
 		optionLabel: 'name',
 		optionValue: 'id',
 		sorters: [

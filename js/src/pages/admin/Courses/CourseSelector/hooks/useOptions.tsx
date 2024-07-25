@@ -21,7 +21,7 @@ const useOptions: () => QueryObserverResult<any> & {
 } = () => {
 	const apiUrl = useApiUrl()
 	const result = useCustom<TOptions>({
-		url: `${apiUrl}/options`,
+		url: `${apiUrl}/courses/options`,
 		method: 'get',
 	})
 
