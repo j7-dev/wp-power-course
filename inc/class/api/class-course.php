@@ -276,8 +276,8 @@ final class Course {
 			'virtual'             => $product->get_virtual(),
 			'downloadable'        => $product->get_downloadable(),
 			'permalink'           => \get_permalink( $product->get_id() ),
-			'average_rating'      => (float) $product->get_average_rating(),
-			'review_count'        => (int) $product->get_review_count(),
+			'average_rating'      => (float) $product->get_average_rating() ?: 2.5,
+			'review_count'        => (int) $product->get_review_count() ?: 20,
 			'purchase_note'       => $product->get_purchase_note(),
 
 			// Get Product Prices
@@ -320,9 +320,9 @@ final class Course {
 			'course_schedule'     => (int) $product->get_meta( 'course_schedule' ),
 			'course_hour'         => (int) $product->get_meta( 'course_hour' ),
 			'course_minute'       => (int) $product->get_meta( 'course_minute' ),
-			'limit_type'          => (string) $product->get_meta( 'limit_type' ),
-			'limit_value'         => (int) $product->get_meta( 'limit_value' ),
-			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ),
+			'limit_type'          => (string) $product->get_meta( 'limit_type' ) ?: 'unlimited',
+			'limit_value'         => (int) $product->get_meta( 'limit_value' ) ?: 1,
+			'limit_unit'          => (string) $product->get_meta( 'limit_unit' ) ?: 'day',
 			'is_popular'          => (string) $product->get_meta( 'is_popular' ),
 			'is_featured'         => (string) $product->get_meta( 'is_featured' ),
 			'show_review'         => (string) $product->get_meta( 'show_review' ),
