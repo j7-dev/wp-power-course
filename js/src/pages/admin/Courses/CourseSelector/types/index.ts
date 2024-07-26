@@ -129,6 +129,7 @@ export type TChapterRecord = {
 	menu_order?: number
 	total_sales?: undefined
 	permalink?: string
+	chapter_length: number
 	category_ids?: string[]
 	tag_ids?: string[]
 	images?: TImage[]

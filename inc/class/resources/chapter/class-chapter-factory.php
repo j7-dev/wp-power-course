@@ -121,6 +121,7 @@ final class ChapterFactory {
 			// 'virtual'            => false,
 			// 'downloadable'       => false,
 			'permalink'          => \get_permalink($post->ID),
+			'chapter_length'     => (int) \get_post_meta($post->ID, 'chapter_length', true),
 
 			// Get Product Prices
 			// 'price_html'         => '',
