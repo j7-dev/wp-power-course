@@ -1,21 +1,15 @@
-import React, { FC } from 'react'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+import { FC } from 'react'
+import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { getPostStatus } from '@/utils'
 import { Tag } from 'antd'
 import { FlattenNode } from '@ant-design/pro-editor'
-import { ChapterName } from '@/components/course'
+import { ChapterName, ChapterLength } from '@/components/course'
 import AddChapter from '@/components/product/ProductAction/AddChapter'
 
 const NodeRender: FC<{
 	node: FlattenNode<TChapterRecord>
-	record: TCourseRecord | TChapterRecord
-	show: {
-		showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
-		showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
-	}
+	record: TChapterRecord
+	show: (_record: TChapterRecord | undefined) => () => void
 	loading: boolean
 }> = ({ node, record, show, loading }) => {
 	const depth = node?.depth || 0
@@ -31,8 +25,10 @@ const NodeRender: FC<{
 					{getPostStatus(record?.status)?.label}
 				</Tag>
 			</div>
+			<div>
+				<ChapterLength record={record} />
+			</div>
 			{depth === 0 && <AddChapter record={record} />}
-			{/* <div>{record?.hours}</div> */}
 			{/* <ProductType record={record} /> */}
 			{/* <ProductPrice record={record} />
       <ProductTotalSales record={record} />

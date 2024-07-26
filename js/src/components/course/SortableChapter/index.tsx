@@ -11,10 +11,7 @@ import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 
 export const SortableChapter: FC<{
 	record: TCourseRecord | TChapterRecord
-	show: {
-		showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
-		showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
-	}
+	show: (_record: TChapterRecord | undefined) => () => void
 }> = ({ record, show }) => {
 	const [treeData, setTreeData] = useState<TreeData<TChapterRecord>>([])
 	const [originTree, setOriginTree] = useState<TreeData<TChapterRecord>>([])

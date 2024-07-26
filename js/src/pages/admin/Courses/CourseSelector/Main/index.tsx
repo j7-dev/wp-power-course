@@ -163,13 +163,7 @@ const index = () => {
 						columns={columns}
 						expandable={{
 							expandedRowRender: (record) => (
-								<SortableChapter
-									record={record}
-									show={{
-										showCourseDrawer,
-										showChapterDrawer,
-									}}
-								/>
+								<SortableChapter record={record} show={showChapterDrawer} />
 							),
 							rowExpandable: (record: TCourseRecord) =>
 								!!record?.chapters?.length,
