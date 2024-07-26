@@ -37,7 +37,7 @@ export function useCourseFormDrawer({
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TCourseRecord | TChapterRecord) => () => {
-		setRecord(theRecord)
+		setRecord({ ...theRecord } as TCourseRecord | TChapterRecord)
 		setOpen(true)
 	}
 

@@ -3,10 +3,8 @@ import {
 	TChapterRecord,
 	TCourseRecord,
 } from '@/pages/admin/Courses/CourseSelector/types'
-import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
-import { Image, message } from 'antd'
-import { EyeOutlined } from '@ant-design/icons'
+import { message } from 'antd'
 
 export const ChapterName: FC<{
 	record: TCourseRecord | TChapterRecord
@@ -16,17 +14,17 @@ export const ChapterName: FC<{
 	}
 	loading?: boolean
 }> = ({ record, show, loading = false }) => {
-	const { id, sku = '', name, images, type } = record
+	const { id, sku = '', name, type } = record
 	const { showChapterDrawer, showCourseDrawer } = show
-	const image_url = images?.[0]?.url || defaultImage
+
 	const isChapter = type === 'chapter'
 
 	const handleClick = () => {
 		if (!loading) {
 			if (isChapter) {
-				showChapterDrawer(record as TChapterRecord)()
+				showChapterDrawer({ ...record } as TChapterRecord)()
 			} else {
-				showCourseDrawer(record as TCourseRecord)()
+				showCourseDrawer({ ...record } as TCourseRecord)()
 			}
 		} else {
 			message.error('請等待儲存後再進行編輯')

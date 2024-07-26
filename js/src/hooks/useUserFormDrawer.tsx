@@ -23,7 +23,7 @@ export function useUserFormDrawer({
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TUserRecord) => () => {
-		setRecord(theRecord)
+		setRecord({ ...theRecord } as TUserRecord)
 		setOpen(true)
 	}
 

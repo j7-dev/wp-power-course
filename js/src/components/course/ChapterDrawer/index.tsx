@@ -39,6 +39,7 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
 						initialValue="publish"
 						getValueProps={(value) => ({ value: value === 'publish' })}
 						normalize={(value) => (value ? 'publish' : 'draft')}
+						hidden
 					>
 						<Switch checkedChildren="發佈" unCheckedChildren="草稿" />
 					</Item>
