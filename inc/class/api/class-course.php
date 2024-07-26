@@ -329,8 +329,16 @@ final class Course {
 			'enable_review'       => (string) $product->get_meta( 'enable_review' ),
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
-			'feature_video'       => (string) $product->get_meta( 'feature_video' ),
-			'trial_video'         => (string) $product->get_meta( 'trial_video' ),
+			'feature_video'       => $product->get_meta( 'feature_video' ) ?: [
+				'type' => 'youtube',
+				'id'   => '',
+				'meta' => [],
+			],
+			'trial_video'         => $product->get_meta( 'trial_video' ) ?: [
+				'type' => 'youtube',
+				'id'   => '',
+				'meta' => [],
+			],
 			'teacher_ids'         => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
 
 			// bundle product

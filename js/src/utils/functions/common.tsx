@@ -146,3 +146,39 @@ export const toFormData = (data: object): GenericFormData => {
 
 	return formData
 }
+
+/**
+ * 從 Youtube 的 URL 中取得影片 ID
+ *
+ * @param {string} url
+ * @return {string | null} 影片 ID
+ */
+export const getYoutubeVideoId = (url: string | null): string | null => {
+	if (!url) return ''
+	try {
+		const urlObj = new URL(url)
+		const searchParams = new URLSearchParams(urlObj.search)
+		return searchParams.get('v')
+	} catch (error) {
+		console.error('無效的 YouTube URL:', error)
+		return null
+	}
+}
+
+/**
+ * 從 vimeo 的 URL 中取得影片 ID
+ *
+ * @param {string} url // ex: https://vimeo.com/900151069
+ * @return {string | null} 影片 ID
+ */
+export const getVimeoVideoId = (url: string | null): string | null => {
+	if (!url) return ''
+	try {
+		const regex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/
+		const match = url.match(regex)
+		return match ? match[1] : null
+	} catch (error) {
+		console.error('无效的 Vimeo URL:', error)
+		return null
+	}
+}

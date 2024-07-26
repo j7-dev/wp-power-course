@@ -96,7 +96,7 @@ final class Bootstrap {
 					/*
 					TODO 下面的資料稍後補上
 					{
-						libraryId: 244459,
+						libraryId: 244459, // OK
 						name: 'cloud luke',
 						apiKey: '192d0f46-75b7-4148-8645a8530673-9081-40fb',
 						enabledResolutions: ['1080p', '720p', '480p', '360p'],
