@@ -134,5 +134,5 @@ export type TChapterRecord = {
 	images?: TImage[]
 	chapters?: TChapterRecord[]
 	parent_id?: string
-	bunny_video_id?: string
+	chapter_video?: string
 }

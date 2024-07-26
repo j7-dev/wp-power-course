@@ -5,10 +5,6 @@
 
 use J7\PowerCourse\Templates\Templates;
 
-// TODO 清除預設值
-$library_id = \get_option( 'library_id', '244459' );
-
-
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 ];
@@ -33,6 +29,9 @@ if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
 }
 
+/**
+ * @var array{type: string, id: string, meta: ?array} $trial_video
+ */
 $trial_video = \get_post_meta( $product_id, 'trial_video', true );
 
 if ( ! ! $trial_video ) {
@@ -53,10 +52,9 @@ if ( ! ! $trial_video ) {
 	false
 	),
 	Templates::get(
-	'bunny/video',
+	'video',
 	[
-		'library_id' => $library_id,
-		'video_id'   => $trial_video,
+		'video_info' => $trial_video,
 	],
 	false
 	)

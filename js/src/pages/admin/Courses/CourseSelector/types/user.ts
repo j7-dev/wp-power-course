@@ -1,7 +1,7 @@
 type TChapter = {
 	id: string
 	name: string
-	bunny_video_id: string
+	chapter_video: string
 	is_finished: boolean
 }
 

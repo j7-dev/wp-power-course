@@ -5,9 +5,6 @@
 
 use J7\PowerCourse\Templates\Templates;
 
-// TODO 清除預設值
-$library_id = get_option( 'bunny_library_id', '244459' );
-
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
@@ -30,7 +27,10 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 $chapter_id = $chapter->ID;
 
-$video_id = get_post_meta( $chapter_id, 'bunny_video_id', true );
+/**
+ * @var array{type: string, id: string, meta: ?array} $video_info
+ */
+$video_info = get_post_meta( $chapter_id, 'chapter_video', true );
 
 
 $course_tabs = [
@@ -72,10 +72,9 @@ Templates::get( 'classroom/header' );
 echo '<div class="z-[15] sticky lg:relative top-0">';
 
 Templates::get(
-	'bunny/video',
+	'video',
 	[
-		'library_id' => $library_id,
-		'video_id'   => $video_id,
+		'video_info' => $video_info,
 		'class'      => 'rounded-none',
 	]
 );

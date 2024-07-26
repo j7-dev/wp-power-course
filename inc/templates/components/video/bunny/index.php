@@ -1,12 +1,18 @@
 <?php
 /**
- * Video component
+ * Bunny video component
  */
+
+use J7\PowerCourse\Templates\Templates;
 
 $default_args = [
 	'class'      => 'rounded-xl',
 	'library_id' => '',
-	'video_id'   => '',
+	'video_info' => [
+		'type' => 'youtube',
+		'id'   => '',
+		'meta' => [],
+	],
 ];
 
 /**
@@ -15,22 +21,23 @@ $default_args = [
  */
 $args = wp_parse_args( $args, $default_args );
 
+
+/**
+ * @var array{type: string, id: string, meta: ?array} $video_info
+ */
 [
-	'library_id' => $library_id,
-	'video_id'   => $video_id,
 	'class'      => $class,
+	'library_id' => $library_id,
+	'video_info'   => $video_info,
 ] = $args;
 
 if ( ! $library_id || ! $video_id ) {
-	printf(
-		/*html*/'
-	<div class="bg-primary aspect-video w-full text-white flex flex-col items-center justify-center">
-		<p class="font-bold text-4xl mb-2">OOPS! 找不到影片🤯</p>
-		<p class="text-base">%1$s</p>
-	</div>
-	',
-		'缺少 ' . ( ! $library_id ? 'library_id' : 'video_id' ) . ' ，請聯絡老師'
-	);
+	Templates::get(
+		'video/404',
+		[
+			'message' => '缺少 ' . ( ! $library_id ? 'library_id' : 'video_id' ) . ' ，請聯絡老師',
+		]
+		);
 
 	return;
 }

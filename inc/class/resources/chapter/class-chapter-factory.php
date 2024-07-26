@@ -156,7 +156,7 @@ final class ChapterFactory {
 			'images'             => $images,
 
 			'parent_id'          => (string) $post->post_parent,
-			'bunny_video_id'     => \get_post_meta($post->ID, 'bunny_video_id', true),
+			'chapter_video'      => \get_post_meta($post->ID, 'chapter_video', true),
 		] + $children;
 
 		return array_merge(

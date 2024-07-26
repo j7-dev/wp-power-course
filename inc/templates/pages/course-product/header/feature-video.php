@@ -31,20 +31,18 @@ if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
 }
 
-
-// TODO 清除預設值 DELETE
-$library_id = \get_option( 'library_id', '244459' );
-
+/**
+ * @var array{type: string, id: string, meta: ?array} $feature_video
+ */
 $feature_video = \get_post_meta( $product_id, 'feature_video', true );
 $image_id      = $product->get_image_id();
 $image_url     = $image_id ? \wp_get_attachment_image_url( (int) $image_id, 'full' ) : Base::DEFAULT_IMAGE;
 
 if ( ! ! $feature_video ) {
 	Templates::get(
-		'bunny/video',
+		'video',
 		[
-			'library_id' => $library_id,
-			'video_id'   => $feature_video,
+			'video_info' => $feature_video,
 			'class'      => 'md:rounded-2xl',
 		]
 	);

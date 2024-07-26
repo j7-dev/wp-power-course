@@ -18,9 +18,9 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
 					<Item name={['name']} label="課程名稱">
 						<Input />
 					</Item>
-					{/* 如果深度為 0 清除 bunny_video_id*/}
+					{/* 如果深度為 0 清除 chapter_video*/}
 					{watchDepth === 0 && (
-						<Item name={['bunny_video_id']} hidden>
+						<Item name={['chapter_video']} hidden>
 							<Input />
 						</Item>
 					)}
@@ -29,7 +29,7 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
 						<div className={'mb-6'}>
 							<p className={'mb-3'}>上傳課程內容</p>
 							<div className={'max-w-[20rem]'}>
-								<VideoInput name={['bunny_video_id']} />
+								<VideoInput name={['chapter_video']} />
 							</div>
 						</div>
 					)}

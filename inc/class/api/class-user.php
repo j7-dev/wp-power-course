@@ -355,10 +355,10 @@ final class User {
 			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, return_ids :true);
 			$finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
 			foreach ($all_chapter_ids as $j => $chapter_id) {
-				$avl_courses[ $i ]['chapters'][ $j ]['id']             = (string) $chapter_id;
-				$avl_courses[ $i ]['chapters'][ $j ]['name']           = \get_the_title($chapter_id);
-				$avl_courses[ $i ]['chapters'][ $j ]['bunny_video_id'] = \get_the_title($chapter_id);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']    = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
+				$avl_courses[ $i ]['chapters'][ $j ]['id']            = (string) $chapter_id;
+				$avl_courses[ $i ]['chapters'][ $j ]['name']          = \get_the_title($chapter_id);
+				$avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
+				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
 			}
 		}
 
