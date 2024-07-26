@@ -60,9 +60,9 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$sub_chapters  = get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
-		$video_length = (int) get_post_meta( $sub_chapter->ID, 'video_length', true );
-		$is_finished  = in_array( (string) $sub_chapter->ID, $finished_chapter_ids, true);
-		$icon         = $is_finished ? 'icon/check' : 'icon/video';
+		$chapter_length = (int) get_post_meta( $sub_chapter->ID, 'chapter_length', true );
+		$is_finished    = in_array( (string) $sub_chapter->ID, $finished_chapter_ids, true );
+		$icon           = $is_finished ? 'icon/check' : 'icon/video';
 
 		$children_html .= sprintf(
 			/*html*/'
@@ -81,7 +81,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			"classroom__sider-collapse__chapter-{$sub_chapter->ID}",
 			Templates::get( $icon, null, false ),
 			$sub_chapter->post_title,
-			Base::get_video_length_by_seconds( $video_length )
+			Base::get_video_length_by_seconds( $chapter_length )
 		);
 	endforeach;
 

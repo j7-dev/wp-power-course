@@ -16,10 +16,15 @@ export const VideoLength: FC<FormItemProps> = (formItemProps) => {
 
 	const handleChange =
 		(field: 'hour' | 'minute' | 'second') => (value: number | null) => {
-			setLength({ ...length, [field]: value ?? 0 })
-			const lengthInSecond =
-				length.hour * 3600 + length.minute * 60 + length.second
-			form.setFieldValue(name, lengthInSecond)
+			setLength((prev) => {
+				const newLength = { ...prev, [field]: value ?? 0 }
+
+				const newLengthInSecond =
+					newLength.hour * 3600 + newLength.minute * 60 + newLength.second
+				form.setFieldValue(name, newLengthInSecond)
+
+				return newLength
+			})
 		}
 
 	useEffect(() => {

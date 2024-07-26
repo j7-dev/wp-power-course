@@ -106,8 +106,8 @@ abstract class Course {
 
 		$length = 0;
 		foreach ( $chapter_ids as $chapter_id ) {
-			$video_length = (int) \get_post_meta( $chapter_id, 'video_length', true );
-			$length      += $video_length;
+			$chapter_length = (int) \get_post_meta( $chapter_id, 'chapter_length', true );
+			$length        += $chapter_length;
 		}
 
 		if ( 'minute' === $type ) {
