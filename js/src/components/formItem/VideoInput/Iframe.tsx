@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
 import { Form, FormItemProps, Input } from 'antd'
 import { FC, DetailedHTMLProps, IframeHTMLAttributes } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { TVideo, TVideoType } from './types'
+import { TVideoType } from './types'
 import { debounce } from 'lodash-es'
 
 const { Item } = Form
@@ -31,17 +30,10 @@ const Iframe: FC<{
 	iframeProps,
 }) => {
 	const form = Form.useFormInstance()
-	const name = formItemProps?.name
+	const { name, ...restFormItemProps } = formItemProps
 	const recordId = Form.useWatch(['id'], form)
 	const watchField = Form.useWatch(name, form)
 	const platFormName = type.toUpperCase()
-
-	useEffect(() => {
-		// 將後端取得的值塞進表單
-		if (watchField) {
-			form.setFieldValue(name, watchField)
-		}
-	}, [watchField])
 
 	if (!name) {
 		throw new Error('name is required')
@@ -64,26 +56,20 @@ const Iframe: FC<{
 	return (
 		<div className="relative">
 			<Item
-				{...formItemProps}
-				getValueProps={
-					debounce((value: TVideo | string) => {
-						// @ts-expect-error 因為 value 可能是 string 或 TVideo
-						const vId = value?.id
-						console.log('⭐  vId:', { vId, value: getVideoUrl(vId) })
-						return {
-							value: vId ? getVideoUrl(vId) : value,
-						}
-					}, 500) as any
-				}
-				normalize={(url) => {
-					const vId = getVideoId(url) || ''
+				{...restFormItemProps}
+				name={[
+					...name,
+					'id',
+				]}
+				className="mb-1"
+				getValueProps={(value) => {
 					return {
-						type,
-						id: vId,
-						meta: {},
+						value: value ? getVideoUrl(value) : value,
 					}
 				}}
-				className="mb-1"
+				normalize={(value) => {
+					return value ? getVideoId(value) || '' : ''
+				}}
 			>
 				<Input
 					size="small"
@@ -91,6 +77,15 @@ const Iframe: FC<{
 					placeholder={`請輸入 ${platFormName} 影片連結`}
 				/>
 			</Item>
+
+			<Item
+				{...restFormItemProps}
+				name={[
+					...name,
+					'meta',
+				]}
+				hidden
+			/>
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
 			{recordId && validVideoId && (
 				<>
