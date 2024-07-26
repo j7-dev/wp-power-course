@@ -1,16 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Button, Form, Drawer, Input, Alert } from 'antd'
-import { EditOutlined, GithubOutlined } from '@ant-design/icons'
+import { EditOutlined, LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
-import { BlockNote, useBlockNote } from 'antd-toolkit'
 import { useApiUrl } from '@refinedev/core'
+import { useBlockNote } from 'antd-toolkit'
 
 const { Item } = Form
+const BlockNote = lazy(() =>
+	import('antd-toolkit').then((module) => ({
+		default: module.BlockNote,
+	})),
+)
 
-/**
- * TODO 移除 BlockNote 的 checkout 插件
- * BlockNote 優化 React.lazy
- */
 const DescriptionDrawer = () => {
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
@@ -69,25 +70,23 @@ const DescriptionDrawer = () => {
 								確認變更只是確認內文有沒有變更，您還是需要儲存才會存進課程
 							</li>
 							<li>可以使用 WordPress shortcode</li>
-							<li>
-								文字與圖片對齊功能目前是無效的，持續整合中
-								<a
-									target="_blank"
-									href="https://github.com/Darginec05/Yoopta-Editor/issues/205"
-									rel="noreferrer"
-								>
-									<GithubOutlined className="mr-1" />
-									已通知套件作者修正
-								</a>
-							</li>
+							<li>圖片在前台顯示皆為 100% ，縮小圖片並不影響前台顯示</li>
+							<li>未來有新功能持續擴充</li>
 						</ol>
 					}
 					type="warning"
 					showIcon
 					closable
 				/>
-
-				<BlockNote {...blockNoteViewProps} />
+				<Suspense
+					fallback={
+						<Button type="text" icon={<LoadingOutlined />}>
+							Loading...
+						</Button>
+					}
+				>
+					<BlockNote {...blockNoteViewProps} />
+				</Suspense>
 			</Drawer>
 		</>
 	)
