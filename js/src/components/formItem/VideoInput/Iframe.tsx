@@ -1,8 +1,13 @@
 import { Form, FormItemProps, Input } from 'antd'
-import { FC, DetailedHTMLProps, IframeHTMLAttributes } from 'react'
+import {
+	FC,
+	DetailedHTMLProps,
+	IframeHTMLAttributes,
+	useEffect,
+	useState,
+} from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import { TVideoType } from './types'
-import { debounce } from 'lodash-es'
 
 const { Item } = Form
 
@@ -29,11 +34,19 @@ const Iframe: FC<{
 	exampleUrl,
 	iframeProps,
 }) => {
+	const [vIdOrUrl, setVIdOrUrl] = useState('')
 	const form = Form.useFormInstance()
-	const { name, ...restFormItemProps } = formItemProps
+	const { name } = formItemProps
 	const recordId = Form.useWatch(['id'], form)
 	const watchField = Form.useWatch(name, form)
 	const platFormName = type.toUpperCase()
+
+	useEffect(() => {
+		if (watchField?.id) {
+			const url = getVideoUrl(watchField.id)
+			setVIdOrUrl(url)
+		}
+	}, [watchField?.id])
 
 	if (!name) {
 		throw new Error('name is required')
@@ -55,37 +68,25 @@ const Iframe: FC<{
 
 	return (
 		<div className="relative">
-			<Item
-				{...restFormItemProps}
-				name={[
-					...name,
-					'id',
-				]}
+			<Input
+				size="small"
+				allowClear
+				placeholder={`請輸入 ${platFormName} 影片連結`}
+				value={vIdOrUrl}
+				onChange={(e) => {
+					const string = e.target.value
+					setVIdOrUrl(string)
+					const vId = string ? getVideoId(string) : ''
+					form.setFieldValue(name, {
+						type,
+						id: vId,
+						meta: {},
+					})
+				}}
 				className="mb-1"
-				getValueProps={(value) => {
-					return {
-						value: value ? getVideoUrl(value) : value,
-					}
-				}}
-				normalize={(value) => {
-					return value ? getVideoId(value) || '' : ''
-				}}
-			>
-				<Input
-					size="small"
-					allowClear
-					placeholder={`請輸入 ${platFormName} 影片連結`}
-				/>
-			</Item>
-
-			<Item
-				{...restFormItemProps}
-				name={[
-					...name,
-					'meta',
-				]}
-				hidden
 			/>
+			<Item {...formItemProps} hidden />
+
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
 			{recordId && validVideoId && (
 				<>
