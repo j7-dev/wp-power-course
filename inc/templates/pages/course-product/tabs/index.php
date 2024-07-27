@@ -39,45 +39,53 @@ $qa          = Templates::get(
 	echo: false
 	);
 
+$review = Templates::get(
+		'review',
+		args: [
+			'product' => $product,
+		],
+		echo: false
+		);
+
 $course_tabs = [
-	[
-		'key'     => '1',
+	'description' => [
 		'label'   => '簡介',
 		'content' => \do_shortcode( \wpautop($description) ),
 	],
-	[
-		'key'     => '2',
+	'chapter' => [
 		'label'   => '章節',
 		'content' => $accordion,
 	],
-	[
-		'key'     => '3',
+	'qa' => [
 		'label'   => '問答',
 		'content' => $qa,
 	],
-	[
-		'key'     => '4',
+	'comment' => [
 		'label'   => '留言',
 		'content' => '🚧 施工中... 🚧',
 	],
-	[
-		'key'     => '5',
+	'review' => [
 		'label'   => '評價',
-		'content' => '🚧 施工中... 🚧',
+		'content' => $review,
 	],
-	[
-		'key'     => '6',
+	'announcement' => [
 		'label'   => '公告',
 		'content' => '🚧 施工中... 🚧',
 	],
 ];
+
+$show_review_tab = 'yes' === $product->get_meta( 'show_review_tab' );
+
+if (!$show_review_tab) {
+	unset($course_tabs[3]);
+}
 
 echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
 Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => '1',
+		'default_active_key' => 'description',
 	]
 );
 echo '</div>';
@@ -86,6 +94,6 @@ Templates::get(
 	'tabs/content',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => '1',
+		'default_active_key' => 'description',
 	]
 );

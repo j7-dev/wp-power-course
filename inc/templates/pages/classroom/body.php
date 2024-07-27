@@ -34,8 +34,7 @@ $video_info = get_post_meta( $chapter_id, 'chapter_video', true );
 
 
 $course_tabs = [
-	[
-		'key'     => '0',
+	'chapter' => [
 		'label'   => '章節',
 		'content' => Templates::get( 'classroom/chapters', null, false ),
 	],
@@ -86,7 +85,7 @@ Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => '0',
+		'default_active_key' => 'chapter',
 	]
 	);
 

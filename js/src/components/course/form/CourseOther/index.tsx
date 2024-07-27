@@ -76,25 +76,19 @@ export const CourseOther = () => {
 				</div>
 			</div>
 
-			<Heading>課程評價</Heading>
+			<Heading>課程評價星星</Heading>
 
 			<div className="grid 2xl:grid-cols-3 gap-6 mb-12">
 				<FiSwitch
 					formItemProps={{
 						name: ['show_review'],
-						label: '顯示用戶評價',
-					}}
-				/>
-				<FiSwitch
-					formItemProps={{
-						name: ['enable_review'],
-						label: '開放已購買用戶評價課程',
+						label: '顯示課程評價星星',
 					}}
 				/>
 				{watchShowReview && (
 					<>
 						<Item
-							label="自訂課程評價"
+							label="自訂課程評價星星"
 							name={['average_rating']}
 							initialValue={2.5}
 						>
@@ -113,8 +107,9 @@ export const CourseOther = () => {
 							</Tooltip>
 						</div>
 						<Item
-							label="自訂評價數量"
+							label="灌水課程評價數量"
 							name={['review_count']}
+							tooltip="前台顯示評價數量 = 實際評價數量 + 灌水評價數量"
 							initialValue={20}
 						>
 							<InputNumber className="w-full" min={0} />
@@ -134,6 +129,24 @@ export const CourseOther = () => {
 						</Item>
 					</>
 				)}
+			</div>
+
+			<Heading>課程評價分頁</Heading>
+
+			<div className="grid 2xl:grid-cols-3 gap-6 mb-12">
+				<FiSwitch
+					formItemProps={{
+						name: ['show_review_tab'],
+						label: '顯示課程評價分頁',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
+						name: ['enable_review_tab'],
+						label: '開放已購買用戶評價課程',
+						tooltip: '您也可以單純蒐集用戶評價，但不顯示其他用戶的評價',
+					}}
+				/>
 			</div>
 
 			<Heading>課程留言</Heading>
