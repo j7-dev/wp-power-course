@@ -74,7 +74,7 @@ final class Product {
 
 		$params = $request->get_query_params() ?? [];
 
-		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
 			'status'         => [ 'publish', 'draft' ],
@@ -270,7 +270,7 @@ final class Product {
 		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 
 		$product = new BundleProduct();
 
@@ -318,7 +318,7 @@ final class Product {
 		$body_params = $request->get_body_params() ?? [];
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 
 		$product = \wc_get_product( $id );
 		if ( ! $product ) {

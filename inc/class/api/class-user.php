@@ -100,7 +100,7 @@ final class User {
 
 		$params = $request->get_query_params();
 
-		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
@@ -159,7 +159,7 @@ final class User {
 
 		$params = $request->get_query_params();
 
-		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
@@ -291,7 +291,7 @@ final class User {
 	public function post_users_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_body_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 
 		[
 		'data' => $data,
@@ -393,7 +393,7 @@ final class User {
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 
 		[
 		'data' => $data,
@@ -435,7 +435,7 @@ final class User {
 
 		$body_params = $request->get_body_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 		$user_ids    = $body_params['user_ids'] ?? [];
 
 		foreach ( $user_ids as $user_id ) {
@@ -465,7 +465,7 @@ final class User {
 
 		$body_params = $request->get_body_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params );
 		$user_ids    = $body_params['user_ids'] ?? [];
 
 		$update_success = false;

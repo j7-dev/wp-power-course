@@ -86,7 +86,7 @@ final class Chapter {
 		$skip_keys   = [
 			'chapter_video',
 		];
-		$body_params = array_map(fn( $param ) => WP::sanitize_text_field_deep($param, true, $skip_keys), $body_params );
+		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		$create_result = ChapterFactory::create_chapter( $body_params );
 
@@ -118,7 +118,7 @@ final class Chapter {
 
 		$body_params = $request->get_json_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
 		$sort_result = ChapterFactory::sort_chapters( $body_params );
 
@@ -149,7 +149,7 @@ final class Chapter {
 		$skip_keys   = [
 			'chapter_video',
 		];
-		$body_params = array_map(fn( $param ) => WP::sanitize_text_field_deep($param, true, $skip_keys), $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, true, $skip_keys );
 
 		$formatted_params = ChapterFactory::converter( $body_params );
 
@@ -218,7 +218,7 @@ final class Chapter {
 		$chapter_id = $request['id'];
 		// @phpstan-ignore-next-line
 		$body_params = $request->get_body_params() ?? [];
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
 		WP::include_required_params( $body_params, [ 'course_id' ]);
 

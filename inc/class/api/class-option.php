@@ -102,7 +102,7 @@ final class Option {
 	public function post_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_json_params();
 
-		$body_params = array_map( fn( $param ) => WP::sanitize_text_field_deep( $param, false ), $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
 		foreach ( $body_params as $key => $value ) {
 			if ( in_array( $key, $this->fields, true ) ) {
