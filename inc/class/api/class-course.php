@@ -135,7 +135,7 @@ final class Course {
 
 		$params = $request->get_query_params();
 
-		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
 			'status'         => [ 'publish', 'draft' ],
@@ -370,7 +370,12 @@ final class Course {
 		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
 		$sanitize_description = \wp_kses_post( $body_params['description'] ?? '' );
 
-		$body_params                = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$skip_keys   = [
+			'feature_video',
+			'trial_video',
+		];
+		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
+
 		$body_params['description'] = $sanitize_description;
 
 		// 將 '[]' 轉為 []
@@ -521,8 +526,9 @@ final class Course {
 	public function post_courses_with_id_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
-		$user_ids    = $body_params['user_ids'] ?? [];
+		$body_params =WP::sanitize_text_field_deep($body_params, false );
+
+		$user_ids = $body_params['user_ids'] ?? [];
 
 		$success = true;
 		foreach ($user_ids as  $user_id) {
@@ -555,7 +561,7 @@ final class Course {
 	public function post_courses_with_id_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 		$user_ids    = $body_params['user_ids'] ?? [];
 		$timestamp   = $body_params['timestamp'] ?? 0; // 一般為 10 位數字，如果是0就是無期限
 
@@ -590,7 +596,7 @@ final class Course {
 	public function post_courses_with_id_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$course_id   = (int) $request['id'];
 		$body_params = $request->get_body_params();
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 		$user_ids    = $body_params['user_ids'] ?? [];
 
 		$success = true;
@@ -675,7 +681,7 @@ final class Course {
 
 		$params = $request->get_query_params();
 
-		$params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $params );
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		// it seems no need to add post_per_page, get_terms will return all terms
 		$default_args = [

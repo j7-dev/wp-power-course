@@ -64,3 +64,14 @@ if ('bunny-stream-api' === $video_type) {
 		]
 		);
 }
+
+
+if ('code' === $video_type) {
+	Templates::get(
+		'video/code',
+		[
+			'video_info' => $video_info,
+			'class'      => $class,
+		]
+		);
+}

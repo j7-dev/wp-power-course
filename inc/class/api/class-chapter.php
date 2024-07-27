@@ -83,7 +83,10 @@ final class Chapter {
 
 		$body_params = $request->get_json_params();
 
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$skip_keys   = [
+			'chapter_video',
+		];
+		$body_params = array_map(fn( $param ) => WP::sanitize_text_field_deep($param, true, $skip_keys), $body_params );
 
 		$create_result = ChapterFactory::create_chapter( $body_params );
 
@@ -143,7 +146,10 @@ final class Chapter {
 
 		$id          = $request['id'];
 		$body_params = $request->get_body_params();
-		$body_params = array_map( [ WP::class, 'sanitize_text_field_deep' ], $body_params );
+		$skip_keys   = [
+			'chapter_video',
+		];
+		$body_params = array_map(fn( $param ) => WP::sanitize_text_field_deep($param, true, $skip_keys), $body_params );
 
 		$formatted_params = ChapterFactory::converter( $body_params );
 

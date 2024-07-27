@@ -97,12 +97,12 @@ function App() {
 							</ConfigProvider>
 						}
 					>
-						<Route index element={<Dashboard />} />
-						<Route path="/dashboard" element={<Dashboard />} />
+						<Route index element={<Courses />} />
 						<Route path="/courses" element={<Courses />} />
 						<Route path="/teachers" element={<Teachers />} />
 						<Route path="/shortcodes" element={<Shortcodes />} />
 						<Route path="/settings" element={<Settings />} />
+						<Route path="/dashboard" element={<Dashboard />} />
 
 						<Route path="*" element={<ErrorComponent />} />
 					</Route>

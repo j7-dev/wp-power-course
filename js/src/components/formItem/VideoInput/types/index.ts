@@ -1,4 +1,4 @@
-export type TVideoType = 'youtube' | 'vimeo' | 'bunny-stream-api'
+export type TVideoType = 'youtube' | 'vimeo' | 'bunny-stream-api' | 'code'
 
 export type TVideo = {
 	type: TVideoType
