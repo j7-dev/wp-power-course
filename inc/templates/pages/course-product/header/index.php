@@ -80,14 +80,15 @@ if ( ! is_array( $teacher_ids ) ) {
 			);
 
 		if ($show_review) {
-			$rating       = $product->get_average_rating();
-			$review_count = $product->get_review_count();
+			$rating             = (float) $product->get_meta( 'custom_rating' );
+			$review_count       = $product->get_review_count();
+			$extra_review_count = (int) $product->get_meta( 'extra_review_count' );
 			Templates::get(
 			'rate',
 			[
 				'show_before' => true,
 				'value'       => $rating,
-				'total'       => $review_count,
+				'total'       => $review_count + $extra_review_count,
 			]
 			);
 		}

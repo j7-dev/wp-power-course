@@ -276,8 +276,8 @@ final class Course {
 			'virtual'             => $product->get_virtual(),
 			'downloadable'        => $product->get_downloadable(),
 			'permalink'           => \get_permalink( $product->get_id() ),
-			'average_rating'      => (float) $product->get_average_rating() ?: 2.5,
-			'review_count'        => (int) $product->get_review_count() ?: 20,
+			'custom_rating'       => (float) $product->get_meta('custom_rating') ?: 2.5,
+			'extra_review_count'  => (int) $product->get_meta('extra_review_count'),
 			'purchase_note'       => $product->get_purchase_note(),
 
 			// Get Product Prices

@@ -12,8 +12,11 @@ export const CourseOther = () => {
 	const watchIsFeatured: boolean =
 		Form.useWatch(['is_featured'], form) === 'yes'
 
-	const watchAvgRating: number = Form.useWatch(['average_rating'], form)
-	const watchReviewCount: number = Form.useWatch(['review_count'], form)
+	const watchCustomRating: number = Form.useWatch(['custom_rating'], form)
+	const watchExtraReviewCount: number = Form.useWatch(
+		['extra_review_count'],
+		form,
+	)
 	const watchShowReview: boolean =
 		Form.useWatch(['show_review'], form) === 'yes'
 
@@ -89,7 +92,7 @@ export const CourseOther = () => {
 					<>
 						<Item
 							label="自訂課程評價星星"
-							name={['average_rating']}
+							name={['custom_rating']}
 							initialValue={2.5}
 						>
 							<Slider step={0.1} min={0} max={5} />
@@ -99,18 +102,18 @@ export const CourseOther = () => {
 							<Tooltip title="預覽" className="w-fit mb-12">
 								<div className="flex items-center text-gray-800">
 									<span className="mr-2 text-2xl font-semibold">
-										{Number(watchAvgRating).toFixed(1)}
+										{Number(watchCustomRating).toFixed(1)}
 									</span>
-									<Rate disabled value={watchAvgRating} allowHalf />
-									<span className="ml-2">({watchReviewCount || 0})</span>
+									<Rate disabled value={watchCustomRating} allowHalf />
+									<span className="ml-2">({watchExtraReviewCount || 0})</span>
 								</div>
 							</Tooltip>
 						</div>
 						<Item
 							label="灌水課程評價數量"
-							name={['review_count']}
+							name={['extra_review_count']}
 							tooltip="前台顯示評價數量 = 實際評價數量 + 灌水評價數量"
-							initialValue={20}
+							initialValue={0}
 						>
 							<InputNumber className="w-full" min={0} />
 						</Item>

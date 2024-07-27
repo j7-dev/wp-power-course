@@ -67,8 +67,8 @@ export type TProduct = {
 		currency_suffix: string
 	}
 	price_html: string
-	average_rating: string
-	review_count: number
+	custom_rating: string
+	extra_review_count: number
 	images: TImage[]
 	categories: TProductTerm[]
 	tags: TProductTerm[]
@@ -116,8 +116,8 @@ export const defaultProduct: TProduct = {
 		currency_suffix: '',
 	},
 	price_html: '',
-	average_rating: '',
-	review_count: 0,
+	custom_rating: '',
+	extra_review_count: 0,
 	images: [],
 	categories: [],
 	tags: [],

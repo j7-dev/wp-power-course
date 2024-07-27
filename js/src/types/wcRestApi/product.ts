@@ -63,7 +63,7 @@ export type TProduct = TProductBase & {
 	shipping_taxable: boolean
 	low_stock_amount: number | null
 	reviews_allowed: boolean
-	average_rating: string
+	custom_rating: string
 	rating_count: number
 	upsell_ids: any[]
 	cross_sell_ids: any[]
