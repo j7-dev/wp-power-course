@@ -30,7 +30,7 @@ $comment_content = wpautop( $product_comment->comment_content );
 
 printf(
 /*html*/'
-<div class="bg-gray-100 p-6">
+<div class="bg-gray-100 p-6 mb-2 rounded">
 	<div class="flex gap-4">
 		<div class="w-10">
 			<img src="%1$s" alt="%2$s" class="w-10 h-10 rounded-full">
@@ -52,8 +52,7 @@ printf(
 	Templates::get(
 		'rate',
 		[
-			'value'    => $rating,
-			'disabled' => true,
+			'value' => $rating,
 		],
 		false
 		),

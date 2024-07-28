@@ -9,6 +9,7 @@ $default_args = [
 	'value'       => 3.7, // 有幾個星星是填滿的
 	'total'       => null, // 有幾個評論 null | int
 	'disabled'    => true, // 是否禁用
+	'name'        => 'rating-10',
 ];
 
 /**
@@ -23,6 +24,7 @@ $args = wp_parse_args( $args, $default_args );
 	'value'       => $value,
 	'total'       => $total,
 	'disabled'    => $disabled,
+	'name'        => $name,
 ] = $args;
 
 $rest = fmod( $value, 1 ); // 取餘數
@@ -33,19 +35,23 @@ $outline_star_num = $count - $fill_star_num - $half_star_num;
 $cursor           = $disabled ? 'cursor-default' : '';
 $disabled         = $disabled ? 'disabled' : '';
 
-$icons_html = /*html*/'<div class="pc-rating pc-rating-sm pc-rating-half"><input type="radio" name="rating-10" class="pc-rating-hidden" />';
+$icons_html = /*html*/'<div class="pc-rating pc-rating-sm pc-rating-half">';
 for ( $i = 1; $i <= $count; $i++ ) {
 	$half_checked = ( $i <= $fill_star_num || ( $i === $fill_star_num + 1 && $half_star_num === 1 ) ) ? 'checked' : '';
 	$full_checked = ( $i <= $fill_star_num ) ? 'checked' : '';
 
 	$icons_html .= sprintf(
-		/*html*/'<input type="radio" name="rating-10" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %1$s" %2$s %3$s />',
+		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %3$s" %4$s %5$s />',
+		$i - 0.5,
+		$name,
 		$cursor,
 		$half_checked,
 		$disabled
 	);
 	$icons_html .= sprintf(
-		/*html*/'<input type="radio" name="rating-10" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-2 %1$s" %2$s %3$s />',
+		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-2 %3$s" %4$s %5$s />',
+		$i,
+		$name,
 		$cursor,
 		$full_checked,
 		$disabled

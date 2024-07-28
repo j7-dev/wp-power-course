@@ -38,6 +38,8 @@ final class Templates {
 
 		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
 		\add_action( 'admin_bar_menu', [ $this, 'admin_bar_item' ], 210 );
+
+		\add_filter('comment_post_redirect', [ $this, 'redirect_after_comment' ], 10, 2);
 	}
 
 	/**
@@ -293,6 +295,26 @@ final class Templates {
 				],
 			]
 		);
+	}
+
+	/**
+	 * 在發送評論後，將使用者導向課程頁面
+	 *
+	 * @param string      $location Location.
+	 * @param \WP_Comment $commentdata Commentdata.
+	 *
+	 * @return string
+	 */
+	public function redirect_after_comment( string $location, \WP_Comment $commentdata ): string {
+		$product_id        = $commentdata->comment_post_ID;
+		$product           = \wc_get_product($product_id);
+		$is_course_product = CourseUtils::is_course_product($product);
+		if ($is_course_product) {
+			$post_slug = \get_post_field('post_name', $product_id);
+			$location  = \site_url( 'courses' ) . "/{$post_slug}";
+		}
+
+		return $location;
 	}
 }
 
