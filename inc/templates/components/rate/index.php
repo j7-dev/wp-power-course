@@ -25,30 +25,29 @@ $args = wp_parse_args( $args, $default_args );
 	'disabled'    => $disabled,
 ] = $args;
 
-$rest = fmod( $value, 1 );
+$rest = fmod( $value, 1 ); // 取餘數
 
-$fill_start_num = ( (int) $value ) + ( $rest >= 0.8 ? 1 : 0 );
-$half_start_num = ( $rest > 0.2 && $rest < 0.8 ) ? 1 : 0;
-
-
-$outline_start_num = $count - $fill_start_num - $half_start_num;
-$cursor            = $disabled ? 'cursor-default' : '';
-$disabled          = $disabled ? 'disabled' : '';
+$fill_star_num    = ( (int) $value ) + ( $rest >= 0.8 ? 1 : 0 );
+$half_star_num    = ( $rest > 0.2 && $rest < 0.8 ) ? 1 : 0;
+$outline_star_num = $count - $fill_star_num - $half_star_num;
+$cursor           = $disabled ? 'cursor-default' : '';
+$disabled         = $disabled ? 'disabled' : '';
 
 $icons_html = /*html*/'<div class="pc-rating pc-rating-sm pc-rating-half"><input type="radio" name="rating-10" class="pc-rating-hidden" />';
-for ( $i = 0; $i < $count; $i++ ) {
-	$half_checked = ( $i === ( (int) $fill_start_num ) && ! $half_start_num ) ? 'checked' : '';
-	$full_checked = ( $i === ( (int) $fill_start_num ) && ! ! $half_start_num ) ? 'checked' : '';
-	$icons_html  .= sprintf(
+for ( $i = 1; $i <= $count; $i++ ) {
+	$half_checked = ( $i <= $fill_star_num || ( $i === $fill_star_num + 1 && $half_star_num === 1 ) ) ? 'checked' : '';
+	$full_checked = ( $i <= $fill_star_num ) ? 'checked' : '';
+
+	$icons_html .= sprintf(
 		/*html*/'<input type="radio" name="rating-10" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %1$s" %2$s %3$s />',
 		$cursor,
-		$full_checked,
+		$half_checked,
 		$disabled
 	);
-	$icons_html  .= sprintf(
+	$icons_html .= sprintf(
 		/*html*/'<input type="radio" name="rating-10" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-2 %1$s" %2$s %3$s />',
 		$cursor,
-		$half_checked,
+		$full_checked,
 		$disabled
 	);
 }

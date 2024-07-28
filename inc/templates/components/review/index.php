@@ -1,7 +1,10 @@
 <?php
 /**
  * Review
+ * TODO 前端AJAX換頁
  */
+
+use J7\PowerCourse\Templates\Templates;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -23,25 +26,51 @@ defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-if ( ! comments_open( $product->get_id() ) ) {
-	return;
+
+$reviews_allowed = $product->get_reviews_allowed();
+
+$product_comments = \get_comments(
+	[
+		'post_id'      => $product->get_id(),
+		'post_type'    => 'product',
+		'hierarchical' => 'threaded',
+	]
+);
+
+// Review 標題
+$count = $product->get_review_count();
+echo '<h2 class="text-base font-bold">';
+if ( $count && wc_review_ratings_enabled() ) {
+	/* translators: 1: reviews count 2: product name */
+	$reviews_title = sprintf( esc_html( _n( '%1$s review for %2$s', '%1$s reviews for %2$s', $count, 'woocommerce' ) ), esc_html( $count ), '<span>' . get_the_title() . '</span>' );
+	echo apply_filters( 'woocommerce_reviews_title', $reviews_title, $count, $product ); // WPCS: XSS ok.
+} else {
+	esc_html_e( 'Reviews', 'woocommerce' );
 }
+echo '</h2>';
+
+// Review List
+$show_review_list = $product->get_meta( 'show_review_list' ) === 'yes';
+if ( $show_review_list && count( $product_comments ) ) {
+	foreach ( $product_comments as $product_comment ) {
+		Templates::get(
+			'review/item',
+			[
+				'comment' => $product_comment,
+			]
+			);
+	}
+}
+
 
 ?>
 <div id="reviews" class="woocommerce-Reviews">
 	<div id="comments">
-		<h2 class="woocommerce-Reviews-title">
-			<?php
-			$count = $product->get_review_count();
-			if ( $count && wc_review_ratings_enabled() ) {
-				/* translators: 1: reviews count 2: product name */
-				$reviews_title = sprintf( esc_html( _n( '%1$s review for %2$s', '%1$s reviews for %2$s', $count, 'woocommerce' ) ), esc_html( $count ), '<span>' . get_the_title() . '</span>' );
-				echo apply_filters( 'woocommerce_reviews_title', $reviews_title, $count, $product ); // WPCS: XSS ok.
-			} else {
-				esc_html_e( 'Reviews', 'woocommerce' );
-			}
-			?>
-		</h2>
+
+
+		<ol class="commentlist">
+			<?php wp_list_comments( apply_filters( 'woocommerce_product_review_list_args', [ 'callback' => 'woocommerce_comments' ] ) ); ?>
+			</ol>
 
 		<?php if ( have_comments() ) : ?>
 			<ol class="commentlist">

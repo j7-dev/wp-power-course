@@ -76,8 +76,9 @@ $course_tabs = [
 
 $show_review_tab = 'yes' === $product->get_meta( 'show_review_tab' );
 
+
 if (!$show_review_tab) {
-	unset($course_tabs[3]);
+	unset($course_tabs['review']);
 }
 
 echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
