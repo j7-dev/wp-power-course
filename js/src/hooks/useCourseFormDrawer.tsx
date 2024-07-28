@@ -6,6 +6,7 @@ import {
 	Popconfirm,
 	Switch,
 	Form,
+	message,
 } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import {
@@ -28,7 +29,7 @@ export function useCourseFormDrawer({
 		TCourseRecord | TChapterRecord | undefined
 	>(undefined)
 	const [open, setOpen] = useState(false)
-	const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增課程，否則走更新課程
 	const closeRef = useRef<HTMLDivElement>(null)
 	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 	const [publish, setPublish] = useState(true)
@@ -79,47 +80,59 @@ export function useCourseFormDrawer({
 	}
 
 	const handleSave = () => {
-		form.validateFields().then(() => {
-			const values = form.getFieldsValue()
-			const formData = toFormData(values)
+		form
+			.validateFields()
+			.then(() => {
+				const values = form.getFieldsValue()
+				console.log('⭐  values:', isUpdate, values)
 
-			if (isUpdate) {
-				update(
-					{
-						id: record?.id,
-						resource,
-						values: formData,
-						meta: {
-							headers: { 'Content-Type': 'multipart/form-data;' },
+				const formData = toFormData(values)
+
+				if (isUpdate) {
+					update(
+						{
+							id: record?.id,
+							resource,
+							values: formData,
+							meta: {
+								headers: { 'Content-Type': 'multipart/form-data;' },
+							},
 						},
-					},
-					{
-						onSuccess: () => {
-							invalidateCourse()
-							setUnsavedChangesCheck(false)
+						{
+							onSuccess: () => {
+								invalidateCourse()
+								setUnsavedChangesCheck(false)
+							},
 						},
-					},
-				)
-			} else {
-				create(
-					{
-						resource,
-						values: formData,
-						meta: {
-							headers: { 'Content-Type': 'multipart/form-data;' },
+					)
+				} else {
+					create(
+						{
+							resource,
+							values: formData,
+							meta: {
+								headers: { 'Content-Type': 'multipart/form-data;' },
+							},
 						},
-					},
-					{
-						onSuccess: () => {
-							setOpen(false)
-							form.resetFields()
-							invalidateCourse()
-							setUnsavedChangesCheck(false)
+						{
+							onSuccess: () => {
+								setOpen(false)
+								form.resetFields()
+								invalidateCourse()
+								setUnsavedChangesCheck(false)
+							},
 						},
-					},
-				)
-			}
-		})
+					)
+				}
+			})
+			.catch((error) => {
+				const { errorFields } = error
+				errorFields?.forEach((field: any) => {
+					field?.errors?.forEach((msg: string) => {
+						message.warning(msg)
+					})
+				})
+			})
 	}
 
 	const itemLabel = getItemLabel(resource, record?.depth)

@@ -8,14 +8,6 @@ import {
 
 export const resources = [
 	{
-		name: 'dashboard',
-		list: '/dashboard',
-		meta: {
-			label: '分析',
-			icon: <LineChartOutlined />,
-		},
-	},
-	{
 		name: 'courses',
 		list: '/courses',
 		meta: {
@@ -45,6 +37,14 @@ export const resources = [
 		meta: {
 			label: '設定',
 			icon: <SettingOutlined />,
+		},
+	},
+	{
+		name: 'dashboard',
+		list: '/dashboard',
+		meta: {
+			label: '分析',
+			icon: <LineChartOutlined />,
 		},
 	},
 ]

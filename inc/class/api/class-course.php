@@ -230,28 +230,26 @@ final class Course {
 			)
 		);
 		$chapters = array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters );
+		// 把子章節的時間加總
+		$course_length = array_reduce(
+			$chapters,
+			function ( $acc, $chapter ) {
+				$sub_chapters       = $chapter['chapters'] ?? [];
+				$sub_chapter_length = array_reduce(
+					$sub_chapters,
+					function ( $acc, $sub_chapter ) {
+						return $acc + $sub_chapter['chapter_length'];
+					},
+					0
+					);
+				return $acc + $sub_chapter_length;
+			},
+			0
+			);
 
 		$children = ! ! $chapters ? [
 			'chapters' => $chapters,
 		] : [];
-
-		$attributes = $product->get_attributes(); // get attributes object
-
-		$attributes_arr = [];
-
-		foreach ( $attributes as $key => $attribute ) {
-			if ( $attribute instanceof \WC_Product_Attribute ) {
-				$attributes_arr[] = [
-					'name'     => $attribute->get_name(),
-					'options'  => $attribute->get_options(),
-					'position' => $attribute->get_position(),
-				];
-			}
-
-			if ( is_string( $key ) && is_string( $attribute ) ) {
-				$attributes_arr[ urldecode( $key ) ] = $attribute;
-			}
-		}
 
 		$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids: true);
 
@@ -304,7 +302,7 @@ final class Course {
 			'cross_sell_ids'      => array_map( 'strval', $product->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
-			'attributes'          => $attributes_arr,
+			'attributes'          => WC::get_product_attribute_array( $product ),
 
 			// Get Product Taxonomies
 			'category_ids'        => array_map( 'strval', $product->get_category_ids() ),
@@ -326,7 +324,7 @@ final class Course {
 			'is_popular'          => (string) $product->get_meta( 'is_popular' ),
 			'is_featured'         => (string) $product->get_meta( 'is_featured' ),
 			'show_review'         => (string) $product->get_meta( 'show_review' ),
-			'enable_review'       => (string) $product->get_meta( 'enable_review' ),
+			'reviews_allowed'     => (bool) $product->get_reviews_allowed(),
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'       => $product->get_meta( 'feature_video' ) ?: [
@@ -340,6 +338,7 @@ final class Course {
 				'meta' => [],
 			],
 			'teacher_ids'         => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
+			'course_length'       => $course_length,
 
 			// bundle product
 			'bundle_ids'          => $bundle_ids,

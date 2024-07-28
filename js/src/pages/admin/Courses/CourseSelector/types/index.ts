@@ -1,4 +1,5 @@
 import { Dayjs } from 'dayjs'
+import { TVideo } from '@/components/formItem/VideoInput/types'
 
 export * from './user'
 
@@ -107,9 +108,10 @@ export type TCourseRecord = {
 	enable_review: 'yes' | 'no' | ''
 	enable_comment: 'yes' | 'no' | ''
 	extra_student_count: number
-	feature_video: string
-	trial_video: string
+	feature_video: TVideo
+	trial_video: TVideo
 	teacher_ids: string[]
+	course_length: number
 	bundle_ids: string[]
 }
 
@@ -135,5 +137,5 @@ export type TChapterRecord = {
 	images?: TImage[]
 	chapters?: TChapterRecord[]
 	parent_id?: string
-	chapter_video?: string
+	chapter_video?: TVideo
 }

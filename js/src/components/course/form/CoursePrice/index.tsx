@@ -35,6 +35,7 @@ export const CoursePrice = () => {
 			<Item
 				name={['regular_price']}
 				label="原價"
+				initialValue={0}
 				rules={[
 					{
 						required: true,

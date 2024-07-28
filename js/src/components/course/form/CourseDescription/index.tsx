@@ -38,7 +38,7 @@ export const CourseDescription = () => {
 			form.setFieldsValue({ limit_value: '', limit_unit: '' })
 		}
 		if ('fixed' === value) {
-			form.setFieldsValue({ limit_value: '1', limit_unit: 'day' })
+			form.setFieldsValue({ limit_value: 1, limit_unit: 'day' })
 		}
 		if ('assigned' === value) {
 			form.setFieldsValue({
@@ -220,6 +220,12 @@ export const CourseDescription = () => {
 								}}
 							/>
 						</Item>
+						{'unlimited' === watchLimitType && (
+							<>
+								<Item name={['limit_value']} initialValue="" hidden />
+								<Item name={['limit_unit']} initialValue="" hidden />
+							</>
+						)}
 						{'fixed' === watchLimitType && (
 							<Space.Compact block>
 								<Item
@@ -241,28 +247,6 @@ export const CourseDescription = () => {
 								</Item>
 							</Space.Compact>
 						)}
-
-						{'unlimited' === watchLimitType && (
-							<>
-								<Item name={['limit_value']} initialValue="" hidden>
-									<Input />
-								</Item>
-								<Item
-									name={['limit_unit']}
-									initialValue=""
-									hidden
-									rules={[
-										{
-											required: true,
-											message: '請填寫觀看期限',
-										},
-									]}
-								>
-									<Input />
-								</Item>
-							</>
-						)}
-
 						{'assigned' === watchLimitType && (
 							<>
 								<DatePicker

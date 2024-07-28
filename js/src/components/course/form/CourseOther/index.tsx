@@ -1,5 +1,5 @@
 import React from 'react'
-import { Form, Switch, Slider, InputNumber, Rate, Tooltip, Select } from 'antd'
+import { Form, Switch, Slider, InputNumber, Rate, Tooltip } from 'antd'
 import { Heading } from '@/components/general'
 import { FiSwitch } from '@/components/formItem'
 
@@ -145,11 +145,17 @@ export const CourseOther = () => {
 				/>
 				<FiSwitch
 					formItemProps={{
-						name: ['enable_review_tab'],
-						label: '開放已購買用戶評價課程',
-						tooltip: '您也可以單純蒐集用戶評價，但不顯示其他用戶的評價',
+						name: ['show_review_list'],
+						label: '顯示用戶課程評價',
 					}}
 				/>
+				<Item
+					label="開放已購買用戶評價課程"
+					name={['reviews_allowed']}
+					tooltip="開放已購買用戶評價課程，您也可以設計成只蒐集用戶評價，但不顯示評價"
+				>
+					<Switch />
+				</Item>
 			</div>
 
 			<Heading>課程留言</Heading>

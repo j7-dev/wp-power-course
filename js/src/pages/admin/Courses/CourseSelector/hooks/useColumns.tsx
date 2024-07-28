@@ -13,6 +13,7 @@ import {
 } from '@/components/product'
 import { getPostStatus } from '@/utils'
 import { DateTime } from 'antd-toolkit'
+import { SecondToStr } from '@/components/general'
 
 const useColumns = ({
 	showCourseDrawer,
@@ -80,9 +81,10 @@ const useColumns = ({
 		},
 		{
 			title: '時數',
-			dataIndex: 'hours',
+			dataIndex: 'course_length',
 			width: 180,
-			key: 'hours',
+			key: 'course_length',
+			render: (course_length) => <SecondToStr second={course_length} />,
 		},
 		{
 			title: '商品分類 / 商品標籤',

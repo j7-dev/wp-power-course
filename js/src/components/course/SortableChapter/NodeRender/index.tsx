@@ -3,7 +3,8 @@ import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { getPostStatus } from '@/utils'
 import { Tag } from 'antd'
 import { FlattenNode } from '@ant-design/pro-editor'
-import { ChapterName, ChapterLength } from '@/components/course'
+import { ChapterName } from '@/components/course'
+import { SecondToStr } from '@/components/general'
 import AddChapter from '@/components/product/ProductAction/AddChapter'
 
 const NodeRender: FC<{
@@ -26,7 +27,7 @@ const NodeRender: FC<{
 				</Tag>
 			</div>
 			<div>
-				<ChapterLength record={record} />
+				<SecondToStr second={record?.chapter_length} />
 			</div>
 			{depth === 0 && <AddChapter record={record} />}
 			{/* <ProductType record={record} /> */}
