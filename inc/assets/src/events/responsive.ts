@@ -16,8 +16,8 @@ export const responsive = () => {
 
 		$('#pc-classroom-header').animate({
 			left: windowWidth < SCREEN.LG ? '0' : `${siderWidth}px`,
-			width: windowWidth < SCREEN.LG ? windowWidth : `${windowWidth - siderWidth}px`
+			width:
+				windowWidth < SCREEN.LG ? windowWidth : `${windowWidth - siderWidth}px`,
 		})
 	})
-
 }

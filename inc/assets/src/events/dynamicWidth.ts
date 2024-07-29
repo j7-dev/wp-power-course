@@ -6,8 +6,10 @@ const adjustWidth = () => {
 	store.set(windowWidthAtom, () => window.innerWidth)
 }
 
-
 export const dynamicWidth = () => {
 	store.set(windowWidthAtom, () => window.innerWidth)
-	$(window).on('resize', debounce(() => adjustWidth(), 300))
+	$(window).on(
+		'resize',
+		debounce(() => adjustWidth(), 300),
+	)
 }

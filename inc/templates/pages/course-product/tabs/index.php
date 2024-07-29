@@ -86,7 +86,7 @@ Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'description',
+		'default_active_key' => 'review',
 	]
 );
 echo '</div>';
@@ -95,6 +95,6 @@ Templates::get(
 	'tabs/content',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'description',
+		'default_active_key' => 'review',
 	]
 );
