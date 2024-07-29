@@ -50,7 +50,7 @@ $has_reviewed = get_comments(
 $has_reviewed = count( $has_reviewed ) > 0;
 
 
-if ($reviews_allowed && $has_bought && $has_reviewed) {
+if ($reviews_allowed && $has_bought && !$has_reviewed) {
 	echo '<div class="bg-gray-100 p-6 mb-2 rounded">';
 	include __DIR__ . '/comment_form.php';
 	echo '</div>';

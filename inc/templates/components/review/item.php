@@ -26,7 +26,7 @@ if ( ! $product_comment instanceof WP_Comment ) {
 $comment_id      = $product_comment->comment_ID;
 $rating          = \get_comment_meta( $comment_id, 'rating', true );
 $user_id         = $product_comment->user_id;
-$user_name       = \get_user_by( 'ID', $user_id )->display_name;
+$user_name       = \get_user_by( 'ID', $user_id )?->display_name;
 $user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
 $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 $comment_date    = \get_comment_date( 'Y-m-d h:i:s', $comment_id );
@@ -51,8 +51,8 @@ printf(
 	<div class="flex gap-4">
 		<div class="w-10">
 			<div class="w-10 h-10 rounded-full overflow-hidden relative">
-				<img src="%2$s" alt="%3$s" class="w-full h-full object-cover">
-				<div class="absolute top-0 left-0 w-full h-full bg-gray-400 animate-pulse"></div>
+				<img src="%2$s" loading="lazy" class="w-full h-full object-cover relative z-20">
+				<div class="absolute top-0 left-0 w-full h-full bg-gray-400 animate-pulse z-10"></div>
 			</div>
 		</div>
 		<div class="flex-1">

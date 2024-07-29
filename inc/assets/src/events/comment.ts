@@ -124,8 +124,20 @@ export function comment() {
 			name: 'course-review',
 		},
 	}
-	CommentContainer.before(CommentForm(reviewProps))
-	addCommentFormEvent(reviewProps)
+
+	// render comment form
+	const reviews_allowed = CommentContainer.data('reviews_allowed') === 'yes'
+	if (reviews_allowed) {
+		CommentContainer.before(CommentForm(reviewProps))
+		addCommentFormEvent(reviewProps)
+	}
+
+	// 是否渲染 list
+	const show_review_list = CommentContainer.data('show_review_list') === 'yes'
+	if (!show_review_list) {
+		CommentContainer.remove()
+		return
+	}
 
 	store.sub(commentQueryParamsAtom, () => {
 		const { isLoading, isSuccess, isError, paged, list } = store.get(
@@ -231,6 +243,8 @@ function createComments(args?: { [key: string]: any }) {
 					.text(message)
 					.addClass('text-green-500')
 
+				instance.find('textarea').val('')
+
 				getComments({
 					post_id,
 				})
@@ -243,9 +257,10 @@ function createComments(args?: { [key: string]: any }) {
 		},
 		error(error) {
 			console.log('⭐  error:', error)
+			const message = error?.responseJSON?.message || '發生錯誤'
 			instance
 				.find('.pc-comment-form__message')
-				.text('發生錯誤')
+				.text(message)
 				.addClass('text-red-500')
 		},
 		complete(xhr) {

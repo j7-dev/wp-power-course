@@ -153,6 +153,7 @@ export const CourseOther = () => {
 					label="開放已購買用戶評價課程"
 					name={['reviews_allowed']}
 					tooltip="開放已購買用戶評價課程，您也可以設計成只蒐集用戶評價，但不顯示評價"
+					help="用戶必須符合「已購買課程」、「尚未評價過該課程」兩個條件才能評價課程"
 				>
 					<Switch />
 				</Item>

@@ -105,7 +105,9 @@ export type TCourseRecord = {
 	is_popular: 'yes' | 'no' | ''
 	is_featured: 'yes' | 'no' | ''
 	show_review: 'yes' | 'no' | ''
-	enable_review: 'yes' | 'no' | ''
+	reviews_allowed: boolean
+	show_review_tab: 'yes' | 'no' | ''
+	show_review_list: 'yes' | 'no' | ''
 	enable_comment: 'yes' | 'no' | ''
 	extra_student_count: number
 	feature_video: TVideo

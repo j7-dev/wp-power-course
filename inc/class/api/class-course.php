@@ -325,6 +325,8 @@ final class Course {
 			'is_featured'         => (string) $product->get_meta( 'is_featured' ),
 			'show_review'         => (string) $product->get_meta( 'show_review' ),
 			'reviews_allowed'     => (bool) $product->get_reviews_allowed(),
+			'show_review_tab'     => (string) $product->get_meta( 'show_review_tab' ),
+			'show_review_list'    => (string) $product->get_meta( 'show_review_list' ),
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'       => $product->get_meta( 'feature_video' ) ?: [

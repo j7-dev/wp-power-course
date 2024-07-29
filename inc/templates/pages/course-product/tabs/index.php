@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Comment as CommentUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -47,6 +48,11 @@ $review = Templates::get(
 		false
 		);
 
+
+// 檢查能不能評價商品
+$can_comment = CommentUtils::can_comment($product);
+
+
 $course_tabs = [
 	'description' => [
 		'label'   => '簡介',
@@ -66,14 +72,23 @@ $course_tabs = [
 	],
 	'review' => [
 		'label'   => '評價',
-		'content' => sprintf(/*html*/'<div class="pc-comment" data-post_id="%1$s"></div>', $product->get_id() ),
-		// 'content' => $review,
+		'content' => sprintf(
+			/*html*/'<div class="pc-comment" data-post_id="%1$s" data-show_review_list="%2$s" data-reviews_allowed="%3$s"></div>',
+			$product->get_id(),
+			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
+			$can_comment === true ? 'yes' : 'no'
+			),
 	],
 	'announcement' => [
 		'label'   => '公告',
 		'content' => '🚧 施工中... 🚧',
 	],
 ];
+
+
+
+
+
 
 $show_review_tab = 'yes' === $product->get_meta( 'show_review_tab' );
 
@@ -87,7 +102,7 @@ Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'review',
+		'default_active_key' => 'description',
 	]
 );
 echo '</div>';
@@ -96,6 +111,6 @@ Templates::get(
 	'tabs/content',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'review',
+		'default_active_key' => 'description',
 	]
 );

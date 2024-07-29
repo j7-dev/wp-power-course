@@ -1,6 +1,6 @@
 <?php
 /**
- * User API
+ *  Comment API
  */
 
 declare(strict_types=1);
@@ -9,9 +9,7 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
-use J7\PowerCourse\Utils\AVLCourseMeta;
-use J7\PowerCourse\Utils\Course as CourseUtils;
-
+use J7\PowerCourse\Utils\Comment as CommentUtils;
 /**
  * Class Api
  */
@@ -135,6 +133,21 @@ final class Comment {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
+		$product_id  = $body_params['comment_post_ID'];
+		$product     = \wc_get_product($product_id);
+		$can_comment = CommentUtils::can_comment($product);
+
+		if (true !== $can_comment) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => $can_comment,
+				'data'    => null,
+			],
+			400
+			);
+		}
+
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
@@ -206,15 +219,6 @@ final class Comment {
 		 * @var \WP_Comment[] $children
 		 */
 		$children = $comment->get_children();
-
-		ob_start();
-		var_dump(
-			[
-				'$comment' => $comment,
-				'children' => $children,
-			]
-			);
-		\J7\WpUtils\Classes\Log::info('children' . ob_get_clean());
 
 		$children_array = $children ? array_map(
 			[ $this, 'format_comment_details' ],
