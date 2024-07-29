@@ -492,6 +492,8 @@ abstract class Course {
 	/**
 	 * 檢查用戶是否購買過指定商品
 	 *
+	 * @deprecated 使用 wc_customer_bought_product
+	 *
 	 * @param int|array<int>                                       $target_product_ids 目標商品 id
 	 * @param array{'user_id':int, 'status':string[]|string }|null $args 參數
 	 * - user_id int 使用者 ID，預設 current_user_id

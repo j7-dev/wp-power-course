@@ -7,12 +7,16 @@ use J7\PowerCourse\Templates\Templates;
 
 $default_args = [
 	'comment' => null,
+	'class'   => 'p-6 mt-2 rounded',
+	'depth'   => 0,
 ];
 
 $args = wp_parse_args( $args, $default_args );
 
 [
 	'comment' => $product_comment,
+	'class' => $class,
+	'depth' => $depth,
 ] = $args;
 
 if ( ! $product_comment instanceof WP_Comment ) {
@@ -28,34 +32,50 @@ $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_
 $comment_date    = \get_comment_date( 'Y-m-d h:i:s', $comment_id );
 $comment_content = wpautop( $product_comment->comment_content );
 
+$children      = $product_comment->get_children();
+$children_html = '';
+foreach ($children as $child) {
+	$children_html .= Templates::get(
+		'review/item',
+		[
+			'comment' => $child,
+			'depth'   => $depth + 1,
+		],
+		false
+		);
+}
+
 printf(
 /*html*/'
-<div class="bg-gray-100 p-6 mb-2 rounded">
+<div class="%1$s">
 	<div class="flex gap-4">
 		<div class="w-10">
-			<img src="%1$s" alt="%2$s" class="w-10 h-10 rounded-full">
+			<img src="%2$s" alt="%3$s" class="w-10 h-10 rounded-full">
 		</div>
 		<div class="flex-1">
 			<div class="flex justify-between text-sm">
-				<div class="">%3$s</div>
-				<div>%4$s</div>
+				<div class="">%4$s</div>
+				<div>%5$s</div>
 			</div>
-			<p class="text-gray-400 text-xs mb-4">%5$s</p>
-			<div class="text-sm [&_p]:mb-0">%6$s</div>
+			<p class="text-gray-400 text-xs mb-4">%6$s</p>
+			<div class="mb-4 text-sm [&_p]:mb-0">%7$s</div>
+			%8$s
 		</div>
 	</div>
 </div>
 ',
+	$class . ( $depth % 2 === 0 ? ' bg-gray-100' : ' bg-gray-50' ), // 不同深度灰白相間
 	$user_avatar_url,
 	$user_name,
 	$user_name,
-	Templates::get(
+	$rating ? Templates::get(
 		'rate',
 		[
 			'value' => $rating,
 		],
 		false
-		),
+		) : '',
 	$comment_date,
-	$comment_content
+	$comment_content,
+	$children_html
 );

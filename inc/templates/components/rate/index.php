@@ -10,6 +10,7 @@ $default_args = [
 	'total'       => null, // 有幾個評論 null | int
 	'disabled'    => true, // 是否禁用
 	'name'        => 'rating-10',
+	'half'        => true, // 是否允許半星
 ];
 
 /**
@@ -25,6 +26,7 @@ $args = wp_parse_args( $args, $default_args );
 	'total'       => $total,
 	'disabled'    => $disabled,
 	'name'        => $name,
+	'half'        => $half,
 ] = $args;
 
 $rest = fmod( $value, 1 ); // 取餘數
@@ -35,27 +37,43 @@ $outline_star_num = $count - $fill_star_num - $half_star_num;
 $cursor           = $disabled ? 'cursor-default' : '';
 $disabled         = $disabled ? 'disabled' : '';
 
-$icons_html = /*html*/'<div class="pc-rating pc-rating-sm pc-rating-half">';
-for ( $i = 1; $i <= $count; $i++ ) {
-	$half_checked = ( $i <= $fill_star_num || ( $i === $fill_star_num + 1 && $half_star_num === 1 ) ) ? 'checked' : '';
-	$full_checked = ( $i <= $fill_star_num ) ? 'checked' : '';
 
-	$icons_html .= sprintf(
-		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %3$s" %4$s %5$s />',
+$icons_html = sprintf(
+/*html*/'<div class="pc-rating pc-rating-sm %2$s"><input type="radio" name="%1$s" class="pc-rating-hidden tw-hidden" />',
+$name,
+$half ? 'pc-rating-half' : ''
+);
+for ( $i = 1; $i <= $count; $i++ ) {
+	$half_checked = ( $i === $fill_star_num + 1 && $half_star_num === 1 ) ? 'checked="checked"' : '';
+	$full_checked = ( $i === $fill_star_num && $half_star_num === 0 ) ? 'checked="checked"' : '';
+
+	if ( $half ) {
+		$icons_html .= sprintf(
+			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %3$s" %4$s %5$s />',
 		$i - 0.5,
 		$name,
 		$cursor,
 		$half_checked,
 		$disabled
-	);
-	$icons_html .= sprintf(
+		);
+		$icons_html .= sprintf(
 		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-2 %3$s" %4$s %5$s />',
 		$i,
 		$name,
 		$cursor,
 		$full_checked,
 		$disabled
-	);
+		);
+	} else {
+		$icons_html .= sprintf(
+			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star %3$s" %4$s %5$s />',
+			$i,
+			$name,
+			$cursor,
+			$full_checked,
+			$disabled
+		);
+	}
 }
 $icons_html .= '</div>';
 

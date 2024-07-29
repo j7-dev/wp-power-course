@@ -26,25 +26,25 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $description = $product->get_description();
 $accordion   = Templates::get(
 	'collapse/chapter',
-	args: [
+	[
 		'product' => $product,
 	],
-	echo: false
+	false
 	);
 $qa          = Templates::get(
 	'collapse/qa',
-	args: [
+	[
 		'product' => $product,
 	],
-	echo: false
+	false
 	);
 
 $review = Templates::get(
 		'review',
-		args: [
+		[
 			'product' => $product,
 		],
-		echo: false
+		false
 		);
 
 $course_tabs = [

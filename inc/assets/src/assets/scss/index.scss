@@ -6,8 +6,16 @@
 
 // daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
 div .pc-rating input:checked ~ input,
-div .pc-rating input[aria-checked="true"] ~ input {
+div .pc-rating input[aria-checked="true"] ~ input,
+div .pc-rating input[checked] ~ input {
 	--tw-bg-opacity: 0.2 !important;
+}
+.pc {
+	.comment-respond {
+		.comment-reply-title {
+			margin-bottom: 0.5rem !important;
+		}
+	}
 }
 
 .ajax_add_to_cart.loading {

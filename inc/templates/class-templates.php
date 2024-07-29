@@ -47,7 +47,7 @@ final class Templates {
 	 *
 	 * @param string $name 指定路徑裡面的文件名
 	 * @param mixed  $args 要渲染到模板中的數據
-	 * @param bool   $echo 是否輸出
+	 * @param bool   $output 是否輸出
 	 * @param bool   $load_once 是否只載入一次
 	 *
 	 * @return ?string
@@ -56,10 +56,10 @@ final class Templates {
 	public static function get(
 		string $name,
 		mixed $args = null,
-		?bool $echo = true,
+		?bool $output = true,
 		?bool $load_once = false,
 	): ?string {
-		$result = self::safe_get( $name, $args, $echo, $load_once );
+		$result = self::safe_get( $name, $args, $output, $load_once );
 		if ( false === $result ) {
 			throw new \Exception( "模板文件 {$name} 不存在" );
 		}
@@ -72,7 +72,7 @@ final class Templates {
 	 *
 	 * @param string $name 指定路徑裡面的文件名
 	 * @param mixed  $args 要渲染到模板中的數據
-	 * @param bool   $echo 是否輸出
+	 * @param bool   $output 是否輸出
 	 * @param bool   $load_once 是否只載入一次
 	 *
 	 * @return string|false|null
@@ -81,7 +81,7 @@ final class Templates {
 	public static function safe_get(
 		string $name,
 		mixed $args = null,
-		?bool $echo = true,
+		?bool $output = true,
 		?bool $load_once = false,
 	): string|false|null {
 		$page_names = [ 'course-product', 'classroom', 'my-account', '404' ]; // 區域名稱
@@ -104,7 +104,7 @@ final class Templates {
 
 		// 檢查模板文件是否存在
 		if ( file_exists( "{$template_path}.php" ) ) {
-			if ( $echo ) {
+			if ( $output ) {
 				\load_template( "{$template_path}.php", $load_once, $args );
 
 				return null;
@@ -114,7 +114,7 @@ final class Templates {
 
 			return ob_get_clean();
 		} elseif ( file_exists( "{$template_path}/index.php" ) ) {
-			if ( $echo ) {
+			if ( $output ) {
 				\load_template( "{$template_path}/index.php", $load_once, $args );
 
 				return null;
