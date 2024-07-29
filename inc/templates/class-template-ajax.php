@@ -55,6 +55,15 @@ final class TemplateAjax {
 			]
 		);
 
+		\wp_localize_script(
+			Plugin::$kebab . '-template',
+			'pc_data',
+			[
+				'ajax_url' => \admin_url('admin-ajax.php'),
+				'nonce'    => \wp_create_nonce( 'wp_rest' ),
+			]
+			);
+
 		\wp_enqueue_style(
 			Plugin::$kebab . '-template',
 			Plugin::$url . '/inc/assets/dist/css/index.css',

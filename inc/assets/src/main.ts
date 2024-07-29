@@ -9,6 +9,7 @@ import {
 	coursesProduct,
 	toggleContent,
 	countdown,
+	comment,
 } from './events'
 ;(function ($) {
 	// 訂閱放前面
@@ -25,7 +26,9 @@ import {
 	coursesProduct()
 	toggleContent()
 	countdown()
+	comment()
 
+	// 加入購物車樣式調整
 	$(document.body).on(
 		'added_to_cart',
 		function (event, fragments, cart_hash, Button) {

@@ -66,7 +66,8 @@ $course_tabs = [
 	],
 	'review' => [
 		'label'   => '評價',
-		'content' => $review,
+		'content' => sprintf(/*html*/'<div class="pc-comment" data-post_id="%1$s"></div>', $product->get_id() ),
+		// 'content' => $review,
 	],
 	'announcement' => [
 		'label'   => '公告',

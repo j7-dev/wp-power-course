@@ -50,7 +50,10 @@ printf(
 <div class="%1$s">
 	<div class="flex gap-4">
 		<div class="w-10">
-			<img src="%2$s" alt="%3$s" class="w-10 h-10 rounded-full">
+			<div class="w-10 h-10 rounded-full overflow-hidden relative">
+				<img src="%2$s" alt="%3$s" class="w-full h-full object-cover">
+				<div class="absolute top-0 left-0 w-full h-full bg-gray-400 animate-pulse"></div>
+			</div>
 		</div>
 		<div class="flex-1">
 			<div class="flex justify-between text-sm">

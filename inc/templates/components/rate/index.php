@@ -39,7 +39,7 @@ $disabled         = $disabled ? 'disabled' : '';
 
 
 $icons_html = sprintf(
-/*html*/'<div class="pc-rating pc-rating-sm %2$s"><input type="radio" name="%1$s" class="pc-rating-hidden tw-hidden" />',
+/*html*/'<div class="pc-rating pc-rating-sm %2$s">',
 $name,
 $half ? 'pc-rating-half' : ''
 );

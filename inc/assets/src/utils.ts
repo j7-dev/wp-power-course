@@ -6,3 +6,5 @@ export enum SCREEN {
 	XL = 1280,
 	XXL = 1440,
 }
+
+export const site_url = window.location.origin
