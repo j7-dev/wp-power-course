@@ -157,6 +157,9 @@ export const getYoutubeVideoId = (url: string | null): string | null => {
 	if (!url) return ''
 	try {
 		const urlObj = new URL(url)
+		if (urlObj.hostname === 'youtu.be') {
+			return urlObj.pathname.slice(1)
+		}
 		const searchParams = new URLSearchParams(urlObj.search)
 		return searchParams.get('v')
 	} catch (error) {

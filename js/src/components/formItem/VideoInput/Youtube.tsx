@@ -4,8 +4,17 @@ import { getYoutubeVideoId } from '@/utils'
 import Iframe from './Iframe'
 
 const Youtube: FC<FormItemProps> = (formItemProps) => {
-	const getVideoUrl = (videoId: string | null) =>
-		videoId ? `https://www.youtube.com/watch?v=${videoId}` : ''
+	const getVideoUrl = (videoId: string | null, input?: string) => {
+		if (input) {
+			const urlObj = new URL(input)
+			if (urlObj.hostname === 'youtu.be') {
+				return `https://youtu.be/${videoId}`
+			}
+			return `https://www.youtube.com/watch?v=${videoId}`
+		}
+
+		return ''
+	}
 	const getEmbedVideoUrl = (videoId: string | null) =>
 		videoId ? `https://www.youtube.com/embed/${videoId}` : ''
 
