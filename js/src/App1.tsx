@@ -4,14 +4,12 @@ import { Refine } from '@refinedev/core'
 
 import {
 	ThemedLayoutV2,
-	ThemedTitleV2,
 	ThemedSiderV2,
 	ErrorComponent,
 	useNotificationProvider,
 } from '@refinedev/antd'
 import '@refinedev/antd/dist/reset.css'
 import routerBindings, {
-	DocumentTitleHandler,
 	UnsavedChangesNotifier,
 } from '@refinedev/react-router-v6'
 import { dataProvider } from './rest-data-provider'
@@ -108,7 +106,6 @@ function App() {
 					</Route>
 				</Routes>
 				<UnsavedChangesNotifier />
-				<DocumentTitleHandler />
 				<ReactQueryDevtools initialIsOpen={false} />
 			</Refine>
 		</HashRouter>
