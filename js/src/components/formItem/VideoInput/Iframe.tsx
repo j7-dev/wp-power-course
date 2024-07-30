@@ -17,7 +17,7 @@ const Iframe: FC<{
 	formItemProps: FormItemProps
 	getVideoId: (_url: string | null) => string | null
 	getEmbedVideoUrl: (_videoId: string | null) => string
-	getVideoUrl: (_videoId: string | null) => string
+	getVideoUrl: (_videoId: string | null, input?: string) => string
 	exampleUrl: string
 	iframeProps?: Partial<
 		DetailedHTMLProps<
@@ -43,7 +43,7 @@ const Iframe: FC<{
 
 	useEffect(() => {
 		if (watchField?.id) {
-			const url = getVideoUrl(watchField.id)
+			const url = getVideoUrl(watchField.id, vIdOrUrl)
 			setVIdOrUrl(url)
 		}
 	}, [watchField?.id])
@@ -88,7 +88,7 @@ const Iframe: FC<{
 			<Item {...formItemProps} hidden />
 
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
-			{recordId && validVideoId && (
+			{validVideoId && (
 				<>
 					<div
 						className="aspect-video w-full p-2"
@@ -128,7 +128,7 @@ const Iframe: FC<{
 				</>
 			)}
 
-			{recordId && invalidVideoId && (
+			{invalidVideoId && (
 				<div>
 					請輸入有效的 {platFormName} 影片連結 例如:
 					{exampleUrl}
