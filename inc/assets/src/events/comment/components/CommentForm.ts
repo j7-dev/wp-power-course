@@ -11,7 +11,7 @@ export type TCommentFormProps = {
 export class CommentForm {
 	$element: JQuery<HTMLElement>
 	props: {
-		ratingProps: Partial<TRatingProps>
+		ratingProps?: Partial<TRatingProps>
 		instance: CommentApp
 	}
 	post_id: string // 商品 ID
@@ -20,7 +20,7 @@ export class CommentForm {
 	constructor(element, props) {
 		this.$element = $(element)
 		this.props = props
-		this.post_id = $('.pc-comment').data('post_id')
+		this.post_id = props.instance.post_id
 		this.render()
 		this.createSubcomponents()
 		this.bindEvents()
@@ -32,7 +32,7 @@ export class CommentForm {
 
 	add() {
 		const rating = this.$element
-			.find(`input[name="${this.props.ratingProps.name}"]:checked`)
+			.find(`input[name="${this?.props?.ratingProps?.name}"]:checked`)
 			.val()
 		const comment_content = this.$element.find('textarea').val()
 		const comment_post_ID = this.post_id
@@ -55,7 +55,7 @@ export class CommentForm {
 				const { code, message } = response
 
 				if (200 === code) {
-					const post_id = $('.pc-comment').data('post_id')
+					const post_id = this.post_id
 					this.$element
 						.find('.pc-comment-form__message')
 						.text(message)
@@ -120,11 +120,13 @@ export class CommentForm {
 	}
 
 	createSubcomponents() {
-		this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
-			value: 5,
-			disabled: false,
-			name: 'rating',
-			...this.props.ratingProps,
-		})
+		if (this.props.ratingProps) {
+			this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
+				value: 5,
+				disabled: false,
+				name: 'rating',
+				...this.props.ratingProps,
+			})
+		}
 	}
 }

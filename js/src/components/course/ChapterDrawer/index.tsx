@@ -9,19 +9,20 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
 
 	// 取得課程深度，用來判斷是否為子章節
 	const watchDepth = Form.useWatch(['depth'], form)
+	const label = watchDepth === 0 ? '章節' : '單元'
 
 	return (
 		<>
 			<Drawer {...drawerProps}>
 				{/* 這邊這個 form 只是為了調整 style */}
 				<Form layout="vertical" form={form}>
-					<Item name={['name']} label="課程名稱">
+					<Item name={['name']} label={`${label}名稱`}>
 						<Input />
 					</Item>
 					{/* 如果深度為 0 清除 chapter_video*/}
 					{watchDepth === 0 && (
 						<Item name={['chapter_video']} hidden>
-							<Input />
+							<Input allowClear />
 						</Item>
 					)}
 					{/*如果深度為 1 顯示上傳課程內容*/}

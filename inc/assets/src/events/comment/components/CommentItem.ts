@@ -66,11 +66,13 @@ export class CommentItem {
 
 	createSubcomponents() {
 		const { rating, children } = this.props
-		this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
-			value: rating,
-			disabled: true,
-			name: 'rating-10',
-		})
+		if (rating) {
+			this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
+				value: rating,
+				disabled: true,
+				name: 'rating-10',
+			})
+		}
 
 		children.forEach((child) => {
 			new CommentItem(

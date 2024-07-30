@@ -9,7 +9,7 @@ import {
 	coursesProduct,
 	toggleContent,
 	countdown,
-	ReviewAppInstance,
+	CommentApp,
 } from './events'
 ;(function ($) {
 	// 訂閱放前面
@@ -27,7 +27,22 @@ import {
 	toggleContent()
 	countdown()
 
-	console.log('ReviewAppInstance', ReviewAppInstance)
+	new CommentApp('#review-app', {
+		queryParams: {
+			post_type: 'product',
+		},
+		navElement: '#tab-nav-review',
+		ratingProps: {
+			name: 'course-review',
+		},
+	})
+
+	new CommentApp('#comment-app', {
+		queryParams: {
+			type: 'comment',
+		},
+		navElement: '#tab-nav-comment',
+	})
 
 	// 加入購物車樣式調整
 	$(document.body).on(

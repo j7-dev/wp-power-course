@@ -23,13 +23,13 @@ abstract class Comment {
 			$reviews_allowed = $product->get_reviews_allowed(); // 後台設定，是否允許評價
 
 			if (!$reviews_allowed) {
-				return '此課程不允許評價';
+				return '此課程不開放評價';
 			}
 
 			$has_bought = wc_customer_bought_product( '', get_current_user_id(), $product->get_id() ); // 用戶是否已購買此課程
 
 			if (!$has_bought) {
-				return '尚未購買課程';
+				return '您尚未購買此課程，尚無法評價';
 			}
 
 			// 檢查用戶是否評論過此商品
@@ -41,7 +41,7 @@ abstract class Comment {
 			);
 
 			if ($has_reviewed) {
-				return '已評價過此課程';
+				return '您已評價過此課程，無法再次評價';
 			}
 
 			$has_reviewed    = count( $has_reviewed ) > 0;

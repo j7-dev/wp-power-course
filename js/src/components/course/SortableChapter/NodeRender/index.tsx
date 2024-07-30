@@ -21,15 +21,22 @@ const NodeRender: FC<{
 				{showPlaceholder && <div className="w-[28px] h-[28px]"></div>}
 				<ChapterName record={record} show={show} loading={loading} />
 			</div>
-			<div>
-				<Tag color={getPostStatus(record?.status)?.color}>
-					{getPostStatus(record?.status)?.label}
-				</Tag>
+			<div className="text-xs text-gray-400">
+				{getPostStatus(record?.status)?.label}
 			</div>
 			<div>
 				<SecondToStr second={record?.chapter_length} />
 			</div>
-			{depth === 0 && <AddChapter record={record} />}
+			{depth === 0 && (
+				<AddChapter
+					record={record}
+					buttonProps={{
+						type: 'primary',
+						children: '新增單元',
+						icon: null,
+					}}
+				/>
+			)}
 			{/* <ProductType record={record} /> */}
 			{/* <ProductPrice record={record} />
       <ProductTotalSales record={record} />

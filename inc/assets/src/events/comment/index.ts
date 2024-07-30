@@ -2,7 +2,15 @@ import $, { JQuery } from 'jquery'
 import { site_url } from '../../utils/'
 import { CommentForm, CommentItem, TCommentItemProps } from './components'
 
-export type TCommentAppProps = {}
+export type TCommentAppProps = {
+	queryParams: { [key: string]: any } | undefined
+	navElement: string
+	ratingProps?:
+		| {
+				name: string
+		  }
+		| undefined
+}
 
 export type TCommentQueryParams = {
 	isInit: boolean
@@ -21,9 +29,16 @@ export type TCommentQueryParams = {
 export class CommentApp {
 	$element: JQuery<HTMLElement>
 	props?: TCommentAppProps
+	queryParams: { [key: string]: any } | undefined
+	navElement: string
+	ratingProps:
+		| {
+				name: string
+		  }
+		| undefined
 	commentForm: CommentForm
-	reviewsAllowed: boolean
-	showReviewList: boolean
+	showForm: boolean
+	showList: boolean
 	list: TCommentItemProps[]
 	post_id: string // 商品 ID
 	isLoading: boolean
@@ -33,11 +48,14 @@ export class CommentApp {
 	totalPages: number
 	isInit: boolean
 
-	constructor(element: string, props?: TCommentAppProps) {
+	constructor(element: string, props: TCommentAppProps) {
 		this.$element = $(element)
 		this.props = props
-		this.reviewsAllowed = this.$element.data('reviews_allowed') === 'yes'
-		this.showReviewList = this.$element.data('show_review_list') === 'yes'
+		this.queryParams = props?.queryParams
+		this.navElement = props?.navElement
+		this.ratingProps = props?.ratingProps
+		this.showForm = this.$element.data('show_form') === 'yes'
+		this.showList = this.$element.data('show_list') === 'yes'
 		this.post_id = this.$element.data('post_id')
 		this.isInit = true
 		this.isLoading = false
@@ -48,8 +66,8 @@ export class CommentApp {
 
 	bindEvents() {
 		// 初始化
-		if (this.showReviewList && this.isInit) {
-			$('#tab-nav-review').on('click', () =>
+		if (this.showList && this.isInit) {
+			$(this.navElement).on('click', () =>
 				this.getComments({
 					post_id: this.post_id,
 				}),
@@ -65,17 +83,18 @@ export class CommentApp {
 	}
 
 	createSubcomponents() {
-		if (this.reviewsAllowed) {
+		if (this.showForm) {
 			// render comment form
 			this.commentForm = new CommentForm(
 				this.$element.find('[data-pc="comment-form"]'),
 				{
-					ratingProps: {
-						name: 'course-review',
-					},
+					ratingProps: this.ratingProps,
 					instance: this,
 				},
 			)
+		} else {
+			const reason = this.$element.data('show_form')
+			this.$element.find('[data-pc="comment-form"]').html(reason)
 		}
 	}
 
@@ -92,6 +111,11 @@ export class CommentApp {
 	}
 	setList(value: TCommentItemProps[]) {
 		this.list = value
+
+		if (!value.length) {
+			this.$element.find('[data-pc="comment-list"]').html('目前沒有評價')
+			return
+		}
 
 		// render comment items
 		const nodes = value
@@ -114,7 +138,10 @@ export class CommentApp {
 		$.ajax({
 			url: `${site_url}/wp-json/power-course/comments`,
 			type: 'get',
-			data,
+			data: {
+				...this.queryParams,
+				...data,
+			},
 			headers: {
 				'X-WP-Nonce': (window as any).pc_data?.nonce,
 			},
@@ -140,5 +167,3 @@ export class CommentApp {
 		})
 	}
 }
-
-export const ReviewAppInstance = new CommentApp('#review-app')

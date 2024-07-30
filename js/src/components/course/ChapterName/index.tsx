@@ -21,7 +21,7 @@ export const ChapterName: FC<{
 	return (
 		<>
 			<p
-				className="text-primary hover:text-primary/70 cursor-pointer"
+				className="text-primary hover:text-primary/70 cursor-pointer !mb-0"
 				onClick={handleClick}
 			>
 				{renderHTML(name)}

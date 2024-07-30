@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { PlusCircleFilled } from '@ant-design/icons'
-import { Tooltip, Button } from 'antd'
+import { Tooltip, Button, ButtonProps } from 'antd'
 import {
 	TCourseRecord,
 	TChapterRecord,
@@ -20,7 +20,8 @@ type TCreateParams = {
 
 const AddChapter: FC<{
 	record: TCourseRecord | TChapterRecord
-}> = ({ record }) => {
+	buttonProps?: ButtonProps
+}> = ({ record, buttonProps }) => {
 	const { mutate, isLoading } = useCreate<
 		BaseRecord,
 		HttpError,
@@ -85,6 +86,7 @@ const AddChapter: FC<{
 					className="mx-0"
 					icon={<PlusCircleFilled className="text-gray-400 cursor-pointer" />}
 					onClick={handleCreate}
+					{...buttonProps}
 				/>
 			</Tooltip>
 		</>
