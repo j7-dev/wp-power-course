@@ -73,7 +73,7 @@ $course_tabs = [
 	'review' => [
 		'label'   => '評價',
 		'content' => sprintf(
-			/*html*/'<div class="pc-comment" data-post_id="%1$s" data-show_review_list="%2$s" data-reviews_allowed="%3$s"></div>',
+			/*html*/'<div id="review-app" class="pc-comment" data-post_id="%1$s" data-show_review_list="%2$s" data-reviews_allowed="%3$s"></div>',
 			$product->get_id(),
 			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
 			$can_comment === true ? 'yes' : 'no'

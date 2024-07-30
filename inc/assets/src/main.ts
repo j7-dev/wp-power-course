@@ -9,7 +9,7 @@ import {
 	coursesProduct,
 	toggleContent,
 	countdown,
-	comment,
+	ReviewAppInstance,
 } from './events'
 ;(function ($) {
 	// 訂閱放前面
@@ -26,7 +26,8 @@ import {
 	coursesProduct()
 	toggleContent()
 	countdown()
-	comment()
+
+	console.log('ReviewAppInstance', ReviewAppInstance)
 
 	// 加入購物車樣式調整
 	$(document.body).on(
