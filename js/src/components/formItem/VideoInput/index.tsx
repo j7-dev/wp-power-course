@@ -26,6 +26,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 					'type',
 				]}
 				className="mb-1"
+				initialValue="youtube"
 			>
 				<Select
 					className="w-full"
