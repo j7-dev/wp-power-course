@@ -20,7 +20,6 @@ $default_args = [
  */
 $args = wp_parse_args( $args, $default_args );
 
-
 /**
  * @var array{type: string, id: string, meta: ?array} $video_info
  */
@@ -29,9 +28,18 @@ $args = wp_parse_args( $args, $default_args );
 	'video_info'   => $video_info,
 ] = $args;
 
-[
-	'type' => $video_type
-] = $video_info;
+$video_type = $video_info['type'] ?? '';
+
+if (!$video_type) {
+	Templates::get(
+		'video/404',
+		[
+			'message' => '缺少 影片資訊 ，請聯絡老師',
+		]
+		);
+
+	return;
+}
 
 if ('youtube' === $video_type) {
 	Templates::get(
