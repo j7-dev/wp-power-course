@@ -66,15 +66,15 @@ $course_tabs = [
 		'label'   => '問答',
 		'content' => $qa,
 	],
-	'comment' => [
-		'label'   => '留言',
-		'content' => sprintf(
-			/*html*/'<div id="comment-app" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s"></div>',
-			$product->get_id(),
-			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
-			'yes'
-			),
-	],
+	// 'comment' => [
+	// 'label'   => '留言',
+	// 'content' => sprintf(
+	// *html*/'<div id="comment-app" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s"></div>',
+	// $product->get_id(),
+	// $product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
+	// 'yes'
+	// ),
+	// ],
 	'review' => [
 		'label'   => '評價',
 		'content' => sprintf(
@@ -84,10 +84,10 @@ $course_tabs = [
 			$can_comment === true ? 'yes' : $can_comment
 			),
 	],
-	'announcement' => [
-		'label'   => '公告',
-		'content' => '🚧 施工中... 🚧',
-	],
+	// 'announcement' => [
+	// 'label'   => '公告',
+	// 'content' => '🚧 施工中... 🚧',
+	// ],
 ];
 
 
