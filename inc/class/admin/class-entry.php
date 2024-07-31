@@ -25,7 +25,7 @@ final class Entry {
 	 */
 	public function __construct() {
 
-		\add_action('admin_menu', [ $this, 'add_menu' ]);
+		\add_action('admin_menu', [ $this, 'add_menu' ], 20);
 		// Add the admin page for full-screen.
 		\add_action('current_screen', [ $this, 'maybe_output_admin_page' ], 10);
 	}
@@ -34,8 +34,9 @@ final class Entry {
 	 * Add menu
 	 */
 	public function add_menu(): void {
-		\add_menu_page(
-			__('Power Course', 'power_course'),
+		\add_submenu_page(
+			'power_house',
+			'Power Course',
 			'Power Course',
 			'manage_options',
 			Plugin::$kebab,
@@ -43,15 +44,6 @@ final class Entry {
 			'dashicons-welcome-learn-more',
 			6
 		);
-	}
-
-	/**
-	 * Render the app.
-	 *
-	 * @deprecated
-	 */
-	public function render_app(): void {
-		echo '<div id="' . Plugin::$snake . '"></div>'; // phpcs:ignore
 	}
 
 	/**

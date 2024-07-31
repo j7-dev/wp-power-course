@@ -51,13 +51,13 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'required' => true,
 					'version'  => '7.6.0',
 				],
-				// array(
-				// 'name'     => 'WP Toolkit',
-				// 'slug'     => 'wp-toolkit',
-				// 'source'   => 'Author URL/wp-toolkit/releases/latest/download/wp-toolkit.zip',
-				// 'version'  => '1.6.0',
-				// 'required' => true,
-				// ),
+				[
+					'name'     => 'Power House',
+					'slug'     => 'power-house',
+					'source'   => 'https://github.com/j7-dev/wp-power-house/releases/latest/download/power-house.zip',
+					'version'  => '1.0.4',
+					'required' => true,
+				],
 			];
 
 			$this->init(
