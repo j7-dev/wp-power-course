@@ -41,8 +41,7 @@ final class Entry {
 			'manage_options',
 			Plugin::$kebab,
 			'',
-			'dashicons-welcome-learn-more',
-			6
+			10
 		);
 	}
 

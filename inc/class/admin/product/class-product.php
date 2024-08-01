@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
+use J7\PowerCourse\Utils\Course as CourseUtils;
+
 /**
  * Class Product
  */
@@ -20,8 +22,9 @@ final class Product {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_filter( 'product_type_options', [ $this, 'add_product_type_options' ] );
-		\add_action( 'save_post_product', [ $this, 'save_product_type_options' ], 10, 3 );
+		\add_filter( 'product_type_options', [ __CLASS__, 'add_product_type_options' ] );
+		\add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
+		\add_filter('post_type_link', [ __CLASS__, 'change_product_permalink' ], 10, 2);
 	}
 
 
@@ -33,7 +36,7 @@ final class Product {
 	 *
 	 * @return array
 	 */
-	public function add_product_type_options( $product_type_options ): array {
+	public static function add_product_type_options( $product_type_options ): array {
 
 		$option = self::PRODUCT_OPTION_NAME;
 
@@ -57,10 +60,30 @@ final class Product {
 	 *
 	 * @return void
 	 */
-	public function save_product_type_options( $post_id, $product_post, $update ): void {
+	public static function save_product_type_options( $post_id, $product_post, $update ): void {
 		$option = self::PRODUCT_OPTION_NAME;
 		$option = "_{$option}";
 		\update_post_meta( $post_id, $option, isset( $_POST[ $option ] ) ? 'yes' : 'no' ); // phpcs:ignore
+	}
+
+
+	/**
+	 * Change product permalink
+	 *
+	 * @param string   $permalink - Permalink
+	 * @param \WP_Post $post - Post object
+	 *
+	 * @return string
+	 */
+	public static function change_product_permalink( $permalink, $post ): string {
+		if ('product' === $post->post_type) {
+			$is_course_product = CourseUtils::is_course_product( $post->ID );
+			$override          = \get_option('override_course_product_permalink', 'yes') === 'yes';
+			if ( $is_course_product && $override ) {
+				$permalink = str_replace('product/', 'courses/', $permalink);
+			}
+		}
+		return $permalink;
 	}
 }
 
