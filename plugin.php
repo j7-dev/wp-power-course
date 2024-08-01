@@ -26,6 +26,9 @@ if (!defined('ABSPATH')) {
 if (!\class_exists('J7\PowerCourse\Plugin')) {
 	require_once __DIR__ . '/vendor/autoload.php';
 
+	// 之後要獨立成一個 plugin
+	require_once __DIR__ . '/inc/modules/power-bundle-product/plugin.php';
+
 	/**
 	 * Class Plugin
 	 */

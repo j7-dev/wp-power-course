@@ -14,6 +14,7 @@
  * Domain Path:       /languages
  * Tags:
  */
+
 declare (strict_types = 1);
 
 namespace J7\PowerBundleProduct;

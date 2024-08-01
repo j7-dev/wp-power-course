@@ -19,6 +19,14 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		$is_woocommerce_active = is_plugin_active( 'woocommerce/woocommerce.php' );
+
+		if ( ! $is_woocommerce_active ) {
+			return;
+		}
 
 		require_once Plugin::$dir . '/inc/class/class-wc-bundle-product.php';
 
