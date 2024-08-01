@@ -27,6 +27,8 @@ final class Bootstrap {
 		require_once __DIR__ . '/front-end/index.php';
 		require_once __DIR__ . '/api/index.php';
 		require_once __DIR__ . '/../templates/index.php';
+		// 之後要獨立成一個 plugin
+		require_once __DIR__ . '/../modules/power-bundle-product/plugin.php';
 
 		\add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_script' ], 99 );
 		\add_action( 'wp_enqueue_scripts', [ $this, 'frontend_enqueue_script' ], 99 );
