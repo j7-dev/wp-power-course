@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name:       Power Course | 可能是 WordPress 最好用的課程外掛
+ * Plugin Name:       Power Course | WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
- * Description:       可能是 WordPress 最好用的課程外掛
+ * Description:       WordPress 最好用的課程外掛
  * Version:           0.0.26
  * Requires at least: 5.7
  * Requires PHP:      8.0
@@ -54,8 +54,8 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 				[
 					'name'     => 'Powerhouse',
 					'slug'     => 'powerhouse',
-					'source'   => 'https://github.com/j7-dev/wp-power-house/releases/latest/download/powerhouse.zip',
-					'version'  => '1.0.6',
+					'source'   => 'https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip',
+					'version'  => '1.0.8',
 					'required' => true,
 				],
 			];
