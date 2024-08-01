@@ -220,17 +220,11 @@ final class Comment {
 		 */
 		$children = $comment->get_children();
 
-		$children_array = $children ? array_map(
-			[ $this, 'format_comment_details' ],
-			$children,
-			[
-				'depth' => $depth + 1,
-			]
-			) : [];
+		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1), array_values($children)) : [];
 
 		$base_array = [
 			'id'              => (string) $comment_id,
-			'depth'           => $depth,
+			'depth'           => (int) $depth,
 			'user'            => $user,
 			'rating'          => (int) $rating,
 			'comment_content' => $comment_content,
