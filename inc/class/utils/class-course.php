@@ -27,6 +27,9 @@ abstract class Course {
 	public static function is_course_product( \WC_Product|int $product ): bool {
 		if ( is_numeric( $product ) ) {
 			$product = \wc_get_product( $product );
+			if (!$product) {
+				return false;
+			}
 		}
 
 		return $product?->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ) === 'yes';
