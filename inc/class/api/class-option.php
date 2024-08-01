@@ -41,10 +41,11 @@ final class Option {
 	/**
 	 * Fields
 	 *
-	 * @var string[] $fields 允許獲取的選項
+	 * @var array<string, string> $fields 允許獲取的選項
 	 */
 	private $fields = [
-		'bunny_library_id',
+		'bunny_library_id'                  => '',
+		'override_course_product_permalink' => 'yes',
 	];
 
 	/**
@@ -78,8 +79,8 @@ final class Option {
 		$options = [];
 		$fields  = $this->fields;
 
-		foreach ( $fields as $option_name ) {
-			$options[ $option_name ] = \get_option( $option_name, '' );
+		foreach ( $fields as $option_name => $default ) {
+			$options[ $option_name ] = \get_option( $option_name, $default );
 		}
 
 		return new \WP_REST_Response(
@@ -104,8 +105,10 @@ final class Option {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
+		$allowed_fields = array_keys( $this->fields );
+
 		foreach ( $body_params as $key => $value ) {
-			if ( in_array( $key, $this->fields, true ) ) {
+			if ( in_array( $key, $allowed_fields, true ) ) {
 				\update_option( $key, $value );
 			}
 		}
