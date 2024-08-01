@@ -66,12 +66,14 @@ export class CommentApp {
 
 	bindEvents() {
 		// 初始化
-		if (this.showList && this.isInit) {
-			$(this.navElement).on('click', () =>
-				this.getComments({
-					post_id: this.post_id,
-				}),
-			)
+		if (this.showList) {
+			$(this.navElement).on('click', () => {
+				if (this.isInit) {
+					this.getComments({
+						post_id: this.post_id,
+					})
+				}
+			})
 		}
 	}
 
