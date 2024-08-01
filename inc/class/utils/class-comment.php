@@ -15,11 +15,12 @@ abstract class Comment {
 	 * 檢查能不能評價商品
 	 *
 	 * @param \WC_Product $product 商品
-	 * @param string      $type create
+	 * @param string      $comment_type comment, review, etc...
+	 * @param string      $operate create，CRUD
 	 * @return true|string 能不能 comment 或原因
 	 */
-	public static function can_comment( \WC_Product $product, ?string $type = 'create' ): bool|string {
-		if ('create' === $type) {
+	public static function can_comment( \WC_Product $product, string $comment_type = 'comment', ?string $operate = 'create' ): bool|string {
+		if ('create' === $operate && 'review' === $comment_type) {
 			$reviews_allowed = $product->get_reviews_allowed(); // 後台設定，是否允許評價
 
 			if (!$reviews_allowed) {

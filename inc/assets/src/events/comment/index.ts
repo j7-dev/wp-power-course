@@ -41,6 +41,8 @@ export class CommentApp {
 	showList: boolean
 	list: TCommentItemProps[]
 	post_id: string // 商品 ID
+	user_id: number // 使用者 ID
+	comment_type: string // comment 類型
 	isLoading: boolean
 	isSuccess: boolean
 	isError: boolean
@@ -57,6 +59,8 @@ export class CommentApp {
 		this.showForm = this.$element.data('show_form') === 'yes'
 		this.showList = this.$element.data('show_list') === 'yes'
 		this.post_id = this.$element.data('post_id')
+		this.user_id = Number(this.$element.data('user_id'))
+		this.comment_type = this.$element.data('comment_type')
 		this.isInit = true
 		this.isLoading = false
 		this.render()

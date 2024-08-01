@@ -34,7 +34,7 @@ final class Comment {
 		[
 			'endpoint'            => 'comments',
 			'method'              => 'post',
-			'permission_callback' => null,
+			'permission_callback' => '__return_true',
 		],
 		// [
 		// 'endpoint'            => 'comments/(?P<id>\d+)',
@@ -132,9 +132,10 @@ final class Comment {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$product_id  = $body_params['comment_post_ID'];
-		$product     = \wc_get_product($product_id);
-		$can_comment = CommentUtils::can_comment($product);
+		$comment_type = $body_params['comment_type'];
+		$product_id   = $body_params['comment_post_ID'];
+		$product      = \wc_get_product($product_id);
+		$can_comment  = CommentUtils::can_comment($product, $comment_type);
 
 		if (true !== $can_comment) {
 			return new \WP_REST_Response(
@@ -150,18 +151,20 @@ final class Comment {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'comment' );
+		] = WP::separator(  $body_params, 'comment' );
 
 		$data['comment_meta']      = array_merge($data['comment_meta'] ?? [], $meta_data);
 		$data['comment_author_IP'] = $_SERVER['REMOTE_ADDR']; // phpcs:ignore
 		$data['comment_agent']     = $_SERVER['HTTP_USER_AGENT']; // phpcs:ignore
 
-		$user_id                      = \get_current_user_id();
-		$user                         = \get_user_by('id', $user_id);
-		$data['comment_author']       = $user->display_name;
-		$data['comment_author_email'] = $user->user_email;
-		$data['comment_author_url']   = $user->user_url;
-		$data['user_id']              = $user_id;
+		$user_id = \get_current_user_id();
+		if ($user_id) {
+			$user                         = \get_user_by('id', $user_id);
+			$data['comment_author']       = $user->display_name;
+			$data['comment_author_email'] = $user->user_email;
+			$data['comment_author_url']   = $user->user_url;
+		}
+		$data['user_id'] = $user_id;
 
 		$comment_id = \wp_insert_comment( $data );
 
@@ -176,10 +179,16 @@ final class Comment {
 			);
 		}
 
+		$label = match ($data['comment_type']) {
+			'comment' => '留言',
+			'review'  => '評價',
+			default   => '留言',
+		};
+
 		return new \WP_REST_Response(
 			[
 				'code'    => 200,
-				'message' => '已評價成功',
+				'message' => "已{$label}成功",
 				'data'    => [
 					'id' => (string) $comment_id,
 				],

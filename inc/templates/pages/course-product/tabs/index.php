@@ -69,19 +69,21 @@ $course_tabs = [
 	'comment' => [
 		'label'   => '留言',
 		'content' => sprintf(
-		/*html*/'<div id="comment-app" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s"></div>',
+		/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s"></div>',
 		$product->get_id(),
 		$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
-		'yes'
+		'yes',
+		\get_current_user_id()
 		),
 	],
 	'review' => [
 		'label'   => '評價',
 		'content' => sprintf(
-			/*html*/'<div id="review-app" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s"></div>',
+			/*html*/'<div id="review-app" data-comment_type="review" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s"></div>',
 			$product->get_id(),
 			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
-			$can_comment === true ? 'yes' : $can_comment
+			\is_user_logged_in() ? ( $can_comment === true ? 'yes' : $can_comment ) : '您尚未登入',
+			\get_current_user_id()
 			),
 	],
 	// 'announcement' => [
