@@ -88,7 +88,7 @@ final class Comment {
 			'paged'        => 1,
 			'post_id'      => 0,
 			'post_type'    => 'product',
-			// 'type'         => 'review', // 加了 children 會出不來
+			'type'         => 'review', // 加了 children 會出不來
 			'user_id'      => '',
 			'hierarchical' => 'threaded',
 		];
@@ -101,17 +101,16 @@ final class Comment {
 		/**
 		 * @var \WP_Comment[] $comments
 		 */
-		$comments      = \get_comments($args);
-		$comments      = \array_values($comments);
-		$args['count'] = true;
-		$total         = \get_comments($args);
+		$comments = \get_comments($args);
+		$comments = \array_values($comments);
 
-		$total_pages = \floor( $total / $args['number'] ) + 1;
-
-		$formatted_comments = array_map( [ $this, 'format_comment_details' ], $comments );
+		$formatted_comments = array_map( fn( $comment ) => $this->format_comment_details($comment, 0), $comments );
 
 		$response = new \WP_REST_Response( $formatted_comments );
 
+		$args['count'] = true;
+		$total         = \get_comments($args);
+		$total_pages   = \floor( $total / $args['number'] ) + 1;
 		// set pagination in header
 		$response->header( 'X-WP-Total', (string) $total );
 		$response->header( 'X-WP-TotalPages', (string) $total_pages );
@@ -197,7 +196,7 @@ final class Comment {
 
 	 * @return array{id: string,user_login: string,user_email: string,display_name: string,user_registered: string,user_registered_human: string,user_avatar: string,avl_courses: array<string, mixed>}[]
 	 */
-	public function format_comment_details( \WP_Comment $comment, ?int $depth = 0 ): array {
+	public function format_comment_details( \WP_Comment $comment, int $depth = 0 ): array {
 
 		if ( ! ( $comment instanceof \WP_Comment ) ) {
 			return [];
@@ -218,6 +217,7 @@ final class Comment {
 		/**
 		 * @var \WP_Comment[] $children
 		 */
+		$comment->populated_children(false); // 要關閉這個才會有 children
 		$children = $comment->get_children();
 
 		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1), array_values($children)) : [];
