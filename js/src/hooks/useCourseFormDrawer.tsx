@@ -84,14 +84,13 @@ export function useCourseFormDrawer({
 			.validateFields()
 			.then(() => {
 				const values = form.getFieldsValue()
-				console.log('⭐  values:', isUpdate, values)
 
 				const formData = toFormData(values)
 
 				if (isUpdate) {
 					update(
 						{
-							id: record?.id,
+							id: record!.id,
 							resource,
 							values: formData,
 							meta: {

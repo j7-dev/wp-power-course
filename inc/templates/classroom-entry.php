@@ -105,11 +105,12 @@ if ( ! CourseUtils::is_avl() ) {
 					"nonce": "%1$s",
 				}
 			</script>
+			<script id="wp-power-course-js" src="%2$s"></script>
 			',
-			\wp_create_nonce( 'wp_rest' )
+			\wp_create_nonce( 'wp_rest' ),
+			Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version
 			);
 			?>
-	<script id="wp-power-course-js" src="<?php echo Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version; ?>" ></script>
 </body>
 </html>
 <?php // phpcs:enabled

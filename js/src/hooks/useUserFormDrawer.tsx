@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { DrawerProps, Button, FormInstance, Popconfirm } from 'antd'
+import { DrawerProps, Button, FormInstance, Popconfirm, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { toFormData } from '@/utils'
@@ -16,7 +16,7 @@ export function useUserFormDrawer({
 }) {
 	const [open, setOpen] = useState(false)
 	const [record, setRecord] = useState<TUserRecord | undefined>(undefined)
-	const isUpdate = !!record // 如果沒有傳入 record 就走新增課程，否則走更新課程
+	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增課程，否則走更新課程
 	const closeRef = useRef<HTMLDivElement>(null)
 	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 
@@ -70,7 +70,7 @@ export function useUserFormDrawer({
 				const formData = toFormData(values)
 				update(
 					{
-						id: record?.id,
+						id: record!.id,
 						resource,
 						values: formData,
 						meta: {
@@ -92,6 +92,7 @@ export function useUserFormDrawer({
 					...values,
 					is_teacher: 'yes',
 				})
+
 				create(
 					{
 						resource,
