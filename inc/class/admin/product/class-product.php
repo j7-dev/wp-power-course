@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Admin;
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerBundleProduct\BundleProduct;
 
 /**
  * Class Product
@@ -28,6 +29,7 @@ final class Product {
 		\add_filter( 'display_post_states', [ __CLASS__, 'custom_display_post_states' ], 10, 2 );
 		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
 		\add_filter('get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
+		\add_filter('woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
 	}
 
 
@@ -99,6 +101,9 @@ final class Product {
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
 			$post_states['course'] = '課程商品';
 		}
+		if ( BundleProduct::is_bundle_product( $post->ID ) ) {
+			$post_states['bundle'] = '銷售方案商品';
+		}
 		return $post_states;
 	}
 
@@ -110,14 +115,36 @@ final class Product {
 	 *
 	 * @return array
 	 */
-	public static function modify_list_row_actions( array $actions, $post ): array {
-		if ( CourseUtils::is_course_product( $post->ID ) ) {
+	public static function modify_list_row_actions( array $actions, \WP_Post $post ): array {
+		if ( CourseUtils::is_course_product( $post->ID ) || BundleProduct::is_bundle_product( $post->ID ) ) {
 			unset( $actions['inline hide-if-no-js'] );
 			$actions['edit'] = sprintf(
 			/*html*/'<a href="%s" aria-label="編輯〈課程〉" target="_blank">編輯</a>',
 			\admin_url('admin.php?page=power-course')
 			);
 		}
+
+		if (BundleProduct::is_bundle_product( $post->ID ) ) {
+			$course_posts = get_posts(
+				[
+					'post_type'   => 'product',
+					'numberposts' => -1,
+					'meta_key'    => 'bundle_ids',
+					'meta_value'  => $post->ID,
+				]
+				);
+
+			if ($course_posts) {
+				$course_post     = reset($course_posts);
+				$actions['view'] = sprintf(
+					/*html*/'<a href="%s" rel="bookmark" target="_blank" aria-label="檢視〈商品〉">檢視</a>',
+					\get_the_permalink($course_post)
+				);
+			} else {
+				unset($actions['view']);
+			}
+		}
+
 		return $actions;
 	}
 
@@ -131,10 +158,30 @@ final class Product {
 	 * @return string
 	 */
 	public static function modify_edit_post_link( string $link, int $post_id, $context ): string {
-		if ( CourseUtils::is_course_product( $post_id ) ) {
+		if ( CourseUtils::is_course_product( $post_id ) || BundleProduct::is_bundle_product( $post_id ) ) {
 			$link = \admin_url('admin.php?page=power-course');
 		}
+
 		return $link;
+	}
+
+	/**
+	 * 針對課程商品 || 銷售方案商品在訂單 detail 添加額外的 class
+	 * 不然 WC 會把編輯的連結顯示在畫面上
+	 *
+	 * @param string                 $class - Class
+	 * @param \WC_Order_Item_Product $item - Order item
+	 * @param \WC_Order              $order - Order
+	 *
+	 * @return string
+	 */
+	public static function add_order_item_class( string $class, \WC_Order_Item_Product $item, \WC_Order $order ): string {
+		$product_id = $item->get_product_id();
+		if ( CourseUtils::is_course_product( $product_id ) || BundleProduct::is_bundle_product( $product_id ) ) {
+			$class .= ' pc [&_.wc-order-item-name]:pointer-events-none';
+		}
+
+		return $class;
 	}
 }
 

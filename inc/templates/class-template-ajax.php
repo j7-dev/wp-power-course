@@ -29,7 +29,8 @@ final class TemplateAjax {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue_assets' ] );
+		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ] );
+		\add_action( 'admin_enqueue_scripts', [ __CLASS__, 'admin_enqueue_scripts' ] );
 
 		$actions = $this->actions;
 		foreach ( $actions as $action ) {
@@ -43,7 +44,7 @@ final class TemplateAjax {
 	 *
 	 * @return void
 	 */
-	public static function enqueue_assets(): void {
+	public static function wp_enqueue_scripts(): void {
 		\wp_enqueue_script( 'wc-add-to-cart' );
 		\wp_enqueue_script(
 			Plugin::$kebab . '-template',
@@ -63,6 +64,26 @@ final class TemplateAjax {
 				'nonce'    => \wp_create_nonce( 'wp_rest' ),
 			]
 			);
+
+		\wp_enqueue_style(
+			Plugin::$kebab . '-template',
+			Plugin::$url . '/inc/assets/dist/css/index.css',
+			[],
+			Plugin::$version
+		);
+	}
+
+	/**
+	 * Enqueue assets
+	 *
+	 * @return void
+	 */
+	public static function admin_enqueue_scripts(): void {
+		$screen = \get_current_screen();
+
+		if ('shop_order' !== $screen->id) {
+			return;
+		}
 
 		\wp_enqueue_style(
 			Plugin::$kebab . '-template',
