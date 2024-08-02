@@ -4,6 +4,8 @@
 
 @import "reset";
 
+$primary: #377cfb;
+
 // daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
 div .pc-rating input:checked ~ input,
 div .pc-rating input[aria-checked="true"] ~ input,
@@ -11,9 +13,48 @@ div .pc-rating input[checked] ~ input {
 	--tw-bg-opacity: 0.2 !important;
 }
 .pc {
-	.comment-respond {
-		.comment-reply-title {
-			margin-bottom: 0.5rem !important;
+	// 留言、評價分頁的樣式
+	.pc-pagination {
+		> div {
+			width: 2rem;
+			height: 2rem;
+			border-radius: 0.75rem;
+			border: 1px solid #e5e7eb;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #6b7280;
+			font-size: 0.75rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			&:hover,
+			&.current {
+				color: $primary;
+			}
+			&.current {
+				border: 1px solid $primary;
+				cursor: default;
+			}
+			&.disabled {
+				color: #6b7280;
+				border: 1px solid #e5e7eb;
+				cursor: not-allowed;
+			}
+
+			&.pc-pagination__prev,
+			&.pc-pagination__next {
+				svg path {
+					fill: #6b7280;
+					transition: all 0.3s ease;
+				}
+
+				&:not(.disabled):hover {
+					svg path {
+						fill: $primary;
+					}
+				}
+			}
 		}
 	}
 }
@@ -77,7 +118,9 @@ div .pc-rating input[checked] ~ input {
 
 // My Account 我的學習 icon
 
-.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
+.woocommerce-MyAccount-navigation
+	ul
+	li.woocommerce-MyAccount-navigation-link--courses {
 	a {
 		&::before {
 			content: "";

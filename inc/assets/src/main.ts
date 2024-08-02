@@ -30,6 +30,7 @@ import {
 	new CommentApp('#review-app', {
 		queryParams: {
 			post_type: 'product',
+			type: 'review',
 		},
 		navElement: '#tab-nav-review',
 		ratingProps: {
@@ -39,6 +40,7 @@ import {
 
 	new CommentApp('#comment-app', {
 		queryParams: {
+			post_type: 'product',
 			type: 'comment',
 		},
 		navElement: '#tab-nav-comment',

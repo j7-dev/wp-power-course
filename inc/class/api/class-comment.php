@@ -108,12 +108,15 @@ final class Comment {
 
 		$response = new \WP_REST_Response( $formatted_comments );
 
-		$args['count'] = true;
-		$total         = \get_comments($args);
-		$total_pages   = \floor( $total / $args['number'] ) + 1;
+		$count_args = array_merge($args, [ 'count' => true ]);
+		unset($count_args['paged']);
+		$total       = \get_comments($count_args);
+		$total_pages = \floor( $total / $args['number'] ) + 1;
 		// set pagination in header
 		$response->header( 'X-WP-Total', (string) $total );
 		$response->header( 'X-WP-TotalPages', (string) $total_pages );
+		$response->header( 'X-WP-CurrentPage', (string) $args['paged'] );
+		$response->header( 'X-WP-PageSize', (string) $args['number'] );
 
 		return $response;
 	}
