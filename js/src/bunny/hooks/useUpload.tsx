@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { UploadFile, UploadProps } from 'antd'
 import { bunnyStreamAxios } from '@/rest-data-provider/bunny-stream'
 import { RcFile } from 'antd/lib/upload/interface'
-import { useVideoLibrary } from '@/bunny'
 import { filesInQueueAtom } from '@/pages/admin/Courses'
 import { useSetAtom } from 'jotai'
-import { getVideoUrl } from '@/utils'
+import { getVideoUrl, bunny_library_id } from '@/utils'
 import {
 	TCreateVideoResponse,
 	TUploadVideoResponse,
@@ -14,7 +13,6 @@ import {
 
 export const useUpload = (props?: TUseUploadParams) => {
 	const setFilesInQueue = useSetAtom(filesInQueueAtom)
-	const { libraryId } = useVideoLibrary()
 
 	const uploadProps = props?.uploadProps
 
@@ -50,7 +48,7 @@ export const useUpload = (props?: TUseUploadParams) => {
 				// 創建影片 API
 				const createVideoResult =
 					await bunnyStreamAxios.post<TCreateVideoResponse>(
-						`/${libraryId}/videos`,
+						`/${bunny_library_id}/videos`,
 						{
 							title: (file as RcFile)?.name || 'unknown name',
 						},
@@ -107,7 +105,7 @@ export const useUpload = (props?: TUseUploadParams) => {
 
 				// 上傳影片 API
 				const uploadVideo = await bunnyStreamAxios.put<TUploadVideoResponse>(
-					`/${libraryId}/videos/${vId}?enabledResolutions=720p%2C1080p`,
+					`/${bunny_library_id}/videos/${vId}?enabledResolutions=720p%2C1080p`,
 					file,
 					{
 						headers: {

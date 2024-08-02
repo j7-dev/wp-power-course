@@ -9,13 +9,14 @@ import { generateSort, generateFilter } from '../utils'
 import axios, { AxiosInstance } from 'axios'
 import queryString from 'query-string'
 import { TOrderBy, TOrder, THttpMethods, THttpMethodsWithBody } from '@/types'
+import { bunny_stream_api_key } from '@/utils'
 
 const { stringify } = queryString
 
 export const bunnyStreamAxios = axios.create({
 	baseURL: 'https://video.bunnycdn.com/library',
 	headers: {
-		AccessKey: '192d0f46-75b7-4148-8645a8530673-9081-40fb',
+		AccessKey: bunny_stream_api_key,
 	},
 })
 
@@ -27,7 +28,7 @@ export const dataProvider = (
 	'createMany' | 'updateMany' | 'deleteMany'
 > => ({
 	getList: async ({ resource, pagination, filters, sorters, meta }) => {
-		// TODO
+		// TODO 未來要做 bunny 影片管理再整理
 
 		const url = `${apiUrl}/${resource}`
 

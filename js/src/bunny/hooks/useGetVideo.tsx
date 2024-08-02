@@ -5,7 +5,7 @@ import {
 	BaseRecord,
 	HttpError,
 } from '@refinedev/core/dist/contexts/data/types'
-import { useVideoLibrary } from '@/bunny'
+import { bunny_library_id } from '@/utils'
 
 type TUseGetVideoParams<T = BaseRecord> = {
 	videoId: string
@@ -54,9 +54,8 @@ export const useGetVideo = ({
 	videoId,
 	queryOptions,
 }: TUseGetVideoParams<TGetVideoResponse>) => {
-	const { libraryId } = useVideoLibrary()
 	const result = useOne<TGetVideoResponse>({
-		resource: `${libraryId}/videos`,
+		resource: `${bunny_library_id}/videos`,
 		id: videoId,
 		dataProviderName: 'bunny-stream',
 		queryOptions,

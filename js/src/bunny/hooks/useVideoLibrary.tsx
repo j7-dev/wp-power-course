@@ -1,5 +1,6 @@
 /**
  * TODO 邏輯後補
+ * @deprecated 改從 utils 拿
  * 目的: 讓人在同一個介面就可以選擇 VideoLibrary
  * 1. 先列出所有的 VideoLibrary，下拉選擇
  * 2. 如果沒有，就創建一個新的 VideoLibrary

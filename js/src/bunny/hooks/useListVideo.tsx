@@ -1,10 +1,9 @@
 import { useList } from '@refinedev/core'
-import { useVideoLibrary } from '@/bunny'
+import { bunny_library_id } from '@/utils'
 
 export const useListVideo = () => {
-	const { libraryId } = useVideoLibrary()
 	const result = useList({
-		resource: `${libraryId}/videos`,
+		resource: `${bunny_library_id}/videos`,
 		dataProviderName: 'bunny-stream',
 	})
 
