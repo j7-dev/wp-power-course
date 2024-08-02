@@ -51,7 +51,7 @@ export const CoursePrice = () => {
 				rules={[
 					{
 						type: 'number',
-						max: watchRegularPrice,
+						max: watchRegularPrice - 1,
 						message: '折扣價不能超過原價',
 					},
 				]}
