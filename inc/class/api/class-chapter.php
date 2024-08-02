@@ -81,7 +81,7 @@ final class Chapter {
 	 */
 	public function post_chapters_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$body_params = $request->get_json_params();
+		$body_params = $request->get_body_params();
 
 		$skip_keys   = [
 			'chapter_video',

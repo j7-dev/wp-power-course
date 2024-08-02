@@ -56,6 +56,11 @@ const AddChapter: FC<{
 					post_title: `新${itemLabel}`,
 					menu_order: (record?.chapters || []).length + 1,
 				},
+				meta: {
+					headers: {
+						'Content-Type': 'multipart/form-data;',
+					},
+				},
 			},
 			{
 				onSuccess: (_data, variables) => {
