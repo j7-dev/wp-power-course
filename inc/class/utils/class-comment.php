@@ -38,6 +38,7 @@ abstract class Comment {
 				[
 					'post_id' => $product->get_id(),
 					'user_id' => get_current_user_id(),
+					'type'    => 'review',
 				]
 			);
 

@@ -18,36 +18,38 @@ final class Comment {
 	use \J7\WpUtils\Traits\ApiRegisterTrait;
 
 	/**
-	 * APIs
-	 *
-	 * @var array{endpoint: string, method: string, permission_callback: ?callable}[]
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
-	 */
-	protected $apis = [
-		[
-			'endpoint'            => 'comments',
-			'method'              => 'get',
-			'permission_callback' => '__return_true',
-		],
-		[
-			'endpoint'            => 'comments',
-			'method'              => 'post',
-			'permission_callback' => '__return_true',
-		],
-		// [
-		// 'endpoint'            => 'comments/(?P<id>\d+)',
-		// 'method'              => 'post',
-		// 'permission_callback' => null,
-		// ],
-	];
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
+	}
+
+	/**
+	 * Get APIs
+	 *
+	 * @return array{endpoint: string, method: string, permission_callback: ?callable}[]
+	 * - endpoint: string
+	 * - method: 'get' | 'post' | 'patch' | 'delete'
+	 * - permission_callback : callable
+	 */
+	protected function get_apis(): array {
+		return [
+			[
+				'endpoint'            => 'comments',
+				'method'              => 'get',
+				'permission_callback' => '__return_true',
+			],
+			[
+				'endpoint'            => 'comments',
+				'method'              => 'post',
+				'permission_callback' => '__return_true',
+			],
+			[
+				'endpoint'            => 'comments/(?P<id>\d+)/toggle-approved',
+				'method'              => 'post',
+				'permission_callback' => fn() => \current_user_can( 'manage_options' ),
+			],
+		];
 	}
 
 	/**
@@ -57,12 +59,11 @@ final class Comment {
 	 */
 	public function register_api_products(): void {
 		$this->register_apis(
-		apis: $this->apis,
+		apis: $this->get_apis(),
 		namespace: Plugin::$kebab,
 		default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
 	}
-
 
 	/**
 	 * Get comments callback
@@ -88,9 +89,10 @@ final class Comment {
 			'paged'        => 1,
 			'post_id'      => 0,
 			'post_type'    => 'product',
-			'type'         => 'review', // 加了 children 會出不來
+			'type'         => 'review',
 			'user_id'      => '',
 			'hierarchical' => 'threaded',
+			'status'       => 'approve',
 		];
 
 		$args = \wp_parse_args(
@@ -98,13 +100,26 @@ final class Comment {
 		$default_args,
 		);
 
+		if (\current_user_can('manage_options')) {
+			$args['status'] = 'all';
+		}
+
 		/**
 		 * @var \WP_Comment[] $comments
 		 */
 		$comments = \get_comments($args);
 		$comments = \array_values($comments);
 
-		$formatted_comments = array_map( fn( $comment ) => $this->format_comment_details($comment, 0), $comments );
+		$formatted_comments = array_map(
+			fn( $comment ) => $this->format_comment_details(
+			$comment,
+			0,
+			[
+				'status' => $args['status'],
+			]
+			),
+			$comments
+			);
 
 		$response = new \WP_REST_Response( $formatted_comments );
 
@@ -120,8 +135,6 @@ final class Comment {
 
 		return $response;
 	}
-
-
 
 	/**
 	 * 新增留言
@@ -201,52 +214,175 @@ final class Comment {
 	}
 
 	/**
+	 * 新增留言
+	 *
+	 * @param \WP_REST_Request $request 包含新增留言所需資料的REST請求對象。
+	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_comments_with_id_toggle_approved_callback( \WP_REST_Request $request ): \WP_REST_Response {
+
+		$id = $request['id'];
+
+		if (!\is_numeric($id)) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => '留言 ID 錯誤',
+				'data'    => null,
+			],
+			400
+			);
+		}
+
+		$comment = \get_comment($id);
+
+		if (!$comment) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => '留言不存在',
+				'data'    => null,
+			],
+			400
+			);
+		}
+
+		$comment_approved = $comment->comment_approved; // '0', '1', 'spam'
+
+		if (!\is_numeric($comment_approved)) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 400,
+					'message' => '垃圾留言無法審核',
+					'data'    => [
+						'id' => (string) $id,
+					],
+				],
+				400
+				);
+		}
+
+		$comment_approved_update_value = match ($comment_approved) {
+			'0' => '1',
+			'1'  => '0',
+			default => '1',
+		};
+
+		// 取得所有 Children id
+		$children_ids = self::get_all_children_ids($id);
+
+		$all_comment_ids = [ $id, ...$children_ids ];
+
+		$label = $comment_approved_update_value ? '顯示' : '隱藏';
+
+		foreach ($all_comment_ids as $comment_id) {
+			$result = \wp_update_comment(
+				[
+					'comment_ID'       => $comment_id,
+					'comment_approved' => $comment_approved_update_value,
+				],
+				true
+			);
+
+			if (\is_wp_error($result)) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 400,
+						'message' => $result->get_error_message(),
+						'data'    => [
+							'id' => (string) $comment_id,
+						],
+					],
+					400
+					);
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 200,
+				'message' =>"{$label}留言成功",
+				'data'    => [
+					'ids' => $all_comment_ids,
+				],
+			],
+			200
+			);
+	}
+
+	/**
 	 * Format comment details
 	 *
 	 * @param \WP_Comment $comment  Comment.
 	 * @param int         $depth        Depth.
-
+	 * @param array       $args         Args.
+	 *
 	 * @return array{id: string,user_login: string,user_email: string,display_name: string,user_registered: string,user_registered_human: string,user_avatar: string,avl_courses: array<string, mixed>}[]
 	 */
-	public function format_comment_details( \WP_Comment $comment, int $depth = 0 ): array {
+	public function format_comment_details( \WP_Comment $comment, int $depth = 0, ?array $args = [] ): array {
 
 		if ( ! ( $comment instanceof \WP_Comment ) ) {
 			return [];
 		}
 
-		$comment_id      = $comment->comment_ID;
-		$user_id         = $comment->user_id;
-		$user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
-		$user_avatar_url = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
-		$user            = [
+		$comment_id       = $comment->comment_ID;
+		$user_id          = $comment->user_id;
+		$user_avatar_url  = \get_user_meta($user_id, 'user_avatar_url', true);
+		$user_avatar_url  = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
+		$user             = [
 			'id'         => (string) $user_id,
 			'name'       => \get_the_author_meta('display_name', $user_id) ?: '訪客',
 			'avatar_url' => $user_avatar_url,
 		];
-		$rating          = \get_comment_meta($comment_id, 'rating', true);
-		$comment_content = \wpautop($comment->comment_content);
-		$comment_date    = $comment->comment_date;
+		$rating           = \get_comment_meta($comment_id, 'rating', true);
+		$comment_approved = $comment->comment_approved; // '0', '1', 'spam'
+		$comment_content  = \wpautop($comment->comment_content);
+		$comment_date     = $comment->comment_date;
 		/**
 		 * @var \WP_Comment[] $children
 		 */
 		$comment->populated_children(false); // 要關閉這個才會有 children
-		$children = $comment->get_children();
 
-		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1), array_values($children)) : [];
+		$children = $comment->get_children($args);
+
+		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1, $args), array_values($children)) : [];
 
 		$base_array = [
-			'id'              => (string) $comment_id,
-			'depth'           => (int) $depth,
-			'user'            => $user,
-			'rating'          => (int) $rating,
-			'comment_content' => $comment_content,
-			'comment_date'    => $comment_date,
-			'can_reply'       => true,
-			'can_delete'      => \current_user_can( 'edit_comment', $comment_id ),
-			'children'        => $children_array,
+			'id'               => (string) $comment_id,
+			'depth'            => (int) $depth,
+			'user'             => $user,
+			'rating'           => (int) $rating,
+			'comment_content'  => $comment_content,
+			'comment_date'     => $comment_date,
+			'comment_approved' => $comment_approved,
+			'can_reply'        => true,
+			'can_delete'       => \current_user_can( 'edit_comment', $comment_id ),
+			'children'         => $children_array,
 		];
 
 		return $base_array;
+	}
+
+	/**
+	 * Get all children ids (flat)
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return array<int>
+	 */
+	public static function get_all_children_ids( $comment_id ): array {
+		$children_ids = [];
+		$children     = (array) \get_comments(
+			[
+				'parent'       => $comment_id,
+				'hierarchical' => 'threaded',
+			]
+		);
+		foreach ($children as $child) {
+			$children_ids[] = $child->comment_ID;
+			$children_ids   = array_merge($children_ids, self::get_all_children_ids($child->comment_ID));
+		}
+		return $children_ids;
 	}
 }
 

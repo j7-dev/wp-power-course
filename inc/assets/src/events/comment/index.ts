@@ -35,13 +35,15 @@ export class CommentApp {
 	_list: TCommentItemProps[]
 	post_id: string // 商品 ID
 	user_id: number // 使用者 ID
-	comment_type: string // comment 類型
+	user_role: 'admin' | 'user' // 使用者角色
+	comment_type: string // comment 類型 'comment' | 'review'
 	_isLoading: boolean
 	isSuccess: boolean
 	isError: boolean
 	total: number
 	totalPages: number
 	isInit: boolean
+	commentItems: CommentItem[]
 
 	constructor(element: string, props: TCommentAppProps) {
 		this.$element = $(element)
@@ -53,8 +55,10 @@ export class CommentApp {
 		this.showList = this.$element.data('show_list') === 'yes'
 		this.post_id = this.$element.data('post_id')
 		this.user_id = Number(this.$element.data('user_id'))
+		this.user_role = this.$element.data('user_role')
 		this.comment_type = this.$element.data('comment_type')
 		this.isInit = true
+		this.commentItems = []
 		this._isLoading = false
 		this.render()
 		this.createSubcomponents()
@@ -64,11 +68,10 @@ export class CommentApp {
 	bindEvents() {
 		// 初始化
 		if (this.showList) {
-			$(this.navElement).on('click', () => {
+			$(this.navElement).on('click', (e) => {
+				e.stopPropagation()
 				if (this.isInit) {
-					this.getComments({
-						post_id: this.post_id,
-					})
+					this.getComments()
 				}
 			})
 		}
@@ -80,6 +83,7 @@ export class CommentApp {
 		this.$element
 			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__pages', (e) => {
+				e.stopPropagation()
 				const paged = Number($(e.currentTarget).data('page'))
 				this.queryParams = {
 					...this._queryParams,
@@ -90,6 +94,7 @@ export class CommentApp {
 		this.$element
 			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__prev', (e) => {
+				e.stopPropagation()
 				if (current === 1) {
 					return
 				}
@@ -103,6 +108,7 @@ export class CommentApp {
 		this.$element
 			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__next', (e) => {
+				e.stopPropagation()
 				if (current === totalPages) {
 					return
 				}
@@ -117,6 +123,7 @@ export class CommentApp {
 	// 綁定回覆事件
 	bindReplyEvents() {
 		this.$element.find('.pc-comment-item__reply-button').on('click', (e) => {
+			e.stopPropagation()
 			const commentId = $(e.currentTarget)
 				.closest('.pc-comment-item')
 				.data('comment_id')
@@ -125,18 +132,16 @@ export class CommentApp {
 				'.pc-comment-item__content',
 			)
 
-			const ReplyForm = new CommentForm(
+			new CommentForm(
 				CommentItemContentNode.find('.pc-comment-item__reply-form'),
 				{
-					instance: this,
+					appInstance: this,
 					reply_comment_type: 'comment',
 					reply_comment_parent: commentId,
 				},
 			)
 		})
 	}
-
-	// 綁定隱藏事件
 
 	render() {
 		this.$element.html(/*html*/ `
@@ -153,7 +158,7 @@ export class CommentApp {
 				this.$element.find('.pc-comment-form'),
 				{
 					ratingProps: this.ratingProps,
-					instance: this,
+					appInstance: this,
 				},
 			)
 		} else {
@@ -166,9 +171,7 @@ export class CommentApp {
 	// queryParams 改變時觸發
 	set queryParams(value: { [key: string]: any }) {
 		this._queryParams = value
-		this.getComments({
-			post_id: this.post_id,
-		})
+		this.getComments()
 	}
 
 	// pagination 改變時觸發
@@ -215,23 +218,31 @@ export class CommentApp {
 			.join('')
 		this.$element.find('.pc-comment-list').html(nodes)
 		value.forEach((commentItem) => {
-			new CommentItem(
-				this.$element.find(
-					`.pc-comment-item[data-comment_id="${commentItem.id}"]`,
+			this.commentItems.push(
+				new CommentItem(
+					this.$element.find(
+						`.pc-comment-item[data-comment_id="${commentItem.id}"]`,
+					),
+					{
+						...commentItem,
+						appInstance: this,
+					},
 				),
-				commentItem,
 			)
 		})
 
 		this.bindReplyEvents()
 	}
 
-	getComments(data: { [key: string]: any }) {
-		this.isLoading = true
+	getComments(data?: { [key: string]: any }, showLoading = true) {
+		if (showLoading) {
+			this.isLoading = true
+		}
 		$.ajax({
 			url: `${site_url}/wp-json/power-course/comments`,
 			type: 'get',
 			data: {
+				post_id: this.post_id,
 				...this._queryParams,
 				...data,
 			},
@@ -264,7 +275,9 @@ export class CommentApp {
 				this.isError = true
 			},
 			complete: (xhr) => {
-				this.isLoading = false
+				if (showLoading) {
+					this.isLoading = false
+				}
 				this.isInit = false
 			},
 		})

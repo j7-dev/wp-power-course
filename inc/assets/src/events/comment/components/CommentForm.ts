@@ -5,14 +5,14 @@ import { CommentApp } from '../index'
 
 export type TCommentFormProps = {
 	ratingProps: Partial<TRatingProps>
-	instance: CommentApp
+	appInstance: CommentApp
 }
 
 export class CommentForm {
 	$element: JQuery<HTMLElement>
 	props: {
 		ratingProps?: Partial<TRatingProps>
-		instance: CommentApp
+		appInstance: CommentApp
 		reply_comment_parent?: string
 		reply_comment_type?: 'comment'
 	}
@@ -22,7 +22,7 @@ export class CommentForm {
 	constructor(element, props) {
 		this.$element = $(element)
 		this.props = props
-		this.post_id = props.instance.post_id
+		this.post_id = props.appInstance.post_id
 		this.render()
 		this.createSubcomponents()
 		this.bindEvents()
@@ -33,7 +33,7 @@ export class CommentForm {
 	}
 
 	validate_email(value) {
-		const user_id = this.props.instance.user_id
+		const user_id = this.props.appInstance.user_id
 		const is_user_logged_in = user_id !== 0
 		if (is_user_logged_in) {
 			return true
@@ -67,7 +67,7 @@ export class CommentForm {
 			.val()
 		const comment_content = this.$element.find('textarea').val()
 		const comment_post_ID = this.post_id
-		const comment_type = this.props.instance.comment_type
+		const comment_type = this.props.appInstance.comment_type
 		const comment_author_email = this.$element
 			.find('input[name="comment_author_email"]')
 			.val()
@@ -102,7 +102,6 @@ export class CommentForm {
 				const { code, message } = response
 
 				if (200 === code) {
-					const post_id = this.post_id
 					this.$element
 						.find('.pc-comment-form__message')
 						.text(message)
@@ -111,9 +110,7 @@ export class CommentForm {
 
 					this.$element.find('textarea').val('')
 
-					this.props.instance.getComments({
-						post_id,
-					})
+					this.props.appInstance.getComments()
 				} else {
 					this.$element
 						.find('.pc-comment-form__message')
@@ -160,15 +157,15 @@ export class CommentForm {
 	}
 
 	render() {
-		const { instance, reply_comment_type } = this.props
-		const user_id = instance.user_id
+		const { appInstance, reply_comment_type } = this.props
+		const user_id = appInstance.user_id
 		const is_user_logged_in = user_id !== 0
 
 		// 未登入要留 email
 		const email_field = is_user_logged_in
 			? ''
 			: '<input type="email" placeholder="請輸入您的電子郵件" class="mb-2 rounded h-10 bg-white focus:bg-white" name="comment_author_email" required />'
-		const comment_type = reply_comment_type || instance.comment_type
+		const comment_type = reply_comment_type || appInstance.comment_type
 
 		let label = 'review' === comment_type ? '評價' : '留言'
 		if (reply_comment_type) {
@@ -190,7 +187,7 @@ export class CommentForm {
 	}
 
 	createSubcomponents() {
-		const comment_type = this.props.instance.comment_type
+		const comment_type = this.props.appInstance.comment_type
 		if ('review' === comment_type && this.props.ratingProps) {
 			this.rating = new Rating(this.$element.find('.pc-comment-item__rating'), {
 				value: 5,

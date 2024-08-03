@@ -46,7 +46,7 @@ module.exports = {
 			addUtilities(newUtilities, ['responsive', 'hover'])
 		},
 	],
-	safelist: [],
+	safelist: ['opacity-50'],
 	blocklist: ['hidden', 'columns-1', 'columns-2', 'fixed'],
 	daisyui: {
 		themes: [

@@ -69,21 +69,23 @@ $course_tabs = [
 	'comment' => [
 		'label'   => '留言',
 		'content' => sprintf(
-		/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s"></div>',
+		/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
 		$product->get_id(),
-		'yes',// $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
+		'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
 		'yes',
-		\get_current_user_id()
+		\get_current_user_id(),
+		\current_user_can('manage_options') ? 'admin' : 'user',
 		),
 	],
 	'review' => [
 		'label'   => '評價',
 		'content' => sprintf(
-			/*html*/'<div id="review-app" data-comment_type="review" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s"></div>',
+			/*html*/'<div id="review-app" data-comment_type="review" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
 			$product->get_id(),
 			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
 			\is_user_logged_in() ? ( $can_comment === true ? 'yes' : $can_comment ) : '您尚未登入',
-			\get_current_user_id()
+			\get_current_user_id(),
+			\current_user_can('manage_options') ? 'admin' : 'user',
 			),
 	],
 	// 'announcement' => [
