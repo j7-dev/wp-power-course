@@ -1,4 +1,3 @@
-import { Pagination } from './components/Pagination'
 import $, { JQuery } from 'jquery'
 import { site_url } from '../../utils/'
 import {
@@ -116,12 +115,26 @@ export class CommentApp {
 	}
 
 	// 綁定回覆事件
-	// bindReplyEvents() {
-	// 	this.$element.find('.pc-comment-list').on('click', '.pc-comment__reply', (e) => {
-	// 		const commentId = $(e.currentTarget).data('comment-id')
-	// 		this.commentForm.replyTo(commentId)
-	// 	})
-	// }
+	bindReplyEvents() {
+		this.$element.find('.pc-comment-item__reply-button').on('click', (e) => {
+			const commentId = $(e.currentTarget)
+				.closest('.pc-comment-item')
+				.data('comment_id')
+
+			const CommentItemContentNode = $(e.currentTarget).closest(
+				'.pc-comment-item__content',
+			)
+
+			const ReplyForm = new CommentForm(
+				CommentItemContentNode.find('.pc-comment-item__reply-form'),
+				{
+					instance: this,
+					reply_comment_type: 'comment',
+					reply_comment_parent: commentId,
+				},
+			)
+		})
+	}
 
 	// 綁定隱藏事件
 
@@ -209,6 +222,8 @@ export class CommentApp {
 				commentItem,
 			)
 		})
+
+		this.bindReplyEvents()
 	}
 
 	getComments(data: { [key: string]: any }) {

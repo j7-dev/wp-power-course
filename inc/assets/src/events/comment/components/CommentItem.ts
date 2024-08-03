@@ -30,8 +30,7 @@ export class CommentItem {
 	}
 
 	render() {
-		const { user, comment_content, comment_date, children, depth, id } =
-			this.props
+		const { user, comment_content, comment_date, children, depth } = this.props
 		const childrenHTML = children
 			.map(
 				({ id: childId }) =>
@@ -41,7 +40,7 @@ export class CommentItem {
 		const bgColor = depth % 2 === 0 ? 'bg-gray-100' : 'bg-gray-50'
 
 		this.$element.html(/*html*/ `
-			<div data-comment_id="${id}" class="p-6 mt-2 rounded ${bgColor}">
+			<div class="p-6 mt-2 rounded ${bgColor}">
 				<div class="flex gap-4">
 					<div class="w-10 h-10 rounded-full overflow-hidden relative">
 						<img src="${user.avatar_url}" loading="lazy" class="w-full h-full object-cover relative z-20">
@@ -50,15 +49,16 @@ export class CommentItem {
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">
 							<div class="">${user.name}</div>
-							<div class="pc-comment-rating"></div>
+							<div class="pc-comment-item__rating"></div>
 						</div>
 						<p class="text-gray-400 text-xs mb-4">${comment_date}</p>
-						<div class="text-sm [&_p]:mb-0">
+						<div class="pc-comment-item__content text-sm [&_p]:mb-0">
 							${comment_content}
 							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
-								<span>回覆</span>
-								<span>隱藏</span>
+								<span class="pc-comment-item__reply-button">回覆</span>
+								<span class="pc-comment-item__hide-button">隱藏</span>
 							</div>
+							<div class="pc-comment-item__reply-form"></div>
 						</div>
 						${childrenHTML}
 					</div>
@@ -70,7 +70,7 @@ export class CommentItem {
 	createSubcomponents() {
 		const { rating, children } = this.props
 		if (rating) {
-			this.rating = new Rating(this.$element.find('.pc-comment-rating'), {
+			this.rating = new Rating(this.$element.find('.pc-comment-item__rating'), {
 				value: rating,
 				disabled: true,
 				name: 'rating-10',
