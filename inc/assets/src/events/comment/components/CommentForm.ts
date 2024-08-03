@@ -159,9 +159,9 @@ export class CommentForm {
 		const label = 'review' === comment_type ? '評價' : '留言'
 
 		this.$element.html(/*html*/ `
-			<div class="pc-comment-form bg-gray-100 p-6 mb-2 rounded">
+			<div class="bg-gray-100 p-6 mb-2 rounded">
 				<p class="text-gray-800 text-base font-bold mb-0">新增${label}</p>
-				<div data-pc="rating" class="mb-2"></div>
+				<div class="pc-comment-rating mb-2"></div>
 				${email_field}
 				<textarea placeholder="請輸入您的想法" class="mb-2 rounded h-24 bg-white" name="comment_content" rows="4"></textarea>
 				<div class="flex justify-end gap-4 items-center">
@@ -175,7 +175,7 @@ export class CommentForm {
 	createSubcomponents() {
 		const comment_type = this.props.instance.comment_type
 		if ('review' === comment_type && this.props.ratingProps) {
-			this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
+			this.rating = new Rating(this.$element.find('.pc-comment-rating'), {
 				value: 5,
 				disabled: false,
 				name: 'rating',

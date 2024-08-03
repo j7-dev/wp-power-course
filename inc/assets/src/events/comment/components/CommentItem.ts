@@ -33,7 +33,10 @@ export class CommentItem {
 		const { user, comment_content, comment_date, children, depth, id } =
 			this.props
 		const childrenHTML = children
-			.map(({ id: childId }) => `<div data-pc="comment-item-${childId}"></div>`)
+			.map(
+				({ id: childId }) =>
+					`<div data-comment_id="${childId}" class="pc-comment-item"></div>`,
+			)
 			.join('')
 		const bgColor = depth % 2 === 0 ? 'bg-gray-100' : 'bg-gray-50'
 
@@ -47,12 +50,12 @@ export class CommentItem {
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">
 							<div class="">${user.name}</div>
-							<div data-pc="rating"></div>
+							<div class="pc-comment-rating"></div>
 						</div>
 						<p class="text-gray-400 text-xs mb-4">${comment_date}</p>
-						<div class="mb-4 text-sm [&_p]:mb-0">
+						<div class="text-sm [&_p]:mb-0">
 							${comment_content}
-							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer tw-hidden">
+							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
 								<span>回覆</span>
 								<span>隱藏</span>
 							</div>
@@ -67,7 +70,7 @@ export class CommentItem {
 	createSubcomponents() {
 		const { rating, children } = this.props
 		if (rating) {
-			this.rating = new Rating(this.$element.find('[data-pc="rating"]'), {
+			this.rating = new Rating(this.$element.find('.pc-comment-rating'), {
 				value: rating,
 				disabled: true,
 				name: 'rating-10',
@@ -76,7 +79,7 @@ export class CommentItem {
 
 		children.forEach((child) => {
 			new CommentItem(
-				this.$element.find(`[data-pc="comment-item-${child.id}"]`),
+				this.$element.find(`.pc-comment-item[data-comment_id="${child.id}"]`),
 				child,
 			)
 		})

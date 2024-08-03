@@ -71,7 +71,7 @@ $course_tabs = [
 		'content' => sprintf(
 		/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s"></div>',
 		$product->get_id(),
-		$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
+		'yes',// $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
 		'yes',
 		\get_current_user_id()
 		),

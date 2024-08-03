@@ -79,7 +79,7 @@ export class CommentApp {
 	bindPaginationEvents(pagination: TPaginationProps) {
 		const { current, totalPages, pageSize, total } = pagination
 		this.$element
-			.find('[data-pc="comment-pagination"]')
+			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__pages', (e) => {
 				const paged = Number($(e.currentTarget).data('page'))
 				this.queryParams = {
@@ -89,7 +89,7 @@ export class CommentApp {
 			})
 
 		this.$element
-			.find('[data-pc="comment-pagination"]')
+			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__prev', (e) => {
 				if (current === 1) {
 					return
@@ -102,7 +102,7 @@ export class CommentApp {
 			})
 
 		this.$element
-			.find('[data-pc="comment-pagination"]')
+			.find('.pc-comment-pagination')
 			.on('click', '.pc-pagination__next', (e) => {
 				if (current === totalPages) {
 					return
@@ -115,11 +115,21 @@ export class CommentApp {
 			})
 	}
 
+	// 綁定回覆事件
+	// bindReplyEvents() {
+	// 	this.$element.find('.pc-comment-list').on('click', '.pc-comment__reply', (e) => {
+	// 		const commentId = $(e.currentTarget).data('comment-id')
+	// 		this.commentForm.replyTo(commentId)
+	// 	})
+	// }
+
+	// 綁定隱藏事件
+
 	render() {
 		this.$element.html(/*html*/ `
-			<div data-pc="comment-form"></div>
-			<div data-pc="comment-list"></div>
-			<div data-pc="comment-pagination"></div>
+			<div class="pc-comment-form"></div>
+			<div class="pc-comment-list"></div>
+			<div class="pc-comment-pagination"></div>
 		`)
 	}
 
@@ -127,7 +137,7 @@ export class CommentApp {
 		if (this.showForm) {
 			// render comment form
 			this.commentForm = new CommentForm(
-				this.$element.find('[data-pc="comment-form"]'),
+				this.$element.find('.pc-comment-form'),
 				{
 					ratingProps: this.ratingProps,
 					instance: this,
@@ -136,7 +146,7 @@ export class CommentApp {
 		} else {
 			// 如果不能留言要顯示原因
 			const reason = this.$element.data('show_form')
-			this.$element.find('[data-pc="comment-form"]').html(reason)
+			this.$element.find('.pc-comment-form').html(reason)
 		}
 	}
 
@@ -157,7 +167,7 @@ export class CommentApp {
 		if (totalPages <= 1) {
 			return
 		}
-		new Pagination(this.$element.find('[data-pc="comment-pagination"]'), value)
+		new Pagination(this.$element.find('.pc-comment-pagination'), value)
 
 		this.bindPaginationEvents(value)
 	}
@@ -170,7 +180,7 @@ export class CommentApp {
 						<div class="h-[8.5rem] mt-2 rounded bg-gray-100 animate-pulse"></div>
 						<div class="h-[8.5rem] mt-2 rounded bg-gray-100 animate-pulse"></div>
 						`
-			this.$element.find('[data-pc="comment-list"]').html(loadingHtml)
+			this.$element.find('.pc-comment-list').html(loadingHtml)
 		}
 	}
 
@@ -179,7 +189,7 @@ export class CommentApp {
 		this._list = value
 
 		if (!value.length) {
-			this.$element.find('[data-pc="comment-list"]').html('目前沒有評價')
+			this.$element.find('.pc-comment-list').html('目前沒有評價')
 			return
 		}
 
@@ -187,13 +197,15 @@ export class CommentApp {
 		const nodes = value
 			.map(
 				({ id: comment_id }) =>
-					`<div data-pc="comment-item-${comment_id}"></div>`,
+					`<div data-comment_id="${comment_id}" class="pc-comment-item"></div>`,
 			)
 			.join('')
-		this.$element.find('[data-pc="comment-list"]').html(nodes)
+		this.$element.find('.pc-comment-list').html(nodes)
 		value.forEach((commentItem) => {
 			new CommentItem(
-				this.$element.find(`[data-pc="comment-item-${commentItem.id}"]`),
+				this.$element.find(
+					`.pc-comment-item[data-comment_id="${commentItem.id}"]`,
+				),
 				commentItem,
 			)
 		})
