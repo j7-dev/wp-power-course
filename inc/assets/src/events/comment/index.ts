@@ -44,6 +44,7 @@ export class CommentApp {
 	totalPages: number
 	isInit: boolean
 	commentItems: CommentItem[]
+	captchaModal: HTMLDialogElement | null
 
 	constructor(element: string, props: TCommentAppProps) {
 		this.$element = $(element)
@@ -60,6 +61,7 @@ export class CommentApp {
 		this.isInit = true
 		this.commentItems = []
 		this._isLoading = false
+		this.captchaModal = null
 		this.render()
 		this.createSubcomponents()
 		this.bindEvents()
@@ -148,7 +150,17 @@ export class CommentApp {
 			<div class="pc-comment-form"></div>
 			<div class="pc-comment-list"></div>
 			<div class="pc-comment-pagination"></div>
+			<dialog class="pc-comment__captcha-modal pc-modal">
+				<div class="pc-modal-box !w-[326px] !h-[260px]">
+					<div class="pc-comment__captcha-container relative"></div>
+				</div>
+				<form method="dialog" class="pc-modal-backdrop">
+					<button class="opacity-0">close</button>
+				</form>
+			</dialog>
 		`)
+
+		this.captchaModal = this.$element.find('.pc-comment__captcha-modal')[0]
 	}
 
 	createSubcomponents() {

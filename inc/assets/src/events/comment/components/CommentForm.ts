@@ -2,6 +2,7 @@ import $, { JQuery } from 'jquery'
 import { Rating, TRatingProps } from './Rating'
 import { site_url } from '../../../utils/'
 import { CommentApp } from '../index'
+import { SliderCaptcha } from './SliderCaptcha'
 
 export type TCommentFormProps = {
 	ratingProps: Partial<TRatingProps>
@@ -18,18 +19,49 @@ export class CommentForm {
 	}
 	post_id: string // 商品 ID
 	rating: Rating
+	sliderCaptcha: SliderCaptcha | null
 
 	constructor(element, props) {
 		this.$element = $(element)
 		this.props = props
 		this.post_id = props.appInstance.post_id
+		this.sliderCaptcha = null
 		this.render()
 		this.createSubcomponents()
 		this.bindEvents()
 	}
 
 	bindEvents() {
-		this.$element.on('click', '.pc-comment-form__submit', () => this.add())
+		this.$element.on('click', '.pc-comment-form__submit', (e) => {
+			e.stopPropagation()
+			e.preventDefault()
+
+			const user_id = this.props.appInstance.user_id
+			const is_user_logged_in = user_id !== 0
+
+			if (is_user_logged_in) {
+				this.add()
+				return
+			}
+
+			if (this.sliderCaptcha) {
+				this.sliderCaptcha.destroy()
+			}
+
+			const captchaModal = this.props.appInstance.captchaModal
+			if (captchaModal) {
+				captchaModal.showModal()
+				const captchaModalBox = captchaModal.querySelector(
+					'.pc-comment__captcha-container',
+				)
+				this.sliderCaptcha = new SliderCaptcha(captchaModalBox, {
+					onSuccess: () => {
+						captchaModal.close()
+						this.add()
+					},
+				})
+			}
+		})
 	}
 
 	validate_email(value) {

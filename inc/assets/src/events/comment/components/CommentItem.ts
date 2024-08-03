@@ -31,8 +31,10 @@ export class CommentItem {
 		this.$element = $(element)
 		this._props = props
 		this.appInstance = props.appInstance
-		this.render()
 		this._isLoading = false
+		this.render()
+		this.createSubcomponents()
+		this.bindHideEvents(this._props)
 	}
 
 	set isLoading(value: boolean) {
@@ -45,53 +47,50 @@ export class CommentItem {
 
 	// 綁定隱藏事件
 	bindHideEvents(props) {
-		this.$element
-			.find('.pc-comment-item__hide-button')
-			.first()
-			.on('click', (e) => {
-				e.stopPropagation()
-				const commentId = $(e.currentTarget)
-					.closest('.pc-comment-item')
-					.data('comment_id')
+		this.$element.on('click', '.pc-comment-item__hide-button:first', (e) => {
+			e.stopPropagation()
+			const commentId = $(e.currentTarget)
+				.closest('.pc-comment-item')
+				.data('comment_id')
 
-				const CommentItemContentNode = this.$element.find(
-					'.pc-comment-item__content',
-				)
+			const CommentItemContentNode = this.$element.find(
+				'.pc-comment-item__content',
+			)
 
-				const fromApproved = props.comment_approved
-				const toApproved = fromApproved === '1' ? '0' : '1'
+			const fromApproved = props.comment_approved
+			const toApproved = fromApproved === '1' ? '0' : '1'
 
-				$.ajax({
-					url: `${site_url}/wp-json/power-course/comments/${commentId}/toggle-approved`,
-					type: 'post',
-					data: null,
-					headers: {
-						'X-WP-Nonce': (window as any).pc_data?.nonce,
-					},
-					timeout: 30000,
-					success: (response, textStatus, jqXHR) => {
-						const { code, message } = response
+			$.ajax({
+				url: `${site_url}/wp-json/power-course/comments/${commentId}/toggle-approved`,
+				type: 'post',
+				data: null,
+				headers: {
+					'X-WP-Nonce': (window as any).pc_data?.nonce,
+				},
+				timeout: 30000,
+				success: (response, textStatus, jqXHR) => {
+					const { code, message } = response
 
-						if (200 === code) {
-							this.appInstance.getComments({}, false)
-						} else {
-							CommentItemContentNode.find('.pc-comment-item__reply-form')
-								.text(message)
-								.removeClass('text-green-500')
-								.addClass('text-red-500')
-						}
-					},
-					error: (error) => {
-						console.log('⭐  error:', error)
-						const message = error?.responseJSON?.message || '發生錯誤'
+					if (200 === code) {
+						this.appInstance.getComments({}, false)
+					} else {
 						CommentItemContentNode.find('.pc-comment-item__reply-form')
 							.text(message)
 							.removeClass('text-green-500')
 							.addClass('text-red-500')
-					},
-					complete: (xhr) => {},
-				})
+					}
+				},
+				error: (error) => {
+					console.log('⭐  error:', error)
+					const message = error?.responseJSON?.message || '發生錯誤'
+					CommentItemContentNode.find('.pc-comment-item__reply-form')
+						.text(message)
+						.removeClass('text-green-500')
+						.addClass('text-red-500')
+				},
+				complete: (xhr) => {},
 			})
+		})
 	}
 
 	render() {
@@ -136,8 +135,6 @@ export class CommentItem {
 				</div>
 			</div>
 		`)
-		this.createSubcomponents()
-		this.bindHideEvents(this._props)
 	}
 
 	createSubcomponents() {
