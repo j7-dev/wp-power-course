@@ -42,15 +42,17 @@ export class CommentItem {
 	set isLoading(value: boolean) {
 		this._isLoading = value
 
-		// this.$element
-		// 	.find(`.pc-comment-item[data-comment_id="${this._props.id}"]`)
-		// 	.toggleClass('animate-pulse', value)
+		this.appInstance.$element
+			.find(`.pc-comment-item[data-comment_id="${this._props.id}"]`)
+			.toggleClass('animate-pulse-2', value)
 	}
 
 	// 綁定隱藏事件
 	bindHideEvents(props) {
 		this.$element.on('click', '.pc-comment-item__hide-button:first', (e) => {
 			e.stopPropagation()
+			this.isLoading = true
+
 			const commentId = $(e.currentTarget)
 				.closest('.pc-comment-item')
 				.data('comment_id')
@@ -58,9 +60,6 @@ export class CommentItem {
 			const CommentItemContentNode = this.$element.find(
 				'.pc-comment-item__content',
 			)
-
-			const fromApproved = props.comment_approved
-			const toApproved = fromApproved === '1' ? '0' : '1'
 
 			$.ajax({
 				url: `${site_url}/wp-json/power-course/comments/${commentId}/toggle-approved`,
@@ -90,7 +89,9 @@ export class CommentItem {
 						.removeClass('text-green-500')
 						.addClass('text-red-500')
 				},
-				complete: (xhr) => {},
+				complete: (xhr) => {
+					this.isLoading = false
+				},
 			})
 		})
 	}
