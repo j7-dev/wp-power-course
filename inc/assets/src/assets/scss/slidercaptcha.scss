@@ -82,12 +82,18 @@ body {
 	top: -1px;
 	border: 1px solid #f57a7a;
 	background-color: #f57a7a !important;
+	path {
+		stroke: #fff;
+	}
 }
 
 .sliderContainer_fail .sliderMask {
 	border: 1px solid #f57a7a;
 	background-color: #fce1e1;
 	border-width: 1px 0 1px 1px;
+	path {
+		stroke: #fff;
+	}
 }
 
 .sliderContainer_fail .sliderIcon:before {

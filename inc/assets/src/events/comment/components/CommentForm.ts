@@ -44,16 +44,20 @@ export class CommentForm {
 				return
 			}
 
-			if (this.sliderCaptcha) {
-				this.sliderCaptcha.destroy()
+			const captchaModal = this.props.appInstance.captchaModal
+
+			const captchaModalBox = captchaModal?.querySelector(
+				'.pc-comment__captcha-container',
+			)
+
+			// 每次點擊清除舊的 captcha
+			if (captchaModalBox?.firstElementChild) {
+				captchaModalBox.innerHTML = ''
 			}
 
-			const captchaModal = this.props.appInstance.captchaModal
 			if (captchaModal) {
 				captchaModal.showModal()
-				const captchaModalBox = captchaModal.querySelector(
-					'.pc-comment__captcha-container',
-				)
+
 				this.sliderCaptcha = new SliderCaptcha(captchaModalBox, {
 					onSuccess: () => {
 						captchaModal.close()

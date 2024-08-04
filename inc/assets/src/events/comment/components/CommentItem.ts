@@ -10,11 +10,13 @@ export type TCommentItemProps = {
 		id: string
 		name: string
 		avatar_url: string
+		email: string
 	}
 	rating: number
 	comment_content: string
 	comment_date: string
 	comment_approved: '0' | '1' | 'spam'
+	comment_author_IP: string
 	can_reply: boolean
 	can_delete: boolean
 	children: TCommentItemProps[]
@@ -94,8 +96,15 @@ export class CommentItem {
 	}
 
 	render() {
-		const { user, comment_content, comment_date, children, depth, id } =
-			this._props
+		const {
+			user,
+			comment_content,
+			comment_date,
+			children,
+			depth,
+			id,
+			comment_author_IP,
+		} = this._props
 		const childrenHTML = children
 			.map(
 				({ id: childId }) =>
@@ -110,7 +119,7 @@ export class CommentItem {
 		const can_reply = !(comment_type === 'review' && user_role === 'user')
 
 		this.$element.html(/*html*/ `
-			<div class="p-6 mt-2 rounded ${bgColor} ${comment_approved ? '' : 'border-2 border-dashed border-gray-400'}">
+			<div class="relative p-6 mt-2 rounded ${bgColor} ${comment_approved ? '' : 'border-2 border-dashed border-gray-400'}">
 				<div class="flex gap-4">
 					<div class="w-10 h-10 rounded-full overflow-hidden relative">
 						<img src="${user.avatar_url}" loading="lazy" class="w-full h-full object-cover relative z-20">
@@ -118,10 +127,10 @@ export class CommentItem {
 					</div>
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">
-							<div class="">${user.name}</div>
+							<div class="pc-tooltip" data-tip="${user_role === 'admin' ? `email: ${user.email}` : ''}">${user.name}</div>
 							<div class="pc-comment-item__rating"></div>
 						</div>
-						<p class="text-gray-400 text-xs mb-4">${comment_date} ${user_role === 'admin' ? `#${id}` : ''} ${comment_approved ? '' : '留言已隱藏'}</p>
+						<p class="text-gray-400 text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
 						<div class="pc-comment-item__content text-sm [&_p]:mb-0">
 							${comment_content}
 							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
@@ -133,6 +142,7 @@ export class CommentItem {
 						${childrenHTML}
 					</div>
 				</div>
+				<span class="absolute top-2 right-2 text-xs text-gray-400">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
 			</div>
 		`)
 	}

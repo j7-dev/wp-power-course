@@ -326,19 +326,21 @@ final class Comment {
 			return [];
 		}
 
-		$comment_id       = $comment->comment_ID;
-		$user_id          = $comment->user_id;
-		$user_avatar_url  = \get_user_meta($user_id, 'user_avatar_url', true);
-		$user_avatar_url  = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
-		$user             = [
+		$comment_id        = $comment->comment_ID;
+		$user_id           = $comment->user_id;
+		$user_avatar_url   = \get_user_meta($user_id, 'user_avatar_url', true);
+		$user_avatar_url   = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
+		$user              = [
 			'id'         => (string) $user_id,
 			'name'       => \get_the_author_meta('display_name', $user_id) ?: '訪客',
 			'avatar_url' => $user_avatar_url,
+			'email'      => $comment->comment_author_email,
 		];
-		$rating           = \get_comment_meta($comment_id, 'rating', true);
-		$comment_approved = $comment->comment_approved; // '0', '1', 'spam'
-		$comment_content  = \wpautop($comment->comment_content);
-		$comment_date     = $comment->comment_date;
+		$rating            = \get_comment_meta($comment_id, 'rating', true);
+		$comment_approved  = $comment->comment_approved; // '0', '1', 'spam'
+		$comment_author_IP = $comment->comment_author_IP; //phpcs:ignore
+		$comment_content   = \wpautop($comment->comment_content);
+		$comment_date      = $comment->comment_date;
 		/**
 		 * @var \WP_Comment[] $children
 		 */
@@ -349,16 +351,17 @@ final class Comment {
 		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1, $args), array_values($children)) : [];
 
 		$base_array = [
-			'id'               => (string) $comment_id,
-			'depth'            => (int) $depth,
-			'user'             => $user,
-			'rating'           => (int) $rating,
-			'comment_content'  => $comment_content,
-			'comment_date'     => $comment_date,
-			'comment_approved' => $comment_approved,
-			'can_reply'        => true,
-			'can_delete'       => \current_user_can( 'edit_comment', $comment_id ),
-			'children'         => $children_array,
+			'id'                => (string) $comment_id,
+			'depth'             => (int) $depth,
+			'user'              => $user,
+			'rating'            => (int) $rating,
+			'comment_content'   => $comment_content,
+			'comment_date'      => $comment_date,
+			'comment_approved'  => $comment_approved,
+			'comment_author_IP' => $comment_author_IP, //phpcs:ignore
+			'can_reply'         => true,
+			'can_delete'        => \current_user_can( 'edit_comment', $comment_id ),
+			'children'          => $children_array,
 		];
 
 		return $base_array;

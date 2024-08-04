@@ -400,7 +400,3 @@ _proto.reset = function () {
 	this.text.textContent = this.options.loadingText
 	this.img.setSrc()
 }
-
-_proto.destroy = function () {
-	this.$element.innerHTML = ''
-}
