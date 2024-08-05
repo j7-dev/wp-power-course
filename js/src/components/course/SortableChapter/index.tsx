@@ -8,6 +8,7 @@ import { message } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { isEqual as _isEqual } from 'lodash-es'
 
 export const SortableChapter: FC<{
 	record: TCourseRecord | TChapterRecord
@@ -77,8 +78,22 @@ export const SortableChapter: FC<{
 					hideAdd
 					treeData={treeData}
 					onTreeDataChange={(data: TreeData<TChapterRecord>) => {
+						const treeDataWithoutCollapsed = data.map((item) => ({
+							...item,
+							collapsed: false,
+						}))
+						const dataWithoutCollapse = data.map((item) => ({
+							...item,
+							collapsed: false,
+						}))
+						const isEqual = _isEqual(
+							treeDataWithoutCollapsed,
+							dataWithoutCollapse,
+						)
 						setTreeData(data)
-						handleSave(data)
+						if (!isEqual) {
+							handleSave(data)
+						}
 					}}
 					renderContent={(node) => {
 						const theRecord = node.content
