@@ -3,7 +3,9 @@
  * Collapse component for chapter.
  */
 
+use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -34,6 +36,8 @@ $args2 = [
 
 $chapters = \get_children( $args2 );
 
+$is_avl = CourseUtils::is_avl( $product );
+
 foreach ( $chapters as $chapter_id => $chapter ) :
 	$args3 = [
 		'posts_per_page' => - 1,
@@ -47,14 +51,28 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	$sub_chapters  = \get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
+		$classroom_link      = \site_url("classroom/{$product->get_slug()}/{$sub_chapter->ID}");
+		$classroom_link_html = sprintf(
+		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-primary">%2$s %3$s</a>',
+		$classroom_link,
+		$sub_chapter->post_title,
+		Templates::get(
+			'icon/external-link',
+			[
+				'class' => 'w-4 h-4 relative top-0.5 ml-2',
+			],
+			false
+			),
+		);
+
 		$children_html .= sprintf(
-			'
-                    <div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex pl-8 pr-4">
-                        <div class="w-8 flex justify-center items-start">•</div>
-                        <div class="flex-1">%1$s</div>
-                    </div>
-                    ',
-			$sub_chapter->post_title,
+			/*html*/'
+			<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex pl-8 pr-4">
+					<div class="w-8 flex justify-center items-start">•</div>
+					<div class="flex-1">%1$s</div>
+			</div>
+			',
+			$is_avl ? $classroom_link_html : $sub_chapter->post_title,
 		);
 	endforeach;
 

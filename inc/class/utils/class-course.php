@@ -424,10 +424,19 @@ abstract class Course {
 	 * @return bool Returns true if the course is available, false otherwise.
 	 */
 	public static function is_avl( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
-		global $product;
-		$the_product    = $the_product ?? $product;
+		$user_id = $user_id ?? \get_current_user_id();
+		if ( ! $user_id ) {
+			return false;
+		}
+		if ( ! $the_product ) {
+			global $product;
+			$the_product = $product;
+		}
+
+		if ( ! $the_product ) {
+			return false;
+		}
 		$the_product_id = (string) $the_product->get_id();
-		$user_id        = $user_id ?? \get_current_user_id();
 		$avl_course_ids = self::get_avl_courses_by_user($user_id, return_ids: true);
 		return in_array($the_product_id, $avl_course_ids, true);
 	}

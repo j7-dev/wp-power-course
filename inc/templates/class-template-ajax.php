@@ -10,6 +10,9 @@ namespace J7\PowerCourse\Templates;
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Utils\Course as CourseUtils;
+
+
 
 
 /**
@@ -56,12 +59,15 @@ final class TemplateAjax {
 			]
 		);
 
+		$is_avl = CourseUtils::is_avl();
+
 		\wp_localize_script(
 			Plugin::$kebab . '-template',
 			'pc_data',
 			[
 				'ajax_url' => \admin_url('admin-ajax.php'),
 				'nonce'    => \wp_create_nonce( 'wp_rest' ),
+				'is_avl'   => $is_avl,
 			]
 			);
 

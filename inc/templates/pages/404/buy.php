@@ -24,7 +24,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $message = sprintf(
-	'您好像還沒購買此課程，<a target="_blank" href="%1$s" class="font-semibold underline hover:no-underline">前往購買</a>',
+	'您還沒購買此課程，無法上課，<a target="_blank" href="%1$s" class="text-primary font-semibold underline hover:opacity-70">前往購買</a>',
 	site_url( 'courses' ) . '/' . $product->get_slug()
 );
 
