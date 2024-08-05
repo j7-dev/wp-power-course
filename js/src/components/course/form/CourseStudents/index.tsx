@@ -12,7 +12,7 @@ export const CourseStudents = () => {
 						message="注意事項"
 						description={
 							<ol className="pl-4">
-								<li>請搜尋關鍵字尋找用戶 (每次顯示20筆結果) </li>
+								<li>請搜尋關鍵字尋找用戶 (每次最多顯示 30 筆結果) </li>
 								<li>此處的變更立即生效，不需要點按儲存</li>
 								<li>搜尋不到想找的用戶? 有可能他已經在學員列表內了!</li>
 							</ol>

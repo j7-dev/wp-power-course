@@ -27,9 +27,9 @@ const index = () => {
 				value: '',
 			},
 			{
-				field: 'number',
+				field: 'posts_per_page',
 				operator: 'eq',
-				value: '20',
+				value: '30',
 			},
 			{
 				field: 'meta_key',
@@ -39,7 +39,7 @@ const index = () => {
 			{
 				field: 'meta_value',
 				operator: 'ne',
-				value: '2030',
+				value: watchId,
 			},
 		],
 		onSearch: (value) => {
