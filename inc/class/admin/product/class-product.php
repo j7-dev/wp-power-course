@@ -30,6 +30,8 @@ final class Product {
 		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
 		\add_filter('get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
 		\add_filter('woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
+
+		\add_action('wp', [ __CLASS__, 'redirect_to_course_page' ], 1);
 	}
 
 
@@ -182,6 +184,39 @@ final class Product {
 		}
 
 		return $class;
+	}
+
+	/**
+	 * 如果是課程商品，就導向課程銷售頁面
+	 */
+	public static function redirect_to_course_page(): void {
+
+		if (!is_product()) {
+			return;
+		}
+
+		$override = \get_option('override_course_product_permalink', 'yes') === 'yes';
+
+		if (!$override) {
+			return;
+		}
+
+		global $wp_query;
+		/**
+		 * @var \WP_Post $product_post
+		 */
+		$product_post = $wp_query->get_queried_object();
+
+		$is_course_product = CourseUtils::is_course_product($product_post->ID);
+
+		if (!$is_course_product) {
+			return;
+		}
+
+		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+
+		\wp_safe_redirect( site_url( "{$course_permalink_structure}/{$product_post->post_name}" ) );
+		exit;
 	}
 }
 
