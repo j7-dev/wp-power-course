@@ -38,7 +38,7 @@ printf(
 			<span class="text-base tracking-wide font-bold">課程單元</span>
 			<span class="text-sm text-gray-400">%2$s 個單元%3$s</span>
 		</div>
-		<div class="overflow-y-auto calc-sider-h">
+		<div class="pc-sider-chapters overflow-y-auto">
 			%4$s
 		</div>
 ',

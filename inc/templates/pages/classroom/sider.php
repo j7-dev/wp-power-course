@@ -31,19 +31,19 @@ printf(
 	/*html*/'
 <div id="pc-classroom-sider" class="tw-hidden lg:block w-[25rem] bg-white z-20 left-0 h-screen expended"
 	style="border-right: 1px solid #eee;position:fixed;left:0px">
-	<div id="pc-classroom-sider__main">
+	<div id="pc-classroom-sider__main" class="h-full flex flex-col [&_.pc-sider-chapters]:flex-1 [&_.pc-sider-chapters]:pb-12">
 		%1$s
-		<a
-			href="%2$s"
-			class="hover:opacity-75 transition duration-300"
-		>
-			<div class="flex gap-4 items-center py-4 pl-9 absolute bottom-0 w-full">
+		<div class="py-4 pl-9 absolute bottom-0 w-full bg-white">
+			<a
+				href="%2$s"
+				class="hover:opacity-75 transition duration-300 flex gap-4 items-center"
+			>
 				<img class="w-6 h-6" src="%3$s" />
 				<span class="text-gray-600 font-light">
 						回《我的學習》
 				</span>
-			</div>
-		</a>
+			</a>
+		</div>
 	</div>
 </div>
 ',
