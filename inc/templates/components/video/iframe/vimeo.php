@@ -58,11 +58,11 @@ $iframe_url = add_query_arg(
 	$base_url
 );
 
-echo '<div class="relative" style="padding-top:56.25%;">';
+echo '<div class="relative [&>*]:absolute [&>*]:top-0 [&>*]:left-0 [&>*]:w-full [&>*]:h-full" style="padding-top:56.25%;">';
 printf(
 	/*html*/'
-	<iframe class="z-20 border-0 absolute top-0 left-0 w-full h-full %2$s" src="%1$s" loading="lazy" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center absolute top-0 left-0 w-full  %2$s">LOADING...</div>
+	<iframe class="z-20 border-0 %2$s" src="%1$s" loading="lazy" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %2$s">LOADING...</div>
 			',
 	$iframe_url,
 	$class

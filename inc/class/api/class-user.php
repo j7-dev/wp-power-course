@@ -168,8 +168,8 @@ final class User {
 			'offset'         => 0,
 			'paged'          => 1,
 			'count_total'    => true,
-		'meta_key'       => 'avl_course_ids', // phpcs:ignore
-		'meta_value'     => '', // phpcs:ignore
+			'meta_key'       => 'avl_course_ids', // phpcs:ignore
+			'meta_value'     => '', // phpcs:ignore
 		];
 
 		$args = \wp_parse_args(

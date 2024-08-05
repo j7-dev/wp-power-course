@@ -5,6 +5,7 @@
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\User as UserUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -47,8 +48,8 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 		$count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 
 
-		$total_sales  = ( $product->get_total_sales() ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-		$limit_labels = CourseUtils::get_limit_label_by_product( $product );
+		$total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+		$limit_labels  = CourseUtils::get_limit_label_by_product( $product );
 
 		Templates::get(
 			'course-product/info',
@@ -76,7 +77,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 				[
 					'icon'  => 'team',
 					'label' => '課程學員',
-					'value' => "{$total_sales} 人",
+					'value' => "{$total_student} 人",
 				],
 			],
 		);

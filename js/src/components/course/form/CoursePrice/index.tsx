@@ -48,13 +48,17 @@ export const CoursePrice = () => {
 			<Item
 				name={['sale_price']}
 				label="折扣價"
-				rules={[
-					{
-						type: 'number',
-						max: watchRegularPrice - 1,
-						message: '折扣價不能超過原價',
-					},
-				]}
+				rules={
+					watchIsFree
+						? []
+						: [
+								{
+									type: 'number',
+									max: watchRegularPrice - 1,
+									message: '折扣價不能超過原價',
+								},
+							]
+				}
 			>
 				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
 			</Item>

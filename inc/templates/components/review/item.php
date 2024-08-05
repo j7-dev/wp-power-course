@@ -26,7 +26,8 @@ if ( ! $product_comment instanceof WP_Comment ) {
 $comment_id      = $product_comment->comment_ID;
 $rating          = \get_comment_meta( $comment_id, 'rating', true );
 $user_id         = $product_comment->user_id;
-$user_name       = \get_user_by( 'ID', $user_id )?->display_name;
+$user            = \get_user_by( 'ID', $user_id );
+$user_name       = $user ? $user->display_name : '訪客';
 $user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
 $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 $comment_date    = \get_comment_date( 'Y-m-d h:i:s', $comment_id );
