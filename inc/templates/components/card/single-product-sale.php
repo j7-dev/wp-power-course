@@ -64,7 +64,7 @@ Templates::get(
 	[
 		'type'     => 'primary',
 		'children' => '立即購買',
-		'class'    => 'text-white flex-1',
+		'class'    => 'pc-add-to-cart-link text-white flex-1',
 		'href'     => $url,
 	],
 	false

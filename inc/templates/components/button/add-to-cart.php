@@ -55,7 +55,7 @@ $button_html = Templates::get(
 );
 
 printf(
-/*html*/'<div class="%1$s">%2$s</div>',
+/*html*/'<div class="pc-add-to-cart %1$s">%2$s</div>',
 $wrapper_class,
 $button_html
 );

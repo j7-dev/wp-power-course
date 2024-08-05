@@ -58,18 +58,25 @@ div .pc-rating input[checked] ~ input {
 			}
 		}
 	}
-}
 
-.ajax_add_to_cart.loading {
-	svg {
-		// AJAX 加入購物車時，loading 時原本圖示不顯示
-		display: none !important;
+	.ajax_add_to_cart.loading {
+		svg {
+			// AJAX 加入購物車時，loading 時原本圖示不顯示
+			display: none !important;
+		}
+
+		&:hover {
+			// hover 時 loading 顯示為白色
+			&:after {
+				color: #fff;
+			}
+		}
 	}
-
-	&:hover {
-		// hover 時 loading 顯示為白色
-		&:after {
-			color: #fff;
+	.add_to_cart_button {
+		&.added {
+			svg path {
+				fill: $primary;
+			}
 		}
 	}
 }

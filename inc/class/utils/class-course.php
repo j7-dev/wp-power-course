@@ -433,7 +433,7 @@ abstract class Course {
 			$the_product = $product;
 		}
 
-		if ( ! $the_product ) {
+		if ( ! ( $the_product instanceof \WC_Product ) ) {
 			return false;
 		}
 		$the_product_id = (string) $the_product->get_id();
