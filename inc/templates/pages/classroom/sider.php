@@ -5,6 +5,7 @@
 
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\FrontEnd\MyAccount;
 
 
 $default_args = [
@@ -53,6 +54,6 @@ printf(
 		],
 		false
 		),
-	\wc_get_account_endpoint_url( 'courses' ),
+	\wc_get_account_endpoint_url( MyAccount::COURSES_ENDPOINT ),
 	Plugin::$url . '/inc/assets/src/assets/svg/learn.svg',
 );

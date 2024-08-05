@@ -28,3 +28,6 @@ export const bunny_library_id =
 	window?.[APP_DOMAIN]?.env?.bunny_library_id || ''
 export const bunny_stream_api_key =
 	window?.[APP_DOMAIN]?.env?.bunny_stream_api_key || ''
+
+export const course_permalink_structure =
+	window?.[APP_DOMAIN]?.env?.course_permalink_structure || 'courses'

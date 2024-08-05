@@ -41,12 +41,13 @@ final class Option {
 	/**
 	 * Fields
 	 *
-	 * @var array<string, string> $fields 允許獲取的選項
+	 * @var array<string, string> $fields 允許獲取 & 儲存的選項
 	 */
 	private $fields = [
 		'bunny_library_id'                  => '',
 		'bunny_stream_api_key'              => '',
 		'override_course_product_permalink' => 'yes',
+		'course_permalink_structure'        => 'courses',
 	];
 
 	/**

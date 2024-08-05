@@ -136,9 +136,10 @@ final class Templates {
 	 */
 	public function add_rewrite_rules(): void {
 		// get registered rewrite rules.
-		$rules = get_option( 'rewrite_rules', [] );
+		$rules                      = get_option( 'rewrite_rules', [] );
+		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
 		// 課程頁面
-		$course_regex = '^courses/?([^/]*)/?';
+		$course_regex = '^' . $course_permalink_structure . '/?([^/]*)/?';
 		\add_rewrite_rule( $course_regex, 'index.php?' . self::COURSE_SLUG . '=$matches[1]', 'top' );
 
 		// 上課頁面
@@ -310,8 +311,9 @@ final class Templates {
 		$product           = \wc_get_product($product_id);
 		$is_course_product = CourseUtils::is_course_product($product);
 		if ($is_course_product) {
-			$post_slug = \get_post_field('post_name', $product_id);
-			$location  = \site_url( 'courses' ) . "/{$post_slug}";
+			$post_slug                  = \get_post_field('post_name', $product_id);
+			$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+			$location                   = \site_url( "{$course_permalink_structure}/{$post_slug}" );
 		}
 
 		return $location;

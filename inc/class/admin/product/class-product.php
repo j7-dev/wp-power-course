@@ -86,7 +86,8 @@ final class Product {
 		$is_course_product = CourseUtils::is_course_product( $post->ID );
 		$override          = \get_option('override_course_product_permalink', 'yes') === 'yes';
 		if ( $is_course_product && $override ) {
-			$permalink = str_replace('product/', 'courses/', $permalink);
+			$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+			$permalink                  = str_replace('product/', "{$course_permalink_structure}/", $permalink);
 		}
 		return $permalink;
 	}

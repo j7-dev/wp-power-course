@@ -5,7 +5,7 @@ import {
 	termFormatter,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
-import { siteUrl } from '@/utils'
+import { siteUrl, course_permalink_structure } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
 import { FiSwitch, VideoInput, DatePicker } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
@@ -20,7 +20,7 @@ export const CourseDescription = () => {
 	const form = Form.useFormInstance()
 	const { options, isLoading } = useOptions()
 	const { product_cats = [], product_tags = [] } = options
-	const productUrl = `${siteUrl}/courses/`
+	const productUrl = `${siteUrl}/${course_permalink_structure}/`
 	const slug = Form.useWatch(['slug'], form)
 	const bunnyUploadProps = useUpload()
 	const { fileList } = bunnyUploadProps

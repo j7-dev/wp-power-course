@@ -39,10 +39,21 @@ const index = () => {
 							name: ['override_course_product_permalink'],
 							label: '改寫課程商品的永久連結',
 							tooltip:
-								'開啟後，課程商品的 product/{slug} 連結將會被覆寫為 courses/{slug}',
+								'開啟後，課程商品的 product/{slug} 連結將會被覆寫為 courses/{slug} (預設的 course permalink structure)',
 							initialValue: 'yes',
 						}}
+						switchProps={{
+							disabled: isGetLoading || isSaveLoading,
+						}}
 					/>
+
+					<Item
+						name={['course_permalink_structure']}
+						label="修改課程商品的永久連結結構"
+						tooltip="請先確保網址結構沒有與其他外掛、主題衝突"
+					>
+						<Input disabled={isGetLoading || isSaveLoading} allowClear />
+					</Item>
 
 					<Button
 						type="primary"

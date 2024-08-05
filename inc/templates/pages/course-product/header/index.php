@@ -93,12 +93,13 @@ if ( ! is_array( $teacher_ids ) ) {
 			);
 		}
 
+		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
 		if ( $show_link ) {
 			echo '<div class="mt-6">';
 			Templates::get(
 				'button',
 				[
-					'href'     => site_url( 'courses' ) . '/' . $product->get_slug(),
+					'href'     => site_url( "{$course_permalink_structure}/{$product->get_slug()}" ),
 					'children' => '查看課程',
 					'class'    => 'w-full text-white',
 					'type'     => 'primary',

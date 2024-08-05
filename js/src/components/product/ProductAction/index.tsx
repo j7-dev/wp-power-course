@@ -9,7 +9,7 @@ import { DeleteButton } from '@refinedev/antd'
 import { useInvalidate } from '@refinedev/core'
 import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
-import { siteUrl } from '@/utils'
+import { siteUrl, course_permalink_structure } from '@/utils'
 
 export const ProductAction: FC<{
 	record: TCourseRecord | TChapterRecord
@@ -22,7 +22,7 @@ export const ProductAction: FC<{
 		<div className="flex gap-2">
 			<Tooltip title="開啟課程網址">
 				<a
-					href={`${siteUrl}/courses/${record?.slug}`}
+					href={`${siteUrl}/${course_permalink_structure}/${record?.slug}`}
 					className="text-gray-400"
 					target="_blank"
 					rel="noreferrer"
