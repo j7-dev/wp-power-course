@@ -11,6 +11,9 @@ module.exports = {
 		'./inc/assets/src/**/*.ts',
 	],
 	theme: {
+		animation: {
+			pulse: 'tw-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+		},
 		extend: {
 			screens: {
 				sm: '576px', // iphone SE
@@ -18,6 +21,11 @@ module.exports = {
 				lg: '1080px', // ipad Landscape
 				xl: '1280px', // mac air
 				xxl: '1440px',
+			},
+			keyframes: {
+				'tw-pulse': {
+					'50%': { opacity: '0.5' },
+				},
 			},
 		},
 	},

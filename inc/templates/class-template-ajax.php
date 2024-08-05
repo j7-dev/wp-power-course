@@ -32,7 +32,7 @@ final class TemplateAjax {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ] );
+		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ], 2000 );
 		\add_action( 'admin_enqueue_scripts', [ __CLASS__, 'admin_enqueue_scripts' ] );
 
 		$actions = $this->actions;
