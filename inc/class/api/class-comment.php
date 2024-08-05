@@ -88,7 +88,7 @@ final class Comment {
 			'number'       => 10,
 			'paged'        => 1,
 			'post_id'      => 0,
-			'post_type'    => 'product',
+			// 'post_type'    => 'product',
 			'type'         => 'review',
 			'user_id'      => '',
 			'hierarchical' => 'threaded',

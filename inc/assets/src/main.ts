@@ -30,10 +30,8 @@ import {
 
 	new CommentApp('#review-app', {
 		queryParams: {
-			post_type: 'product',
 			type: 'review',
 		},
-		navElement: '#tab-nav-review',
 		ratingProps: {
 			name: 'course-review',
 		},
@@ -41,10 +39,8 @@ import {
 
 	new CommentApp('#comment-app', {
 		queryParams: {
-			post_type: 'product',
 			type: 'comment',
 		},
-		navElement: '#tab-nav-comment',
 	})
 
 	// 加入購物車樣式調整

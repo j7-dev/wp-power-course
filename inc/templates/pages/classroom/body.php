@@ -38,33 +38,45 @@ $course_tabs = [
 		'label'   => '章節',
 		'content' => Templates::get( 'classroom/chapters', null, false ),
 	],
+	'discuss' => [
+		'label'   => '討論',
+		'content' => sprintf(
+			/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
+			$chapter_id,
+			'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
+			'yes',
+			\get_current_user_id(),
+			\current_user_can('manage_options') ? 'admin' : 'user',
+			),
+	],
+
 
 	/*
 	[
-		'key'     => '1',
-		'label'   => '討論',
-		'content' => '🚧 施工中... 🚧',
+	'key'     => '1',
+	'label'   => '討論',
+	'content' => '🚧 施工中... 🚧',
 	],
 	[
-		'key'     => '2',
-		'label'   => '教材',
-		'content' => '🚧 施工中... 🚧',
+	'key'     => '2',
+	'label'   => '教材',
+	'content' => '🚧 施工中... 🚧',
 	],
 	[
-		'key'     => '3',
-		'label'   => '公告',
-		'content' => '🚧 施工中... 🚧',
+	'key'     => '3',
+	'label'   => '公告',
+	'content' => '🚧 施工中... 🚧',
 	],
 	[
-		'key'     => '4',
-		'label'   => '評價',
-		'content' => '🚧 施工中... 🚧',
+	'key'     => '4',
+	'label'   => '評價',
+	'content' => '🚧 施工中... 🚧',
 	],
 	*/
 
 ];
 
-echo '<div class="w-full bg-white pt-[3.25rem] lg:pt-16">';
+echo '<div id="pc-classroom-body" class="w-full bg-white pt-[3.25rem] lg:pt-16">';
 
 Templates::get( 'classroom/header' );
 
@@ -85,7 +97,7 @@ Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'chapter',
+		'default_active_key' => 'discuss',
 	]
 	);
 
@@ -99,7 +111,7 @@ Templates::get(
 'tabs/content',
 [
 	'course_tabs'        => $course_tabs,
-	'default_active_key' => '0',
+	'default_active_key' => 'discuss',
 ]
 );
 

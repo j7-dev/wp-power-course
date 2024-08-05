@@ -23,7 +23,6 @@ export class CommentApp {
 	props?: TCommentAppProps
 	_queryParams: { [key: string]: any } | undefined
 	_pagination: TPaginationProps | undefined
-	navElement: string
 	ratingProps:
 		| {
 				name: string
@@ -50,7 +49,6 @@ export class CommentApp {
 		this.$element = $(element)
 		this.props = props
 		this._queryParams = props?.queryParams
-		this.navElement = props?.navElement
 		this.ratingProps = props?.ratingProps
 		this.showForm = this.$element.data('show_form') === 'yes'
 		this.showList = this.$element.data('show_list') === 'yes'
@@ -70,12 +68,9 @@ export class CommentApp {
 	bindEvents() {
 		// 初始化
 		if (this.showList) {
-			$(this.navElement).on('click', (e) => {
-				e.stopPropagation()
-				if (this.isInit) {
-					this.getComments()
-				}
-			})
+			if (this.isInit) {
+				this.getComments()
+			}
 		}
 	}
 

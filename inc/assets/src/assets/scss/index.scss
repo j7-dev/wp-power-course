@@ -79,6 +79,14 @@ div .pc-rating input[checked] ~ input {
 			}
 		}
 	}
+
+	// classroom
+	#pc-classroom-body {
+		#tab-nav-chapter,
+		#tab-content-chapter {
+			@apply lg:hidden;
+		}
+	}
 }
 
 // 不知道為什麼背景有填色
@@ -126,9 +134,7 @@ div .pc-rating input[checked] ~ input {
 
 // My Account 我的學習 icon
 
-.woocommerce-MyAccount-navigation
-	ul
-	li.woocommerce-MyAccount-navigation-link--courses {
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
 	a {
 		&::before {
 			content: "";
@@ -161,7 +167,7 @@ div .pc-rating input[checked] ~ input {
 
 // course product tab
 // Notion 編輯器 HTML 內容
-div#tab-content-1 {
+div#tab-content-description {
 	img:not([class]) {
 		max-width: 100%;
 		width: 100%;
