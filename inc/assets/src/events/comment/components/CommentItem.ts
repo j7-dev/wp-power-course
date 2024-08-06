@@ -15,7 +15,7 @@ export type TCommentItemProps = {
 	rating: number
 	comment_content: string
 	comment_date: string
-	comment_approved: '0' | '1' | 'spam'
+	comment_approved: '0' | '1' | 'spam' | 'trash'
 	comment_author_IP: string
 	can_reply: boolean
 	can_delete: boolean
@@ -35,8 +35,6 @@ export class CommentItem {
 		this.appInstance = props.appInstance
 		this._isLoading = false
 		this.render()
-		this.createSubcomponents()
-		this.bindHideEvents(this._props)
 	}
 
 	set isLoading(value: boolean) {
@@ -48,14 +46,15 @@ export class CommentItem {
 	}
 
 	// 綁定隱藏事件
-	bindHideEvents(props) {
+	bindHideEvents() {
 		this.$element.on('click', '.pc-comment-item__hide-button:first', (e) => {
 			e.stopPropagation()
 			this.isLoading = true
 
-			const commentId = $(e.currentTarget)
-				.closest('.pc-comment-item')
-				.data('comment_id')
+			// const commentId = $(e.currentTarget)
+			// 	.closest('.pc-comment-item')
+			// 	.data('comment_id')
+			const commentId = this._props.id
 
 			const CommentItemContentNode = this.$element.find(
 				'.pc-comment-item__content',
@@ -64,6 +63,56 @@ export class CommentItem {
 			$.ajax({
 				url: `${site_url}/wp-json/power-course/comments/${commentId}/toggle-approved`,
 				type: 'post',
+				data: null,
+				headers: {
+					'X-WP-Nonce': (window as any).pc_data?.nonce,
+				},
+				timeout: 30000,
+				success: (response, textStatus, jqXHR) => {
+					const { code, message } = response
+
+					if (200 === code) {
+						this.appInstance.getComments({}, false)
+					} else {
+						CommentItemContentNode.find('.pc-comment-item__reply-form')
+							.text(message)
+							.removeClass('text-green-500')
+							.addClass('text-red-500')
+					}
+				},
+				error: (error) => {
+					console.log('⭐  error:', error)
+					const message = error?.responseJSON?.message || '發生錯誤'
+					CommentItemContentNode.find('.pc-comment-item__reply-form')
+						.text(message)
+						.removeClass('text-green-500')
+						.addClass('text-red-500')
+				},
+				complete: (xhr) => {
+					this.isLoading = false
+				},
+			})
+		})
+	}
+
+	// 綁定移動到垃圾桶事件
+	bindTrashEvents() {
+		this.$element.on('click', '.pc-comment-item__trash-button:first', (e) => {
+			e.stopPropagation()
+			this.isLoading = true
+
+			// const commentId = $(e.currentTarget)
+			// 	.closest('.pc-comment-item')
+			// 	.data('comment_id')
+			const commentId = this._props.id
+
+			const CommentItemContentNode = this.$element.find(
+				'.pc-comment-item__content',
+			)
+
+			$.ajax({
+				url: `${site_url}/wp-json/power-course/comments/${commentId}`,
+				type: 'DELETE',
 				data: null,
 				headers: {
 					'X-WP-Nonce': (window as any).pc_data?.nonce,
@@ -115,12 +164,13 @@ export class CommentItem {
 		const bgColor = depth % 2 === 0 ? 'bg-gray-100' : 'bg-gray-50'
 
 		const comment_approved = this._props.comment_approved === '1'
+		const is_trash = this._props.comment_approved === 'trash'
 		const user_role = this.appInstance.user_role
 		const comment_type = this.appInstance.comment_type
 		const can_reply = !(comment_type === 'review' && user_role === 'user')
 
 		this.$element.html(/*html*/ `
-			<div class="relative p-6 mt-2 rounded ${bgColor} ${comment_approved ? '' : 'border-2 border-dashed border-gray-400'}">
+			<div class="relative p-6 mt-2 rounded ${bgColor} ${this._props.comment_approved === '0' ? 'border-2 border-dashed border-gray-400' : ''} ${is_trash ? 'border-2 border-dashed border-red-400' : ''}">
 				<div class="flex gap-4">
 					<div class="w-10 h-10 rounded-full overflow-hidden relative">
 						<img src="${user.avatar_url}" loading="lazy" class="w-full h-full object-cover relative z-20">
@@ -137,6 +187,7 @@ export class CommentItem {
 							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
 								${can_reply ? '<span class="pc-comment-item__reply-button">回覆</span>' : ''}
 								${user_role === 'admin' ? `<span class="pc-comment-item__hide-button">${comment_approved ? '隱藏' : '顯示'}</span>` : ''}
+								${user_role === 'admin' && !is_trash ? '<span class="pc-comment-item__trash-button text-red-500">移動到垃圾桶</span>' : ''}
 							</div>
 							<div class="pc-comment-item__reply-form"></div>
 						</div>
@@ -146,6 +197,10 @@ export class CommentItem {
 				<span class="absolute top-2 right-2 text-xs text-gray-400">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
 			</div>
 		`)
+
+		this.createSubcomponents()
+		this.bindHideEvents()
+		this.bindTrashEvents()
 	}
 
 	createSubcomponents() {

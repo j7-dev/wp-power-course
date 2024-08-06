@@ -49,6 +49,11 @@ final class Comment {
 				'method'              => 'post',
 				'permission_callback' => fn() => \current_user_can( 'manage_options' ),
 			],
+			[
+				'endpoint'            => 'comments/(?P<id>\d+)',
+				'method'              => 'delete',
+				'permission_callback' => fn() => \current_user_can( 'manage_options' ),
+			],
 		];
 	}
 
@@ -248,7 +253,7 @@ final class Comment {
 			);
 		}
 
-		$comment_approved = $comment->comment_approved; // '0', '1', 'spam'
+		$comment_approved = $comment->comment_approved; // '0', '1', 'spam', 'trash'
 
 		if (!\is_numeric($comment_approved)) {
 			return new \WP_REST_Response(
@@ -312,6 +317,95 @@ final class Comment {
 	}
 
 	/**
+	 * 刪除留言
+	 *
+	 * @param \WP_REST_Request $request 包含新增留言所需資料的REST請求對象。
+	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_comments_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
+
+		$id = $request['id'];
+
+		if (!\is_numeric($id)) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => '留言 ID 錯誤',
+				'data'    => null,
+			],
+			400
+			);
+		}
+
+		$comment = \get_comment($id);
+
+		if (!$comment) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => '留言不存在',
+				'data'    => null,
+			],
+			400
+			);
+		}
+
+		$comment_approved = $comment->comment_approved; // '0', '1', 'spam', 'trash'
+
+		if ('trash' === $comment_approved) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 400,
+					'message' => '留言已經在垃圾桶中',
+					'data'    => [
+						'id' => (string) $id,
+					],
+				],
+				400
+				);
+		}
+
+		// 取得所有 Children id
+		$children_ids = self::get_all_children_ids($id);
+
+		$all_comment_ids = [ $id, ...$children_ids ];
+
+		foreach ($all_comment_ids as $comment_id) {
+			$result = \wp_update_comment(
+				[
+					'comment_ID'       => $comment_id,
+					'comment_approved' => 'trash',
+				],
+				true
+			);
+
+			if (\is_wp_error($result)) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 400,
+						'message' => $result->get_error_message(),
+						'data'    => [
+							'id' => (string) $comment_id,
+						],
+					],
+					400
+					);
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 200,
+				'message' =>'已刪除留言',
+				'data'    => [
+					'ids' => $all_comment_ids,
+				],
+			],
+			200
+			);
+	}
+	/**
 	 * Format comment details
 	 *
 	 * @param \WP_Comment $comment  Comment.
@@ -337,7 +431,7 @@ final class Comment {
 			'email'      => $comment->comment_author_email,
 		];
 		$rating            = \get_comment_meta($comment_id, 'rating', true);
-		$comment_approved  = $comment->comment_approved; // '0', '1', 'spam'
+		$comment_approved  = $comment->comment_approved; // '0', '1', 'spam', 'trash'
 		$comment_author_IP = $comment->comment_author_IP; //phpcs:ignore
 		$comment_content   = \wpautop($comment->comment_content);
 		$comment_date      = $comment->comment_date;

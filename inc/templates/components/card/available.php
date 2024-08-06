@@ -33,9 +33,8 @@ $chapter_ids = CourseUtils::get_sub_chapters($product_id, return_ids :true);
 $name              = $product->get_name();
 $product_image_url = Base::get_image_url_by_product( $product, 'full' );
 $teacher_ids       = \get_post_meta( $product_id, 'teacher_ids', false );
-$teacher_name      = '';
+$teacher_name      = 'by ';
 foreach ( $teacher_ids as $key => $teacher_id ) {
-	$teacher_name .= 'by ';
 	$is_last       = $key === count( $teacher_ids ) - 1;
 	$connect       = $is_last ? '' : ' & ';
 	$teacher       = \get_user_by( 'id', $teacher_id );
