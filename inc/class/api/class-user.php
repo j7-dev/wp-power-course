@@ -209,10 +209,8 @@ final class User {
 		} else {
 			$sql = sprintf(
 			'SELECT u.ID
-			FROM %1$s u
-			LEFT JOIN %2$s um ON u.ID = um.user_id ',
+			FROM %1$s u ',
 			$wpdb->users,
-			$wpdb->usermeta,
 			);
 		}
 
@@ -225,7 +223,15 @@ final class User {
 			);
 		} else {
 			$where = sprintf(
-			" WHERE um.meta_value != '%1\$s' ",
+			" WHERE u.ID NOT IN (
+    SELECT DISTINCT u.ID
+    FROM %1\$s u
+    LEFT JOIN %2\$s um ON u.ID = um.user_id
+    WHERE um.meta_key = '%3\$s' AND um.meta_value = '%4\$s'
+) ",
+			$wpdb->users,
+			$wpdb->usermeta,
+			$args['meta_key'],
 			$course_id
 			);
 		}
@@ -243,12 +249,21 @@ final class User {
 		}
 
 		$sql .= $where;
-		$sql .= sprintf(
-		' ORDER BY um.umeta_id DESC
+		if (!$reverse) {
+			$sql .= sprintf(
+			' ORDER BY um.umeta_id DESC
 			LIMIT %1$d OFFSET %2$d',
-		$args['posts_per_page'],
-		( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
-		);
+			$args['posts_per_page'],
+			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
+			);
+		} else {
+			$sql .= sprintf(
+			' ORDER BY u.ID DESC
+				LIMIT %1$d OFFSET %2$d',
+			$args['posts_per_page'],
+			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
+			);
+		}
 
 		$user_ids = $wpdb->get_col( $wpdb->prepare($sql)); // phpcs:ignore
 		$user_ids = \array_unique($user_ids);
