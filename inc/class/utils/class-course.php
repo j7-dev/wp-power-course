@@ -280,6 +280,10 @@ abstract class Course {
 			default  => $limit_value ? "{$limit_value} 天" : '',
 		};
 
+		if ( 'unlimited' === $limit_type ) {
+			$limit_value_label = '';
+		}
+
 		return [
 			'type'  => $limit_type_label,
 			'value' => $limit_value_label,
