@@ -208,12 +208,11 @@ final class User {
 			);
 		} else {
 			$sql = sprintf(
-			"SELECT u.ID
-			FROM %1\$s u
-			LEFT JOIN %2\$s um ON u.ID = um.user_id AND um.meta_key = '%3\$s'",
+			'SELECT u.ID
+			FROM %1$s u
+			LEFT JOIN %2$s um ON u.ID = um.user_id ',
 			$wpdb->users,
 			$wpdb->usermeta,
-			$args['meta_key'],
 			);
 		}
 
@@ -226,8 +225,7 @@ final class User {
 			);
 		} else {
 			$where = sprintf(
-			" WHERE ( (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s') OR (um.meta_key IS NULL) )",
-			$args['meta_key'],
+			" WHERE um.meta_value != '%1\$s' ",
 			$course_id
 			);
 		}
