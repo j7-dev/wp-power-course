@@ -179,27 +179,15 @@ final class Chapter {
 	 * @phpstan-ignore-next-line
 	 */
 	public function delete_chapters_with_id_callback( $request ): \WP_REST_Response {
-		$id            = $request['id'];
-		$delete_result = ChapterFactory::delete_chapter( $id );
+		$id          = $request['id'];
+		$deleted_ids = ChapterFactory::delete_chapter( (int) $id );
 
-		if ( ! $delete_result ) {
-			return new \WP_REST_Response(
-				[
-					'code'    => 'delete_failed',
-					'message' => '刪除失敗',
-					'data'    => [
-						'id' => $id,
-					],
-				],
-				400
-			);
-		}
 		return new \WP_REST_Response(
 			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'id' => $id,
+					'ids' => $deleted_ids,
 				],
 			]
 		);

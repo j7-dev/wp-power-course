@@ -51,7 +51,57 @@ abstract class Course {
 	}
 
 	/**
-	 * 取得課程章節
+	 * 取得課程章節+單元 (flat)
+	 *
+	 * @param \WC_Product|int $product 商品
+	 * @param bool|null       $return_ids 是否只回傳 id
+	 *
+	 * @return array<int|\WP_Post>
+	 */
+	public static function get_all_chapters( \WC_Product|int $product, ?bool $return_ids = false ): array {
+		if (!is_numeric($product)) {
+			$product = $product->get_id();
+		}
+
+		$args = [
+			'posts_per_page' => - 1,
+			'order'          => 'ASC',
+			'orderby'        => 'menu_order',
+			'post_parent'    => $product,
+			'post_status'    => 'publish',
+			'post_type'      => RegisterCPT::POST_TYPE,
+		];
+
+		if ( $return_ids ) {
+			$args['fields'] = 'ids';
+		}
+
+		$chapters = \get_children( $args );
+
+		$sub_chapters = [];
+		foreach ( $chapters as $chapter ) :
+			$chapter_id = $return_ids ? $chapter : $chapter->ID;
+			$sub_args   = [
+				'posts_per_page' => - 1,
+				'order'          => 'ASC',
+				'orderby'        => 'menu_order',
+				'post_parent'    => $chapter_id,
+				'post_status'    => 'publish',
+				'post_type'      => RegisterCPT::POST_TYPE,
+			];
+
+			if ( $return_ids ) {
+				$sub_args['fields'] = 'ids';
+			}
+
+			$sub_chapters = array_merge( $sub_chapters, $chapter, \get_children( $sub_args ) );
+		endforeach;
+
+		return $sub_chapters;
+	}
+
+	/**
+	 * 取得課程單元
 	 *
 	 * @param \WC_Product|int $product 商品
 	 * @param bool|null       $return_ids 是否只回傳 id
@@ -70,14 +120,18 @@ abstract class Course {
 			'post_parent'    => $product,
 			'post_status'    => 'publish',
 			'post_type'      => RegisterCPT::POST_TYPE,
-			'fields'         => 'ids',
 		];
 
-		$chapter_ids = \get_children( $args );
+		if ( $return_ids ) {
+			$args['fields'] = 'ids';
+		}
+
+		$chapters = \get_children( $args );
 
 		$sub_chapters = [];
-		foreach ( $chapter_ids as $chapter_id ) :
-			$args = [
+		foreach ( $chapters as $chapter ) :
+			$chapter_id = $return_ids ? $chapter : $chapter->ID;
+			$sub_args   = [
 				'posts_per_page' => - 1,
 				'order'          => 'ASC',
 				'orderby'        => 'menu_order',
@@ -87,10 +141,10 @@ abstract class Course {
 			];
 
 			if ( $return_ids ) {
-				$args['fields'] = 'ids';
+				$sub_args['fields'] = 'ids';
 			}
 
-			$sub_chapters = array_merge( $sub_chapters, \get_children( $args ) );
+			$sub_chapters = array_merge( $sub_chapters, \get_children( $sub_args ) );
 		endforeach;
 
 		return $sub_chapters;
@@ -386,7 +440,7 @@ abstract class Course {
 
 		\J7\WpUtils\Classes\Log::info( str_replace( '\"', '"', $prepare ) );
 
-		return $wpdb->get_col( str_replace( '\"', '"', $prepare ) );
+		return $wpdb->get_col( str_replace( '\"', '"', $prepare ) ); // phpcs:ignore
 	}
 
 	/**

@@ -352,7 +352,7 @@ final class User {
 			$avl_courses[ $i ]['id']          = (string) $course_id;
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
 			$avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
-			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, return_ids :true);
+			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
 			$finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
 			foreach ($all_chapter_ids as $j => $chapter_id) {
 				$avl_courses[ $i ]['chapters'][ $j ]['id']            = (string) $chapter_id;

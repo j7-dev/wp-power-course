@@ -65,7 +65,7 @@ $finish_chapter_button_html = sprintf(
 
 
 // next chapter button html
-$chapter_ids     = CourseUtils::get_sub_chapters($product_id, return_ids :true);
+$chapter_ids     = CourseUtils::get_sub_chapters($product_id, true);
 $index           = array_search($current_chapter_id, $chapter_ids, true);
 $next_chapter_id = $chapter_ids[ $index + 1 ] ?? false;
 
