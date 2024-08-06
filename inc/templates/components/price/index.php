@@ -26,6 +26,21 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $regular_price = $product->get_regular_price();
 $sale_price    = $product->get_sale_price();
 
+if ('' === $sale_price) {
+
+	printf(
+		/*html*/'
+		<div class="flex flex-col">
+			<ins class="text-gray-600 text-2xl font-semibold">%1$s</ins>
+		</div>
+		',
+		( is_numeric( $regular_price ) ? \wc_price( (float) $regular_price ) : $regular_price ),
+		);
+
+	return;
+}
+
+
 printf(
 /*html*/'
 <div class="flex flex-col">

@@ -253,8 +253,8 @@ final class Course {
 
 		$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids: true);
 
-		$regular_price = (int) $product->get_regular_price();
-		$sale_price    = (int) $product->get_sale_price();
+		$regular_price = $product->get_regular_price();
+		$sale_price    = $product->get_sale_price();
 		$price_html    = Base::get_price_html( $product );
 
 		$base_array = [

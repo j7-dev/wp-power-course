@@ -38,6 +38,7 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 						{ value: 'bunny-stream-api', label: 'Bunny Stream API' },
 						{ value: 'code', label: '自訂代碼' },
 					]}
+					allowClear
 				/>
 			</Item>
 			{watchVideoType === 'youtube' && <Youtube {...formItemProps} />}

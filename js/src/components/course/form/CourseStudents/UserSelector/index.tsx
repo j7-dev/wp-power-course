@@ -63,8 +63,6 @@ const index = () => {
 		},
 	})
 
-	console.log(selectProps.loading)
-
 	// add student mutation
 	const { mutate: addStudent, isLoading } = useCustomMutation()
 

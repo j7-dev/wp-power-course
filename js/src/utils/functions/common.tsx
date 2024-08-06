@@ -133,6 +133,10 @@ export const toFormData = (data: object): GenericFormData => {
 				acc[key] = '[]'
 				return acc
 			}
+			if (value === null || value === undefined) {
+				acc[key] = ''
+				return acc
+			}
 			acc[key] = value
 
 			return acc
