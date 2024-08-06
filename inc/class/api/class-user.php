@@ -268,7 +268,7 @@ final class User {
 
 		$total = $wpdb->get_var($wpdb->prepare($count_query)); // phpcs:ignore
 
-		$total_pages = \floor( $total / $args['posts_per_page'] ) + 1;
+		$total_pages = \floor( ( (int) $total )/ ( (int) $args['posts_per_page'] ) ) + 1;
 
 		$formatted_users = array_map( [ $this, 'format_user_details' ], $users );
 

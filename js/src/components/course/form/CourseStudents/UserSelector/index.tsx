@@ -17,7 +17,7 @@ const index = () => {
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
 
-	const { selectProps } = useSelect<TUserRecord>({
+	const { selectProps, queryResult } = useSelect<TUserRecord>({
 		resource: 'users/students',
 		optionLabel: 'display_name',
 		optionValue: 'id',
@@ -62,6 +62,8 @@ const index = () => {
 			enabled: !!watchId && !!keyword,
 		},
 	})
+
+	console.log(selectProps.loading)
 
 	// add student mutation
 	const { mutate: addStudent, isLoading } = useCustomMutation()
@@ -108,7 +110,7 @@ const index = () => {
 				type="primary"
 				onClick={handleAdd}
 				loading={isLoading}
-				disabled={!userIds.length}
+				disabled={!userIds.length || queryResult.isFetching}
 			>
 				新增學員
 			</Button>
@@ -122,6 +124,7 @@ const index = () => {
 					setUserIds(value)
 				}}
 				value={userIds}
+				loading={queryResult.isFetching}
 			/>
 			<Select
 				value={searchField}
@@ -135,6 +138,7 @@ const index = () => {
 					{ value: 'name', label: '名稱' },
 					{ value: 'id', label: 'ID' },
 				]}
+				disabled={isLoading || queryResult.isFetching}
 			/>
 		</Space.Compact>
 	)
