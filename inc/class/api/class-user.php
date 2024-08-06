@@ -256,6 +256,7 @@ final class User {
 		$user_ids = \array_unique($user_ids);
 
 		$users = array_map( fn( $user_id ) => get_user_by('id', $user_id), $user_ids );
+		$users = array_filter($users);
 
 		// 查找總數
 		$count_query = sprintf(

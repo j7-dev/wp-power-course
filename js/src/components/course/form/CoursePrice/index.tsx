@@ -9,7 +9,6 @@ const { Item } = Form
 
 export const CoursePrice = () => {
 	const form = Form.useFormInstance()
-	const watchRegularPrice = Form.useWatch(['regular_price'], form)
 	const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
 	const watchDateOnSaleFrom = Form.useWatch(['date_on_sale_from'], form)
 
@@ -45,21 +44,7 @@ export const CoursePrice = () => {
 			>
 				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
 			</Item>
-			<Item
-				name={['sale_price']}
-				label="折扣價"
-				rules={
-					watchIsFree
-						? []
-						: [
-								{
-									type: 'number',
-									max: watchRegularPrice - 1,
-									message: '折扣價不能超過原價',
-								},
-							]
-				}
-			>
+			<Item name={['sale_price']} label="折扣價">
 				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
 			</Item>
 

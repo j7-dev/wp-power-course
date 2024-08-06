@@ -109,6 +109,7 @@ final class Product {
 		$total_pages = $results->max_num_pages;
 
 		$products = $results->products;
+		$products = array_filter($products);
 
 		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
 
@@ -157,6 +158,7 @@ final class Product {
 		$children      = [];
 		if ( ! empty( $variation_ids ) ) {
 			$variation_products = array_map( 'wc_get_product', $variation_ids );
+			$variation_products = array_filter($variation_products);
 			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
 			$children           = [
 				'children'  => $children_details,
