@@ -12,6 +12,7 @@ const index = () => {
 	const invalidate = useInvalidate()
 	const [userIds, setUserIds] = useState<string[]>([])
 	const [keyword, setKeyword] = useState<string>('')
+	const [searchField, setSearchField] = useState<string>('all')
 
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
@@ -25,6 +26,11 @@ const index = () => {
 				field: 'search',
 				operator: 'eq',
 				value: '',
+			},
+			{
+				field: 'search_field',
+				operator: 'eq',
+				value: searchField,
 			},
 			{
 				field: 'posts_per_page',
@@ -116,6 +122,19 @@ const index = () => {
 					setUserIds(value)
 				}}
 				value={userIds}
+			/>
+			<Select
+				value={searchField}
+				style={{ width: 120 }}
+				onChange={(value: string) => {
+					setSearchField(value)
+				}}
+				options={[
+					{ value: 'all', label: '所有欄位' },
+					{ value: 'email', label: 'Email' },
+					{ value: 'name', label: '名稱' },
+					{ value: 'id', label: 'ID' },
+				]}
 			/>
 		</Space.Compact>
 	)

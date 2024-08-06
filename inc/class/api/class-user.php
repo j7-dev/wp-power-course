@@ -226,22 +226,22 @@ final class User {
 			);
 		} else {
 			$where = sprintf(
-			" WHERE um.user_id IS NULL OR (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s')",
+			" WHERE (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s')",
 			$args['meta_key'],
 			$course_id
 			);
 		}
 
 		if (!empty($args['search'])) {
-			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
-			$where         .= sprintf(
-			" AND (u.ID LIKE '%1\$s'
-					OR u.user_login LIKE '%1\$s'
-					OR u.user_email LIKE '%1\$s'
-					OR u.user_nicename LIKE '%1\$s'
-					OR u.display_name LIKE '%1\$s')",
-			$args['search']
-			);
+			$search_value = $args['search'];
+			$where       .= ' AND (';
+			$where       .= match ($args['search_field']) {
+				'email'=> "u.user_email LIKE '%{$search_value}%'",
+				'name'=> "u.user_login LIKE '%{$search_value}%' OR u.user_nicename LIKE '%{$search_value}%' OR u.display_name LIKE '%{$search_value}%'",
+				'id' => \is_numeric($search_value) ? "u.ID = {$search_value}" : '',
+				default => "u.user_login LIKE '%{$search_value}%' OR u.user_nicename LIKE '%{$search_value}%' OR u.display_name LIKE '%{$search_value}%' OR u.user_email LIKE '%{$search_value}%'" . ( \is_numeric($search_value) ? " OR u.ID = {$search_value}" : '' ),
+			};
+			$where .= ')';
 		}
 
 		$sql .= $where;
