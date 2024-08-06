@@ -26,19 +26,19 @@ export const VideoInput: FC<FormItemProps> = (formItemProps) => {
 					'type',
 				]}
 				className="mb-1"
-				initialValue="youtube"
+				initialValue="none"
 			>
 				<Select
 					className="w-full"
 					size="small"
 					onChange={handleChange}
 					options={[
+						{ value: 'none', label: '無影片' },
 						{ value: 'youtube', label: 'Youtube 嵌入' },
 						{ value: 'vimeo', label: 'Vimeo 嵌入' },
 						{ value: 'bunny-stream-api', label: 'Bunny Stream API' },
 						{ value: 'code', label: '自訂代碼' },
 					]}
-					allowClear
 				/>
 			</Item>
 			{watchVideoType === 'youtube' && <Youtube {...formItemProps} />}

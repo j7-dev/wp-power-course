@@ -38,7 +38,9 @@ $feature_video = \get_post_meta( $product_id, 'feature_video', true );
 $image_id      = $product->get_image_id();
 $image_url     = $image_id ? \wp_get_attachment_image_url( (int) $image_id, 'full' ) : Base::DEFAULT_IMAGE;
 
-if ( ! ! $feature_video ) {
+$video_type = $feature_video['type'] ?? 'none';
+
+if ( 'none' !== $video_type ) {
 	Templates::get(
 		'video',
 		[

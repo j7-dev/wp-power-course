@@ -33,8 +33,9 @@ if ( ! is_array( $teacher_ids ) ) {
  * @var array{type: string, id: string, meta: ?array} $trial_video
  */
 $trial_video = \get_post_meta( $product_id, 'trial_video', true );
+$video_type  = $trial_video['type'] ?? 'none';
 
-if ( ! ! $trial_video ) {
+if ( 'none' !== $video_type ) {
 	printf(
 	/*html*/'
 <div class="mb-12">
