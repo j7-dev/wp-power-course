@@ -346,21 +346,22 @@ final class User {
 		$avl_course_ids =\get_user_meta($user_id, 'avl_course_ids');
 		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
 
-		$avl_courses = [];
-		foreach ($avl_course_ids as $i => $course_id) {
-			$course_id                        = (int) $course_id;
-			$avl_courses[ $i ]['id']          = (string) $course_id;
-			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
-			$avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
-			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
-			$finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
-			foreach ($all_chapter_ids as $j => $chapter_id) {
-				$avl_courses[ $i ]['chapters'][ $j ]['id']            = (string) $chapter_id;
-				$avl_courses[ $i ]['chapters'][ $j ]['name']          = \get_the_title($chapter_id);
-				$avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
-			}
-		}
+		// BUG: 有用戶因為章節太多，會 500 Error
+		// $avl_courses = [];
+		// foreach ($avl_course_ids as $i => $course_id) {
+		// $course_id                        = (int) $course_id;
+		// $avl_courses[ $i ]['id']          = (string) $course_id;
+		// $avl_courses[ $i ]['name']        = \get_the_title($course_id);
+		// $avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
+		// $all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
+		// $finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
+		// foreach ($all_chapter_ids as $j => $chapter_id) {
+		// $avl_courses[ $i ]['chapters'][ $j ]['id']            = (string) $chapter_id;
+		// $avl_courses[ $i ]['chapters'][ $j ]['name']          = \get_the_title($chapter_id);
+		// $avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
+		// $avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
+		// }
+		// }
 
 		$base_array = [
 			'id'                    => (string) $user_id,
@@ -370,7 +371,7 @@ final class User {
 			'user_registered'       => $user_registered,
 			'user_registered_human' => \human_time_diff( \strtotime( $user_registered ) ),
 			'user_avatar_url'       => $user_avatar_url,
-			'avl_courses'           => $avl_courses,
+			// 'avl_courses'           => $avl_courses,
 			'description'           => $user->description,
 		];
 
