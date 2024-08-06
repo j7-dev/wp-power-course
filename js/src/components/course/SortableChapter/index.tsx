@@ -82,7 +82,7 @@ export const SortableChapter: FC<{
 							...item,
 							collapsed: false,
 						}))
-						const dataWithoutCollapse = data.map((item) => ({
+						const dataWithoutCollapse = treeData.map((item) => ({
 							...item,
 							collapsed: false,
 						}))
