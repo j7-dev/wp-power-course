@@ -93,11 +93,13 @@ final class ChapterFactory {
 				]
 			)
 		);
-		$chapters = array_map(
+		$chapters = array_values(
+			array_map(
 			[ __CLASS__, 'format_chapter_details' ],
 			$chapters,
 			array_fill(0, count($chapters), false),
-			array_fill(0, count($chapters), $depth + 1)
+				array_fill(0, count($chapters), $depth + 1)
+			)
 		);
 
 		$children = !!$chapters ? [

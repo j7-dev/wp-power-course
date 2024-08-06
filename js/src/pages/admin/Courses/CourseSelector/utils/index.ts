@@ -58,7 +58,7 @@ export const defaultPaginationProps: PaginationProps & {
 	showQuickJumper: true,
 	showTitle: true,
 	showTotal: (total: number, range: [number, number]) =>
-		`目前顯示第 ${range[0]} ~ ${range[1]} 個商品，總共有 ${total} 個商品`,
+		`目前顯示第 ${range?.[0]} ~ ${range?.[1]} 個商品，總共有 ${total} 個商品`,
 }
 
 export const termFormatter = (terms: TTerm[]) => {

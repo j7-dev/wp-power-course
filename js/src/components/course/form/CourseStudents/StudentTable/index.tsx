@@ -179,6 +179,7 @@ const index = () => {
 				{...tableProps}
 				columns={columns}
 				rowSelection={rowSelection}
+				expandable={undefined}
 				pagination={{
 					...tableProps.pagination,
 					...defaultPaginationProps,

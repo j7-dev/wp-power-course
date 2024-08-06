@@ -110,7 +110,7 @@ final class Product {
 
 		$products = $results->products;
 
-		$formatted_products = array_map( [ $this, 'format_product_details' ], $products );
+		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -157,7 +157,7 @@ final class Product {
 		$children      = [];
 		if ( ! empty( $variation_ids ) ) {
 			$variation_products = array_map( 'wc_get_product', $variation_ids );
-			$children_details   = array_map( [ $this, 'format_product_details' ], $variation_products );
+			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
 			$children           = [
 				'children'  => $children_details,
 				'parent_id' => (string) $product?->get_id(),

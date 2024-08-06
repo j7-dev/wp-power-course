@@ -10,7 +10,7 @@ export const UserWatchStatus: FC<{
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
 
-	const currentCourse = avl_courses.find((course) => course.id === watchId)
+	const currentCourse = avl_courses?.find((course) => course?.id === watchId)
 
 	if (!currentCourse) return <>出錯了！找不到課程</>
 

@@ -172,7 +172,7 @@ final class Course {
 
 		$products = $results->products;
 
-		$formatted_products = array_map( [ $this, 'format_product_details' ], $products );
+		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -229,7 +229,7 @@ final class Course {
 				]
 			)
 		);
-		$chapters = array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters );
+		$chapters = array_values(array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters ));
 		// 把子章節的時間加總
 		$course_length = array_reduce(
 			$chapters,
@@ -720,7 +720,7 @@ final class Course {
 
 		$terms = \get_terms( $args );
 
-		$formatted_terms = array_map( [ $this, 'format_terms' ], array_keys( $terms ), array_values( $terms ) );
+		$formatted_terms = array_values(array_map( [ $this, 'format_terms' ], array_keys( $terms ), array_values( $terms ) ));
 
 		return $formatted_terms;
 	}
@@ -761,7 +761,7 @@ final class Course {
 		];
 		$cats     = \get_terms( $cat_args );
 
-		$formatted_cats = array_map( [ $this, 'format_terms' ], array_keys( $cats ), array_values( $cats ) );
+		$formatted_cats = array_values(array_map( [ $this, 'format_terms' ], array_keys( $cats ), array_values( $cats ) ));
 
 		$tag_args = [
 			'taxonomy'   => 'product_tag',
@@ -773,7 +773,7 @@ final class Course {
 
 		$tags = \get_terms( $tag_args );
 
-		$formatted_tags = array_map( [ $this, 'format_terms' ], array_keys( $tags ), array_values( $tags ) );
+		$formatted_tags = array_values(array_map( [ $this, 'format_terms' ], array_keys( $tags ), array_values( $tags ) ));
 
 		$top_sales_products = CourseUtils::get_top_sales_courses( 5 );
 

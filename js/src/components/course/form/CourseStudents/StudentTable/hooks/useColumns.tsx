@@ -1,8 +1,6 @@
-import React from 'react'
 import { TableProps, Tooltip } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { UserName, UserWatchLimit, UserWatchStatus } from '@/components/user'
-import Remove from '../Remove'
 
 const useColumns = () => {
 	const columns: TableProps<TUserRecord>['columns'] = [

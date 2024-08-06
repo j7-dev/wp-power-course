@@ -442,7 +442,7 @@ final class Comment {
 
 		$children = $comment->get_children($args);
 
-		$children_array = $children ? array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1, $args), array_values($children)) : [];
+		$children_array = $children ? array_values(array_map(fn( $child ) => $this->format_comment_details($child, $depth + 1, $args), $children)) : [];
 
 		$base_array = [
 			'id'                => (string) $comment_id,
