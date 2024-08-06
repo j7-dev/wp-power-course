@@ -10,7 +10,7 @@ export const Gallery: React.FC<{
 			<img className="aspect-square w-full object-cover" src={defaultImage} />
 		)
 	}
-	const isInclude = images.some((i) => i === selectedImage)
+	const isInclude = images?.some((i) => i === selectedImage)
 
 	const [
 		selected,

@@ -70,7 +70,7 @@ export const useListSelect = <T extends BaseRecord>({
 	// 處理點擊商品，有可能是加入也可能是移除
 
 	const onListClick = (item: T) => () => {
-		const isInclude = selectedItems.some(
+		const isInclude = selectedItems?.some(
 			(theItem) => theItem?.[rowKey as keyof T] === item?.[rowKey as keyof T],
 		)
 		if (isInclude) {

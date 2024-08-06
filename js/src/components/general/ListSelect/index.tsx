@@ -50,7 +50,7 @@ export const ListSelect = <T extends BaseRecord>({
 						dataSource={dataSource}
 						renderItem={(item) => {
 							const { [rowKey]: key, [rowUrl]: url, [rowName]: name } = item
-							const isInclude = selectedItems.some(
+							const isInclude = selectedItems?.some(
 								({ [rowKey]: theKey = '' }) =>
 									theKey === item?.[rowKey as keyof T],
 							)

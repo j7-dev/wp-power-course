@@ -90,7 +90,7 @@ const BundleForm: FC<{
 	// 處理點擊商品，有可能是加入也可能是移除
 
 	const handleClick = (product: TProductRecord) => () => {
-		const isInclude = selectedProducts.some(({ id }) => id === product.id)
+		const isInclude = selectedProducts?.some(({ id }) => id === product.id)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
 
@@ -243,7 +243,7 @@ const BundleForm: FC<{
 							dataSource={searchProducts}
 							renderItem={(product) => {
 								const { id, images, name, price_html } = product
-								const isInclude = selectedProducts.some(
+								const isInclude = selectedProducts?.some(
 									({ id: theId }) => theId === product.id,
 								)
 								return (
