@@ -226,7 +226,7 @@ final class User {
 			);
 		} else {
 			$where = sprintf(
-			" WHERE (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s')",
+			" WHERE ( (um.meta_key = '%1\$s' AND um.meta_value != '%2\$s') OR (um.meta_key IS NULL) )",
 			$args['meta_key'],
 			$course_id
 			);
