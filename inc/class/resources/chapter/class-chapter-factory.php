@@ -281,7 +281,7 @@ final class ChapterFactory {
 	}
 
 	/**
-	 * Delete a chapter
+	 * 刪除章節跟其子章節
 	 *
 	 * @param int  $id           chapter id.
 	 * @param bool $force_delete Force delete.

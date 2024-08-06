@@ -632,7 +632,7 @@ final class Course {
 	 * @phpstan-ignore-next-line
 	 */
 	public function delete_courses_with_id_callback( $request ) {
-		$id = $request['id'];
+		$id = (int) $request['id'];
 		if ( empty( $id ) ) {
 			return new \WP_REST_Response(
 				[
@@ -644,17 +644,35 @@ final class Course {
 			);
 		}
 
-		$delete_result = \wp_delete_post( $id );
+		$args = [
+			'posts_per_page' => - 1,
+			'post_parent'    => $id,
+			'post_status'    => 'any',
+			'post_type'      => RegisterCPT::POST_TYPE,
+			'fields'         => 'ids',
+		];
 
-		if ( ! $delete_result ) {
-			return new \WP_REST_Response(
-				[
-					'code'    => 'delete_failed',
-					'message' => '刪除失敗',
-					'data'    => $delete_result,
-				],
-				400
-			);
+		$chapter_ids         = \get_children( $args ); // 只取到第一層
+		$deleted_chapter_ids = [];
+		foreach ($chapter_ids as $chapter_id) {
+			$deleted_chapter_ids[] = ChapterFactory::delete_chapter( (int) $chapter_id);
+		}
+
+		$bundle_ids = CourseUtils::get_bundles_by_product(  $id, true);
+
+		$delete_result = null;
+		foreach ([ $id, ...$bundle_ids ] as $post_id) {
+			$delete_result = \wp_delete_post( $post_id );
+			if ( ! $delete_result ) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 'delete_failed',
+						'message' => "刪除 post #{$post_id} 失敗",
+						'data'    => $delete_result,
+					],
+					400
+				);
+			}
 		}
 
 		return new \WP_REST_Response(
@@ -662,7 +680,9 @@ final class Course {
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'id' => $id,
+					'id'          => $id,
+					'chapter_ids' => $deleted_chapter_ids,
+					'bundle_ids'  => $bundle_ids,
 				],
 			]
 		);
