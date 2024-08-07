@@ -20,16 +20,25 @@ global $product;
 \add_filter(
 	'document_title_parts',
 	function ( $title_parts_array ) use ( $product ) {
-		$title_parts_array['title'] = $product->get_name(); // 修改 doc title
+		$title_parts_array['title'] = $product->get_name() . ' - ' . get_bloginfo('name'); // 修改 doc title
 		return $title_parts_array;
-	}
+	},
+	2000
+	);
+
+// 如果有使用 rank math
+\add_filter(
+	'rank_math/frontend/title',
+	function ( $title ) use ( $product ) {
+		return $product->get_name() . ' - ' . get_bloginfo('name'); // 修改 doc title
+	},
+	2000
 	);
 
 use J7\PowerCourse\Templates\Templates;
 
 $product_status = $product->get_status();
 $can_edit       = \current_user_can( 'edit_product', $product->get_id() );
-
 
 if ('draft' === $product_status && !$can_edit) {
 	// 如果商品為草稿且用戶沒有權限編輯，就 redirect

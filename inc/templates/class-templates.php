@@ -216,7 +216,6 @@ final class Templates {
 
 			if ( $slug ) {
 				if ( file_exists( $path ) ) {
-					global $product;
 					// @phpstan-ignore-next-line
 					$product_post = \get_page_by_path( $slug, OBJECT, 'product' );
 					if ( ! $product_post ) {
@@ -227,7 +226,7 @@ final class Templates {
 					$GLOBALS['product'] = \wc_get_product( $product_post->ID );
 
 					// 如果商品不是課程，則不要載入模板
-					$is_course_product = CourseUtils::is_course_product( $product );
+					$is_course_product = CourseUtils::is_course_product( $GLOBALS['product'] );
 
 					if ( ! $is_course_product ) {
 						return $template;
