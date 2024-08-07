@@ -20,7 +20,7 @@ export function chapterToTreeNode(
 		},
 		children: chapters?.map(chapterToTreeNode) || [],
 		showExtra: false,
-		collapsed: false,
+		collapsed: true, // 預設為折疊
 	}
 }
 

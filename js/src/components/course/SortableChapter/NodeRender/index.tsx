@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { getPostStatus } from '@/utils'
-import { Tag } from 'antd'
 import { FlattenNode } from '@ant-design/pro-editor'
 import { ChapterName } from '@/components/course'
 import { SecondToStr } from '@/components/general'
