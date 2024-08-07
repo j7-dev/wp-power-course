@@ -140,7 +140,7 @@ export function useCourseFormDrawer({
 
 	const mergedDrawerProps: DrawerProps = {
 		title: `${isUpdate ? '編輯' : '新增'}${itemLabel} - ${watchName} ${watchId ? `#${watchId}` : ''}`,
-		forceRender: true,
+		forceRender: false,
 		push: false,
 		onClose: close,
 		open,

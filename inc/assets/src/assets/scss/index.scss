@@ -183,6 +183,7 @@ div#tab-content-description {
 	p {
 		margin-bottom: 0rem !important;
 		margin-top: 0.5rem !important;
+		white-space: pre-line;
 		&:empty {
 			// 空白行
 			min-height: 1.75em;
@@ -197,6 +198,7 @@ div#tab-content-description {
 	}
 }
 
+// 留言的 loading 樣式
 .animate-pulse-2 {
 	position: relative;
 	overflow: hidden;

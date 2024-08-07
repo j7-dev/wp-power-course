@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from 'react'
+import { FC, useEffect, lazy, Suspense, useMemo } from 'react'
 import { Button, Form, Drawer, Input, Alert } from 'antd'
 import { EditOutlined, LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
@@ -6,13 +6,25 @@ import { useApiUrl } from '@refinedev/core'
 import { useBlockNote } from 'antd-toolkit'
 
 const { Item } = Form
-const BlockNote = lazy(() =>
-	import('antd-toolkit').then((module) => ({
-		default: module.BlockNote,
-	})),
-)
 
-const DescriptionDrawer = () => {
+type TDescriptionDrawerProps = {
+	name?: string | string[]
+	itemLabel?: string
+}
+export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
+	props,
+) => {
+	const BlockNote = useMemo(
+		() =>
+			lazy(() =>
+				import('antd-toolkit').then((module) => ({
+					default: module.BlockNote,
+				})),
+			),
+		[],
+	)
+	const name = props?.name || ['description']
+	const itemLabel = props?.itemLabel || '課程'
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
@@ -26,16 +38,18 @@ const DescriptionDrawer = () => {
 	})
 	const { editor } = blockNoteViewProps
 
-	const { drawerProps, show, close, open } = useEditorDrawer()
+	const { drawerProps, show, close, open } = useEditorDrawer({
+		itemLabel,
+	})
 
 	const handleConfirm = () => {
-		form.setFieldValue(['description'], html)
+		form.setFieldValue(name, html)
 		close()
 	}
 
 	useEffect(() => {
 		if (watchId && open) {
-			const description = form.getFieldValue(['description'])
+			const description = form.getFieldValue(name)
 
 			async function loadInitialHTML() {
 				const blocks = await editor.tryParseHTMLToBlocks(description)
@@ -48,9 +62,9 @@ const DescriptionDrawer = () => {
 	return (
 		<>
 			<Button type="primary" icon={<EditOutlined />} onClick={show}>
-				編輯課程重點介紹
+				編輯{itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}
 			</Button>
-			<Item name={['description']} label="課程重點介紹" hidden>
+			<Item name={name} label={`${itemLabel}完整介紹`} hidden>
 				<Input.TextArea rows={8} disabled />
 			</Item>
 			<Drawer
@@ -67,7 +81,8 @@ const DescriptionDrawer = () => {
 					description={
 						<ol className="pl-4">
 							<li>
-								確認變更只是確認內文有沒有變更，您還是需要儲存才會存進課程
+								確認變更只是確認內文有沒有變更，您還是需要儲存才會存進
+								{itemLabel}
 							</li>
 							<li>可以使用 WordPress shortcode</li>
 							<li>圖片在前台顯示皆為 100% ，縮小圖片並不影響前台顯示</li>
@@ -91,5 +106,3 @@ const DescriptionDrawer = () => {
 		</>
 	)
 }
-
-export default DescriptionDrawer

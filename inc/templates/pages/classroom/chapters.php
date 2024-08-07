@@ -31,14 +31,12 @@ $course_length_in_minutes = CourseUtils::get_course_length( $product, 'minute' )
 
 printf(
 	/*html*/'
-		<div class="px-4 pt-5">
-			<h2 class="text-lg text-bold tracking-wide my-0 line-clamp-2 h-14">%1$s</h2>
-		</div>
-		<div class="flex justify-between items-center p-4">
+		<h2 class="text-lg text-bold tracking-wide my-0 line-clamp-2 h-14 pt-5">%1$s</h2>
+		<div class="flex justify-between items-center py-4">
 			<span class="text-base tracking-wide font-bold">課程單元</span>
 			<span class="text-sm text-gray-400">%2$s 個單元%3$s</span>
 		</div>
-		<div class="pc-sider-chapters overflow-y-auto">
+		<div class="pc-sider-chapters overflow-y-auto -ml-4 -mr-4">
 			%4$s
 		</div>
 ',

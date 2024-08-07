@@ -12,6 +12,7 @@ use J7\PowerCourse\Resources\Chapter\ChapterFactory;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Utils\Base;
 
 /**
  * Class Course
@@ -72,6 +73,46 @@ final class Chapter {
 	}
 
 	/**
+	 * 處理並分離產品資訊
+	 *
+	 * 根據請求分離產品資訊，並處理描述欄位。
+	 *
+	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
+	 * @throws \Exception 當找不到商品時拋出異常。.
+	 * @return array{product:\WC_Product, data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
+	 * @phpstan-ignore-next-line
+	 */
+	private function separator( $request ): array {
+		$body_params = $request->get_body_params();
+		$file_params = $request->get_file_params();
+
+		$formatted_params = ChapterFactory::converter( $body_params );
+
+		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
+		$sanitize_description = \wp_kses_post( $formatted_params['post_content'] ?? '' );
+
+		$skip_keys   = [
+			'chapter_video',
+		];
+		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
+
+		$body_params['post_content'] = $sanitize_description;
+
+		// 將 '[]' 轉為 []
+		$body_params = Base::format_empty_array( $body_params );
+
+		[
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = WP::separator( args: $body_params, obj: 'post', files: $file_params['files'] ?? [] );
+
+		return [
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		];
+	}
+
+	/**
 	 * Post Chapter callback
 	 * 創建章節
 	 *
@@ -81,17 +122,17 @@ final class Chapter {
 	 */
 	public function post_chapters_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$body_params = $request->get_body_params();
+		[
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = $this->separator( $request );
 
-		$skip_keys   = [
-			'chapter_video',
-		];
-		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
+		$data['meta_input'] = $meta_data;
 
-		$create_result = ChapterFactory::create_chapter( $body_params );
+		$post_id = ChapterFactory::create_chapter( $data );
 
-		if ( \is_wp_error( $create_result ) ) {
-			return $create_result;
+		if ( \is_wp_error( $post_id ) ) {
+			return $post_id;
 		}
 
 		return new \WP_REST_Response(
@@ -99,7 +140,7 @@ final class Chapter {
 				'code'    => 'create_success',
 				'message' => '新增成功',
 				'data'    => [
-					'id' => $create_result,
+					'id' => $post_id,
 				],
 			]
 		);
@@ -144,16 +185,16 @@ final class Chapter {
 	 */
 	public function post_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$id          = $request['id'];
-		$body_params = $request->get_body_params();
-		$skip_keys   = [
-			'chapter_video',
-		];
-		$body_params = WP::sanitize_text_field_deep( $body_params, true, $skip_keys );
+		$id = $request['id'];
 
-		$formatted_params = ChapterFactory::converter( $body_params );
+		[
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = $this->separator( $request );
 
-		$update_result = ChapterFactory::update_chapter( $id, $formatted_params );
+		$data['meta_input'] = $meta_data;
+
+		$update_result = ChapterFactory::update_chapter( $id, $data );
 
 		if ( \is_wp_error( $update_result ) ) {
 			return $update_result;

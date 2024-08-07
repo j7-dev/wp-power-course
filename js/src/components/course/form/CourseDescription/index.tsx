@@ -7,10 +7,14 @@ import {
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
 import { siteUrl, course_permalink_structure } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
-import { FiSwitch, VideoInput, DatePicker } from '@/components/formItem'
+import {
+	FiSwitch,
+	VideoInput,
+	DatePicker,
+	DescriptionDrawer,
+} from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import { useUpload } from '@/bunny'
-import DescriptionDrawer from './DescriptionDrawer'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FileUpload } from '@/components/post'
 

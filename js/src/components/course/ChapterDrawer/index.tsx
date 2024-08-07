@@ -1,6 +1,10 @@
 import { FC } from 'react'
 import { Drawer, DrawerProps, Form, Input, Switch } from 'antd'
-import { VideoInput, VideoLength } from '@/components/formItem'
+import {
+	VideoInput,
+	VideoLength,
+	DescriptionDrawer,
+} from '@/components/formItem'
 
 const { Item } = Form
 
@@ -27,16 +31,19 @@ export const ChapterDrawer: FC<DrawerProps> = (drawerProps) => {
 					)}
 					{/*如果深度為 1 顯示上傳課程內容*/}
 					{watchDepth === 1 && (
-						<div className="mb-6 max-w-[20rem]">
-							<p className="mb-3">上傳課程內容</p>
-							<VideoInput name={['chapter_video']} />
-						</div>
-					)}
-					{watchDepth === 1 && (
-						<div className="mb-6 max-w-[20rem]">
-							<p className="mb-3">課程時長</p>
-							<VideoLength name={['chapter_length']} />
-						</div>
+						<>
+							<div className="mb-8">
+								<DescriptionDrawer itemLabel="單元" />
+							</div>
+							<div className="mb-6 max-w-[20rem]">
+								<p className="mb-3">上傳課程內容</p>
+								<VideoInput name={['chapter_video']} />
+							</div>
+							<div className="mb-6 max-w-[20rem]">
+								<p className="mb-3">課程時長</p>
+								<VideoLength name={['chapter_length']} />
+							</div>
+						</>
 					)}
 					<Item
 						name={['status']}

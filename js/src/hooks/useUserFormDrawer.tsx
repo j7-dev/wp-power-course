@@ -127,7 +127,7 @@ export function useUserFormDrawer({
 
 	const mergedDrawerProps: DrawerProps = {
 		title: `${isUpdate ? '編輯' : '新增'}講師`,
-		forceRender: true,
+		forceRender: false,
 		push: false,
 		onClose: close,
 		open,
