@@ -17,7 +17,7 @@ export function useBundleFormDrawer({
 }) {
 	const [open, setOpen] = useState(false)
 	const [record, setRecord] = useState<TProductRecord | undefined>(undefined)
-	const isUpdate = !!record // 如果沒有傳入 record 就走新增，否則走更新
+	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增，否則走更新
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TProductRecord) => () => {
@@ -46,6 +46,7 @@ export function useBundleFormDrawer({
 	const handleSave = () => {
 		form.validateFields().then(() => {
 			const values = form.getFieldsValue()
+			console.log('⭐  values:', values)
 			const sale_date_range = values?.sale_date_range || [null, null]
 
 			// 處理日期欄位 sale_date_range
@@ -68,11 +69,12 @@ export function useBundleFormDrawer({
 			}
 
 			const formData = toFormData(formattedValues)
+			console.log('⭐  formData:', formData)
 
 			if (isUpdate) {
 				update(
 					{
-						id: record?.id,
+						id: record!.id,
 						resource,
 						values: formData,
 						meta: {
