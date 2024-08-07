@@ -755,7 +755,7 @@ final class Course {
 		$cat_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
-			'hide_empty' => true,
+			'hide_empty' => false,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
 		];
@@ -766,7 +766,7 @@ final class Course {
 		$tag_args = [
 			'taxonomy'   => 'product_tag',
 			'fields'     => 'id=>name',
-			'hide_empty' => true,
+			'hide_empty' => false,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
 		];
