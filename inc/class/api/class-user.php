@@ -199,7 +199,7 @@ final class User {
 		global $wpdb;
 
 		if (!$reverse) {
-			$sql = sprintf(
+			$sql = $wpdb->prepare(
 			'SELECT u.ID
 			FROM %1$s u
 			INNER JOIN %2$s um ON u.ID = um.user_id',
@@ -207,7 +207,7 @@ final class User {
 			$wpdb->usermeta,
 			);
 		} else {
-			$sql = sprintf(
+			$sql = $wpdb->prepare(
 			'SELECT u.ID
 			FROM %1$s u ',
 			$wpdb->users,
@@ -215,14 +215,14 @@ final class User {
 		}
 
 		if (!$reverse) {
-			$where = sprintf(
+			$where = $wpdb->prepare(
 			" WHERE um.meta_key = '%1\$s'
 			AND um.meta_value = '%2\$s'",
 			$args['meta_key'],
 			$args['meta_value']
 			);
 		} else {
-			$where = sprintf(
+			$where = $wpdb->prepare(
 			" WHERE u.ID NOT IN (
     SELECT DISTINCT u.ID
     FROM %1\$s u
@@ -250,14 +250,14 @@ final class User {
 
 		$sql .= $where;
 		if (!$reverse) {
-			$sql .= sprintf(
+			$sql .= $wpdb->prepare(
 			' ORDER BY um.umeta_id DESC
 			LIMIT %1$d OFFSET %2$d',
 			$args['posts_per_page'],
 			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
 			);
 		} else {
-			$sql .= sprintf(
+			$sql .= $wpdb->prepare(
 			' ORDER BY u.ID DESC
 				LIMIT %1$d OFFSET %2$d',
 			$args['posts_per_page'],
@@ -265,14 +265,14 @@ final class User {
 			);
 		}
 
-		$user_ids = $wpdb->get_col( $wpdb->prepare($sql)); // phpcs:ignore
+		$user_ids = $wpdb->get_col( $sql); // phpcs:ignore
 		$user_ids = \array_unique($user_ids);
 
 		$users = array_map( fn( $user_id ) => get_user_by('id', $user_id), $user_ids );
 		$users = array_filter($users);
 
 		// 查找總數
-		$count_query = sprintf(
+		$count_query = $wpdb->prepare(
 		'SELECT DISTINCT COUNT(DISTINCT u.ID)
 			FROM %1$s u
 			INNER JOIN %2$s um ON u.ID = um.user_id',
@@ -280,7 +280,7 @@ final class User {
 			$wpdb->usermeta,
 		) . $where;
 
-		$total = $wpdb->get_var($wpdb->prepare($count_query)); // phpcs:ignore
+		$total = $wpdb->get_var($count_query); // phpcs:ignore
 
 		$total_pages = \floor( ( (int) $total )/ ( (int) $args['posts_per_page'] ) ) + 1;
 

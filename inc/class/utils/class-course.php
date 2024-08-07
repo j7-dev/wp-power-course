@@ -442,8 +442,6 @@ abstract class Course {
 			$numberposts                   // %9$d - limit
 		);
 
-		\J7\WpUtils\Classes\Log::info( str_replace( '\"', '"', $prepare ) );
-
 		return $wpdb->get_col( str_replace( '\"', '"', $prepare ) ); // phpcs:ignore
 	}
 
