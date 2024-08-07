@@ -32,6 +32,8 @@ $chapter_id = $chapter->ID;
  */
 $video_info = get_post_meta( $chapter_id, 'chapter_video', true );
 
+$content = \do_shortcode( \wpautop($chapter->post_content ) );
+
 $course_tabs = [
 	'chapter' => [
 		'label'   => '章節',
@@ -39,7 +41,7 @@ $course_tabs = [
 	],
 	'description' => [
 		'label'   => '單元內容',
-		'content' => \do_shortcode( \wpautop($chapter->post_content ) ),
+		'content' => $content,
 	],
 	'discuss' => [
 		'label'   => '討論',
@@ -53,6 +55,10 @@ $course_tabs = [
 			),
 	],
 ];
+
+if (!$content) {
+	unset($course_tabs['description']);
+}
 
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[3.25rem] lg:pt-16">';
 
@@ -75,7 +81,7 @@ Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'description',
+		'default_active_key' => $content ? 'description' : 'discuss',
 	]
 	);
 
@@ -89,7 +95,7 @@ Templates::get(
 'tabs/content',
 [
 	'course_tabs'        => $course_tabs,
-	'default_active_key' => 'description',
+	'default_active_key' => $content ? 'description' : 'discuss',
 ]
 );
 echo '</div>';

@@ -51,28 +51,30 @@ $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 		return $classes;
 	}
 );
-
-if ( ! CourseUtils::is_avl() ) {
-	get_header();
-	$GLOBALS['product'] = $keep_product;
-	$GLOBALS['chapter'] = $keep_chapter;
-	Templates::get( '404/buy', null );
-	get_footer();
-	exit;
-} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-	get_header();
-	$GLOBALS['product'] = $keep_product;
-	$GLOBALS['chapter'] = $keep_chapter;
-	Templates::get( '404/not-ready', null );
-	get_footer();
-	exit;
-} elseif ( $is_expired ) {
-	get_header();
-	$GLOBALS['product'] = $keep_product;
-	$GLOBALS['chapter'] = $keep_chapter;
-	Templates::get( '404/expired', null );
-	get_footer();
-	exit;
+$is_avl = CourseUtils::is_avl();
+if (!current_user_can('manage_options')) {
+	if ( ! $is_avl ) {
+		get_header();
+		$GLOBALS['product'] = $keep_product;
+		$GLOBALS['chapter'] = $keep_chapter;
+		Templates::get( '404/buy', null );
+		get_footer();
+		exit;
+	} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
+		get_header();
+		$GLOBALS['product'] = $keep_product;
+		$GLOBALS['chapter'] = $keep_chapter;
+		Templates::get( '404/not-ready', null );
+		get_footer();
+		exit;
+	} elseif ( $is_expired ) {
+		get_header();
+		$GLOBALS['product'] = $keep_product;
+		$GLOBALS['chapter'] = $keep_chapter;
+		Templates::get( '404/expired', null );
+		get_footer();
+		exit;
+	}
 }
 
 // phpcs:disable

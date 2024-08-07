@@ -44,12 +44,12 @@ const ToggleVisibility: FC<{
 		>
 			{isVisible ? (
 				<EyeOutlined
-					className="text-gray-400 cursor-pointer"
+					className="text-gray-400 cursor-pointer w-6 flex justify-center"
 					onClick={handleToggle}
 				/>
 			) : (
 				<EyeInvisibleOutlined
-					className="text-yellow-700 cursor-pointer"
+					className="text-yellow-700 cursor-pointer w-6 flex justify-center"
 					onClick={handleToggle}
 				/>
 			)}

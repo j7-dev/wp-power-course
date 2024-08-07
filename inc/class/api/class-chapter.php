@@ -86,10 +86,10 @@ final class Chapter {
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		$formatted_params = ChapterFactory::converter( $body_params );
+		$body_params = ChapterFactory::converter( $body_params );
 
 		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
-		$sanitize_description = \wp_kses_post( $formatted_params['post_content'] ?? '' );
+		$sanitize_description = \wp_kses_post( $body_params['post_content'] ?? '' );
 
 		$skip_keys   = [
 			'chapter_video',
