@@ -11,6 +11,8 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\PowerBundleProduct\BundleProduct;
+use J7\PowerCourse\Utils\Base;
+
 
 
 /**
@@ -186,6 +188,8 @@ final class Product {
 		$include_product_ids        = (array) \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
 		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
+		$price_html = Base::get_price_html( $product );
+
 		$base_array = [
 			// Get Product General Info
 			'id'                                        => (string) $product?->get_id(),
@@ -204,7 +208,7 @@ final class Product {
 			'permalink'                                 => get_permalink( $product?->get_id() ),
 
 			// Get Product Prices
-			'price_html'                                => $product?->get_price_html(),
+			'price_html'                                => $price_html,
 			'regular_price'                             => $product?->get_regular_price(),
 			'sale_price'                                => $product?->get_sale_price(),
 			'on_sale'                                   => $product?->is_on_sale(),
