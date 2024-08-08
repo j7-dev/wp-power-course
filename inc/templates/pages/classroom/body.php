@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -63,6 +64,11 @@ if (!$content) {
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[3.25rem] lg:pt-16">';
 
 Templates::get( 'classroom/header' );
+
+$is_avl = CourseUtils::is_avl();
+if (current_user_can('manage_options') && !$is_avl) {
+	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full">此為管理員預覽模式</div>';
+}
 
 echo '<div class="z-[15] sticky lg:relative top-0">';
 

@@ -31,12 +31,13 @@ $args = wp_parse_args( $args, $default_args );
 $video_type = $video_info['type'] ?? 'none';
 
 if ('none' === $video_type) {
-	Templates::get(
-		'video/404',
-		[
-			'message' => '缺少 影片資訊 ，請聯絡老師',
-		]
-		);
+	// Templates::get(
+	// 'video/404',
+	// [
+	// 'message' => '缺少 影片資訊 ，請聯絡老師',
+	// ]
+	// );
+	echo '';
 	return;
 }
 
