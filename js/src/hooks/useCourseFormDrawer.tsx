@@ -84,7 +84,6 @@ export function useCourseFormDrawer({
 			.validateFields()
 			.then(() => {
 				const values = form.getFieldsValue()
-
 				const formData = toFormData(values)
 
 				if (isUpdate) {

@@ -119,7 +119,7 @@ export const CourseQA = () => {
 					}}
 				/>
 			</div>
-			<Item hidden name={['qa_list']}>
+			<Item hidden name={['qa_list']} initialValue={[]}>
 				<Input />
 			</Item>
 		</>

@@ -132,6 +132,7 @@ export const CourseDescription = () => {
 				<Item
 					name={['category_ids']}
 					label={keyLabelMapper('product_category_id')}
+					initialValue={[]}
 				>
 					<Select
 						options={termFormatter(product_cats)}
@@ -140,7 +141,11 @@ export const CourseDescription = () => {
 						allowClear
 					/>
 				</Item>
-				<Item name={['tag_ids']} label={keyLabelMapper('product_tag_id')}>
+				<Item
+					name={['tag_ids']}
+					label={keyLabelMapper('product_tag_id')}
+					initialValue={[]}
+				>
 					<Select
 						options={termFormatter(product_tags)}
 						mode="multiple"
@@ -281,7 +286,7 @@ export const CourseDescription = () => {
 					rowName="display_name"
 					rowUrl="user_avatar_url"
 				/>
-				<Item name={['teacher_ids']} hidden />
+				<Item name={['teacher_ids']} hidden initialValue={[]} />
 			</div>
 		</>
 	)

@@ -87,7 +87,7 @@ export const CourseBundle = () => {
 					))}
 			</div>
 
-			<Item name={['bundle_ids']} hidden>
+			<Item name={['bundle_ids']} hidden initialValue={[]}>
 				<Input />
 			</Item>
 
