@@ -97,6 +97,7 @@ final class Bootstrap {
 					'API_TIMEOUT'                => Base::API_TIMEOUT,
 					'nonce'                      => \wp_create_nonce( Plugin::$kebab ),
 					'bunny_library_id'           => \get_option( 'bunny_library_id', '' ),
+					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
 					/*
 					TODO 下面的資料稍後補上
 					{
