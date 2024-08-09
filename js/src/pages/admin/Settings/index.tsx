@@ -70,7 +70,7 @@ const index = () => {
 					</Button>
 
 					<Divider className="mt-12" plain>
-						批次上傳
+						批次上傳學員權限
 					</Divider>
 
 					<Alert
