@@ -12,6 +12,7 @@ export * from './FileEncodeProgress'
 export * from './ListSelect'
 export * from './SecondToStr'
 export * from './SimpleImage'
+export * from './FileUpload'
 
 export const Logo: FC<{ className?: string; color?: string }> = ({
 	className = 'w-6 h-6',

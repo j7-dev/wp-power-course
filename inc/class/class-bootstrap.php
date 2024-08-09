@@ -30,6 +30,9 @@ final class Bootstrap {
 
 		\add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_script' ], 99 );
 		\add_action( 'wp_enqueue_scripts', [ $this, 'frontend_enqueue_script' ], 99 );
+
+		// 讓 action scheduler 同時執行的數量增加
+		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );
 	}
 
 	/**

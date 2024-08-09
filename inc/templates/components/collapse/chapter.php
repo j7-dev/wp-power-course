@@ -36,7 +36,7 @@ $args2 = [
 
 $chapters = \get_children( $args2 );
 
-$is_avl = CourseUtils::is_avl( $product );
+$is_avl = CourseUtils::is_avl( $product->get_id() );
 
 foreach ( $chapters as $chapter_id => $chapter ) :
 	$args3 = [

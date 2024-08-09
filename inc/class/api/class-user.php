@@ -9,6 +9,8 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\File;
+use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
@@ -18,6 +20,8 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 final class User {
 	use \J7\WpUtils\Traits\SingletonTrait;
 	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	const BATCH_SIZE = 100;
 
 	/**
 	 * APIs
@@ -59,6 +63,11 @@ final class User {
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
+		[
+			'endpoint'            => 'users/upload-students', // CSV 新增學員
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
 	];
 
 	/**
@@ -66,6 +75,7 @@ final class User {
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
+		\add_action( 'pc_batch_add_students_task', [ $this, 'process_batch_add_students' ], 10, 4 );
 	}
 
 	/**
@@ -501,6 +511,228 @@ final class User {
 		],
 		$update_success ? 200 : 400
 		);
+	}
+
+	public function post_users_upload_students_callback( \WP_REST_Request $request ): \WP_REST_Response {
+
+		$file_params = $request->get_file_params();
+		/**
+		 * @var array{name: string, type: string, tmp_name: string, error: int, size: int} $file
+		 */
+		$file = $file_params['files'];
+
+		// 上傳到媒體庫
+		$upload = \wp_upload_bits($file['name'], null, file_get_contents($file['tmp_name']));
+
+		if ($upload['error'] !== false) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'upload_students_error',
+					'message' => '上傳學員失敗',
+					'data'    => $file,
+				],
+				400
+			);
+		}
+
+		$allowed_mime_types = [ 'text/csv', 'application/csv', 'text/comma-separated-values', 'application/excel', 'application/vnd.ms-excel', 'application/vnd.msexcel' ];
+		// 限制檔案類型
+		$wp_filetype = \wp_check_filetype_and_ext($file['tmp_name'], $file['name'], $allowed_mime_types);
+		$attachment  = [
+			'post_mime_type' => $wp_filetype['type'],
+			'post_title'     => \sanitize_file_name($file['name']),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		];
+
+		$attachment_id = \wp_insert_attachment($attachment, $upload['file']);
+
+		if (\is_wp_error($attachment_id)) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'upload_students_error',
+					'message' => '上傳學員失敗 ' . $attachment_id->get_error_message(),
+					'data'    => $file,
+				],
+				400
+			);
+		}
+
+		// --- START 將 email_content 寫入到 txt 檔，不然太大傳參會 exception START ---
+		$email_content_file_name    = 'pc_batch_upload_email_content_' . time() . '.txt';
+		$email_content_file_content = sprintf("csv 匯入學員開始，每批次 %1\$d 筆 \n\n\n", self::BATCH_SIZE);
+
+		// 獲取 WordPress 上傳目錄的路徑
+		$upload_dir  = \wp_upload_dir();
+		$upload_path = $upload_dir['path'];
+
+		// 創建文字檔的完整路徑
+		$email_content_file_path = "{$upload_path}/{$email_content_file_name}";
+
+		// 初始化 WP_Filesystem
+		global $wp_filesystem;
+		if (empty($wp_filesystem)) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			\WP_Filesystem();
+		}
+
+		// 寫入文字檔內容
+		$wp_filesystem->put_contents($email_content_file_path, $email_content_file_content, FS_CHMOD_FILE);
+
+		// --- END 將 email content 寫入到 txt 檔，不然太大傳參會 exception END ---
+
+		$action_id = \as_enqueue_async_action( 'pc_batch_add_students_task', [ $attachment_id, 0, self::BATCH_SIZE, $email_content_file_path ], 'power_course_batch_add_students' );
+
+		// 寫入 DB
+		return new \WP_REST_Response(
+			[
+				'code'    => 'upload_students_success',
+				'message' => '已排程上傳學員成功，結果將用 EMAIL 通知',
+				'data'    => [
+					'action_id' => $action_id,
+					'url'       => \admin_url('admin.php?page=wc-status&tab=action-scheduler&s=pc_batch_add_students_task'),
+				],
+			],
+			200
+		);
+	}
+
+	/**
+	 * 經過實測，大約連續創建 32個用戶，系統就會資源不足
+	 * 每批數量建議10人
+	 *
+	 * @param int    $attachment_id 附件 ID
+	 * @param int    $batch 批次
+	 * @param int    $batch_size 每批數量
+	 * @param string $email_content_path 要傳送的 EMAIL 內容 txt 檔路徑
+	 * @return void
+	 */
+	public function process_batch_add_students( int $attachment_id, int $batch, int $batch_size, string $email_content_path ): void {
+		$file = File::get_file_by_id($attachment_id);
+		// 獲取當前批次的資料
+		$current_batch_rows = File::parse_csv_streaming($file, $batch, $batch_size);
+		$is_last_batch      = $batch === 0 ? count($current_batch_rows) < $batch_size - 1 : count($current_batch_rows) < $batch_size; // -1 是要扣掉標題欄
+		// 去除重複
+		$unique_array_instance = new UniqueArray($current_batch_rows);
+		$unique_rows           = $unique_array_instance->get_list();
+
+		$records = []; // 要一次多筆寫入的資料
+
+		foreach ($unique_rows as $csv_row) {
+			$email     = $csv_row[0];
+			$course_id = $csv_row[1];
+			if (!\is_email($email) || !$course_id || !\is_numeric($course_id)) {
+				continue;
+			}
+
+			$user = \get_user_by('email', $email);
+			if (!$user) {
+				// 如果用戶不存在，要創建用戶，並且計送 EMAIL 設置密碼
+
+				// 把 email @ 的前面作為 username
+				$username = \explode('@', $email)[0];
+				$password = \wp_generate_password(12);
+				$user_id  = \wp_create_user($username, $password, $email);
+				if (\is_wp_error($user_id)) {
+					\J7\WpUtils\Classes\Log::info('創建用戶失敗: ' . $user_id->get_error_message());
+					continue;
+				}
+
+				// 發送重新設置密碼的信
+				$result = \retrieve_password($username);
+
+				if (true !== $result) {
+					\J7\WpUtils\Classes\Log::info('發送重新設置密碼的信失敗: ' . $result->get_error_message());
+				}
+			} else {
+				// 如果用戶已經存在，要先取得用戶 ID
+				$user_id = (int) $user->ID;
+				$is_avl  = CourseUtils::is_avl( (int) $course_id, (int) $user_id);
+				// 原本用戶已經可以上課，那就不用新增
+				if ($is_avl) {
+					continue;
+				}
+			}
+
+			$records[] = [ $user_id, 'avl_course_ids', $course_id ];
+		}
+		global $wpdb;
+
+		$user_meta_table = $wpdb->prefix . 'usermeta';
+
+		// 構建 SQL 語句
+		$sql = "INSERT INTO $user_meta_table (user_id, meta_key, meta_value) VALUES ";
+
+		$additional_content = sprintf(
+			/*html*/"\n\n\n\n %1\$s 第 %2\$s 批次 %3\$s ",
+			'❌',
+			$batch,
+			'沒有執行 $records 長度為 0',
+			);
+		if ($records) {
+			foreach ($records as $key => $record) {
+				$sql .= $wpdb->prepare('(%d, %s, %s)', (int) $record[0], $record[1], $record[2]);
+				if ($key !== count($records) - 1) {
+					$sql .= ', ';
+				}
+			}
+
+			$result = $wpdb->query($sql); // phpcs:ignore
+
+			ob_start();
+			\print_r($records);
+			$records_in_text = ob_get_clean();
+
+			$additional_content = sprintf(
+				/*html*/"\n\n\n\n %1\$s 第 %2\$s 批次 %3\$s %4\$s \n\n SQL 執行:\n %5\$s \n\n 此批共 %6\$d 筆:\n %7\$s \n\n 錯誤資訊: \n %8\$s",
+				$result === false ? '❌' : '✅',
+				$batch,
+				$result === false ? '失敗' : '成功',
+				$result === false ? "\n\n請檢查資料是否正確，或者請聯繫開發人員" : '',
+				$sql,
+				count($records),
+				$records_in_text,
+				$result === false ? $wpdb->last_error : '沒有錯誤'
+				);
+		}
+
+		// 初始化 WP_Filesystem
+		global $wp_filesystem;
+		if (empty($wp_filesystem)) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			\WP_Filesystem();
+		}
+		// 檢查檔案是否存在
+		$updated_content = '';
+		if ($wp_filesystem->exists($email_content_path)) {
+			// 讀取現有內容
+			$existing_content = $wp_filesystem->get_contents($email_content_path);
+
+			// 附加新內容到現有內容
+			$updated_content = $existing_content . $additional_content;
+
+			// 寫入更新後的內容到文字檔
+			$wp_filesystem->put_contents($email_content_path, $updated_content, FS_CHMOD_FILE);
+		}
+
+		\J7\WpUtils\Classes\Log::info($is_last_batch ? '已經是最後一批，發信，結束' : '還沒到最後一批，繼續');
+
+		// 如果還有下一批資料,安排下一次執行
+		if ( !$is_last_batch ) {
+			\as_enqueue_async_action(
+			'pc_batch_add_students_task',
+			[ $attachment_id, $batch + 1, $batch_size, $email_content_path ],
+			'power_course_batch_add_students',
+			);
+		} else {
+			// 如果已經沒有下一批資料, 就發送 EMAIL
+			$admin_email = \get_option('admin_email');
+			\wp_mail(
+			$admin_email,
+			sprintf('csv 匯入學員結果，共 %1$d 筆，共 %2$d 批次，每批次 %3$d 筆', ( $batch ) * $batch_size + count($current_batch_rows), $batch + 1, $batch_size),
+			$updated_content,
+			);
+		}
 	}
 }
 
