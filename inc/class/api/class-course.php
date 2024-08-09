@@ -479,15 +479,6 @@ final class Course {
 			'meta_data' => $meta_data,
 		] = $this->separator($request);
 
-		ob_start();
-		var_dump(
-		[
-			'data'      => $data,
-			'meta_data' => $meta_data,
-		]
-		);
-		\J7\WpUtils\Classes\Log::info('' . ob_get_clean());
-
 		$this->handle_save_course_data($product, $data );
 		$this->handle_save_course_meta_data($product, $meta_data );
 

@@ -189,9 +189,9 @@ final class Templates {
 	 * Load custom template
 	 * Set {Plugin::$kebab}/{slug}/report  php template
 	 *
-	 * @param string $template Template.
+	 * @param string|null $template Template.
 	 */
-	public function load_custom_template( string $template ): string {
+	public function load_custom_template( $template ) {
 		// 使用自定義的模板
 		$items = [
 			[

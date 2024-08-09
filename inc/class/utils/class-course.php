@@ -475,26 +475,27 @@ abstract class Course {
 	/**
 	 * Checks if a course is available for a given product and user.
 	 *
-	 * @param \WC_Product|null $the_product The product to check availability for.
-	 * @param int|null         $user_id The user ID to check availability for.
+	 * @param int|null $product_id The product to check availability for.
+	 * @param int|null $user_id The user ID to check availability for.
 	 * @return bool Returns true if the course is available, false otherwise.
 	 */
-	public static function is_avl( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
+	public static function is_avl( ?int $product_id = 0, ?int $user_id = null ): bool {
 		$user_id = $user_id ?? \get_current_user_id();
 		if ( ! $user_id ) {
 			return false;
 		}
-		if ( ! $the_product ) {
+
+		if (!$product_id) {
 			global $product;
-			$the_product = $product;
+			if (!( $product instanceof \WC_Product )) {
+				return false;
+			}
+			$product_id = $product->get_id();
 		}
 
-		if ( ! ( $the_product instanceof \WC_Product ) ) {
-			return false;
-		}
-		$the_product_id = (string) $the_product->get_id();
 		$avl_course_ids = self::get_avl_courses_by_user($user_id, return_ids: true);
-		return in_array($the_product_id, $avl_course_ids, true);
+
+		return in_array( (string) $product_id, $avl_course_ids, true);
 	}
 
 	/**
@@ -530,7 +531,7 @@ abstract class Course {
 		$the_product = $the_product ?? $product;
 		$user_id     = $user_id ?? \get_current_user_id();
 
-		if ( ! self::is_avl($the_product, $user_id) ) {
+		if ( ! self::is_avl($the_product->get_id(), $user_id) ) {
 			return [
 				'label'       => '未購買',
 				'badge_color' => 'ghost',

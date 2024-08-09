@@ -51,6 +51,7 @@ $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 		return $classes;
 	}
 );
+
 $is_avl = CourseUtils::is_avl();
 if (!current_user_can('manage_options')) {
 	if ( ! $is_avl ) {

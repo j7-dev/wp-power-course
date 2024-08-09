@@ -47,7 +47,9 @@ abstract class Comment {
 				return '此課程不開放評價';
 			}
 
-			$is_avl = CourseUtils::is_avl( $maybe_product ); // 判斷用戶是否是學員
+			$product_id = $maybe_product->get_id();
+
+			$is_avl = CourseUtils::is_avl( $product_id ); // 判斷用戶是否是學員
 
 			if (!$is_avl) {
 				return '您尚未購買此課程，尚無法評價';
@@ -56,7 +58,7 @@ abstract class Comment {
 			// 檢查用戶是否評論過此商品
 			$has_reviewed = get_comments(
 				[
-					'post_id' => $maybe_product->get_id(),
+					'post_id' => $product_id,
 					'user_id' => get_current_user_id(),
 					'type'    => 'review',
 				]

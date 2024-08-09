@@ -30,7 +30,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 echo '<div class="flex-1 px-4 md:px-0">';
 echo '<div class="mb-12">';
 
-$is_avl = CourseUtils::is_avl( $product );
+$is_avl = CourseUtils::is_avl( $product->get_id() );
 if ( $is_avl ) {
 	Templates::get(
 		'alert',
