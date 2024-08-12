@@ -31,8 +31,10 @@ const VideoItem = ({
 			onMouseLeave={() => {
 				setFilename(video?.thumbnailFileName)
 			}}
-			className={`w-36 aspect-video rounded-md overflow-hidden cursor-pointer ${
-				isSelected ? 'border-4 border-primary border-solid' : ''
+			className={`w-36 rounded-md overflow-hidden cursor-pointer ${
+				isSelected
+					? 'outline outline-4 outline-yellow-300 outline-offset-1'
+					: ''
 			}`}
 			loadingClassName="text-sm text-gray-500 font-bold"
 			src={`https://${bunny_cdn_hostname}/${video.guid}/${filename}`}

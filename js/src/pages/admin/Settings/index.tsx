@@ -153,14 +153,22 @@ const index = () => {
 					/>
 					<div className="mb-4">
 						<p>1. 前往 Bunny 後台，選擇 「Stream」 並進入 「Library」</p>
-						<SimpleImage src={bunnyTutorial1} className="w-full aspect-[2.1]" />
+						<SimpleImage
+							src={bunnyTutorial1}
+							ratio="aspect-[2.1]"
+							className="w-full"
+						/>
 					</div>
 					<div className="mb-4">
 						<p>
 							2. 進入「API」分頁，複製 Library ID 、 CDN Hostname 和 Stream API
 							Key
 						</p>
-						<SimpleImage src={bunnyTutorial2} className="w-full aspect-[2.1]" />
+						<SimpleImage
+							src={bunnyTutorial2}
+							ratio="aspect-[2.1]"
+							className="w-full"
+						/>
 					</div>
 				</div>
 			</div>

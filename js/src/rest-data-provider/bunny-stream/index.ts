@@ -6,10 +6,11 @@
 
 import { DataProvider } from '@refinedev/core'
 import { generateSort, generateFilter } from '../utils'
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import queryString from 'query-string'
-import { TOrderBy, TOrder, THttpMethods, THttpMethodsWithBody } from '@/types'
+import { THttpMethods, THttpMethodsWithBody } from '@/types'
 import { bunny_stream_api_key } from '@/utils'
+import { TGetVideosResponse } from '@/pages/admin/MediaLibrary/types'
 
 const { stringify } = queryString
 
@@ -38,37 +39,40 @@ export const dataProvider = (
 		const requestMethod = (method as THttpMethods) ?? 'get'
 
 		const queryFilters = generateFilter(filters)
+		console.log('⭐  queryFilters:', queryFilters)
 
 		const query: {
-			paged?: number
-			posts_per_page?: number
-			orderby?: TOrderBy
-			order?: TOrder
+			page?: number
+			itemsPerPage?: number
+			search?: string | null
+			collection?: string | null
+			orderBy?: string | null //Defaults to date
 		} = {}
 
 		if (mode === 'server') {
-			query.paged = current
-			query.posts_per_page = pageSize
+			query.page = current
+			query.itemsPerPage = pageSize
 		}
 
-		const generatedSort = generateSort(sorters)
-		if (generatedSort) {
-			const { _sort, _order } = generatedSort
-			query.orderby = _sort.join(',')
-			query.order = _order.join(',')
-		}
+		// const generatedSort = generateSort(sorters)
+		// if (generatedSort) {
+		// 	const { _sort, _order } = generatedSort
+		// 	query.orderby = _sort.join(',')
+		// 	query.order = _order.join(',')
+		// }
 
-		const { data, headers } = await httpClient[requestMethod](
+		const { data } = (await httpClient[requestMethod](
 			`${url}?${stringify(query)}&${stringify(queryFilters, { arrayFormat: 'bracket' })}`,
 			{
 				headers: headersFromMeta,
 			},
-		)
+		)) as AxiosResponse<TGetVideosResponse>
 
-		const total = headers?.['x-wp-total'] || data.length
+		const total = data?.totalItems || data?.items?.length || 0
+		const items = data?.items || []
 
 		return {
-			data,
+			data: items,
 			total,
 		}
 	},

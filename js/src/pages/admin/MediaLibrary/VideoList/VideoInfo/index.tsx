@@ -13,7 +13,7 @@ const VideoInfo = ({ video }: { video: TVideo }) => {
 	return (
 		<>
 			<SimpleImage
-				className="w-full aspect-video rounded-md overflow-hidden"
+				className="w-full rounded-md overflow-hidden"
 				loadingClassName="text-sm text-gray-500 font-bold"
 				src={`https://${bunny_cdn_hostname}/${guid}/preview.webp`}
 			/>
