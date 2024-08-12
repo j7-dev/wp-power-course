@@ -45,6 +45,7 @@ final class Option {
 	 */
 	private $fields = [
 		'bunny_library_id'                  => '',
+		'bunny_cdn_hostname'                => '',
 		'bunny_stream_api_key'              => '',
 		'override_course_product_permalink' => 'yes',
 		'course_permalink_structure'        => 'courses',

@@ -1,15 +1,13 @@
-import React from 'react'
 import { Form, Input, Button, Alert, Divider } from 'antd'
 import useOptions from './hooks/useOptions'
 import useSave from './hooks/useSave'
 import { FiSwitch } from '@/components/formItem'
-import { SimpleImage, FileUpload } from '@/components/general'
+import { SimpleImage, FileUpload, Heading } from '@/components/general'
 import bunnyTutorial1 from '@/assets/images/bunny-tutorial-1.jpg'
 import bunnyTutorial2 from '@/assets/images/bunny-tutorial-2.jpg'
 import { RxExternalLink } from 'react-icons/rx'
 import { useApiUrl } from '@refinedev/core'
 import { siteUrl } from '@/utils'
-import { DownloadOutlined } from '@ant-design/icons'
 import { SiMicrosoftexcel } from 'react-icons/si'
 
 const { Item } = Form
@@ -25,11 +23,19 @@ const index = () => {
 		<Form layout="vertical" form={form} onFinish={handleSave}>
 			<div className="flex flex-col md:flex-row gap-8">
 				<div className="w-full max-w-[400px]">
+					<Heading>Bunny Streaming API 設定</Heading>
 					<Item name={['bunny_library_id']} label="Bunny Library ID">
 						<Input
 							disabled={isGetLoading || isSaveLoading}
 							allowClear
 							placeholder="xxxxxxx"
+						/>
+					</Item>
+					<Item name={['bunny_cdn_hostname']} label="Bunny CDN Hostname">
+						<Input
+							disabled={isGetLoading || isSaveLoading}
+							allowClear
+							placeholder="xx-xxxxxxxx-xxx.b-cdn.net"
 						/>
 					</Item>
 					<Item name={['bunny_stream_api_key']} label="Bunny Stream API Key">
@@ -39,6 +45,7 @@ const index = () => {
 							placeholder="xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxx-xxxx"
 						/>
 					</Item>
+					<Heading className="mt-20">課程商品永久連結設定</Heading>
 					<FiSwitch
 						formItemProps={{
 							name: ['override_course_product_permalink'],
@@ -69,9 +76,7 @@ const index = () => {
 						儲存
 					</Button>
 
-					<Divider className="mt-12" plain>
-						批次上傳學員權限
-					</Divider>
+					<Heading className="mt-20">CSV 批次上傳學員權限</Heading>
 
 					<Alert
 						message="批次上傳注意事項"
@@ -151,7 +156,10 @@ const index = () => {
 						<SimpleImage src={bunnyTutorial1} className="w-full aspect-[2.1]" />
 					</div>
 					<div className="mb-4">
-						<p>2. 進入「API」分頁，複製 Library ID 和 Stream API Key</p>
+						<p>
+							2. 進入「API」分頁，複製 Library ID 、 CDN Hostname 和 Stream API
+							Key
+						</p>
 						<SimpleImage src={bunnyTutorial2} className="w-full aspect-[2.1]" />
 					</div>
 				</div>

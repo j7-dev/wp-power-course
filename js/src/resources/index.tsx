@@ -5,6 +5,7 @@ import {
 	CodeOutlined,
 	SettingOutlined,
 } from '@ant-design/icons'
+import { FaPhotoVideo } from 'react-icons/fa'
 
 export const resources = [
 	{
@@ -21,6 +22,14 @@ export const resources = [
 		meta: {
 			label: '講師管理',
 			icon: <UserOutlined />,
+		},
+	},
+	{
+		name: 'media-library',
+		list: '/media-library',
+		meta: {
+			label: 'Bunny 媒體庫',
+			icon: <FaPhotoVideo />,
 		},
 	},
 	{

@@ -35,4 +35,29 @@ export const responsive = () => {
 			showChapterInMobile()
 		}
 	})
+
+	// classroom 的 sider 移動到當前章節
+	function scrollToChapter() {
+		const url = new URL(window.location.href)
+		const chapter_id = url.pathname.split('/')?.[3]
+		const target = $(
+			`#pc-classroom-sider__main [data-chapter_id="${chapter_id}"]`,
+		)
+		if (!target.length) {
+			console.log('chapter target not found')
+			return
+		}
+		const targetOffset = target.offset().top
+		const parentDiv = target.closest('.pc-sider-chapters')
+
+		// 將父級 div 滾動到目標節點的位置
+		parentDiv.animate(
+			{
+				scrollTop: targetOffset - parentDiv.offset().top,
+			},
+			500,
+		)
+	}
+
+	scrollToChapter()
 }

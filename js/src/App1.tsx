@@ -23,6 +23,7 @@ import Courses from '@/pages/admin/Courses'
 import Teachers from '@/pages/admin/Teachers'
 import Settings from '@/pages/admin/Settings'
 import Shortcodes from '@/pages/admin/Shortcodes'
+import MediaLibrary from '@/pages/admin/MediaLibrary'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Logo } from '@/components/general'
@@ -101,6 +102,7 @@ function App() {
 						<Route path="/shortcodes" element={<Shortcodes />} />
 						<Route path="/settings" element={<Settings />} />
 						<Route path="/dashboard" element={<Dashboard />} />
+						<Route path="/media-library" element={<MediaLibrary />} />
 
 						<Route path="*" element={<ErrorComponent />} />
 					</Route>

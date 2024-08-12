@@ -66,16 +66,17 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 
 		$children_html .= sprintf(
 			/*html*/'
-				<a href="%1$s">
-					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %2$s">
-						<div id="%3$s" class="w-8 flex justify-center items-start">%4$s</div>
+				<a data-chapter_id="%1$s" href="%2$s">
+					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %3$s">
+						<div id="%4$s" class="w-8 flex justify-center items-start">%5$s</div>
 						<div class="flex-1 text-gray-800 hover:text-gray-600">
-							<p class="my-1 font-medium">%5$s</p>
-							<p class="text-gray-400 text-xs m-0 font-light">%6$s</p>
+							<p class="my-1 font-medium">%6$s</p>
+							<p class="text-gray-400 text-xs m-0 font-light">%7$s</p>
 						</div>
 					</div>
 				</a>
                     ',
+			$sub_chapter->ID,
 			site_url( "classroom/{$product->get_slug()}/{$sub_chapter->ID}" ),
 			$sub_chapter->ID === $chapter_id ? 'bg-primary/10' : '',
 			"classroom__sider-collapse__chapter-{$sub_chapter->ID}",

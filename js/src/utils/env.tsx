@@ -26,6 +26,8 @@ export const apiTimeout = '30000'
 export const ajaxNonce = window?.[APP_DOMAIN]?.env?.nonce || ''
 export const bunny_library_id =
 	window?.[APP_DOMAIN]?.env?.bunny_library_id || ''
+export const bunny_cdn_hostname =
+	window?.[APP_DOMAIN]?.env?.bunny_cdn_hostname || ''
 export const bunny_stream_api_key =
 	window?.[APP_DOMAIN]?.env?.bunny_stream_api_key || ''
 
