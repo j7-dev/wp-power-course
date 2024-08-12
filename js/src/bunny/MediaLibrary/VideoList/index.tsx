@@ -22,7 +22,6 @@ const VideoList: FC<TMediaLibraryProps> = ({
 }) => {
 	const [search, setSearch] = useState('')
 	const filesInQueue = useAtomValue(filesInQueueAtom)
-	console.log('⭐  filesInQueue:', filesInQueue)
 	const {
 		data,
 		isError,

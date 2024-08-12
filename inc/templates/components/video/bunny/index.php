@@ -31,6 +31,8 @@ $args = wp_parse_args( $args, $default_args );
 	'video_info'   => $video_info,
 ] = $args;
 
+$video_id = $video_info['id'];
+
 if ( ! $library_id || ! $video_id ) {
 	Templates::get(
 		'video/404',

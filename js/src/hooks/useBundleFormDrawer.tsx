@@ -46,7 +46,6 @@ export function useBundleFormDrawer({
 	const handleSave = () => {
 		form.validateFields().then(() => {
 			const values = form.getFieldsValue()
-			console.log('⭐  values:', values)
 			const sale_date_range = values?.sale_date_range || [null, null]
 
 			// 處理日期欄位 sale_date_range
@@ -69,7 +68,6 @@ export function useBundleFormDrawer({
 			}
 
 			const formData = toFormData(formattedValues)
-			console.log('⭐  formData:', formData)
 
 			if (isUpdate) {
 				update(

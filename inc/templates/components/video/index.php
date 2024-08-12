@@ -62,7 +62,7 @@ if ('vimeo' === $video_type) {
 }
 
 if ('bunny-stream-api' === $video_type) {
-	$library_id = \get_option( 'library_id', '' );
+	$library_id = \get_option( 'bunny_library_id', '' );
 	Templates::get(
 		'video/bunny',
 		[

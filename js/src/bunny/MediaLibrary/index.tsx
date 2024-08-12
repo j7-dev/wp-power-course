@@ -8,16 +8,32 @@ import UploadVideo from './UploadVideo'
 import { atom } from 'jotai'
 import { RcFile } from 'antd/lib/upload/interface'
 import { TVideo } from '@/bunny/MediaLibrary/types'
+import { bunny_library_id, bunny_stream_api_key } from '@/utils'
+import NoLibraryId from '@/components/formItem/VideoInput/NoLibraryId'
 
 export type TMediaLibraryProps = {
 	selectedVideos: TVideo[]
-	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
+	setSelectedVideos:
+		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| ((
+				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+		  ) => void)
 	limit?: number
 	selectButtonProps?: ButtonProps
 }
 
 export const MediaLibrary: FC<TMediaLibraryProps> = (props) => {
 	const [activeKey, setActiveKey] = useState('bunny-media-library')
+
+	if (!bunny_library_id || !bunny_stream_api_key) {
+		return (
+			<NoLibraryId
+				bunny_library_id={bunny_library_id}
+				bunny_stream_api_key={bunny_stream_api_key}
+			/>
+		)
+	}
+
 	const items: TabsProps['items'] = [
 		{
 			key: 'upload-video',

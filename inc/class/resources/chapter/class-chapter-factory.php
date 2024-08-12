@@ -264,21 +264,15 @@ final class ChapterFactory {
 	 * @return integer|\WP_Error
 	 */
 	public static function update_chapter( string $id, array $args ): int|\WP_Error {
-		// 將資料拆成 data 與 meta_data
-		[
-			'data' => $data,
-			'meta_data' => $meta_data,
-		] = WP::separator(args: $args, obj: 'post', files: []);
 
-		if (isset($meta_data['image_ids'])) {
-			\set_post_thumbnail($id, $meta_data['image_ids'][0]);
-			unset($meta_data['image_ids']);
-		}
+		$args['ID']            = $id;
+		$args['post_title']    = $args['post_title'] ?? '新章節';
+		$args['post_status']   = $args['status'] ?? 'publish';
+		$args['post_author']   = \get_current_user_id();
+		$args['post_type']     = RegisterCPT::POST_TYPE;
+		$args['page_template'] = self::TEMPLATE;
 
-		$data['ID']         = $id;
-		$data['meta_input'] = $meta_data;
-
-		$update_result = \wp_update_post($data);
+		$update_result = \wp_update_post($args);
 
 		return $update_result;
 	}

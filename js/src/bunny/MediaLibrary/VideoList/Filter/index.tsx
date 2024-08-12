@@ -22,7 +22,11 @@ const Filter = ({
 	...inputProps
 }: {
 	selectedVideos: TVideo[]
-	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
+	setSelectedVideos:
+		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| ((
+				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+		  ) => void)
 	setSearch: React.Dispatch<React.SetStateAction<string>>
 	loading?: boolean
 	selectButtonProps?: ButtonProps

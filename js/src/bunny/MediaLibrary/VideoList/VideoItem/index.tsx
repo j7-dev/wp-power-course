@@ -17,7 +17,11 @@ const VideoItem = ({
 	children?: React.ReactNode
 	video: TVideo
 	selectedVideos: TVideo[]
-	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
+	setSelectedVideos:
+		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| ((
+				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+		  ) => void)
 	limit: number | undefined
 }) => {
 	const [filename, setFilename] = useState(video?.thumbnailFileName)
@@ -34,6 +38,7 @@ const VideoItem = ({
 					key: 'limit',
 					content: `最多只能選取${limit}個影片`,
 				})
+				setSelectedVideos((prev) => [...prev.slice(1), video])
 				return
 			}
 			setSelectedVideos((prev) => [...prev, video])

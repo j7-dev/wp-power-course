@@ -144,8 +144,6 @@ export const dataProvider = (
 			headers,
 		})
 
-		console.log('⭐  result:', result)
-
 		return {
 			data: result.data,
 		}
