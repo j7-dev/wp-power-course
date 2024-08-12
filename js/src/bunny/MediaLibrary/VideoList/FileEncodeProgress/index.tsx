@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { Progress, Tooltip } from 'antd'
-import { filesInQueueAtom, TFileInQueue } from '@/pages/admin/MediaLibrary'
+import { filesInQueueAtom, TFileInQueue } from '@/bunny/MediaLibrary'
 import { useGetVideo } from '@/bunny'
 import { useSetAtom } from 'jotai'
 import { useInvalidate } from '@refinedev/core'
@@ -8,7 +8,7 @@ import { bunny_library_id } from '@/utils'
 
 const REFETCH_INTERVAL = 10000
 
-export const FileEncodeProgress: FC<{
+const FileEncodeProgress: FC<{
 	fileInQueue: TFileInQueue
 }> = ({ fileInQueue }) => {
 	const { status = 'active', videoId = '' } = fileInQueue
@@ -68,3 +68,5 @@ export const FileEncodeProgress: FC<{
 		</>
 	)
 }
+
+export default FileEncodeProgress

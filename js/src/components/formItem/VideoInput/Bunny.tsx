@@ -1,4 +1,3 @@
-import { useUpload } from '@/bunny'
 import { Form, FormItemProps } from 'antd'
 import { FC, useEffect } from 'react'
 import { Upload } from '@/components/general'
@@ -10,7 +9,7 @@ import { TVideo } from './types'
 const { Item } = Form
 const Bunny: FC<FormItemProps> = (formItemProps) => {
 	const form = Form.useFormInstance()
-	const bunnyUploadProps = useUpload()
+	const bunnyUploadProps = {}
 	const { fileList, setFileList } = bunnyUploadProps
 	const videoId = fileList?.[0]?.videoId // 上傳影片到 bunny 後取得的 videoId
 	const preview = fileList?.[0]?.preview // 瀏覽器端的 preview

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { TVideo } from '@/pages/admin/MediaLibrary/types'
+import { TVideo } from '@/bunny/MediaLibrary/types'
 import { bunny_cdn_hostname } from '@/utils'
 import { SimpleImage } from '@/components/general'
-import { Typography } from 'antd'
+import { Typography, message } from 'antd'
 
 const PREVIEW_FILENAME = 'preview.webp'
 const { Text } = Typography
@@ -10,22 +10,36 @@ const { Text } = Typography
 const VideoItem = ({
 	children,
 	video,
-	isSelected,
+	selectedVideos,
 	setSelectedVideos,
+	limit,
 }: {
 	children?: React.ReactNode
 	video: TVideo
-	isSelected: boolean
+	selectedVideos: TVideo[]
 	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
+	limit: number | undefined
 }) => {
 	const [filename, setFilename] = useState(video?.thumbnailFileName)
+	const isSelected = selectedVideos?.some(
+		(selectedVideo) => selectedVideo.guid === video.guid,
+	)
+
 	const handleClick = () => {
 		if (isSelected) {
 			setSelectedVideos((prev) => prev.filter((v) => v.guid !== video.guid))
 		} else {
+			if (limit && selectedVideos.length >= limit) {
+				message.warning({
+					key: 'limit',
+					content: `最多只能選取${limit}個影片`,
+				})
+				return
+			}
 			setSelectedVideos((prev) => [...prev, video])
 		}
 	}
+
 	return (
 		<div className="w-36">
 			<SimpleImage

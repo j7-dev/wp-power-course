@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMediaUpload } from '@/pages/admin/MediaLibrary/hooks'
+import { useMediaUpload } from '@/bunny/MediaLibrary/hooks'
 import { Upload } from '@/components/general'
 
 const UploadVideo = ({
@@ -11,9 +11,9 @@ const UploadVideo = ({
 		setActiveKey,
 	})
 	return (
-		<>
+		<div className="lg:max-w-[80rem]">
 			<Upload {...bunnyUploadProps} />
-		</>
+		</div>
 	)
 }
 

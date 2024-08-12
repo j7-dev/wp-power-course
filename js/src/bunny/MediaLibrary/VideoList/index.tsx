@@ -1,19 +1,25 @@
-import React, { useState } from 'react'
+import React, { FC, useState } from 'react'
 import Filter from './Filter'
 import { useInfiniteList } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
 import { Button } from 'antd'
-import { TVideo } from '@/pages/admin/MediaLibrary/types'
-import { filesInQueueAtom } from '@/pages/admin/MediaLibrary'
+import { TVideo } from '@/bunny/MediaLibrary/types'
+import { filesInQueueAtom, TMediaLibraryProps } from '@/bunny/MediaLibrary'
 import { useAtomValue } from 'jotai'
 import VideoInfo from './VideoInfo'
 import VideoItem from './VideoItem'
 import { LoadingCard } from 'antd-toolkit'
-import { FileEncodeProgress, FileUploadProgress } from '@/components/general'
+import FileEncodeProgress from './FileEncodeProgress'
+import FileUploadProgress from './FileUploadProgress'
 
 const PAGE_SIZE = 30
 
-const VideoList = () => {
+const VideoList: FC<TMediaLibraryProps> = ({
+	selectedVideos,
+	setSelectedVideos,
+	selectButtonProps,
+	limit,
+}) => {
 	const [search, setSearch] = useState('')
 	const filesInQueue = useAtomValue(filesInQueueAtom)
 	console.log('⭐  filesInQueue:', filesInQueue)
@@ -44,8 +50,6 @@ const VideoList = () => {
 		...(data?.pages ?? []).map((page) => page?.data || []),
 	)
 
-	const [selectedVideos, setSelectedVideos] = useState<TVideo[]>([])
-
 	const isSearchFetching = isFetching && !isFetchingNextPage
 
 	return (
@@ -56,6 +60,7 @@ const VideoList = () => {
 				setSearch={setSearch}
 				disabled={isFetching}
 				loading={isSearchFetching}
+				selectButtonProps={selectButtonProps}
 			/>
 			<div className="flex">
 				<div className="flex-1">
@@ -86,9 +91,8 @@ const VideoList = () => {
 								<VideoItem
 									key={video.guid}
 									video={video}
-									isSelected={selectedVideos?.some(
-										(selectedVideo) => selectedVideo.guid === video.guid,
-									)}
+									selectedVideos={selectedVideos}
+									limit={limit}
 									setSelectedVideos={setSelectedVideos}
 								/>
 							))}

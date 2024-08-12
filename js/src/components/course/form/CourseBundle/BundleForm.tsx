@@ -14,7 +14,6 @@ import {
 } from '@ant-design/icons'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FiSwitch, RangePicker } from '@/components/formItem'
-import { useUpload } from '@/bunny'
 import { FileUpload } from '@/components/post'
 
 // TODO 目前只支援簡單商品
@@ -47,7 +46,7 @@ const BundleForm: FC<{
 		Form.useWatch(['sale_price'], bundleProductForm),
 	)
 
-	const bunnyUploadProps = useUpload()
+	const bunnyUploadProps = {}
 	const { fileList } = bunnyUploadProps
 
 	const onSearch = (value: string) => {

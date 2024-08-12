@@ -1,6 +1,13 @@
 import React, { useState } from 'react'
-import { Input, InputProps, Button, Popconfirm, message } from 'antd'
-import { TVideo } from '@/pages/admin/MediaLibrary/types'
+import {
+	Input,
+	InputProps,
+	Button,
+	Popconfirm,
+	message,
+	ButtonProps,
+} from 'antd'
+import { TVideo } from '@/bunny/MediaLibrary/types'
 import { useDelete, useInvalidate } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
 
@@ -11,12 +18,14 @@ const Filter = ({
 	setSelectedVideos,
 	setSearch,
 	loading,
+	selectButtonProps,
 	...inputProps
 }: {
 	selectedVideos: TVideo[]
 	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
 	setSearch: React.Dispatch<React.SetStateAction<string>>
 	loading?: boolean
+	selectButtonProps?: ButtonProps
 } & InputProps) => {
 	const [value, setValue] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +82,7 @@ const Filter = ({
 
 			<div className="flex items-center gap-2">
 				<p className="text-sm m-0 text-gray-500">
-					已經選取 {selectedVideos?.length} 個影片
+					已經選取 {selectedVideos?.length ?? 0} 個影片
 				</p>
 				<Popconfirm
 					title="確定要刪除這些影片嗎？"
@@ -87,9 +96,17 @@ const Filter = ({
 						type="primary"
 						danger
 					>
-						批量刪除 ({selectedVideos?.length})
+						批量刪除{' '}
+						{selectedVideos?.length ? `(${selectedVideos?.length})` : ''}
 					</Button>
 				</Popconfirm>
+				<Button
+					type="primary"
+					{...selectButtonProps}
+					disabled={!selectedVideos?.length}
+				>
+					選取影片 {selectedVideos?.length ? `(${selectedVideos?.length})` : ''}
+				</Button>
 			</div>
 		</div>
 	)

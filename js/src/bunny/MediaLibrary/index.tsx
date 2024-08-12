@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Tabs, TabsProps } from 'antd'
+import React, { FC, useState } from 'react'
+import { Tabs, TabsProps, ButtonProps } from 'antd'
 import { FaPhotoVideo } from 'react-icons/fa'
 import { CloudUploadOutlined } from '@ant-design/icons'
 import { Heading } from '@/components/general'
@@ -7,9 +7,17 @@ import VideoList from './VideoList'
 import UploadVideo from './UploadVideo'
 import { atom } from 'jotai'
 import { RcFile } from 'antd/lib/upload/interface'
+import { TVideo } from '@/bunny/MediaLibrary/types'
 
-const index = () => {
-	const [activeKey, setActiveKey] = useState('upload-video')
+export type TMediaLibraryProps = {
+	selectedVideos: TVideo[]
+	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
+	limit?: number
+	selectButtonProps?: ButtonProps
+}
+
+export const MediaLibrary: FC<TMediaLibraryProps> = (props) => {
+	const [activeKey, setActiveKey] = useState('bunny-media-library')
 	const items: TabsProps['items'] = [
 		{
 			key: 'upload-video',
@@ -20,7 +28,7 @@ const index = () => {
 		{
 			key: 'bunny-media-library',
 			label: 'Bunny 媒體庫',
-			children: <VideoList />,
+			children: <VideoList {...props} />,
 			icon: <FaPhotoVideo />,
 		},
 	]
@@ -37,8 +45,6 @@ const index = () => {
 		</>
 	)
 }
-
-export default index
 
 export type TUploadStatus =
 	| 'active'

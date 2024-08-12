@@ -1,10 +1,7 @@
 import React, { FC, useEffect, useState } from 'react'
-import { BiMoviePlay } from 'react-icons/bi'
-import { Typography, Progress } from 'antd'
+import { Progress } from 'antd'
 import { getEstimateUploadTimeInSeconds } from '@/utils'
-import { TFileInQueue } from '@/pages/admin/Courses'
-
-const { Paragraph } = Typography
+import { TFileInQueue } from '@/bunny/MediaLibrary'
 
 /**
   ⭐  file:
@@ -16,11 +13,11 @@ const { Paragraph } = Typography
   type: "video/mp4"
  */
 
-export const FileUploadProgress: FC<{
+const FileUploadProgress: FC<{
 	fileInQueue: TFileInQueue
 }> = ({ fileInQueue }) => {
 	const [percent, setPercent] = useState(0)
-	const { file, status = 'active', encodeProgress } = fileInQueue
+	const { file, status = 'active' } = fileInQueue
 
 	// 估計上傳時間
 	const estimatedTimeInSeconds = getEstimateUploadTimeInSeconds(file.size)
@@ -77,3 +74,5 @@ export const FileUploadProgress: FC<{
 		</>
 	)
 }
+
+export default FileUploadProgress

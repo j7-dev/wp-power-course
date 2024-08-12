@@ -1,4 +1,4 @@
-import { TVideo } from '@/pages/admin/MediaLibrary/types'
+import { TVideo } from '@/bunny/MediaLibrary/types'
 import { bunny_cdn_hostname, bunny_library_id } from '@/utils'
 import { SimpleImage } from '@/components/general'
 import { ObjectTable, CopyText } from 'antd-toolkit'

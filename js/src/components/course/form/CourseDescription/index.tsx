@@ -14,7 +14,6 @@ import {
 	DescriptionDrawer,
 } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
-import { useUpload } from '@/bunny'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FileUpload } from '@/components/post'
 
@@ -26,7 +25,7 @@ export const CourseDescription = () => {
 	const { product_cats = [], product_tags = [] } = options
 	const productUrl = `${siteUrl}/${course_permalink_structure}/`
 	const slug = Form.useWatch(['slug'], form)
-	const bunnyUploadProps = useUpload()
+	const bunnyUploadProps = {}
 	const { fileList } = bunnyUploadProps
 	const watchLimitType: string = Form.useWatch(['limit_type'], form)
 	const watchId = Form.useWatch(['id'], form)
