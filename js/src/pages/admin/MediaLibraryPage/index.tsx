@@ -8,7 +8,6 @@ const MediaLibraryPage = () => {
 		<MediaLibrary
 			selectedVideos={selectedVideos}
 			setSelectedVideos={setSelectedVideos}
-			limit={1}
 		/>
 	)
 }
