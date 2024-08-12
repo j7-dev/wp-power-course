@@ -11,6 +11,7 @@ import { LoadingCard } from 'antd-toolkit'
 const PAGE_SIZE = 30
 
 const VideoList = () => {
+	const [search, setSearch] = useState('')
 	const {
 		data,
 		isError,
@@ -18,12 +19,20 @@ const VideoList = () => {
 		hasNextPage,
 		fetchNextPage,
 		isFetchingNextPage,
+		isFetching,
 	} = useInfiniteList<TVideo>({
 		dataProviderName: 'bunny-stream',
 		resource: `${bunny_library_id}/videos`,
 		pagination: {
 			pageSize: PAGE_SIZE,
 		},
+		filters: [
+			{
+				field: 'search',
+				operator: 'eq',
+				value: search,
+			},
+		],
 	})
 
 	const allVideos = ([] as TVideo[]).concat(
@@ -32,22 +41,29 @@ const VideoList = () => {
 
 	const [selectedVideo, setSelectedVideo] = useState<TVideo | null>(null)
 
+	const isSearchFetching = isFetching && !isFetchingNextPage
+
 	return (
 		<>
-			<Filter />
+			<Filter
+				setSearch={setSearch}
+				disabled={isFetching}
+				loading={isSearchFetching}
+			/>
 			<div className="flex">
 				<div className="flex-1">
 					<div className="flex flex-wrap gap-4">
-						{allVideos.map((video) => (
-							<VideoItem
-								key={video.guid}
-								video={video}
-								isSelected={selectedVideo?.guid === video.guid}
-								setSelectedVideo={setSelectedVideo}
-							/>
-						))}
+						{!isSearchFetching &&
+							allVideos.map((video) => (
+								<VideoItem
+									key={video.guid}
+									video={video}
+									isSelected={selectedVideo?.guid === video.guid}
+									setSelectedVideo={setSelectedVideo}
+								/>
+							))}
 
-						{(isLoading || isFetchingNextPage) &&
+						{isFetching &&
 							new Array(PAGE_SIZE)
 								.fill(0)
 								.map((_, index) => (
@@ -59,7 +75,7 @@ const VideoList = () => {
 							<Button
 								type="link"
 								onClick={() => fetchNextPage()}
-								disabled={isFetchingNextPage}
+								disabled={isFetching}
 							>
 								顯示更多
 							</Button>
