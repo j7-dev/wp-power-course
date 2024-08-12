@@ -25,19 +25,26 @@ const VideoInfo = ({ video }: { video: TVideo }) => {
 					</Button>
 				</CopyText>
 				<Tooltip title="前往 Bunny 頁面">
-					<Button type="default" href={bunnyUrl} target="_blank">
+					<Button
+						type="default"
+						href={bunnyUrl}
+						target="_blank"
+						className="px-0 w-8"
+					>
 						<ExportOutlined />
 					</Button>
 				</Tooltip>
-				<DeleteButton
-					hideText
-					resource={`${bunny_library_id}/videos`}
-					dataProviderName="bunny-stream"
-					recordItemId={guid}
-					confirmTitle="確認刪除 Bunny 影片嗎?"
-					confirmOkText="確認"
-					confirmCancelText="取消"
-				/>
+				<Tooltip title="刪除 Bunny 影片">
+					<DeleteButton
+						hideText
+						resource={`${bunny_library_id}/videos`}
+						dataProviderName="bunny-stream"
+						recordItemId={guid}
+						confirmTitle="確認刪除 Bunny 影片嗎?"
+						confirmOkText="確認"
+						confirmCancelText="取消"
+					/>
+				</Tooltip>
 			</div>
 			<ObjectTable record={video} />
 		</>

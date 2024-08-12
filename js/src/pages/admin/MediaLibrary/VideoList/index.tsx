@@ -48,30 +48,11 @@ const VideoList = () => {
 
 	const isSearchFetching = isFetching && !isFetchingNextPage
 
-	const fakes = [
-		// {
-		// 	key: 'rc-upload-1723454876057-3',
-		// 	file: {},
-		// 	status: 'active',
-		// 	videoId: '',
-		// 	isEncoding: false,
-		// 	encodeProgress: 0,
-		// },
-		// {
-		// 	key: 'rc-upload-1723454876057-4',
-		// 	file: {},
-		// 	status: 'active',
-		// 	videoId: '',
-		// 	isEncoding: true,
-		// 	encodeProgress: 0,
-		// },
-	]
-
 	return (
 		<>
 			<Filter
 				selectedVideos={selectedVideos}
-				setSelectedVideos
+				setSelectedVideos={setSelectedVideos}
 				setSearch={setSearch}
 				disabled={isFetching}
 				loading={isSearchFetching}
@@ -79,27 +60,6 @@ const VideoList = () => {
 			<div className="flex">
 				<div className="flex-1">
 					<div className="flex flex-wrap gap-4">
-						{fakes.map((fileInQueue) =>
-							fileInQueue?.isEncoding ? (
-								<div
-									key={fileInQueue?.key}
-									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-								>
-									<FileEncodeProgress fileInQueue={fileInQueue} />
-								</div>
-							) : (
-								<div
-									key={fileInQueue?.key}
-									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-								>
-									<FileUploadProgress
-										key={fileInQueue?.key}
-										fileInQueue={fileInQueue}
-									/>
-								</div>
-							),
-						)}
-
 						{filesInQueue.map((fileInQueue) =>
 							fileInQueue?.isEncoding ? (
 								<div
@@ -134,11 +94,12 @@ const VideoList = () => {
 							))}
 
 						{isFetching &&
-							new Array(PAGE_SIZE)
-								.fill(0)
-								.map((_, index) => (
-									<LoadingCard ratio="w-36 aspect-video" key={index} />
-								))}
+							new Array(PAGE_SIZE).fill(0).map((_, index) => (
+								<div key={index} className="w-36">
+									<LoadingCard ratio="aspect-video" />
+									<LoadingCard ratio="h-3 !p-0 rounded-sm">&nbsp;</LoadingCard>
+								</div>
+							))}
 					</div>
 					{hasNextPage && (
 						<div className="text-center mt-8">

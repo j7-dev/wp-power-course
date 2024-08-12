@@ -1,5 +1,5 @@
 import React from 'react'
-import { useMediaUpload } from '@/pages/admin/MediaLibrary/hooks/'
+import { useMediaUpload } from '@/pages/admin/MediaLibrary/hooks'
 import { Upload } from '@/components/general'
 
 const UploadVideo = ({
