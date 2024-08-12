@@ -6,20 +6,22 @@ import { SimpleImage } from '@/components/general'
 const PREVIEW_FILENAME = 'preview.webp'
 
 const VideoItem = ({
+	children,
 	video,
 	isSelected,
-	setSelectedVideo,
+	setSelectedVideos,
 }: {
+	children?: React.ReactNode
 	video: TVideo
 	isSelected: boolean
-	setSelectedVideo: React.Dispatch<React.SetStateAction<TVideo | null>>
+	setSelectedVideos: React.Dispatch<React.SetStateAction<TVideo[]>>
 }) => {
 	const [filename, setFilename] = useState(video?.thumbnailFileName)
 	const handleClick = () => {
 		if (isSelected) {
-			setSelectedVideo(null)
+			setSelectedVideos((prev) => prev.filter((v) => v.guid !== video.guid))
 		} else {
-			setSelectedVideo(video)
+			setSelectedVideos((prev) => [...prev, video])
 		}
 	}
 	return (
@@ -38,7 +40,9 @@ const VideoItem = ({
 			}`}
 			loadingClassName="text-sm text-gray-500 font-bold"
 			src={`https://${bunny_cdn_hostname}/${video.guid}/${filename}`}
-		/>
+		>
+			{children}
+		</SimpleImage>
 	)
 }
 

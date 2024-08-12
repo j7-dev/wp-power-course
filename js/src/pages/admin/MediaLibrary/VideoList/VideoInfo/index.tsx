@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
 import { TVideo } from '@/pages/admin/MediaLibrary/types'
-import { bunny_cdn_hostname } from '@/utils'
+import { bunny_cdn_hostname, bunny_library_id } from '@/utils'
 import { SimpleImage } from '@/components/general'
 import { ObjectTable, CopyText } from 'antd-toolkit'
 import { Button, Tooltip } from 'antd'
 import { CopyOutlined, ExportOutlined } from '@ant-design/icons'
+import { DeleteButton } from '@refinedev/antd'
 
 const VideoInfo = ({ video }: { video: TVideo }) => {
 	const { guid, videoLibraryId } = video
@@ -29,6 +29,15 @@ const VideoInfo = ({ video }: { video: TVideo }) => {
 						<ExportOutlined />
 					</Button>
 				</Tooltip>
+				<DeleteButton
+					hideText
+					resource={`${bunny_library_id}/videos`}
+					dataProviderName="bunny-stream"
+					recordItemId={guid}
+					confirmTitle="確認刪除 Bunny 影片嗎?"
+					confirmOkText="確認"
+					confirmCancelText="取消"
+				/>
 			</div>
 			<ObjectTable record={video} />
 		</>

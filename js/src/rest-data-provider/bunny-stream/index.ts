@@ -136,17 +136,18 @@ export const dataProvider = (
 
 	deleteOne: async ({ resource, id, variables, meta }) => {
 		const url = `${apiUrl}/${resource}/${id}`
-
 		const { headers, method } = meta ?? {}
-		const requestMethod = (method as THttpMethodsWithBody) ?? 'delete'
+		const requestMethod = (method ?? 'delete') as THttpMethodsWithBody
 
-		const { data } = await httpClient[requestMethod](url, {
+		const result = await httpClient?.[requestMethod](url, {
 			data: variables,
 			headers,
 		})
 
+		console.log('⭐  result:', result)
+
 		return {
-			data,
+			data: result.data,
 		}
 	},
 
