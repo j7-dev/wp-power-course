@@ -91,7 +91,7 @@ const VideoItem = ({
 				{video.title}
 			</Text>
 			{isSelected && (
-				<div className="bg-white absolute -top-2 -right-2 z-50 w-6 h-6 -1 rounded-full flex items-center justify-center">
+				<div className="bg-white absolute -top-2 -right-2 z-30 w-6 h-6 -1 rounded-full flex items-center justify-center">
 					<CheckIcon className="w-5 h-5 [&_path]:fill-yellow-300" />
 				</div>
 			)}

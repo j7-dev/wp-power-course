@@ -62,6 +62,7 @@ export const MediaLibrary: FC<TMediaLibraryProps> = (props) => {
 				onChange={setActiveKey}
 				items={items}
 				type="card"
+				className="pc-media-library__tabs"
 			/>
 		</>
 	)

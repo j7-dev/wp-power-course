@@ -71,10 +71,10 @@ const Filter = ({
 	}
 
 	return (
-		<div className="flex items-center justify-between">
+		<div className="pc-media-library__tabs__filter flex items-center justify-between sticky backdrop-blur-sm z-50 top-0 -mx-6 px-6 pb-4">
 			<Search
 				placeholder="搜尋關鍵字，按 ENTER 也能搜"
-				className="w-[20rem] mb-4"
+				className="w-[20rem]"
 				value={value}
 				onChange={(e) => setValue(e.target.value)}
 				allowClear

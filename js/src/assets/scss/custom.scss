@@ -1,0 +1,23 @@
+.pc-media-library {
+	&__tabs {
+		.ant-tabs-nav {
+			z-index: 60;
+		}
+
+		&__filter {
+			margin-top: -2rem;
+			padding-top: 2rem;
+		}
+	}
+}
+
+.ant-modal {
+	.pc-media-library {
+		&__tabs {
+			&__filter {
+				margin-top: -1rem;
+				padding-top: 1rem;
+			}
+		}
+	}
+}

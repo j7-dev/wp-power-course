@@ -19,6 +19,7 @@ export const mediaLibraryAtom = atom<{
 		footer: null,
 		centered: true,
 		zIndex: 2000,
+		className: 'pc-media-library',
 
 		// destroyOnClose: true,
 	},
