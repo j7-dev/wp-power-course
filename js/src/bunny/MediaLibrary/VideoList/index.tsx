@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react'
 import Filter from './Filter'
 import { useInfiniteList } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
-import { Button } from 'antd'
+import { Button, Empty, Result } from 'antd'
 import { TVideo } from '@/bunny/MediaLibrary/types'
 import { filesInQueueAtom, TMediaLibraryProps } from '@/bunny/MediaLibrary'
 import { useAtomValue } from 'jotai'
@@ -25,7 +25,6 @@ const VideoList: FC<TMediaLibraryProps> = ({
 	const {
 		data,
 		isError,
-		isLoading,
 		hasNextPage,
 		fetchNextPage,
 		isFetchingNextPage,
@@ -51,6 +50,16 @@ const VideoList: FC<TMediaLibraryProps> = ({
 
 	const isSearchFetching = isFetching && !isFetchingNextPage
 
+	if (isError) {
+		return (
+			<Result
+				status="error"
+				title="獲取影片失敗"
+				subTitle="Bunny Stream API 回應錯誤，請聯繫網站管理人員或稍候再嘗試"
+			/>
+		)
+	}
+
 	return (
 		<>
 			<Filter
@@ -63,47 +72,56 @@ const VideoList: FC<TMediaLibraryProps> = ({
 			/>
 			<div className="flex">
 				<div className="flex-1">
-					<div className="flex flex-wrap gap-4">
-						{filesInQueue.map((fileInQueue) =>
-							fileInQueue?.isEncoding ? (
-								<div
-									key={fileInQueue?.key}
-									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-								>
-									<FileEncodeProgress fileInQueue={fileInQueue} />
-								</div>
-							) : (
-								<div
-									key={fileInQueue?.key}
-									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-								>
-									<FileUploadProgress
+					{!!allVideos?.length && (
+						<div className="flex flex-wrap gap-4">
+							{filesInQueue.map((fileInQueue) =>
+								fileInQueue?.isEncoding ? (
+									<div
 										key={fileInQueue?.key}
-										fileInQueue={fileInQueue}
+										className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
+									>
+										<FileEncodeProgress fileInQueue={fileInQueue} />
+									</div>
+								) : (
+									<div
+										key={fileInQueue?.key}
+										className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
+									>
+										<FileUploadProgress
+											key={fileInQueue?.key}
+											fileInQueue={fileInQueue}
+										/>
+									</div>
+								),
+							)}
+
+							{!isSearchFetching &&
+								allVideos.map((video) => (
+									<VideoItem
+										key={video.guid}
+										video={video}
+										selectedVideos={selectedVideos}
+										limit={limit}
+										setSelectedVideos={setSelectedVideos}
 									/>
-								</div>
-							),
-						)}
+								))}
 
-						{!isSearchFetching &&
-							allVideos.map((video) => (
-								<VideoItem
-									key={video.guid}
-									video={video}
-									selectedVideos={selectedVideos}
-									limit={limit}
-									setSelectedVideos={setSelectedVideos}
-								/>
-							))}
+							{isFetching &&
+								new Array(PAGE_SIZE).fill(0).map((_, index) => (
+									<div key={index} className="w-36">
+										<LoadingCard ratio="aspect-video" />
+										<LoadingCard ratio="h-3 !p-0 rounded-sm">
+											&nbsp;
+										</LoadingCard>
+									</div>
+								))}
+						</div>
+					)}
 
-						{isFetching &&
-							new Array(PAGE_SIZE).fill(0).map((_, index) => (
-								<div key={index} className="w-36">
-									<LoadingCard ratio="aspect-video" />
-									<LoadingCard ratio="h-3 !p-0 rounded-sm">&nbsp;</LoadingCard>
-								</div>
-							))}
-					</div>
+					{!allVideos?.length && (
+						<Empty className="my-24" description="找不到影片資料" />
+					)}
+
 					{hasNextPage && (
 						<div className="text-center mt-8">
 							<Button

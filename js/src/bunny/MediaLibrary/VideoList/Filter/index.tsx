@@ -78,7 +78,7 @@ const Filter = ({
 				value={value}
 				onChange={(e) => setValue(e.target.value)}
 				allowClear
-				onSearch={() => setSearch(value)}
+				onSearch={(searchValue) => setSearch(searchValue)}
 				enterButton
 				loading={loading}
 				{...inputProps}

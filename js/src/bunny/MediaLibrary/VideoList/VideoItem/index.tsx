@@ -87,7 +87,7 @@ const VideoItem = ({
 			>
 				{children}
 			</SimpleImage>
-			<Text className=" text-xs" ellipsis>
+			<Text className="text-xs text-gray-800" ellipsis>
 				{video.title}
 			</Text>
 			{isSelected && (
