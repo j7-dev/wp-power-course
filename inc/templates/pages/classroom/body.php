@@ -31,18 +31,12 @@ $chapter_id = $chapter->ID;
 /**
  * @var array{type: string, id: string, meta: ?array} $video_info
  */
-$video_info = get_post_meta( $chapter_id, 'chapter_video', true );
-
-$content = \do_shortcode( \wpautop($chapter->post_content ) );
+$video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
 $course_tabs = [
 	'chapter' => [
 		'label'   => '章節',
 		'content' => Templates::get( 'classroom/chapters', null, false ),
-	],
-	'description' => [
-		'label'   => '單元內容',
-		'content' => $content,
 	],
 	'discuss' => [
 		'label'   => '討論',
@@ -57,9 +51,7 @@ $course_tabs = [
 	],
 ];
 
-if (!$content) {
-	unset($course_tabs['description']);
-}
+$content = \do_shortcode( \wpautop($chapter->post_content ) );
 
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[3.25rem] lg:pt-16">';
 
@@ -70,8 +62,7 @@ if (current_user_can('manage_options') && !$is_avl) {
 	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full">此為管理員預覽模式</div>';
 }
 
-echo '<div class="z-[15] sticky lg:relative top-0">';
-
+echo '<div class="pc-classroom-body__video z-[15] sticky lg:relative top-[3.25rem]">';
 Templates::get(
 	'video',
 	[
@@ -79,21 +70,26 @@ Templates::get(
 		'class'      => 'rounded-none',
 	]
 );
+echo '</div>';
+
+printf(
+	/*html*/'<div class="p-4 lg:p-12">%s</div>',
+$content
+);
+
 echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
 Templates::get( 'progress' );
 echo '</div>';
 
+echo '<div class="pc-classroom-body__tabs-nav z-[15] lg:relative">';
 Templates::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => $content ? 'description' : 'discuss',
+		'default_active_key' => 'discuss',
 	]
 	);
-
 echo '</div>';
-
-
 
 
 echo '<div class="px-4 lg:px-12">';
@@ -101,7 +97,7 @@ Templates::get(
 'tabs/content',
 [
 	'course_tabs'        => $course_tabs,
-	'default_active_key' => $content ? 'description' : 'discuss',
+	'default_active_key' => 'discuss',
 ]
 );
 echo '</div>';

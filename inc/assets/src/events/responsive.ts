@@ -2,20 +2,65 @@ import $ from 'jquery'
 import { store, windowWidthAtom } from '../store'
 import { SCREEN } from '../utils'
 
-const showChapterInMobile = () => {
+// 手機板 classroom 的 TAB 要切換
+const showChapterInMobile = (isMobile = true) => {
+	if (!$('#pc-classroom-body div[id^="tab-"]').length) {
+		return
+	}
 	$('#pc-classroom-body div[id^="tab-"]').removeClass('active')
-	$(
-		'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-content-chapter',
-	).addClass('active')
+	if (isMobile) {
+		$(
+			'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-content-chapter',
+		).addClass('active')
+	} else {
+		$(
+			'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-nav-discuss',
+		).addClass('active')
+	}
+}
+
+// classroom 的 sider 移動到當前章節
+const scrollToChapter = () => {
+	if (!$('#pc-classroom-sider__main').length) {
+		return
+	}
+	const url = new URL(window.location.href)
+	const chapter_id = url.pathname.split('/')?.[3]
+	const target = $(
+		`#pc-classroom-sider__main [data-chapter_id="${chapter_id}"]`,
+	)
+	if (!target.length) {
+		console.log('chapter target not found')
+		return
+	}
+	const targetOffset = target.offset().top
+	const parentDiv = target.closest('.pc-sider-chapters')
+
+	// 將父級 div 滾動到目標節點的位置
+	parentDiv.animate(
+		{
+			scrollTop: targetOffset - parentDiv.offset().top,
+		},
+		500,
+	)
+}
+
+const stickyTabsNav = (isMobile = true) => {
+	if (!$('.pc-classroom-body__tabs-nav').length) {
+		return
+	}
+	const videoHeight = $('.pc-classroom-body__video').height() || 0
+	$('.pc-classroom-body__tabs-nav').css({
+		position: isMobile ? 'sticky' : 'relative',
+		top: isMobile ? `${videoHeight + 52}px` : 'unset',
+	})
 }
 
 // 調整 classroom 畫面
 export const responsive = () => {
 	const siderWidth = $('#pc-classroom-sider').outerWidth() || 400
 
-	if (window.outerWidth < SCREEN.LG) {
-		showChapterInMobile()
-	}
+	showChapterInMobile(window.outerWidth < SCREEN.LG)
 
 	store.sub(windowWidthAtom, () => {
 		const windowWidth = store.get(windowWidthAtom)
@@ -31,33 +76,10 @@ export const responsive = () => {
 				windowWidth < SCREEN.LG ? windowWidth : `${windowWidth - siderWidth}px`,
 		})
 
-		if (windowWidth < SCREEN.LG) {
-			showChapterInMobile()
-		}
+		showChapterInMobile(windowWidth < SCREEN.LG)
+		stickyTabsNav(window.outerWidth < SCREEN.LG)
 	})
 
-	// classroom 的 sider 移動到當前章節
-	function scrollToChapter() {
-		const url = new URL(window.location.href)
-		const chapter_id = url.pathname.split('/')?.[3]
-		const target = $(
-			`#pc-classroom-sider__main [data-chapter_id="${chapter_id}"]`,
-		)
-		if (!target.length) {
-			console.log('chapter target not found')
-			return
-		}
-		const targetOffset = target.offset().top
-		const parentDiv = target.closest('.pc-sider-chapters')
-
-		// 將父級 div 滾動到目標節點的位置
-		parentDiv.animate(
-			{
-				scrollTop: targetOffset - parentDiv.offset().top,
-			},
-			500,
-		)
-	}
-
 	scrollToChapter()
+	stickyTabsNav(window.outerWidth < SCREEN.LG)
 }

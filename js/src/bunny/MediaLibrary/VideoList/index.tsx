@@ -72,53 +72,49 @@ const VideoList: FC<TMediaLibraryProps> = ({
 			/>
 			<div className="flex">
 				<div className="flex-1">
-					{!!allVideos?.length && (
-						<div className="flex flex-wrap gap-4">
-							{filesInQueue.map((fileInQueue) =>
-								fileInQueue?.isEncoding ? (
-									<div
+					<div className="flex flex-wrap gap-4">
+						{filesInQueue.map((fileInQueue) =>
+							fileInQueue?.isEncoding ? (
+								<div
+									key={fileInQueue?.key}
+									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
+								>
+									<FileEncodeProgress fileInQueue={fileInQueue} />
+								</div>
+							) : (
+								<div
+									key={fileInQueue?.key}
+									className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
+								>
+									<FileUploadProgress
 										key={fileInQueue?.key}
-										className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-									>
-										<FileEncodeProgress fileInQueue={fileInQueue} />
-									</div>
-								) : (
-									<div
-										key={fileInQueue?.key}
-										className="w-36 aspect-video bg-gray-200 rounded-md px-4 py-2 flex flex-col justify-center items-center"
-									>
-										<FileUploadProgress
-											key={fileInQueue?.key}
-											fileInQueue={fileInQueue}
-										/>
-									</div>
-								),
-							)}
-
-							{!isSearchFetching &&
-								allVideos.map((video) => (
-									<VideoItem
-										key={video.guid}
-										video={video}
-										selectedVideos={selectedVideos}
-										limit={limit}
-										setSelectedVideos={setSelectedVideos}
+										fileInQueue={fileInQueue}
 									/>
-								))}
+								</div>
+							),
+						)}
 
-							{isFetching &&
-								new Array(PAGE_SIZE).fill(0).map((_, index) => (
-									<div key={index} className="w-36">
-										<LoadingCard ratio="aspect-video" />
-										<LoadingCard ratio="h-3 !p-0 rounded-sm">
-											&nbsp;
-										</LoadingCard>
-									</div>
-								))}
-						</div>
-					)}
+						{!isSearchFetching &&
+							allVideos.map((video) => (
+								<VideoItem
+									key={video.guid}
+									video={video}
+									selectedVideos={selectedVideos}
+									limit={limit}
+									setSelectedVideos={setSelectedVideos}
+								/>
+							))}
 
-					{!allVideos?.length && (
+						{isFetching &&
+							new Array(PAGE_SIZE).fill(0).map((_, index) => (
+								<div key={index} className="w-36">
+									<LoadingCard ratio="aspect-video" />
+									<LoadingCard ratio="h-3 !p-0 rounded-sm">&nbsp;</LoadingCard>
+								</div>
+							))}
+					</div>
+
+					{!allVideos?.length && !isFetching && (
 						<Empty className="my-24" description="找不到影片資料" />
 					)}
 
