@@ -68,7 +68,7 @@ if ('draft' === $product_status) {
 	</div>';
 }
 
-echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-[5rem] pb-[10rem]">';
+echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
 
 // Header
 Templates::get( 'course-product/header', null, true, true );

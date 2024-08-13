@@ -53,7 +53,7 @@ $course_tabs = [
 
 $content = \do_shortcode( \wpautop($chapter->post_content ) );
 
-echo '<div id="pc-classroom-body" class="w-full bg-white pt-[3.25rem] lg:pt-16">';
+echo '<div id="pc-classroom-body" class="w-full bg-white pt-[52px] lg:pt-16">';
 
 Templates::get( 'classroom/header' );
 
@@ -62,7 +62,7 @@ if (current_user_can('manage_options') && !$is_avl) {
 	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full">此為管理員預覽模式</div>';
 }
 
-echo '<div class="pc-classroom-body__video z-[15] sticky lg:relative top-[3.25rem]">';
+echo '<div class="pc-classroom-body__video z-[15] sticky top-[52px] lg:relative lg:top-[unset]">';
 Templates::get(
 	'video',
 	[
