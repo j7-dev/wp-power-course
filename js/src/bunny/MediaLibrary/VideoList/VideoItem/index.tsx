@@ -3,6 +3,7 @@ import { TVideo } from '@/bunny/MediaLibrary/types'
 import { bunny_cdn_hostname } from '@/utils'
 import { SimpleImage } from '@/components/general'
 import { Typography, message } from 'antd'
+import { uniqBy } from 'lodash-es'
 
 const PREVIEW_FILENAME = 'preview.webp'
 const { Text } = Typography
@@ -32,12 +33,16 @@ const CheckIcon: FC<HTMLAttributes<SVGElement>> = (props) => {
 const VideoItem = ({
 	children,
 	video,
+	allVideos,
+	index,
 	selectedVideos,
 	setSelectedVideos,
 	limit,
 }: {
 	children?: React.ReactNode
 	video: TVideo
+	allVideos: TVideo[]
+	index: number
 	selectedVideos: TVideo[]
 	setSelectedVideos:
 		| React.Dispatch<React.SetStateAction<TVideo[]>>
@@ -51,7 +56,30 @@ const VideoItem = ({
 		(selectedVideo) => selectedVideo.guid === video.guid,
 	)
 
-	const handleClick = () => {
+	const handleClick = (e) => {
+		// 上一個選中的
+		const prevSelected = selectedVideos?.length
+			? selectedVideos?.slice(-1)?.[0]
+			: null
+
+		const prevSelectedIndex = allVideos.findIndex(
+			(v) => v.guid === prevSelected?.guid,
+		) // 沒找到會返回 -1
+		// 確保 prevSelectedIndex 不會是-1
+		const formattedPrevSelectedIndex =
+			prevSelectedIndex === -1 ? 0 : prevSelectedIndex
+
+		if (e.shiftKey && formattedPrevSelectedIndex !== index) {
+			// 從上一個選中的 item 開始選擇到 這個 item
+			setSelectedVideos((prev) => {
+				// 确定开始和结束的索引
+				const start = Math.min(formattedPrevSelectedIndex, index)
+				const end = Math.max(formattedPrevSelectedIndex, index)
+				const newSelected = allVideos.slice(start, end + 1)
+				return uniqBy([...prev, ...newSelected], 'guid')
+			})
+			return
+		}
 		if (isSelected) {
 			setSelectedVideos((prev) => prev.filter((v) => v.guid !== video.guid))
 		} else {

@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react'
 import Filter from './Filter'
 import { useInfiniteList } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
-import { Button, Empty, Result } from 'antd'
+import { Button, Empty, Result, Alert } from 'antd'
 import { TVideo } from '@/bunny/MediaLibrary/types'
 import { filesInQueueAtom, TMediaLibraryProps } from '@/bunny/MediaLibrary'
 import { useAtomValue } from 'jotai'
@@ -62,6 +62,11 @@ const VideoList: FC<TMediaLibraryProps> = ({
 
 	return (
 		<>
+			<Alert
+				message="影片上傳中可以離開此頁，但不要「重新整理」頁面，「重新整理」會導致上傳中斷"
+				banner
+				className="mb-8"
+			/>
 			<Filter
 				selectedVideos={selectedVideos}
 				setSelectedVideos={setSelectedVideos}
@@ -95,10 +100,12 @@ const VideoList: FC<TMediaLibraryProps> = ({
 						)}
 
 						{!isSearchFetching &&
-							allVideos.map((video) => (
+							allVideos.map((video, index) => (
 								<VideoItem
 									key={video.guid}
 									video={video}
+									index={index}
+									allVideos={allVideos}
 									selectedVideos={selectedVideos}
 									limit={limit}
 									setSelectedVideos={setSelectedVideos}

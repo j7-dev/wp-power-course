@@ -71,7 +71,7 @@ const Filter = ({
 	}
 
 	return (
-		<div className="pc-media-library__tabs__filter flex items-center justify-between sticky backdrop-blur-sm z-50 top-0 -mx-6 px-6 pb-4">
+		<div className="pc-media-library__tabs__filter flex items-center justify-between sticky backdrop-blur-sm z-50 top-0 -mx-6 px-6 pb-4 mb-4">
 			<Search
 				placeholder="搜尋關鍵字，按 ENTER 也能搜"
 				className="w-[20rem]"

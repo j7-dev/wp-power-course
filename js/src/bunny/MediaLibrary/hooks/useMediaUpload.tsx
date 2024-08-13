@@ -40,6 +40,7 @@ export const useMediaUpload = (props?: any) => {
 					videoId: '',
 					isEncoding: false,
 					encodeProgress: 0,
+					uploadProgress: 0,
 					preview,
 				},
 			])
@@ -71,20 +72,6 @@ export const useMediaUpload = (props?: any) => {
 					})
 				})
 
-				// 更新到狀態
-				setFilesInQueue((prev) => {
-					return prev.map((fileInQueue) => {
-						if (fileInQueue.key === file?.uid) {
-							return {
-								...fileInQueue,
-								videoId: vId,
-							}
-						}
-
-						return fileInQueue
-					})
-				})
-
 				// 上傳影片 API
 				const uploadVideo = await bunnyStreamAxios.put<TUploadVideoResponse>(
 					`/${bunny_library_id}/videos/${vId}?enabledResolutions=720p%2C1080p`,
@@ -97,12 +84,13 @@ export const useMediaUpload = (props?: any) => {
 				)
 
 				if (uploadVideo?.data?.success) {
-					// 設定為 100% 並顯示成功，狀態不用改，馬上就要 encode
+					// 設定為 100% 並顯示成功
 					setFilesInQueue((prev) => {
 						return prev.map((fileInQueue) => {
 							if (fileInQueue.key === file?.uid) {
 								return {
 									...fileInQueue,
+									uploadProgress: 100,
 									isEncoding: true,
 								}
 							}

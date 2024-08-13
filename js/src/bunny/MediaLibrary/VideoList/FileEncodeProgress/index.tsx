@@ -1,46 +1,11 @@
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import { Progress, Tooltip } from 'antd'
-import { filesInQueueAtom, TFileInQueue } from '@/bunny/MediaLibrary'
-import { useGetVideo } from '@/bunny'
-import { useSetAtom } from 'jotai'
-import { useInvalidate } from '@refinedev/core'
-import { bunny_library_id } from '@/utils'
-
-const REFETCH_INTERVAL = 10000
+import { TFileInQueue } from '@/bunny/MediaLibrary'
 
 const FileEncodeProgress: FC<{
 	fileInQueue: TFileInQueue
 }> = ({ fileInQueue }) => {
-	const { status = 'active', videoId = '' } = fileInQueue
-	const [enabled, setEnabled] = useState(true)
-	const { data } = useGetVideo({
-		videoId,
-		queryOptions: {
-			enabled: !!fileInQueue?.videoId && enabled,
-			refetchInterval: REFETCH_INTERVAL,
-		},
-	})
-	const invalidate = useInvalidate()
-
-	const encodeProgress = data?.data?.encodeProgress || 0
-
-	const setFilesInQueue = useSetAtom(filesInQueueAtom)
-
-	useEffect(() => {
-		if (encodeProgress >= 100) {
-			setEnabled(false)
-
-			setFilesInQueue((prev) =>
-				prev.filter((theFileInQueue) => videoId !== theFileInQueue.videoId),
-			)
-
-			invalidate({
-				dataProviderName: 'bunny-stream',
-				resource: `${bunny_library_id}/videos`,
-				invalidates: ['list'],
-			})
-		}
-	}, [encodeProgress])
+	const { status = 'active', videoId = '', encodeProgress } = fileInQueue
 
 	const bunnyUrl = `https://dash.bunny.net/stream/244459/library/videos?videoId=${videoId}&page=1&search=${videoId}#noscroll`
 

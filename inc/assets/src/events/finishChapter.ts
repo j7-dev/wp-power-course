@@ -60,7 +60,7 @@ export function finishChapter() {
 				$('progress').attr('value', progress).prev().text(`${progress}%`)
 			}
 
-			$(`#classroom__sider-collapse__chapter-${chapter_id}`).html(CheckIcon)
+			$(`.classroom__sider-collapse__chapter-${chapter_id}`).html(CheckIcon)
 		}
 
 		if (isError) {

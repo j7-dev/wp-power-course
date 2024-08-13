@@ -1,4 +1,5 @@
 /* eslint-disable quote-props */
+
 import '@/assets/scss/index.scss'
 import { Refine } from '@refinedev/core'
 
@@ -27,6 +28,7 @@ import MediaLibraryPage from '@/pages/admin/MediaLibraryPage'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Logo } from '@/components/general'
+import { MediaLibraryIndicator } from '@/bunny'
 
 function App() {
 	return (
@@ -92,6 +94,7 @@ function App() {
 									)}
 								>
 									<Outlet />
+									<MediaLibraryIndicator />
 								</ThemedLayoutV2>
 							</ConfigProvider>
 						}

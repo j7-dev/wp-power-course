@@ -72,10 +72,12 @@ Templates::get(
 );
 echo '</div>';
 
-printf(
-	/*html*/'<div class="p-4 lg:p-12">%s</div>',
-$content
-);
+if($content){
+	printf(
+		/*html*/'<div class="p-4 lg:p-12">%s</div>',
+	$content
+	);
+}
 
 echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
 Templates::get( 'progress' );

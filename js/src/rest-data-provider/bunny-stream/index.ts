@@ -29,8 +29,6 @@ export const dataProvider = (
 	'createMany' | 'updateMany' | 'deleteMany'
 > => ({
 	getList: async ({ resource, pagination, filters, sorters, meta }) => {
-		// TODO 未來要做 bunny 影片管理再整理
-
 		const url = `${apiUrl}/${resource}`
 
 		const { current = 1, pageSize = 10, mode = 'server' } = pagination ?? {}
@@ -39,7 +37,6 @@ export const dataProvider = (
 		const requestMethod = (method as THttpMethods) ?? 'get'
 
 		const queryFilters = generateFilter(filters)
-		console.log('⭐  queryFilters:', queryFilters)
 
 		const query: {
 			page?: number
