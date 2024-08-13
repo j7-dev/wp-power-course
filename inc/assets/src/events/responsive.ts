@@ -1,14 +1,15 @@
 import $ from 'jquery'
 import { store, windowWidthAtom } from '../store'
-import { SCREEN } from '../utils'
+import { SCREEN, isMobile } from '../utils'
 
 // 手機板 classroom 的 TAB 要切換
-const showChapterInMobile = (isMobile = true) => {
+const showChapterInMobile = (_isMobile = true) => {
 	if (!$('#pc-classroom-body div[id^="tab-"]').length) {
 		return
 	}
-	$('#pc-classroom-body div[id^="tab-"]').removeClass('active')
-	if (isMobile) {
+
+	if (_isMobile) {
+		$('#pc-classroom-body div[id^="tab-"]').removeClass('active')
 		$(
 			'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-content-chapter',
 		).addClass('active')
@@ -45,14 +46,15 @@ const scrollToChapter = () => {
 	)
 }
 
-const stickyTabsNav = (isMobile = true) => {
+// 手機板 classroom 的 TABS NAV 要 sticky
+const stickyTabsNav = (_isMobile = true) => {
 	if (!$('.pc-classroom-body__tabs-nav').length) {
 		return
 	}
 	const videoHeight = $('.pc-classroom-body__video').height() || 0
 	$('.pc-classroom-body__tabs-nav').css({
-		position: isMobile ? 'sticky' : 'relative',
-		top: isMobile ? `${videoHeight + 52}px` : 'unset',
+		position: _isMobile ? 'sticky' : 'relative',
+		top: _isMobile ? `${videoHeight + 52}px` : 'unset',
 	})
 }
 
@@ -60,7 +62,7 @@ const stickyTabsNav = (isMobile = true) => {
 export const responsive = () => {
 	const siderWidth = $('#pc-classroom-sider').outerWidth() || 400
 
-	showChapterInMobile(window.outerWidth < SCREEN.LG)
+	showChapterInMobile(isMobile())
 
 	store.sub(windowWidthAtom, () => {
 		const windowWidth = store.get(windowWidthAtom)
@@ -77,9 +79,9 @@ export const responsive = () => {
 		})
 
 		showChapterInMobile(windowWidth < SCREEN.LG)
-		stickyTabsNav(window.outerWidth < SCREEN.LG)
+		stickyTabsNav(windowWidth < SCREEN.LG)
 	})
 
 	scrollToChapter()
-	stickyTabsNav(window.outerWidth < SCREEN.LG)
+	stickyTabsNav(isMobile())
 }

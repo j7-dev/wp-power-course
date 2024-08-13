@@ -2,13 +2,6 @@ import $ from 'jquery'
 import { SCREEN } from '../utils'
 import { throttle } from 'lodash-es'
 
-// 判斷元素距離可視區域頂部的距離
-function getDistanceFromViewportTop($element) {
-	const elementTop = $element?.offset()?.top || 0
-	const scrollTop = $(window).scrollTop()
-	return elementTop - scrollTop
-}
-
 // 處理 courses product 銷售業手機板的事件
 export const coursesProduct = () => {
 	const video = $('#courses-product__feature-video')
