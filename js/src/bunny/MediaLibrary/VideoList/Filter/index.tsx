@@ -73,8 +73,8 @@ const Filter = ({
 	return (
 		<div className="flex items-center justify-between">
 			<Search
-				placeholder="搜尋關鍵字"
-				className="w-60 mb-4"
+				placeholder="搜尋關鍵字，按 ENTER 也能搜"
+				className="w-[20rem] mb-4"
 				value={value}
 				onChange={(e) => setValue(e.target.value)}
 				allowClear

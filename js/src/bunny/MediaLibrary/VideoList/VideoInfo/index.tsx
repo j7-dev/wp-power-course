@@ -20,7 +20,7 @@ const VideoInfo = ({ video }: { video: TVideo }) => {
 			/>
 			<div className="flex gap-4 my-4">
 				<CopyText text={iframeText}>
-					<Button type="primary" icon={<CopyOutlined />} iconPosition="end">
+					<Button type="default" icon={<CopyOutlined />} iconPosition="end">
 						複製 iframe 影片嵌入代碼
 					</Button>
 				</CopyText>

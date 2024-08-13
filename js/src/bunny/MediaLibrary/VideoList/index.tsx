@@ -12,7 +12,7 @@ import { LoadingCard } from 'antd-toolkit'
 import FileEncodeProgress from './FileEncodeProgress'
 import FileUploadProgress from './FileUploadProgress'
 
-const PAGE_SIZE = 30
+const PAGE_SIZE = 50
 
 const VideoList: FC<TMediaLibraryProps> = ({
 	selectedVideos,

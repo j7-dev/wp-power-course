@@ -1,6 +1,10 @@
 import { Form, FormItemProps, Button } from 'antd'
-import { FC, useEffect } from 'react'
-import { bunny_library_id, bunny_stream_api_key } from '@/utils'
+import { FC } from 'react'
+import {
+	bunny_library_id,
+	bunny_stream_api_key,
+	bunny_cdn_hostname,
+} from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
 import NoLibraryId from './NoLibraryId'
 import { TVideo } from './types'
@@ -39,11 +43,13 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 		throw new Error('name is required')
 	}
 
-	if (!bunny_library_id || !bunny_stream_api_key) {
+	if (!bunny_library_id || !bunny_stream_api_key || !bunny_cdn_hostname) {
 		return (
 			<NoLibraryId
 				bunny_library_id={bunny_library_id}
 				bunny_stream_api_key={bunny_stream_api_key}
+				bunny_cdn_hostname={bunny_cdn_hostname}
+				type="video"
 			/>
 		)
 	}
