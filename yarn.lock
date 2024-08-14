@@ -1501,10 +1501,10 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@blocknote/core@^0.15.3":
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/@blocknote/core/-/core-0.15.3.tgz#775ba61e1d61f0e3651988265c498bc1d573f25e"
-  integrity sha512-2ZOWpxt4rm5YdH9Gn9YXYQsI9wYMAkFcKkuSpprHGCl7ALk+Iv7Gw+BswttlhKFyYoY/df7dlc9lcZr5zVAWWw==
+"@blocknote/core@^0.15.4":
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/@blocknote/core/-/core-0.15.4.tgz#2dc7e38d929ac87e3254204cc39023a7a479d9e4"
+  integrity sha512-agOIkb63u4GDzK1UbL4v1Tzcim7p2mJj/YMS7QEYCSe54pdgVH07Gx2CS+nZfjs8BmPjCkEQg1yRxCf0NT9P+g==
   dependencies:
     "@emoji-mart/data" "^1.2.1"
     "@tiptap/core" "^2.5.0"
@@ -1548,13 +1548,13 @@
     y-protocols "^1.0.6"
     yjs "^13.6.15"
 
-"@blocknote/mantine@^0.15.3":
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/@blocknote/mantine/-/mantine-0.15.3.tgz#040b36df2eb262319850205362adc76be6282b22"
-  integrity sha512-KEtRffEAjqmIW9sSpDdiEgOhsSZLcI2zV/0hHOe/ZM/01UE/V4Vl7VKicgDd7FUBzn2BoqqxOv0GW1n5mLsfCw==
+"@blocknote/mantine@^0.15.4":
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/@blocknote/mantine/-/mantine-0.15.4.tgz#f0e6b8323b6f68936247a3927f0c387e76f227a9"
+  integrity sha512-sMKR2MrubzHShnG23Q+RwmsXoqGu/E9vyqdZ5TSM8D2J5pydqLiwO8pKXS3Uq4OnddZMXyn/V3q1pa7Uh7T2Rw==
   dependencies:
-    "@blocknote/core" "^0.15.3"
-    "@blocknote/react" "^0.15.3"
+    "@blocknote/core" "^0.15.4"
+    "@blocknote/react" "^0.15.4"
     "@mantine/core" "^7.10.1"
     "@mantine/hooks" "^7.10.1"
     "@mantine/utils" "^6.0.21"
@@ -1562,12 +1562,12 @@
     react-dom "^18"
     react-icons "^5.2.1"
 
-"@blocknote/react@^0.15.3":
-  version "0.15.3"
-  resolved "https://registry.yarnpkg.com/@blocknote/react/-/react-0.15.3.tgz#e47486d453a223f5660297721748279cbc71e943"
-  integrity sha512-lawcNmXIo+dQkd7gZkCbvNmKLNL/3y82q5NT26VNQH0axQSTJ7/Mjiam6A82gCvcPWXx/1ILh6OClx8IV977ag==
+"@blocknote/react@^0.15.4":
+  version "0.15.4"
+  resolved "https://registry.yarnpkg.com/@blocknote/react/-/react-0.15.4.tgz#08f9dfb1e485122e602eea43cf6c0fe7736cfee9"
+  integrity sha512-EcDeHTylbWnpB8LtUslpf+x6da9YK4IpaSl8W7Is7sVcKuBesSkNxv0g4pMBIjDrFgqa70IUXAQTCohSX7aWYw==
   dependencies:
-    "@blocknote/core" "^0.15.3"
+    "@blocknote/core" "^0.15.4"
     "@floating-ui/react" "^0.26.4"
     "@tiptap/core" "^2.5.0"
     "@tiptap/react" "^2.5.0"
@@ -5505,14 +5505,14 @@ antd-style@^3.6.2:
     "@emotion/utils" "^1.2.1"
     use-merge-value "^1.2.0"
 
-antd-toolkit@^1.1.11:
-  version "1.1.11"
-  resolved "https://registry.yarnpkg.com/antd-toolkit/-/antd-toolkit-1.1.11.tgz#3358ef78d4a932302bbe69138d009e941f40e0d9"
-  integrity sha512-7yp39Tiek+YApjYJameXWc8AjnO7+e34Xa2BjbRmx6Cd0xXnxIlfaO6laC603X47LMSLCXEmxSyMhPWhA0XStg==
+antd-toolkit@^1.1.12:
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/antd-toolkit/-/antd-toolkit-1.1.12.tgz#e2968cf0b08360ac5e30cc1dfc1b31f4211d6b55"
+  integrity sha512-RkSMkHe+kXO8oofnbh7LOhtWDfzzsP5eAjk+QoeKrbIyvXISKc3ie8IurJCsFsUPcu6OpjBTP9x3Poomhy4d8A==
   dependencies:
-    "@blocknote/core" "^0.15.3"
-    "@blocknote/mantine" "^0.15.3"
-    "@blocknote/react" "^0.15.3"
+    "@blocknote/core" "^0.15.4"
+    "@blocknote/mantine" "^0.15.4"
+    "@blocknote/react" "^0.15.4"
     "@refinedev/antd" "^5.42.0"
     "@refinedev/core" "^4.53.0"
     "@yoopta/accordion" "^4.6.3-rc.0"

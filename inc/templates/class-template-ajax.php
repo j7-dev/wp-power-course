@@ -77,6 +77,13 @@ final class TemplateAjax {
 			[],
 			Plugin::$version
 		);
+
+		\wp_enqueue_style(
+			'blocknote-mantine',
+			Plugin::$url . '/inc/assets/dist/css/BlockNote-mantine.css',
+			[],
+			Plugin::$version
+		);
 	}
 
 	/**

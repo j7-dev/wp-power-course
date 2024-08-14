@@ -56,7 +56,10 @@ $can_comment = CommentUtils::can_comment($product);
 $course_tabs = [
 	'description' => [
 		'label'   => '簡介',
-		'content' => \do_shortcode( \wpautop($description) ),
+		'content' => sprintf(
+			/*html*/'<div class="bn-container">%s</div>',
+			\do_shortcode( \wpautop($description) )
+		),
 	],
 	'chapter' => [
 		'label'   => '章節',
