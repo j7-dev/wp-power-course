@@ -25,7 +25,6 @@ $product_id = $product->get_id();
 
 $qa_list = \get_post_meta( $product_id, 'qa_list', true );
 
-
 if ( ! is_array( $qa_list ) ) {
 	$qa_list = [];
 }

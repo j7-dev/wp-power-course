@@ -1,6 +1,6 @@
 /* eslint-disable lines-around-comment */
 import { useRef, useEffect } from 'react'
-import { Input, Button, Collapse, CollapseProps, Form } from 'antd'
+import { Input, Button, Collapse, CollapseProps, Form, Empty } from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
 import { nanoid } from 'nanoid'
@@ -22,16 +22,7 @@ export const CourseQA = () => {
 
 	useEffect(() => {
 		if (!watchQAList.length) {
-			form.setFieldValue(
-				['qa_list'],
-				[
-					{
-						key: 'defaultQA',
-						question: '',
-						answer: '',
-					},
-				],
-			)
+			form.setFieldValue(['qa_list'], [])
 		}
 	}, [watchQAList?.length])
 
@@ -64,6 +55,7 @@ export const CourseQA = () => {
 						form.setFieldValue(['qa_list'], newList)
 					}}
 					getItemStyles={() => ({ padding: '16px' })}
+					renderEmpty={() => <Empty description="目前沒有 QA" />}
 					renderItem={(item: TListItem, { index, listeners }) => {
 						const collapseItem: TCollapseItem = {
 							key: item.key,
