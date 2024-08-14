@@ -56,7 +56,7 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 
 	const isEmpty = savedVideo?.id === ''
 
-	const videoUrl = `https://iframe.mediadelivery.net/embed/${bunny_library_id}/${savedVideo?.id}`
+	const videoUrl = `https://iframe.mediadelivery.net/embed/${bunny_library_id}/${savedVideo?.id}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`
 
 	const handleDelete = () => {
 		form.setFieldValue(name, {
