@@ -48,7 +48,7 @@ const index = () => {
 					}))
 				}}
 			>
-				<div className="max-h-[75vh] overflow-y-auto pr-4">
+				<div className="max-h-[75vh] overflow-x-hidden overflow-y-auto pr-4">
 					<MediaLibrary
 						limit={limit}
 						selectedVideos={selectedVideos}

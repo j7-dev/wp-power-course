@@ -55,7 +55,13 @@ $content = \do_shortcode( \wpautop($chapter->post_content ) );
 
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[52px] lg:pt-16">';
 
-Templates::get( 'classroom/header' );
+Templates::get(
+	'classroom/header',
+	[
+		'product' => $product,
+		'chapter' => $chapter,
+	]
+	);
 
 $is_avl = CourseUtils::is_avl();
 if (current_user_can('manage_options') && !$is_avl) {
@@ -72,7 +78,7 @@ Templates::get(
 );
 echo '</div>';
 
-if($content){
+if ($content) {
 	printf(
 		/*html*/'<div class="p-4 lg:p-12">%s</div>',
 	$content

@@ -9,6 +9,8 @@ use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 
+
+
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
@@ -18,7 +20,7 @@ $default_args = [
  * @var array $args
  * @phpstan-ignore-next-line
  */
-$args = wp_parse_args( $args, $default_args );
+$args = \wp_parse_args( $args, $default_args );
 
 [
 	'product' => $product,
@@ -100,7 +102,7 @@ if (count($chapter_ids) > 0) {
 // render
 printf(
 	/*html*/'
-<div id="pc-classroom-header" class="bg-white py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-20" style="position:fixed;">
+<div id="pc-classroom-header" class="w-full bg-white py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-20" style="position:fixed;">
   <div class="flex flex-nowrap gap-4 items-end">
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1 pl-6 lg:pl-0">%1$s</h2>
 		%2$s

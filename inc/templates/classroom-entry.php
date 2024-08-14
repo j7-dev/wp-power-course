@@ -19,6 +19,7 @@ use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Utils\Base;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -87,6 +88,11 @@ if (!current_user_can('manage_options')) {
 			<meta charset="UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<?php echo $doc_title; ?>
+			<?php
+			if ( Base::has_shortcode( \get_the_content(null, false, $keep_chapter) ) ) {
+				\wp_head();
+			}
+			?>
 			<link rel="stylesheet" id="wp-power-course-css" href="<?php echo Plugin::$url . '/inc/assets/dist/css/index.css?ver=' . Plugin::$version; ?>"  media='all' />
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>

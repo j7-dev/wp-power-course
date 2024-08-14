@@ -123,4 +123,20 @@ abstract class Base {
 		\wc_price($sale_price)
 		);
 	}
+
+	/**
+	 * 是否有短碼
+	 *
+	 * @param string $content 內容
+	 *
+	 * @return bool
+	 */
+	public static function has_shortcode( string $content ): bool {
+
+		if ( str_contains( $content, '[' ) && str_contains( $content, ']' ) ) {
+			return true;
+		}
+
+		return false;
+	}
 }
