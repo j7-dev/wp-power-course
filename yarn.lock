@@ -5505,10 +5505,10 @@ antd-style@^3.6.2:
     "@emotion/utils" "^1.2.1"
     use-merge-value "^1.2.0"
 
-antd-toolkit@^1.1.12:
-  version "1.1.12"
-  resolved "https://registry.yarnpkg.com/antd-toolkit/-/antd-toolkit-1.1.12.tgz#e2968cf0b08360ac5e30cc1dfc1b31f4211d6b55"
-  integrity sha512-RkSMkHe+kXO8oofnbh7LOhtWDfzzsP5eAjk+QoeKrbIyvXISKc3ie8IurJCsFsUPcu6OpjBTP9x3Poomhy4d8A==
+antd-toolkit@^1.1.13:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/antd-toolkit/-/antd-toolkit-1.1.13.tgz#a539c4b5a2447c409e243cd6f79a6a8b426cd7f0"
+  integrity sha512-DvXCdacX/99gJHcs2E6DljwS+yBfB287GDCjhZWiuK73cFuKOnUvSGth3fTYXx3m+3HXzCBsSuuivIi/xcMSog==
   dependencies:
     "@blocknote/core" "^0.15.4"
     "@blocknote/mantine" "^0.15.4"
