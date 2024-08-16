@@ -161,7 +161,7 @@ final class Chapter {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$sort_result = ChapterFactory::sort_chapters( $body_params );
+		$sort_result = ChapterFactory::sort_chapters( (array) $body_params );
 
 		if ( \is_wp_error( $sort_result ) ) {
 			return $sort_result;

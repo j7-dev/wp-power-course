@@ -105,6 +105,34 @@ final class Upload {
 
 		$_FILES['0'] = $file;
 
+		// 根據 MIME 類型的開頭判斷文件類型
+		$file_type = match (true) {
+			str_starts_with($file['type'], 'image/') => 'image',
+			str_starts_with($file['type'], 'video/') => 'video',
+			str_starts_with($file['type'], 'audio/') => 'audio',
+			default => 'other',
+		};
+
+		if ('image' === $file_type) {
+			return $this->handle_single_upload_image($file, $upload_only);
+		}
+
+		return $this->handle_single_upload_other($file, $upload_only);
+	}
+
+
+	/**
+	 * Handle Single upload IMAGE
+	 *
+	 * @param array{name:string,type:string,tmp_name:string,error:int,size:int} $file 檔案資訊
+	 * @param string|null                                                       $upload_only 是否只上傳，不新增到媒體庫 '0' or '1'
+	 *
+	 * @return \WP_REST_Response
+	 */
+	private function handle_single_upload_image( array $file, ?string $upload_only = '0' ): \WP_REST_Response {
+
+		$_FILES['0'] = $file;
+
 		// 獲取圖片尺寸
 		$image_info = getimagesize($file['tmp_name']);
 
@@ -170,6 +198,76 @@ final class Upload {
 				'size'   => $file['size'],
 				'width'  => $width,
 				'height' => $height,
+			];
+		}
+
+		// 返回上傳成功的訊息
+		return new \WP_REST_Response(
+			[
+				'code'    => 'upload_success',
+				'message' => '檔案上傳成功',
+				'data'    => $upload_result,
+			],
+		);
+	}
+
+	/**
+	 * Handle Single upload OTHER
+	 *
+	 * @param array{name:string,type:string,tmp_name:string,error:int,size:int} $file 檔案資訊
+	 * @param string|null                                                       $upload_only 是否只上傳，不新增到媒體庫 '0' or '1'
+	 *
+	 * @return \WP_REST_Response
+	 */
+	private function handle_single_upload_other( array $file, ?string $upload_only = '0' ): \WP_REST_Response {
+
+		$_FILES['0'] = $file;
+
+		if ( $upload_only ) {
+			// 直接上傳到 wp-content/uploads 不會新增到媒體庫
+			$upload_overrides = [ 'test_form' => false ];
+			$upload_result    = \wp_handle_upload( $file, $upload_overrides );
+
+			unset( $upload_result['file'] );
+			$upload_result['id']   = null;
+			$upload_result['type'] = $file['type'];
+			$upload_result['name'] = $file['name'];
+			$upload_result['size'] = $file['size'];
+			if ( isset( $upload_result['error'] ) ) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 'upload_error',
+						'message' => $upload_result['error'],
+						'data'    => $upload_result,
+					],
+					400
+				);
+			}
+		} else {
+			// 將檔案上傳到媒體庫
+			$attachment_id = \media_handle_upload(
+				file_id: '0',
+				post_id: 0
+			);
+
+			if ( \is_wp_error( $attachment_id ) ) {
+				// 處理錯誤
+				return new \WP_REST_Response(
+					[
+						'code'    => 'upload_error',
+						'message' => $attachment_id->get_error_message(),
+						'data'    => $file,
+					],
+					400
+				);
+			}
+
+			$upload_result = [
+				'id'   => (string) $attachment_id,
+				'url'  => \wp_get_attachment_url( $attachment_id ),
+				'type' => $file['type'],
+				'name' => $file['name'],
+				'size' => $file['size'],
 			];
 		}
 
