@@ -3,7 +3,7 @@ import Filter from './Filter'
 import { useInfiniteList } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
 import { Button, Empty, Result, Alert } from 'antd'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 import { filesInQueueAtom, TMediaLibraryProps } from '@/bunny/MediaLibrary'
 import { useAtomValue } from 'jotai'
 import VideoInfo from './VideoInfo'
@@ -29,7 +29,7 @@ const VideoList: FC<TMediaLibraryProps> = ({
 		fetchNextPage,
 		isFetchingNextPage,
 		isFetching,
-	} = useInfiniteList<TVideo>({
+	} = useInfiniteList<TBunnyVideo>({
 		dataProviderName: 'bunny-stream',
 		resource: `${bunny_library_id}/videos`,
 		pagination: {
@@ -44,7 +44,7 @@ const VideoList: FC<TMediaLibraryProps> = ({
 		],
 	})
 
-	const allVideos = ([] as TVideo[]).concat(
+	const allVideos = ([] as TBunnyVideo[]).concat(
 		...(data?.pages ?? []).map((page) => page?.data || []),
 	)
 

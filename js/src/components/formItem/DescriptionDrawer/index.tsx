@@ -3,7 +3,7 @@ import { Button, Form, Drawer, Input, Alert } from 'antd'
 import { EditOutlined, LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
 import { useApiUrl } from '@refinedev/core'
-import { useBlockNote } from 'antd-toolkit'
+import { useBlockNote } from '@/components/general'
 
 const { Item } = Form
 
@@ -17,7 +17,7 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 	const BlockNote = useMemo(
 		() =>
 			lazy(() =>
-				import('antd-toolkit').then((module) => ({
+				import('@/components/general').then((module) => ({
 					default: module.BlockNote,
 				})),
 			),
@@ -36,6 +36,7 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 			}),
 		},
 	})
+
 	const { editor } = blockNoteViewProps
 
 	const { drawerProps, show, close, open } = useEditorDrawer({

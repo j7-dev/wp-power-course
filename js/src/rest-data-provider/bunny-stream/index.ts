@@ -10,7 +10,7 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import queryString from 'query-string'
 import { THttpMethods, THttpMethodsWithBody } from '@/types'
 import { bunny_stream_api_key } from '@/utils'
-import { TGetVideosResponse } from '@/pages/admin/MediaLibrary/types'
+import { TGetVideosResponse } from '@/bunny/types'
 
 const { stringify } = queryString
 

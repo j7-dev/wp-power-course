@@ -4,6 +4,8 @@
 
 @import "reset";
 @import "slidercaptcha.scss";
+@import "../../../../../js/src/components/general/BlockNote/index.scss";
+@import "./BlockNote-mantine.css";
 
 $primary: #377cfb;
 
@@ -181,8 +183,8 @@ div#tab-content-description {
 	h5,
 	h6,
 	p {
-		margin-bottom: 0rem !important;
-		margin-top: 0.5rem !important;
+		margin-bottom: 0.5rem;
+		margin-top: 0rem;
 		white-space: pre-line;
 		&:empty {
 			// 空白行

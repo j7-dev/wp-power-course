@@ -6,6 +6,7 @@ import {
 	HttpError,
 } from '@refinedev/core/dist/contexts/data/types'
 import { bunny_library_id } from '@/utils'
+import { TBunnyVideo } from '../types'
 
 type TUseGetVideoParams<T = BaseRecord> = {
 	videoId: string
@@ -14,47 +15,11 @@ type TUseGetVideoParams<T = BaseRecord> = {
 		| undefined
 }
 
-export type TGetVideoResponse = {
-	videoLibraryId: number
-	guid: string
-	title: string
-	dateUploaded: string
-	views: number
-	isPublic: false
-	length: number
-	status: number
-	framerate: number
-	rotation: number
-	width: number
-	height: number
-	availableResolutions: string
-	thumbnailCount: number
-	encodeProgress: number
-	storageSize: number
-	captions: Array<any> //TYPE
-	hasMP4Fallback: true
-	collectionId: string
-	thumbnailFileName: string
-	averageWatchTime: number
-	totalWatchTime: number
-	category: string
-	chapters: Array<any> //TYPE
-	moments: Array<any> //TYPE
-	metaTags: Array<any> //TYPE
-	transcodingMessages: {
-		timeStamp: string
-		level: number
-		issueCode: number
-		message: string
-		value: string
-	}[]
-}
-
 export const useGetVideo = ({
 	videoId,
 	queryOptions,
-}: TUseGetVideoParams<TGetVideoResponse>) => {
-	const result = useOne<TGetVideoResponse>({
+}: TUseGetVideoParams<TBunnyVideo>) => {
+	const result = useOne<TBunnyVideo>({
 		resource: `${bunny_library_id}/videos`,
 		id: videoId,
 		dataProviderName: 'bunny-stream',

@@ -368,16 +368,12 @@ final class Course {
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		// sanitize_text_field 會過濾 html tag ，description 需要保留 html tag，使用 wp_kses_post
-		$sanitize_description = \wp_kses_post( $body_params['description'] ?? '' );
-
 		$skip_keys   = [
 			'feature_video',
 			'trial_video',
+			'description',
 		];
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
-
-		$body_params['description'] = $sanitize_description;
 
 		// 將 '[]' 轉為 []
 		$body_params = Base::format_empty_array( $body_params );

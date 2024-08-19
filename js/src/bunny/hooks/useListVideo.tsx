@@ -5,9 +5,9 @@ import {
 	GetListResponse,
 	HttpError,
 } from '@refinedev/core/dist/contexts/data/types'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 
-type TUseListVideoParams<T = TVideo> = {
+type TUseListVideoParams<T = TBunnyVideo> = {
 	queryOptions?:
 		| UseQueryOptions<
 				GetListResponse<T>,

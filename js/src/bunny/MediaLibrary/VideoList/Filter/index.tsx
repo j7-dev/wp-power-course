@@ -7,7 +7,7 @@ import {
 	message,
 	ButtonProps,
 } from 'antd'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 import { useDelete, useInvalidate } from '@refinedev/core'
 import { bunny_library_id } from '@/utils'
 
@@ -21,11 +21,13 @@ const Filter = ({
 	selectButtonProps,
 	...inputProps
 }: {
-	selectedVideos: TVideo[]
+	selectedVideos: TBunnyVideo[]
 	setSelectedVideos:
-		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
 		| ((
-				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+				_videosOrFunction:
+					| TBunnyVideo[]
+					| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
 		  ) => void)
 	setSearch: React.Dispatch<React.SetStateAction<string>>
 	loading?: boolean

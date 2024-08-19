@@ -7,7 +7,7 @@ import VideoList from './VideoList'
 import UploadVideo from './UploadVideo'
 import { atom } from 'jotai'
 import { RcFile } from 'antd/lib/upload/interface'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 import {
 	bunny_library_id,
 	bunny_stream_api_key,
@@ -16,11 +16,13 @@ import {
 import NoLibraryId from '@/components/formItem/VideoInput/NoLibraryId'
 
 export type TMediaLibraryProps = {
-	selectedVideos: TVideo[]
+	selectedVideos: TBunnyVideo[]
 	setSelectedVideos:
-		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
 		| ((
-				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+				_videosOrFunction:
+					| TBunnyVideo[]
+					| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
 		  ) => void)
 	limit?: number
 	selectButtonProps?: ButtonProps

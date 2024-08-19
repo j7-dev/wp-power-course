@@ -1,5 +1,5 @@
 import React, { FC, useState, HTMLAttributes } from 'react'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 import { bunny_cdn_hostname } from '@/utils'
 import { SimpleImage } from '@/components/general'
 import { Typography, message } from 'antd'
@@ -40,14 +40,16 @@ const VideoItem = ({
 	limit,
 }: {
 	children?: React.ReactNode
-	video: TVideo
-	allVideos: TVideo[]
+	video: TBunnyVideo
+	allVideos: TBunnyVideo[]
 	index: number
-	selectedVideos: TVideo[]
+	selectedVideos: TBunnyVideo[]
 	setSelectedVideos:
-		| React.Dispatch<React.SetStateAction<TVideo[]>>
+		| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
 		| ((
-				_videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+				_videosOrFunction:
+					| TBunnyVideo[]
+					| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
 		  ) => void)
 	limit: number | undefined
 }) => {

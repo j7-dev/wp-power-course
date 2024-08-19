@@ -5,7 +5,7 @@ import { RcFile } from 'antd/lib/upload/interface'
 import { filesInQueueAtom, TUploadStatus } from '@/bunny/MediaLibrary'
 import { useSetAtom } from 'jotai'
 import { getVideoUrl, bunny_library_id } from '@/utils'
-import { TCreateVideoResponse, TUploadVideoResponse } from 'bunny/types'
+import { TBunnyVideo, TUploadVideoResponse } from 'bunny/types'
 
 export const useMediaUpload = (props?: any) => {
 	const setFilesInQueue = useSetAtom(filesInQueueAtom)
@@ -47,13 +47,12 @@ export const useMediaUpload = (props?: any) => {
 
 			try {
 				// 創建影片 API
-				const createVideoResult =
-					await bunnyStreamAxios.post<TCreateVideoResponse>(
-						`/${bunny_library_id}/videos`,
-						{
-							title: (file as RcFile)?.name || 'unknown name',
-						},
-					)
+				const createVideoResult = await bunnyStreamAxios.post<TBunnyVideo>(
+					`/${bunny_library_id}/videos`,
+					{
+						title: (file as RcFile)?.name || 'unknown name',
+					},
+				)
 
 				// 取得 bunny 影片 ID
 				const vId = createVideoResult?.data?.guid || 'unknown id'

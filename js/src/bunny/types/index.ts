@@ -4,7 +4,7 @@ export type TUseUploadParams = {
 	uploadProps?: UploadProps
 }
 
-export type TCreateVideoResponse = {
+export type TBunnyVideo = {
 	videoLibraryId: number
 	guid: string
 	title: string
@@ -31,11 +31,24 @@ export type TCreateVideoResponse = {
 	chapters: Array<any> //TYPE
 	moments: Array<any> //TYPE
 	metaTags: Array<any> //TYPE
-	transcodingMessages: Array<any> //TYPE
+	transcodingMessages: {
+		timeStamp: string
+		level: number
+		issueCode: number
+		message: string
+		value: string
+	}[]
 }
 
 export type TUploadVideoResponse = {
 	success: boolean
 	message: string
 	statusCode: number
+}
+
+export type TGetVideosResponse = {
+	totalItems: number
+	currentPage: number
+	itemsPerPage: number
+	items: TBunnyVideo[]
 }
