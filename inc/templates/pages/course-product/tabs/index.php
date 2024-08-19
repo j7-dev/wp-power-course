@@ -58,7 +58,7 @@ $course_tabs = [
 		'label'   => '簡介',
 		'content' => sprintf(
 			/*html*/'<div class="bn-container">%s</div>',
-			\do_shortcode( \wpautop($description) )
+			\do_shortcode( $description )
 		),
 	],
 	'chapter' => [

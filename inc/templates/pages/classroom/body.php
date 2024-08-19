@@ -51,7 +51,7 @@ $course_tabs = [
 	],
 ];
 
-$content = \do_shortcode( \wpautop($chapter->post_content ) );
+$content = \do_shortcode( $chapter->post_content );
 
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[52px] lg:pt-16">';
 

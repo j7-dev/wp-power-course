@@ -15,6 +15,10 @@
 		margin-bottom: 0rem !important;
 		margin-left: 0.5rem !important;
 	}
+	.bn-file-caption:empty {
+		display: none !important;
+	}
+
 	.bn-block-content:not([contenteditable]) {
 		a:hover {
 			background-color: unset;

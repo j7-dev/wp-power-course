@@ -47,6 +47,8 @@ export const schema = BlockNoteSchema.create({
 		alert: Alert,
 		customHTML: CustomHTML,
 		checkListItem: undefined as any,
+		video: undefined as any,
+		audio: undefined as any,
 	},
 })
 

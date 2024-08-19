@@ -75,7 +75,7 @@ if ( ! is_array( $teacher_ids ) ) {
 		Templates::get(
 			'typography/paragraph/expandable',
 			[
-				'children' => \do_shortcode( \wpautop( $product->get_short_description() ) ),
+				'children' => \do_shortcode(  $product->get_short_description()  ),
 			]
 			);
 
