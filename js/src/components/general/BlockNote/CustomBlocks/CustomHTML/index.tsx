@@ -25,7 +25,6 @@ export const customHTMLMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 const customHTMLBlockConfig: CustomBlockConfig = {
 	type: 'customHTML',
 	propSchema: {
-		textAlignment: defaultProps.textAlignment,
 		html: {
 			default: '',
 		},
@@ -71,6 +70,6 @@ export const CustomHTML = createReactBlockSpec(customHTMLBlockConfig, {
 	// ❗toExternalHTML 是例如，將區塊複製到剪貼簿到外部時，會複製的 內容，如果沒有定義就使用 render
 	toExternalHTML: (props) => {
 		const value = props.block.props.html
-		return value
+		return <div>{value}</div>
 	},
 })

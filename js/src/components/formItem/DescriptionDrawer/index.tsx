@@ -23,6 +23,7 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 			),
 		[],
 	)
+
 	const name = props?.name || ['description']
 	const itemLabel = props?.itemLabel || '課程'
 	const apiUrl = useApiUrl()

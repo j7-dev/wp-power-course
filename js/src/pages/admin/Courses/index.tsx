@@ -2,7 +2,7 @@ import CourseSelector from './CourseSelector'
 import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
 import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 import { Modal } from 'antd'
 
 const index = () => {
@@ -11,7 +11,9 @@ const index = () => {
 	const { limit, selectedVideos } = mediaLibraryProps
 
 	const selectedVideosSetter = (
-		videosOrFunction: TVideo[] | ((_videos: TVideo[]) => TVideo[]),
+		videosOrFunction:
+			| TBunnyVideo[]
+			| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
 	) => {
 		if (typeof videosOrFunction === 'function') {
 			const newVideos = videosOrFunction(selectedVideos)
@@ -61,6 +63,10 @@ const index = () => {
 										...prev.modalProps,
 										open: false,
 									},
+								}))
+								setMediaLibrary((prev) => ({
+									...prev,
+									confirmedSelectedVideos: selectedVideos,
 								}))
 								if (form) {
 									form.setFieldValue(name, {
