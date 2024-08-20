@@ -11,6 +11,7 @@ import {
 	countdown,
 	CommentApp,
 	cart,
+	HlsSupport,
 } from './events'
 ;(function ($) {
 	// 訂閱放前面
@@ -27,6 +28,7 @@ import {
 	coursesProduct()
 	toggleContent()
 	countdown()
+	HlsSupport()
 
 	new CommentApp('#review-app', {
 		queryParams: {
