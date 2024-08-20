@@ -33,6 +33,8 @@ import {
 	customHTMLMenuItem,
 	BunnyVideo,
 	bunnyVideoMenuItem,
+	BunnyAudio,
+	bunnyAudioMenuItem,
 } from './CustomBlocks'
 import {
 	uploadWP,
@@ -49,6 +51,8 @@ export const schema = BlockNoteSchema.create({
 		alert: Alert,
 		customHTML: CustomHTML,
 		bunnyVideo: BunnyVideo,
+		bunnyAudio: BunnyAudio,
+		numberedListItem: undefined as any,
 		checkListItem: undefined as any,
 		video: undefined as any,
 		audio: undefined as any,
@@ -179,10 +183,16 @@ export const useBlockNote = (params: TUseBlockNoteParams) => {
 							'Bunny',
 						)
 
+						const menuItemsAfterBunnyAudioInserted = insertAfter(
+							menuItemsAfterBunnyVideoInserted,
+							bunnyAudioMenuItem(editor),
+							'Bunny',
+						)
+
 						return filterSuggestionItems(
 							// eslint-disable-next-line lines-around-comment
 							// Gets all default slash menu items and `insertAlert` item.
-							menuItemsAfterBunnyVideoInserted,
+							menuItemsAfterBunnyAudioInserted,
 							query,
 						)
 					}}

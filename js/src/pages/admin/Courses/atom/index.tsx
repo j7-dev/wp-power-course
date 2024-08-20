@@ -12,6 +12,7 @@ export const mediaLibraryAtom = atom<{
 	modalProps: ModalProps
 	mediaLibraryProps: Omit<TMediaLibraryProps, 'setSelectedVideos'>
 	confirmedSelectedVideos: TBunnyVideo[]
+	key: string
 }>({
 	form: undefined,
 	name: undefined,
@@ -31,4 +32,5 @@ export const mediaLibraryAtom = atom<{
 		selectedVideos: [],
 	},
 	confirmedSelectedVideos: [],
+	key: '',
 })

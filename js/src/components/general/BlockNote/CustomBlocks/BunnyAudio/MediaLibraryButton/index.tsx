@@ -9,7 +9,7 @@ import {
 	DefaultStyleSchema,
 } from '@blocknote/core'
 import { TbSwitchHorizontal } from 'react-icons/tb'
-import { bunny_library_id } from '@/utils'
+import { bunny_cdn_hostname, bunny_library_id } from '@/utils'
 
 export type TMediaLibraryButton = ReactCustomBlockRenderProps<
 	CustomBlockConfig,
@@ -30,7 +30,7 @@ const MediaLibraryButton = (props: TMediaLibraryButton) => {
 		const timer = setTimeout(() => {
 			if (confirmedSelectedVId && key === blockId) {
 				props.editor.updateBlock(props.block, {
-					type: 'bunnyVideo',
+					type: 'bunnyAudio',
 					props: { vId: confirmedSelectedVId as any },
 				})
 			}
@@ -57,25 +57,7 @@ const MediaLibraryButton = (props: TMediaLibraryButton) => {
 		}))
 	}
 
-	const videoUrl = `https://iframe.mediadelivery.net/embed/${bunny_library_id}/${vId}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`
-
-	const handleSwitch = () => {
-		setMediaLibrary((prev) => ({
-			...prev,
-			modalProps: {
-				...prev.modalProps,
-				open: true,
-			},
-			mediaLibraryProps: {
-				...prev.mediaLibraryProps,
-				selectedVideos: [],
-			},
-			name: undefined,
-			form: undefined,
-			confirmedSelectedVideos: [],
-			key: blockId,
-		}))
-	}
+	const audioUrl = `https://${bunny_cdn_hostname}/${vId}/playlist.m3u8`
 
 	return (
 		<div
@@ -93,36 +75,7 @@ const MediaLibraryButton = (props: TMediaLibraryButton) => {
 					開啟 Bunny 媒體庫
 				</Button>
 			)}
-			{!!vId && (
-				<div className="relative aspect-video rounded-lg border border-dashed border-gray-300">
-					<div className="absolute w-full h-full top-0 left-0 p-2">
-						<div className="w-full h-full rounded-xl overflow-hidden">
-							<div
-								className="rounded-xl bg-gray-200 block"
-								style={{
-									position: 'relative',
-									paddingTop: '56.25%',
-								}}
-							>
-								<iframe
-									className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
-									src={videoUrl}
-									loading="lazy"
-									allow="encrypted-media;picture-in-picture;"
-									allowFullScreen={true}
-								></iframe>
-
-								<div
-									onClick={handleSwitch}
-									className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-primary cursor-pointer"
-								>
-									<TbSwitchHorizontal className="text-primary group-hover:text-white" />
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			)}
+			{!!vId && <audio id="audioPlayer" data-src={audioUrl} controls></audio>}
 		</div>
 	)
 }

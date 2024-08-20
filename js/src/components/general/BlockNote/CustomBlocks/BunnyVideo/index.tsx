@@ -1,8 +1,4 @@
-import {
-	defaultProps,
-	insertOrUpdateBlock,
-	CustomBlockConfig,
-} from '@blocknote/core'
+import { insertOrUpdateBlock, CustomBlockConfig } from '@blocknote/core'
 import { createReactBlockSpec } from '@blocknote/react'
 import { schema } from '../../useBlockNote'
 import { FaPhotoVideo } from 'react-icons/fa'
@@ -12,7 +8,7 @@ import MediaLibraryButton, { TMediaLibraryButton } from './MediaLibraryButton'
 export const bunnyVideoMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 	key: 'bunnyVideo',
 	title: 'Bunny Video', // 選單中文
-	subtext: '', // 說明文字
+	subtext: '可放置 Bunny 影片檔', // 說明文字
 	onItemClick: () => {
 		insertOrUpdateBlock(editor, {
 			type: 'bunnyVideo',
@@ -26,7 +22,6 @@ export const bunnyVideoMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 const bunnyVideoBlockConfig: CustomBlockConfig = {
 	type: 'bunnyVideo',
 	propSchema: {
-		textAlignment: defaultProps.textAlignment,
 		vId: {
 			default: '',
 		},
@@ -36,27 +31,25 @@ const bunnyVideoBlockConfig: CustomBlockConfig = {
 
 export const BunnyVideo = createReactBlockSpec(bunnyVideoBlockConfig, {
 	render: (props) => {
-		const value = props.block.props.vId
-		console.log('⭐  BunnyVideo render:', value)
+		const vId = props.block.props.vId
+		const videoUrl = `https://iframe.mediadelivery.net/embed/${bunny_library_id}/${vId}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`
 
 		// ❗contentRef 有個屬性 name ，如果不能編輯是 ""，可以編輯是 "nodeViewContentRef"
 		const editable = !(props.contentRef.name === '')
 
-		console.log('⭐  BunnyVideo editable:', editable)
-
 		if (!editable) {
-			return <>{value}</>
+			return (
+				<iframe
+					className="border-0 w-full aspect-video rounded-xl"
+					src={videoUrl}
+					loading="lazy"
+					allow="encrypted-media;picture-in-picture;"
+					allowFullScreen={true}
+				></iframe>
+			)
 		}
 
-		return (
-			<div
-				className={'bn-file-block-content-wrapper w-full'}
-				data-editable="1"
-				ref={props.contentRef}
-			>
-				<MediaLibraryButton {...(props as unknown as TMediaLibraryButton)} />
-			</div>
-		)
+		return <MediaLibraryButton {...(props as unknown as TMediaLibraryButton)} />
 	},
 
 	// ❗parse 是例如，將剪貼簿複製到編輯器時，要怎麼解析 HTML 轉換為 BLOCK

@@ -8,6 +8,7 @@ import { RiAlertFill } from 'react-icons/ri'
 export const alertMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 	key: 'alert',
 	title: 'Alert',
+	subtext: '可製作醒目提醒、注意事項', // 說明文字
 	onItemClick: () => {
 		insertOrUpdateBlock(editor, {
 			type: 'alert',
