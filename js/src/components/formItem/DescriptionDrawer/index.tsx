@@ -29,7 +29,7 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
-	const { blockNoteViewProps, html } = useBlockNote({
+	const { blockNoteViewProps, html, setHTML } = useBlockNote({
 		apiConfig: {
 			apiEndpoint: `${apiUrl}/upload`,
 			headers: new Headers({
@@ -72,9 +72,21 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 			<Drawer
 				{...drawerProps}
 				extra={
-					<Button type="primary" onClick={handleConfirm}>
-						確認變更
-					</Button>
+					<div className="flex gap-x-4">
+						<Button
+							type="default"
+							danger
+							onClick={() => {
+								setHTML('')
+								editor.removeBlocks(editor.document)
+							}}
+						>
+							一鍵清空內容
+						</Button>
+						<Button type="primary" onClick={handleConfirm}>
+							確認變更
+						</Button>
+					</div>
 				}
 			>
 				<Alert

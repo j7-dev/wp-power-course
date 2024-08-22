@@ -92,6 +92,17 @@ export const useBlockNote = (params: TUseBlockNoteParams) => {
 			// Saves the document JSON to state.
 			setBlocks(editor.document as Block[])
 
+			// 如果沒有內容就 setHTML 為空字串
+			if (editor.document.length === 1) {
+				if (
+					'paragraph' === editor.document[0].type &&
+					!(editor.document[0]?.content as Array<any>)?.length
+				) {
+					setHTML('')
+					return
+				}
+			}
+
 			// 另一種輸出方式 const newHtml = await editor.blocksToHTMLLossy(editor.document)
 			const newHtml = await editor.blocksToFullHTML(editor.document)
 			const parser = new DOMParser()
