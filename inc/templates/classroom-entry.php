@@ -107,6 +107,14 @@ if (!current_user_can('manage_options')) {
 			Templates::get( 'classroom/body', null, true, true );
 			echo '</div>';
 
+
+			// TODO 需要測試會不會重複載入 script
+			// if ( Base::has_shortcode( \get_the_content(null, false, $keep_chapter) ) ) {
+			// 	\wp_footer();
+			// }
+
+			\do_action( 'pc_classroom_footer' );
+
 			printf(
 			/*html*/'
 			<script>

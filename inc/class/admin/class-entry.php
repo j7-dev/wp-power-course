@@ -35,7 +35,7 @@ final class Entry {
 	 */
 	public function add_menu(): void {
 		\add_submenu_page(
-			'power_house',
+			'powerhouse',
 			'Power Course',
 			'Power Course',
 			'manage_options',
