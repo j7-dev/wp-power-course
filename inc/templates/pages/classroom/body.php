@@ -80,7 +80,7 @@ echo '</div>';
 
 if ($content) {
 	printf(
-		/*html*/'<div class="p-4 lg:p-12">%s</div>',
+		/*html*/'<div class="p-4 lg:p-12 bn-container">%s</div>',
 	$content
 	);
 }
