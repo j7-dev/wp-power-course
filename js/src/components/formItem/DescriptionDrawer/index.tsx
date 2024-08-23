@@ -59,6 +59,11 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 			}
 			loadInitialHTML()
 		}
+
+		if (!watchId && open) {
+			setHTML('')
+			editor.removeBlocks(editor.document)
+		}
 	}, [watchId, open])
 
 	return (
