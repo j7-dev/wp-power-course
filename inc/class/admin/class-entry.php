@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Bootstrap;
 
@@ -48,7 +47,7 @@ final class Entry {
 	/**
 	 * Output the dashboard admin page.
 	 */
-	public function maybe_output_admin_page() {
+	public function maybe_output_admin_page(): void {
 		// Exit if not in admin.
 		if (!\is_admin()) {
 			return;
@@ -71,7 +70,7 @@ final class Entry {
 	 *
 	 * Credit: SliceWP Setup Wizard.
 	 */
-	public function render_page() {
+	public function render_page(): void {
 		// Output header HTML.
 		Bootstrap::enqueue_script();
 		$blog_name = \get_bloginfo('name');
