@@ -68,6 +68,7 @@ final class TemplateAjax {
 				'ajax_url' => \admin_url('admin-ajax.php'),
 				'nonce'    => \wp_create_nonce( 'wp_rest' ),
 				'is_avl'   => $is_avl,
+				'header_offset' => \get_option('header_offset', 0),
 			]
 			);
 

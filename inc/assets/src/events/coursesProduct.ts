@@ -1,5 +1,5 @@
 import $ from 'jquery'
-import { SCREEN } from '../utils'
+import { SCREEN, header_offset } from '../utils'
 import { throttle } from 'lodash-es'
 
 // 處理 courses product 銷售業手機板的事件
@@ -18,7 +18,7 @@ export const coursesProduct = () => {
 				// 如果滾動位置超過 video 頂部
 				video.css({
 					position: 'fixed',
-					top: '0',
+					top: `${header_offset}px`,
 					left: '0',
 				})
 			} else {
@@ -35,7 +35,7 @@ export const coursesProduct = () => {
 				// 如果滾動位置超過 tabsNav 頂部
 				tabsNav.css({
 					position: 'fixed',
-					top: `${videoH}px`,
+					top: `${videoH + header_offset}px`,
 					left: '0',
 					padding: '0',
 				})
@@ -49,6 +49,6 @@ export const coursesProduct = () => {
 					'background-color': 'unset',
 				})
 			}
-		}, 200),
+		}, 150),
 	)
 }

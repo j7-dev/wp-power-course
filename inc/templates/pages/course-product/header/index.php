@@ -38,7 +38,7 @@ if ( ! is_array( $teacher_ids ) ) {
 
 ?>
 <div class="flex gap-6 flex-col md:flex-row mb-20">
-	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0 z-30">
+	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0 z-[99998]">
 		<?php Templates::get( 'course-product/header/feature-video' ); ?>
 	</div>
 

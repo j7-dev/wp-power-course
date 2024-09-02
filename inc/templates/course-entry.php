@@ -12,7 +12,7 @@ global $product;
 \add_filter(
 	'body_class',
 	function ( $classes ) {
-		$classes[] = 'bg-gray-50 pc'; // 添加背景色, pc 代表 power course
+		$classes[] = 'bg-gray-50 courses-product'; // 添加背景色
 		return $classes;
 	}
 );

@@ -48,7 +48,7 @@ $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 \add_filter(
 	'body_class',
 	function ( $classes ) {
-		$classes[] = 'pc'; // 添加背景色, pc 代表 power course
+		$classes[] = 'tailwind'; // 添加背景色
 		return $classes;
 	}
 );
@@ -97,7 +97,7 @@ if (!current_user_can('manage_options')) {
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0 min-h-screen bg-gray-50 pc">
+		<body class="!m-0 min-h-screen bg-gray-50 tailwind classroom">
 			<?php
 			$GLOBALS['product'] = $keep_product;
 			$GLOBALS['chapter'] = $keep_chapter;

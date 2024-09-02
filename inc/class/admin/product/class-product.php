@@ -181,7 +181,7 @@ final class Product {
 	public static function add_order_item_class( string $class, \WC_Order_Item_Product $item, \WC_Order $order ): string {
 		$product_id = $item->get_product_id();
 		if ( CourseUtils::is_course_product( $product_id ) || BundleProduct::is_bundle_product( $product_id ) ) {
-			$class .= ' pc [&_.wc-order-item-name]:pointer-events-none';
+			$class .= ' [&_.wc-order-item-name]:pointer-events-none';
 		}
 
 		return $class;

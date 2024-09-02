@@ -15,7 +15,7 @@ div .pc-rating input[aria-checked="true"] ~ input,
 div .pc-rating input[checked] ~ input {
 	--tw-bg-opacity: 0.2 !important;
 }
-.pc {
+.tailwind {
 	// 留言、評價分頁的樣式
 	.pc-pagination {
 		> div {
@@ -136,7 +136,9 @@ div .pc-rating input[checked] ~ input {
 
 // My Account 我的學習 icon
 
-.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
+.woocommerce-MyAccount-navigation
+	ul
+	li.woocommerce-MyAccount-navigation-link--courses {
 	a {
 		&::before {
 			content: "";
