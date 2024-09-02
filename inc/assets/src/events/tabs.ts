@@ -1,5 +1,5 @@
 import $ from 'jquery'
-import { isMobile, getDistanceFromViewportTop } from '../utils'
+import { isMobile, getDistanceFromViewportTop, header_offset } from '../utils'
 
 // 處理 TAB 組件的切換事件
 export const tabs = () => {
@@ -29,7 +29,7 @@ export const tabs = () => {
 		// 	? videoHeight + 52 // 52 是手機 header 的高度
 		// 	: 64 // 64 是 header 的高度
 
-		const offsetTop = headerH + videoH + navH
+		const offsetTop = headerH + videoH + navH + header_offset
 		const scrollTop =
 			$('div.active[id^="tab-content-"]').parent('div').offset().top -
 			offsetTop +

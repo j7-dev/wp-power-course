@@ -65,7 +65,7 @@ final class MyAccount {
 	 * Render courses
 	 */
 	public function render_courses(): void {
-		echo '<div class="pc">';
+		echo '<div class="tailwind">';
 		Templates::get( 'my-account' );
 		echo '</div>';
 	}

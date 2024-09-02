@@ -1,9 +1,10 @@
 import $ from 'jquery'
-import { SCREEN, header_offset } from '../utils'
+import { SCREEN, header_offset, fix_video_and_tabs_mobile } from '../utils'
 import { throttle } from 'lodash-es'
 
 // 處理 courses product 銷售業手機板的事件
 export const coursesProduct = () => {
+	if (!fix_video_and_tabs_mobile) return
 	const video = $('#courses-product__feature-video')
 	const tabsNav = $('#courses-product__tabs-nav')
 	const videoH = video.outerHeight()
@@ -14,7 +15,7 @@ export const coursesProduct = () => {
 		throttle(() => {
 			if (window.innerWidth > SCREEN.MD) return
 			const scrollTop = $(window).scrollTop() // 獲取當前滾動位置
-			if (scrollTop > videoOffset) {
+			if (scrollTop > videoOffset - header_offset) {
 				// 如果滾動位置超過 video 頂部
 				video.css({
 					position: 'fixed',

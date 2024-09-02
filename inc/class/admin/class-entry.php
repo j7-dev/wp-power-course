@@ -85,7 +85,7 @@ final class Entry {
 			<title>課程後台 | <?php echo $blog_name; ?></title>
 		</head>
 
-		<body  class="pc">
+		<body  class="tailwind">
 			<main id="power_course">
 
 			</main>

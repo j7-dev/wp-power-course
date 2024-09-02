@@ -12,6 +12,8 @@ export enum SCREEN {
 export const site_url = window.location.origin
 
 export const header_offset = Number(window.pc_data?.header_offset) || 0
+export const fix_video_and_tabs_mobile =
+	(window.pc_data?.fix_video_and_tabs_mobile || 'yes') === 'yes'
 
 export const isMobile = (size = 'LG') => {
 	return window.innerWidth < SCREEN?.[size]

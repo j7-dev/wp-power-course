@@ -47,9 +47,11 @@ final class Option {
 		'bunny_library_id'                  => '',
 		'bunny_cdn_hostname'                => '',
 		'bunny_stream_api_key'              => '',
-		'override_course_product_permalink' => 'yes',
-		'course_permalink_structure'        => 'courses',
-		'hide_myaccount_courses'            => 'no',
+		'override_course_product_permalink' => 'yes', // 是否覆蓋課程產品的永久連結
+		'course_permalink_structure'        => 'courses', // 課程的永久連結結構
+		'hide_myaccount_courses'            => 'no', // 是否隱藏我的帳戶中的課程
+		'fix_video_and_tabs_mobile'         => 'yes', // 手機板時，影片以及 tabs 黏性(sticky)置頂
+		'pc_header_offset'                  => '0', // 黏性的偏移距離
 	];
 
 	/**
