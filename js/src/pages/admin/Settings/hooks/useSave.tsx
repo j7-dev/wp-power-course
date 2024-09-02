@@ -1,12 +1,13 @@
 import { useCustomMutation, useApiUrl } from '@refinedev/core'
 import { FormInstance, message } from 'antd'
+import { useCallback } from 'react'
 
 const useSave = ({ form }: { form: FormInstance }) => {
 	const apiUrl = useApiUrl()
 	const mutation = useCustomMutation()
 	const { mutate } = mutation
 
-	const handleSave = () => {
+	const handleSave = useCallback(() => {
 		message.loading({
 			content: '儲存中...',
 			duration: 0,
@@ -30,7 +31,7 @@ const useSave = ({ form }: { form: FormInstance }) => {
 				},
 			)
 		})
-	}
+	}, [form])
 
 	return {
 		handleSave,

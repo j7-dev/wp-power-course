@@ -49,6 +49,7 @@ final class Option {
 		'bunny_stream_api_key'              => '',
 		'override_course_product_permalink' => 'yes',
 		'course_permalink_structure'        => 'courses',
+		'hide_myaccount_courses'            => 'no',
 	];
 
 	/**

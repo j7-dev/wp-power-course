@@ -22,6 +22,12 @@ final class MyAccount {
 	 * Constructor
 	 */
 	public function __construct() {
+		$hide_myaccount_courses = \get_option( 'hide_myaccount_courses', 'no' );
+
+		if ( 'yes' === $hide_myaccount_courses ) {
+			return;
+		}
+
 		\add_action( 'init', [ $this, 'custom_account_endpoint' ] );
 		\add_filter( 'woocommerce_account_menu_items', [ $this, 'courses_menu_items' ], 100, 1 );
 		\add_action(
