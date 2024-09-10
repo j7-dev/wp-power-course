@@ -21,6 +21,13 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
+		// TODO encrypt
+		// @phpstan-ignore-next-line
+		// $is_activated = \J7\Powerhouse\LC::is_activated(Plugin::$kebab);
+		// if (!$is_activated) {
+		// return;
+		// }
+
 		require_once __DIR__ . '/utils/index.php';
 		require_once __DIR__ . '/resources/index.php';
 		require_once __DIR__ . '/admin/index.php';
@@ -75,7 +82,7 @@ final class Bootstrap {
 		);
 
 		$post_id   = \get_the_ID();
-		$permalink = \get_permalink( $post_id );
+		$permalink = $post_id ? \get_permalink( $post_id ) : '';
 
 		\wp_localize_script(
 			Plugin::$kebab,
@@ -99,15 +106,6 @@ final class Bootstrap {
 					'bunny_library_id'           => \get_option( 'bunny_library_id', '' ),
 					'bunny_cdn_hostname'         => \get_option( 'bunny_cdn_hostname', '' ),
 					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
-					/*
-					TODO 下面的資料稍後補上
-					{
-						libraryId: 244459, // OK
-						name: 'cloud luke',
-						apiKey: '192d0f46-75b7-4148-8645a8530673-9081-40fb',
-						enabledResolutions: ['1080p', '720p', '480p', '360p'],
-					}
-					 */
 				],
 			]
 		);

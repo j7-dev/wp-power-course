@@ -24,25 +24,10 @@ final class Entry {
 	 */
 	public function __construct() {
 
-		\add_action('admin_menu', [ $this, 'add_menu' ], 20);
 		// Add the admin page for full-screen.
 		\add_action('current_screen', [ $this, 'maybe_output_admin_page' ], 10);
 	}
 
-	/**
-	 * Add menu
-	 */
-	public function add_menu(): void {
-		\add_submenu_page(
-			'powerhouse',
-			'Power Course',
-			'Power Course',
-			'manage_options',
-			Plugin::$kebab,
-			'',
-			10
-		);
-	}
 
 	/**
 	 * Output the dashboard admin page.
@@ -58,7 +43,6 @@ final class Entry {
 		if (Plugin::$kebab !== $screen?->id) {
 			return;
 		}
-		// require_once ABSPATH . 'wp-admin/admin-header.php';
 
 		$this->render_page();
 

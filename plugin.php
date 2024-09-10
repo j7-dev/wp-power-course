@@ -3,7 +3,7 @@
  * Plugin Name:       Power Course | WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
  * Description:       WordPress 最好用的課程外掛
- * Version:           0.0.68
+ * Version:           0.0.70
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            J7
@@ -66,6 +66,41 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'github_repo' => 'https://github.com/j7-dev/wp-power-course',
 					'callback'    => [ Bootstrap::class, 'instance' ],
 				]
+			);
+
+			// TODO encrypt
+			\add_filter(
+				'powerhouse_product_infos',
+				function ( $product_infos ) {
+					return $product_infos + [
+						Plugin::$kebab => [
+							'name' => Plugin::$app_name,
+							'link' => 'https://cloud.luke.cafe',
+						],
+					]; }
+				);
+
+			\add_action('admin_menu', [ $this, 'add_menu' ], 20);
+		}
+
+
+		/**
+		 * Add menu
+		 */
+		public function add_menu(): void {
+			// TODO encrypt
+			// @phpstan-ignore-next-line
+			$is_activated = \J7\Powerhouse\LC::is_activated(self::$kebab);
+
+			\add_submenu_page(
+			'powerhouse',
+			'Power Course',
+			'Power Course',
+			'manage_options',
+			// @phpstan-ignore-next-line
+			$is_activated ? self::$kebab : \J7\Powerhouse\Bootstrap::LC_MENU_SLUG,
+			'',
+			10
 			);
 		}
 
