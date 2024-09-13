@@ -47,6 +47,9 @@ final class Bootstrap {
 	 */
 	public static function prevent_guest_checkout(): void {
 
+		if ( ! \WC() || ! \WC()?->cart ) {
+			return;
+		}
 		$cart_items     = \WC()->cart->get_cart_contents();
 		$include_course = false;
 		foreach ($cart_items as $cart_item) {
