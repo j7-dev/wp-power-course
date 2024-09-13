@@ -73,7 +73,7 @@ final class Bootstrap {
 			'woocommerce_registration_generate_password' => 'no',
 		];
 		foreach ($prevent_guest_checkout_options as $option_name => $option_value) {
-			\add_filter("option_{$option_name}", fn( $value, $option ) => $option_value, 99, 2 );
+			\add_filter("option_{$option_name}", fn() => $option_value, 99);
 		}
 	}
 
