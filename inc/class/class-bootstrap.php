@@ -9,6 +9,7 @@ namespace J7\PowerCourse;
 
 use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * Class Bootstrap
@@ -33,7 +34,50 @@ final class Bootstrap {
 
 		// 讓 action scheduler 同時執行的數量增加
 		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );
+
+		\add_action( 'wp_loaded', [ __CLASS__, 'prevent_guest_checkout' ], 99 );
 	}
+
+
+	/**
+	 * Prevent guest checkout
+	 * 當購物車中有課程商品時，不允許訪客結帳
+	 *
+	 * @return void
+	 */
+	public static function prevent_guest_checkout(): void {
+
+		$cart_items     = \WC()->cart->get_cart_contents();
+		$include_course = false;
+		foreach ($cart_items as $cart_item) {
+			$product_id = $cart_item['product_id'] ?? 0;
+			if (!$product_id) {
+				continue;
+			}
+			$is_course_product = CourseUtils::is_course_product( $product_id );
+			if ($is_course_product) {
+				$include_course = true;
+				break;
+			}
+		}
+
+		if (!$include_course) {
+			return;
+		}
+
+		// 不允許訪客結帳
+		$prevent_guest_checkout_options = [
+			'woocommerce_enable_guest_checkout'          => 'no',
+			'woocommerce_enable_checkout_login_reminder' => 'yes',
+			'woocommerce_enable_signup_and_login_from_checkout' => 'yes',
+			'woocommerce_registration_generate_password' => 'no',
+		];
+		foreach ($prevent_guest_checkout_options as $option_name => $option_value) {
+			\add_filter("option_{$option_name}", fn( $value, $option ) => $option_value, 99, 2 );
+		}
+	}
+
+
 
 	/**
 	 * Admin Enqueue script
@@ -99,15 +143,6 @@ final class Bootstrap {
 					'bunny_library_id'           => \get_option( 'bunny_library_id', '' ),
 					'bunny_cdn_hostname'         => \get_option( 'bunny_cdn_hostname', '' ),
 					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
-					/*
-					TODO 下面的資料稍後補上
-					{
-						libraryId: 244459, // OK
-						name: 'cloud luke',
-						apiKey: '192d0f46-75b7-4148-8645a8530673-9081-40fb',
-						enabledResolutions: ['1080p', '720p', '480p', '360p'],
-					}
-					 */
 				],
 			]
 		);
