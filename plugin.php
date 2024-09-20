@@ -88,6 +88,9 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 * Add menu
 		 */
 		public function add_menu(): void {
+			if (!\class_exists('\J7\Powerhouse\LC')) {
+				return;
+			}
 			// TODO encrypt
 			// @phpstan-ignore-next-line
 			$is_activated = \J7\Powerhouse\LC::is_activated(self::$kebab);
