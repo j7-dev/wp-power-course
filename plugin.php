@@ -80,19 +80,17 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					]; }
 				);
 
-			\add_action('admin_menu', [ $this, 'add_menu' ], 20);
+			\add_action('admin_menu', [ __CLASS__, 'add_menu' ], 20);
 		}
-
 
 		/**
 		 * Add menu
 		 */
-		public function add_menu(): void {
+		public static function add_menu(): void {
 			if (!\class_exists('\J7\Powerhouse\LC')) {
 				return;
 			}
 			// TODO encrypt
-			// @phpstan-ignore-next-line
 			$is_activated = \J7\Powerhouse\LC::is_activated(self::$kebab);
 
 			\add_submenu_page(
@@ -100,12 +98,23 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 			'Power Course',
 			'Power Course',
 			'manage_options',
-			// @phpstan-ignore-next-line
-			$is_activated ? self::$kebab : \J7\Powerhouse\Bootstrap::LC_MENU_SLUG,
-			'',
+			self::$kebab,
+			$is_activated ? '' : [ __CLASS__, 'redirect' ],
 			10
 			);
 		}
+
+		/**
+		 * Redirect to the admin page.
+		 *
+		 * @return void
+		 */
+		public static function redirect(): void {
+			// @phpstan-ignore-next-line
+			\wp_redirect(\admin_url('admin.php?page=' . \J7\Powerhouse\Bootstrap::LC_MENU_SLUG));
+			exit;
+		}
+
 
 		/**
 		 * Activate

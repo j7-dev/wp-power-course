@@ -23,16 +23,14 @@ final class Entry {
 	 * Constructor
 	 */
 	public function __construct() {
-
 		// Add the admin page for full-screen.
-		\add_action('current_screen', [ $this, 'maybe_output_admin_page' ], 10);
+		\add_action('current_screen', [ __CLASS__, 'maybe_output_admin_page' ], 10);
 	}
-
 
 	/**
 	 * Output the dashboard admin page.
 	 */
-	public function maybe_output_admin_page(): void {
+	public static function maybe_output_admin_page(): void {
 		// Exit if not in admin.
 		if (!\is_admin()) {
 			return;
@@ -40,11 +38,12 @@ final class Entry {
 
 		// Make sure we're on the right screen.
 		$screen = \get_current_screen();
+
 		if (Plugin::$kebab !== $screen?->id) {
 			return;
 		}
 
-		$this->render_page();
+		self::render_page();
 
 		exit;
 	}
@@ -54,7 +53,7 @@ final class Entry {
 	 *
 	 * Credit: SliceWP Setup Wizard.
 	 */
-	public function render_page(): void {
+	public static function render_page(): void {
 		// Output header HTML.
 		Bootstrap::enqueue_script();
 		$blog_name = \get_bloginfo('name');
