@@ -25,7 +25,7 @@
 	},
 	"require": {
 		"kucrut/vite-for-wp": "^0.8.0",
-		"j7-dev/wp-plugin-trait": "0.0.5"
+		"j7-dev/wp-plugin-trait": "0.0.12"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "@stable",
@@ -33,7 +33,7 @@
 		"dealerdirect/phpcodesniffer-composer-installer": "@stable",
 		"phpcompatibility/php-compatibility": "@stable",
 		"phpstan/phpstan": "^1.11",
-		"php-stubs/woocommerce-stubs": "^9.0",
+		"php-stubs/woocommerce-stubs": "^9.1",
 		"php-stubs/wordpress-stubs": "^6.5",
 		"phpstan/extension-installer": "^1.4"
 	},

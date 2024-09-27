@@ -67,54 +67,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'callback'    => [ Bootstrap::class, 'instance' ],
 				]
 			);
-
-			// TODO encrypt
-			\add_filter(
-				'powerhouse_product_infos',
-				function ( $product_infos ) {
-					return $product_infos + [
-						Plugin::$kebab => [
-							'name' => Plugin::$app_name,
-							'link' => 'https://cloud.luke.cafe',
-						],
-					]; }
-				);
-
-			\add_action('admin_menu', [ __CLASS__, 'add_menu' ], 20);
 		}
-
-		/**
-		 * Add menu
-		 */
-		public static function add_menu(): void {
-			if (!\class_exists('\J7\Powerhouse\LC')) {
-				return;
-			}
-			// TODO encrypt
-			$is_activated = \J7\Powerhouse\LC::is_activated(self::$kebab);
-
-			\add_submenu_page(
-			'powerhouse',
-			'Power Course',
-			'Power Course',
-			'manage_options',
-			self::$kebab,
-			$is_activated ? '' : [ __CLASS__, 'redirect' ],
-			10
-			);
-		}
-
-		/**
-		 * Redirect to the admin page.
-		 *
-		 * @return void
-		 */
-		public static function redirect(): void {
-			// @phpstan-ignore-next-line
-			\wp_redirect(\admin_url('admin.php?page=' . \J7\Powerhouse\Bootstrap::LC_MENU_SLUG));
-			exit;
-		}
-
 
 		/**
 		 * Activate
