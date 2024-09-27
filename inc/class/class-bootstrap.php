@@ -21,13 +21,6 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
-		// TODO encrypt
-		// @phpstan-ignore-next-line
-		$is_activated = \J7\Powerhouse\LC::is_activated(Plugin::$kebab);
-		if (!$is_activated) {
-			return;
-		}
-
 		require_once __DIR__ . '/utils/index.php';
 		require_once __DIR__ . '/resources/index.php';
 		require_once __DIR__ . '/admin/index.php';
