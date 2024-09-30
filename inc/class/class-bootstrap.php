@@ -122,7 +122,7 @@ final class Bootstrap {
 		);
 
 		$post_id   = \get_the_ID();
-		$permalink = \get_permalink( $post_id );
+		$permalink = $post_id ? \get_permalink( $post_id ) : '';
 
 		\wp_localize_script(
 			Plugin::$kebab,

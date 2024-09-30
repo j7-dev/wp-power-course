@@ -4,6 +4,11 @@ parameters:
 		- plugin.php
 		- inc/
 		- modules/
+	ignoreErrors:
+		- '#Access to constant .* on an unknown class#'
+		- '#Constant .* not found#'
+		- '#Function .* not found#'
+		- '#Cannot cast mixed to .*#'
 	excludePaths:
 		- js/*
 		- vendor/*

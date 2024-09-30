@@ -39,9 +39,10 @@ if ( ! class_exists( 'Plugin' ) ) {
 
 			$this->init(
 				[
-					'app_name'    => 'Power Bundle Product',
-					'github_repo' => '',
-					'callback'    => [ Bootstrap::class, 'instance' ],
+					'app_name'     => 'Power Bundle Product',
+					'github_repo'  => '',
+					'callback'     => [ Bootstrap::class, 'instance' ],
+					'hide_submenu' => true,
 				]
 			);
 		}
