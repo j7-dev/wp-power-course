@@ -1,10 +1,10 @@
 {
 	"name": "wp-power-course",
 	"private": true,
-	"version": "0.0.75",
+	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"bootstrap": "yarn install && composer install --no-interaction",
+		"bootstrap": "yarn && composer install --no-interaction",
 		"dev": "vite",
 		"prebuild": "echo 'todo: remove console'",
 		"build": "vite build && node release/mv-manifest.cjs",
