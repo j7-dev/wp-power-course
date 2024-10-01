@@ -25,10 +25,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$current_user_id = get_current_user_id();
+$current_user_id = \get_current_user_id();
 
 if ( ! $current_user_id ) {
-	wp_safe_redirect( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) );
+	\wp_safe_redirect( \get_permalink( \get_option( 'woocommerce_myaccount_page_id' ) ) );
 	exit;
 }
 global $product, $chapter;

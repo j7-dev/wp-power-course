@@ -32,13 +32,13 @@ final class TemplateAjax {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ], 2000 );
+		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ], -10 );
 		\add_action( 'admin_enqueue_scripts', [ __CLASS__, 'admin_enqueue_scripts' ] );
 
 		$actions = $this->actions;
 		foreach ( $actions as $action ) {
-			\add_action( "wp_ajax_{$action}", [ $this, "{$action}_callback" ] );
-			\add_action( "wp_ajax_nopriv_{$action}", [ $this, "{$action}_callback" ] );
+			\add_action( "wp_ajax_{$action}", [ $this, "{$action}_callback" ] ); // @phpstan-ignore-line
+			\add_action( "wp_ajax_nopriv_{$action}", [ $this, "{$action}_callback" ] ); // @phpstan-ignore-line
 		}
 	}
 
@@ -96,7 +96,7 @@ final class TemplateAjax {
 	public static function admin_enqueue_scripts(): void {
 		$screen = \get_current_screen();
 
-		if ('shop_order' !== $screen->id) {
+		if ('shop_order' !== $screen?->id) {
 			return;
 		}
 

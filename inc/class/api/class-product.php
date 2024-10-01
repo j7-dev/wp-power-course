@@ -175,7 +175,7 @@ final class Product {
 		foreach ( $attributes as $key => $attribute ) {
 			if ( $attribute instanceof \WC_Product_Attribute ) {
 				$attributes_arr[] = [
-					'name'     => $attribute?->get_name(),
+					'name'     => \wc_attribute_label( $attribute?->get_name() ),
 					'options'  => $attribute?->get_options(),
 					'position' => $attribute?->get_position(),
 				];

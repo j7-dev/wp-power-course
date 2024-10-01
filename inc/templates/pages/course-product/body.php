@@ -62,38 +62,44 @@ $course_minute                = (int) $product->get_meta( 'course_minute' );
 $count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 
 
-$total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-$limit_labels  = CourseUtils::get_limit_label_by_product( $product );
+$total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+$limit_labels       = CourseUtils::get_limit_label_by_product( $product );
+$show_total_student = $product->get_meta( 'show_total_student' ) ?: 'yes';
+
+$items = [
+	[
+		'icon'  => 'calendar',
+		'label' => '開課時間',
+		'value' => $course_schedule,
+	],
+	[
+		'icon'  => 'clock',
+		'label' => '預計時長',
+		'value' => "{$course_hour} 小時 {$course_minute} 分",
+	],
+	[
+		'icon'  => 'list',
+		'label' => '預計單元',
+		'value' => "{$count_all_chapters} 個",
+	],
+	[
+		'icon'  => 'eye',
+		'label' => '觀看時間',
+		'value' =>"{$limit_labels['type']} {$limit_labels['value']}",
+	],
+];
+
+if ( $show_total_student === 'yes' ) {
+	$items[] = [
+		'icon'  => 'team',
+		'label' => '課程學員',
+		'value' => "{$total_student} 人",
+	];
+}
 
 Templates::get(
 			'course-product/info',
-			[
-				[
-					'icon'  => 'calendar',
-					'label' => '開課時間',
-					'value' => $course_schedule,
-				],
-				[
-					'icon'  => 'clock',
-					'label' => '預計時長',
-					'value' => "{$course_hour} 小時 {$course_minute} 分",
-				],
-				[
-					'icon'  => 'list',
-					'label' => '預計單元',
-					'value' => "{$count_all_chapters} 個",
-				],
-				[
-					'icon'  => 'eye',
-					'label' => '觀看時間',
-					'value' =>"{$limit_labels['type']} {$limit_labels['value']}",
-				],
-				[
-					'icon'  => 'team',
-					'label' => '課程學員',
-					'value' => "{$total_student} 人",
-				],
-			],
+			$items
 		);
 
 // echo '<div class="mt-8 flex items-end gap-4">';
