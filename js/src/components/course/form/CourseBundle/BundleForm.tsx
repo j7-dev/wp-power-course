@@ -46,9 +46,6 @@ const BundleForm: FC<{
 		Form.useWatch(['sale_price'], bundleProductForm),
 	)
 
-	const bunnyUploadProps = {}
-	const { fileList } = bunnyUploadProps
-
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
 	}
@@ -102,10 +99,6 @@ const BundleForm: FC<{
 			setSelectedProducts([...selectedProducts, product])
 		}
 	}
-
-	useEffect(() => {
-		bundleProductForm.setFieldValue(['files'], fileList)
-	}, [fileList])
 
 	useEffect(() => {
 		// 選擇商品改變時，同步更新到表單上
@@ -386,23 +379,34 @@ const BundleForm: FC<{
 				</div>
 			</div>
 
-			<FiSwitch
-				formItemProps={{
-					name: ['status'],
-					label: '發佈',
-					initialValue: 'publish',
-					getValueProps: (value) => ({ value: value === 'publish' }),
-					normalize: (value) => (value ? 'publish' : 'draft'),
-				}}
-				switchProps={{
-					checkedChildren: '發佈',
-					unCheckedChildren: '草稿',
-				}}
-			/>
+			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+				<FiSwitch
+					formItemProps={{
+						name: ['virtual'],
+						label: '虛擬商品',
+						initialValue: 'yes',
+					}}
+				/>
+
+				<FiSwitch
+					formItemProps={{
+						name: ['status'],
+						label: '發佈',
+						initialValue: 'publish',
+						getValueProps: (value) => ({ value: value === 'publish' }),
+						normalize: (value) => (value ? 'publish' : 'draft'),
+					}}
+					switchProps={{
+						checkedChildren: '發佈',
+						unCheckedChildren: '草稿',
+					}}
+				/>
+			</div>
 		</Form>
 	)
 }
 
+// 取得總金額
 function getPrice({
 	isFetching = false,
 	type,
