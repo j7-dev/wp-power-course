@@ -327,6 +327,7 @@ final class Course {
 			'reviews_allowed'     => (bool) $product->get_reviews_allowed(),
 			'show_review_tab'     => (string) $product->get_meta( 'show_review_tab' ),
 			'show_review_list'    => (string) $product->get_meta( 'show_review_list' ),
+			'show_total_student'  => (string) $product->get_meta( 'show_total_student' ) ?: 'yes',
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
 			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'       => $product->get_meta( 'feature_video' ) ?: [

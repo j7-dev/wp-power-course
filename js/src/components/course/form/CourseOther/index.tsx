@@ -7,10 +7,8 @@ const { Item } = Form
 
 export const CourseOther = () => {
 	const form = Form.useFormInstance()
-
-	const watchIsPopular: boolean = Form.useWatch(['is_popular'], form) === 'yes'
-	const watchIsFeatured: boolean =
-		Form.useWatch(['is_featured'], form) === 'yes'
+	const watchShowTotalStudent: boolean =
+		Form.useWatch(['show_total_student'], form) === 'yes'
 
 	const watchCustomRating: number = Form.useWatch(['custom_rating'], form)
 	const watchExtraReviewCount: number = Form.useWatch(
@@ -117,19 +115,6 @@ export const CourseOther = () => {
 						>
 							<InputNumber className="w-full" min={0} />
 						</Item>
-						<Item
-							label="灌水學員人數"
-							name={['extra_student_count']}
-							tooltip="前台顯示學員人數 = 實際學員人數 + 灌水學員人數"
-							initialValue={0}
-						>
-							<InputNumber
-								addonBefore="實際學員人數 + "
-								addonAfter="人"
-								className="w-full"
-								min={0}
-							/>
-						</Item>
 					</>
 				)}
 			</div>
@@ -156,6 +141,32 @@ export const CourseOther = () => {
 					help="用戶必須符合「已購買課程」、「尚未評價過該課程」兩個條件才能評價課程"
 				>
 					<Switch />
+				</Item>
+			</div>
+
+			<Heading>課程學員人數</Heading>
+
+			<div className="grid 2xl:grid-cols-3 gap-6 mb-12">
+				<FiSwitch
+					formItemProps={{
+						name: ['show_total_student'],
+						label: '顯示課程學員',
+						initialValue: 'yes',
+					}}
+				/>
+				<Item
+					hidden={!watchShowTotalStudent}
+					label="灌水學員人數"
+					name={['extra_student_count']}
+					tooltip="前台顯示學員人數 = 實際學員人數 + 灌水學員人數"
+					initialValue={0}
+				>
+					<InputNumber
+						addonBefore="實際學員人數 + "
+						addonAfter="人"
+						className="w-full"
+						min={0}
+					/>
 				</Item>
 			</div>
 
