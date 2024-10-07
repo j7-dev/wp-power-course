@@ -55,7 +55,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'name'     => 'Powerhouse',
 					'slug'     => 'powerhouse',
 					'source'   => 'https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip',
-					'version'  => '2.0.0',
+					'version'  => '2.0.1',
 					'required' => true,
 				],
 			];
@@ -102,8 +102,33 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 			} catch (\Throwable $th) {
 				throw new \Exception($th->getMessage());
 			}
+
+			self::set_default_product_meta();
+		}
+
+		/**
+		 * 設定預設的產品 meta
+		 *
+		 * @return void
+		 */
+		public static function set_default_product_meta(): void {
+			$post_ids = \get_posts(
+			[
+				'post_type'   => 'product',
+				'numberposts' => -1,
+				'fields'      => 'ids',
+			]
+			);
+			foreach ($post_ids as $post_id) {
+				$is_course = \get_post_meta($post_id, '_is_course', true);
+				if (!$is_course) {
+					\update_post_meta($post_id, '_is_course', 'no');
+				}
+			}
 		}
 	}
+
+
 
 	Plugin::instance();
 }
