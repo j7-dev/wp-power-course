@@ -10,6 +10,7 @@ namespace J7\PowerCourse;
 use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerBundleProduct\BundleProduct;
 
 /**
  * Class Bootstrap
@@ -53,12 +54,14 @@ final class Bootstrap {
 		$cart_items     = \WC()->cart->get_cart_contents();
 		$include_course = false;
 		foreach ($cart_items as $cart_item) {
-			$product_id = $cart_item['product_id'] ?? 0;
+			$product_id = (int) ( $cart_item['product_id'] ?? 0 );
 			if (!$product_id) {
 				continue;
 			}
 			$is_course_product = CourseUtils::is_course_product( $product_id );
-			if ($is_course_product) {
+			$is_bundle_product = BundleProduct::is_bundle_product( $product_id );
+
+			if ($is_course_product || $is_bundle_product) {
 				$include_course = true;
 				break;
 			}
