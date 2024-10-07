@@ -41,16 +41,16 @@ final class Comment {
 
 		$comment_parent_id = $comment->comment_parent; // 被回復的評論 ID
 
-		$emails = [];
+		$emails      = [];
+		$emails[]    = \get_option('admin_email');
+		$teacher_ids = \get_post_meta($post->ID, 'teacher_ids') ?: [];
+		foreach ($teacher_ids as $teacher_id) {
+			$teacher  = \get_user_by('ID', $teacher_id);
+			$emails[] = $teacher->user_email;
+		}
 		if ($comment_parent_id ) {
 			$comment_parent = \get_comment($comment_parent_id);
 			$emails[]       = $comment_parent->comment_author_email;
-		} else {
-			$teacher_ids = \get_post_meta($post->ID, 'teacher_ids') ?: [];
-			foreach ($teacher_ids as $teacher_id) {
-				$teacher  = \get_user_by('ID', $teacher_id);
-				$emails[] = $teacher->user_email;
-			}
 		}
 
 		$switched_locale = \switch_to_locale( \get_locale() );
