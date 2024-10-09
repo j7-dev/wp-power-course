@@ -16,6 +16,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
+use J7\PowerCourse\Resources\Course as CourseResource;
 
 
 
@@ -646,45 +647,14 @@ final class Course {
 			);
 		}
 
-		$args = [
-			'posts_per_page' => - 1,
-			'post_parent'    => $id,
-			'post_status'    => 'any',
-			'post_type'      => RegisterCPT::POST_TYPE,
-			'fields'         => 'ids',
-		];
-
-		$chapter_ids         = \get_children( $args ); // 只取到第一層
-		$deleted_chapter_ids = [];
-		foreach ($chapter_ids as $chapter_id) {
-			$deleted_chapter_ids[] = ChapterFactory::delete_chapter( (int) $chapter_id);
-		}
-
-		$bundle_ids = CourseUtils::get_bundles_by_product(  $id, true);
-
-		$delete_result = null;
-		foreach ([ $id, ...$bundle_ids ] as $post_id) {
-			$delete_result = \wp_delete_post( $post_id );
-			if ( ! $delete_result ) {
-				return new \WP_REST_Response(
-					[
-						'code'    => 'delete_failed',
-						'message' => "刪除 post #{$post_id} 失敗",
-						'data'    => $delete_result,
-					],
-					400
-				);
-			}
-		}
+		\wp_trash_post( $id );
 
 		return new \WP_REST_Response(
 			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'id'          => $id,
-					'chapter_ids' => $deleted_chapter_ids,
-					'bundle_ids'  => $bundle_ids,
+					'id'  => $id,
 				],
 			]
 		);

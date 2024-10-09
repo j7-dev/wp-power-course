@@ -24,7 +24,7 @@ final class Product {
 	 */
 	public function __construct() {
 		\add_filter( 'product_type_options', [ __CLASS__, 'add_product_type_options' ] );
-		\add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
+		// \add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
 		\add_filter('post_type_link', [ __CLASS__, 'change_product_permalink' ], 10, 2);
 		\add_filter( 'display_post_states', [ __CLASS__, 'custom_display_post_states' ], 10, 2 );
 		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
@@ -60,6 +60,8 @@ final class Product {
 
 	/**
 	 * Save product type options
+	 *
+	 * @deprecated 已經有 J7\PowerCourse\FrontEnd\Product::add_post_meta_to_course_product
 	 *
 	 * @param int      $post_id - Post ID
 	 * @param \WP_Post $product_post - Post object

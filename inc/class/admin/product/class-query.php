@@ -1,19 +1,19 @@
 <?php
 /**
- * Front-end Product
+ * Product Query
  */
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\FrontEnd;
+namespace J7\PowerCourse\Admin\Product;
 
 use J7\PowerBundleProduct\BundleProduct;
 use J7\WpUtils\Classes\General;
 
 /**
- * Class FrontEnd
+ * Class Query
  */
-final class Product {
+final class Query {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -136,4 +136,4 @@ final class Product {
 	}
 }
 
-Product::instance();
+Query::instance();
