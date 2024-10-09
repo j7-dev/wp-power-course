@@ -54,12 +54,13 @@ abstract class Course {
 	/**
 	 * 取得課程章節+單元 (flat)
 	 *
-	 * @param \WC_Product|int $product 商品
-	 * @param bool|null       $return_ids 是否只回傳 id
+	 * @param \WC_Product|int           $product 商品
+	 * @param bool|null                 $return_ids 是否只回傳 id
+	 * @param array<string>|null|string $post_status 文章狀態
 	 *
 	 * @return array<int|\WP_Post>
 	 */
-	public static function get_all_chapters( \WC_Product|int $product, ?bool $return_ids = false ): array {
+	public static function get_all_chapters( \WC_Product|int $product, ?bool $return_ids = false, $post_status = 'publish' ): array {
 		if (!is_numeric($product)) {
 			$product = $product->get_id();
 		}
@@ -69,7 +70,7 @@ abstract class Course {
 			'order'          => 'ASC',
 			'orderby'        => 'menu_order',
 			'post_parent'    => $product,
-			'post_status'    => 'publish',
+			'post_status'    => $post_status,
 			'post_type'      => RegisterCPT::POST_TYPE,
 		];
 
@@ -87,7 +88,7 @@ abstract class Course {
 				'order'          => 'ASC',
 				'orderby'        => 'menu_order',
 				'post_parent'    => $chapter_id,
-				'post_status'    => 'publish',
+				'post_status'    => $post_status,
 				'post_type'      => RegisterCPT::POST_TYPE,
 			];
 
@@ -95,7 +96,7 @@ abstract class Course {
 				$sub_args['fields'] = 'ids';
 			}
 
-			$sub_chapters = array_merge( $sub_chapters, $chapter, \get_children( $sub_args ) );
+			$sub_chapters = array_merge( $sub_chapters, [ $chapter_id ], \get_children( $sub_args ) );
 		endforeach;
 
 		return $sub_chapters;
@@ -234,17 +235,18 @@ abstract class Course {
 	 * 取得 bundle_ids (銷售方案) by product
 	 * 用商品反查有哪些銷售方案
 	 *
-	 * @param int       $product_id 商品 id
-	 * @param bool|null $return_ids 是否只回傳 id
+	 * @param int                       $product_id 商品 id
+	 * @param bool|null                 $return_ids 是否只回傳 id
+	 * @param array<string>|null|string $post_status 文章狀態
 	 *
 	 * @return array<\WP_Post|int> bundle_ids (銷售方案)
 	 */
-	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false ): array {
+	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false, $post_status = [ 'publish', 'draft' ] ): array {
 
 		$args = [
 			'post_type'   => 'product',
 			'numberposts' => - 1,
-			'post_status' => [ 'publish', 'draft' ],
+			'post_status' => $post_status,
 			'meta_key'    => BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
 			'meta_value'  => (string) $product_id,
 		];

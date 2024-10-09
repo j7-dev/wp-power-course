@@ -13,6 +13,7 @@ use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Resources\Course;
 
 /**
  * Class Course
@@ -216,15 +217,15 @@ final class Chapter {
 	 * @phpstan-ignore-next-line
 	 */
 	public function delete_chapters_with_id_callback( $request ): \WP_REST_Response {
-		$id          = $request['id'];
-		$deleted_ids = ChapterFactory::delete_chapter( (int) $id );
+		$id = $request['id'];
+		\wp_trash_post( $id );
 
 		return new \WP_REST_Response(
 			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'ids' => $deleted_ids,
+					'id' => $id,
 				],
 			]
 		);

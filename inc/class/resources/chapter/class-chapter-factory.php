@@ -205,7 +205,7 @@ final class ChapterFactory {
 		}
 
 		foreach ($delete_ids as $id) {
-			self::delete_chapter( (int) $id);
+			\wp_trash_post( $id );
 		}
 
 		return true;
@@ -277,39 +277,4 @@ final class ChapterFactory {
 		return $update_result;
 	}
 
-	/**
-	 * 刪除章節跟其子章節
-	 *
-	 * @param int  $id           chapter id.
-	 * @param bool $force_delete Force delete.
-	 *
-	 * @return array<int> 刪除的章節 IDs
-	 * @throws \Exception 刪除失敗時，會丟出錯誤
-	 */
-	public static function delete_chapter( int $id, ?bool $force_delete = false ): array {
-		$sub_args = [
-			'posts_per_page' => - 1,
-			'order'          => 'ASC',
-			'orderby'        => 'menu_order',
-			'post_parent'    => $id,
-			'post_status'    => 'publish',
-			'post_type'      => RegisterCPT::POST_TYPE,
-			'fields'         => 'ids',
-		];
-
-		$sub_chapter_ids = (array) \get_children( $sub_args );
-
-		$chapter_ids = [ $id, ...$sub_chapter_ids ];
-
-		$deleted_ids = [];
-		foreach ( $chapter_ids as $chapter_id ) :
-			$delete_result = \wp_delete_post($chapter_id, $force_delete);
-			if ( ! $delete_result ) {
-				throw new \Exception( "Chapter #{$chapter_id} delete failed" );
-			}
-			$deleted_ids[] = $chapter_id;
-		endforeach;
-
-		return $deleted_ids;
-	}
 }
