@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\RegisterCPT;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerBundleProduct\BundleProduct;
 
 
 /**
@@ -244,7 +245,7 @@ abstract class Course {
 			'post_type'   => 'product',
 			'numberposts' => - 1,
 			'post_status' => [ 'publish', 'draft' ],
-			'meta_key'    => 'pbp_product_ids',
+			'meta_key'    => BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
 			'meta_value'  => (string) $product_id,
 		];
 
