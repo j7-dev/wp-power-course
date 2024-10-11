@@ -52,13 +52,16 @@ $review = Templates::get(
 // 檢查能不能評價商品
 $can_comment = CommentUtils::can_comment($product);
 
+ob_start();
+\the_content();
+$the_content = ob_get_clean();
 
 $course_tabs = [
 	'description' => [
 		'label'   => '簡介',
 		'content' => sprintf(
 			/*html*/'<div class="bn-container">%s</div>',
-			\do_shortcode( $description )
+			$the_content
 		),
 	],
 	'chapter' => [
