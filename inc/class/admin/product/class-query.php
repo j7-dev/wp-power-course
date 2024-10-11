@@ -64,7 +64,7 @@ final class Query {
 	 */
 	public static function exclude_course_product( $query ): void {
 
-		if ( \is_admin() || !$query->is_main_query()) {
+		if ( \is_admin() || !$query->is_main_query() || $query->is_single()) {
 			return;
 		}
 

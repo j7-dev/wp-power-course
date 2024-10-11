@@ -7,47 +7,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-global $product;
+global $post, $product;
+$product_id         = $post->ID;
+$product            = wc_get_product( $product_id );
+$GLOBALS['product'] = $product;
 
 \add_filter(
-	'body_class',
-	function ( $classes ) {
-		$classes[] = 'bg-gray-50 courses-product'; // 添加背景色
-		return $classes;
-	}
+'body_class',
+function ( $classes ) {
+	$classes[] = 'bg-gray-50 courses-product'; // 添加背景色
+	return $classes;
+}
 );
-
-\add_filter(
-	'document_title_parts',
-	function ( $title_parts_array ) use ( $product ) {
-		$title_parts_array['title'] = $product->get_name() . ' - ' . get_bloginfo('name'); // 修改 doc title
-		return $title_parts_array;
-	},
-	2000
-	);
-
-// 如果有使用 rank math
-\add_filter(
-	'rank_math/frontend/title',
-	function ( $title ) use ( $product ) {
-		return $product->get_name() . ' - ' . get_bloginfo('name'); // 修改 doc title
-	},
-	2000
-	);
 
 use J7\PowerCourse\Templates\Templates;
 
-$product_status = $product->get_status();
-$can_edit       = \current_user_can( 'edit_product', $product->get_id() );
+// PENDING
+// $product_status = $product->get_status();
+// $can_edit       = \current_user_can( 'edit_product', $product->get_id() );
 
-if ('draft' === $product_status && !$can_edit) {
-	// 如果商品為草稿且用戶沒有權限編輯，就 redirect
-	\wp_safe_redirect( home_url('/404') );
-}
+// if ('draft' === $product_status && !$can_edit) {
+// // 如果商品為草稿且用戶沒有權限編輯，就 redirect
+// \wp_safe_redirect( home_url('/404') );
+// }
 
-$keep_product = $product; // 某些情況下，全域變數在 get_header 後會莫名消失，所以先存起來
 get_header();
-$GLOBALS['product'] = $keep_product;
 
 
 if ('draft' === $product_status) {

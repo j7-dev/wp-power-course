@@ -31,7 +31,7 @@ final class Product {
 		\add_filter('get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
 		\add_filter('woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
 
-		\add_action('wp', [ __CLASS__, 'redirect_to_course_page' ], 1);
+		// \add_action('wp', [ __CLASS__, 'redirect_to_course_page' ], 1);
 	}
 
 
@@ -191,6 +191,8 @@ final class Product {
 
 	/**
 	 * 如果是課程商品，就導向課程銷售頁面
+	 *
+	 * @deprecated 0.3.0 以後改為覆寫 product 模板
 	 */
 	public static function redirect_to_course_page(): void {
 
@@ -218,7 +220,7 @@ final class Product {
 
 		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
 
-		\wp_safe_redirect( site_url( "{$course_permalink_structure}/{$product_post->post_name}" ) );
+		\wp_safe_redirect( \site_url( "{$course_permalink_structure}/{$product_post->post_name}" ) );
 		exit;
 	}
 }
