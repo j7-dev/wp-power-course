@@ -707,4 +707,21 @@ abstract class Course {
 
 		return $formatted_top_selling_products;
 	}
+
+	/**
+	 * 取得課程的永久連結結構
+	 *
+	 * @return string
+	 */
+	public static function get_course_permalink_structure(): string {
+		$course_permalink_structure = \wp_unslash(
+			\get_option(
+			'woocommerce_permalinks',
+			[
+				'product_base' => 'product',
+			]
+			)
+		)['product_base'] ?? 'product';
+		return preg_replace('/^\//', '', $course_permalink_structure);
+	}
 }

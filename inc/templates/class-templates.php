@@ -152,6 +152,10 @@ final class Templates {
 		// get registered rewrite rules.
 		$rules = \get_option( 'rewrite_rules', [] );
 
+		// @deprecated 為了兼容0.3以前版本的永久連結
+		$old_course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+		\add_rewrite_rule('^' . $old_course_permalink_structure . '/(.+)/?$', 'index.php?product=$matches[1]', 'top');
+
 		// 教室頁面
 		$classroom_regex = '^classroom/([^/]+)/?([^/]*)/?'; // '^classroom/?([^/]*)/?';
 		\add_rewrite_rule(

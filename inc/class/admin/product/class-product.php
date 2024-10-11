@@ -25,13 +25,10 @@ final class Product {
 	public function __construct() {
 		\add_filter( 'product_type_options', [ __CLASS__, 'add_product_type_options' ] );
 		// \add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
-		\add_filter('post_type_link', [ __CLASS__, 'change_product_permalink' ], 10, 2);
 		\add_filter( 'display_post_states', [ __CLASS__, 'custom_display_post_states' ], 10, 2 );
 		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
 		\add_filter('get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
 		\add_filter('woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
-
-		// \add_action('wp', [ __CLASS__, 'redirect_to_course_page' ], 1);
 	}
 
 
@@ -73,25 +70,6 @@ final class Product {
 		$option = self::PRODUCT_OPTION_NAME;
 		$option = "_{$option}";
 		\update_post_meta( $post_id, $option, isset( $_POST[ $option ] ) ? 'yes' : 'no' ); // phpcs:ignore
-	}
-
-
-	/**
-	 * Change product permalink
-	 *
-	 * @param string   $permalink - Permalink
-	 * @param \WP_Post $post - Post object
-	 *
-	 * @return string
-	 */
-	public static function change_product_permalink( string $permalink, $post ): string {
-		$is_course_product = CourseUtils::is_course_product( $post->ID );
-		$override          = \get_option('override_course_product_permalink', 'yes') === 'yes';
-		if ( $is_course_product && $override ) {
-			$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
-			$permalink                  = str_replace('product/', "{$course_permalink_structure}/", $permalink);
-		}
-		return $permalink;
 	}
 
 	/**
@@ -187,41 +165,6 @@ final class Product {
 		}
 
 		return $class;
-	}
-
-	/**
-	 * 如果是課程商品，就導向課程銷售頁面
-	 *
-	 * @deprecated 0.3.0 以後改為覆寫 product 模板
-	 */
-	public static function redirect_to_course_page(): void {
-
-		if (!is_product()) {
-			return;
-		}
-
-		$override = \get_option('override_course_product_permalink', 'yes') === 'yes';
-
-		if (!$override) {
-			return;
-		}
-
-		global $wp_query;
-		/**
-		 * @var \WP_Post $product_post
-		 */
-		$product_post = $wp_query->get_queried_object();
-
-		$is_course_product = CourseUtils::is_course_product($product_post->ID);
-
-		if (!$is_course_product) {
-			return;
-		}
-
-		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
-
-		\wp_safe_redirect( \site_url( "{$course_permalink_structure}/{$product_post->post_name}" ) );
-		exit;
 	}
 }
 
