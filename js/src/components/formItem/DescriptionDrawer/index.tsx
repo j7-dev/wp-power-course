@@ -1,9 +1,10 @@
-import { FC, useEffect, lazy, Suspense, useMemo } from 'react'
-import { Button, Form, Drawer, Input, Alert } from 'antd'
-import { EditOutlined, LoadingOutlined } from '@ant-design/icons'
+import { FC, useEffect, lazy, Suspense, useMemo, memo } from 'react'
+import { Button, Form, Drawer, Input, Alert, Dropdown } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
 import { useApiUrl } from '@refinedev/core'
 import { useBlockNote } from '@/components/general'
+import { siteUrl } from '@/utils'
 
 const { Item } = Form
 
@@ -11,7 +12,7 @@ type TDescriptionDrawerProps = {
 	name?: string | string[]
 	itemLabel?: string
 }
-export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
+const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	props,
 ) => {
 	const BlockNote = useMemo(
@@ -68,9 +69,31 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 
 	return (
 		<>
-			<Button type="primary" icon={<EditOutlined />} onClick={show}>
+			<p className="mb-2">
 				編輯{itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}
-			</Button>
+			</p>
+			<Dropdown.Button
+				trigger={['click']}
+				menu={{
+					items: [
+						{
+							key: 'elementor',
+							label: (
+								<a
+									href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
+									target="_blank"
+									rel="noreferrer"
+								>
+									或 使用 Elementor 編輯器
+								</a>
+							),
+						},
+					],
+				}}
+				onClick={show}
+			>
+				使用 Notion 編輯器
+			</Dropdown.Button>
 			<Item name={name} label={`${itemLabel}完整介紹`} hidden>
 				<Input.TextArea rows={8} disabled />
 			</Item>
@@ -125,3 +148,5 @@ export const DescriptionDrawer: FC<TDescriptionDrawerProps | undefined> = (
 		</>
 	)
 }
+
+export const DescriptionDrawer = memo(DescriptionDrawerComponent)

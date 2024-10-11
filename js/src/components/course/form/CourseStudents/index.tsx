@@ -5,7 +5,7 @@ import { Alert } from 'antd'
 export const CourseStudents = () => {
 	return (
 		<>
-			<div className="mb-12">
+			<div className="mb-4">
 				<div className="max-w-[30rem]">
 					<Alert
 						className="mb-4"
