@@ -18,43 +18,20 @@ final class RegisterCPT {
 	public const POST_TYPE = 'pc_chapter';
 
 	/**
-	 * Rewrite
-	 *
-	 * @var array
-	 */
-	public $rewrite = [
-		'template_path' => 'test.php',
-		'slug'          => 'test',
-		'var'           => 'power_course_test',
-	];
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		\add_action( 'init', [ $this, 'init' ] );
-
-		if ( ! empty( $args['rewrite'] ) ) {
-			\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
-			\add_filter( 'template_include', [ $this, 'load_custom_template' ], 99 );
-		}
+		\add_filter('option_elementor_cpt_support', [ $this, 'add_elementor_cpt_support' ]);
 	}
+
+
 
 	/**
 	 * Initialize
 	 */
 	public function init(): void {
 		$this->register_cpt();
-
-		// add {$this->post_type}/{slug}/test rewrite rule
-		if ( ! empty( $this->rewrite ) ) {
-			\add_rewrite_rule(
-				'^power-course/([^/]+)/' . $this->rewrite['slug'] . '/?$',
-				'index.php?post_type=power-course&name=$matches[1]&' . $this->rewrite['var'] . '=1',
-				'top'
-			);
-			\flush_rewrite_rules();
-		}
 	}
 
 	/**
@@ -107,7 +84,6 @@ final class RegisterCPT {
 			'show_in_nav_menus'     => WP_DEBUG,
 			'show_in_admin_bar'     => WP_DEBUG,
 			'show_in_rest'          => true,
-			'query_var'             => false,
 			'can_export'            => true,
 			'delete_with_user'      => false,
 			'has_archive'           => false,
@@ -127,51 +103,16 @@ final class RegisterCPT {
 		\register_post_type( self::POST_TYPE, $args );
 	}
 
-
 	/**
-	 * Add query var
+	 * Add elementor cpt support
 	 *
-	 * @param array $vars Vars.
+	 * @param array<string> $value Value.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
-	public function add_query_var( $vars ) {
-		$vars[] = $this->rewrite['var'];
-
-		return $vars;
-	}
-
-	/**
-	 * Custom post type rewrite rules
-	 *
-	 * @param array $rules Rules.
-	 *
-	 * @return array
-	 */
-	public function custom_post_type_rewrite_rules( $rules ) {
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-
-		return $rules;
-	}
-
-
-	/**
-	 * Load custom template
-	 * Set {Plugin::$kebab}/{slug}/report  php template
-	 *
-	 * @param string $template Template.
-	 */
-	public function load_custom_template( $template ) {
-		$repor_template_path = Plugin::$dir . '/inc/templates/' . $this->rewrite['template_path'];
-
-		if ( \get_query_var( $this->rewrite['var'] ) ) {
-			if ( file_exists( $repor_template_path ) ) {
-				return $repor_template_path;
-			}
-		}
-
-		return $template;
+	public function add_elementor_cpt_support( $value ): array {
+		$value[] = self::POST_TYPE;
+		return $value;
 	}
 }
 

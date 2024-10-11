@@ -185,21 +185,6 @@ final class Templates {
 	}
 
 	/**
-	 * Custom post type rewrite rules
-	 *
-	 * @param array $rules Rules.
-	 *
-	 * @return array
-	 * @phpstan-ignore-next-line
-	 */
-	public function custom_post_type_rewrite_rules( array $rules ): array {
-		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
-
-		return $rules;
-	}
-
-	/**
 	 * Load custom template
 	 * Set {Plugin::$kebab}/{slug}/report  php template
 	 *
