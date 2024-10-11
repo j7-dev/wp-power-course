@@ -8,21 +8,11 @@ const index = () => {
 	return (
 		<div className="flex flex-col md:flex-row gap-8">
 			<div className="w-full max-w-[400px]">
-				<Heading className="mt-8">課程商品永久連結設定</Heading>
-				<FiSwitch
-					formItemProps={{
-						name: ['override_course_product_permalink'],
-						label: '改寫課程商品的永久連結',
-						tooltip:
-							'開啟後，課程商品的 product/{slug} 連結將會被覆寫為 courses/{slug} (預設的 course permalink structure)',
-						initialValue: 'yes',
-					}}
-				/>
-
+				<Heading className="mt-8">擴展課程銷售頁永久連結設定</Heading>
 				<Item
 					name={['course_permalink_structure']}
-					label="修改課程商品的永久連結結構"
-					tooltip="請先確保網址結構沒有與其他外掛、主題衝突"
+					label="擴充課程銷售頁的永久連結結構"
+					tooltip="例如: courses/{slug} 當用戶前往 courses/{slug} 時，也能看到課程銷售頁"
 				>
 					<Input allowClear />
 				</Item>
