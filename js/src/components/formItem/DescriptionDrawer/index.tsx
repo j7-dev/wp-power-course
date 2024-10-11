@@ -72,28 +72,36 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 			<p className="mb-2">
 				編輯{itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}
 			</p>
-			<Dropdown.Button
-				trigger={['click']}
-				menu={{
-					items: [
-						{
-							key: 'elementor',
-							label: (
-								<a
-									href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
-									target="_blank"
-									rel="noreferrer"
-								>
-									或 使用 Elementor 編輯器
-								</a>
-							),
-						},
-					],
-				}}
-				onClick={show}
-			>
-				使用 Notion 編輯器
-			</Dropdown.Button>
+			{itemLabel === '課程' ? (
+				<Dropdown.Button
+					trigger={['click']}
+					placement="bottomLeft"
+					menu={{
+						items: [
+							{
+								key: 'elementor',
+								label: (
+									<a
+										href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
+										target="_blank"
+										rel="noreferrer"
+									>
+										或 使用 Elementor 編輯器
+									</a>
+								),
+							},
+						],
+					}}
+					onClick={show}
+				>
+					使用 Notion 編輯器
+				</Dropdown.Button>
+			) : (
+				<Button type="default" onClick={show}>
+					使用 Notion 編輯器
+				</Button>
+			)}
+
 			<Item name={name} label={`${itemLabel}完整介紹`} hidden>
 				<Input.TextArea rows={8} disabled />
 			</Item>
