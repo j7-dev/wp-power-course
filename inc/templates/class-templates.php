@@ -17,9 +17,6 @@ final class Templates {
 
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	// 課程頁面
-	public const COURSE_SLUG = 'course_slug';
-
 	// 上課頁面
 	public const CLASSROOM_SLUG = 'classroom_slug';
 	public const CHAPTER_ID     = 'chapter_id';
@@ -28,18 +25,35 @@ final class Templates {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action(
-			'init',
-			[ $this, 'add_rewrite_rules' ]
-		);
-
+		\add_filter('template_include', [ $this, 'course_product_template' ], 9999);
+		\add_action('init', [ $this, 'add_rewrite_rules' ]);
 		\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
-		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 999999 );
-
+		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 9999 );
 		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
 		\add_action( 'admin_bar_menu', [ $this, 'admin_bar_item' ], 210 );
+	}
 
-		\add_filter('comment_post_redirect', [ $this, 'redirect_after_comment' ], 10, 2);
+	/**
+	 * 覆寫課程商品頁面
+	 *
+	 * @param string $template 原本的模板路徑
+	 *
+	 * @return string
+	 */
+	public function course_product_template( $template ) {
+		global $post;
+		if ('product' !== $post->post_type) {
+			return $template;
+		}
+
+		$product_id = $post->ID;
+
+		if (!CourseUtils::is_course_product( $product_id )) {
+			return $template;
+		}
+
+		$course_product_template = Plugin::$dir . '/inc/templates/course-product-entry.php';
+		return $course_product_template;
 	}
 
 	/**
@@ -136,13 +150,9 @@ final class Templates {
 	 */
 	public function add_rewrite_rules(): void {
 		// get registered rewrite rules.
-		$rules                      = get_option( 'rewrite_rules', [] );
-		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
-		// 課程頁面
-		$course_regex = '^' . $course_permalink_structure . '/?([^/]*)/?';
-		\add_rewrite_rule( $course_regex, 'index.php?' . self::COURSE_SLUG . '=$matches[1]', 'top' );
+		$rules = \get_option( 'rewrite_rules', [] );
 
-		// 上課頁面
+		// 教室頁面
 		$classroom_regex = '^classroom/([^/]+)/?([^/]*)/?'; // '^classroom/?([^/]*)/?';
 		\add_rewrite_rule(
 			$classroom_regex,
@@ -150,7 +160,7 @@ final class Templates {
 			'top'
 		);
 
-		if ( ! isset( $rules[ $course_regex ] ) || ! isset( $rules[ $classroom_regex ] ) ) {
+		if ( ! isset( $rules[ $classroom_regex ] ) ) {
 			\flush_rewrite_rules();
 		}
 	}
@@ -163,10 +173,8 @@ final class Templates {
 	 * @return array<string>
 	 */
 	public function add_query_var( array $vars ): array {
-		$vars[] = self::COURSE_SLUG;
 		$vars[] = self::CLASSROOM_SLUG;
 		$vars[] = self::CHAPTER_ID;
-
 		return $vars;
 	}
 
@@ -195,12 +203,7 @@ final class Templates {
 		// 使用自定義的模板
 		$items = [
 			[
-				'key'    => 'course-product',
-				'slug'   => \get_query_var( self::COURSE_SLUG ),
-				'slug_2' => \get_query_var( self::CHAPTER_ID ),
-				'path'   => Plugin::$dir . '/inc/templates/course-entry.php',
-			],
-			[
+				// {site_url}/classroom/{slug}/{slug_2}
 				'key'    => 'classroom',
 				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
 				'slug_2' => \get_query_var( self::CHAPTER_ID ),
@@ -295,27 +298,6 @@ final class Templates {
 				],
 			]
 		);
-	}
-
-	/**
-	 * 在發送評論後，將使用者導向課程頁面
-	 *
-	 * @param string      $location Location.
-	 * @param \WP_Comment $commentdata Commentdata.
-	 *
-	 * @return string
-	 */
-	public function redirect_after_comment( string $location, \WP_Comment $commentdata ): string {
-		$product_id        = $commentdata->comment_post_ID;
-		$product           = \wc_get_product($product_id);
-		$is_course_product = CourseUtils::is_course_product($product);
-		if ($is_course_product) {
-			$post_slug                  = \get_post_field('post_name', $product_id);
-			$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
-			$location                   = \site_url( "{$course_permalink_structure}/{$post_slug}" );
-		}
-
-		return $location;
 	}
 }
 
