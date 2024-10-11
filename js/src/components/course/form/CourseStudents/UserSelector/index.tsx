@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, Form, message } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
@@ -142,4 +142,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default memo(index)
