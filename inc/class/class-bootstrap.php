@@ -137,7 +137,7 @@ final class Bootstrap {
 					'userId'                     => \wp_get_current_user()->data->ID ?? null,
 					'postId'                     => $post_id,
 					'permalink'                  => \untrailingslashit( $permalink ),
-					'course_permalink_structure' => \get_option('course_permalink_structure', 'courses'),
+					'course_permalink_structure' => CourseUtils::get_course_permalink_structure(),
 					'APP_NAME'                   => Plugin::$app_name,
 					'KEBAB'                      => Plugin::$kebab,
 					'SNAKE'                      => Plugin::$snake,

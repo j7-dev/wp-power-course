@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -22,7 +23,7 @@ $args = wp_parse_args( $args, $default_args );
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
-$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+$course_permalink_structure = CourseUtils::get_course_permalink_structure();
 $message                    = sprintf(
 	'您還沒購買此課程，無法上課，<a target="_blank" href="%1$s" class="text-primary font-semibold underline hover:opacity-70">前往購買</a>',
 	site_url( "{$course_permalink_structure}/{$product->get_slug()}" )

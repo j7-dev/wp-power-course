@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product'   => $GLOBALS['product'] ?? null,
@@ -93,7 +94,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			);
 		}
 
-		$course_permalink_structure = \get_option('course_permalink_structure', 'courses');
+		$course_permalink_structure = CourseUtils::get_course_permalink_structure();
 		if ( $show_link ) {
 			echo '<div class="mt-6">';
 			Templates::get(
