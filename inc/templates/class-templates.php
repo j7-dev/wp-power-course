@@ -154,8 +154,9 @@ final class Templates {
 
 		// @deprecated 為了兼容0.3以前版本的永久連結
 		$old_course_permalink_structure = \get_option('course_permalink_structure', '');
+		$old_course_regex               = '^' . $old_course_permalink_structure . '/(.+)/?$';
 		if ($old_course_permalink_structure) {
-			\add_rewrite_rule('^' . $old_course_permalink_structure . '/(.+)/?$', 'index.php?product=$matches[1]', 'top');
+			\add_rewrite_rule($old_course_regex, 'index.php?product=$matches[1]', 'top');
 		}
 
 		// 教室頁面
@@ -166,7 +167,7 @@ final class Templates {
 			'top'
 		);
 
-		if ( ! isset( $rules[ $classroom_regex ] ) ) {
+		if ( ! isset( $rules[ $classroom_regex ] ) || ! isset( $rules[ $old_course_regex ] ) ) {
 			\flush_rewrite_rules();
 		}
 	}
