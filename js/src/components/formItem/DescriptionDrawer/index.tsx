@@ -94,11 +94,11 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 					}}
 					onClick={show}
 				>
-					使用 Notion 編輯器
+					使用 Power 編輯器
 				</Dropdown.Button>
 			) : (
 				<Button type="default" onClick={show}>
-					使用 Notion 編輯器
+					使用 Power 編輯器
 				</Button>
 			)}
 
