@@ -16,7 +16,7 @@ import useGCDCourses from './hooks/useGCDCourses'
 import { useRowSelection } from 'antd-toolkit'
 import { useApiUrl, useInvalidate } from '@refinedev/core'
 import {
-	defaultPaginationProps,
+	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import { PopconfirmDelete } from '@/components/general'
@@ -102,7 +102,7 @@ const StudentTable = () => {
 					rowSelection={rowSelection}
 					pagination={{
 						...tableProps.pagination,
-						...defaultPaginationProps,
+						...getDefaultPaginationProps({ label: '學員' }),
 					}}
 				/>
 			</Card>

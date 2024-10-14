@@ -16,7 +16,7 @@ import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { Dayjs } from 'dayjs'
 import {
-	defaultPaginationProps,
+	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import { GrantCourseAccess } from '@/components/user'
@@ -195,7 +195,7 @@ const StudentTable = () => {
 				expandable={undefined}
 				pagination={{
 					...tableProps.pagination,
-					...defaultPaginationProps,
+					...getDefaultPaginationProps({ label: '學員' }),
 				}}
 			/>
 		</>

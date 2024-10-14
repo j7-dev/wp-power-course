@@ -6,7 +6,7 @@ import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import {
-	defaultPaginationProps,
+	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import UserSelector from '../UserSelector'
@@ -127,7 +127,7 @@ const index = () => {
 				rowSelection={rowSelection}
 				pagination={{
 					...tableProps.pagination,
-					...defaultPaginationProps,
+					...getDefaultPaginationProps({ label: '講師' }),
 				}}
 			/>
 			<Form layout="vertical" form={form}>
