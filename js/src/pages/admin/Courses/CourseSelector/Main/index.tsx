@@ -14,7 +14,7 @@ import {
 import {
 	keyLabelMapper,
 	onSearch,
-	defaultPaginationProps,
+	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import { getInitialFilters, getIsVariation } from '@/utils'
@@ -157,7 +157,7 @@ const Main = () => {
 						{...tableProps}
 						pagination={{
 							...tableProps.pagination,
-							...defaultPaginationProps,
+							...getDefaultPaginationProps({ label: '課程' }),
 						}}
 						rowSelection={rowSelection}
 						columns={columns}

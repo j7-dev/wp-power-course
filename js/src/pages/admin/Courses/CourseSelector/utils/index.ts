@@ -42,7 +42,11 @@ export const defaultTableProps: TableProps = {
 	sticky: true,
 }
 
-export const defaultPaginationProps: PaginationProps & {
+export const getDefaultPaginationProps = ({
+	label = '商品',
+}: {
+	label?: string
+}): PaginationProps & {
 	position: [
 		| 'topLeft'
 		| 'topCenter'
@@ -51,15 +55,15 @@ export const defaultPaginationProps: PaginationProps & {
 		| 'bottomCenter'
 		| 'bottomRight',
 	]
-} = {
+} => ({
 	position: ['bottomCenter'],
 	size: 'default',
 	showSizeChanger: true,
 	showQuickJumper: true,
 	showTitle: true,
 	showTotal: (total: number, range: [number, number]) =>
-		`目前顯示第 ${range?.[0]} ~ ${range?.[1]} 個商品，總共有 ${total} 個商品`,
-}
+		`目前顯示第 ${range?.[0]} ~ ${range?.[1]} 個 ${label}，總共有 ${total} 個 ${label}`,
+})
 
 export const termFormatter = (terms: TTerm[]) => {
 	return terms?.map((term) => ({
