@@ -5,11 +5,11 @@ type TChapter = {
 	is_finished: boolean
 }
 
-type TAVLCourse = {
+export type TAVLCourse = {
 	id: string
 	name: string
 	expire_date: number
-	chapters: TChapter[]
+	chapters?: TChapter[]
 }
 
 export type TUserRecord = {

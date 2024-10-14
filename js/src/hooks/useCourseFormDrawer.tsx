@@ -15,6 +15,7 @@ import {
 } from '@/pages/admin/Courses/CourseSelector/types'
 import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
+import { useWindowSize } from '@uidotdev/usehooks'
 
 export function useCourseFormDrawer({
 	form,
@@ -33,6 +34,7 @@ export function useCourseFormDrawer({
 	const closeRef = useRef<HTMLDivElement>(null)
 	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 	const [publish, setPublish] = useState(true)
+	const { width } = useWindowSize()
 
 	// const isChapter = resource === 'chapters'
 	const invalidate = useInvalidate()
@@ -143,7 +145,7 @@ export function useCourseFormDrawer({
 		push: false,
 		onClose: close,
 		open,
-		width: '50%',
+		width: (width || 1980) > 1440 ? '50%' : 'calc(100% - 200px)',
 		extra: (
 			<div className="flex gap-6 items-center">
 				<Switch

@@ -4,6 +4,13 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { ajaxNonce } from '@/utils'
 
+/**
+ * @param options
+ * @param options.args
+ * @param options.config
+ * @param options.mutationOptions
+ * @deprecated
+ */
 export const useAjax = (options?: {
 	args?: Omit<TAdminAjaxArgs, 'nonce'>
 	config?: AxiosRequestConfig<{ [key: string]: any }> | undefined

@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Form, Button } from 'antd'
+import { Table, FormInstance, Spin, Form, Button, TableProps } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
@@ -30,7 +30,7 @@ import useColumns from '@/pages/admin/Courses/CourseSelector/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
 import { coursesAtom } from '@/pages/admin/Courses/CourseSelector'
 
-const index = () => {
+const Main = () => {
 	const { width = 1920 } = useWindowSize()
 	const isMobile = width ? width < 810 : false
 	const { tableProps, searchFormProps, filters } = useTable<
@@ -153,7 +153,7 @@ const index = () => {
 					</Button>
 
 					<Table
-						{...defaultTableProps}
+						{...(defaultTableProps as unknown as TableProps<TCourseRecord>)}
 						{...tableProps}
 						pagination={{
 							...tableProps.pagination,
@@ -184,4 +184,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default memo(Main)

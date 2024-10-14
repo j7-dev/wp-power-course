@@ -1,7 +1,7 @@
 import React from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { Table, message, Button, Form } from 'antd'
+import { Table, message, Button, Form, TableProps } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
@@ -121,7 +121,7 @@ const index = () => {
 				/>
 			</div>
 			<Table
-				{...defaultTableProps}
+				{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
 				{...tableProps}
 				columns={columns}
 				rowSelection={rowSelection}
