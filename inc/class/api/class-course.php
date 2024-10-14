@@ -654,7 +654,7 @@ final class Course {
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'id'  => $id,
+					'id' => $id,
 				],
 			]
 		);
