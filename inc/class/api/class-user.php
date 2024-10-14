@@ -644,7 +644,7 @@ final class User {
 				$password = \wp_generate_password(12);
 				$user_id  = \wp_create_user($username, $password, $email);
 				if (\is_wp_error($user_id)) {
-					\J7\WpUtils\Classes\Log::info('創建用戶失敗: ' . $user_id->get_error_message());
+					\J7\WpUtils\Classes\ErrorLog::info('創建用戶失敗: ' . $user_id->get_error_message());
 					continue;
 				}
 
@@ -652,7 +652,7 @@ final class User {
 				$result = \retrieve_password($username);
 
 				if (true !== $result) {
-					\J7\WpUtils\Classes\Log::info('發送重新設置密碼的信失敗: ' . $result->get_error_message());
+					\J7\WpUtils\Classes\ErrorLog::info('發送重新設置密碼的信失敗: ' . $result->get_error_message());
 				}
 			} else {
 				// 如果用戶已經存在，要先取得用戶 ID
@@ -725,7 +725,7 @@ final class User {
 			$wp_filesystem->put_contents($email_content_path, $updated_content, FS_CHMOD_FILE);
 		}
 
-		\J7\WpUtils\Classes\Log::info($is_last_batch ? '已經是最後一批，發信，結束' : '還沒到最後一批，繼續');
+		\J7\WpUtils\Classes\ErrorLog::info($is_last_batch ? '已經是最後一批，發信，結束' : '還沒到最後一批，繼續');
 
 		// 如果還有下一批資料,安排下一次執行
 		if ( !$is_last_batch ) {

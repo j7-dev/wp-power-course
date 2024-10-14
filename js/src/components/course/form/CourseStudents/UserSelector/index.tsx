@@ -69,10 +69,11 @@ const index = () => {
 	const handleAdd = () => {
 		addStudent(
 			{
-				url: `${apiUrl}/courses/${watchId}/add-students`,
+				url: `${apiUrl}/courses/add-students`,
 				method: 'post',
 				values: {
 					user_ids: userIds,
+					course_ids: [watchId],
 				},
 				config: {
 					headers: {
