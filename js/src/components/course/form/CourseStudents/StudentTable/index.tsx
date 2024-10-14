@@ -1,7 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { Table, Form, message, DatePicker, Space, Button } from 'antd'
+import {
+	Table,
+	Form,
+	message,
+	DatePicker,
+	Space,
+	Button,
+	TableProps,
+} from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
@@ -11,8 +19,9 @@ import {
 	defaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
+import { GrantCourseAccess } from '@/components/user'
 
-const index = () => {
+const StudentTable = () => {
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
 	const form = Form.useFormInstance()
@@ -56,10 +65,11 @@ const index = () => {
 	const handleRemove = () => {
 		mutate(
 			{
-				url: `${apiUrl}/courses/${watchId}/remove-students`,
+				url: `${apiUrl}/courses/remove-students`,
 				method: 'post',
 				values: {
 					user_ids: selectedRowKeys,
+					course_ids: [watchId],
 				},
 				config: {
 					headers: {
@@ -91,6 +101,7 @@ const index = () => {
 
 	// update student mutation
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
+
 	const handleUpdate = (timestamp?: number) => () => {
 		mutate(
 			{
@@ -132,7 +143,7 @@ const index = () => {
 	return (
 		<>
 			<div className="mb-4 flex justify-between gap-4">
-				<div className="flex gap-4">
+				<div className="flex gap-4 flex-wrap">
 					<Button
 						type="primary"
 						disabled={!selectedRowKeys.length}
@@ -152,13 +163,15 @@ const index = () => {
 						/>
 						<Button
 							type="primary"
-							disabled={!selectedRowKeys.length}
+							disabled={!selectedRowKeys.length || !time}
 							onClick={handleUpdate()}
 							ghost
 						>
 							修改觀看期限
 						</Button>
 					</Space.Compact>
+
+					<GrantCourseAccess user_ids={selectedRowKeys as string[]} />
 				</div>
 
 				<PopconfirmDelete
@@ -175,7 +188,7 @@ const index = () => {
 				/>
 			</div>
 			<Table
-				{...defaultTableProps}
+				{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
 				{...tableProps}
 				columns={columns}
 				rowSelection={rowSelection}
@@ -189,4 +202,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default memo(StudentTable)

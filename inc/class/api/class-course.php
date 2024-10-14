@@ -50,15 +50,15 @@ final class Course {
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'courses/(?P<id>\d+)/add-students',
+			'endpoint' => 'courses/add-students',
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'courses/(?P<id>\d+)/update-students',
+			'endpoint' => 'courses/remove-students',
 			'method'   => 'post',
 		],
 		[
-			'endpoint' => 'courses/(?P<id>\d+)/remove-students',
+			'endpoint' => 'courses/update-students',
 			'method'   => 'post',
 		],
 		[
@@ -173,7 +173,7 @@ final class Course {
 
 		$products = $results->products;
 
-		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
+		$formatted_products = array_values(array_map( [ $this, 'format_course_details' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -185,18 +185,16 @@ final class Course {
 	}
 
 	/**
-	 * Format product details
-	 * TODO
+	 * Format course details
 	 *
 	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
 	 *
 	 * @param \WC_Product $product Product.
-	 * @param bool        $with_description With description.
 	 *
 	 * @return array
 	 * @phpstan-ignore-next-line
 	 */
-	public function format_product_details( $product, $with_description = true ) { // phpcs:ignore
+	public function format_course_details( $product ) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
@@ -211,10 +209,10 @@ final class Course {
 		$image_ids = $image_id ? [ $image_id, ...$gallery_image_ids ] : [];
 		$images    = $image_ids ? array_map( [ WP::class, 'get_image_info' ], $image_ids ) : [];
 
-		$description_array = $with_description ? [
+		$description_array = [
 			'description'       => $product->get_description(),
 			'short_description' => $product->get_short_description(),
-		] : [];
+		];
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
@@ -527,19 +525,37 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_with_id_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
-		$course_id   = (int) $request['id'];
+	public function post_courses_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
 		$body_params =WP::sanitize_text_field_deep($body_params, false );
 
-		$user_ids = $body_params['user_ids'] ?? [];
+		$user_ids    = $body_params['user_ids'] ?? [];
+		$course_ids  = $body_params['course_ids'] ?? [];
+		$expire_date = $body_params['expire_date'] ?? 0;
+
+		if (empty($user_ids) || empty($course_ids)) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'add_students_failed',
+					'message' => '新增學員失敗，缺少 user_ids 或 course_ids',
+				],
+				400
+			);
+		}
 
 		$success = true;
-		foreach ($user_ids as  $user_id) {
-			$mid = \add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
-			if (false === $mid) {
-				$success = false;
-				break;
+		foreach ($course_ids as $course_id) {
+			foreach ($user_ids as  $user_id) {
+				$current_avl_course_ids = (array) \get_user_meta( $user_id, 'avl_course_ids', true );
+				if (\in_array($course_id, $current_avl_course_ids)) {
+					continue;
+				}
+				$mid            = \add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
+				$update_success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
+				if (false === $mid || false === $update_success) {
+					$success = false;
+					break;
+				}
 			}
 		}
 
@@ -548,7 +564,8 @@ final class Course {
 				'code'    => $success ? 'add_students_success' : 'add_students_failed',
 				'message' => $success ? '新增學員成功' : '新增學員失敗',
 				'data'    => [
-					'user_ids' => \implode(',', $user_ids),
+					'user_ids'   => \implode(',', $user_ids),
+					'course_ids' => \implode(',', $course_ids),
 				],
 			],
 			$success ? 200 : 400
@@ -562,18 +579,20 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_with_id_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
-		$course_id   = (int) $request['id'];
+	public function post_courses_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 		$user_ids    = $body_params['user_ids'] ?? [];
 		$timestamp   = $body_params['timestamp'] ?? 0; // 一般為 10 位數字，如果是0就是無期限
+		$course_ids  = $body_params['course_ids'] ?? [];
 
 		$success = true;
-		foreach ($user_ids as  $user_id) {
-			$success = AVLCourseMeta::update( $course_id, (int) $user_id, 'expire_date', $timestamp );
-			if (false === $success ) {
-				break;
+		foreach ($course_ids as $course_id) {
+			foreach ($user_ids as  $user_id) {
+				$success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $timestamp );
+				if (false === $success ) {
+					break;
+				}
 			}
 		}
 
@@ -582,8 +601,9 @@ final class Course {
 				'code'    => $success ? 'update_students_success' : 'update_students_failed',
 				'message' => $success ? '批量調整觀看期限成功' : '批量調整觀看期限失敗',
 				'data'    => [
-					'user_ids'  => \implode(',', $user_ids),
-					'timestamp' => $timestamp,
+					'user_ids'   => \implode(',', $user_ids),
+					'course_ids' => \implode(',', $course_ids),
+					'timestamp'  => $timestamp,
 				],
 			],
 			$success ? 200 : 400
@@ -597,19 +617,21 @@ final class Course {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function post_courses_with_id_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
-		$course_id   = (int) $request['id'];
+	public function post_courses_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 		$user_ids    = $body_params['user_ids'] ?? [];
+		$course_ids  = $body_params['course_ids'] ?? [];
 
 		$success = true;
-		foreach ($user_ids as $user_id) {
-			$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
-			$success2 = AVLCourseMeta::delete( $course_id, (int) $user_id, 'expire_date' );
-			if (false === $success1 || false === $success2) {
-				$success = false;
-				break;
+		foreach ($course_ids as $course_id) {
+			foreach ($user_ids as $user_id) {
+				$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
+				$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id, 'expire_date' );
+				if (false === $success1 || false === $success2) {
+					$success = false;
+					break;
+				}
 			}
 		}
 
@@ -618,7 +640,8 @@ final class Course {
 				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',
 				'message' => $success ? '移除學員成功' : '移除學員失敗',
 				'data'    => [
-					'user_ids' => \implode(',', $user_ids),
+					'user_ids'   => \implode(',', $user_ids),
+					'course_ids' => \implode(',', $course_ids),
 				],
 			],
 			$success ? 200 : 400
