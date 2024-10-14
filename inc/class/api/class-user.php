@@ -95,7 +95,6 @@ final class User {
 	/**
 	 * Get users callback
 	 * 通用的用戶查詢
-	 * TODO 還沒測過分頁功能
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * $params
@@ -112,9 +111,13 @@ final class User {
 
 		$params = WP::sanitize_text_field_deep( $params, false );
 
+		// 轉換 posts_per_page 為 number
+		$params['number'] = $params['posts_per_page'] ?? 10;
+		unset($params['posts_per_page']);
+
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'posts_per_page' => 10,
+			'number'         => 10,
 			'orderby'        => 'ID',
 			'order'          => 'DESC',
 			'offset'         => 0,
@@ -140,7 +143,7 @@ final class User {
 		$users = $wp_user_query->get_results();
 
 		$total       = $wp_user_query->get_total();
-		$total_pages = \floor( $total / $args['posts_per_page'] ) + 1;
+		$total_pages = \floor( $total / $args['number'] ) + 1;
 
 		$formatted_users = array_values(array_map( [ $this, 'format_user_details' ], $users ));
 
@@ -365,7 +368,7 @@ final class User {
 		$user_id         = (int) $user->get( 'ID' );
 		$user_registered = $user->get( 'user_registered' );
 		$user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
-		$user_avatar_url = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
+		$user_avatar_url = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id );
 
 		$avl_course_ids =\get_user_meta($user_id, 'avl_course_ids');
 		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
@@ -390,7 +393,7 @@ final class User {
 		$base_array = [
 			'id'                    => (string) $user_id,
 			'user_login'            => $user->user_login,
-			'user_email'            =>$user->user_email,
+			'user_email'            => $user->user_email,
 			'display_name'          => $user->display_name,
 			'user_registered'       => $user_registered,
 			'user_registered_human' => \human_time_diff( \strtotime( $user_registered ) ),
@@ -513,6 +516,13 @@ final class User {
 		);
 	}
 
+	/**
+	 * 上傳學員
+	 *
+	 * @param \WP_REST_Request $request 包含上傳學員資料的REST請求對象。
+	 * @return \WP_REST_Response 包含操作結果的REST響應對象。
+	 * @phpstan-ignore-next-line
+	 */
 	public function post_users_upload_students_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
 		$file_params = $request->get_file_params();

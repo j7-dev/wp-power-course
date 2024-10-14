@@ -276,5 +276,4 @@ final class ChapterFactory {
 
 		return $update_result;
 	}
-
 }

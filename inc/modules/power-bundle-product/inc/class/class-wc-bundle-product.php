@@ -35,7 +35,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 			 * @var \WC_Product $this
 			 */
 
-			$this->supports[]   = 'ajax_add_to_cart';
+			$this->supports[] = 'ajax_add_to_cart';
 
 			parent::__construct( $product );
 		}
