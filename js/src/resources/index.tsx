@@ -6,6 +6,7 @@ import {
 	SettingOutlined,
 } from '@ant-design/icons'
 import { FaPhotoVideo } from 'react-icons/fa'
+import { PiStudent } from 'react-icons/pi'
 
 export const resources = [
 	{
@@ -22,6 +23,14 @@ export const resources = [
 		meta: {
 			label: '講師管理',
 			icon: <UserOutlined />,
+		},
+	},
+	{
+		name: 'students',
+		list: '/students',
+		meta: {
+			label: '學員管理',
+			icon: <PiStudent />,
 		},
 	},
 	{

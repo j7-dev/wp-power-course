@@ -22,6 +22,7 @@ import { resources } from '@/resources'
 import Dashboard from '@/pages/admin/Dashboard'
 import Courses from '@/pages/admin/Courses'
 import Teachers from '@/pages/admin/Teachers'
+import Students from '@/pages/admin/Students'
 import Settings from '@/pages/admin/Settings'
 import Shortcodes from '@/pages/admin/Shortcodes'
 import MediaLibraryPage from '@/pages/admin/MediaLibraryPage'
@@ -102,6 +103,7 @@ function App() {
 						<Route index element={<Courses />} />
 						<Route path="/courses" element={<Courses />} />
 						<Route path="/teachers" element={<Teachers />} />
+						<Route path="/students" element={<Students />} />
 						<Route path="/shortcodes" element={<Shortcodes />} />
 						<Route path="/settings" element={<Settings />} />
 						<Route path="/dashboard" element={<Dashboard />} />
