@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, memo } from 'react'
 import {
 	FormProps,
 	Form,
@@ -10,11 +10,10 @@ import {
 	Divider,
 	Spin,
 } from 'antd'
-import { BooleanSegmented } from 'antd-toolkit'
+import { BooleanRadioButton } from 'antd-toolkit'
 import { TFilterProps } from '@/pages/admin/Courses/CourseSelector/types'
 import {
 	keyLabelMapper,
-	defaultBooleanRadioButtonProps,
 	termFormatter,
 } from '@/pages/admin/Courses/CourseSelector/utils'
 import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
@@ -39,7 +38,7 @@ export const initialFilteredValues = {
  * @see https://github.com/woocommerce/woocommerce/wiki/wc_get_products-and-WC_Product_Query
  */
 
-const index: FC<{
+const Filter: FC<{
 	searchFormProps: FormProps
 }> = ({ searchFormProps }) => {
 	const [isExpand, setIsExpand] = useState(false)
@@ -66,12 +65,12 @@ const index: FC<{
 				initialValues={initialFilteredValues}
 				className="antd-form-sm"
 			>
-				<div className="grid grid-cols-4 gap-x-4">
+				<div className="grid grid-cols-3 xl:grid-cols-4 gap-x-4">
 					<Item name={['s']} label={keyLabelMapper('s')}>
-						<Input size="small" placeholder="模糊搜尋" allowClear />
+						<Input placeholder="模糊搜尋" allowClear />
 					</Item>
 					<Item name={['sku']} label={keyLabelMapper('sku')}>
-						<Input size="small" placeholder="模糊搜尋" allowClear />
+						<Input placeholder="模糊搜尋" allowClear />
 					</Item>
 
 					<Item
@@ -79,7 +78,6 @@ const index: FC<{
 						label={keyLabelMapper('product_category_id')}
 					>
 						<Select
-							size="small"
 							options={termFormatter(product_cats)}
 							mode="multiple"
 							placeholder="可多選"
@@ -92,7 +90,6 @@ const index: FC<{
 						label={keyLabelMapper('product_tag_id')}
 					>
 						<Select
-							size="small"
 							options={termFormatter(product_tags)}
 							mode="multiple"
 							placeholder="可多選"
@@ -127,7 +124,7 @@ const index: FC<{
 					</Button>
 				</Divider>
 				<div
-					className={`grid-cols-4 gap-x-4 ${isExpand ? 'grid' : 'tw-hidden'}`}
+					className={`grid-cols-3 xl:grid-cols-4 gap-x-4 ${isExpand ? 'grid' : 'tw-hidden'}`}
 				>
 					{(
 						[
@@ -138,8 +135,7 @@ const index: FC<{
 							'sold_individually',
 						] as (keyof TFilterProps)[]
 					).map((key) => (
-						<BooleanSegmented
-							{...defaultBooleanRadioButtonProps}
+						<BooleanRadioButton
 							key={key}
 							formItemProps={{
 								name: [key],
@@ -149,7 +145,6 @@ const index: FC<{
 					))}
 					<Item name={['status']} label={keyLabelMapper('status')}>
 						<Select
-							size="small"
 							options={statusOptions}
 							mode="multiple"
 							placeholder="可多選"
@@ -158,7 +153,6 @@ const index: FC<{
 					</Item>
 					<Item name={['backorders']} label={keyLabelMapper('backorders')}>
 						<Select
-							size="small"
 							options={backordersOptions}
 							mode="multiple"
 							placeholder="可多選"
@@ -167,7 +161,6 @@ const index: FC<{
 					</Item>
 					<Item name={['stock_status']} label={keyLabelMapper('stock_status')}>
 						<Select
-							size="small"
 							options={stockStatusOptions}
 							mode="multiple"
 							placeholder="可多選"
@@ -175,27 +168,25 @@ const index: FC<{
 						/>
 					</Item>
 					<Item name={['date_created']} label={keyLabelMapper('date_created')}>
-						<RangePicker size="small" className="w-full" />
+						<RangePicker className="w-full" />
 					</Item>
 				</div>
-				<div className="grid grid-cols-4 gap-x-4 mt-4">
+				<div className="grid grid-cols-3 xl:grid-cols-4 gap-x-4 mt-4">
+					<Button
+						htmlType="submit"
+						type="primary"
+						className="w-full"
+						icon={<SearchOutlined />}
+					>
+						篩選
+					</Button>
 					<Button
 						type="default"
-						size="small"
 						className="w-full"
 						onClick={handleReset}
 						icon={<UndoOutlined />}
 					>
 						重置
-					</Button>
-					<Button
-						htmlType="submit"
-						type="primary"
-						size="small"
-						className="w-full"
-						icon={<SearchOutlined />}
-					>
-						篩選
 					</Button>
 				</div>
 			</Form>
@@ -203,4 +194,4 @@ const index: FC<{
 	)
 }
 
-export default index
+export default memo(Filter)
