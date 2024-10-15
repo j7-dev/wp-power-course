@@ -25,16 +25,9 @@ export const CourseDescription = () => {
 	const { product_cats = [], product_tags = [] } = options
 	const productUrl = `${siteUrl}/${course_permalink_structure}/`
 	const slug = Form.useWatch(['slug'], form)
-	const bunnyUploadProps = {}
-	const { fileList } = bunnyUploadProps
 	const watchLimitType: string = Form.useWatch(['limit_type'], form)
 	const watchId = Form.useWatch(['id'], form)
-	const isUpdate = !!watchId
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
-
-	useEffect(() => {
-		form.setFieldValue(['files'], fileList)
-	}, [fileList])
 
 	const handleReset = (value: string) => {
 		if ('unlimited' === value) {

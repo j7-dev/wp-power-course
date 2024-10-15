@@ -19,8 +19,8 @@ const useColumns = ({
 	showCourseDrawer,
 	showChapterDrawer,
 }: {
-	showCourseDrawer: (_record?: TCourseRecord | undefined) => () => void
-	showChapterDrawer: (_record?: TChapterRecord | undefined) => () => void
+	showCourseDrawer: (_record: TCourseRecord) => () => void
+	showChapterDrawer: (_record: TChapterRecord) => () => void
 }) => {
 	const columns: TableProps<TCourseRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
