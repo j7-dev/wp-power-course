@@ -11,8 +11,8 @@ import { EyeOutlined } from '@ant-design/icons'
 export const ProductName: FC<{
 	record: TCourseRecord | TChapterRecord
 	show: {
-		showCourseDrawer: (_record: TCourseRecord | undefined) => () => void
-		showChapterDrawer: (_record: TChapterRecord | undefined) => () => void
+		showCourseDrawer: (_record: TCourseRecord) => () => void
+		showChapterDrawer: (_record: TChapterRecord) => () => void
 	}
 	loading?: boolean
 }> = ({ record, show, loading = false }) => {

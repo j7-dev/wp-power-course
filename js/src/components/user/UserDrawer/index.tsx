@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import { Drawer, DrawerProps, Form, Input } from 'antd'
 import { UserAvatarUpload } from '@/components/user'
 

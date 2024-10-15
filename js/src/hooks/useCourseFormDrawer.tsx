@@ -8,7 +8,7 @@ import {
 	Form,
 	message,
 } from 'antd'
-import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
+import { useUpdate } from '@refinedev/core'
 import {
 	TChapterRecord,
 	TCourseRecord,
@@ -30,14 +30,10 @@ export function useCourseFormDrawer({
 		TCourseRecord | TChapterRecord | undefined
 	>(undefined)
 	const [open, setOpen] = useState(false)
-	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增課程，否則走更新課程
 	const closeRef = useRef<HTMLDivElement>(null)
 	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
 	const [publish, setPublish] = useState(true)
 	const { width } = useWindowSize()
-
-	// const isChapter = resource === 'chapters'
-	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TCourseRecord | TChapterRecord) => () => {
 		setRecord({ ...theRecord } as TCourseRecord | TChapterRecord)
@@ -69,17 +65,13 @@ export function useCourseFormDrawer({
 		}
 	}
 
-	const { mutate: create, isLoading: isLoadingCreate } = useCreate()
-	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
-
-	const invalidateCourse = () => {
-		if (resource === 'chapters') {
-			invalidate({
-				resource: 'courses',
-				invalidates: ['list'],
-			})
-		}
-	}
+	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate({
+		resource,
+		invalidates: ['list'],
+		meta: {
+			headers: { 'Content-Type': 'multipart/form-data;' },
+		},
+	})
 
 	const handleSave = () => {
 		form
@@ -88,42 +80,17 @@ export function useCourseFormDrawer({
 				const values = form.getFieldsValue()
 				const formData = toFormData(values)
 
-				if (isUpdate) {
-					update(
-						{
-							id: record!.id,
-							resource,
-							values: formData,
-							meta: {
-								headers: { 'Content-Type': 'multipart/form-data;' },
-							},
+				update(
+					{
+						id: record!.id,
+						values: formData,
+					},
+					{
+						onSuccess: () => {
+							setUnsavedChangesCheck(false)
 						},
-						{
-							onSuccess: () => {
-								invalidateCourse()
-								setUnsavedChangesCheck(false)
-							},
-						},
-					)
-				} else {
-					create(
-						{
-							resource,
-							values: formData,
-							meta: {
-								headers: { 'Content-Type': 'multipart/form-data;' },
-							},
-						},
-						{
-							onSuccess: () => {
-								setOpen(false)
-								form.resetFields()
-								invalidateCourse()
-								setUnsavedChangesCheck(false)
-							},
-						},
-					)
-				}
+					},
+				)
 			})
 			.catch((error) => {
 				const { errorFields } = error
@@ -140,7 +107,7 @@ export function useCourseFormDrawer({
 	const watchId = Form.useWatch(['id'], form)
 
 	const mergedDrawerProps: DrawerProps = {
-		title: `${isUpdate ? '編輯' : '新增'}${itemLabel} - ${watchName} ${watchId ? `#${watchId}` : ''}`,
+		title: `編輯${itemLabel} - ${watchName} ${watchId ? `#${watchId}` : ''}`,
 		forceRender: false,
 		push: false,
 		onClose: close,
@@ -169,11 +136,7 @@ export function useCourseFormDrawer({
 							&nbsp;
 						</p>
 					</Popconfirm>
-					<Button
-						type="primary"
-						onClick={handleSave}
-						loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
-					>
+					<Button type="primary" onClick={handleSave} loading={isLoadingUpdate}>
 						儲存
 					</Button>
 				</div>
@@ -183,16 +146,9 @@ export function useCourseFormDrawer({
 	}
 
 	useEffect(() => {
-		if (record?.id) {
-			// update
-			form.setFieldsValue(record)
-			setUnsavedChangesCheck(true)
-			setPublish(record?.status === 'publish')
-		} else {
-			// create
-			form.resetFields()
-			setUnsavedChangesCheck(false)
-		}
+		form.setFieldsValue(record)
+		setUnsavedChangesCheck(true)
+		setPublish(record?.status === 'publish')
 	}, [record])
 
 	useEffect(() => {
