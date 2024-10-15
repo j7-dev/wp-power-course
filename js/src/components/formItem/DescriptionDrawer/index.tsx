@@ -1,5 +1,5 @@
 import { FC, useEffect, lazy, Suspense, useMemo, memo } from 'react'
-import { Button, Form, Drawer, Input, Alert, Dropdown } from 'antd'
+import { Button, Form, Drawer, Input, Alert, Dropdown, Tooltip } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
 import { useApiUrl } from '@refinedev/core'
@@ -15,14 +15,10 @@ type TDescriptionDrawerProps = {
 const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	props,
 ) => {
-	const BlockNote = useMemo(
-		() =>
-			lazy(() =>
-				import('@/components/general').then((module) => ({
-					default: module.BlockNote,
-				})),
-			),
-		[],
+	const BlockNote = lazy(() =>
+		import('@/components/general').then((module) => ({
+			default: module.BlockNote,
+		})),
 	)
 
 	const name = props?.name || ['description']
@@ -80,7 +76,7 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 						items: [
 							{
 								key: 'elementor',
-								label: (
+								label: watchId ? (
 									<a
 										href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
 										target="_blank"
@@ -88,6 +84,10 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 									>
 										或 使用 Elementor 編輯器
 									</a>
+								) : (
+									<Tooltip title="先儲存後就可以使用 Elementor 編輯了">
+										或 使用 Elementor 編輯器 🚫
+									</Tooltip>
 								),
 							},
 						],
