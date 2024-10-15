@@ -95,6 +95,7 @@ final class User {
 	/**
 	 * Get users callback
 	 * 通用的用戶查詢
+	 * TODO 再改成 SQL 查詢，以支持更複雜的查詢，例如買過OO商品的用戶
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * $params
@@ -132,6 +133,18 @@ final class User {
 
 		if (!empty($args['search'])) {
 			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
+		}
+
+		if (!empty($args['avl_course_ids'])) {
+			$args['meta_query']             = [];
+			$args['meta_query']['relation'] = 'AND';
+			foreach ($args['avl_course_ids'] as $course_id) {
+				$args['meta_query'][] = [
+					'key'     => 'avl_course_ids',
+					'value'   => $course_id,
+					'compare' => '=',
+				];
+			}
 		}
 
 		// Create the WP_User_Query object
@@ -400,6 +413,7 @@ final class User {
 			'user_avatar_url'       => $user_avatar_url,
 			'avl_courses'           => $avl_courses,
 			'description'           => $user->description,
+			'is_teacher'            => \get_user_meta($user_id, 'is_teacher', true) === 'yes',
 		];
 
 		return $base_array;

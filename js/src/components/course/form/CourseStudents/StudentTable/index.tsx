@@ -10,7 +10,7 @@ import {
 	Button,
 	TableProps,
 } from 'antd'
-import useColumns from './hooks/useColumns'
+import useColumns from '@/pages/admin/Students/StudentTable/hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
@@ -19,7 +19,7 @@ import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
-import { GrantCourseAccess } from '@/components/user'
+import AddOtherCourse from '../AddOtherCourse'
 
 const StudentTable = () => {
 	const apiUrl = useApiUrl()
@@ -102,14 +102,15 @@ const StudentTable = () => {
 	// update student mutation
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
 
-	const handleUpdate = (timestamp?: number) => () => {
+	const handleUpdate = () => {
 		mutate(
 			{
-				url: `${apiUrl}/courses/${watchId}/update-students`,
+				url: `${apiUrl}/courses/update-students`,
 				method: 'post',
 				values: {
 					user_ids: selectedRowKeys,
-					timestamp: timestamp ?? time?.unix(),
+					course_ids: [watchId],
+					timestamp: time ? time?.unix() : 0,
 				},
 				config: {
 					headers: {
@@ -143,37 +144,24 @@ const StudentTable = () => {
 	return (
 		<>
 			<div className="mb-4 flex justify-between gap-4">
-				<div className="flex gap-4 flex-wrap">
+				<Space.Compact>
+					<DatePicker
+						value={time}
+						placeholder="留空為無期限"
+						showTime
+						format="YYYY-MM-DD HH:mm"
+						onChange={(value: Dayjs) => {
+							setTime(value)
+						}}
+					/>
 					<Button
 						type="primary"
 						disabled={!selectedRowKeys.length}
-						onClick={handleUpdate(0)}
+						onClick={handleUpdate}
 					>
-						修改為無期限
+						修改觀看期限
 					</Button>
-
-					<Space.Compact>
-						<DatePicker
-							value={time}
-							showTime
-							format="YYYY-MM-DD HH:mm"
-							onChange={(value: Dayjs) => {
-								setTime(value)
-							}}
-						/>
-						<Button
-							type="primary"
-							disabled={!selectedRowKeys.length || !time}
-							onClick={handleUpdate()}
-							ghost
-						>
-							修改觀看期限
-						</Button>
-					</Space.Compact>
-
-					<GrantCourseAccess user_ids={selectedRowKeys as string[]} />
-				</div>
-
+				</Space.Compact>
 				<PopconfirmDelete
 					type="button"
 					popconfirmProps={{
@@ -181,12 +169,15 @@ const StudentTable = () => {
 						onConfirm: handleRemove,
 					}}
 					buttonProps={{
-						children: '移除學員',
+						children: '移除課程權限(移除學員)',
 						disabled: !selectedRowKeys.length,
 						loading: isLoading,
 					}}
 				/>
 			</div>
+
+			<AddOtherCourse user_ids={selectedRowKeys as string[]} />
+
 			<Table
 				{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
 				{...tableProps}

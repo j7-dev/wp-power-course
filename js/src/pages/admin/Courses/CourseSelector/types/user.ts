@@ -21,4 +21,5 @@ export type TUserRecord = {
 	user_registered_human: string
 	user_avatar_url: string
 	avl_courses: TAVLCourse[]
+	is_teacher: boolean
 }

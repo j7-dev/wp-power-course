@@ -1,25 +1,14 @@
 import React, { memo } from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import {
-	Table,
-	message,
-	Button,
-	Form,
-	TableProps,
-	Card,
-	Space,
-	DatePicker,
-} from 'antd'
+import { Table, Form, TableProps, Card, FormInstance } from 'antd'
 import useColumns from './hooks/useColumns'
 import useGCDCourses from './hooks/useGCDCourses'
-import { useRowSelection } from 'antd-toolkit'
-import { useApiUrl, useInvalidate } from '@refinedev/core'
+import { useRowSelection, FilterTags } from 'antd-toolkit'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/pages/admin/Courses/CourseSelector/utils'
-import { PopconfirmDelete } from '@/components/general'
 import { useUserFormDrawer } from '@/hooks'
 import {
 	UserDrawer,
@@ -27,15 +16,28 @@ import {
 	RemoveCourseAccess,
 	ModifyCourseExpireDate,
 } from '@/components/user'
+import Filter, { TFilterValues } from './Filter'
+import { HttpError } from '@refinedev/core'
+import { keyLabelMapper } from './utils'
 
 const StudentTable = () => {
-	const apiUrl = useApiUrl()
-	const invalidate = useInvalidate()
-
-	const { tableProps } = useTable<TUserRecord>({
+	const { searchFormProps, tableProps } = useTable<
+		TUserRecord,
+		HttpError,
+		TFilterValues
+	>({
 		resource: 'users',
 		pagination: {
 			pageSize: 20,
+		},
+		onSearch: (values) => {
+			return Object.keys(values).map((key) => {
+				return {
+					field: key,
+					operator: 'contains',
+					value: values[key as keyof TFilterValues],
+				}
+			})
 		},
 	})
 
@@ -68,13 +70,17 @@ const StudentTable = () => {
 	return (
 		<>
 			<Card title="Filter" bordered={false} className="mb-4">
-				<div className="flex gap-4 mb-4"></div>
+				<Filter formProps={searchFormProps} />
+				<FilterTags
+					form={searchFormProps.form as FormInstance}
+					keyLabelMapper={keyLabelMapper}
+				/>
 			</Card>
 			<Card bordered={false}>
 				<div className="mb-4">
 					<GrantCourseAccess user_ids={selectedRowKeys as string[]} />
 				</div>
-				<div className="mb-4 flex justify-between">
+				<div className="mb-4 flex justify-between gap-x-6">
 					<div>
 						<GcdCoursesTags />
 					</div>

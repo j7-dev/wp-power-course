@@ -1,6 +1,13 @@
-import { TableProps, Tooltip } from 'antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
-import { UserName, UserWatchLimit, UserWatchStatus } from '@/components/user'
+import { TableProps, Typography } from 'antd'
+import {
+	TUserRecord,
+	TAVLCourse,
+} from '@/pages/admin/Courses/CourseSelector/types'
+import { UserName } from '@/components/user'
+import { WatchStatusTag } from '@/components/general'
+import dayjs from 'dayjs'
+
+const { Text } = Typography
 
 const useColumns = () => {
 	const columns: TableProps<TUserRecord>['columns'] = [
@@ -11,20 +18,38 @@ const useColumns = () => {
 			render: (_, record) => <UserName record={record} />,
 		},
 		{
-			title: '狀態',
+			title: '已開通課程',
 			dataIndex: 'avl_courses',
-			key: 'avl_courses_status',
-			width: 100,
-			render: (_, record) => <UserWatchStatus record={record} />,
-		},
-		{
-			title: (
-				<Tooltip title="學員可以看的期限，如果空白代表無期限">觀看期限</Tooltip>
-			),
-			dataIndex: 'avl_courses',
-			key: 'avl_courses',
-			width: 180,
-			render: (_, record) => <UserWatchLimit record={record} />,
+			width: 240,
+			render: (avl_courses: TAVLCourse[]) => {
+				return avl_courses.map(({ id, name, expire_date }) => (
+					<div key={id} className="grid grid-cols-[12rem_4rem_8rem] gap-1 my-1">
+						<div>
+							<Text
+								ellipsis={{
+									tooltip: (
+										<>
+											{name || '未知的課程名稱'} <sub>#{id}</sub>
+										</>
+									),
+								}}
+							>
+								{name || '未知的課程名稱'} <sub>#{id}</sub>
+							</Text>
+						</div>
+
+						<div className="text-center">
+							<WatchStatusTag expireDate={expire_date} />
+						</div>
+
+						<div className="text-center">
+							{expire_date
+								? dayjs.unix(expire_date).format('YYYY/MM/DD HH:mm')
+								: ''}
+						</div>
+					</div>
+				))
+			},
 		},
 	]
 

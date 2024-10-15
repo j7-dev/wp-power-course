@@ -59,7 +59,7 @@ const index = () => {
 			]
 		},
 		queryOptions: {
-			enabled: !!watchId && !!keyword,
+			enabled: !!watchId,
 		},
 	})
 
@@ -124,6 +124,13 @@ const index = () => {
 				}}
 				value={userIds}
 				loading={queryResult.isFetching}
+				optionRender={({ value, label }) => {
+					return (
+						<span>
+							{label} <sub className="text-gray-500">#{value}</sub>
+						</span>
+					)
+				}}
 			/>
 			<Select
 				value={searchField}
