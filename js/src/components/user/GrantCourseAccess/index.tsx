@@ -1,31 +1,13 @@
 import React, { memo, useState } from 'react'
-import { Select, Button, Space, DatePicker, SelectProps, message } from 'antd'
-import { useSelect } from '@refinedev/antd'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { Select, Button, Space, DatePicker, message } from 'antd'
 import { Dayjs } from 'dayjs'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { useCourseSelect } from '@/hooks'
 
 const GrantCourseAccessComponent = ({ user_ids }: { user_ids: string[] }) => {
-	const { selectProps } = useSelect<TCourseRecord>({
-		resource: 'courses',
-		optionLabel: 'name',
-		optionValue: 'id',
-		debounce: 500,
-		pagination: {
-			pageSize: 20,
-			mode: 'server',
-		},
-		onSearch: (value) => [
-			{
-				field: 's',
-				operator: 'contains',
-				value,
-			},
-		],
-	})
+	const { selectProps, courseIds } = useCourseSelect()
 
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
-	const [courseIds, setCourseIds] = useState<string[]>([])
 
 	const { mutate: addStudent, isLoading } = useCustomMutation()
 	const apiUrl = useApiUrl()
@@ -57,6 +39,10 @@ const GrantCourseAccessComponent = ({ user_ids }: { user_ids: string[] }) => {
 						resource: 'users',
 						invalidates: ['list'],
 					})
+					invalidate({
+						resource: 'users/students',
+						invalidates: ['list'],
+					})
 				},
 				onError: () => {
 					message.error({
@@ -70,24 +56,7 @@ const GrantCourseAccessComponent = ({ user_ids }: { user_ids: string[] }) => {
 
 	return (
 		<Space.Compact className="w-full">
-			<Select
-				{...(selectProps as SelectProps)}
-				placeholder="搜尋課程關鍵字"
-				className="w-full"
-				allowClear
-				mode="multiple"
-				optionRender={({ value, label }) => {
-					return (
-						<span>
-							{label} <sub className="text-gray-500">#{value}</sub>
-						</span>
-					)
-				}}
-				value={courseIds}
-				onChange={(value) => {
-					setCourseIds(value)
-				}}
-			/>
+			<Select {...selectProps} />
 			<DatePicker
 				placeholder="留空為無期限"
 				value={time}

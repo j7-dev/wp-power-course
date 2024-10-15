@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { memo } from 'react'
 import dayjs from 'dayjs'
 import { Tag } from 'antd'
 
-export const WatchStatusTag = ({ expireDate }: { expireDate: number }) => {
+const WatchStatusTagComponent = ({ expireDate }: { expireDate: number }) => {
 	const currentTimestamp = dayjs().unix()
 
 	if (!expireDate) {
@@ -15,3 +15,5 @@ export const WatchStatusTag = ({ expireDate }: { expireDate: number }) => {
 
 	return <Tag color="green">未過期</Tag>
 }
+
+export const WatchStatusTag = memo(WatchStatusTagComponent)

@@ -8,12 +8,14 @@ import { UserName } from '@/components/user'
 import { WatchStatusTag } from '@/components/general'
 import dayjs from 'dayjs'
 
-const { Text } = Typography
-const useColumns = ({
-	onClick: show,
-}: {
+type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
-}) => {
+}
+
+const { Text } = Typography
+
+const useColumns = (params?: TUseColumnsParams) => {
+	const show = params?.onClick
 	const columns: TableProps<TUserRecord>['columns'] = [
 		{
 			title: '會員',
@@ -25,7 +27,7 @@ const useColumns = ({
 			title: '已開通課程',
 			dataIndex: 'avl_courses',
 			width: 240,
-			render: (avl_courses: TAVLCourse[], record) => {
+			render: (avl_courses: TAVLCourse[]) => {
 				return avl_courses.map(({ id, name, expire_date }) => (
 					<div key={id} className="grid grid-cols-[12rem_4rem_8rem] gap-1 my-1">
 						<div>
