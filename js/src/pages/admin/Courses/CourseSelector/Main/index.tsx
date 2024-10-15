@@ -6,7 +6,7 @@ import Filter, {
 	initialFilteredValues,
 } from '@/pages/admin/Courses/CourseSelector/Filter'
 import MobileFilter from '@/pages/admin/Courses/CourseSelector/Filter/MobileFilter'
-import { HttpError } from '@refinedev/core'
+import { HttpError, useCreate } from '@refinedev/core'
 import {
 	TFilterProps,
 	TCourseRecord,
@@ -120,6 +120,22 @@ const Main = () => {
 		showChapterDrawer,
 	})
 
+	const { mutate: create } = useCreate({
+		resource: 'courses',
+		invalidates: ['list'],
+		meta: {
+			headers: { 'Content-Type': 'multipart/form-data;' },
+		},
+	})
+
+	const createCourse = () => {
+		create({
+			values: {
+				name: '新課程',
+			},
+		})
+	}
+
 	return (
 		<Spin spinning={tableProps?.loading as boolean}>
 			<Card title="篩選" className="mb-4">
@@ -147,7 +163,7 @@ const Main = () => {
 					type="primary"
 					className="mb-4"
 					icon={<PlusOutlined />}
-					onClick={showCourseDrawer()}
+					onClick={createCourse}
 				>
 					新增課程
 				</Button>
