@@ -69,7 +69,7 @@ const StudentTable = () => {
 
 	return (
 		<>
-			<Card title="Filter" bordered={false} className="mb-4">
+			<Card title="篩選" bordered={false} className="mb-4">
 				<Filter formProps={searchFormProps} />
 				<FilterTags
 					form={searchFormProps.form as FormInstance}

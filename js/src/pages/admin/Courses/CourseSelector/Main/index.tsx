@@ -1,6 +1,6 @@
 import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Form, Button, TableProps } from 'antd'
+import { Table, FormInstance, Spin, Form, Button, TableProps, Card } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
@@ -121,66 +121,64 @@ const Main = () => {
 	})
 
 	return (
-		<div className="flex gap-8 flex-col">
-			{!isMobile && (
-				<div className="w-full">
+		<Spin spinning={tableProps?.loading as boolean}>
+			<Card title="篩選" className="mb-4">
+				{isMobile ? (
+					<MobileFilter searchFormProps={searchFormProps} />
+				) : (
 					<Filter searchFormProps={searchFormProps} />
-				</div>
-			)}
-			<div className="w-full">
-				<Spin spinning={tableProps?.loading as boolean}>
-					<div className="mb-4">
-						{isMobile && <MobileFilter searchFormProps={searchFormProps} />}
-						<FilterTags
-							form={searchFormProps?.form as FormInstance<TFilterProps>}
-							keyLabelMapper={keyLabelMapper}
-							valueLabelMapper={valueLabelMapper}
-							booleanKeys={[
-								'featured',
-								'downloadable',
-								'virtual',
-								'sold_individually',
-							]}
-						/>
-					</div>
-					<Button
-						type="primary"
-						className="mb-4"
-						icon={<PlusOutlined />}
-						onClick={showCourseDrawer()}
-					>
-						新增課程
-					</Button>
-
-					<Table
-						{...(defaultTableProps as unknown as TableProps<TCourseRecord>)}
-						{...tableProps}
-						pagination={{
-							...tableProps.pagination,
-							...getDefaultPaginationProps({ label: '課程' }),
-						}}
-						rowSelection={rowSelection}
-						columns={columns}
-						expandable={{
-							expandedRowRender: (record) => (
-								<SortableChapter record={record} show={showChapterDrawer} />
-							),
-							rowExpandable: (record: TCourseRecord) =>
-								!!record?.chapters?.length,
-						}}
-						rowKey={(record) => record.id.toString()}
+				)}
+				<div className="mt-2">
+					<FilterTags
+						form={searchFormProps?.form as FormInstance<TFilterProps>}
+						keyLabelMapper={keyLabelMapper}
+						valueLabelMapper={valueLabelMapper}
+						booleanKeys={[
+							'featured',
+							'downloadable',
+							'virtual',
+							'sold_individually',
+						]}
 					/>
+				</div>
+			</Card>
+			<Card>
+				<Button
+					type="primary"
+					className="mb-4"
+					icon={<PlusOutlined />}
+					onClick={showCourseDrawer()}
+				>
+					新增課程
+				</Button>
+				<Table
+					{...(defaultTableProps as unknown as TableProps<TCourseRecord>)}
+					{...tableProps}
+					pagination={{
+						...tableProps.pagination,
+						...getDefaultPaginationProps({ label: '課程' }),
+					}}
+					rowSelection={rowSelection}
+					columns={columns}
+					expandable={{
+						expandedRowRender: (record) => (
+							<SortableChapter record={record} show={showChapterDrawer} />
+						),
+						rowExpandable: (record: TCourseRecord) =>
+							!!record?.chapters?.length,
+					}}
+					rowKey={(record) => record.id.toString()}
+				/>
+			</Card>
 
-					<Form layout="vertical" form={courseForm}>
-						<CourseDrawer {...courseDrawerProps} />
-					</Form>
+			<Form layout="vertical" form={courseForm}>
+				<CourseDrawer {...courseDrawerProps} />
+			</Form>
 
-					<Form layout="vertical" form={chapterForm}>
-						<ChapterDrawer {...chapterDrawerProps} />
-					</Form>
-				</Spin>
-			</div>
-		</div>
+			<Form layout="vertical" form={chapterForm}>
+				<ChapterDrawer {...chapterDrawerProps} />
+			</Form>
+		</Spin>
 	)
 }
 
