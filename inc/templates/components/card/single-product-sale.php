@@ -23,6 +23,11 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
+$hide_single_course = $product->get_meta( 'hide_single_course' ) ?: 'no';
+if ( 'yes' === $hide_single_course ) {
+	return;
+}
+
 $purchase_note = \wpautop( $product->get_purchase_note() );
 $checkout_url  = \wc_get_checkout_url();
 $url           = \add_query_arg(

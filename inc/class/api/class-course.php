@@ -328,6 +328,7 @@ final class Course {
 			'show_review_list'    => (string) $product->get_meta( 'show_review_list' ),
 			'show_total_student'  => (string) $product->get_meta( 'show_total_student' ) ?: 'yes',
 			'enable_comment'      => (string) $product->get_meta( 'enable_comment' ),
+			'hide_single_course'  => (string) $product->get_meta( 'hide_single_course' ) ?: 'no',
 			'extra_student_count' => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'       => $product->get_meta( 'feature_video' ) ?: [
 				'type' => 'youtube',
@@ -474,15 +475,6 @@ final class Course {
 			'data'      => $data,
 			'meta_data' => $meta_data,
 		] = $this->separator($request);
-
-		ob_start();
-		var_dump(
-			[
-				'data'      => $data,
-				'meta_data' => $meta_data,
-			]
-			);
-		\J7\WpUtils\Classes\ErrorLog::info('' . ob_get_clean());
 
 		$this->handle_save_course_data($product, $data );
 		$this->handle_save_course_meta_data($product, $meta_data );
