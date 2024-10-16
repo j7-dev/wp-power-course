@@ -27,8 +27,8 @@ final class Product {
 		// \add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
 		\add_filter( 'display_post_states', [ __CLASS__, 'custom_display_post_states' ], 10, 2 );
 		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
-		\add_filter('get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
-		\add_filter('woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
+		\add_filter( 'get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
+		\add_filter( 'woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
 	}
 
 
@@ -101,6 +101,7 @@ final class Product {
 	public static function modify_list_row_actions( array $actions, \WP_Post $post ): array {
 		if ( CourseUtils::is_course_product( $post->ID ) || BundleProduct::is_bundle_product( $post->ID ) ) {
 			unset( $actions['inline hide-if-no-js'] );
+			unset( $actions['trash'] );
 			$actions['edit'] = sprintf(
 			/*html*/'<a href="%s" aria-label="編輯〈課程〉" target="_blank">編輯</a>',
 			\admin_url('admin.php?page=power-course')
