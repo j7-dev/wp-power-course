@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react'
 import { Tabs, TabsProps, ButtonProps } from 'antd'
-import { FaPhotoVideo, FaShekelSign } from 'react-icons/fa'
+import { FaPhotoVideo } from 'react-icons/fa'
 import { CloudUploadOutlined } from '@ant-design/icons'
 import { Heading } from '@/components/general'
 import VideoList from './VideoList'
