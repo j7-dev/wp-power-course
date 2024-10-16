@@ -555,7 +555,7 @@ final class Course {
 		$success = true;
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
-				$current_avl_course_ids = (array) \get_user_meta( $user_id, 'avl_course_ids', true );
+				$current_avl_course_ids = (array) \get_user_meta( $user_id, 'avl_course_ids' );
 				if (\in_array($course_id, $current_avl_course_ids)) {
 					continue;
 				}
