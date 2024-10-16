@@ -69,12 +69,20 @@ export const CoursePrice = () => {
 				}}
 			/>
 
-			<FiSwitch
-				formItemProps={{
-					name: ['is_free'],
-					label: '這是免費課程',
-				}}
-			/>
+			<div className="grid grid-cols-2 gap-4">
+				<FiSwitch
+					formItemProps={{
+						name: ['is_free'],
+						label: '這是免費課程',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
+						name: ['hide_single_course'],
+						label: '隱藏購買單堂課',
+					}}
+				/>
+			</div>
 
 			<Item name={['purchase_note']} label="購買備註">
 				<Input.TextArea rows={4} />

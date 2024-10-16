@@ -304,7 +304,7 @@ abstract class Course {
 	public static function get_avl_courses_by_user( ?int $user_id = null, ?bool $return_ids = false ): array {
 
 		$user_id        = $user_id ?? get_current_user_id();
-		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids', false);
+		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids');
 
 		/**
 		 * @var array<string> $avl_course_ids
