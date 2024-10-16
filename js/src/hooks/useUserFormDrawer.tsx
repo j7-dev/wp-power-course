@@ -52,15 +52,19 @@ export function useUserFormDrawer({
 		}
 	}
 
-	const { mutate: create, isLoading: isLoadingCreate } = useCreate()
-	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate()
-
-	const invalidateUser = () => {
-		invalidate({
-			resource,
-			invalidates: ['list'],
-		})
-	}
+	const { mutate: create, isLoading: isLoadingCreate } = useCreate({
+		resource,
+		meta: {
+			headers: { 'Content-Type': 'multipart/form-data;' },
+		},
+	})
+	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate({
+		resource,
+		meta: {
+			headers: { 'Content-Type': 'multipart/form-data;' },
+		},
+		invalidates: ['list'],
+	})
 
 	const handleSave = () => {
 		form.validateFields().then(() => {
@@ -71,15 +75,10 @@ export function useUserFormDrawer({
 				update(
 					{
 						id: record!.id,
-						resource,
 						values: formData,
-						meta: {
-							headers: { 'Content-Type': 'multipart/form-data;' },
-						},
 					},
 					{
 						onSuccess: () => {
-							invalidateUser()
 							if (record) {
 								setRecord({ ...(record as TUserRecord) })
 							}
@@ -95,17 +94,12 @@ export function useUserFormDrawer({
 
 				create(
 					{
-						resource,
 						values: formData,
-						meta: {
-							headers: { 'Content-Type': 'multipart/form-data;' },
-						},
 					},
 					{
 						onSuccess: () => {
 							setOpen(false)
 							form.resetFields()
-							invalidateUser()
 							if (record) {
 								setRecord({ ...(record as TUserRecord) })
 							}

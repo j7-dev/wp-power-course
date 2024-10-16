@@ -7,6 +7,7 @@ import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import ProductCheckCard from './ProductCheckCard'
 import { coursesAtom } from '@/pages/admin/Courses/CourseSelector'
 import { useAtomValue } from 'jotai'
+import { FiSwitch } from '@/components/formItem'
 
 const { Item } = Form
 

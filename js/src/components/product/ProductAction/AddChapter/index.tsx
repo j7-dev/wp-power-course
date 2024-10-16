@@ -22,11 +22,16 @@ const AddChapter: FC<{
 	record: TCourseRecord | TChapterRecord
 	buttonProps?: ButtonProps
 }> = ({ record, buttonProps }) => {
-	const { mutate, isLoading } = useCreate<
-		BaseRecord,
-		HttpError,
-		TCreateParams
-	>()
+	const { mutate, isLoading } = useCreate<BaseRecord, HttpError, TCreateParams>(
+		{
+			resource: 'chapters',
+			meta: {
+				headers: {
+					'Content-Type': 'multipart/form-data;',
+				},
+			},
+		},
+	)
 	const invalidate = useInvalidate()
 	const { type, depth } = record
 	const isChapter = type === 'chapter'
@@ -50,21 +55,15 @@ const AddChapter: FC<{
 	const handleCreate = () => {
 		mutate(
 			{
-				resource: 'chapters',
 				values: {
 					post_parent: record.id,
 					post_title: `新${itemLabel}`,
 					menu_order: (record?.chapters || []).length + 1,
 				},
-				meta: {
-					headers: {
-						'Content-Type': 'multipart/form-data;',
-					},
-				},
 			},
 			{
 				onSuccess: (_data, variables) => {
-					const id: string = variables?.values?.post_parent
+					const id: string = variables?.values?.post_parent ?? ''
 					invalidate({
 						resource: 'courses',
 						invalidates: ['list'],
