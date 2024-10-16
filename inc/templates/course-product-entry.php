@@ -23,13 +23,13 @@ function ( $classes ) {
 use J7\PowerCourse\Templates\Templates;
 
 // PENDING
-// $product_status = $product->get_status();
-// $can_edit       = \current_user_can( 'edit_product', $product->get_id() );
+$product_status = $product->get_status();
+$can_edit       = \current_user_can( 'edit_product', $product->get_id() );
 
-// if ('draft' === $product_status && !$can_edit) {
-// // 如果商品為草稿且用戶沒有權限編輯，就 redirect
-// \wp_safe_redirect( home_url('/404') );
-// }
+if ('draft' === $product_status && !$can_edit) {
+	// 如果商品為草稿且用戶沒有權限編輯，就 redirect
+	\wp_safe_redirect( home_url('/404') );
+}
 
 get_header();
 

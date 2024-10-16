@@ -113,7 +113,7 @@ final class Query {
 	public static function exclude_bundle_product( $query ): void {
 		$meta_key = $query->get('meta_key');
 		// 只有在 power course api 取得時，還有課程銷售頁可見
-		if (General::in_url([ '/wp-json/power-course' ]) || BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY === $meta_key) {
+		if (General::in_url([ '/wp-json/power-course' ]) || 'link_course_ids' === $meta_key) {
 			return;
 		}
 

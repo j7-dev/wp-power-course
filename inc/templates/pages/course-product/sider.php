@@ -30,8 +30,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 	<?php Templates::get( 'card/single-product' ); ?>
 	<?php
-	$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids:true );
-
+	$bundle_ids = CourseUtils::get_bundles_by_product( (int) $product->get_id(), true );
 	foreach ( $bundle_ids as $bundle_id ) {
 		$bundle_product = \wc_get_product( $bundle_id );
 		if ( ! $bundle_product ) {

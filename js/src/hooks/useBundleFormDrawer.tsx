@@ -21,7 +21,7 @@ export function useBundleFormDrawer({
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TProductRecord) => () => {
-		setRecord({ ...theRecord } as TProductRecord)
+		setRecord(theRecord)
 		setOpen(true)
 	}
 
@@ -130,7 +130,7 @@ export function useBundleFormDrawer({
 				onClick={handleSave}
 				loading={isUpdate ? isLoadingUpdate : isLoadingCreate}
 				disabled={
-					watchIncludedProductIds?.length < 2 ||
+					watchIncludedProductIds?.length === 0 ||
 					watchSalePrice > watchRegularPrice
 				}
 			>

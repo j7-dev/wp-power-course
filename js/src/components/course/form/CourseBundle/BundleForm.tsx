@@ -1,4 +1,4 @@
-import { useEffect, useState, FC } from 'react'
+import { useEffect, useState, FC, memo } from 'react'
 import { Form, InputNumber, Select, Input, FormInstance, List, Tag } from 'antd'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import dayjs from 'dayjs'
@@ -6,11 +6,13 @@ import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { useList } from '@refinedev/core'
-import { PopconfirmDelete } from '@/components/general'
+import { PopconfirmDelete, Heading } from '@/components/general'
 import {
 	CheckOutlined,
 	PlusOutlined,
 	ExclamationCircleOutlined,
+	LinkOutlined,
+	DisconnectOutlined,
 } from '@ant-design/icons'
 import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
 import { FiSwitch, RangePicker } from '@/components/formItem'
@@ -19,7 +21,7 @@ import { FileUpload } from '@/components/post'
 // TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?
 
-dayjs.extend(customParseFormat)
+// dayjs.extend(customParseFormat)
 
 const { Item } = Form
 const { Search } = Input
@@ -45,6 +47,9 @@ const BundleForm: FC<{
 	const watchSalePrice = Number(
 		Form.useWatch(['sale_price'], bundleProductForm),
 	)
+	const watchBundleType = Form.useWatch(['bundle_type'], bundleProductForm)
+	const watchExcludeMainCourse =
+		Form.useWatch(['exclude_main_course'], bundleProductForm) === 'yes'
 
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
@@ -102,12 +107,15 @@ const BundleForm: FC<{
 
 	useEffect(() => {
 		// 選擇商品改變時，同步更新到表單上
+		const productIds = watchExcludeMainCourse
+			? selectedProducts.map(({ id }) => id)
+			: [
+					selectedCourse?.id,
+					...selectedProducts.map(({ id }) => id),
+				]
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
-			[
-				selectedCourse?.id,
-				...selectedProducts.map(({ id }) => id),
-			],
+			productIds,
 		)
 
 		bundleProductForm.setFieldValue(
@@ -116,9 +124,10 @@ const BundleForm: FC<{
 				type: 'regular_price',
 				products: selectedProducts,
 				selectedCourse,
+				excludeMainCourse: watchExcludeMainCourse,
 			}),
 		)
-	}, [selectedProducts.length])
+	}, [selectedProducts.length, watchExcludeMainCourse])
 
 	// 將當前商品移除
 	const initPIdsExcludedCourseId = (
@@ -146,6 +155,7 @@ const BundleForm: FC<{
 
 	useEffect(() => {
 		// 有 id = 編輯方案，要將資料填入表單
+		console.log('⭐  record:', { record, initIsFetching, watchBundleType })
 		if (!!record && !initIsFetching) {
 			// 初始化商品
 			setSelectedProducts(includedProducts)
@@ -154,20 +164,36 @@ const BundleForm: FC<{
 		if (!record) {
 			// 新增方案，清空選擇商品
 			setSelectedProducts([])
+			bundleProductForm.setFieldValue(
+				['bundle_type_label'],
+				OPTIONS.find((o) => o.value === watchBundleType)?.label,
+			)
 		}
-	}, [record, initIsFetching])
+	}, [record, initIsFetching, watchBundleType])
 
 	return (
 		<Form form={bundleProductForm} layout="vertical">
-			<Item name={['id']} hidden normalize={() => undefined}>
+			{/* <Item name={['id']} hidden normalize={() => undefined}>
 				<Input />
-			</Item>
+			</Item> */}
+			<Item
+				name={['link_course_ids']}
+				initialValue={[selectedCourse?.id]}
+				hidden
+			/>
 			<Item
 				name={['bundle_type']}
 				label="銷售方案種類"
 				initialValue={OPTIONS[0].value}
 			>
 				<Select options={OPTIONS} />
+			</Item>
+			<Item
+				name={['bundle_type_label']}
+				label="銷售方案種類顯示文字"
+				tooltip="銷售方案名稱上方的紅色小字"
+			>
+				<Input />
 			</Item>
 			<Item
 				name={['name']}
@@ -197,10 +223,21 @@ const BundleForm: FC<{
 				</div>
 			)}
 
-			<p className="mb-3">搭配你的銷售方案，請選擇要加入的商品</p>
+			<Heading className="mb-3">搭配你的銷售方案，請選擇要加入的商品</Heading>
+			<FiSwitch
+				formItemProps={{
+					name: ['exclude_main_course'],
+					label: '排除目前課程',
+				}}
+				switchProps={{
+					size: 'small',
+				}}
+			/>
 			<div className="border-2 border-dashed border-blue-500 rounded-xl p-4 mb-8">
 				{/* 當前課程方案 */}
-				<div className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md">
+				<div
+					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
+				>
 					<img
 						src={selectedCourse?.images?.[0]?.url || defaultImage}
 						className="h-9 w-16 rounded object-cover"
@@ -214,7 +251,9 @@ const BundleForm: FC<{
 					</div>
 				</div>
 				{/* END 當前課程方案 */}
-				<div className="text-center my-2">
+				<div
+					className={`text-center my-2 ${watchExcludeMainCourse ? 'opacity-0' : ''}`}
+				>
 					<PlusOutlined />
 				</div>
 				<div className="relative mb-2">
@@ -331,6 +370,7 @@ const BundleForm: FC<{
 									products: selectedProducts,
 									selectedCourse,
 									returnType: 'string',
+									excludeMainCourse: watchExcludeMainCourse,
 								})}
 							</div>
 							<div>此銷售組合原訂折扣價</div>
@@ -341,6 +381,7 @@ const BundleForm: FC<{
 									products: selectedProducts,
 									selectedCourse,
 									returnType: 'string',
+									excludeMainCourse: watchExcludeMainCourse,
 								})}
 							</div>
 						</div>
@@ -413,12 +454,14 @@ function getPrice({
 	products,
 	selectedCourse,
 	returnType = 'number',
+	excludeMainCourse = false,
 }: {
 	isFetching?: boolean
 	type: 'regular_price' | 'sale_price'
 	products: TProductRecord[] | undefined
 	selectedCourse: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
+	excludeMainCourse?: boolean
 }) {
 	if (isFetching) {
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
@@ -434,10 +477,10 @@ function getPrice({
 					acc + Number(product?.[type] || product.regular_price),
 				0,
 			),
-		) + coursePrice
+		) + (excludeMainCourse ? 0 : coursePrice)
 
 	if ('number' === returnType) return total
 	return `NT$ ${total?.toLocaleString()}`
 }
 
-export default BundleForm
+export default memo(BundleForm)

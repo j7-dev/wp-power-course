@@ -27,7 +27,7 @@ final class Course {
 
 	/**
 	 * 刪除課程與相關項目
-	 * 刪除課程時連帶刪除子章節以及組合商品(bundle product)
+	 * 刪除課程時連帶刪除子章節以及銷售方案(bundle product)
 	 *
 	 * @param int     $id 課程 id
 	 * @param ?string $previous_status 前一個狀態

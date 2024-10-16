@@ -108,26 +108,27 @@ final class Product {
 			);
 		}
 
-		if (BundleProduct::is_bundle_product( $post->ID ) ) {
-			$course_posts = get_posts(
-				[
-					'post_type'   => 'product',
-					'numberposts' => -1,
-					'meta_key'    => 'bundle_ids',
-					'meta_value'  => $post->ID,
-				]
-				);
+		// 因為已經把 BundleProduct 排除後台 wp-admin 顯示了 所以不需要這個了，參考 J7\PowerCourse\Admin\Product\Query::exclude_bundle_product
+		// if (BundleProduct::is_bundle_product( $post->ID ) ) {
+		// $course_posts = get_posts(
+		// [
+		// 'post_type'   => 'product',
+		// 'numberposts' => -1,
+		// 'meta_key'    => 'bundle_ids',
+		// 'meta_value'  => $post->ID,
+		// ]
+		// );
 
-			if ($course_posts) {
-				$course_post     = reset($course_posts);
-				$actions['view'] = sprintf(
-					/*html*/'<a href="%s" rel="bookmark" target="_blank" aria-label="檢視〈商品〉">檢視</a>',
-					\get_the_permalink($course_post)
-				);
-			} else {
-				unset($actions['view']);
-			}
-		}
+		// if ($course_posts) {
+		// $course_post     = reset($course_posts);
+		// $actions['view'] = sprintf(
+		// *html*/'<a href="%s" rel="bookmark" target="_blank" aria-label="檢視〈商品〉">檢視</a>',
+		// \get_the_permalink($course_post)
+		// );
+		// } else {
+		// unset($actions['view']);
+		// }
+		// }
 
 		return $actions;
 	}
