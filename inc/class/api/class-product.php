@@ -240,9 +240,6 @@ final class Product {
 			// Get Product Images
 			'images'                                    => $images,
 
-			// PENDING meta data
-			// 'meta_data'          => WC::get_formatted_meta_data( $product ),
-
 			'is_course'                                 => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
 			'parent_id'                                 => (string) $product->get_parent_id(),
 
@@ -252,6 +249,8 @@ final class Product {
 			'sale_date_range'                           => [ (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                                   => [],
+			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
+			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
 
 		] + $children;
 
@@ -399,6 +398,14 @@ final class Product {
 
 		if ( isset( $meta_data['product_type'] ) ) {
 			unset( $meta_data['product_type'] );
+		}
+
+		if (isset($meta_data['link_course_ids']) && is_array($meta_data['link_course_ids'])) {
+			foreach ($meta_data['link_course_ids'] as $course_id) {
+				$product->add_meta_data( 'link_course_ids', $course_id, unique:false );
+			}
+			$product->save_meta_data();
+			unset( $meta_data['link_course_ids'] );
 		}
 
 		return $meta_data;

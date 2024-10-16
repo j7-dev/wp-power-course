@@ -247,7 +247,7 @@ abstract class Course {
 			'post_type'   => 'product',
 			'numberposts' => - 1,
 			'post_status' => $post_status,
-			'meta_key'    => BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
+			'meta_key'    => 'link_course_ids',
 			'meta_value'  => (string) $product_id,
 		];
 

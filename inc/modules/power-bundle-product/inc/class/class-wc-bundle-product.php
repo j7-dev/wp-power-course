@@ -23,7 +23,8 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		public $product_type = Plugin::PRODUCT_TYPE;
 
 		public const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
-		const LINK_TO_BUNDLE_IDS_META_KEY         = 'pbp_bundle_ids';          // 此商品連結到哪個 bundle product ids
+
+		const LINK_TO_BUNDLE_IDS_META_KEY = 'pbp_bundle_ids';          // 此商品連結到哪個 bundle product ids
 
 		/**
 		 * Constructor of this class.
@@ -79,7 +80,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		}
 
 		/**
-		 * Add bundle_ids
+		 * 往銷售方案裡面添加商品 id
 		 *
 		 * @param int $product_id product_id.
 		 *
@@ -96,14 +97,18 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 
 
 		/**
-		 * Set bundle_ids
-		 * TODO
+		 * 直接設定銷售方案裡面商品 ids
 		 *
-		 * @param array $product_ids product_ids.
+		 * @param array<int> $product_ids product_ids.
 		 *
 		 * @return void
 		 */
 		public function set_bundled_ids( array $product_ids ): void {
+			$this->delete_meta_data( self::INCLUDE_PRODUCT_IDS_META_KEY );
+			foreach ($product_ids as $product_id) {
+				$this->add_meta_data( self::INCLUDE_PRODUCT_IDS_META_KEY, $product_id );
+			}
+			$this->save_meta_data();
 		}
 
 		/**
@@ -115,6 +120,7 @@ if ( ! class_exists( 'BundleProduct' ) ) {
 		 */
 		public function delete_bundled_ids( int $product_id ): void {
 			$this->delete_meta_data_value( self::INCLUDE_PRODUCT_IDS_META_KEY, $product_id );
+			$this->save_meta_data();
 		}
 	}
 }
