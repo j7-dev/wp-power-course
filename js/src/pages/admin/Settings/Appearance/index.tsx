@@ -37,6 +37,27 @@ const index = () => {
 				>
 					<InputNumber addonAfter="px" />
 				</Item>
+
+				<Heading className="mt-8">My Account</Heading>
+				<FiSwitch
+					formItemProps={{
+						name: ['hide_myaccount_courses'],
+						label: '隱藏 My Account 我的學習選單',
+						tooltip:
+							'還沒準備好對外公布你的課程網站? 可以隱藏 My Account 我的學習選單',
+						initialValue: 'no',
+					}}
+				/>
+
+				<Heading className="mt-8">商店頁</Heading>
+				<FiSwitch
+					formItemProps={{
+						name: ['hide_courses_in_main_query'],
+						label: '商店頁隱藏課程商品',
+						tooltip:
+							'開啟後商店頁、彙整頁、搜尋頁，不顯示課程商品，如果要顯示課程列表可以使用 Power Course 的短代馬',
+					}}
+				/>
 			</div>
 			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto"></div>
 		</div>

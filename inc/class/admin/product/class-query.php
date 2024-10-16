@@ -64,6 +64,12 @@ final class Query {
 	 */
 	public static function exclude_course_product( $query ): void {
 
+		$hide_courses_in_main_query = \get_option('hide_courses_in_main_query', 'no') === 'yes';
+
+		if (!$hide_courses_in_main_query) {
+			return;
+		}
+
 		if ( \is_admin() || !$query->is_main_query() || $query->is_single()) {
 			return;
 		}
