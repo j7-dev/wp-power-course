@@ -7,17 +7,22 @@ declare (strict_types = 1);
 
 namespace J7\PowerCourse;
 
+use J7\WpUtils\Classes\Meta;
 use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerBundleProduct\BundleProduct;
+
+
 
 /**
  * Class Bootstrap
  */
 final class Bootstrap {
 	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\WpUtils\Traits\ContainerTrait;
 
+	const AS_COMPATIBILITY_HOOK = 'pc_compatibility_action_scheduler';
 
 	/**
 	 * Constructor
@@ -37,6 +42,10 @@ final class Bootstrap {
 		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );
 
 		\add_action( 'wp_loaded', [ __CLASS__, 'prevent_guest_checkout' ], 99 );
+
+		// 排程只執行一次的兼容設定
+		\add_action( 'init', [ __CLASS__, 'compatibility_action_scheduler' ] );
+		\add_action( self::AS_COMPATIBILITY_HOOK, [ __CLASS__, 'compatibility' ]);
 	}
 
 
@@ -161,5 +170,57 @@ final class Bootstrap {
 				'nonce' => \wp_create_nonce( 'wp_rest' ),
 			]
 		);
+	}
+
+	/**
+	 * 排程只執行一次的兼容設定
+	 *
+	 * @return void
+	 */
+	public static function compatibility_action_scheduler(): void {
+		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
+		if ($scheduled_version === Plugin::$version) {
+			return;
+		}
+		\as_enqueue_async_action( self::AS_COMPATIBILITY_HOOK, [] );
+	}
+
+	/**
+	 * 執行排程
+	 *
+	 * @return void
+	 */
+	public static function compatibility(): void {
+		$args = [
+			'post_type'    => 'product',
+			'numberposts'  => -1,
+			'meta_key'     => BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
+			'meta_compare' => 'EXISTS',
+			'fields'       => 'ids',
+		];
+		// 找出所有的銷售方案
+		$product_ids = \get_posts($args);
+
+		foreach ($product_ids as $product_id) {
+			// 1. 找出所有的銷售方案，加上 bundle_type_label
+			\update_post_meta($product_id, 'bundle_type_label', '合購優惠');
+
+			// 找出所有銷售方案包含商品 ids
+			$pbp_product_ids = (array) \get_post_meta($product_id, BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY);
+
+			$course_ids = [];
+			foreach ($pbp_product_ids as $pbp_product_id) {
+				// 找出課程商品 id
+				if (CourseUtils::is_course_product( (int) $pbp_product_id)) {
+					$course_ids[] = $pbp_product_id;
+				}
+			}
+			$product = new Meta( (int) $product_id);
+
+			$product->add_array('link_course_ids', $course_ids);
+		}
+
+		// 註記已經執行過相容設定
+		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
 	}
 }
