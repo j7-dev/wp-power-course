@@ -2,7 +2,7 @@ import { FC } from 'react'
 import {
 	TCourseRecord,
 	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { ProductPrice } from '@/components/product'

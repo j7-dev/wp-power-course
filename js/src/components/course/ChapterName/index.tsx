@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { renderHTML } from 'antd-toolkit'
 import { message } from 'antd'
 

@@ -2,7 +2,7 @@ import { TableProps, Typography } from 'antd'
 import {
 	TUserRecord,
 	TAVLCourse,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import { UserName } from '@/components/user'
 import { WatchStatusTag } from '@/components/general'
 import dayjs from 'dayjs'

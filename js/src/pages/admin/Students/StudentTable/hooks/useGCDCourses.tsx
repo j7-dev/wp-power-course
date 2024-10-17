@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC } from 'react'
 import { CheckCircleOutlined } from '@ant-design/icons'
 import { Tag } from 'antd'
-import { TAVLCourse } from '@/pages/admin/Courses/CourseSelector/types'
+import { TAVLCourse } from '@/pages/admin/Courses/CourseTable/types'
 import { getGCDCourse } from '@/utils'
 
 const useGCDCourses = ({

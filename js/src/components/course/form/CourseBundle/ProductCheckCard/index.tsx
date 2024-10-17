@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import { CheckCard } from '@ant-design/pro-components'
 import { SaleRange } from '@/components/general'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DrawerProps, Button, FormInstance, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import { toFormData } from '@/utils'
 import dayjs, { Dayjs } from 'dayjs'
 import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '@/components/course/form/CourseBundle/BundleForm'

@@ -1,4 +1,4 @@
-import CourseSelector from './CourseSelector'
+import CourseSelector from './CourseTable'
 import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
 import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'

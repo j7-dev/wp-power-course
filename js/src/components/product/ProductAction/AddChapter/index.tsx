@@ -4,7 +4,7 @@ import { Tooltip, Button, ButtonProps } from 'antd'
 import {
 	TCourseRecord,
 	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import {
 	BaseRecord,
 	HttpError,

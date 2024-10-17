@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import {
 	keyLabelMapper,
-	termFormatter,
-} from '@/pages/admin/Courses/CourseSelector/utils'
-import useOptions from '@/pages/admin/Courses/CourseSelector/hooks/useOptions'
+	termToOptions,
+} from '@/components/product/ProductTable/utils'
+import useOptions from '@/components/product/ProductTable/hooks/useOptions'
 import { siteUrl, course_permalink_structure } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
 import {
@@ -14,14 +14,14 @@ import {
 	DescriptionDrawer,
 } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { FileUpload } from '@/components/post'
 
 const { Item } = Form
 
 export const CourseDescription = () => {
 	const form = Form.useFormInstance()
-	const { options, isLoading } = useOptions()
+	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
 	const productUrl = `${siteUrl}/${course_permalink_structure}/`
 	const slug = Form.useWatch(['slug'], form)
@@ -127,7 +127,7 @@ export const CourseDescription = () => {
 					initialValue={[]}
 				>
 					<Select
-						options={termFormatter(product_cats)}
+						options={termToOptions(product_cats)}
 						mode="multiple"
 						placeholder="可多選"
 						allowClear
@@ -139,7 +139,7 @@ export const CourseDescription = () => {
 					initialValue={[]}
 				>
 					<Select
-						options={termFormatter(product_tags)}
+						options={termToOptions(product_tags)}
 						mode="multiple"
 						placeholder="可多選"
 						allowClear
