@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { Table, Form, TableProps, Card, FormInstance } from 'antd'
 import useColumns from './hooks/useColumns'
 import useGCDCourses from './hooks/useGCDCourses'
@@ -8,7 +8,7 @@ import { useRowSelection, FilterTags } from 'antd-toolkit'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
-} from '@/pages/admin/Courses/CourseSelector/utils'
+} from '@/components/product/ProductTable/utils'
 import { useUserFormDrawer } from '@/hooks'
 import {
 	UserDrawer,

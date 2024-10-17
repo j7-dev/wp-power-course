@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { SelectProps } from 'antd'
 
 type TUseCourseSelectParams = {

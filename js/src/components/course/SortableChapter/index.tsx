@@ -3,7 +3,7 @@ import { SortableTree, TreeData } from '@ant-design/pro-editor'
 import {
 	TCourseRecord,
 	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import { message } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'

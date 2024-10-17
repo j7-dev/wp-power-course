@@ -1,5 +1,5 @@
 import { TreeData, TreeNode } from '@ant-design/pro-editor'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
 
 /**
  * 將章節 TChapterRecord 傳換成 TreeNode<TChapterRecord>

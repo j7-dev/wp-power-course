@@ -189,41 +189,42 @@ final class Product {
 		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$price_html = Base::get_price_html( $product );
+		$product_id = $product->get_id();
 
 		$base_array = [
 			// Get Product General Info
-			'id'                                        => (string) $product?->get_id(),
-			'type'                                      => $product?->get_type(),
-			'name'                                      => $product?->get_name(),
-			'slug'                                      => $product?->get_slug(),
+			'id'                                        => (string) $product_id,
+			'type'                                      => $product->get_type(),
+			'name'                                      => $product->get_name(),
+			'slug'                                      => $product->get_slug(),
 			'date_created'                              => $date_created->date( 'Y-m-d H:i:s' ),
 			'date_modified'                             => $date_modified->date( 'Y-m-d H:i:s' ),
-			'status'                                    => $product?->get_status(),
-			'featured'                                  => $product?->get_featured(),
-			'catalog_visibility'                        => $product?->get_catalog_visibility(),
-			'sku'                                       => $product?->get_sku(),
+			'status'                                    => $product->get_status(),
+			'featured'                                  => $product->get_featured(),
+			'catalog_visibility'                        => $product->get_catalog_visibility(),
+			'sku'                                       => $product->get_sku(),
 			// 'menu_order'         => $product?->get_menu_order(),
-			'virtual'                                   => $product?->get_virtual(),
-			'downloadable'                              => $product?->get_downloadable(),
-			'permalink'                                 => get_permalink( $product?->get_id() ),
+			'virtual'                                   => $product->get_virtual(),
+			'downloadable'                              => $product->get_downloadable(),
+			'permalink'                                 => get_permalink( $product->get_id() ),
 
 			// Get Product Prices
 			'price_html'                                => $price_html,
-			'regular_price'                             => $product?->get_regular_price(),
-			'sale_price'                                => $product?->get_sale_price(),
-			'on_sale'                                   => $product?->is_on_sale(),
-			'date_on_sale_from'                         => $product?->get_date_on_sale_from(),
-			'date_on_sale_to'                           => $product?->get_date_on_sale_to(),
-			'total_sales'                               => $product?->get_total_sales(),
+			'regular_price'                             => $product->get_regular_price(),
+			'sale_price'                                => $product->get_sale_price(),
+			'on_sale'                                   => $product->is_on_sale(),
+			'date_on_sale_from'                         => $product->get_date_on_sale_from(),
+			'date_on_sale_to'                           => $product->get_date_on_sale_to(),
+			'total_sales'                               => $product->get_total_sales(),
 
 			// Get Product Stock
-			'stock'                                     => $product?->get_stock_quantity(),
-			'stock_status'                              => $product?->get_stock_status(),
-			'manage_stock'                              => $product?->get_manage_stock(),
-			'stock_quantity'                            => $product?->get_stock_quantity(),
-			'backorders'                                => $product?->get_backorders(),
-			'backorders_allowed'                        => $product?->backorders_allowed(),
-			'backordered'                               => $product?->is_on_backorder(),
+			'stock'                                     => $product->get_stock_quantity(),
+			'stock_status'                              => $product->get_stock_status(),
+			'manage_stock'                              => $product->get_manage_stock(),
+			'stock_quantity'                            => $product->get_stock_quantity(),
+			'backorders'                                => $product->get_backorders(),
+			'backorders_allowed'                        => $product->backorders_allowed(),
+			'backordered'                               => $product->is_on_backorder(),
 			'low_stock_amount'                          => $low_stock_amount,
 
 			// Get Linked Products
@@ -234,8 +235,18 @@ final class Product {
 			'attributes'                                => $attributes_arr,
 
 			// Get Product Taxonomies
-			'category_ids'                              => array_map( 'strval', $product->get_category_ids() ),
-			'tag_ids'                                   => array_map( 'strval', $product->get_tag_ids() ),
+			'categories'                                => self::format_terms(
+				[
+					'taxonomy'   => 'product_cat',
+					'object_ids' => $product_id,
+				]
+				),
+			'tags'                                      => self::format_terms(
+				[
+					'taxonomy'   => 'product_tag',
+					'object_ids' => $product_id,
+				]
+				),
 
 			// Get Product Images
 			'images'                                    => $images,
@@ -409,6 +420,101 @@ final class Product {
 		}
 
 		return $meta_data;
+	}
+
+	/**
+	 * Format terms
+	 *
+	 * @param ?array<string, mixed> $params Params.
+	 *
+	 * @return array{id:string, name:string}
+	 */
+	public static function format_terms( ?array $params = null ): array {
+		// it seems no need to add post_per_page, get_terms will return all terms
+		$default_args = [
+			'taxonomy'   => 'product_cat',
+			'fields'     => 'id=>name',
+			'hide_empty' => true,
+			'orderby'    => 'name',
+			'order'      => 'ASC',
+		];
+
+		$args = \wp_parse_args(
+				$params,
+				$default_args,
+			);
+
+		$terms = \get_terms( $args );
+
+		$formatted_terms = array_values(
+				array_map(
+				fn( $key, $value ) => [
+					'id'   => (string) $key,
+					'name' => $value,
+				],
+				array_keys( $terms ),
+				array_values( $terms )
+				)
+				);
+
+		return $formatted_terms;
+	}
+
+	/**
+	 * Get Max Min Price
+	 *
+	 * @return array{max_price:int, min_price:int}
+	 */
+	public static function get_max_min_prices(): array {
+		$transient_key = 'max_min_prices';
+
+		$max_min_prices = \get_transient( $transient_key );
+
+		if ( false !== $max_min_prices ) {
+			return $max_min_prices;
+		}
+		// 獲取最高價格的商品
+		$max_price_products = \wc_get_products(
+			[
+				'order'    => 'DESC', // 遞減排序
+				'orderby'  => 'meta_value_num',
+				'meta_key' => '_price',
+				'limit'    => 1,         // 僅獲取一個結果
+				'status'   => 'publish', // 僅包含已發佈的商品
+			]
+		);
+		$max_price          = 0;
+		if ( ! empty( $max_price_products ) ) {
+			$max_price_product = reset( $max_price_products );     // 獲取第一個元素
+			$max_price         = $max_price_product?->get_price(); // 獲取最高價格
+		}
+
+		// 獲取最低價格的商品
+		$min_price_products = \wc_get_products(
+			[
+				'order'    => 'ASC', // 遞增排序
+				'orderby'  => 'meta_value_num',
+				'meta_key' => '_price',
+				'limit'    => 1,         // 僅獲取一個結果
+				'status'   => 'publish', // 僅包含已發佈的商品
+			]
+		);
+
+		$min_price = 0;
+		if ( ! empty( $min_price_products ) ) {
+			$min_price_product = reset( $min_price_products );     // 獲取第一個元素
+			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
+		}
+
+		$max_min_prices = [
+			'max_price' => $max_price,
+			'min_price' => $min_price,
+		];
+
+		// @phpstan-ignore-next-line
+		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
+
+		return $max_min_prices;
 	}
 }
 

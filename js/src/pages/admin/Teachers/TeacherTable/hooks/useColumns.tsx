@@ -1,6 +1,6 @@
 import React from 'react'
 import { TableProps } from 'antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { UserName } from '@/components/user'
 
 const useColumns = ({

@@ -4,6 +4,7 @@ import {
 	UserOutlined,
 	CodeOutlined,
 	SettingOutlined,
+	ProductOutlined,
 } from '@ant-design/icons'
 import { FaPhotoVideo } from 'react-icons/fa'
 import { PiStudent } from 'react-icons/pi'
@@ -31,6 +32,14 @@ export const resources = [
 		meta: {
 			label: '學員管理',
 			icon: <PiStudent />,
+		},
+	},
+	{
+		name: 'products',
+		list: '/products',
+		meta: {
+			label: '商品管理', // 商品管理
+			icon: <ProductOutlined />,
 		},
 	},
 	{

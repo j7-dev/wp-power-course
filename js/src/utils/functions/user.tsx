@@ -1,4 +1,4 @@
-import { TAVLCourse } from '@/pages/admin/Courses/CourseSelector/types'
+import { TAVLCourse } from '@/pages/admin/Courses/CourseTable/types'
 
 /**
  * 取得最大公約數的 TAVLCourse
