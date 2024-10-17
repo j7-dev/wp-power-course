@@ -17,7 +17,7 @@ export function useBundleFormDrawer({
 }) {
 	const [open, setOpen] = useState(false)
 	const [record, setRecord] = useState<TProductRecord | undefined>(undefined)
-	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增，否則走更新
+	const isUpdate = !!record // 如果沒有傳入 record 就走新增，否則走更新
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TProductRecord) => () => {
