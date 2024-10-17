@@ -8,6 +8,12 @@ import { siteUrl } from '@/utils'
 
 const { Item } = Form
 
+const BlockNote = lazy(() =>
+	import('@/components/general').then((module) => ({
+		default: module.BlockNote,
+	})),
+)
+
 type TDescriptionDrawerProps = {
 	name?: string | string[]
 	itemLabel?: string
@@ -15,12 +21,6 @@ type TDescriptionDrawerProps = {
 const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	props,
 ) => {
-	const BlockNote = lazy(() =>
-		import('@/components/general').then((module) => ({
-			default: module.BlockNote,
-		})),
-	)
-
 	const name = props?.name || ['description']
 	const itemLabel = props?.itemLabel || '課程'
 	const apiUrl = useApiUrl()
