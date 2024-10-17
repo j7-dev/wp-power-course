@@ -63,9 +63,10 @@ const StudentTable = () => {
 		.filter((courses) => courses !== undefined)
 
 	// 取得最大公約數的課程
-	const { GcdCoursesTags, selectedGCDs, setSelectedGCDs } = useGCDCourses({
-		allUsersAVLCourses: selectedAllAVLCourses,
-	})
+	const { GcdCoursesTags, selectedGCDs, setSelectedGCDs, gcdCourses } =
+		useGCDCourses({
+			allUsersAVLCourses: selectedAllAVLCourses,
+		})
 
 	return (
 		<>
@@ -104,10 +105,12 @@ const StudentTable = () => {
 							/>
 						</div>
 					</div>
-					<div className="flex-1">
-						<label className="block mb-2">選擇課程</label>
-						<GcdCoursesTags />
-					</div>
+					{!!gcdCourses.length && (
+						<div className="flex-1">
+							<label className="block mb-2">選擇課程</label>
+							<GcdCoursesTags />
+						</div>
+					)}
 				</div>
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
