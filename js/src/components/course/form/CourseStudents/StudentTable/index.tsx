@@ -169,7 +169,7 @@ const StudentTable = () => {
 						onConfirm: handleRemove,
 					}}
 					buttonProps={{
-						children: '移除課程權限(移除學員)',
+						children: '移除課程(移除學員)',
 						disabled: !selectedRowKeys.length,
 						loading: isLoading,
 					}}

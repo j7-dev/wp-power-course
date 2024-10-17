@@ -32,7 +32,7 @@ const Filter = ({ formProps }: { formProps: FormProps }) => {
 					</Item>
 					<Item
 						name="avl_course_ids"
-						label="已開通指定課程權限"
+						label="已開通指定課程"
 						className="col-span-3"
 					>
 						<Select {...courseSelectProps} />
