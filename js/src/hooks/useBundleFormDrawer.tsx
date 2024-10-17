@@ -21,7 +21,7 @@ export function useBundleFormDrawer({
 	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TProductRecord) => () => {
-		setRecord(theRecord)
+		setRecord(theRecord ? { ...theRecord } : theRecord)
 		setOpen(true)
 	}
 
