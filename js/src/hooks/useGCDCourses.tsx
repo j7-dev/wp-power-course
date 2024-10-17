@@ -4,19 +4,19 @@ import { Tag } from 'antd'
 import { TAVLCourse } from '@/pages/admin/Courses/CourseTable/types'
 import { getGCDCourse } from '@/utils'
 
-const useGCDCourses = ({
-	allUsersAVLCourses,
+export const useGCDCourses = ({
+	allAVLCourses,
 }: {
-	allUsersAVLCourses: TAVLCourse[][]
+	allAVLCourses: TAVLCourse[][]
 }) => {
 	const [selectedGCDs, setSelectedGCDs] = useState<string[]>([])
 
 	// 取得最大公約數的課程
-	const gcdCourses = getGCDCourse(allUsersAVLCourses)
+	const gcdCourses = getGCDCourse(allAVLCourses)
 
 	useEffect(() => {
 		setSelectedGCDs([])
-	}, [allUsersAVLCourses.length])
+	}, [allAVLCourses.length])
 
 	const GcdCoursesTags: FC = () =>
 		gcdCourses.map((course: TAVLCourse) => {
@@ -46,5 +46,3 @@ const useGCDCourses = ({
 		GcdCoursesTags,
 	}
 }
-
-export default useGCDCourses

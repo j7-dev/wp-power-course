@@ -5,7 +5,6 @@ import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
-import MobileFilter from '@/components/product/ProductTable/Filter/MobileFilter'
 import { HttpError } from '@refinedev/core'
 import {
 	TFilterProps,
@@ -19,11 +18,16 @@ import {
 } from '@/components/product/ProductTable/utils'
 import { getInitialFilters, getIsVariation } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Products/ProductTable/hooks/useValueLabelMapper'
-
+import {
+	BindCourses,
+	UpdateBoundCourses,
+	UnbindCourses,
+} from '@/components/product'
 import { useAtom, useSetAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Products/atom'
 import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
 import { productsAtom } from '@/pages/admin/Products/ProductTable'
+import { useGCDCourses } from '@/hooks'
 
 const Main = () => {
 	const { tableProps, searchFormProps, filters } = useTable<
@@ -101,6 +105,19 @@ const Main = () => {
 
 	const columns = useColumns()
 
+	// const selectedAllAVLCourses = addedProductIds
+	// 	.map((key) => {
+	// 		return tableProps?.dataSource?.find((user) => user.id === key)
+	// 			?.avl_courses
+	// 	})
+	// 	.filter((courses) => courses !== undefined)
+
+	// 取得最大公約數的課程
+	const { GcdCoursesTags, selectedGCDs, setSelectedGCDs, gcdCourses } =
+		useGCDCourses({
+			allAVLCourses: [],
+		})
+
 	return (
 		<Spin spinning={tableProps?.loading as boolean}>
 			<Card title="篩選" className="mb-4">
@@ -120,6 +137,39 @@ const Main = () => {
 				</div>
 			</Card>
 			<Card>
+				<div className="mb-4">
+					<BindCourses
+						product_ids={addedProductIds as string[]}
+						label="綁定其他課程"
+					/>
+				</div>
+				<div className="mb-4 flex gap-x-6">
+					<div>
+						<label className="block mb-2">批量操作</label>
+						<div className="flex gap-x-4">
+							<UpdateBoundCourses
+								product_ids={addedProductIds as string[]}
+								course_ids={selectedGCDs}
+								onSettled={() => {
+									setSelectedGCDs([])
+								}}
+							/>
+							<UnbindCourses
+								product_ids={addedProductIds}
+								course_ids={selectedGCDs}
+								onSettled={() => {
+									setSelectedGCDs([])
+								}}
+							/>
+						</div>
+					</div>
+					{!!gcdCourses.length && (
+						<div className="flex-1">
+							<label className="block mb-2">選擇課程</label>
+							<GcdCoursesTags />
+						</div>
+					)}
+				</div>
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TProductRecord>)}
 					{...tableProps}

@@ -4,11 +4,11 @@ import { Dayjs } from 'dayjs'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { useCourseSelect } from '@/hooks'
 
-const GrantCourseAccessComponent = ({
-	user_ids,
+const BindCoursesComponent = ({
+	product_ids,
 	label,
 }: {
-	user_ids: string[]
+	product_ids: string[]
 	label?: string
 }) => {
 	const { selectProps, courseIds: course_ids } = useCourseSelect()
@@ -22,10 +22,10 @@ const GrantCourseAccessComponent = ({
 	const handleClick = () => {
 		mutate(
 			{
-				url: `${apiUrl}/courses/add-students`,
+				url: `${apiUrl}/products/bind-courses`,
 				method: 'post',
 				values: {
-					user_ids,
+					product_ids,
 					course_ids,
 					expire_date: time ? time.unix() : 0,
 				},
@@ -38,22 +38,18 @@ const GrantCourseAccessComponent = ({
 			{
 				onSuccess: () => {
 					message.success({
-						content: '新增學員成功！',
-						key: 'add-students',
+						content: '綁定課程成功！',
+						key: 'bind-courses',
 					})
 					invalidate({
-						resource: 'users',
-						invalidates: ['list'],
-					})
-					invalidate({
-						resource: 'users/students',
+						resource: 'products',
 						invalidates: ['list'],
 					})
 				},
 				onError: () => {
 					message.error({
-						content: '新增學員失敗！',
-						key: 'add-students',
+						content: '綁定課程失敗！',
+						key: 'bind-courses',
 					})
 				},
 			},
@@ -77,14 +73,14 @@ const GrantCourseAccessComponent = ({
 				<Button
 					type="primary"
 					loading={isLoading}
-					disabled={!user_ids.length || !course_ids.length}
+					disabled={!product_ids.length || !course_ids.length}
 					onClick={handleClick}
 				>
-					添加其他課程
+					綁定其他課程
 				</Button>
 			</Space.Compact>
 		</>
 	)
 }
 
-export const GrantCourseAccess = memo(GrantCourseAccessComponent)
+export const BindCourses = memo(BindCoursesComponent)
