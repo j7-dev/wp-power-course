@@ -35,20 +35,26 @@ final class Templates {
 
 	/**
 	 * 覆寫課程商品頁面
+	 * [危險] 如果全域變數汙染，會導致無法預期行為
 	 *
 	 * @param string $template 原本的模板路徑
 	 *
 	 * @return string
 	 */
 	public function course_product_template( $template ) {
-		global $post;
-		if ('product' !== $post->post_type) {
+		global $wp_query;
+
+		if ($wp_query->is_page() || !$wp_query->is_single()) {
 			return $template;
 		}
 
-		$product_id = $post->ID;
+		if ('product' !== $wp_query->get('post_type')) {
+			return $template;
+		}
 
-		if (!CourseUtils::is_course_product( $product_id )) {
+		$product_id = $wp_query->queried_object_id;
+
+		if (!CourseUtils::is_course_product( (int) $product_id )) {
 			return $template;
 		}
 
