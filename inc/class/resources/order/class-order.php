@@ -155,6 +155,8 @@ final class Order {
 			 */
 			$product_id = $item->get_product_id();
 
+			// TODO 或有 course_id 的 meta 紀錄
+
 			// 如果是課程商品
 			if ( CourseUtils::is_course_product( $product_id ) ) {
 

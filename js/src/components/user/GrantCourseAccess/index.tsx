@@ -4,7 +4,13 @@ import { Dayjs } from 'dayjs'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { useCourseSelect } from '@/hooks'
 
-const GrantCourseAccessComponent = ({ user_ids }: { user_ids: string[] }) => {
+const GrantCourseAccessComponent = ({
+	user_ids,
+	label,
+}: {
+	user_ids: string[]
+	label?: string
+}) => {
 	const { selectProps, courseIds } = useCourseSelect()
 
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
@@ -55,26 +61,29 @@ const GrantCourseAccessComponent = ({ user_ids }: { user_ids: string[] }) => {
 	}
 
 	return (
-		<Space.Compact className="w-full">
-			<Select {...selectProps} />
-			<DatePicker
-				placeholder="留空為無期限"
-				value={time}
-				showTime
-				format="YYYY-MM-DD HH:mm"
-				onChange={(value: Dayjs) => {
-					setTime(value)
-				}}
-			/>
-			<Button
-				type="primary"
-				loading={isLoading}
-				disabled={!user_ids.length || !courseIds.length}
-				onClick={handleGrant}
-			>
-				添加其他課程權限
-			</Button>
-		</Space.Compact>
+		<>
+			{label && <label className="block mb-2">{label}</label>}
+			<Space.Compact className="w-full">
+				<Select {...selectProps} />
+				<DatePicker
+					placeholder="留空為無期限"
+					value={time}
+					showTime
+					format="YYYY-MM-DD HH:mm"
+					onChange={(value: Dayjs) => {
+						setTime(value)
+					}}
+				/>
+				<Button
+					type="primary"
+					loading={isLoading}
+					disabled={!user_ids.length || !courseIds.length}
+					onClick={handleGrant}
+				>
+					添加其他課程
+				</Button>
+			</Space.Compact>
+		</>
 	)
 }
 

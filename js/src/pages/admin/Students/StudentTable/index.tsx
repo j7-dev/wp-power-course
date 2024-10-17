@@ -78,27 +78,35 @@ const StudentTable = () => {
 			</Card>
 			<Card bordered={false}>
 				<div className="mb-4">
-					<GrantCourseAccess user_ids={selectedRowKeys as string[]} />
+					<GrantCourseAccess
+						user_ids={selectedRowKeys as string[]}
+						label="添加其他課程"
+					/>
 				</div>
-				<div className="mb-4 flex justify-between gap-x-6">
+
+				<div className="mb-4 flex gap-x-6">
 					<div>
-						<GcdCoursesTags />
+						<label className="block mb-2">批量操作</label>
+						<div className="flex gap-x-4">
+							<ModifyCourseExpireDate
+								user_ids={selectedRowKeys as string[]}
+								course_ids={selectedGCDs}
+								onSettled={() => {
+									setSelectedGCDs([])
+								}}
+							/>
+							<RemoveCourseAccess
+								user_ids={selectedRowKeys}
+								course_ids={selectedGCDs}
+								onSettled={() => {
+									setSelectedGCDs([])
+								}}
+							/>
+						</div>
 					</div>
-					<div className="flex gap-x-4">
-						<ModifyCourseExpireDate
-							user_ids={selectedRowKeys as string[]}
-							course_ids={selectedGCDs}
-							onSettled={() => {
-								setSelectedGCDs([])
-							}}
-						/>
-						<RemoveCourseAccess
-							user_ids={selectedRowKeys}
-							course_ids={selectedGCDs}
-							onSettled={() => {
-								setSelectedGCDs([])
-							}}
-						/>
+					<div className="flex-1">
+						<label className="block mb-2">選擇課程</label>
+						<GcdCoursesTags />
 					</div>
 				</div>
 				<Table

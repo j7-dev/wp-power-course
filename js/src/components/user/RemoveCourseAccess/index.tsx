@@ -65,7 +65,7 @@ const RemoveCourseAccessComponent = ({
 				onConfirm: handleRemove,
 			}}
 			buttonProps={{
-				children: '移除課程權限',
+				children: '移除課程',
 				disabled: !user_ids.length || !course_ids.length,
 				loading: isLoading,
 			}}
