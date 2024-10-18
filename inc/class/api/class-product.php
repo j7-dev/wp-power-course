@@ -41,6 +41,14 @@ final class Product {
 			'method'   => 'post',
 		],
 		[
+			'endpoint' => 'products/bind-courses',
+			'method'   => 'post',
+		],
+		[
+			'endpoint' => 'products/unbind-courses',
+			'method'   => 'post',
+		],
+		[
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		],
@@ -180,6 +188,128 @@ final class Product {
 		);
 	}
 
+
+	/**
+	 * 綁定課程到商品上
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_products_bind_courses_callback( $request ) {
+		$body_params = $request->get_body_params() ?? [];
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
+
+		if (\is_wp_error($include_required_params)) {
+			return $include_required_params;
+		}
+
+		$body_params = WP::sanitize_text_field_deep( $body_params );
+
+		$product_ids = $body_params['product_ids'];
+		$course_ids  = $body_params['course_ids'];
+
+		$success_ids = [];
+		$failed_ids  = [];
+		foreach ($product_ids as $product_id) {
+			$result = WcProduct::add_meta_array( (int) $product_id, 'bind_course_ids', $course_ids );
+			if (\is_wp_error($result)) {
+				$failed_ids[] = $product_id;
+				continue;
+			}
+			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+
+			$bind_courses_data_ids = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? '0', $bind_courses_data);
+
+			foreach ($course_ids as $course_id) {
+				if (\in_array($course_id, $bind_courses_data_ids)) {
+					// 如果原本的資料裡面有這次新增的，那就跳過不動
+					continue;
+				}
+				// 原本的資料沒有這次新增的，那就新增下去
+				$bind_courses_data[] = [
+					'id'          => $course_id,
+					'limit_type'  => $body_params['limit_type'],
+					'limit_value' => $body_params['limit_value'],
+					'limit_unit'  => $body_params['limit_unit'],
+				];
+			}
+
+			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$success_ids[] = $product_id;
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'success',
+				'message' => '綁定成功',
+				'data'    => [
+					'success_ids' => $success_ids,
+					'failed_ids'  => $failed_ids,
+					'course_ids'  => $course_ids,
+				],
+			],
+			200
+		);
+	}
+
+
+	/**
+	 * 解除綁定課程到商品上
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_products_unbind_courses_callback( $request ) {
+		$body_params = $request->get_body_params() ?? [];
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
+
+		if (\is_wp_error($include_required_params)) {
+			return $include_required_params;
+		}
+
+		$body_params = WP::sanitize_text_field_deep( $body_params );
+
+		$product_ids = $body_params['product_ids'];
+		$course_ids  = $body_params['course_ids'];
+
+		$success_ids = [];
+		$failed_ids  = [];
+		foreach ($product_ids as $product_id) {
+			$original_course_ids = \get_post_meta( $product_id, 'bind_course_ids' ) ?: [];
+			$new_course_ids      = \array_filter( $original_course_ids, fn( $original_course_id ) => ! \in_array( $original_course_id, $course_ids ) );
+
+			$result = WcProduct::update_meta_array( (int) $product_id, 'bind_course_ids', $new_course_ids );
+			if (\is_wp_error($result)) {
+				$failed_ids[] = $product_id;
+				continue;
+			}
+
+			/**
+			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
+			 */
+			$bind_courses_data     = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+			$new_bind_courses_data = array_filter($bind_courses_data, fn( $bind_course_data ) => !\in_array($bind_course_data['id'], $course_ids));
+			\update_post_meta( $product_id, 'bind_courses_data', $new_bind_courses_data );
+
+			$success_ids[] = $product_id;
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'success',
+				'message' => '解除綁定成功',
+				'data'    => [
+					'success_ids' => $success_ids,
+					'failed_ids'  => $failed_ids,
+					'course_ids'  => $course_ids,
+				],
+			],
+			200
+		);
+	}
+
 	/**
 	 * Format product details
 	 * TODO
@@ -246,6 +376,23 @@ final class Product {
 
 		$price_html = Base::get_price_html( $product );
 		$product_id = $product->get_id();
+
+		$bind_courses_data           = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+		$formatted_bind_courses_data = array_values(
+			array_map(
+			function ( $bind_course_data ) {
+				$id = $bind_course_data['id'] ?? '';
+				return [
+					'id'          => $id,
+					'name'        => $id ? \get_the_title($id) : '',
+					'limit_type'  => $bind_course_data['limit_type'] ?? '',
+					'limit_value' => $bind_course_data['limit_value'] ?? '',
+					'limit_unit'  => $bind_course_data['limit_unit'] ?? '',
+				];
+			},
+			$bind_courses_data
+		)
+			);
 
 		$base_array = [
 			// Get Product General Info
@@ -318,6 +465,7 @@ final class Product {
 			'qa_list'                                   => [],
 			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
 			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
+			'bind_courses_data'                         => $formatted_bind_courses_data,
 
 		] + $children;
 

@@ -1,6 +1,5 @@
-import React, { memo, useState } from 'react'
-import { Select, Button, Space, DatePicker, message } from 'antd'
-import { Dayjs } from 'dayjs'
+import React, { memo } from 'react'
+import { Select, Button, Space, message, Form } from 'antd'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { useCourseSelect } from '@/hooks'
 
@@ -13,13 +12,17 @@ const BindCoursesComponent = ({
 }) => {
 	const { selectProps, courseIds: course_ids } = useCourseSelect()
 
-	const [time, setTime] = useState<Dayjs | undefined>(undefined)
-
 	const { mutate, isLoading } = useCustomMutation()
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
+	const form = Form.useFormInstance()
 
 	const handleClick = () => {
+		const values: {
+			limit_type: string
+			limit_value: number
+			limit_unit: string
+		} = form.getFieldsValue()
 		mutate(
 			{
 				url: `${apiUrl}/products/bind-courses`,
@@ -27,7 +30,7 @@ const BindCoursesComponent = ({
 				values: {
 					product_ids,
 					course_ids,
-					expire_date: time ? time.unix() : 0,
+					...values,
 				},
 				config: {
 					headers: {
@@ -61,15 +64,6 @@ const BindCoursesComponent = ({
 			{label && <label className="block mb-2">{label}</label>}
 			<Space.Compact className="w-full">
 				<Select {...selectProps} />
-				<DatePicker
-					placeholder="留空為無期限"
-					value={time}
-					showTime
-					format="YYYY-MM-DD HH:mm"
-					onChange={(value: Dayjs) => {
-						setTime(value)
-					}}
-				/>
 				<Button
 					type="primary"
 					loading={isLoading}

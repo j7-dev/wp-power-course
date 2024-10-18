@@ -1,6 +1,6 @@
 import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, TableProps, Card } from 'antd'
+import { Table, FormInstance, Spin, TableProps, Card, Form } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
@@ -9,6 +9,7 @@ import { HttpError } from '@refinedev/core'
 import {
 	TFilterProps,
 	TProductRecord,
+	TBindCoursesData,
 } from '@/components/product/ProductTable/types'
 import {
 	onSearch,
@@ -27,7 +28,8 @@ import { useAtom, useSetAtom } from 'jotai'
 import { addedProductIdsAtom } from '@/pages/admin/Products/atom'
 import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
 import { productsAtom } from '@/pages/admin/Products/ProductTable'
-import { useGCDCourses } from '@/hooks'
+import { useGCDItems } from '@/hooks'
+import { WatchLimit } from '@/components/formItem'
 
 const Main = () => {
 	const { tableProps, searchFormProps, filters } = useTable<
@@ -38,11 +40,7 @@ const Main = () => {
 		resource: 'products',
 		onSearch,
 		filters: {
-			initial: getInitialFilters({
-				...initialFilteredValues,
-				meta_key: '_is_course',
-				meta_value: 'no',
-			}),
+			initial: getInitialFilters(initialFilteredValues),
 		},
 	})
 
@@ -105,17 +103,17 @@ const Main = () => {
 
 	const columns = useColumns()
 
-	// const selectedAllAVLCourses = addedProductIds
-	// 	.map((key) => {
-	// 		return tableProps?.dataSource?.find((user) => user.id === key)
-	// 			?.avl_courses
-	// 	})
-	// 	.filter((courses) => courses !== undefined)
+	const selectedAllBindCoursesData = addedProductIds
+		.map((key) => {
+			return tableProps?.dataSource?.find((product) => product.id === key)
+				?.bind_courses_data
+		})
+		.filter((item) => item !== undefined)
 
 	// 取得最大公約數的課程
-	const { GcdCoursesTags, selectedGCDs, setSelectedGCDs, gcdCourses } =
-		useGCDCourses({
-			allAVLCourses: [],
+	const { GcdItemsTags, selectedGCDs, setSelectedGCDs, gcdItems } =
+		useGCDItems<TBindCoursesData>({
+			allItems: selectedAllBindCoursesData,
 		})
 
 	return (
@@ -137,39 +135,48 @@ const Main = () => {
 				</div>
 			</Card>
 			<Card>
-				<div className="mb-4">
-					<BindCourses
-						product_ids={addedProductIds as string[]}
-						label="綁定其他課程"
-					/>
-				</div>
-				<div className="mb-4 flex gap-x-6">
-					<div>
-						<label className="block mb-2">批量操作</label>
-						<div className="flex gap-x-4">
-							<UpdateBoundCourses
-								product_ids={addedProductIds as string[]}
-								course_ids={selectedGCDs}
-								onSettled={() => {
-									setSelectedGCDs([])
-								}}
-							/>
-							<UnbindCourses
-								product_ids={addedProductIds}
-								course_ids={selectedGCDs}
-								onSettled={() => {
-									setSelectedGCDs([])
-								}}
-							/>
+				<Form layout="vertical">
+					<div className="grid grid-cols-4 gap-x-6">
+						<div>
+							<WatchLimit />
+						</div>
+						<div className="col-span-3">
+							<div className="mb-4">
+								<BindCourses
+									product_ids={addedProductIds as string[]}
+									label="綁定其他課程"
+								/>
+							</div>
+							<div className="mb-4 flex gap-x-6">
+								<div>
+									<label className="block mb-2">批量操作</label>
+									<div className="flex gap-x-4">
+										<UpdateBoundCourses
+											product_ids={addedProductIds as string[]}
+											course_ids={selectedGCDs}
+											onSettled={() => {
+												setSelectedGCDs([])
+											}}
+										/>
+										<UnbindCourses
+											product_ids={addedProductIds}
+											course_ids={selectedGCDs}
+											onSettled={() => {
+												setSelectedGCDs([])
+											}}
+										/>
+									</div>
+								</div>
+								{!!gcdItems.length && (
+									<div className="flex-1">
+										<label className="block mb-2">選擇課程</label>
+										<GcdItemsTags />
+									</div>
+								)}
+							</div>
 						</div>
 					</div>
-					{!!gcdCourses.length && (
-						<div className="flex-1">
-							<label className="block mb-2">選擇課程</label>
-							<GcdCoursesTags />
-						</div>
-					)}
-				</div>
+				</Form>
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TProductRecord>)}
 					{...tableProps}

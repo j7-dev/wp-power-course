@@ -6,10 +6,9 @@ import {
 	ProductPrice,
 	ProductTotalSales,
 	ProductCat,
+	ProductBoundCourses,
 } from '@/components/product'
 import { getPostStatus } from '@/utils'
-import { DateTime } from 'antd-toolkit'
-import { SecondToStr } from '@/components/general'
 
 const useColumns = () => {
 	const columns: TableProps<TProductRecord>['columns'] = [
@@ -19,14 +18,12 @@ const useColumns = () => {
 			title: '商品名稱',
 			dataIndex: 'name',
 			width: 300,
-			key: 'name',
 			render: (_, record) => <ProductName record={record} />,
 		},
 		{
 			title: '狀態',
 			dataIndex: 'status',
 			width: 80,
-			key: 'status',
 			render: (_, record) => (
 				<Tag color={getPostStatus(record?.status)?.color}>
 					{getPostStatus(record?.status)?.label}
@@ -37,20 +34,23 @@ const useColumns = () => {
 			title: '總銷量',
 			dataIndex: 'total_sales',
 			width: 150,
-			key: 'total_sales',
 			render: (_, record) => <ProductTotalSales record={record} />,
 		},
 		{
 			title: '價格',
 			dataIndex: 'price',
 			width: 150,
-			key: 'price',
 			render: (_, record) => <ProductPrice record={record} />,
+		},
+		{
+			title: '綁定的課程',
+			dataIndex: 'bind_courses_data',
+			width: 320,
+			render: (_, record) => <ProductBoundCourses record={record} />,
 		},
 		{
 			title: '商品分類 / 商品標籤',
 			dataIndex: 'category_ids',
-			key: 'category_ids',
 			render: (_, record) => <ProductCat record={record} />,
 		},
 	]

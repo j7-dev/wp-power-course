@@ -26,6 +26,7 @@ export const DatePicker: FC<{
 			{...formItemProps}
 		>
 			<AntdDatePicker
+				placeholder="選擇日期"
 				className="w-full"
 				showTime={{ defaultValue: dayjs() }}
 				format="YYYY-MM-DD HH:mm"
