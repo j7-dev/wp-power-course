@@ -12,6 +12,7 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Utils\Base;
+use J7\WpUtils\Classes\WC\Product as WcProduct;
 
 
 
@@ -34,6 +35,10 @@ final class Product {
 		[
 			'endpoint' => 'products',
 			'method'   => 'get',
+		],
+		[
+			'endpoint' => 'products',
+			'method'   => 'post',
 		],
 		[
 			'endpoint' => 'bundle_products',
@@ -122,6 +127,57 @@ final class Product {
 		$response->header( 'X-WP-TotalPages', $total_pages );
 
 		return $response;
+	}
+
+	/**
+	 * 批量創建或修改商品
+	 * 創建要帶 qty
+	 * 修改要帶 ids
+	 * form-data 方式送出
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function post_products_callback( $request ) {
+		$body_params = $request->get_body_params() ?? [];
+		$file_params = $request->get_file_params();
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'action' ] );
+
+		if (\is_wp_error($include_required_params)) {
+			return $include_required_params;
+		}
+
+		$body_params = WP::sanitize_text_field_deep( $body_params );
+
+		$ids = $body_params['ids'] ?? []; // 修改才需要 ids
+		unset( $body_params['ids'] );
+		$qty = $body_params['qty'] ?? 0; // 創建才需要 qty
+		unset( $body_params['qty'] );
+		$action = $body_params['action'];
+		unset( $body_params['action'] );
+
+		[
+			'data' => $data,
+			'meta_data' => $meta_data,
+			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+
+		$std_response = match ($action) {
+			'update' => WcProduct::multi_update( $ids, $data, $meta_data ),
+			'create' => WcProduct::multi_create( $qty, $data, $meta_data ),
+			default => [
+				'code'    => 'post_failed',
+				'message' => '修改失敗，未知的 action',
+				'data'    => [
+					'action' => $action,
+				],
+			],
+		};
+
+		return new \WP_REST_Response(
+			$std_response,
+			$std_response['code'] === 'success' ? 200 : 400
+		);
 	}
 
 	/**
@@ -385,38 +441,36 @@ final class Product {
 
 	/**
 	 * 針對特殊欄位處理
-	 * 'pbp_product_ids'
-	 * TODO 'product_type'
-	 * 前端送出資料後，要存入 WP 前處理
+	 * 例如要儲存成 array 的 meta data，或是要略過的 meta data
 	 *
 	 * @param array $meta_data Meta data.
 	 * @param mixed $product Product.
 	 * @return array
 	 */
 	public static function handle_special_fields( $meta_data, $product ) {
+		$array_meta_keys = [
+			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
+			'link_course_ids', // 用來表示 bundle product 連結的課程
+		];
+		$unset_meta_keys = [
+			'product_type', // product_type 就不用處理了，因為是預設值
+		];
 
-		$meta_key = BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY;
+		$product_id = $product->get_id();
 
-		if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
-			// 先刪除原本的 meta data
-			$product->delete_meta_data( $meta_key );
-			foreach ( $meta_data[ $meta_key ] as $pbp_product_id ) {
-				$product->add_meta_data( BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY, $pbp_product_id, unique:false );
+		foreach ($array_meta_keys as $meta_key) {
+			if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
+				// 先刪除原本的 meta data
+				$meta_values = $meta_data[ $meta_key ];
+				WcProduct::update_meta_array( $product_id, $meta_key, $meta_values );
+				unset( $meta_data[ $meta_key ] );
 			}
-			$product->save_meta_data();
-			unset( $meta_data[ $meta_key ] );
 		}
 
-		if ( isset( $meta_data['product_type'] ) ) {
-			unset( $meta_data['product_type'] );
-		}
-
-		if (isset($meta_data['link_course_ids']) && is_array($meta_data['link_course_ids'])) {
-			foreach ($meta_data['link_course_ids'] as $course_id) {
-				$product->add_meta_data( 'link_course_ids', $course_id, unique:false );
+		foreach ($unset_meta_keys as $meta_key) {
+			if ( isset( $meta_data[ $meta_key ] ) ) {
+				unset( $meta_data[ $meta_key ] );
 			}
-			$product->save_meta_data();
-			unset( $meta_data['link_course_ids'] );
 		}
 
 		return $meta_data;
