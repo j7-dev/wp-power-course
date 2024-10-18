@@ -35,12 +35,14 @@ const useColumns = (params?: TUseColumnsParams) => {
 								ellipsis={{
 									tooltip: (
 										<>
-											{name || '未知的課程名稱'} <sub>#{id}</sub>
+											<sub className="text-gray-500">#{id}</sub>{' '}
+											{name || '未知的課程名稱'}
 										</>
 									),
 								}}
 							>
-								{name || '未知的課程名稱'} <sub>#{id}</sub>
+								<sub className="text-gray-500">#{id}</sub>{' '}
+								{name || '未知的課程名稱'}
 							</Text>
 						</div>
 

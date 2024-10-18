@@ -1,6 +1,9 @@
 import React, { memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import {
+	TUserRecord,
+	TAVLCourse,
+} from '@/pages/admin/Courses/CourseTable/types'
 import { Table, Form, TableProps, Card, FormInstance } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection, FilterTags } from 'antd-toolkit'
@@ -8,7 +11,7 @@ import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { useUserFormDrawer, useGCDCourses } from '@/hooks'
+import { useUserFormDrawer, useGCDItems } from '@/hooks'
 import {
 	UserDrawer,
 	GrantCourseAccess,
@@ -62,9 +65,9 @@ const StudentTable = () => {
 		.filter((courses) => courses !== undefined)
 
 	// 取得最大公約數的課程
-	const { GcdCoursesTags, selectedGCDs, setSelectedGCDs, gcdCourses } =
-		useGCDCourses({
-			allAVLCourses: selectedAllAVLCourses,
+	const { GcdItemsTags, selectedGCDs, setSelectedGCDs, gcdItems } =
+		useGCDItems<TAVLCourse>({
+			allItems: selectedAllAVLCourses,
 		})
 
 	return (
@@ -104,10 +107,10 @@ const StudentTable = () => {
 							/>
 						</div>
 					</div>
-					{!!gcdCourses.length && (
+					{!!gcdItems.length && (
 						<div className="flex-1">
 							<label className="block mb-2">選擇課程</label>
-							<GcdCoursesTags />
+							<GcdItemsTags />
 						</div>
 					)}
 				</div>

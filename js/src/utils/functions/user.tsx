@@ -1,32 +1,32 @@
-import { TAVLCourse } from '@/pages/admin/Courses/CourseTable/types'
-
 /**
- * 取得最大公約數的 TAVLCourse
- *
- * @param {TAVLCourse[][]} items
- * @return TAVLCourse[]
+ * 取得最大公約數
+ * @param items
+ * @param key
  */
-export const getGCDCourse = (items: TAVLCourse[][]): TAVLCourse[] => {
+export function getGCDItems<T>(items: T[][], key = 'id'): T[] {
 	if (items.length === 0) return []
 
 	// sort by items length asc
 	const sortedItems = items.sort((a, b) => a.length - b.length)
 	if (sortedItems[0].length === 0) return []
-	const firstItemCourseIds = sortedItems[0].map((course) => course.id)
+	console.log('sortedItems[0]', sortedItems[0])
+	const firstItemIds = sortedItems?.[0]?.map((item) => item?.[key as keyof T])
 
-	const gcdCourseIds: string[] = []
-	firstItemCourseIds.forEach((courseId) => {
+	const gcdIds: string[] = []
+	firstItemIds.forEach((id) => {
 		if (
-			sortedItems.every((item) => item.some((course) => course.id === courseId))
+			sortedItems.every((item) =>
+				item.some((course) => course?.[key as keyof T] === id),
+			)
 		) {
-			gcdCourseIds.push(courseId)
+			gcdIds.push(id as string)
 		}
 	})
-	const gcdCourses = gcdCourseIds
+	const gcdItems = gcdIds
 		.map((id) => {
-			return sortedItems[0].find((course) => course.id === id)
+			return sortedItems[0].find((item) => item?.[key as keyof T] === id)
 		})
-		.filter((course) => course !== undefined)
+		.filter((item) => item !== undefined)
 
-	return gcdCourses
+	return gcdItems
 }

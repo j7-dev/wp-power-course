@@ -1,48 +1,54 @@
 import React, { useState, useEffect, FC } from 'react'
 import { CheckCircleOutlined } from '@ant-design/icons'
 import { Tag } from 'antd'
-import { TAVLCourse } from '@/pages/admin/Courses/CourseTable/types'
-import { getGCDCourse } from '@/utils'
+import { getGCDItems } from '@/utils'
 
-export const useGCDCourses = ({
-	allAVLCourses,
+export function useGCDItems<T>({
+	allItems,
+	key = 'id',
 }: {
-	allAVLCourses: TAVLCourse[][]
-}) => {
+	allItems: T[][]
+	key?: keyof T | string
+}) {
 	const [selectedGCDs, setSelectedGCDs] = useState<string[]>([])
 
 	// 取得最大公約數的課程
-	const gcdCourses = getGCDCourse(allAVLCourses)
+	const gcdItems = getGCDItems<T>(allItems)
 
 	useEffect(() => {
 		setSelectedGCDs([])
-	}, [allAVLCourses.length])
+	}, [allItems.length])
 
-	const GcdCoursesTags: FC = () =>
-		gcdCourses.map((course: TAVLCourse) => {
-			const isSelected = selectedGCDs.includes(course.id)
+	const GcdItemsTags: FC = () =>
+		gcdItems.map((item: T) => {
+			const isSelected = selectedGCDs.includes(item?.[key as keyof T] as string)
 			return (
 				<Tag
 					icon={isSelected ? <CheckCircleOutlined /> : undefined}
 					color={isSelected ? 'processing' : 'default'}
-					key={course.id}
+					key={item?.[key as keyof T] as string}
 					className="cursor-pointer"
 					onClick={() => {
 						if (isSelected) {
-							setSelectedGCDs(selectedGCDs.filter((id) => id !== course.id))
+							setSelectedGCDs(
+								selectedGCDs.filter((id) => id !== item?.[key as keyof T]),
+							)
 						} else {
-							setSelectedGCDs([...selectedGCDs, course.id])
+							setSelectedGCDs([
+								...selectedGCDs,
+								item?.[key as keyof T] as string,
+							])
 						}
 					}}
 				>
-					{course.name || '未知的課程名稱'}
+					{item?.name || '未知的課程名稱'}
 				</Tag>
 			)
 		})
 	return {
 		selectedGCDs,
 		setSelectedGCDs,
-		gcdCourses,
-		GcdCoursesTags,
+		gcdItems,
+		GcdItemsTags,
 	}
 }

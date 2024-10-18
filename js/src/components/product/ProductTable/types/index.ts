@@ -43,6 +43,14 @@ export type TImage = {
 	url: string
 }
 
+export type TBindCoursesData = {
+	id: string
+	name: string
+	limit_type: 'unlimited' | 'fixed' | 'assigned'
+	limit_value: number
+	limit_unit: 'second' | 'day' | 'month' | 'year'
+}
+
 export type TProductRecord = {
 	id: string
 	type: TProductType
@@ -85,6 +93,14 @@ export type TProductRecord = {
 	pbp_product_ids: string[]
 	sale_date_range: [number, number]
 	is_free: 'yes' | 'no' | ''
+	qa_list: {
+		key: string
+		question: string
+		answer: string
+	}[]
+	bundle_type_label: string
+	exclude_main_course: 'yes' | 'no' | ''
+	bind_courses_data: TBindCoursesData[]
 }
 
 export type TProductVariation = TProductRecord & {
