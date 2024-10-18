@@ -72,10 +72,13 @@ const FullFilter: FC<{
 					<Item name={['s']} label={keyLabelMapper('s')}>
 						<Input placeholder="模糊搜尋" allowClear />
 					</Item>
-					<Item name={['sku']} label={keyLabelMapper('sku')}>
-						<Input placeholder="模糊搜尋" allowClear />
-					</Item>
 
+					<BooleanRadioButton
+						formItemProps={{
+							name: ['is_course'],
+							label: keyLabelMapper('is_course'),
+						}}
+					/>
 					<Item
 						name={['product_category_id']}
 						label={keyLabelMapper('product_category_id')}
@@ -132,7 +135,6 @@ const FullFilter: FC<{
 					{(
 						[
 							'featured',
-							'is_course',
 							'downloadable',
 							'virtual',
 							'sold_individually',
@@ -172,6 +174,9 @@ const FullFilter: FC<{
 					</Item>
 					<Item name={['date_created']} label={keyLabelMapper('date_created')}>
 						<RangePicker className="w-full" />
+					</Item>
+					<Item name={['sku']} label={keyLabelMapper('sku')}>
+						<Input placeholder="模糊搜尋" allowClear />
 					</Item>
 				</div>
 				<div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4 mt-4">
