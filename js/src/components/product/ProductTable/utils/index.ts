@@ -21,7 +21,7 @@ export const getFilterLabels = (
 	backorders: '允許延期交貨',
 	stock_status: '庫存狀態',
 	date_created: `${label}發佈日期`,
-	is_course: `${label}狀態`,
+	is_course: '是否為課程商品',
 	price_range: '價格範圍',
 })
 

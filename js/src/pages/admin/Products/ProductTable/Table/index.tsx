@@ -40,7 +40,7 @@ const Main = () => {
 		resource: 'products',
 		onSearch,
 		filters: {
-			initial: getInitialFilters(initialFilteredValues),
+			initial: getInitialFilters({ ...initialFilteredValues, is_course: '0' }),
 		},
 	})
 
@@ -130,6 +130,7 @@ const Main = () => {
 							'downloadable',
 							'virtual',
 							'sold_individually',
+							'is_course',
 						]}
 					/>
 				</div>

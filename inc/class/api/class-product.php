@@ -49,6 +49,10 @@ final class Product {
 			'method'   => 'post',
 		],
 		[
+			'endpoint' => 'products/update-bound-courses',
+			'method'   => 'post',
+		],
+		[
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		],
@@ -63,6 +67,23 @@ final class Product {
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
+
+		\add_filter(
+			'woocommerce_product_data_store_cpt_get_products_query',
+			function ( $query, $query_vars ) {
+				if ( isset($query_vars['is_course']) ) {
+					$query['meta_query'][] = [
+						[
+							'key'   => '_is_course',
+							'value' => $query_vars['is_course'] ? 'yes' : 'no',
+						],
+					];
+				}
+				return $query;
+			},
+			10,
+			2,
+		);
 	}
 
 	/**
@@ -106,14 +127,13 @@ final class Product {
 		);
 
 		if ( isset( $args['price_range'] ) ) {
-			$args['meta_query'] = [
-				'relation' => 'AND',
-				[
-					'key'     => '_price', // 價格自定義欄位
-					'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
-					'compare' => 'BETWEEN', // 在此範圍之間
-					'type'    => 'DECIMAL', // 處理為數值
-				],
+			$args['meta_query']             = [];
+			$args['meta_query']['relation'] = 'AND';
+			$args['meta_query'][]           = [
+				'key'     => '_price', // 價格自定義欄位
+				'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
+				'compare' => 'BETWEEN', // 在此範圍之間
+				'type'    => 'DECIMAL', // 處理為數值
 			];
 			unset( $args['price_range'] );
 		}
@@ -198,7 +218,7 @@ final class Product {
 	public function post_products_bind_courses_callback( $request ) {
 		$body_params = $request->get_body_params() ?? [];
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
+		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
 
 		if (\is_wp_error($include_required_params)) {
 			return $include_required_params;
@@ -243,6 +263,66 @@ final class Product {
 			[
 				'code'    => 'success',
 				'message' => '綁定成功',
+				'data'    => [
+					'success_ids' => $success_ids,
+					'failed_ids'  => $failed_ids,
+					'course_ids'  => $course_ids,
+				],
+			],
+			200
+		);
+	}
+
+
+	/**
+	 * 更新已綁定課程觀看權限到商品上
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function post_products_update_bound_courses_callback( $request ) {
+		$body_params = $request->get_body_params() ?? [];
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
+
+		if (\is_wp_error($include_required_params)) {
+			return $include_required_params;
+		}
+
+		$body_params = WP::sanitize_text_field_deep( $body_params );
+
+		$product_ids = $body_params['product_ids'];
+		$course_ids  = $body_params['course_ids'];
+
+		$success_ids = [];
+		$failed_ids  = [];
+		foreach ($product_ids as $product_id) {
+			/**
+			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
+			 */
+			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+
+			foreach ($bind_courses_data as $index => $bind_course_data) {
+				$bind_course_id = $bind_course_data['id'] ?? 0;
+
+				if (!\in_array($bind_course_id, $course_ids) || !$bind_course_id) {
+					// 如果原本的資料裡面找不到 course_id 就跳過
+					continue;
+				}
+
+				$bind_courses_data[ $index ]['limit_type']  = $body_params['limit_type'];
+				$bind_courses_data[ $index ]['limit_value'] = $body_params['limit_value'];
+				$bind_courses_data[ $index ]['limit_unit']  = $body_params['limit_unit'];
+			}
+
+			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$success_ids[] = $product_id;
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'success',
+				'message' => '修改成功',
 				'data'    => [
 					'success_ids' => $success_ids,
 					'failed_ids'  => $failed_ids,
