@@ -84,7 +84,12 @@ const Main = () => {
 	return (
 		<Spin spinning={tableProps?.loading as boolean}>
 			<Card title="篩選" className="mb-4">
-				<Filter searchFormProps={searchFormProps} />
+				<Filter
+					searchFormProps={searchFormProps}
+					optionParams={{
+						endpoint: 'products/options',
+					}}
+				/>
 				<div className="mt-2">
 					<FilterTags
 						form={searchFormProps?.form as FormInstance<TFilterProps>}

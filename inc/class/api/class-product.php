@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Api;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\WC;
 use J7\PowerBundleProduct\BundleProduct;
 use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
@@ -59,6 +60,10 @@ final class Product {
 		[
 			'endpoint' => 'bundle_products/(?P<id>\d+)',
 			'method'   => 'post',
+		],
+		[
+			'endpoint' => 'products/options',
+			'method'   => 'get',
 		],
 	];
 
@@ -797,6 +802,38 @@ final class Product {
 		\set_transient( $transient_key, $max_min_prices, 1 * HOUR_IN_SECONDS );
 
 		return $max_min_prices;
+	}
+
+	/**
+	 * Get options callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return array
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_products_options_callback( $request ) { // phpcs:ignore
+		$formatted_cats = self::format_terms();
+		$formatted_tags = self::format_terms(
+			[
+				'taxonomy' => 'product_tag',
+			]
+			);
+
+		$top_sales_products = WC::get_top_sales_products( 5 );
+
+		[
+			'max_price' => $max_price,
+			'min_price' => $min_price,
+		] = self::get_max_min_prices();
+
+		return [
+			'product_cats'       => $formatted_cats,
+			'product_tags'       => $formatted_tags,
+			'top_sales_products' => $top_sales_products,
+			'max_price'          => (int) $max_price,
+			'min_price'          => (int) $min_price,
+		];
 	}
 }
 

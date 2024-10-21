@@ -20,7 +20,7 @@ const getLimitLabel = (
 		case 'unlimited':
 			return '無期限'
 		case 'fixed':
-			return `固定 ${limit_value} ${LIMIT_UNIT_LABEL?.[limit_unit as keyof typeof LIMIT_UNIT_LABEL] || ''}`
+			return `訂單完成後 ${limit_value} ${LIMIT_UNIT_LABEL?.[limit_unit as keyof typeof LIMIT_UNIT_LABEL] || ''}`
 		case 'assigned':
 			return `至 ${dayjs.unix(limit_value).format('YYYY/MM/DD HH:mm')}`
 	}
