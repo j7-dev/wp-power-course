@@ -24,6 +24,7 @@ import { ChapterDrawer } from '@/components/course/ChapterDrawer'
 import useColumns from '@/pages/admin/Courses/CourseTable/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
 import { coursesAtom } from '@/pages/admin/Courses/CourseTable'
+import DeleteButton from './DeleteButton'
 
 const Main = () => {
 	const { tableProps, searchFormProps } = useTable<
@@ -40,20 +41,16 @@ const Main = () => {
 
 	const { valueLabelMapper } = useValueLabelMapper()
 
-	const { rowSelection, selectedRowKeys } = useRowSelection<TCourseRecord>({
-		getCheckboxProps: (record) => {
-			const isVariation = getIsVariation(record?.type)
-			return {
-				disabled: isVariation,
-				className: isVariation ? 'tw-hidden' : '',
-			}
-		},
-	})
-
-	/*
-	 * 換頁時，將已加入的商品全局狀態同步到當前頁面的 selectedRowKeys 狀態
-	 * 這樣在換頁時，已加入的商品就會被選中
-	 */
+	const { rowSelection, selectedRowKeys, setSelectedRowKeys } =
+		useRowSelection<TCourseRecord>({
+			getCheckboxProps: (record) => {
+				const isVariation = getIsVariation(record?.type)
+				return {
+					disabled: isVariation,
+					className: isVariation ? 'tw-hidden' : '',
+				}
+			},
+		})
 
 	const setCourses = useSetAtom(coursesAtom)
 
@@ -79,7 +76,7 @@ const Main = () => {
 		showChapterDrawer,
 	})
 
-	const { mutate: create } = useCreate({
+	const { mutate: create, isLoading: isCreating } = useCreate({
 		resource: 'courses',
 		invalidates: ['list'],
 		meta: {
@@ -119,14 +116,20 @@ const Main = () => {
 				</div>
 			</Card>
 			<Card>
-				<Button
-					type="primary"
-					className="mb-4"
-					icon={<PlusOutlined />}
-					onClick={createCourse}
-				>
-					新增課程
-				</Button>
+				<div className="mb-4 flex justify-between">
+					<Button
+						loading={isCreating}
+						type="primary"
+						icon={<PlusOutlined />}
+						onClick={createCourse}
+					>
+						新增課程
+					</Button>
+					<DeleteButton
+						selectedRowKeys={selectedRowKeys}
+						setSelectedRowKeys={setSelectedRowKeys}
+					/>
+				</div>
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TCourseRecord>)}
 					{...tableProps}
