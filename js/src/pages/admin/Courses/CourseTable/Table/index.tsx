@@ -100,6 +100,7 @@ const Main = () => {
 					optionParams={{
 						endpoint: 'courses/options',
 					}}
+					isCourse={true}
 				/>
 				<div className="mt-2">
 					<FilterTags

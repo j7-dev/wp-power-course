@@ -43,7 +43,8 @@ export const initialFilteredValues = {
 const FullFilter: FC<{
 	searchFormProps: FormProps
 	optionParams?: TUseOptionsParams
-}> = ({ searchFormProps, optionParams }) => {
+	isCourse?: boolean
+}> = ({ searchFormProps, optionParams, isCourse }) => {
 	const [isExpand, setIsExpand] = useState(false)
 	const form = searchFormProps.form as FormInstance<TFilterProps>
 	const handleReset = () => {
@@ -65,7 +66,10 @@ const FullFilter: FC<{
 			<Form<TFilterProps>
 				{...searchFormProps}
 				layout="vertical"
-				initialValues={initialFilteredValues}
+				initialValues={{
+					...initialFilteredValues,
+					is_course: isCourse ? 'yes' : '',
+				}}
 				className="antd-form-sm"
 			>
 				<div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4">
@@ -78,7 +82,11 @@ const FullFilter: FC<{
 							name: ['is_course'],
 							label: keyLabelMapper('is_course'),
 						}}
+						radioGroupProps={{
+							disabled: isCourse,
+						}}
 					/>
+
 					<Item
 						name={['product_category_id']}
 						label={keyLabelMapper('product_category_id')}
