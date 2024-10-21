@@ -38,7 +38,7 @@ export const resources = [
 		name: 'products',
 		list: '/products',
 		meta: {
-			label: '商品管理', // 商品管理
+			label: '課程權限綁定', // 商品管理
 			icon: <ProductOutlined />,
 		},
 	},
