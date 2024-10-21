@@ -12,7 +12,7 @@ import { EyeOutlined } from '@ant-design/icons'
 export const ProductName: FC<{
 	record: TProductRecord | TCourseRecord | TChapterRecord
 	onClick?: (
-		_record: TProductRecord | TCourseRecord | TChapterRecord,
+		_record?: TProductRecord | TCourseRecord | TChapterRecord,
 	) => () => void
 }> = ({ record, onClick }) => {
 	const { id, sku = '', name, images } = record

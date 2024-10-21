@@ -40,6 +40,8 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 	$teacher       = \get_user_by( 'id', $teacher_id );
 	$teacher_name .= $teacher->display_name . $connect;
 }
+$teacher_name = count($teacher_ids) > 0 ? $teacher_name : '&nbsp;';
+
 $current_user_id   = get_current_user_id();
 $limit_labels      = CourseUtils::get_limit_label_by_product( $product );
 $expire_date       = AVLCourseMeta::get( $product_id, $current_user_id, 'expire_date', true );

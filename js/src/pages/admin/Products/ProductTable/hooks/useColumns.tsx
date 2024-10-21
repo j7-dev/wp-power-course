@@ -8,7 +8,7 @@ import {
 	ProductCat,
 	ProductBoundCourses,
 } from '@/components/product'
-import { getPostStatus } from '@/utils'
+import { getPostStatus, siteUrl, course_permalink_structure } from '@/utils'
 
 const useColumns = () => {
 	const columns: TableProps<TProductRecord>['columns'] = [
@@ -18,7 +18,21 @@ const useColumns = () => {
 			title: '商品名稱',
 			dataIndex: 'name',
 			width: 300,
-			render: (_, record) => <ProductName record={record} />,
+			render: (_, record) => (
+				<ProductName
+					record={record}
+					onClick={
+						'variation' === record?.type
+							? undefined
+							: () => () => {
+									window.open(
+										`${siteUrl}/${course_permalink_structure}/${record?.slug}`,
+										'_blank',
+									)
+								}
+					}
+				/>
+			),
 		},
 		{
 			title: '狀態',
