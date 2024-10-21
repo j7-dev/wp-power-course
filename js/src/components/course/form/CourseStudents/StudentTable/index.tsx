@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import {
 	Table,
 	Form,
@@ -18,7 +18,7 @@ import { Dayjs } from 'dayjs'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
-} from '@/pages/admin/Courses/CourseSelector/utils'
+} from '@/components/product/ProductTable/utils'
 import AddOtherCourse from '../AddOtherCourse'
 
 const StudentTable = () => {

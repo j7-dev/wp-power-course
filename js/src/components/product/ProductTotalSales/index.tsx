@@ -2,9 +2,10 @@ import React, { FC } from 'react'
 import {
 	TCourseRecord,
 	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Badge, Tooltip } from 'antd'
-import useOptions from '@/pages/admin/Courses/ProductSelector/hooks/useOptions'
+import useOptions from '@/components/product/ProductTable/hooks/useOptions'
 
 const COLOR_GRADE = {
 	'tier-5': '#ffccc7',
@@ -15,11 +16,13 @@ const COLOR_GRADE = {
 }
 
 export const ProductTotalSales: FC<{
-	record: TCourseRecord | TChapterRecord
+	record: TProductRecord | TCourseRecord | TChapterRecord
 }> = ({ record }) => {
 	const { total_sales } = record
 	if (!total_sales) return null
-	const { options } = useOptions()
+	const { options } = useOptions({
+		endpoint: 'products/options',
+	})
 	const { top_sales_products = [] } = options
 	const max_sales = top_sales_products?.[0]?.total_sales || 0
 	const { color, label } = get_tier(total_sales, max_sales)

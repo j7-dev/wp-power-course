@@ -1,0 +1,106 @@
+import { TVideo } from '@/components/formItem/VideoInput/types'
+import {
+	TTerm,
+	TStockStatus,
+	TProductType,
+	TProductAttribute,
+	TImage,
+} from '@/components/product/ProductTable/types'
+
+export * from './user'
+
+export type TCourseRecord = {
+	id: string
+	type: TProductType
+	depth: number
+	name: string
+	slug: string
+	date_created: string
+	date_modified: string
+	status: string
+	featured: boolean
+	catalog_visibility: string
+	description: string
+	short_description: string
+	sku: string
+	menu_order: number
+	virtual: boolean
+	downloadable: boolean
+	permalink: string
+	custom_rating: number
+	extra_review_count: number
+	price_html: string
+	regular_price: string
+	sale_price: string
+	on_sale: boolean
+	date_on_sale_from: string | null
+	date_on_sale_to: string | null
+	total_sales: number
+	stock: number | null
+	stock_status: TStockStatus
+	manage_stock: boolean
+	stock_quantity: number | null
+	backorders: 'yes'
+	backorders_allowed: boolean
+	backordered: boolean
+	low_stock_amount: number | null
+	upsell_ids: number[]
+	cross_sell_ids: number[]
+	attributes: TProductAttribute[]
+	categories: TTerm[]
+	tags: TTerm[]
+	images: TImage[]
+	chapters?: TChapterRecord[]
+	is_course: boolean
+	parent_id?: string
+	hours: number
+	is_free: 'yes' | 'no' | ''
+	qa_list: {
+		question: string
+		answer: string
+	}[]
+	course_schedule: number
+	course_hour: number
+	course_minute: number
+	limit_type: string
+	limit_value: number
+	limit_unit: string
+	is_popular: 'yes' | 'no' | ''
+	is_featured: 'yes' | 'no' | ''
+	show_review: 'yes' | 'no' | ''
+	reviews_allowed: boolean
+	show_review_tab: 'yes' | 'no' | ''
+	show_review_list: 'yes' | 'no' | ''
+	enable_comment: 'yes' | 'no' | ''
+	extra_student_count: number
+	feature_video: TVideo
+	trial_video: TVideo
+	teacher_ids: string[]
+	course_length: number
+	bundle_ids: string[]
+}
+
+export type TChapterRecord = {
+	id: string
+	type: 'chapter'
+	status: string
+	depth: number
+	name: string
+	slug?: string
+	date_created?: string
+	date_modified?: string
+	catalog_visibility?: string
+	description?: string
+	short_description?: string
+	sku?: undefined
+	menu_order?: number
+	total_sales?: undefined
+	permalink?: string
+	chapter_length: number
+	category_ids?: string[]
+	tag_ids?: string[]
+	images?: TImage[]
+	chapters?: TChapterRecord[]
+	parent_id?: string
+	chapter_video?: TVideo
+}

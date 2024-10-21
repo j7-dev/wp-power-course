@@ -1,8 +1,6 @@
 import { FC } from 'react'
-import {
-	TCourseRecord,
-	TStockStatus,
-} from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TStockStatus } from '@/components/product/ProductTable/types'
 import { Tag } from 'antd'
 import {
 	FieldTimeOutlined,

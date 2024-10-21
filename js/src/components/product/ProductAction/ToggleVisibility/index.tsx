@@ -7,7 +7,7 @@ import {
 import {
 	TCourseRecord,
 	TChapterRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import { Tooltip } from 'antd'
 import { useUpdate } from '@refinedev/core'
 import { toFormData } from '@/utils'

@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { Form } from 'antd'
 import { WatchStatusTag } from '@/components/general'
 
