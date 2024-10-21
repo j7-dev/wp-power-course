@@ -9,6 +9,7 @@ import { HttpError } from '@refinedev/core'
 import {
 	TFilterProps,
 	TProductRecord,
+	TProductVariation,
 	TBindCoursesData,
 } from '@/components/product/ProductTable/types'
 import {
@@ -17,7 +18,7 @@ import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { getInitialFilters, getIsVariation } from '@/utils'
+import { getInitialFilters } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Products/ProductTable/hooks/useValueLabelMapper'
 import {
 	BindCourses,
@@ -68,12 +69,26 @@ const Main = () => {
 
 	const columns = useColumns()
 
-	const selectedAllBindCoursesData = selectedRowKeys
-		.map((key) => {
-			return tableProps?.dataSource?.find((product) => product.id === key)
-				?.bind_courses_data
-		})
-		.filter((item) => item !== undefined)
+	const productAllBindCoursesData = selectedRowKeys.map((key) => {
+		return tableProps?.dataSource?.find((product) => product.id === key)
+			?.bind_courses_data
+	})
+
+	const variationAllBindCoursesData = selectedRowKeys.map((key) => {
+		const allVariations = tableProps?.dataSource?.reduce((acc, product) => {
+			if (product.children) {
+				acc.push(...(product.children as TProductVariation[]))
+			}
+			return acc
+		}, [] as TProductVariation[])
+		return allVariations?.find((product) => product.id === key)
+			?.bind_courses_data
+	})
+
+	const selectedAllBindCoursesData = [
+		...productAllBindCoursesData,
+		...variationAllBindCoursesData,
+	].filter((item) => item !== undefined)
 
 	// 取得最大公約數的課程
 	const { GcdItemsTags, selectedGCDs, setSelectedGCDs, gcdItems } =
