@@ -4,7 +4,7 @@
 import { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, message } from 'antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 
 const index = () => {

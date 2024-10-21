@@ -2,36 +2,21 @@ import { FC } from 'react'
 import {
 	TChapterRecord,
 	TCourseRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
-import { Image, message } from 'antd'
+import { Image } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
 
 export const ProductName: FC<{
-	record: TCourseRecord | TChapterRecord
-	show: {
-		showCourseDrawer: (_record: TCourseRecord) => () => void
-		showChapterDrawer: (_record: TChapterRecord) => () => void
-	}
-	loading?: boolean
-}> = ({ record, show, loading = false }) => {
-	const { id, sku = '', name, images, type } = record
-	const { showChapterDrawer, showCourseDrawer } = show
+	record: TProductRecord | TCourseRecord | TChapterRecord
+	onClick?: (
+		_record?: TProductRecord | TCourseRecord | TChapterRecord,
+	) => () => void
+}> = ({ record, onClick }) => {
+	const { id, sku = '', name, images } = record
 	const image_url = images?.[0]?.url || defaultImage
-	const isChapter = type === 'chapter'
-
-	const handleClick = () => {
-		if (!loading) {
-			if (isChapter) {
-				showChapterDrawer(record as TChapterRecord)()
-			} else {
-				showCourseDrawer(record as TCourseRecord)()
-			}
-		} else {
-			message.error('請等待儲存後再進行編輯')
-		}
-	}
 
 	return (
 		<>
@@ -53,7 +38,7 @@ export const ProductName: FC<{
 				<div className="flex-1">
 					<p
 						className="mb-1 text-primary hover:text-primary/70 cursor-pointer"
-						onClick={handleClick}
+						onClick={onClick ? onClick(record) : undefined}
 					>
 						{renderHTML(name)}
 					</p>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { Table, message, Button, Form, TableProps } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
@@ -8,7 +8,7 @@ import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
-} from '@/pages/admin/Courses/CourseSelector/utils'
+} from '@/components/product/ProductTable/utils'
 import UserSelector from '../UserSelector'
 import { PopconfirmDelete } from '@/components/general'
 import { useUserFormDrawer } from '@/hooks'

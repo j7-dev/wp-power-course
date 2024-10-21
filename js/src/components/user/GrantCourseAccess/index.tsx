@@ -11,22 +11,22 @@ const GrantCourseAccessComponent = ({
 	user_ids: string[]
 	label?: string
 }) => {
-	const { selectProps, courseIds } = useCourseSelect()
+	const { selectProps, courseIds: course_ids } = useCourseSelect()
 
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
 
-	const { mutate: addStudent, isLoading } = useCustomMutation()
+	const { mutate, isLoading } = useCustomMutation()
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
 
-	const handleGrant = () => {
-		addStudent(
+	const handleClick = () => {
+		mutate(
 			{
 				url: `${apiUrl}/courses/add-students`,
 				method: 'post',
 				values: {
 					user_ids,
-					course_ids: courseIds,
+					course_ids,
 					expire_date: time ? time.unix() : 0,
 				},
 				config: {
@@ -77,8 +77,8 @@ const GrantCourseAccessComponent = ({
 				<Button
 					type="primary"
 					loading={isLoading}
-					disabled={!user_ids.length || !courseIds.length}
-					onClick={handleGrant}
+					disabled={!user_ids.length || !course_ids.length}
+					onClick={handleClick}
 				>
 					添加其他課程
 				</Button>

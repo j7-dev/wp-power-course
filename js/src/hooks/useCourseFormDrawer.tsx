@@ -12,7 +12,7 @@ import { useUpdate } from '@refinedev/core'
 import {
 	TChapterRecord,
 	TCourseRecord,
-} from '@/pages/admin/Courses/CourseSelector/types'
+} from '@/pages/admin/Courses/CourseTable/types'
 import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 import { useWindowSize } from '@uidotdev/usehooks'

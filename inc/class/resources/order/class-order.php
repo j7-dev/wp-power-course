@@ -80,15 +80,6 @@ final class Order {
 		// 處理完銷售方案，重新拿一次 items
 		$items = $order->get_items();
 		foreach ( $items as $item ) {
-			/**
-			 * @var \WC_Order_Item_Product $item
-			 */
-			$product_id = $item->get_product_id();
-			$product    = \wc_get_product( $product_id );
-
-			if ( ! $product ) {
-				continue;
-			}
 			$this->_handle_add_course_item_meta_by_order_item( $item );
 		}
 	}
@@ -110,8 +101,9 @@ final class Order {
 			return;
 		}
 
-		$product_id = $item->get_product_id();
-		$product    = \wc_get_product( $product_id );
+		$product_id = $item->get_variation_id() ?: $item->get_product_id();
+
+		$product = \wc_get_product( $product_id );
 
 		if ( ! $product ) {
 			return;
@@ -126,8 +118,13 @@ final class Order {
 				$item->update_meta_data( '_' . $meta_key, $meta_value );
 			}
 			$item->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
-			$item->save_meta_data();
 		}
+
+		$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+		if ( $bind_courses_data ) {
+			$item->update_meta_data( '_bind_courses_data', $bind_courses_data );
+		}
+		$item->save_meta_data();
 	}
 
 
@@ -155,46 +152,91 @@ final class Order {
 			 */
 			$product_id = $item->get_product_id();
 
-			// TODO 或有 course_id 的 meta 紀錄
+			$bind_courses_data = $item->get_meta( '_bind_courses_data' ) ?: [];
+			$is_course         = CourseUtils::is_course_product( $product_id );
 
-			// 如果是課程商品
-			if ( CourseUtils::is_course_product( $product_id ) ) {
+			// 如果 "不是課程商品" 或 "沒有綁定課程"，就什麼也不做
+			if ( !$is_course && !$bind_courses_data ) {
+				continue;
+			}
 
-				// 先檢查用戶有沒有買過
-				$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
-				if (!\is_array($avl_course_ids)) {
-					$avl_course_ids = [];
-				}
-				// 如果沒買過就新增
-				if (!\in_array($product_id, $avl_course_ids)) {
-					\add_user_meta( $customer_id, 'avl_course_ids', $product_id );
-				}
+			// 如果是單一課程，就處理單一課程
+			if ($is_course) {
+				$this->handle_single_course( $customer_id, $item );
+			}
 
-				// 將課程限制條件紀錄到訂單
-				$limit_type  = $item->get_meta( '_limit_type' );
-				$limit_value = (int) $item->get_meta( '_limit_value' );
-				$limit_unit  = $item->get_meta( '_limit_unit' );
-
-				/**
-				 * 計算到期日 expire_date
-					 * $limit_type 'unlimited' | 'fixed' | 'assigned';
-					 * $limit_value int
-					 * $limit_unit 'timestamp' | 'day' | 'month' | 'year'
-					 *
-					 * $expire_date int timestamp $limit_type = unlimited 的話就是無期限，就是0
-					 */
-				$expire_date = 0;
-
-				if ('assigned' === $limit_type) {
-					$expire_date = $limit_value; // timestamp
-				}
-				if ('fixed' === $limit_type) {
-					$expire_date = (int) strtotime("+{$limit_value} {$limit_unit}");
-				}
-
-				AVLCourseMeta::update( $product_id, $customer_id, 'expire_date', $expire_date);
+			// 如果有綁定課程，就處理綁定課程
+			if ($bind_courses_data) {
+				$this->handle_bind_courses( $customer_id, $item );
 			}
 		}
+	}
+
+	/**
+	 * 處理綑綁課程
+	 *
+	 * @param int                    $customer_id 用戶ID。
+	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
+	 * @return void
+	 */
+	public function handle_bind_courses( int $customer_id, $item ): void {
+		// 從訂單拿 _bind_courses_data
+		$bind_courses_data = $item->get_meta( '_bind_courses_data' ) ?: [];
+		// 先檢查用戶有沒有買過
+		$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
+		if (!\is_array($avl_course_ids)) {
+			$avl_course_ids = [];
+		}
+
+		foreach ($bind_courses_data as $bind_course_data) {
+			$bind_course_id = (int) $bind_course_data['id'] ?? 0;
+			if (!$bind_course_id) {
+				continue;
+			}
+			// 如果沒買過就新增
+			if (!\in_array($bind_course_id, $avl_course_ids)) {
+				\add_user_meta( $customer_id, 'avl_course_ids', $bind_course_id );
+			}
+
+			$limit_type  = (string) $bind_course_data['limit_type'] ?? 'unlimited';
+			$limit_value = (int) $bind_course_data['limit_value'] ?? 0;
+			$limit_unit  = (string) $bind_course_data['limit_unit'] ?? '';
+
+			$expire_date = CourseUtils::calc_expire_date( $limit_type, $limit_value, $limit_unit );
+
+			AVLCourseMeta::update( $bind_course_id, $customer_id, 'expire_date', $expire_date);
+
+		}
+	}
+
+
+	/**
+	 * 處理單一課程
+	 *
+	 * @param int                    $customer_id 用戶ID。
+	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
+	 * @return void
+	 */
+	public function handle_single_course( int $customer_id, $item ): void {
+		$product_id = $item->get_product_id();
+		// 先檢查用戶有沒有買過
+		$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
+		if (!\is_array($avl_course_ids)) {
+			$avl_course_ids = [];
+		}
+		// 如果沒買過就新增
+		if (!\in_array($product_id, $avl_course_ids)) {
+			\add_user_meta( $customer_id, 'avl_course_ids', $product_id );
+		}
+
+		// 將課程限制條件紀錄到訂單
+		$limit_type  = (string) $item->get_meta( '_limit_type' );
+		$limit_value = (int) $item->get_meta( '_limit_value' );
+		$limit_unit  = (string) $item->get_meta( '_limit_unit' );
+
+		$expire_date = CourseUtils::calc_expire_date( $limit_type, $limit_value, $limit_unit );
+
+		AVLCourseMeta::update( $product_id, $customer_id, 'expire_date', $expire_date);
 	}
 }
 

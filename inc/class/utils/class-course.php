@@ -199,7 +199,9 @@ abstract class Course {
 		$sub_chapters_count      = count(self::get_sub_chapters($product, true));
 		$finished_chapters_count = count(self::get_finished_chapters($product_id, $user_id, return_ids: true));
 
-		return $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
+		$progress = $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
+		$progress = min( 100, $progress );
+		return $progress;
 	}
 	/**
 	 * 取得已完成章節
@@ -518,6 +520,35 @@ abstract class Course {
 		$user_id        = $user_id ?? \get_current_user_id();
 		$expire_date    = AVLCourseMeta::get($the_product_id, $user_id, 'expire_date', true);
 		return empty($expire_date) ? false : $expire_date < time();
+	}
+
+
+	/**
+	 * 計算到期日 expire_date
+	 * $limit_type 'unlimited' | 'fixed' | 'assigned';
+	 * $limit_value int
+	 * $limit_unit 'timestamp' | 'day' | 'month' | 'year'
+	 *
+	 * @param string $limit_type 限制類型 'unlimited' | 'fixed' | 'assigned'
+	 * @param int    $limit_value 限制值
+	 * @param string $limit_unit 限制單位 'timestamp' | 'day' | 'month' | 'year'
+	 * @return int 到期日 timestamp
+	 */
+	public static function calc_expire_date( string $limit_type, int $limit_value, string $limit_unit ): int {
+
+		$expire_date = 0;
+
+		if ('assigned' === $limit_type) {
+			$expire_date = $limit_value; // timestamp
+		}
+		if ('fixed' === $limit_type) {
+			$expire_date_timestamp = (int) strtotime("+{$limit_value} {$limit_unit}");
+			// 將 timestamp 轉換為當天的日期，並固定在當天的 15:59:00
+			$expire_date_string = date('Y-m-d', $expire_date_timestamp) . ' 15:59:00';
+			$expire_date        = (int) strtotime($expire_date_string);
+		}
+
+		return $expire_date;
 	}
 
 	/**

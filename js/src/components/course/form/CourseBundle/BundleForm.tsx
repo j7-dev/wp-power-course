@@ -2,7 +2,7 @@ import { useEffect, useState, FC, memo } from 'react'
 import { Form, InputNumber, Select, Input, FormInstance, List, Tag } from 'antd'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import dayjs from 'dayjs'
-import { TProductRecord } from '@/pages/admin/Courses/ProductSelector/types'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { useList } from '@refinedev/core'
@@ -14,7 +14,7 @@ import {
 	LinkOutlined,
 	DisconnectOutlined,
 } from '@ant-design/icons'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseSelector/types'
+import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { FiSwitch, RangePicker } from '@/components/formItem'
 import { FileUpload } from '@/components/post'
 
@@ -216,12 +216,6 @@ const BundleForm: FC<{
 			</Item>
 
 			<Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
-			{!selectedProducts.length && !initIsFetching && (
-				<div className="text-red-500">
-					<ExclamationCircleOutlined className="mr-2" />
-					請至少加入一款產品
-				</div>
-			)}
 
 			<Heading className="mb-3">搭配你的銷售方案，請選擇要加入的商品</Heading>
 			<FiSwitch
@@ -233,6 +227,7 @@ const BundleForm: FC<{
 					size: 'small',
 				}}
 			/>
+
 			<div className="border-2 border-dashed border-blue-500 rounded-xl p-4 mb-8">
 				{/* 當前課程方案 */}
 				<div
@@ -256,6 +251,12 @@ const BundleForm: FC<{
 				>
 					<PlusOutlined />
 				</div>
+				{!selectedProducts.length && !initIsFetching && (
+					<div className="text-red-500">
+						<ExclamationCircleOutlined className="mr-2" />
+						請至少加入一款產品
+					</div>
+				)}
 				<div className="relative mb-2">
 					<Search
 						placeholder="請輸入關鍵字後按下 ENTER 搜尋，每次最多返回 20 筆資料"
