@@ -22,7 +22,8 @@ export const initialFilteredValues = {
 const Filter: FC<{
 	searchFormProps: FormProps
 	optionParams?: TUseOptionsParams
-}> = ({ searchFormProps, optionParams }) => {
+	isCourse?: boolean
+}> = ({ searchFormProps, optionParams, isCourse = false }) => {
 	const { width = 1920 } = useWindowSize()
 	const isMobile = width ? width < 810 : false
 
@@ -32,13 +33,18 @@ const Filter: FC<{
 				<FullFilter
 					searchFormProps={searchFormProps}
 					optionParams={optionParams}
+					isCourse={isCourse}
 				/>
 			</MobileFilter>
 		)
 	}
 
 	return (
-		<FullFilter searchFormProps={searchFormProps} optionParams={optionParams} />
+		<FullFilter
+			searchFormProps={searchFormProps}
+			optionParams={optionParams}
+			isCourse={isCourse}
+		/>
 	)
 }
 
