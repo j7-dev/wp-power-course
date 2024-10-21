@@ -20,7 +20,9 @@ export const ProductTotalSales: FC<{
 }> = ({ record }) => {
 	const { total_sales } = record
 	if (!total_sales) return null
-	const { options } = useOptions()
+	const { options } = useOptions({
+		endpoint: 'products/options',
+	})
 	const { top_sales_products = [] } = options
 	const max_sales = top_sales_products?.[0]?.total_sales || 0
 	const { color, label } = get_tier(total_sales, max_sales)
