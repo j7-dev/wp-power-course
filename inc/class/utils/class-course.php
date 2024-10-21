@@ -542,7 +542,10 @@ abstract class Course {
 			$expire_date = $limit_value; // timestamp
 		}
 		if ('fixed' === $limit_type) {
-			$expire_date = (int) strtotime("+{$limit_value} {$limit_unit}");
+			$expire_date_timestamp = (int) strtotime("+{$limit_value} {$limit_unit}");
+			// 將 timestamp 轉換為當天的日期，並固定在當天的 15:59:00
+			$expire_date_string = date('Y-m-d', $expire_date_timestamp) . ' 15:59:00';
+			$expire_date        = (int) strtotime($expire_date_string);
 		}
 
 		return $expire_date;

@@ -24,15 +24,14 @@ import {
 	UpdateBoundCourses,
 	UnbindCourses,
 } from '@/components/product'
-import { useAtom, useSetAtom } from 'jotai'
-import { addedProductIdsAtom } from '@/pages/admin/Products/atom'
+import { useSetAtom } from 'jotai'
 import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
 import { productsAtom } from '@/pages/admin/Products/ProductTable'
 import { useGCDItems } from '@/hooks'
 import { WatchLimit } from '@/components/formItem'
 
 const Main = () => {
-	const { tableProps, searchFormProps, filters } = useTable<
+	const { tableProps, searchFormProps } = useTable<
 		TProductRecord,
 		HttpError,
 		TFilterProps
@@ -44,37 +43,15 @@ const Main = () => {
 		},
 	})
 
-	const currentAllKeys =
-		tableProps?.dataSource?.map((record) => record?.id.toString()) || []
-	const [addedProductIds, setAddedProductIds] = useAtom(addedProductIdsAtom)
-
 	const { valueLabelMapper } = useValueLabelMapper()
 
-	const { rowSelection, setSelectedRowKeys } = useRowSelection<TProductRecord>({
+	const { rowSelection, selectedRowKeys } = useRowSelection<TProductRecord>({
 		getCheckboxProps: (record) => {
-			const isVariation = getIsVariation(record?.type)
+			const isVariableProduct = record?.type?.startsWith('variable')
 			return {
-				disabled: isVariation,
-				className: isVariation ? 'tw-hidden' : '',
+				disabled: !!isVariableProduct,
+				className: isVariableProduct ? 'tw-hidden' : '',
 			}
-		},
-		onChange: (currentSelectedRowKeys: React.Key[]) => {
-			setSelectedRowKeys(currentSelectedRowKeys)
-			const addedProductIdsNotInCurrentPage = addedProductIds.filter(
-				(addedProductId) => !currentAllKeys.includes(addedProductId),
-			)
-
-			const currentSelectedRowKeysStringify = currentSelectedRowKeys.map(
-				(key) => key.toString(),
-			)
-
-			setAddedProductIds(() => {
-				const newKeys = new Set([
-					...addedProductIdsNotInCurrentPage,
-					...currentSelectedRowKeysStringify,
-				])
-				return [...newKeys]
-			})
 		},
 	})
 
@@ -86,24 +63,12 @@ const Main = () => {
 	const setCourses = useSetAtom(productsAtom)
 
 	useEffect(() => {
-		if (!tableProps?.loading) {
-			const filteredKey =
-				currentAllKeys?.filter((id) => addedProductIds?.includes(id)) || []
-			setSelectedRowKeys(filteredKey)
-		}
-	}, [
-		JSON.stringify(filters),
-		JSON.stringify(tableProps?.pagination),
-		tableProps?.loading,
-	])
-
-	useEffect(() => {
 		setCourses([...(tableProps?.dataSource || [])])
 	}, [tableProps?.dataSource])
 
 	const columns = useColumns()
 
-	const selectedAllBindCoursesData = addedProductIds
+	const selectedAllBindCoursesData = selectedRowKeys
 		.map((key) => {
 			return tableProps?.dataSource?.find((product) => product.id === key)
 				?.bind_courses_data
@@ -144,7 +109,7 @@ const Main = () => {
 						<div className="col-span-3">
 							<div className="mb-4">
 								<BindCourses
-									product_ids={addedProductIds as string[]}
+									product_ids={selectedRowKeys as string[]}
 									label="綁定其他課程"
 								/>
 							</div>
@@ -153,14 +118,14 @@ const Main = () => {
 									<label className="block mb-2">批量操作</label>
 									<div className="flex gap-x-4">
 										<UpdateBoundCourses
-											product_ids={addedProductIds as string[]}
+											product_ids={selectedRowKeys as string[]}
 											course_ids={selectedGCDs}
 											onSettled={() => {
 												setSelectedGCDs([])
 											}}
 										/>
 										<UnbindCourses
-											product_ids={addedProductIds}
+											product_ids={selectedRowKeys as string[]}
 											course_ids={selectedGCDs}
 											onSettled={() => {
 												setSelectedGCDs([])

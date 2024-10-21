@@ -27,6 +27,12 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
 			children: <CoursePrice />,
 		},
 		{
+			key: 'CourseBundle',
+			forceRender: true,
+			label: '銷售方案',
+			children: <CourseBundle />,
+		},
+		{
 			key: 'CourseQA',
 			forceRender: true,
 			label: 'QA設定',
@@ -43,13 +49,6 @@ export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
 			forceRender: true,
 			label: '其他設定',
 			children: <CourseOther />,
-		},
-
-		{
-			key: 'CourseBundle',
-			forceRender: true,
-			label: '銷售方案',
-			children: <CourseBundle />,
 		},
 		{
 			key: 'CourseStudents',
