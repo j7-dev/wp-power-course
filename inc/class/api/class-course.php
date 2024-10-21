@@ -397,7 +397,7 @@ final class Course {
 			'meta_data' => $meta_data,
 		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
-		if (!$meta_data['files']) {
+		if (!( $meta_data['files'] ?? '' )) {
 			unset($meta_data['files']);
 		}
 
@@ -682,7 +682,7 @@ final class Course {
 			);
 		}
 
-		\wp_trash_post( $id );
+		\wp_delete_post( $id, true );
 
 		return new \WP_REST_Response(
 			[

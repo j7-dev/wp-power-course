@@ -183,6 +183,8 @@ final class Product {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
+		$body_params['_is_course'] = 'yes';
+
 		$ids = $body_params['ids'] ?? []; // 修改才需要 ids
 		unset( $body_params['ids'] );
 		$qty = $body_params['qty'] ?? 0; // 創建才需要 qty
