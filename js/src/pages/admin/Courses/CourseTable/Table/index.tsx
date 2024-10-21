@@ -16,8 +16,7 @@ import {
 } from '@/components/product/ProductTable/utils'
 import { getInitialFilters, getIsVariation } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Courses/CourseTable/hooks/useValueLabelMapper'
-import { useAtom, useSetAtom } from 'jotai'
-import { addedProductIdsAtom } from '@/pages/admin/Courses/atom'
+import { useSetAtom } from 'jotai'
 import { SortableChapter } from '@/components/course'
 import { CourseDrawer } from '@/components/course/CourseDrawer'
 import { useCourseFormDrawer } from '@/hooks'
@@ -27,7 +26,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { coursesAtom } from '@/pages/admin/Courses/CourseTable'
 
 const Main = () => {
-	const { tableProps, searchFormProps, filters } = useTable<
+	const { tableProps, searchFormProps } = useTable<
 		TCourseRecord,
 		HttpError,
 		TFilterProps
@@ -39,37 +38,15 @@ const Main = () => {
 		},
 	})
 
-	const currentAllKeys =
-		tableProps?.dataSource?.map((record) => record?.id.toString()) || []
-	const [addedProductIds, setAddedProductIds] = useAtom(addedProductIdsAtom)
-
 	const { valueLabelMapper } = useValueLabelMapper()
 
-	const { rowSelection, setSelectedRowKeys } = useRowSelection<TCourseRecord>({
+	const { rowSelection, selectedRowKeys } = useRowSelection<TCourseRecord>({
 		getCheckboxProps: (record) => {
 			const isVariation = getIsVariation(record?.type)
 			return {
 				disabled: isVariation,
 				className: isVariation ? 'tw-hidden' : '',
 			}
-		},
-		onChange: (currentSelectedRowKeys: React.Key[]) => {
-			setSelectedRowKeys(currentSelectedRowKeys)
-			const addedProductIdsNotInCurrentPage = addedProductIds.filter(
-				(addedProductId) => !currentAllKeys.includes(addedProductId),
-			)
-
-			const currentSelectedRowKeysStringify = currentSelectedRowKeys.map(
-				(key) => key.toString(),
-			)
-
-			setAddedProductIds(() => {
-				const newKeys = new Set([
-					...addedProductIdsNotInCurrentPage,
-					...currentSelectedRowKeysStringify,
-				])
-				return [...newKeys]
-			})
 		},
 	})
 
@@ -79,18 +56,6 @@ const Main = () => {
 	 */
 
 	const setCourses = useSetAtom(coursesAtom)
-
-	useEffect(() => {
-		if (!tableProps?.loading) {
-			const filteredKey =
-				currentAllKeys?.filter((id) => addedProductIds?.includes(id)) || []
-			setSelectedRowKeys(filteredKey)
-		}
-	}, [
-		JSON.stringify(filters),
-		JSON.stringify(tableProps?.pagination),
-		tableProps?.loading,
-	])
 
 	useEffect(() => {
 		setCourses([...(tableProps?.dataSource || [])])

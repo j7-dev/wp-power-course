@@ -3,8 +3,6 @@ import { ModalProps, FormInstance } from 'antd'
 import { TMediaLibraryProps } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
 
-export const addedProductIdsAtom = atom<string[]>([])
-
 export const mediaLibraryAtom = atom<{
 	form?: FormInstance
 	name?: string[]

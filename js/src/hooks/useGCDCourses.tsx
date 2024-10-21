@@ -41,6 +41,7 @@ export function useGCDItems<T>({
 						}
 					}}
 				>
+					{/* @ts-expect-error 沒有名字就顯示預設值 */}
 					{item?.name || '未知的課程名稱'}
 				</Tag>
 			)
