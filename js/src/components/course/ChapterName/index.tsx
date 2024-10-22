@@ -1,21 +1,17 @@
 import { FC } from 'react'
 import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
 import { renderHTML } from 'antd-toolkit'
-import { message } from 'antd'
 
 export const ChapterName: FC<{
 	record: TChapterRecord
-	show: (_record: TChapterRecord | undefined) => () => void
-	loading?: boolean
-}> = ({ record, show, loading = false }) => {
+	setSelectedChapter: React.Dispatch<
+		React.SetStateAction<TChapterRecord | null>
+	>
+}> = ({ record, setSelectedChapter }) => {
 	const { id, name } = record
 
 	const handleClick = () => {
-		if (!loading) {
-			show({ ...record } as TChapterRecord)()
-		} else {
-			message.error('請等待儲存後再進行編輯')
-		}
+		setSelectedChapter(record)
 	}
 
 	return (

@@ -177,7 +177,7 @@ final class Product {
 
 		$include_required_params = WP::include_required_params( $body_params, [ 'action' ] );
 
-		if (\is_wp_error($include_required_params)) {
+		if ( $include_required_params !== true ) {
 			return $include_required_params;
 		}
 
@@ -227,7 +227,7 @@ final class Product {
 
 		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
 
-		if (\is_wp_error($include_required_params)) {
+		if ($include_required_params !== true) {
 			return $include_required_params;
 		}
 
@@ -292,7 +292,7 @@ final class Product {
 
 		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
 
-		if (\is_wp_error($include_required_params)) {
+		if ($include_required_params !== true) {
 			return $include_required_params;
 		}
 
@@ -352,7 +352,7 @@ final class Product {
 
 		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
 
-		if (\is_wp_error($include_required_params)) {
+		if ($include_required_params !== true) {
 			return $include_required_params;
 		}
 

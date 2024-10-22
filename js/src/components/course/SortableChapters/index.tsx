@@ -1,19 +1,53 @@
-import { FC, useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
-import { message } from 'antd'
+import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { Form, message, Card } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import {
+	useCustomMutation,
+	useApiUrl,
+	useInvalidate,
+	useList,
+	HttpError,
+} from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
+import { ChapterEdit } from '@/components/chapters'
 
-export const SortableChapter: FC<{
-	record: TCourseRecord | TChapterRecord
-	show: (_record: TChapterRecord | undefined) => () => void
-}> = ({ record, show }) => {
+const LoadingChapters = () => (
+	<div className="pl-3">
+		{new Array(10).fill(0).map((_, index) => (
+			<div
+				key={index}
+				className=" bg-gray-100 h-7 rounded-sm mb-1 animate-pulse"
+			/>
+		))}
+	</div>
+)
+
+const SortableChaptersComponent = () => {
+	const form = Form.useFormInstance()
+	const courseId = form?.getFieldValue('id')
+	const { data: chaptersData, isLoading: isListLoading } = useList<
+		TChapterRecord,
+		HttpError
+	>({
+		resource: 'chapters',
+		filters: [
+			{
+				field: 'post_parent',
+				operator: 'eq',
+				value: courseId,
+			},
+		],
+		pagination: {
+			current: 1,
+			pageSize: -1,
+		},
+	})
+
+	const chapters = chaptersData?.data || []
+
 	const [treeData, setTreeData] = useState<TreeData<TChapterRecord>>([])
 	const [originTree, setOriginTree] = useState<TreeData<TChapterRecord>>([])
 	const invalidate = useInvalidate()
@@ -22,12 +56,12 @@ export const SortableChapter: FC<{
 	const { mutate, isLoading } = useCustomMutation()
 
 	useEffect(() => {
-		if (!!record?.chapters) {
-			const chapterTree = record?.chapters?.map(chapterToTreeNode)
+		if (!isListLoading) {
+			const chapterTree = chapters?.map(chapterToTreeNode)
 			setTreeData(chapterTree)
 			setOriginTree(chapterTree)
 		}
-	}, [record])
+	}, [isListLoading])
 
 	const handleSave = (data: TreeData<TChapterRecord>) => {
 		// 這個儲存只存新增，不存章節的細部資料
@@ -35,9 +69,8 @@ export const SortableChapter: FC<{
 			content: '排序儲存中...',
 			key: 'chapter-sorting',
 		})
-		const topParentId = record.id
-		const from_tree = treeToParams(originTree, topParentId)
-		const to_tree = treeToParams(data, topParentId)
+		const from_tree = treeToParams(originTree, courseId)
+		const to_tree = treeToParams(data, courseId)
 
 		mutate(
 			{
@@ -71,52 +104,58 @@ export const SortableChapter: FC<{
 		)
 	}
 
+	const [selectedChapter, setSelectedChapter] = useState<TChapterRecord | null>(
+		null,
+	)
+
 	return (
 		<>
-			<div className="pl-[4.5rem]">
-				<SortableTree
-					hideAdd
-					treeData={treeData}
-					onTreeDataChange={(data: TreeData<TChapterRecord>) => {
-						const treeDataWithoutCollapsed = data.map((item) => ({
-							...item,
-							collapsed: false,
-						}))
-						const dataWithoutCollapse = treeData.map((item) => ({
-							...item,
-							collapsed: false,
-						}))
-						const isEqual = _isEqual(
-							treeDataWithoutCollapsed,
-							dataWithoutCollapse,
-						)
-						setTreeData(data)
-						if (!isEqual) {
-							handleSave(data)
-						}
-					}}
-					renderContent={(node) => {
-						const theRecord = node.content
-						return (
-							theRecord && (
+			<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+				{isListLoading && <LoadingChapters />}
+				{!isListLoading && (
+					<SortableTree
+						hideAdd
+						treeData={treeData}
+						onTreeDataChange={(data: TreeData<TChapterRecord>) => {
+							const treeDataWithoutCollapsed = data?.map((item) => ({
+								...item,
+								collapsed: false,
+							}))
+							const dataWithoutCollapse = treeData?.map((item) => ({
+								...item,
+								collapsed: false,
+							}))
+							const isEqual = _isEqual(
+								treeDataWithoutCollapsed,
+								dataWithoutCollapse,
+							)
+							setTreeData(data)
+							if (!isEqual) {
+								handleSave(data)
+							}
+						}}
+						renderContent={(node) => {
+							return (
 								<NodeRender
 									node={node}
-									record={theRecord}
-									show={show}
-									loading={isLoading}
+									setSelectedChapter={setSelectedChapter}
 								/>
 							)
-						)
-					}}
-					indentationWidth={48}
-					sortableRule={({ activeNode, projected }) => {
-						const activeNodeHasChild = !!activeNode.children.length
-						const sortable = projected?.depth <= (activeNodeHasChild ? 0 : 1)
-						if (!sortable) message.error('超過最大深度，無法執行')
-						return sortable
-					}}
-				/>
+						}}
+						indentationWidth={48}
+						sortableRule={({ activeNode, projected }) => {
+							const activeNodeHasChild = !!activeNode.children.length
+							const sortable = projected?.depth <= (activeNodeHasChild ? 0 : 1)
+							if (!sortable) message.error('超過最大深度，無法執行')
+							return sortable
+						}}
+					/>
+				)}
+
+				{selectedChapter && <ChapterEdit record={selectedChapter} />}
 			</div>
 		</>
 	)
 }
+
+export const SortableChapters = memo(SortableChaptersComponent)

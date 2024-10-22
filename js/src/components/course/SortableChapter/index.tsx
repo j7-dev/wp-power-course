@@ -10,6 +10,7 @@ import { chapterToTreeNode, treeToParams } from './utils'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
 
+// DELETE
 export const SortableChapter: FC<{
 	record: TCourseRecord | TChapterRecord
 	show: (_record: TChapterRecord | undefined) => () => void
