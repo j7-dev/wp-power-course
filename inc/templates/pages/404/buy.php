@@ -3,7 +3,7 @@
  * 還沒購買課程
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -31,14 +31,14 @@ $message                    = sprintf(
 
 
 echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
-Templates::get(
+Plugin::get(
 	'alert',
 	[
 		'type'    => 'error',
 		'message' => $message,
 	]
 );
-Templates::get(
+Plugin::get(
 	'course-product/header',
 	[
 		'show_link' => true,

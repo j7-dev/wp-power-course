@@ -3,7 +3,7 @@
  * Single Product Card with price
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -48,15 +48,15 @@ printf(
 	<div class="flex gap-3">%5$s %6$s</div>
 </div>
 ',
-Templates::get( 'divider', null, false ),
-Templates::get(
+Plugin::get( 'divider', null, false ),
+Plugin::get(
 	'price',
 	[
 		'product' => $product,
 	],
 	false
 ),
-Templates::get(
+Plugin::get(
 	'countdown/sales',
 	[
 		'product' => $product,
@@ -64,7 +64,7 @@ Templates::get(
 	false
 	),
 $purchase_note,
-Templates::get(
+Plugin::get(
 	'button',
 	[
 		'type'     => 'primary',
@@ -74,7 +74,7 @@ Templates::get(
 	],
 	false
 ),
-Templates::get(
+Plugin::get(
 	'button/add-to-cart',
 	[
 		'product'       => $product,

@@ -3,7 +3,7 @@
  * Body of the classroom page.
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -36,7 +36,7 @@ $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 $course_tabs = [
 	'chapter' => [
 		'label'   => '章節',
-		'content' => Templates::get( 'classroom/chapters', null, false ),
+		'content' => Plugin::get( 'classroom/chapters', null, false ),
 	],
 	'discuss' => [
 		'label'   => '討論',
@@ -55,7 +55,7 @@ $content = \do_shortcode( $chapter->post_content );
 
 echo '<div id="pc-classroom-body" class="w-full bg-white pt-[52px] lg:pt-16">';
 
-Templates::get(
+Plugin::get(
 	'classroom/header',
 	[
 		'product' => $product,
@@ -69,7 +69,7 @@ if (current_user_can('manage_options') && !$is_avl) {
 }
 
 echo '<div class="pc-classroom-body__video z-[15] sticky top-[52px] lg:relative lg:top-[unset]">';
-Templates::get(
+Plugin::get(
 	'video',
 	[
 		'video_info' => $video_info,
@@ -86,11 +86,11 @@ if ($content) {
 }
 
 echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
-Templates::get( 'progress' );
+Plugin::get( 'progress' );
 echo '</div>';
 
 echo '<div class="pc-classroom-body__tabs-nav z-[15] lg:relative">';
-Templates::get(
+Plugin::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
@@ -101,7 +101,7 @@ echo '</div>';
 
 
 echo '<div class="px-4 lg:px-12">';
-Templates::get(
+Plugin::get(
 'tabs/content',
 [
 	'course_tabs'        => $course_tabs,

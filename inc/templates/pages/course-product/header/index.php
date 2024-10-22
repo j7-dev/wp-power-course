@@ -3,7 +3,7 @@
  * Header for course product
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -40,7 +40,7 @@ if ( ! is_array( $teacher_ids ) ) {
 ?>
 <div class="flex gap-6 flex-col md:flex-row mb-20">
 	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0 z-40">
-		<?php Templates::get( 'course-product/header/feature-video' ); ?>
+		<?php Plugin::get( 'course-product/header/feature-video' ); ?>
 	</div>
 
 	<div class="w-full md:w-[45%] px-4 md:px-0">
@@ -48,7 +48,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
 				$teacher = \get_user_by( 'id', $teacher_id );
-				Templates::get(
+				Plugin::get(
 					'user',
 					[
 						'user' => $teacher,
@@ -65,15 +65,15 @@ if ( ! is_array( $teacher_ids ) ) {
 		<?php
 		echo '<div class="flex gap-2 items-center mb-[10px]">';
 		if ($is_popular) {
-			Templates::get('badge/popular');
+			Plugin::get('badge/popular');
 		}
 		if ($is_featured) {
-			Templates::get('badge/feature');
+			Plugin::get('badge/feature');
 		}
 		echo '</div>';
 
 
-		Templates::get(
+		Plugin::get(
 			'typography/paragraph/expandable',
 			[
 				'children' => \do_shortcode(  \wpautop($product->get_short_description())  ),
@@ -84,7 +84,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			$rating             = (float) $product->get_meta( 'custom_rating' );
 			$review_count       = $product->get_review_count();
 			$extra_review_count = (int) $product->get_meta( 'extra_review_count' );
-			Templates::get(
+			Plugin::get(
 			'rate',
 			[
 				'show_before' => true,
@@ -97,7 +97,7 @@ if ( ! is_array( $teacher_ids ) ) {
 		$course_permalink_structure = CourseUtils::get_course_permalink_structure();
 		if ( $show_link ) {
 			echo '<div class="mt-6">';
-			Templates::get(
+			Plugin::get(
 				'button',
 				[
 					'href'     => site_url( "{$course_permalink_structure}/{$product->get_slug()}" ),

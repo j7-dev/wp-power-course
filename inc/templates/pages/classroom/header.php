@@ -115,7 +115,7 @@ printf(
 </div>
 ',
 $chapter->post_title ? $chapter->post_title : $product->get_title(),
-	Templates::get(
+	Plugin::get(
 		'badge',
 		[
 			'type'     => $is_this_chapter_finished ? 'secondary' : 'accent',

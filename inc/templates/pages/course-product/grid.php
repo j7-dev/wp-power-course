@@ -4,7 +4,7 @@
  * TODO 分頁
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
@@ -39,7 +39,7 @@ $filtered_courses = array_filter(
 );
 
 if ( empty( $filtered_courses ) ) {
-	Templates::get(
+	Plugin::get(
 		'alert',
 		[
 			'type'    => 'info',
@@ -52,7 +52,7 @@ if ( empty( $filtered_courses ) ) {
 
 echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
 foreach ( $filtered_courses as $course ) {
-	Templates::get(
+	Plugin::get(
 		'card/available',
 		[
 			'product' => $course,

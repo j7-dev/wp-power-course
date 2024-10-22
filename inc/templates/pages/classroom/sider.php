@@ -3,7 +3,6 @@
  * Sidebar for classroom
  */
 
-use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 
@@ -47,7 +46,7 @@ printf(
 	</div>
 </div>
 ',
-	Templates::get(
+	Plugin::get(
 		'classroom/chapters',
 		[
 			'product' => $product,

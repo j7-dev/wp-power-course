@@ -11,7 +11,7 @@
  * pc-btn-square pc-btn-circle
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_props = [
 	'type'          => '', // primary | secondary | neutral | link | ghost | accent | info | success | warning | error
@@ -71,13 +71,17 @@ $class_arr = array_filter( $class_arr );
 $class_arr = array_map( fn( $class_name ) => "pc-btn-$class_name", $class_arr);
 $classes   = $class . ' ' . implode( ' ', $class_arr ) . ( $outline ? ' border-solid ' : '' );
 
-$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out"></span>' : Templates::safe_get(
-	"icon/{$icon}",
-	[
-		'class' => $icon_class,
-	],
-	false
-);
+$icon_html = '';
+if ($icon) {
+	$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out"></span>' : Plugin::safe_get(
+		"icon/{$icon}",
+		[
+			'class' => $icon_class,
+		],
+		false
+	);
+}
+
 
 $content = sprintf(
 /*html*/'%1$s %2$s',

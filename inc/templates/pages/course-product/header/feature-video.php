@@ -3,7 +3,7 @@
  * Feature video for course product
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 
 $default_args = [
@@ -41,7 +41,7 @@ $image_url     = $image_id ? \wp_get_attachment_image_url( (int) $image_id, 'ful
 $video_type = $feature_video['type'] ?? 'none';
 
 if ( 'none' !== $video_type ) {
-	Templates::get(
+	Plugin::get(
 		'video',
 		[
 			'video_info' => $feature_video,

@@ -3,7 +3,7 @@
  * Video component
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'class'      => 'rounded-xl',
@@ -31,7 +31,7 @@ $args = wp_parse_args( $args, $default_args );
 $video_type = $video_info['type'] ?? 'none';
 
 if ('none' === $video_type) {
-	// Templates::get(
+	// Plugin::get(
 	// 'video/404',
 	// [
 	// 'message' => '缺少 影片資訊 ，請聯絡老師',
@@ -42,7 +42,7 @@ if ('none' === $video_type) {
 }
 
 if ('youtube' === $video_type) {
-	Templates::get(
+	Plugin::get(
 		'video/iframe/youtube',
 		[
 			'video_info' => $video_info,
@@ -52,7 +52,7 @@ if ('youtube' === $video_type) {
 }
 
 if ('vimeo' === $video_type) {
-	Templates::get(
+	Plugin::get(
 		'video/iframe/vimeo',
 		[
 			'video_info' => $video_info,
@@ -63,7 +63,7 @@ if ('vimeo' === $video_type) {
 
 if ('bunny-stream-api' === $video_type) {
 	$library_id = \get_option( 'bunny_library_id', '' );
-	Templates::get(
+	Plugin::get(
 		'video/bunny',
 		[
 			'library_id' => $library_id,
@@ -75,7 +75,7 @@ if ('bunny-stream-api' === $video_type) {
 
 
 if ('code' === $video_type) {
-	Templates::get(
+	Plugin::get(
 		'video/code',
 		[
 			'video_info' => $video_info,

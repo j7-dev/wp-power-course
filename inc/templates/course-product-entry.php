@@ -20,9 +20,8 @@ function ( $classes ) {
 }
 );
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
-// PENDING
 $product_status = $product->get_status();
 $can_edit       = \current_user_can( 'edit_product', $product->get_id() );
 
@@ -55,15 +54,15 @@ if ('draft' === $product_status) {
 echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
 
 // Header
-Templates::get( 'course-product/header', null, true, true );
+Plugin::get( 'course-product/header', null, true, true );
 
 echo '<div class="flex flex-col md:flex-row gap-8">';
 
 // Body
-Templates::get( 'course-product/body', null, true, true );
+Plugin::get( 'course-product/body', null, true, true );
 
 // Sider
-Templates::get( 'course-product/sider', null, true, true );
+Plugin::get( 'course-product/sider', null, true, true );
 
 echo '</div>';
 echo '</div>';

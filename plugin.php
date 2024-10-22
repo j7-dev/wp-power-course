@@ -40,6 +40,8 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 */
 		public function __construct() {
 
+			self::$template_page_names = [ 'course-product', 'classroom', 'my-account', '404' ];
+
 			$this->required_plugins = [
 				[
 					'name'     => 'WooCommerce',

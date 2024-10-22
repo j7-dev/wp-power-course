@@ -3,7 +3,7 @@
  * Countdown component
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -47,7 +47,7 @@ if ($from <= time() && time() < $to ) { // 折扣進行期間
 		剩餘
 		%1$s
 	',
-	Templates::get(
+	Plugin::get(
 		'countdown',
 		[
 			'type'      => 'sm',

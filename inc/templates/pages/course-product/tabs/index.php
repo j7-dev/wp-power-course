@@ -3,7 +3,7 @@
  * Course Tabs component
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Comment as CommentUtils;
 
 $default_args = [
@@ -25,14 +25,14 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $description = $product->get_description();
-$accordion   = Templates::get(
+$accordion   = Plugin::get(
 	'collapse/chapter',
 	[
 		'product' => $product,
 	],
 	false
 	);
-$qa          = Templates::get(
+$qa          = Plugin::get(
 	'collapse/qa',
 	[
 		'product' => $product,
@@ -40,7 +40,7 @@ $qa          = Templates::get(
 	false
 	);
 
-$review = Templates::get(
+$review = Plugin::get(
 		'review',
 		[
 			'product' => $product,
@@ -113,7 +113,7 @@ if (!$show_review_tab) {
 }
 
 echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
-Templates::get(
+Plugin::get(
 	'tabs/nav',
 	[
 		'course_tabs'        => $course_tabs,
@@ -122,7 +122,7 @@ Templates::get(
 );
 echo '</div>';
 
-Templates::get(
+Plugin::get(
 	'tabs/content',
 	[
 		'course_tabs'        => $course_tabs,
