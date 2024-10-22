@@ -39,7 +39,9 @@ const useColumns = ({
 			dataIndex: 'name',
 			width: 300,
 			key: 'name',
-			render: (_, record) => <ProductName record={record} onClick={onClick} />,
+			render: (_, record) => (
+				<ProductName record={record} onClick={onClick(record)} />
+			),
 		},
 		{
 			title: '狀態',

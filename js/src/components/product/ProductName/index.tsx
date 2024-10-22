@@ -11,9 +11,7 @@ import { EyeOutlined } from '@ant-design/icons'
 
 export const ProductName: FC<{
 	record: TProductRecord | TCourseRecord | TChapterRecord
-	onClick?: (
-		_record?: TProductRecord | TCourseRecord | TChapterRecord,
-	) => () => void
+	onClick?: () => void
 }> = ({ record, onClick }) => {
 	const { id, sku = '', name, images } = record
 	const image_url = images?.[0]?.url || defaultImage
@@ -38,7 +36,7 @@ export const ProductName: FC<{
 				<div className="flex-1">
 					<p
 						className="mb-1 text-primary hover:text-primary/70 cursor-pointer"
-						onClick={onClick ? onClick(record) : undefined}
+						onClick={onClick ? onClick : undefined}
 					>
 						{renderHTML(name)}
 					</p>
