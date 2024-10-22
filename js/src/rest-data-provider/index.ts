@@ -80,7 +80,10 @@ export const dataProvider = (
 		const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
 
 		const { data } = await httpClient[requestMethod](url, variables, {
-			headers,
+			headers: {
+				'Content-Type': 'multipart/form-data;',
+				...headers,
+			},
 		})
 
 		return {
@@ -95,7 +98,10 @@ export const dataProvider = (
 		const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
 
 		const { data } = await httpClient[requestMethod](url, variables, {
-			headers,
+			headers: {
+				'Content-Type': 'multipart/form-data;',
+				...headers,
+			},
 		})
 
 		return {
@@ -124,7 +130,10 @@ export const dataProvider = (
 
 		const { data } = await httpClient[requestMethod](url, {
 			data: variables,
-			headers,
+			headers: {
+				'Content-Type': 'multipart/form-data;',
+				...headers,
+			},
 		})
 
 		return {
@@ -170,6 +179,7 @@ export const dataProvider = (
 
 		if (headers) {
 			httpClient.defaults.headers = {
+				'Content-Type': 'multipart/form-data;',
 				...httpClient.defaults.headers,
 				...headers,
 			}

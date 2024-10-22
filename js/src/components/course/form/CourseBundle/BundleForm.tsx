@@ -408,7 +408,7 @@ const BundleForm: FC<{
 			/>
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 				<div>
-					<p className="mb-3">課程封面圖</p>
+					<label className="mb-3 block">課程封面圖</label>
 					<div className="mb-8">
 						<FileUpload />
 						<Item hidden name={['files']} label="課程封面圖">

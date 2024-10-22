@@ -10,6 +10,7 @@ import {
 	CourseStudents,
 } from '@/components/course/form'
 
+// DELETE
 export const CourseDrawer: FC<DrawerProps> = (drawerProps) => {
 	const form = Form.useFormInstance()
 

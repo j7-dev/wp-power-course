@@ -1,8 +1,9 @@
+import React, { memo } from 'react'
 import UserSelector from './UserSelector'
 import StudentTable from './StudentTable'
 import { Alert } from 'antd'
 
-export const CourseStudents = () => {
+const CourseStudentsComponent = () => {
 	return (
 		<>
 			<div className="mb-4">
@@ -27,3 +28,5 @@ export const CourseStudents = () => {
 		</>
 	)
 }
+
+export const CourseStudents = memo(CourseStudentsComponent)

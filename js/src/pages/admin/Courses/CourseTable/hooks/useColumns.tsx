@@ -14,6 +14,7 @@ import {
 import { getPostStatus } from '@/utils'
 import { DateTime } from 'antd-toolkit'
 import { SecondToStr } from '@/components/general'
+import { useNavigation } from '@refinedev/core'
 
 const useColumns = ({
 	showCourseDrawer,
@@ -22,13 +23,14 @@ const useColumns = ({
 	showCourseDrawer: (_record: TCourseRecord) => () => void
 	showChapterDrawer: (_record: TChapterRecord) => () => void
 }) => {
+	const { edit } = useNavigation()
 	const onClick = (record: TCourseRecord | TChapterRecord) => () => {
 		const { type } = record
 		const isChapter = type === 'chapter'
 		if (isChapter) {
 			showChapterDrawer(record as TChapterRecord)()
 		} else {
-			showCourseDrawer(record as TCourseRecord)()
+			edit('courses', record.id)
 		}
 	}
 	const columns: TableProps<TCourseRecord>['columns'] = [

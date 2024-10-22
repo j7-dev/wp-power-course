@@ -1,5 +1,5 @@
 /* eslint-disable lines-around-comment */
-import { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, memo } from 'react'
 import { Input, Button, Collapse, CollapseProps, Form, Empty } from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -14,7 +14,7 @@ type TListItem = {
 
 const { Item } = Form
 
-export const CourseQA = () => {
+const CourseQAComponent = () => {
 	const ref = useRef<SortableListRef>(null)
 	const form = Form.useFormInstance()
 
@@ -117,3 +117,5 @@ export const CourseQA = () => {
 		</>
 	)
 }
+
+export const CourseQA = memo(CourseQAComponent)

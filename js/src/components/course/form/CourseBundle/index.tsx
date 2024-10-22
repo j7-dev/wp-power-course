@@ -1,4 +1,5 @@
-import { Button, Form, Drawer, Input } from 'antd'
+import React, { memo } from 'react'
+import { Button, Form, Drawer } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useBundleFormDrawer } from '@/hooks'
 import BundleForm from './BundleForm'
@@ -7,11 +8,8 @@ import { TProductRecord } from '@/components/product/ProductTable/types'
 import ProductCheckCard from './ProductCheckCard'
 import { coursesAtom } from '@/pages/admin/Courses/CourseTable'
 import { useAtomValue } from 'jotai'
-import { FiSwitch } from '@/components/formItem'
 
-const { Item } = Form
-
-export const CourseBundle = () => {
+const CourseBundleComponent = () => {
 	const form = Form.useFormInstance()
 	const watchCourseId: string = Form.useWatch(['id'], form) || []
 	const courses = useAtomValue(coursesAtom)
@@ -98,3 +96,5 @@ export const CourseBundle = () => {
 		</>
 	)
 }
+
+export const CourseBundle = memo(CourseBundleComponent)

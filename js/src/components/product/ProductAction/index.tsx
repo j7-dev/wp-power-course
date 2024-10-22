@@ -9,6 +9,7 @@ import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
 import { siteUrl, course_permalink_structure } from '@/utils'
 import { SiGoogleclassroom } from 'react-icons/si'
+import { EditButton } from '@refinedev/antd'
 
 export const ProductAction: FC<{
 	record: TCourseRecord | TChapterRecord

@@ -17,6 +17,7 @@ import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 import { useWindowSize } from '@uidotdev/usehooks'
 
+// DELETE
 export function useCourseFormDrawer({
 	form,
 	resource = 'courses',

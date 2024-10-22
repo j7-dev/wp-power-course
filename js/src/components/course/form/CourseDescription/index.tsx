@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import {
 	keyLabelMapper,
@@ -20,7 +20,7 @@ import { FileUpload } from '@/components/post'
 
 const { Item } = Form
 
-export const CourseDescription = () => {
+const CourseDescriptionComponent = () => {
 	const form = Form.useFormInstance()
 	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
@@ -103,42 +103,48 @@ export const CourseDescription = () => {
 				<Item name={['id']} hidden normalize={() => undefined}>
 					<Input />
 				</Item>
-				<Item name={['name']} label="課程名稱">
-					<Input allowClear />
-				</Item>
-				<Item
-					name={['category_ids']}
-					label={keyLabelMapper('product_category_id')}
-					initialValue={[]}
-				>
-					<Select
-						options={termToOptions(product_cats)}
-						mode="multiple"
-						placeholder="可多選"
-						allowClear
-					/>
-				</Item>
-				<Item
-					name={['tag_ids']}
-					label={keyLabelMapper('product_tag_id')}
-					initialValue={[]}
-				>
-					<Select
-						options={termToOptions(product_tags)}
-						mode="multiple"
-						placeholder="可多選"
-						allowClear
-					/>
-				</Item>
 
-				<Item name={['short_description']} label="課程簡介">
-					<Input.TextArea rows={8} allowClear />
-				</Item>
-				<DescriptionDrawer />
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+					<Item name={['name']} label="課程名稱">
+						<Input allowClear />
+					</Item>
+					<Item
+						name={['category_ids']}
+						label={keyLabelMapper('product_category_id')}
+						initialValue={[]}
+					>
+						<Select
+							options={termToOptions(product_cats)}
+							mode="multiple"
+							placeholder="可多選"
+							allowClear
+						/>
+					</Item>
+					<Item
+						name={['tag_ids']}
+						label={keyLabelMapper('product_tag_id')}
+						initialValue={[]}
+					>
+						<Select
+							options={termToOptions(product_tags)}
+							mode="multiple"
+							placeholder="可多選"
+							allowClear
+						/>
+					</Item>
+				</div>
+				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+					<Item
+						name={['short_description']}
+						label="課程簡介"
+						className="col-span-2"
+					>
+						<Input.TextArea rows={8} allowClear />
+					</Item>
+					<DescriptionDrawer />
 
-				<div className="grid grid-cols-2 gap-6 mb-12 mt-12">
 					<div className="mb-8">
-						<p className="mb-3">課程封面圖</p>
+						<label className="mb-3 block">課程封面圖</label>
 						<FileUpload />
 						<Item hidden name={['files']} label="課程封面圖">
 							<Input />
@@ -147,9 +153,6 @@ export const CourseDescription = () => {
 							<Input />
 						</Item>
 					</div>
-				</div>
-
-				<div className="grid grid-cols-2 gap-6">
 					<div className="mb-8">
 						<p className="mb-3">課程封面影片</p>
 						<VideoInput name={['feature_video']} />
@@ -201,3 +204,5 @@ export const CourseDescription = () => {
 		</>
 	)
 }
+
+export const CourseDescription = memo(CourseDescriptionComponent)

@@ -64,7 +64,7 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	}, [watchId, open])
 
 	return (
-		<>
+		<div>
 			<p className="mb-2">
 				編輯{itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}
 			</p>
@@ -153,7 +153,7 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 					<BlockNote {...blockNoteViewProps} />
 				</Suspense>
 			</Drawer>
-		</>
+		</div>
 	)
 }
 

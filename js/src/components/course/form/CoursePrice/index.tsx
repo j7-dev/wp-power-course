@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, memo } from 'react'
 import { Form, InputNumber, Input, DatePickerProps } from 'antd'
 import { FiSwitch, DatePicker } from '@/components/formItem'
 import dayjs from 'dayjs'
@@ -7,7 +7,7 @@ const { Item } = Form
 
 // TODO 把日期改成 Range Picker
 
-export const CoursePrice = () => {
+const CoursePriceComponent = () => {
 	const form = Form.useFormInstance()
 	const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
 	const watchDateOnSaleFrom = Form.useWatch(['date_on_sale_from'], form)
@@ -90,3 +90,5 @@ export const CoursePrice = () => {
 		</div>
 	)
 }
+
+export const CoursePrice = memo(CoursePriceComponent)
