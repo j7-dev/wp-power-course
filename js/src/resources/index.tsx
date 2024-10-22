@@ -20,6 +20,14 @@ export const resources = [
 		},
 	},
 	{
+		name: 'chapters',
+		list: '/chapters',
+		edit: '/chapters/edit/:id',
+		meta: {
+			hide: true,
+		},
+	},
+	{
 		name: 'teachers',
 		list: '/teachers',
 		meta: {

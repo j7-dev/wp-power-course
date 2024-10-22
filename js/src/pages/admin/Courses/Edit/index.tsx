@@ -10,6 +10,7 @@ import {
 	CourseOther,
 	CourseStudents,
 } from '@/components/course/form'
+import { SortableChapters } from '@/components/course'
 import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
 import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
@@ -69,7 +70,7 @@ export const CoursesEdit = () => {
 			key: 'Chapters',
 			forceRender: false,
 			label: '章節管理',
-			children: <CourseStudents />,
+			children: <SortableChapters />,
 		},
 	]
 

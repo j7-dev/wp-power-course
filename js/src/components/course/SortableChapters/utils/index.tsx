@@ -44,7 +44,7 @@ export function treeToParams(
 	treeData: TreeData<TChapterRecord>,
 	topParentId: string,
 ): TParam[] {
-	const depth0 = treeData.map((node, index) => {
+	const depth0 = treeData?.map((node, index) => {
 		return {
 			id: node.id as string,
 			depth: 0,
@@ -56,8 +56,8 @@ export function treeToParams(
 		// parent_id 不帶就不變更
 	})
 	const depth1 = treeData
-		.map((parentNode) => {
-			const nodes = parentNode.children.map((node, index) => {
+		?.map((parentNode) => {
+			const nodes = parentNode.children?.map((node, index) => {
 				return {
 					id: node.id as string,
 					depth: 1,

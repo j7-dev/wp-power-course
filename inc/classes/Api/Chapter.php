@@ -9,6 +9,8 @@ namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Factory as ChapterFactory;
+use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
@@ -31,6 +33,11 @@ final class Chapter {
 	 * - permission_callback : callable
 	 */
 	protected $apis = [
+		[
+			'endpoint'            => 'chapters',
+			'method'              => 'get',
+			'permission_callback' => null,
+		],
 		[
 			'endpoint'            => 'chapters',
 			'method'              => 'post',
@@ -72,6 +79,49 @@ final class Chapter {
 			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
 		);
 	}
+
+	/**
+	 * Get chapters callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response|\WP_Error
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_chapters_callback( $request ) { // phpcs:ignore
+
+		$params = $request->get_query_params();
+
+		$params = WP::sanitize_text_field_deep( $params, false );
+
+		$include_required_params = WP::include_required_params( $params, [ 'post_parent' ] );
+		if ( $include_required_params !== true ) {
+			return $include_required_params;
+		}
+
+		$default_args = [
+			'post_type'      => ChapterCPT::POST_TYPE,
+			'posts_per_page' => - 1,
+			'post_status'    => 'any',
+			'orderby'        => 'menu_order',
+			'order'          => 'ASC',
+		];
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		$chapters = array_values(
+			\get_children($args)
+		);
+		$chapters = array_values(array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters ));
+
+		$response = new \WP_REST_Response( $chapters );
+
+		return $response;
+	}
+
 
 	/**
 	 * 處理並分離產品資訊
@@ -160,7 +210,7 @@ final class Chapter {
 
 		$sort_result = ChapterFactory::sort_chapters( (array) $body_params );
 
-		if ( \is_wp_error( $sort_result ) ) {
+		if ( $sort_result !== true ) {
 			return $sort_result;
 		}
 
@@ -246,7 +296,10 @@ final class Chapter {
 		$body_params = $request->get_body_params() ?? [];
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		WP::include_required_params( $body_params, [ 'course_id' ]);
+		$include_required_params = WP::include_required_params( $body_params, [ 'course_id' ] );
+		if ( $include_required_params !== true ) {
+			return $include_required_params;
+		}
 
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
