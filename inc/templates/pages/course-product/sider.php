@@ -3,7 +3,7 @@
  * Sidebar for course product
  */
 
-use J7\PowerBundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
