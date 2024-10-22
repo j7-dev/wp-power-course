@@ -4,7 +4,7 @@
  */
 
 use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Resources\Chapter\RegisterCPT;
+use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -31,7 +31,7 @@ $args2 = [
 	'orderby'        => 'menu_order',
 	'post_parent'    => $product->get_id(),
 	'post_status'    => 'publish',
-	'post_type'      => RegisterCPT::POST_TYPE,
+	'post_type'      => ChapterCPT::POST_TYPE,
 ];
 
 $chapters = \get_children( $args2 );
@@ -45,7 +45,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		'orderby'        => 'menu_order',
 		'post_parent'    => $chapter_id,
 		'post_status'    => 'publish',
-		'post_type'      => RegisterCPT::POST_TYPE,
+		'post_type'      => ChapterCPT::POST_TYPE,
 	];
 
 	$sub_chapters  = \get_children( $args3 );
