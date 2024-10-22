@@ -13,6 +13,7 @@ export const resources = [
 	{
 		name: 'courses',
 		list: '/courses',
+		edit: '/courses/edit/:id',
 		meta: {
 			label: '課程列表',
 			icon: <TableOutlined />,

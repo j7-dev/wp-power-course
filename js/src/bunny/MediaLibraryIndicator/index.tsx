@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { filesInQueueAtom } from '@/bunny/MediaLibrary'
 import { useAtom } from 'jotai'
 import { Progress, Tooltip, Alert } from 'antd'
@@ -15,7 +15,7 @@ import { getEstimateUploadTimeInSeconds } from '@/utils'
 
 const REFETCH_INTERVAL = 30000 // 30 秒
 
-export const MediaLibraryIndicator = () => {
+const MediaLibraryIndicatorComponent = () => {
 	const [isExpanded, setIsExpanded] = useState(false)
 
 	const [filesInQueue, setFilesInQueue] = useAtom(filesInQueueAtom)
@@ -160,3 +160,5 @@ export const MediaLibraryIndicator = () => {
 		</div>
 	)
 }
+
+export const MediaLibraryIndicator = memo(MediaLibraryIndicatorComponent)

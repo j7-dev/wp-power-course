@@ -41,6 +41,10 @@ final class Course {
 			'method'   => 'get',
 		],
 		[
+			'endpoint' => 'courses/(?P<id>\d+)',
+			'method'   => 'get',
+		],
+		[
 			'endpoint' => 'courses',
 			'method'   => 'post',
 		],
@@ -179,6 +183,35 @@ final class Course {
 		// set pagination in header
 		$response->header( 'X-WP-Total', $total );
 		$response->header( 'X-WP-TotalPages', $total_pages );
+
+		return $response;
+	}
+
+
+	/**
+	 * Get single course callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_courses_with_id_callback( $request ) { // phpcs:ignore
+		$id = $request['id'] ?? null;
+
+		if (!$id) {
+			return new \WP_REST_Response(
+				[
+					'message' => 'id is required',
+				],
+				400
+				);
+		}
+
+		$product           = \wc_get_product( $id );
+		$formatted_product = $this->format_course_details( $product );
+
+		$response = new \WP_REST_Response( $formatted_product );
 
 		return $response;
 	}

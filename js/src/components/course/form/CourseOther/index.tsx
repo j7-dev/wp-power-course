@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Form, Switch, Slider, InputNumber, Rate, Tooltip } from 'antd'
 import { Heading } from '@/components/general'
 import { FiSwitch } from '@/components/formItem'
 
 const { Item } = Form
 
-export const CourseOther = () => {
+const CourseOtherComponent = () => {
 	const form = Form.useFormInstance()
 	const watchShowTotalStudent: boolean =
 		Form.useWatch(['show_total_student'], form) === 'yes'
@@ -183,3 +183,5 @@ export const CourseOther = () => {
 		</>
 	)
 }
+
+export const CourseOther = memo(CourseOtherComponent)

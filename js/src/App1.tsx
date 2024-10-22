@@ -12,6 +12,7 @@ import {
 import '@refinedev/antd/dist/reset.css'
 import routerBindings, {
 	UnsavedChangesNotifier,
+	NavigateToResource,
 } from '@refinedev/react-router-v6'
 import { dataProvider } from './rest-data-provider'
 import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
@@ -21,6 +22,7 @@ import { apiUrl, kebab, siteUrl } from '@/utils'
 import { resources } from '@/resources'
 import Dashboard from '@/pages/admin/Dashboard'
 import Courses from '@/pages/admin/Courses'
+import CoursesEdit from '@/pages/admin/Courses/Edit'
 import Teachers from '@/pages/admin/Teachers'
 import Students from '@/pages/admin/Students'
 import Products from '@/pages/admin/Products'
@@ -101,15 +103,18 @@ function App() {
 							</ConfigProvider>
 						}
 					>
-						<Route index element={<Courses />} />
-						<Route path="/courses" element={<Courses />} />
-						<Route path="/teachers" element={<Teachers />} />
-						<Route path="/students" element={<Students />} />
-						<Route path="/products" element={<Products />} />
-						<Route path="/shortcodes" element={<Shortcodes />} />
-						<Route path="/settings" element={<Settings />} />
-						<Route path="/dashboard" element={<Dashboard />} />
-						<Route path="/media-library" element={<MediaLibraryPage />} />
+						<Route index element={<NavigateToResource resource="courses" />} />
+						<Route path="courses">
+							<Route index element={<Courses />} />
+							<Route path="edit/:id" element={<CoursesEdit />} />
+						</Route>
+						<Route path="teachers" element={<Teachers />} />
+						<Route path="students" element={<Students />} />
+						<Route path="products" element={<Products />} />
+						<Route path="shortcodes" element={<Shortcodes />} />
+						<Route path="settings" element={<Settings />} />
+						<Route path="dashboard" element={<Dashboard />} />
+						<Route path="media-library" element={<MediaLibraryPage />} />
 
 						<Route path="*" element={<ErrorComponent />} />
 					</Route>
