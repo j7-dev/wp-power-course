@@ -24,7 +24,7 @@ const useColumns = () => {
 					onClick={
 						'variation' === record?.type
 							? undefined
-							: () => () => {
+							: () => {
 									window.open(
 										`${siteUrl}/${course_permalink_structure}/${record?.slug}`,
 										'_blank',
