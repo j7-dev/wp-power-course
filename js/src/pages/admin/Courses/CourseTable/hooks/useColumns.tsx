@@ -57,7 +57,14 @@ const useColumns = ({
 			dataIndex: 'total_sales',
 			width: 150,
 			key: 'total_sales',
-			render: (_, record) => <ProductTotalSales record={record} />,
+			render: (_, record) => (
+				<ProductTotalSales
+					record={record}
+					optionParams={{
+						endpoint: 'courses/options',
+					}}
+				/>
+			),
 		},
 		{
 			title: '價格',
