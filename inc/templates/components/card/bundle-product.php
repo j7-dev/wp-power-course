@@ -4,7 +4,7 @@
  */
 
 use J7\PowerCourse\BundleProduct\BundleProduct;
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'bundle_product' => null, // BundleProduct
@@ -43,7 +43,7 @@ printf(
 	$bundle_title
 );
 
-Templates::get( 'divider' );
+Plugin::get( 'divider' );
 
 printf(
 /*html*/'<div class="mb-6 text-sm">%s</div>',
@@ -53,19 +53,19 @@ printf(
 foreach ( $product_ids as $product_id ) :
 	$product = \wc_get_product( $product_id );
 	echo '<div>';
-	Templates::get(
+	Plugin::get(
 		'course-product/list',
 		[
 			'product' => $product,
 		]
 		);
 	echo '</div>';
-	Templates::get( 'divider' );
+	Plugin::get( 'divider' );
 endforeach;
 
 echo '<div class="flex gap-3 justify-between items-end">';
 
-Templates::get(
+Plugin::get(
 	'price',
 	[
 		'product' => $bundle_product,
@@ -73,7 +73,7 @@ Templates::get(
 	]
 );
 
-Templates::get(
+Plugin::get(
 	'button/add-to-cart',
 	[
 		'product'       => $bundle_product,

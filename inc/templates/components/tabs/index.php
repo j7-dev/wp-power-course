@@ -3,7 +3,7 @@
  * @var mixed $args
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'course_tabs'        => [],
@@ -16,5 +16,5 @@ $course_tabs        = $args['course_tabs'];
 $default_active_key = $args['default_active_key'];
 
 
-Templates::get('tabs/nav', $args);
-Templates::get('tabs/content', $args);
+Plugin::get('tabs/nav', $args);
+Plugin::get('tabs/content', $args);

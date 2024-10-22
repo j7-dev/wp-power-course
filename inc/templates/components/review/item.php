@@ -3,7 +3,7 @@
  * Review Item
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'comment' => null,
@@ -36,7 +36,7 @@ $comment_content = wpautop( $product_comment->comment_content );
 $children      = $product_comment->get_children();
 $children_html = '';
 foreach ($children as $child) {
-	$children_html .= Templates::get(
+	$children_html .= Plugin::get(
 		'review/item',
 		[
 			'comment' => $child,
@@ -72,7 +72,7 @@ printf(
 	$user_avatar_url,
 	$user_name,
 	$user_name,
-	$rating ? Templates::get(
+	$rating ? Plugin::get(
 		'rate',
 		[
 			'value' => $rating,

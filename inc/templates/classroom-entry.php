@@ -15,7 +15,6 @@
  * @version     1.6.4
  */
 
-use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Plugin;
@@ -54,26 +53,26 @@ $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 );
 
 $is_avl = CourseUtils::is_avl();
-if (!current_user_can('manage_options')) {
+if (!( 'local' === \wp_get_environment_type() )) {
 	if ( ! $is_avl ) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Templates::get( '404/buy', null );
+		Plugin::get( '404/buy', null );
 		get_footer();
 		exit;
 	} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Templates::get( '404/not-ready', null );
+		Plugin::get( '404/not-ready', null );
 		get_footer();
 		exit;
 	} elseif ( $is_expired ) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Templates::get( '404/expired', null );
+		Plugin::get( '404/expired', null );
 		get_footer();
 		exit;
 	}
@@ -103,8 +102,8 @@ if (!current_user_can('manage_options')) {
 			$GLOBALS['chapter'] = $keep_chapter;
 
 			echo '<div id="pc-classroom-main">';
-			Templates::get( 'classroom/sider', null, true, false );
-			Templates::get( 'classroom/body', null, true, true );
+			Plugin::get( 'classroom/sider', null, true, false );
+			Plugin::get( 'classroom/body', null, true, true );
 			echo '</div>';
 
 

@@ -3,7 +3,7 @@
  * Comment Form
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $commenter    = wp_get_current_commenter();
 $comment_form = [
@@ -14,7 +14,7 @@ $comment_form = [
 	'comment_field'       => '',
 	'submit_field'        => sprintf(
 		/*html*/'<div class="text-right">%s</div>',
-		Templates::get(
+		Plugin::get(
 			'button',
 			[
 				'size'     => 'sm',
@@ -33,7 +33,7 @@ $comment_form['comment_field'] = sprintf(
 <div class="mb-2">%1$s</div>
 <textarea class="mb-2 rounded h-24 bg-white" id="comment" name="comment" rows="4"></textarea>
 ',
-Templates::get(
+Plugin::get(
 	'rate',
 	[
 		'name'     => 'rating',

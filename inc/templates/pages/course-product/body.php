@@ -3,7 +3,7 @@
  * Course Product > body
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
 
@@ -32,7 +32,7 @@ echo '<div class="mb-12">';
 
 $is_avl = CourseUtils::is_avl( $product->get_id() );
 if ( $is_avl ) {
-	Templates::get(
+	Plugin::get(
 		'alert',
 	[
 		'type'    => 'info',
@@ -44,7 +44,7 @@ if ( $is_avl ) {
 	);
 }
 
-Templates::get(
+Plugin::get(
 'typography/title',
 [
 	'value' => '課程資訊',
@@ -97,13 +97,13 @@ if ( $show_total_student === 'yes' ) {
 	];
 }
 
-Templates::get(
+Plugin::get(
 			'course-product/info',
 			$items
 		);
 
 // echo '<div class="mt-8 flex items-end gap-4">';
-// Templates::get(
+// Plugin::get(
 // 'countdown',
 // [
 // 'type'       => 'lg',
@@ -115,7 +115,7 @@ Templates::get(
 
 echo '</div>';
 // Tabs
-Templates::get( 'course-product/tabs', null, true, true );
+Plugin::get( 'course-product/tabs', null, true, true );
 // Footer
-Templates::get( 'course-product/footer', null, true, true );
+Plugin::get( 'course-product/footer', null, true, true );
 echo '</div>';

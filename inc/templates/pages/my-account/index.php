@@ -3,25 +3,25 @@
  * My Account 我的學習
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 
 $course_tabs = [
 	'all' => [
 		'label'   => '所有課程',
-		'content' => Templates::get( 'course-product/grid', [ 'type' => 'all' ], false ),
+		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'all' ], false ),
 	],
 	'ready' => [
 		'label'   => '已開課',
-		'content' => Templates::get( 'course-product/grid', [ 'type' => 'ready' ], false ),
+		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'ready' ], false ),
 	],
 	'not-ready' => [
 		'label'   => '尚未開課',
-		'content' => Templates::get( 'course-product/grid', [ 'type' => 'not-ready' ], false ),
+		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'not-ready' ], false ),
 	],
 ];
 
-Templates::get(
+Plugin::get(
 	'tabs',
 	[
 		'course_tabs'        => $course_tabs,

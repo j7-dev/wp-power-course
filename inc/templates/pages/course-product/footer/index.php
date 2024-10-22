@@ -3,7 +3,7 @@
  * Footer for course product
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -45,14 +45,14 @@ if ( 'none' !== $video_type ) {
 	</div>
 </div>
 ',
-	Templates::get(
+	Plugin::get(
 	'typography/title',
 	[
 		'value' => '課程試看',
 	],
 	false
 	),
-	Templates::get(
+	Plugin::get(
 	'video',
 	[
 		'video_info' => $trial_video,
@@ -63,7 +63,7 @@ if ( 'none' !== $video_type ) {
 }
 
 if ( ! ! $teacher_ids ) {
-	Templates::get(
+	Plugin::get(
 		'typography/title',
 		[
 			'value' => '關於講師',
@@ -74,7 +74,7 @@ if ( ! ! $teacher_ids ) {
 foreach ( $teacher_ids as $teacher_id ) {
 	$teacher = \get_user_by( 'id', $teacher_id );
 	echo '<div class="mb-12">';
-	Templates::get(
+	Plugin::get(
 		'user/about',
 		[
 			'user' => $teacher,

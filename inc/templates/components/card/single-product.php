@@ -3,7 +3,7 @@
  * Single Product Card
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $is_free = 'yes' === $product->get_meta( 'is_free' );
 
 if ( $is_free ) {
-	Templates::get(
+	Plugin::get(
 		'card/single-product-free',
 		[
 			'product' => $product,
@@ -35,7 +35,7 @@ if ( $is_free ) {
 	return;
 }
 
-Templates::get(
+Plugin::get(
 	'card/single-product-sale',
 	[
 		'product' => $product,

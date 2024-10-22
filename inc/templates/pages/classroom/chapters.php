@@ -3,7 +3,7 @@
  * Sidebar for classroom
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -43,5 +43,5 @@ printf(
 	$product->get_title(),
 	$count_all_chapters,
 	$course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : '',
-	Templates::get( 'collapse/classroom-chapter', null, false ),
+	Plugin::get( 'collapse/classroom-chapter', null, false ),
 );

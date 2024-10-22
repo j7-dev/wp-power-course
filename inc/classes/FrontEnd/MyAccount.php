@@ -8,7 +8,7 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\FrontEnd;
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 /**
  * Class FrontEnd
@@ -66,7 +66,7 @@ final class MyAccount {
 	 */
 	public function render_courses(): void {
 		echo '<div class="tailwind">';
-		Templates::get( 'my-account' );
+		Plugin::get( 'my-account' );
 		echo '</div>';
 	}
 }

@@ -4,7 +4,7 @@
  */
 
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
@@ -80,7 +80,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			site_url( "classroom/{$product->get_slug()}/{$sub_chapter->ID}" ),
 			$sub_chapter->ID === $chapter_id ? 'bg-primary/10' : '',
 			"classroom__sider-collapse__chapter-{$sub_chapter->ID}",
-			Templates::get( $icon, null, false ),
+			Plugin::get( $icon, null, false ),
 			$sub_chapter->post_title,
 			Base::get_video_length_by_seconds( $chapter_length )
 		);

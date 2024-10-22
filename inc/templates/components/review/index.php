@@ -4,7 +4,7 @@
  * TODO 前端AJAX換頁
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -60,7 +60,7 @@ if ($reviews_allowed && $has_bought && !$has_reviewed) {
 $show_review_list = $product->get_meta( 'show_review_list' ) === 'yes';
 if ( $show_review_list && count( $product_comments ) ) {
 	foreach ( $product_comments as $product_comment ) {
-		Templates::get(
+		Plugin::get(
 			'review/item',
 			[
 				'comment' => $product_comment,

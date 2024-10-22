@@ -3,7 +3,7 @@
  * Course Info component
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 /**
  * @var array{icon:string, label:string, value:string}[] $args
@@ -31,7 +31,7 @@ foreach ( $items as $index => $item ) :
 					</div>
         </div>
         ',
-		Templates::safe_get(
+		Plugin::safe_get(
 			'icon/' . $item['icon'],
 			[
 				'class' => 'h-4 w-4',

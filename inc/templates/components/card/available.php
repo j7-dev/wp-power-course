@@ -4,7 +4,7 @@
  * 已登入，有上課進度，可直接上課
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
@@ -49,7 +49,7 @@ $expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d
 $is_expired        = CourseUtils::is_expired($product, $current_user_id);
 $avl_status        = CourseUtils::get_avl_status($product, $current_user_id);
 
-$badge_html = Templates::get(
+$badge_html = Plugin::get(
 	'badge',
 	[
 		'type'     => $avl_status['badge_color'],
@@ -88,7 +88,7 @@ $badge_html,
 	$product_image_url,
 	$name,
 	$teacher_name,
-	Templates::get(
+	Plugin::get(
 		'progress/vertical',
 		[
 			'product' => $product,

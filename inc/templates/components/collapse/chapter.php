@@ -3,7 +3,7 @@
  * Collapse component for chapter.
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
@@ -56,7 +56,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-primary">%2$s %3$s</a>',
 		$classroom_link,
 		$sub_chapter->post_title,
-		Templates::get(
+		Plugin::get(
 			'icon/external-link',
 			[
 				'class' => 'w-4 h-4 relative top-0.5 ml-2',

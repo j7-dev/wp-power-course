@@ -3,7 +3,7 @@
  * Button component
  */
 
-use J7\PowerCourse\Templates\Templates;
+use J7\PowerCourse\Plugin;
 
 $default_props = [
 	'type'          => '', // primary | secondary | neutral | link | ghost | accent | info | success | warning | error
@@ -48,7 +48,7 @@ $args['attr']  .= sprintf(
 
 unset($args['product'], $args['wrapper_class'], $args['qty']);
 
-$button_html = Templates::get(
+$button_html = Plugin::get(
 	'button',
 	$args,
 	false
