@@ -6,7 +6,7 @@ import {
 	CourseQA,
 	CourseAnnouncement,
 	CoursePrice,
-	CourseBundle,
+	CourseBundles,
 	CourseOther,
 	CourseStudents,
 } from '@/components/course/form'
@@ -43,7 +43,7 @@ export const CoursesEdit = () => {
 			key: 'CourseBundle',
 			forceRender: false,
 			label: '銷售方案',
-			children: <CourseBundle />,
+			children: <CourseBundles />,
 		},
 		{
 			key: 'CourseQA',
