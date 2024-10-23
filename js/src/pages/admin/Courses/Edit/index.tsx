@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Modal } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Modal, Button } from 'antd'
 import {
 	CourseDescription,
 	CourseQA,
@@ -17,6 +17,7 @@ import { MediaLibrary } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
 import { toFormData } from '@/utils'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { siteUrl, course_permalink_structure } from '@/utils'
 
 export const CoursesEdit = () => {
 	// 初始化資料
@@ -116,6 +117,7 @@ export const CoursesEdit = () => {
 	const watchName = Form.useWatch(['name'], form)
 	const watchId = Form.useWatch(['id'], form)
 	const watchStatus = Form.useWatch(['status'], form)
+	const watchSlug = Form.useWatch(['slug'], form)
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (values: Partial<TCourseRecord>) => {
@@ -149,6 +151,15 @@ export const CoursesEdit = () => {
 							}}
 						/>
 						{defaultButtons}
+						<a
+							href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
+							target="_blank"
+							rel="noreferrer"
+						>
+							<Button className="ml-4" color="primary" variant="filled">
+								前往銷售頁
+							</Button>
+						</a>
 					</>
 				)}
 				isLoading={query?.isLoading}

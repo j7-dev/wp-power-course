@@ -5,21 +5,25 @@ import {
 	ProductPrice,
 	ProductTotalSales,
 } from '@/components/product'
-import { getPostStatus, siteUrl, course_permalink_structure } from '@/utils'
+import { getPostStatus } from '@/utils'
 import { Tag } from 'antd'
 import { TRenderItemOptions } from '../index'
 import { HolderOutlined } from '@ant-design/icons'
 import { PopconfirmDelete } from '@/components/general'
 import { useDelete } from '@refinedev/core'
 
-const Item = ({
+const ListItem = ({
 	record,
 	options,
+	setSelectedProduct,
 }: {
 	record: TProductRecord
 	options: TRenderItemOptions
+	setSelectedProduct: React.Dispatch<
+		React.SetStateAction<TProductRecord | null>
+	>
 }) => {
-	const { id, type, slug, status } = record
+	const { id, status } = record
 	const { index, listeners } = options
 	const { mutate: deleteProduct } = useDelete()
 
@@ -35,16 +39,7 @@ const Item = ({
 			<div className="self-center">
 				<ProductName
 					record={record}
-					onClick={
-						'variation' === type
-							? undefined
-							: () => {
-									window.open(
-										`${siteUrl}/${course_permalink_structure}/${slug}`,
-										'_blank',
-									)
-								}
-					}
+					onClick={() => setSelectedProduct(record)}
 				/>
 			</div>
 
@@ -80,4 +75,4 @@ const Item = ({
 	)
 }
 
-export default memo(Item)
+export default memo(ListItem)

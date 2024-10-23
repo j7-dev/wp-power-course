@@ -23,9 +23,16 @@
 }
 
 .sticky-card-actions {
-	ul.ant-card-actions {
-		position: sticky;
-		bottom: 0;
+	.ant-card {
+		ul.ant-card-actions {
+			position: sticky;
+			bottom: 0;
+		}
+		.ant-card {
+			ul.ant-card-actions {
+				bottom: 3.5rem;
+			}
+		}
 	}
 }
 

@@ -29,10 +29,11 @@ const LoadingChapters = () => (
 const SortableChaptersComponent = () => {
 	const form = Form.useFormInstance()
 	const courseId = form?.getFieldValue('id')
-	const { data: chaptersData, isFetching: isListFetching } = useList<
-		TChapterRecord,
-		HttpError
-	>({
+	const {
+		data: chaptersData,
+		isFetching: isListFetching,
+		isLoading: isListLoading,
+	} = useList<TChapterRecord, HttpError>({
 		resource: 'chapters',
 		filters: [
 			{
@@ -125,8 +126,8 @@ const SortableChaptersComponent = () => {
 				<AddChapters records={chapters} />
 			</div>
 			<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-				{isListFetching && <LoadingChapters />}
-				{!isListFetching && (
+				{isListLoading && <LoadingChapters />}
+				{!isListLoading && (
 					<SortableTree
 						hideAdd
 						treeData={treeData}
