@@ -40,7 +40,7 @@ const Main = () => {
 		resource: 'products',
 		onSearch,
 		filters: {
-			initial: getInitialFilters({ ...initialFilteredValues, is_course: '0' }),
+			initial: getInitialFilters(initialFilteredValues),
 		},
 	})
 
