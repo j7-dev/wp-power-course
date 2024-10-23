@@ -53,17 +53,21 @@ final class Product {
 			'endpoint' => 'products/update-bound-courses',
 			'method'   => 'post',
 		],
-		[
+		[ // TODO 修改為直接創建
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		],
-		[
+		[ // TODO 有需要這個嗎? 要檢查一下
 			'endpoint' => 'bundle_products/(?P<id>\d+)',
 			'method'   => 'post',
 		],
 		[
 			'endpoint' => 'products/options',
 			'method'   => 'get',
+		],
+		[
+			'endpoint' => 'products/(?P<id>\d+)',
+			'method'   => 'delete',
 		],
 	];
 
@@ -668,6 +672,41 @@ final class Product {
 				'message' => '修改成功',
 				'data'    => [
 					'id' => (string) $id,
+				],
+			]
+		);
+	}
+
+
+	/**
+	 * Delete product with id callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_products_with_id_callback( $request ) {
+		$id = (int) $request['id'];
+		if ( empty( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'id_not_provided',
+					'message' => '刪除失敗，請提供ID',
+					'data'    => null,
+				],
+				400
+			);
+		}
+
+		\wp_delete_post( $id, true );
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'delete_success',
+				'message' => '刪除成功',
+				'data'    => [
+					'id' => $id,
 				],
 			]
 		);

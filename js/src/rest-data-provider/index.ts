@@ -59,15 +59,14 @@ export const dataProvider = (
 	getMany: async ({ resource, ids, meta }) => {
 		const { headers, method } = meta ?? {}
 		const requestMethod = (method as THttpMethods) ?? 'get'
+		const includeParams = ids.map((id) => `include[]=${id}`).join('&')
 
-		const { data } = await httpClient[requestMethod](
-			`${apiUrl}/${resource}?${stringify({ id: ids })}`,
+		const result = await httpClient[requestMethod](
+			`${apiUrl}/${resource}?${includeParams}`,
 			{ headers },
 		)
 
-		return {
-			data,
-		}
+		return result
 	},
 
 	create: async ({ resource, variables, meta }) => {
@@ -130,11 +129,9 @@ export const dataProvider = (
 		const { headers, method } = meta ?? {}
 		const requestMethod = (method as THttpMethods) ?? 'get'
 
-		const { data } = await httpClient[requestMethod](url, { headers })
+		const result = await httpClient[requestMethod](url, { headers })
 
-		return {
-			data,
-		}
+		return result
 	},
 
 	deleteOne: async ({ resource, id, variables, meta }) => {

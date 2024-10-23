@@ -42,25 +42,32 @@ const DeleteButton = ({
 				okText="我已知曉影響，確認刪除"
 				cancelText="取消"
 				onOk={() => {
-					deleteMany({
-						resource: 'courses',
-						ids: selectedRowKeys as string[],
-						invalidates: ['list'],
-						successNotification: (data, ids, resource) => {
-							close()
-							setSelectedRowKeys([])
-							return {
-								message: `課程 ${ids?.map((id) => `#${id}`).join(', ')} 已刪除成功`,
-								type: 'success',
-							}
+					deleteMany(
+						{
+							resource: 'courses',
+							ids: selectedRowKeys as string[],
+							invalidates: ['list'],
+							mutationMode: 'undoable',
+							successNotification: (data, ids, resource) => {
+								return {
+									message: `課程 ${ids?.map((id) => `#${id}`).join(', ')} 已刪除成功`,
+									type: 'success',
+								}
+							},
+							errorNotification: (data, ids, resource) => {
+								return {
+									message: 'OOPS，出錯了，請在試一次',
+									type: 'error',
+								}
+							},
 						},
-						errorNotification: (data, ids, resource) => {
-							return {
-								message: 'OOPS，出錯了，請在試一次',
-								type: 'error',
-							}
+						{
+							onSuccess: () => {
+								close()
+								setSelectedRowKeys([])
+							},
 						},
-					})
+					)
 				}}
 				confirmLoading={isDeleting}
 			>
