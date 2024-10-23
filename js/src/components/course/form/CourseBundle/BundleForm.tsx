@@ -69,11 +69,6 @@ const BundleForm: FC<{
 				value: 'publish',
 			},
 			{
-				field: 'posts_per_page',
-				operator: 'eq',
-				value: '20',
-			},
-			{
 				field: 'exclude',
 				operator: 'eq',
 				value: [selectedCourse?.id],
@@ -84,6 +79,9 @@ const BundleForm: FC<{
 				value: 'simple',
 			},
 		],
+		pagination: {
+			pageSize: 20,
+		},
 	})
 
 	const searchProducts = searchProductsResult.data?.data || []

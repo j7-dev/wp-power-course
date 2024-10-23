@@ -242,7 +242,7 @@ abstract class Course {
 	 *
 	 * @return array<\WP_Post|int> bundle_ids (銷售方案)
 	 */
-	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false, $post_status = [ 'publish', 'draft' ] ): array {
+	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
 
 		$args = [
 			'post_type'   => 'product',

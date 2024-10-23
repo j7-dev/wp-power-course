@@ -69,7 +69,7 @@ const Item = ({
 						title: '確認刪除這個銷售方案嗎?',
 						onConfirm: () =>
 							deleteProduct({
-								resource: 'products',
+								resource: 'bundle_products',
 								id,
 								mutationMode: 'undoable',
 							}),
