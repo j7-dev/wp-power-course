@@ -5,7 +5,6 @@ import useSave from './hooks/useSave'
 
 import Bunny from './Bunny'
 import General from './General'
-import CsvUpload from './CsvUpload'
 import Appearance from './Appearance'
 
 const items: TabsProps['items'] = [
@@ -23,11 +22,6 @@ const items: TabsProps['items'] = [
 		key: 'bunny',
 		label: 'Bunny 整合',
 		children: <Bunny />,
-	},
-	{
-		key: 'csv-upload',
-		label: 'CSV 批次上傳學員權限',
-		children: <CsvUpload />,
 	},
 ]
 
