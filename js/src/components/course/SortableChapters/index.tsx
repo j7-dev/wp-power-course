@@ -59,7 +59,17 @@ const SortableChaptersComponent = () => {
 	useEffect(() => {
 		if (!isListFetching) {
 			const chapterTree = chapters?.map(chapterToTreeNode)
-			setTreeData(chapterTree)
+			setTreeData((prev) => {
+				// 維持原本的開合狀態
+				const newChapterTree = chapterTree.map((item) => ({
+					...item,
+					collapsed:
+						prev?.find((prevItem) => prevItem.id === item.id)?.collapsed ??
+						true,
+				}))
+
+				return newChapterTree
+			})
 			setOriginTree(chapterTree)
 		}
 	}, [isListFetching])
@@ -121,18 +131,17 @@ const SortableChaptersComponent = () => {
 						hideAdd
 						treeData={treeData}
 						onTreeDataChange={(data: TreeData<TChapterRecord>) => {
-							const treeDataWithoutCollapsed = data?.map((item) => ({
-								...item,
+							const from = data?.map((item) => ({
+								id: item?.id,
+								children: item?.children?.map((child) => child?.id),
 								collapsed: false,
 							}))
-							const dataWithoutCollapse = treeData?.map((item) => ({
-								...item,
+							const to = treeData?.map((item) => ({
+								id: item?.id,
+								children: item?.children?.map((child) => child?.id),
 								collapsed: false,
 							}))
-							const isEqual = _isEqual(
-								treeDataWithoutCollapsed,
-								dataWithoutCollapse,
-							)
+							const isEqual = _isEqual(from, to)
 							setTreeData(data)
 							if (!isEqual) {
 								handleSave(data)
