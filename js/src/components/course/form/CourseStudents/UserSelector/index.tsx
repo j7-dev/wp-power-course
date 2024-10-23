@@ -6,6 +6,7 @@ import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, Form, message } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { defaultSelectProps } from '@/utils'
 
 const index = () => {
 	const apiUrl = useApiUrl()
@@ -114,23 +115,14 @@ const index = () => {
 				新增學員
 			</Button>
 			<Select
+				{...defaultSelectProps}
 				{...selectProps}
-				className="w-full"
 				placeholder="試試看搜尋 Email, 名稱, ID"
-				mode="multiple"
-				allowClear
 				onChange={(value: string[]) => {
 					setUserIds(value)
 				}}
 				value={userIds}
 				loading={queryResult.isFetching}
-				optionRender={({ value, label }) => {
-					return (
-						<span>
-							{label} <sub className="text-gray-500">#{value}</sub>
-						</span>
-					)
-				}}
 			/>
 			<Select
 				value={searchField}

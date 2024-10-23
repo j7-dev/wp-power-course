@@ -19,7 +19,12 @@ import {
 import useOptions, {
 	TUseOptionsParams,
 } from '@/components/product/ProductTable/hooks/useOptions'
-import { backordersOptions, stockStatusOptions, statusOptions } from '@/utils'
+import {
+	backordersOptions,
+	stockStatusOptions,
+	statusOptions,
+	defaultSelectProps,
+} from '@/utils'
 import { SearchOutlined, UndoOutlined } from '@ant-design/icons'
 import { BsChevronDoubleDown, BsChevronDoubleUp } from 'react-icons/bs'
 
@@ -92,10 +97,9 @@ const FullFilter: FC<{
 						label={keyLabelMapper('product_category_id')}
 					>
 						<Select
+							{...defaultSelectProps}
 							options={termToOptions(product_cats)}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 
@@ -104,10 +108,9 @@ const FullFilter: FC<{
 						label={keyLabelMapper('product_tag_id')}
 					>
 						<Select
+							{...defaultSelectProps}
 							options={termToOptions(product_tags)}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 					{/* <Item
@@ -158,26 +161,23 @@ const FullFilter: FC<{
 					))}
 					<Item name={['status']} label={keyLabelMapper('status')}>
 						<Select
+							{...defaultSelectProps}
 							options={statusOptions}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 					<Item name={['backorders']} label={keyLabelMapper('backorders')}>
 						<Select
+							{...defaultSelectProps}
 							options={backordersOptions}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 					<Item name={['stock_status']} label={keyLabelMapper('stock_status')}>
 						<Select
+							{...defaultSelectProps}
 							options={stockStatusOptions}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 					<Item name={['date_created']} label={keyLabelMapper('date_created')}>

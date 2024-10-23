@@ -9,12 +9,16 @@ import ProductCheckCard from './ProductCheckCard'
 import { coursesAtom } from '@/pages/admin/Courses/List'
 import { useAtomValue } from 'jotai'
 
+/**
+ * TODO
+ * 改版
+ */
 const CourseBundleComponent = () => {
 	const form = Form.useFormInstance()
 	const watchCourseId: string = Form.useWatch(['id'], form) || []
 	const courses = useAtomValue(coursesAtom)
 	const selectedCourse = courses.find(({ id }) => id === watchCourseId)
-	const bundleIds: string[] = selectedCourse?.bundle_ids || []
+	const bundleIds: string[] = Form.useWatch(['bundle_ids'], form) || []
 	const [bundleProductForm] = Form.useForm()
 	const { drawerProps, show, open, record } = useBundleFormDrawer({
 		form: bundleProductForm,

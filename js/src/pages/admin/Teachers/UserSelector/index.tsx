@@ -6,12 +6,12 @@ import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, message } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { defaultSelectProps } from '@/utils'
 
 const index = () => {
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
 	const [userIds, setUserIds] = useState<string[]>([])
-	const [keyword, setKeyword] = useState<string>('')
 
 	const { selectProps } = useSelect<TUserRecord>({
 		resource: 'users',
@@ -60,7 +60,6 @@ const index = () => {
 			},
 		],
 		onSearch: (value) => {
-			setKeyword(value)
 			return [
 				{
 					field: 'search',
@@ -125,11 +124,9 @@ const index = () => {
 				從 WordPress User 新增
 			</Button>
 			<Select
+				{...defaultSelectProps}
 				{...selectProps}
-				className="w-full"
 				placeholder="試試看搜尋 Email, 名稱, ID"
-				mode="multiple"
-				allowClear
 				onChange={(value: string[]) => {
 					setUserIds(value)
 				}}

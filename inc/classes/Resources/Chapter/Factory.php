@@ -45,7 +45,11 @@ final class Factory {
 			],
 		);
 
-		$args['post_title']    = $args['post_title'] ?? '新章節';
+		$post_parent = (int) $args['post_parent'];
+		$parent_post_type = \get_post_type($post_parent);
+		$default_post_title = $parent_post_type === CPT::POST_TYPE ? '新單元' : '新章節';
+
+		$args['post_title']    = $args['post_title'] ?? $default_post_title;
 		$args['post_status']   = 'publish';
 		$args['post_author']   = \get_current_user_id();
 		$args['post_type']     = CPT::POST_TYPE;

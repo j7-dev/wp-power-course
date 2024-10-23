@@ -11,10 +11,7 @@ const { stringify } = queryString
 export const dataProvider = (
 	apiUrl: string,
 	httpClient: AxiosInstance = axiosInstance,
-): Omit<
-	Required<DataProvider>,
-	'createMany' | 'updateMany' | 'deleteMany'
-> => ({
+): Omit<Required<DataProvider>, 'updateMany' | 'deleteMany'> => ({
 	getList: async ({ resource, pagination, filters, sorters, meta }) => {
 		const url = `${apiUrl}/${resource}`
 
@@ -74,6 +71,24 @@ export const dataProvider = (
 	},
 
 	create: async ({ resource, variables, meta }) => {
+		const url = `${apiUrl}/${resource}`
+
+		const { headers, method } = meta ?? {}
+		const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
+
+		const { data } = await httpClient[requestMethod](url, variables, {
+			headers: {
+				'Content-Type': 'multipart/form-data;',
+				...headers,
+			},
+		})
+
+		return {
+			data,
+		}
+	},
+
+	createMany: async ({ resource, variables, meta }) => {
 		const url = `${apiUrl}/${resource}`
 
 		const { headers, method } = meta ?? {}

@@ -3,6 +3,7 @@ import { useSelect } from '@refinedev/antd'
 import { Form, Select, FormItemProps, SelectProps } from 'antd'
 import { TFilterProps, TTerm } from '@/components/product/ProductTable/types'
 import { keyLabelMapper } from '@/components/product/ProductTable/utils'
+import { defaultSelectProps } from '@/utils'
 
 const { Item } = Form
 
@@ -31,7 +32,7 @@ const TermSelector: FC<TTermSelector> = ({
 	selectProps,
 }) => {
 	const name = formName[0]
-	const label = keyLabelMapper(name)
+	const fieldLabel = keyLabelMapper(name)
 	const { selectProps: selectPropsFetched } = useSelect<TTerm>({
 		resource: 'terms',
 		optionLabel: 'name',
@@ -54,20 +55,19 @@ const TermSelector: FC<TTermSelector> = ({
 		],
 		errorNotification: () => {
 			return {
-				message: `獲取${label} API 失敗`,
+				message: `獲取${fieldLabel} API 失敗`,
 				type: 'error',
 			}
 		},
 	})
 
 	return (
-		<Item name={formName} label={label} {...formItemProps}>
+		<Item name={formName} label={fieldLabel} {...formItemProps}>
 			<Select
+				{...defaultSelectProps}
 				{...selectPropsFetched}
 				size="small"
-				mode="multiple"
 				placeholder="可多選"
-				allowClear
 				{...selectProps}
 			/>
 		</Item>

@@ -1,11 +1,15 @@
 import { memo, useEffect, useState } from 'react'
-import { Form, Input, InputNumber, Radio, Select, Space } from 'antd'
+import { Form, Input, InputNumber, Select, Space } from 'antd'
 import {
 	keyLabelMapper,
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
-import { siteUrl, course_permalink_structure } from '@/utils'
+import {
+	siteUrl,
+	course_permalink_structure,
+	defaultSelectProps,
+} from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
 import {
 	FiSwitch,
@@ -100,9 +104,9 @@ const CourseDescriptionComponent = () => {
 			<div className="mb-12">
 				<Heading>課程描述</Heading>
 
-				<Item name={['id']} hidden normalize={() => undefined}>
-					<Input />
-				</Item>
+				<Item name={['id']} hidden normalize={() => undefined} />
+
+				<Item name={['bundle_ids']} hidden />
 
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 					<Item name={['name']} label="課程名稱">
@@ -114,10 +118,9 @@ const CourseDescriptionComponent = () => {
 						initialValue={[]}
 					>
 						<Select
+							{...defaultSelectProps}
 							options={termToOptions(product_cats)}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 					<Item
@@ -126,10 +129,9 @@ const CourseDescriptionComponent = () => {
 						initialValue={[]}
 					>
 						<Select
+							{...defaultSelectProps}
 							options={termToOptions(product_tags)}
-							mode="multiple"
 							placeholder="可多選"
-							allowClear
 						/>
 					</Item>
 				</div>
