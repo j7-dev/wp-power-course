@@ -10,8 +10,12 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 	const { id } = useParsed()
 
 	const [form] = Form.useForm()
-	const watchDepth = Form.useWatch(['depth'], form)
-	const watchQty = Form.useWatch(['qty'], form)
+	const watchDepth = Form.useWatch(['depth'], form) || 0
+	const watchQty = Form.useWatch(['qty'], form) || 0
+	const watchPostParents = Form.useWatch(['post_parents'], form) || []
+	const canAdd =
+		(watchDepth === 0 && watchQty > 0) ||
+		(watchDepth > 0 && watchQty > 0 && watchPostParents?.length > 0)
 
 	const { mutate, isLoading } = useCreateMany({
 		resource: 'chapters',
@@ -36,7 +40,7 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 					type="primary"
 					loading={isLoading}
 					onClick={handleCreateMany}
-					disabled={!watchQty}
+					disabled={!canAdd}
 				>
 					新增
 				</Button>
