@@ -1,6 +1,6 @@
 import React from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { Table, message, Button, Form, TableProps } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'

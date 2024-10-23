@@ -1,9 +1,6 @@
 import { FC, useState, useEffect } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { message } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'

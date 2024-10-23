@@ -176,7 +176,7 @@ final class Course {
 
 		$products = $results->products;
 
-		$formatted_products = array_values(array_map( [ $this, 'format_course_details' ], $products ));
+		$formatted_products = array_values(array_map( [ $this, 'format_course_base_records' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -209,7 +209,7 @@ final class Course {
 		}
 
 		$product           = \wc_get_product( $id );
-		$formatted_product = $this->format_course_details( $product );
+		$formatted_product = $this->format_course_records( $product );
 
 		$response = new \WP_REST_Response( $formatted_product );
 
@@ -217,7 +217,7 @@ final class Course {
 	}
 
 	/**
-	 * Format course details
+	 * Format course base records
 	 *
 	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
 	 *
@@ -226,7 +226,7 @@ final class Course {
 	 * @return array
 	 * @phpstan-ignore-next-line
 	 */
-	public function format_course_details( $product ) { // phpcs:ignore
+	public function format_course_base_records( $product ) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
@@ -240,11 +240,6 @@ final class Course {
 
 		$image_ids = $image_id ? [ $image_id, ...$gallery_image_ids ] : [];
 		$images    = $image_ids ? array_map( [ WP::class, 'get_image_info' ], $image_ids ) : [];
-
-		$description_array = [
-			'description'       => $product->get_description(),
-			'short_description' => $product->get_short_description(),
-		];
 
 		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
@@ -278,87 +273,137 @@ final class Course {
 			0
 			);
 
+		$regular_price = $product->get_regular_price();
+		$sale_price    = $product->get_sale_price();
+		$price_html    = Base::get_price_html( $product );
+		$product_id    = $product->get_id();
+		$categories    = Product::format_terms(
+			[
+				'taxonomy'   => 'product_cat',
+				'object_ids' => $product_id,
+			]
+			);
+		$category_ids  = array_column( $categories, 'id' );
+		$tags          = Product::format_terms(
+			[
+				'taxonomy'   => 'product_tag',
+				'object_ids' => $product_id,
+			]
+			);
+		$tag_ids       = array_column( $tags, 'id' );
+
+		$base_array = [
+			// Get Product General Info
+			'id'                 => (string) $product_id,
+			'type'               => $product->get_type(),
+			'name'               => $product->get_name(),
+			'slug'               => $product->get_slug(),
+			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
+			'status'             => $product->get_status(),
+			'featured'           => $product->get_featured(),
+			'catalog_visibility' => $product->get_catalog_visibility(),
+			'sku'                => $product->get_sku(),
+			'menu_order'         => (int) $product->get_menu_order(),
+			'virtual'            => $product->get_virtual(),
+			'downloadable'       => $product->get_downloadable(),
+			'permalink'          => \get_permalink( $product->get_id() ),
+			'custom_rating'      => (float) $product->get_meta('custom_rating') ?: 2.5,
+			'extra_review_count' => (int) $product->get_meta('extra_review_count'),
+
+			// Get Product Prices
+			'price_html'         => $price_html,
+			'regular_price'      => $regular_price,
+			'sale_price'         => $sale_price,
+			'on_sale'            => $product->is_on_sale(),
+			'date_on_sale_from'  => $product->get_date_on_sale_from()?->getTimestamp(),
+			'date_on_sale_to'    => $product->get_date_on_sale_to()?->getTimestamp(),
+			'total_sales'        => $product->get_total_sales(),
+
+			// Get Product Stock
+			'stock'              => $product->get_stock_quantity(),
+			'stock_status'       => $product->get_stock_status(),
+			'manage_stock'       => $product->get_manage_stock(),
+			'stock_quantity'     => $product->get_stock_quantity(),
+			'backorders'         => $product->get_backorders(),
+			'backorders_allowed' => $product->backorders_allowed(),
+			'backordered'        => $product->is_on_backorder(),
+			'low_stock_amount'   => $low_stock_amount,
+
+			// Get Product Taxonomies
+			'category_ids'       => $category_ids,
+
+			'categories'         => Product::format_terms(
+				[
+					'taxonomy'   => 'product_cat',
+					'object_ids' => $product_id,
+				]
+				),
+			'tags'               => Product::format_terms(
+				[
+					'taxonomy'   => 'product_tag',
+					'object_ids' => $product_id,
+				]
+				),
+			'tag_ids'            => $tag_ids,
+			// Get Product Images
+			'images'             => $images,
+			'is_course'          => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'is_free'            => (string) $product->get_meta( 'is_free' ),
+			'qa_list'            => (array) $product->get_meta( 'qa_list' ),
+			'course_schedule'    => (int) $product->get_meta( 'course_schedule' ),
+			'course_hour'        => (int) $product->get_meta( 'course_hour' ),
+			'course_minute'      => (int) $product->get_meta( 'course_minute' ),
+			'teacher_ids'        => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
+			'course_length'      => $course_length,
+		];
+
+		return $base_array;
+	}
+
+	/**
+	 * Format course records
+	 *
+	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
+	 *
+	 * @param \WC_Product $product Product.
+	 *
+	 * @return array
+	 * @phpstan-ignore-next-line
+	 */
+	public function format_course_records( $product ) { // phpcs:ignore
+
+		$base_array = $this->format_course_base_records( $product );
+
+		$chapters = array_values(
+			\get_children(
+				[
+					'post_parent' => $product->get_id(),
+					'post_type'   => ChapterCPT::POST_TYPE,
+					'numberposts' => - 1,
+					'post_status' => 'any',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
+				]
+			)
+		);
+		$chapters = array_values(array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters ));
+
 		$children = ! ! $chapters ? [
 			'chapters' => $chapters,
 		] : [];
 
 		$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids: true);
 
-		$regular_price = $product->get_regular_price();
-		$sale_price    = $product->get_sale_price();
-		$price_html    = Base::get_price_html( $product );
-		$product_id    = $product->get_id();
-
-		$base_array = [
-			// Get Product General Info
-			'id'                         => (string) $product_id,
-			'type'                       => $product->get_type(),
-			'name'                       => $product->get_name(),
-			'depth'                      => 0,
-			'slug'                       => $product->get_slug(),
-			'date_created'               => $date_created?->date( 'Y-m-d H:i:s' ),
-			'date_modified'              => $date_modified?->date( 'Y-m-d H:i:s' ),
-			'status'                     => $product->get_status(),
-			'featured'                   => $product->get_featured(),
-			'catalog_visibility'         => $product->get_catalog_visibility(),
-			'sku'                        => $product->get_sku(),
-			'menu_order'                 => (int) $product->get_menu_order(),
-			'virtual'                    => $product->get_virtual(),
-			'downloadable'               => $product->get_downloadable(),
-			'permalink'                  => \get_permalink( $product->get_id() ),
-			'custom_rating'              => (float) $product->get_meta('custom_rating') ?: 2.5,
-			'extra_review_count'         => (int) $product->get_meta('extra_review_count'),
+		$extra_array = [
 			'purchase_note'              => $product->get_purchase_note(),
-
-			// Get Product Prices
-			'price_html'                 => $price_html,
-			'regular_price'              => $regular_price,
-			'sale_price'                 => $sale_price,
-			'on_sale'                    => $product->is_on_sale(),
-			'date_on_sale_from'          => $product->get_date_on_sale_from()?->getTimestamp(),
-			'date_on_sale_to'            => $product->get_date_on_sale_to()?->getTimestamp(),
-			'total_sales'                => $product->get_total_sales(),
-
-			// Get Product Stock
-			'stock'                      => $product->get_stock_quantity(),
-			'stock_status'               => $product->get_stock_status(),
-			'manage_stock'               => $product->get_manage_stock(),
-			'stock_quantity'             => $product->get_stock_quantity(),
-			'backorders'                 => $product->get_backorders(),
-			'backorders_allowed'         => $product->backorders_allowed(),
-			'backordered'                => $product->is_on_backorder(),
-			'low_stock_amount'           => $low_stock_amount,
-
-			// Get Linked Products
+			'description'                => $product->get_description(),
+			'short_description'          => $product->get_short_description(),
 			'upsell_ids'                 => array_map( 'strval', $product->get_upsell_ids() ),
 			'cross_sell_ids'             => array_map( 'strval', $product->get_cross_sell_ids() ),
-
-			// Get Product Variations and Attributes
 			'attributes'                 => WC::get_product_attribute_array( $product ),
 
-			// Get Product Taxonomies
-			'categories'                 => Product::format_terms(
-				[
-					'taxonomy'   => 'product_cat',
-					'object_ids' => $product_id,
-				]
-				),
-			'tags'                       => Product::format_terms(
-				[
-					'taxonomy'   => 'product_tag',
-					'object_ids' => $product_id,
-				]
-				),
-			// Get Product Images
-			'images'                     => $images,
-
-			'is_course'                  => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'                  => (string) $product->get_parent_id(),
-			'is_free'                    => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                    => (array) $product->get_meta( 'qa_list' ),
-			'course_schedule'            => (int) $product->get_meta( 'course_schedule' ),
-			'course_hour'                => (int) $product->get_meta( 'course_hour' ),
-			'course_minute'              => (int) $product->get_meta( 'course_minute' ),
 			'limit_type'                 => (string) $product->get_meta( 'limit_type' ) ?: 'unlimited',
 			'limit_value'                => (int) $product->get_meta( 'limit_value' ) ?: 1,
 			'limit_unit'                 => (string) $product->get_meta( 'limit_unit' ) ?: 'day',
@@ -383,17 +428,14 @@ final class Course {
 				'id'   => '',
 				'meta' => [],
 			],
-			'teacher_ids'                => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
-			'course_length'              => $course_length,
-
 			// bundle product
 			'bundle_ids'                 => $bundle_ids,
 
 		] + $children;
 
 		return array_merge(
-			$description_array,
-			$base_array
+			$base_array,
+			$extra_array,
 		);
 	}
 
@@ -420,7 +462,7 @@ final class Course {
 		];
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
-		// 將 '[]' 轉為 []
+		// 將 '[]' 轉為 []，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 		$body_params = Base::format_empty_array( $body_params );
 
 		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();

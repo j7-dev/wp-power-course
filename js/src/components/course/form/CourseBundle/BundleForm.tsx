@@ -14,7 +14,7 @@ import {
 	LinkOutlined,
 	DisconnectOutlined,
 } from '@ant-design/icons'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { FiSwitch, RangePicker } from '@/components/formItem'
 import { FileUpload } from '@/components/post'
 

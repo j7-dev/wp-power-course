@@ -9,10 +9,7 @@ import {
 	message,
 } from 'antd'
 import { useUpdate } from '@refinedev/core'
-import {
-	TChapterRecord,
-	TCourseRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord, TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 import { useWindowSize } from '@uidotdev/usehooks'

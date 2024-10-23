@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { Tag } from 'antd'
 
 export const UserName: FC<{

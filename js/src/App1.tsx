@@ -21,7 +21,7 @@ import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab, siteUrl } from '@/utils'
 import { resources } from '@/resources'
 import Dashboard from '@/pages/admin/Dashboard'
-import Courses from '@/pages/admin/Courses'
+import CoursesList from '@/pages/admin/Courses/List'
 import CoursesEdit from '@/pages/admin/Courses/Edit'
 import Teachers from '@/pages/admin/Teachers'
 import Students from '@/pages/admin/Students'
@@ -105,7 +105,7 @@ function App() {
 					>
 						<Route index element={<NavigateToResource resource="courses" />} />
 						<Route path="courses">
-							<Route index element={<Courses />} />
+							<Route index element={<CoursesList />} />
 							<Route path="edit/:id" element={<CoursesEdit />} />
 						</Route>
 						<Route path="teachers" element={<Teachers />} />

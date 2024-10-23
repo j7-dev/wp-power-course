@@ -15,7 +15,7 @@ import {
 	WatchLimit,
 } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
 
 const { Item } = Form

@@ -6,7 +6,7 @@ import BundleForm from './BundleForm'
 import { useList } from '@refinedev/core'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import ProductCheckCard from './ProductCheckCard'
-import { coursesAtom } from '@/pages/admin/Courses/CourseTable'
+import { coursesAtom } from '@/pages/admin/Courses/List'
 import { useAtomValue } from 'jotai'
 
 const CourseBundleComponent = () => {

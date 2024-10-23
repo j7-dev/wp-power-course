@@ -1,8 +1,5 @@
 import { TableProps, Typography } from 'antd'
-import {
-	TUserRecord,
-	TAVLCourse,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { UserName } from '@/components/user'
 import { WatchStatusTag } from '@/components/general'
 import dayjs from 'dayjs'

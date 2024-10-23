@@ -1,9 +1,6 @@
 import React from 'react'
 import { Table, TableProps, Tag } from 'antd'
-import {
-	TChapterRecord,
-	TCourseRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord, TCourseRecord } from '@/pages/admin/Courses/List/types'
 import {
 	ProductName,
 	ProductPrice,
@@ -16,26 +13,13 @@ import { DateTime } from 'antd-toolkit'
 import { SecondToStr } from '@/components/general'
 import { useNavigation } from '@refinedev/core'
 
-const useColumns = ({
-	showCourseDrawer,
-	showChapterDrawer,
-}: {
-	showCourseDrawer: (_record: TCourseRecord) => () => void
-	showChapterDrawer: (_record: TChapterRecord) => () => void
-}) => {
+const useColumns = () => {
 	const { edit } = useNavigation()
-	const onClick = (record: TCourseRecord | TChapterRecord) => () => {
-		const { type } = record
-		const isChapter = type === 'chapter'
-		if (isChapter) {
-			showChapterDrawer(record as TChapterRecord)()
-		} else {
-			edit('courses', record.id)
-		}
+	const onClick = (record: TCourseRecord) => () => {
+		edit('courses', record.id)
 	}
 	const columns: TableProps<TCourseRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
-		Table.EXPAND_COLUMN,
 		{
 			title: '商品名稱',
 			dataIndex: 'name',

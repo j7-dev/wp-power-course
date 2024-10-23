@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { Form } from 'antd'
 import { DateTime } from 'antd-toolkit'
 

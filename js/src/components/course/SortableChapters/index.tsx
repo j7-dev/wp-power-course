@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Form, message, Card } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'

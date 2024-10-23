@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { renderHTML } from 'antd-toolkit'
 
 export const ChapterName: FC<{
