@@ -1,15 +1,11 @@
 import React, { FC } from 'react'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
 import AddChapter from '@/components/product/ProductAction/AddChapter'
 import ToggleVisibility from './ToggleVisibility'
 import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
 import { siteUrl, course_permalink_structure } from '@/utils'
 import { SiGoogleclassroom } from 'react-icons/si'
-import { EditButton } from '@refinedev/antd'
 
 export const ProductAction: FC<{
 	record: TCourseRecord | TChapterRecord
@@ -61,7 +57,6 @@ export const ProductAction: FC<{
 					<ExportOutlined />
 				</a>
 			</Tooltip>
-			<AddChapter record={record} />
 			<ToggleVisibility record={record} />
 		</div>
 	)

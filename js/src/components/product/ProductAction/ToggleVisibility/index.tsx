@@ -4,10 +4,7 @@ import {
 	EyeInvisibleOutlined,
 	LoadingOutlined,
 } from '@ant-design/icons'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Tooltip } from 'antd'
 import { useUpdate } from '@refinedev/core'
 import { toFormData } from '@/utils'

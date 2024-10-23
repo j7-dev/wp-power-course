@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { renderHTML } from 'antd-toolkit'
 import './style.scss'

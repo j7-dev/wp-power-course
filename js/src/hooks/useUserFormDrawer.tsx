@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { DrawerProps, Button, FormInstance, Popconfirm, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { toFormData } from '@/utils'
 import { isEqual } from 'lodash-es'
 

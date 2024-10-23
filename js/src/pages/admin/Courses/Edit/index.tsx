@@ -15,12 +15,15 @@ import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
 import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
+import { toFormData } from '@/utils'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 export const CoursesEdit = () => {
 	// 初始化資料
-	const { formProps, form, saveButtonProps, query, mutation } = useForm({
-		redirect: false,
-	})
+	const { formProps, form, saveButtonProps, query, mutation, onFinish } =
+		useForm({
+			redirect: false,
+		})
 
 	// TAB items
 	const items: TabsProps['items'] = [
@@ -114,6 +117,11 @@ export const CoursesEdit = () => {
 	const watchId = Form.useWatch(['id'], form)
 	const watchStatus = Form.useWatch(['status'], form)
 
+	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
+	const handleOnFinish = (values: Partial<TCourseRecord>) => {
+		onFinish(toFormData(values))
+	}
+
 	return (
 		<div className="sticky-card-actions sticky-tabs-nav">
 			<Edit
@@ -127,7 +135,7 @@ export const CoursesEdit = () => {
 					...saveButtonProps,
 					children: '儲存',
 					icon: null,
-					loading: mutation.isLoading,
+					loading: mutation?.isLoading,
 				}}
 				footerButtons={({ defaultButtons }) => (
 					<>
@@ -146,7 +154,7 @@ export const CoursesEdit = () => {
 				isLoading={query?.isLoading}
 			>
 				{/* 這邊這個 form 只是為了調整 style */}
-				<Form {...formProps} layout="vertical">
+				<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
 					<Tabs items={items} />
 				</Form>
 			</Edit>

@@ -5,19 +5,18 @@ import {
 	VideoLength,
 	DescriptionDrawer,
 } from '@/components/formItem'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
 import { toFormData } from '@/utils'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 
 const { Item } = Form
 
-// TODO 如果不用 toFormData 的話 '[]' 空陣列會怎麼呈現?
 const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 	const { id, name } = record
 
 	// 初始化資料
-	const { formProps, form, saveButtonProps, mutation } = useForm({
+	const { formProps, form, saveButtonProps, mutation, onFinish } = useForm({
 		action: 'edit',
 		resource: 'chapters',
 		id,
@@ -39,6 +38,11 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 		form.setFieldsValue(record)
 	}, [record])
 
+	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
+	const handleOnFinish = (values: Partial<TChapterRecord>) => {
+		onFinish(toFormData(values))
+	}
+
 	return (
 		<Edit
 			resource="chapters"
@@ -55,7 +59,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				...saveButtonProps,
 				children: `儲存${label}`,
 				icon: null,
-				loading: mutation.isLoading,
+				loading: mutation?.isLoading,
 			}}
 			footerButtons={({ defaultButtons }) => (
 				<>
@@ -77,7 +81,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				</>
 			)}
 		>
-			<Form {...formProps} layout="vertical">
+			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
 				<Item name={['name']} label={`${label}名稱`}>
 					<Input />
 				</Item>

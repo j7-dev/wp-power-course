@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TChapterRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { getPostStatus } from '@/utils'
 import { FlattenNode } from '@ant-design/pro-editor'
 import { ChapterName } from '@/components/course'

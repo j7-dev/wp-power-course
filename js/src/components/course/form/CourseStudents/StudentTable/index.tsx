@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import {
 	Table,
 	Form,

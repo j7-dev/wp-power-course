@@ -1,8 +1,5 @@
 import React, { FC } from 'react'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
 
 import { TTerm, TProductRecord } from '@/components/product/ProductTable/types'
 import { Tag } from 'antd'

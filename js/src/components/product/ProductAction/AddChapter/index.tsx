@@ -1,10 +1,7 @@
 import { FC } from 'react'
 import { PlusCircleFilled } from '@ant-design/icons'
 import { Tooltip, Button, ButtonProps } from 'antd'
-import {
-	TCourseRecord,
-	TChapterRecord,
-} from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
 import {
 	BaseRecord,
 	HttpError,
@@ -18,6 +15,7 @@ type TCreateParams = {
 	menu_order: number
 }
 
+//DELETE
 const AddChapter: FC<{
 	record: TCourseRecord | TChapterRecord
 	buttonProps?: ButtonProps

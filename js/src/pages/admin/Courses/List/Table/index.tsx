@@ -1,12 +1,12 @@
 import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, FormInstance, Spin, Form, Button, TableProps, Card } from 'antd'
+import { Table, FormInstance, Spin, Button, TableProps, Card } from 'antd'
 import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
 import { HttpError, useCreate } from '@refinedev/core'
-import { TCourseRecord } from '@/pages/admin/Courses/CourseTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	onSearch,
@@ -15,15 +15,11 @@ import {
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
 import { getInitialFilters, getIsVariation } from '@/utils'
-import useValueLabelMapper from '@/pages/admin/Courses/CourseTable/hooks/useValueLabelMapper'
+import useValueLabelMapper from '@/pages/admin/Courses/List/hooks/useValueLabelMapper'
 import { useSetAtom } from 'jotai'
-import { SortableChapter } from '@/components/course'
-import { CourseDrawer } from '@/components/course/CourseDrawer'
-import { useCourseFormDrawer } from '@/hooks'
-import { ChapterDrawer } from '@/components/course/ChapterDrawer'
-import useColumns from '@/pages/admin/Courses/CourseTable/hooks/useColumns'
+import useColumns from '@/pages/admin/Courses/List/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
-import { coursesAtom } from '@/pages/admin/Courses/CourseTable'
+import { coursesAtom } from '@/pages/admin/Courses/List'
 import DeleteButton from './DeleteButton'
 
 const Main = () => {
@@ -58,23 +54,7 @@ const Main = () => {
 		setCourses([...(tableProps?.dataSource || [])])
 	}, [tableProps?.dataSource])
 
-	// Drawer
-
-	const [courseForm] = Form.useForm()
-	const { show: showCourseDrawer, drawerProps: courseDrawerProps } =
-		useCourseFormDrawer({
-			form: courseForm,
-			resource: 'courses',
-		})
-
-	const [chapterForm] = Form.useForm()
-	const { show: showChapterDrawer, drawerProps: chapterDrawerProps } =
-		useCourseFormDrawer({ form: chapterForm, resource: 'chapters' })
-
-	const columns = useColumns({
-		showCourseDrawer,
-		showChapterDrawer,
-	})
+	const columns = useColumns()
 
 	const { mutate: create, isLoading: isCreating } = useCreate({
 		resource: 'courses',
@@ -140,24 +120,9 @@ const Main = () => {
 					}}
 					rowSelection={rowSelection}
 					columns={columns}
-					expandable={{
-						expandedRowRender: (record) => (
-							<SortableChapter record={record} show={showChapterDrawer} />
-						),
-						rowExpandable: (record: TCourseRecord) =>
-							!!record?.chapters?.length,
-					}}
 					rowKey={(record) => record.id.toString()}
 				/>
 			</Card>
-
-			<Form layout="vertical" form={courseForm}>
-				<CourseDrawer {...courseDrawerProps} />
-			</Form>
-
-			<Form layout="vertical" form={chapterForm}>
-				<ChapterDrawer {...chapterDrawerProps} />
-			</Form>
 		</Spin>
 	)
 }

@@ -9,10 +9,10 @@ import {
 
 export * from './user'
 
-export type TCourseRecord = {
+// List 只會拿基本的欄位
+export type TCourseBaseRecord = {
 	id: string
 	type: TProductType
-	depth: number
 	name: string
 	slug: string
 	date_created: string
@@ -20,8 +20,6 @@ export type TCourseRecord = {
 	status: string
 	featured: boolean
 	catalog_visibility: string
-	description: string
-	short_description: string
 	sku: string
 	menu_order: number
 	virtual: boolean
@@ -44,24 +42,31 @@ export type TCourseRecord = {
 	backorders_allowed: boolean
 	backordered: boolean
 	low_stock_amount: number | null
-	upsell_ids: number[]
-	cross_sell_ids: number[]
-	attributes: TProductAttribute[]
 	categories: TTerm[]
 	tags: TTerm[]
 	images: TImage[]
-	chapters?: TChapterRecord[]
-	is_course: boolean
-	parent_id?: string
-	hours: number
+	is_course: 'yes' | 'no' | ''
 	is_free: 'yes' | 'no' | ''
+	hours: number
+	course_schedule: number
+	course_hour: number
+	course_minute: number
+	course_length: number
+}
+
+// Edit, Show, Create 會拿全部的欄位
+export type TCourseRecord = TCourseBaseRecord & {
+	purchase_note: string
+	description: string
+	short_description: string
+	upsell_ids: number[]
+	cross_sell_ids: number[]
+	attributes: TProductAttribute[]
+	chapters?: TChapterRecord[]
 	qa_list: {
 		question: string
 		answer: string
 	}[]
-	course_schedule: number
-	course_hour: number
-	course_minute: number
 	limit_type: string
 	limit_value: number
 	limit_unit: string
@@ -71,12 +76,13 @@ export type TCourseRecord = {
 	reviews_allowed: boolean
 	show_review_tab: 'yes' | 'no' | ''
 	show_review_list: 'yes' | 'no' | ''
+	show_total_student: 'yes' | 'no' | ''
 	enable_comment: 'yes' | 'no' | ''
+	hide_single_course: 'yes' | 'no' | ''
+	hide_courses_in_main_query: 'yes' | 'no' | ''
 	extra_student_count: number
 	feature_video: TVideo
 	trial_video: TVideo
-	teacher_ids: string[]
-	course_length: number
 	bundle_ids: string[]
 }
 
