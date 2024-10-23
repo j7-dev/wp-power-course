@@ -106,8 +106,6 @@ const CourseDescriptionComponent = () => {
 
 				<Item name={['id']} hidden normalize={() => undefined} />
 
-				<Item name={['bundle_ids']} hidden />
-
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 					<Item name={['name']} label="課程名稱">
 						<Input allowClear />

@@ -107,22 +107,9 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 						</div>
 					</>
 				)}
-				<Item
-					name={['status']}
-					label="發佈"
-					initialValue="publish"
-					getValueProps={(value) => ({ value: value === 'publish' })}
-					normalize={(value) => (value ? 'publish' : 'draft')}
-					hidden
-				>
-					<Switch checkedChildren="發佈" unCheckedChildren="草稿" />
-				</Item>
-				<Item name={['depth']} hidden>
-					<Input />
-				</Item>
-				<Item name={['id']} hidden>
-					<Input />
-				</Item>
+				<Item name={['status']} hidden />
+				<Item name={['depth']} hidden />
+				<Item name={['id']} hidden />
 			</Form>
 		</Edit>
 	)

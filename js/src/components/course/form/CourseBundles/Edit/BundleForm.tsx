@@ -1,5 +1,5 @@
 import { useEffect, useState, FC, memo } from 'react'
-import { Form, InputNumber, Select, Input, FormInstance, List, Tag } from 'antd'
+import { Form, InputNumber, Select, Input, Switch, List, Tag } from 'antd'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import dayjs from 'dayjs'
 import { TProductRecord } from '@/components/product/ProductTable/types'
@@ -18,7 +18,7 @@ import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { FiSwitch, RangePicker } from '@/components/formItem'
 import { FileUpload } from '@/components/post'
 
-// DELETE 目前只支援簡單商品
+// TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?
 
 // dayjs.extend(customParseFormat)
@@ -28,19 +28,23 @@ const { Search } = Input
 
 const OPTIONS = [
 	{ label: '合購優惠', value: 'bundle' },
+	{ label: '定期定額', value: 'subscription' },
 	{ label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
 export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
 const BundleForm: FC<{
-	form: FormInstance
-	course: TCourseRecord | undefined // 課程
+	course: TCourseRecord // 課程
 	record: TProductRecord | undefined // 銷售方案
-}> = ({ form: bundleProductForm, course: selectedCourse, record }) => {
-	const [selectedProducts, setSelectedProducts] = useState<TProductRecord[]>([])
+	selectedProducts: TProductRecord[]
+	setSelectedProducts: React.Dispatch<React.SetStateAction<TProductRecord[]>>
+}> = ({ course, record, selectedProducts, setSelectedProducts }) => {
+	const { id: courseId, name: courseName, price_html: coursePrice } = course
+
 	const [searchKeyWord, setSearchKeyWord] = useState<string>('')
 	const [showList, setShowList] = useState<boolean>(false)
+	const bundleProductForm = Form.useFormInstance()
 	const watchRegularPrice = Number(
 		Form.useWatch(['regular_price'], bundleProductForm),
 	)
@@ -71,7 +75,7 @@ const BundleForm: FC<{
 			{
 				field: 'exclude',
 				operator: 'eq',
-				value: [selectedCourse?.id],
+				value: [courseId],
 			},
 			{
 				field: 'product_type',
@@ -108,7 +112,7 @@ const BundleForm: FC<{
 		const productIds = watchExcludeMainCourse
 			? selectedProducts.map(({ id }) => id)
 			: [
-					selectedCourse?.id,
+					courseId,
 					...selectedProducts.map(({ id }) => id),
 				]
 		bundleProductForm.setFieldValue(
@@ -121,7 +125,7 @@ const BundleForm: FC<{
 			getPrice({
 				type: 'regular_price',
 				products: selectedProducts,
-				selectedCourse,
+				course,
 				excludeMainCourse: watchExcludeMainCourse,
 			}),
 		)
@@ -130,7 +134,7 @@ const BundleForm: FC<{
 	// 將當前商品移除
 	const initPIdsExcludedCourseId = (
 		record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
-	).filter((id) => id !== selectedCourse?.id)
+	).filter((id) => id !== courseId)
 
 	// 初始狀態
 	const { data: initProductsData, isFetching: initIsFetching } =
@@ -145,7 +149,7 @@ const BundleForm: FC<{
 			],
 			queryOptions: {
 				// 剛進來的時候才需要 fetch
-				enabled: !!initPIdsExcludedCourseId,
+				enabled: !!initPIdsExcludedCourseId?.length,
 			},
 		})
 
@@ -153,32 +157,15 @@ const BundleForm: FC<{
 
 	useEffect(() => {
 		// 有 id = 編輯方案，要將資料填入表單
-		console.log('⭐  record:', { record, initIsFetching, watchBundleType })
-		if (!!record && !initIsFetching) {
+		if (!initIsFetching) {
 			// 初始化商品
 			setSelectedProducts(includedProducts)
 		}
-
-		if (!record) {
-			// 新增方案，清空選擇商品
-			setSelectedProducts([])
-			bundleProductForm.setFieldValue(
-				['bundle_type_label'],
-				OPTIONS.find((o) => o.value === watchBundleType)?.label,
-			)
-		}
-	}, [record, initIsFetching, watchBundleType])
+	}, [initIsFetching])
 
 	return (
-		<Form form={bundleProductForm} layout="vertical">
-			{/* <Item name={['id']} hidden normalize={() => undefined}>
-				<Input />
-			</Item> */}
-			<Item
-				name={['link_course_ids']}
-				initialValue={[selectedCourse?.id]}
-				hidden
-			/>
+		<>
+			<Item name={['link_course_ids']} initialValue={[courseId]} hidden />
 			<Item
 				name={['bundle_type']}
 				label="銷售方案種類"
@@ -232,12 +219,11 @@ const BundleForm: FC<{
 					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
 				>
 					<img
-						src={selectedCourse?.images?.[0]?.url || defaultImage}
+						src={course?.images?.[0]?.url || defaultImage}
 						className="h-9 w-16 rounded object-cover"
 					/>
 					<div className="w-full">
-						{selectedCourse?.name} #{selectedCourse?.id}{' '}
-						{renderHTML(selectedCourse?.price_html || '')}
+						{courseName} #{courseId} {renderHTML(coursePrice || '')}
 					</div>
 					<div>
 						<Tag color="blue">目前課程</Tag>
@@ -367,7 +353,7 @@ const BundleForm: FC<{
 									isFetching: initIsFetching,
 									type: 'regular_price',
 									products: selectedProducts,
-									selectedCourse,
+									course,
 									returnType: 'string',
 									excludeMainCourse: watchExcludeMainCourse,
 								})}
@@ -378,7 +364,7 @@ const BundleForm: FC<{
 									isFetching: initIsFetching,
 									type: 'sale_price',
 									products: selectedProducts,
-									selectedCourse,
+									course,
 									returnType: 'string',
 									excludeMainCourse: watchExcludeMainCourse,
 								})}
@@ -389,6 +375,12 @@ const BundleForm: FC<{
 						)}
 					</div>
 				}
+				rules={[
+					{
+						required: true,
+						message: '請輸入折扣價',
+					},
+				]}
 			>
 				<InputNumber
 					addonBefore="NT$"
@@ -420,17 +412,13 @@ const BundleForm: FC<{
 			</div>
 
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-				<FiSwitch
-					formItemProps={{
-						name: ['virtual'],
-						label: '虛擬商品',
-						initialValue: 'yes',
-					}}
-				/>
+				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
+					<Switch />
+				</Item>
 
 				<Item name={['status']} hidden />
 			</div>
-		</Form>
+		</>
 	)
 }
 
@@ -439,14 +427,14 @@ function getPrice({
 	isFetching = false,
 	type,
 	products,
-	selectedCourse,
+	course,
 	returnType = 'number',
 	excludeMainCourse = false,
 }: {
 	isFetching?: boolean
 	type: 'regular_price' | 'sale_price'
 	products: TProductRecord[] | undefined
-	selectedCourse: TCourseRecord | undefined
+	course: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
 	excludeMainCourse?: boolean
 }) {
@@ -454,9 +442,7 @@ function getPrice({
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
 	}
 
-	const coursePrice = Number(
-		selectedCourse?.[type] || selectedCourse?.regular_price || 0,
-	)
+	const coursePrice = Number(course?.[type] || course?.regular_price || 0)
 	const total =
 		Number(
 			products?.reduce(
