@@ -6,6 +6,7 @@ import { toFormData } from '@/utils'
 import dayjs, { Dayjs } from 'dayjs'
 import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '@/components/course/form/CourseBundle/BundleForm'
 
+// DELETE
 export function useBundleFormDrawer({
 	form,
 	resource = 'products',

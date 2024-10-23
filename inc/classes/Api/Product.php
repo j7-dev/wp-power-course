@@ -53,13 +53,21 @@ final class Product {
 			'endpoint' => 'products/update-bound-courses',
 			'method'   => 'post',
 		],
-		[ // TODO 修改為直接創建
+		[
+			'endpoint' => 'bundle_products',
+			'method'   => 'get',
+		],
+		[
 			'endpoint' => 'bundle_products',
 			'method'   => 'post',
 		],
 		[ // TODO 有需要這個嗎? 要檢查一下
 			'endpoint' => 'bundle_products/(?P<id>\d+)',
 			'method'   => 'post',
+		],
+		[
+			'endpoint' => 'bundle_products/(?P<id>\d+)',
+			'method'   => 'delete',
 		],
 		[
 			'endpoint' => 'products/options',
@@ -85,6 +93,15 @@ final class Product {
 						[
 							'key'   => '_is_course',
 							'value' => $query_vars['is_course'] ? 'yes' : 'no',
+						],
+					];
+				}
+
+				if ( isset($query_vars['link_course_ids']) ) {
+					$query['meta_query'][] = [
+						[
+							'key'   => 'link_course_ids',
+							'value' => $query_vars['link_course_ids'],
 						],
 					];
 				}
@@ -186,8 +203,6 @@ final class Product {
 		}
 
 		$body_params = WP::sanitize_text_field_deep( $body_params );
-
-		$body_params['_is_course'] = 'yes';
 
 		$ids = $body_params['ids'] ?? []; // 修改才需要 ids
 		unset( $body_params['ids'] );
@@ -403,7 +418,6 @@ final class Product {
 
 	/**
 	 * Format product details
-	 * TODO
 	 *
 	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
 	 *
@@ -567,6 +581,18 @@ final class Product {
 	}
 
 	/**
+	 * Get bundle products callback
+	 * 目前跟 get_products_callback 行為一樣
+	 * 只是標示為相同資源，方便前端 invalidate 資源
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function get_bundle_products_callback( $request ) { // phpcs:ignore
+		return $this->get_products_callback( $request );
+	}
+
+	/**
 	 * Post bundle product callback (bundle product)
 	 * 新增 bundle product
 	 * 用 form-data 方式送出
@@ -679,6 +705,21 @@ final class Product {
 
 
 	/**
+	 * Delete bundle product with id callback
+	 * 目前跟 delete_products_with_id_callback 行為一樣
+	 * 只是標示為相同資源，方便前端 invalidate 資源
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_bundle_products_with_id_callback( $request ) {
+		return $this->delete_products_with_id_callback( $request );
+	}
+
+
+	/**
 	 * Delete product with id callback
 	 *
 	 * @param \WP_REST_Request $request Request.
@@ -727,7 +768,7 @@ final class Product {
 			'link_course_ids', // 用來表示 bundle product 連結的課程
 		];
 		$unset_meta_keys = [
-			'product_type', // product_type 就不用處理了，因為是預設值
+			'product_type', // product_type 就不用處理了，前端會帶
 		];
 
 		$product_id = $product->get_id();

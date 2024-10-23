@@ -10,7 +10,7 @@ import { coursesAtom } from '@/pages/admin/Courses/List'
 import { useAtomValue } from 'jotai'
 
 /**
- * TODO
+ * DELETE
  * 改版
  */
 const CourseBundleComponent = () => {
@@ -40,16 +40,14 @@ const CourseBundleComponent = () => {
 				value: 'any',
 			},
 			{
-				field: 'posts_per_page',
-				operator: 'eq',
-				value: '100',
-			},
-			{
 				field: 'type',
 				operator: 'eq',
 				value: 'power_bundle_product',
 			},
 		],
+		pagination: {
+			pageSize: 100,
+		},
 		queryOptions: {
 			enabled: !!bundleIds.length,
 			staleTime: 0,

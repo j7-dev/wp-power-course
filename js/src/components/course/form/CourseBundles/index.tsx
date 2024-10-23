@@ -2,35 +2,36 @@ import React, { useRef, useEffect, memo } from 'react'
 import { Button, Form, Empty } from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { RenderItem } from '@ant-design/pro-editor/es/SortableList/type'
-import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
-import { useList } from '@refinedev/core'
+import { useList, useCreate, useParsed } from '@refinedev/core'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import Item from './Item'
+import dayjs, { Dayjs } from 'dayjs'
+import { toFormData } from '@/utils'
 
 export type TRenderItemOptions = Parameters<RenderItem<TProductRecord>>[1]
 
-const CourseBundlesComponent = () => {
-	const form = Form.useFormInstance()
-	const bundleIds: string[] = form.getFieldValue(['bundle_ids']) || []
+const LoadingItems = () => {
+	return (
+		<div className="h-[4.5rem] mb-1 bg-gray-100 rounded-md animate-pulse" />
+	)
+}
 
-	const { data, isFetching } = useList<TProductRecord>({
-		resource: 'products',
+const CourseBundlesComponent = () => {
+	const { id: courseId } = useParsed()
+	const form = Form.useFormInstance()
+
+	const { data, isFetching, isLoading } = useList<TProductRecord>({
+		resource: 'bundle_products',
 		filters: [
 			{
-				field: 'include',
+				field: 'meta_key',
 				operator: 'eq',
-				value: bundleIds,
-			},
-
-			{
-				field: 'status',
-				operator: 'eq',
-				value: 'any',
+				value: 'link_course_ids',
 			},
 			{
-				field: 'posts_per_page',
+				field: 'meta_value',
 				operator: 'eq',
-				value: '-1',
+				value: courseId,
 			},
 			{
 				field: 'type',
@@ -38,8 +39,11 @@ const CourseBundlesComponent = () => {
 				value: 'power_bundle_product',
 			},
 		],
+		pagination: {
+			pageSize: -1,
+		},
 		queryOptions: {
-			enabled: !!bundleIds.length,
+			enabled: !!courseId,
 			staleTime: 0,
 			cacheTime: 0,
 		},
@@ -58,27 +62,54 @@ const CourseBundlesComponent = () => {
 		}
 	}, [isFetching])
 
+	const { mutate: create, isLoading: isCreating } = useCreate()
+	const handleCreate = () => {
+		const values = {
+			name: '銷售方案',
+			product_type: 'power_bundle_product', // 創建綑綁商品
+			link_course_ids: [courseId],
+		}
+
+		const formData = toFormData(values)
+
+		create({
+			resource: 'bundle_products',
+			values: formData,
+			invalidates: ['list'],
+		})
+	}
+
 	return (
 		<>
 			<div className="gap-6 p-6">
-				<Button type="primary">新增</Button>
+				<Button type="primary" onClick={handleCreate} loading={isCreating}>
+					新增
+				</Button>
 
-				<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-					<SortableList<TProductRecord>
-						value={bundleProducts}
-						ref={ref}
-						onChange={(newList) => {
-							console.log('⭐  newList:', newList)
+				{isLoading &&
+					new Array(4)
+						.fill(null)
+						.map((_, index) => <LoadingItems key={index} />)}
 
-							// TODO 修改每個 bundle product 的 menu order
-						}}
-						getItemStyles={() => ({ padding: '16px' })}
-						renderEmpty={() => <Empty description="目前沒有銷售方案" />}
-						renderItem={(item: TProductRecord, options: TRenderItemOptions) => (
-							<Item record={item} options={options} />
-						)}
-					/>
-				</div>
+				{!isLoading && (
+					<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+						<SortableList<TProductRecord>
+							value={bundleProducts}
+							ref={ref}
+							onChange={(newList) => {
+								console.log('⭐  newList:', newList)
+
+								// TODO 修改每個 bundle product 的 menu order
+							}}
+							getItemStyles={() => ({ padding: '16px' })}
+							renderEmpty={() => <Empty description="目前沒有銷售方案" />}
+							renderItem={(
+								item: TProductRecord,
+								options: TRenderItemOptions,
+							) => <Item record={item} options={options} />}
+						/>
+					</div>
+				)}
 			</div>
 		</>
 	)
