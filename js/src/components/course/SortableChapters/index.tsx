@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
-import { Form, message, Card } from 'antd'
+import { Form, message } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'
 import {
@@ -13,6 +13,7 @@ import {
 } from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
 import { ChapterEdit } from '@/components/chapters'
+import AddChapters from './AddChapters'
 
 const LoadingChapters = () => (
 	<div className="pl-3">
@@ -28,7 +29,7 @@ const LoadingChapters = () => (
 const SortableChaptersComponent = () => {
 	const form = Form.useFormInstance()
 	const courseId = form?.getFieldValue('id')
-	const { data: chaptersData, isLoading: isListLoading } = useList<
+	const { data: chaptersData, isFetching: isListFetching } = useList<
 		TChapterRecord,
 		HttpError
 	>({
@@ -56,12 +57,12 @@ const SortableChaptersComponent = () => {
 	const { mutate, isLoading } = useCustomMutation()
 
 	useEffect(() => {
-		if (!isListLoading) {
+		if (!isListFetching) {
 			const chapterTree = chapters?.map(chapterToTreeNode)
 			setTreeData(chapterTree)
 			setOriginTree(chapterTree)
 		}
-	}, [isListLoading])
+	}, [isListFetching])
 
 	const handleSave = (data: TreeData<TChapterRecord>) => {
 		// 這個儲存只存新增，不存章節的細部資料
@@ -110,9 +111,12 @@ const SortableChaptersComponent = () => {
 
 	return (
 		<>
+			<div className="mb-8">
+				<AddChapters records={chapters} />
+			</div>
 			<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-				{isListLoading && <LoadingChapters />}
-				{!isListLoading && (
+				{isListFetching && <LoadingChapters />}
+				{!isListFetching && (
 					<SortableTree
 						hideAdd
 						treeData={treeData}

@@ -103,8 +103,12 @@ final class Chapter {
 			'post_type'      => ChapterCPT::POST_TYPE,
 			'posts_per_page' => - 1,
 			'post_status'    => 'any',
-			'orderby'        => 'menu_order',
-			'order'          => 'ASC',
+			'orderby'        => [
+				'menu_order' => 'ASC',
+				'date'       => 'DESC',
+				'ID'         => 'DESC',
+			],
+
 		];
 
 		$args = \wp_parse_args(
@@ -174,23 +178,45 @@ final class Chapter {
 			'meta_data' => $meta_data,
 		] = $this->separator( $request );
 
+		$qty = (int) ( $meta_data['qty'] ?? 1 );
+		unset($meta_data['qty']);
+
+		$post_parents = ( $meta_data['post_parents'] ?? [] );
+		unset($meta_data['post_parents']);
+
+		// 不需要紀錄 depth，深度是由 post_parent 決定的
+		unset($meta_data['depth']);
+
 		$data['meta_input'] = $meta_data;
 
-		$post_id = ChapterFactory::create_chapter( $data );
-
-		if ( \is_wp_error( $post_id ) ) {
-			return $post_id;
+		$success_ids = [];
+		$failed_ids  = [];
+		foreach ($post_parents as $post_parent) {
+			$data['post_parent'] = $post_parent;
+			for ($i = 0; $i < $qty; $i++) {
+				$post_id = ChapterFactory::create_chapter( $data );
+				if (is_numeric($post_id)) {
+					$success_ids[] = $post_id;
+				} else {
+					$failed_ids[] = $post_id;
+				}
+			}
 		}
 
 		return new \WP_REST_Response(
-			[
-				'code'    => 'create_success',
-				'message' => '新增成功',
-				'data'    => [
-					'id' => $post_id,
-				],
-			]
+			$success_ids
 		);
+
+		// return new \WP_REST_Response(
+		// [
+		// 'code'    => 'create_success',
+		// 'message' => '新增成功',
+		// 'data'    => [
+		// 'success_ids' => $success_ids,
+		// 'failed_ids'  => $failed_ids,
+		// ],
+		// ]
+		// );
 	}
 
 

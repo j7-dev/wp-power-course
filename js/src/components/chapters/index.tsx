@@ -1,1 +1,1 @@
-export * from './ChapterEdit'
+export * from './Edit'

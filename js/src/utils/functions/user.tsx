@@ -9,7 +9,6 @@ export function getGCDItems<T>(items: T[][], key = 'id'): T[] {
 	// sort by items length asc
 	const sortedItems = items.sort((a, b) => a.length - b.length)
 	if (sortedItems[0].length === 0) return []
-	console.log('sortedItems[0]', sortedItems[0])
 	const firstItemIds = sortedItems?.[0]?.map((item) => item?.[key as keyof T])
 
 	const gcdIds: string[] = []

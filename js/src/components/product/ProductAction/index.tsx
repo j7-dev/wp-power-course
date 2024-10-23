@@ -1,6 +1,5 @@
 import React, { FC } from 'react'
 import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
-import AddChapter from '@/components/product/ProductAction/AddChapter'
 import ToggleVisibility from './ToggleVisibility'
 import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
