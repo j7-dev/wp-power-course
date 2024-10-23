@@ -1,16 +1,15 @@
 import React, { memo } from 'react'
-import { useTable } from '@refinedev/antd'
+import { useTable, useModal } from '@refinedev/antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
-import { Table, Form, TableProps, Card, FormInstance } from 'antd'
+import { Table, TableProps, Card, FormInstance, Button, Modal } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection, FilterTags } from 'antd-toolkit'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { useUserFormDrawer, useGCDItems } from '@/hooks'
+import { useGCDItems } from '@/hooks'
 import {
-	UserDrawer,
 	GrantCourseAccess,
 	RemoveCourseAccess,
 	ModifyCourseExpireDate,
@@ -18,6 +17,7 @@ import {
 import Filter, { TFilterValues } from './Filter'
 import { HttpError } from '@refinedev/core'
 import { keyLabelMapper } from './utils'
+import CsvUpload from './CsvUpload'
 
 const StudentTable = () => {
 	const { searchFormProps, tableProps } = useTable<
@@ -48,11 +48,7 @@ const StudentTable = () => {
 			},
 		})
 
-	const [form] = Form.useForm()
-	const { show, drawerProps } = useUserFormDrawer({ form, resource: 'users' })
-	const columns = useColumns({
-		onClick: show,
-	})
+	const columns = useColumns()
 
 	const selectedAllAVLCourses = selectedRowKeys
 		.map((key) => {
@@ -66,6 +62,9 @@ const StudentTable = () => {
 		useGCDItems<TAVLCourse>({
 			allItems: selectedAllAVLCourses,
 		})
+
+	// CSV 上傳 Modal
+	const { show, modalProps } = useModal()
 
 	return (
 		<>
@@ -84,7 +83,7 @@ const StudentTable = () => {
 					/>
 				</div>
 
-				<div className="mb-4 flex gap-x-6">
+				<div className="mb-4 flex gap-x-6 justify-between">
 					<div>
 						<label className="block mb-2">批量操作</label>
 						<div className="flex gap-x-4">
@@ -110,6 +109,14 @@ const StudentTable = () => {
 							<GcdItemsTags />
 						</div>
 					)}
+					<Button
+						onClick={show}
+						color="primary"
+						variant="outlined"
+						className="self-end"
+					>
+						CSV 批次上傳學員權限
+					</Button>
 				</div>
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
@@ -122,9 +129,14 @@ const StudentTable = () => {
 					}}
 				/>
 			</Card>
-			<Form layout="vertical" form={form}>
-				<UserDrawer {...drawerProps} />
-			</Form>
+			<Modal
+				{...modalProps}
+				centered
+				title="CSV 批次上傳學員權限"
+				footer={null}
+			>
+				<CsvUpload />
+			</Modal>
 		</>
 	)
 }

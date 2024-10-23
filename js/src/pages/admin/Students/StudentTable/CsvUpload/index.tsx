@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Button, Alert } from 'antd'
-import { FileUpload, Heading } from '@/components/general'
+import { FileUpload } from '@/components/general'
 import { useApiUrl } from '@refinedev/core'
 import { siteUrl } from '@/utils'
 import { SiMicrosoftexcel } from 'react-icons/si'
@@ -8,10 +8,8 @@ import { SiMicrosoftexcel } from 'react-icons/si'
 const index = () => {
 	const apiUrl = useApiUrl()
 	return (
-		<div className="flex flex-col md:flex-row gap-8">
-			<div className="w-full max-w-[400px]">
-				<Heading className="mt-8">CSV 批次上傳學員權限</Heading>
-
+		<div className="flex flex-col md:flex-row gap-8 py-8">
+			<div className="w-full">
 				<Alert
 					message="批次上傳注意事項"
 					description={
@@ -65,7 +63,6 @@ const index = () => {
 					}}
 				/>
 			</div>
-			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto"></div>
 		</div>
 	)
 }
