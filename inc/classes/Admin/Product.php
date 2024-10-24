@@ -104,7 +104,7 @@ final class Product {
 			unset( $actions['trash'] );
 			$actions['edit'] = sprintf(
 			/*html*/'<a href="%s" aria-label="編輯〈課程〉" target="_blank">編輯</a>',
-			\admin_url('admin.php?page=power-course')
+			\admin_url("admin.php?page=power-course#/courses/edit/{$post->ID}")
 			);
 		}
 
@@ -144,7 +144,7 @@ final class Product {
 	 */
 	public static function modify_edit_post_link( string $link, int $post_id, $context ): string {
 		if ( CourseUtils::is_course_product( $post_id ) || BundleProduct::is_bundle_product( $post_id ) ) {
-			$link = \admin_url('admin.php?page=power-course');
+			$link = \admin_url("admin.php?page=power-course#/courses/edit/{$post_id}");
 		}
 
 		return $link;

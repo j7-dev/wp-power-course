@@ -186,6 +186,8 @@ final class Chapter {
 
 		// 不需要紀錄 depth，深度是由 post_parent 決定的
 		unset($meta_data['depth']);
+		// action 用來區分是 create 還是 update ，目前只有 create ，所以不用判斷
+		unset($meta_data['action']);
 
 		$data['meta_input'] = $meta_data;
 
