@@ -2,7 +2,7 @@ div[class^="ant-"] {
 	.at-product-price {
 		del,
 		ins {
-			@apply ml-0 block;
+			@apply ml-0 tw-block;
 		}
 
 		.woocommerce-Price-currencySymbol {

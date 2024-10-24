@@ -98,7 +98,7 @@ const MediaLibraryButton = (props: TMediaLibraryButton) => {
 					<div className="absolute w-full h-full top-0 left-0 p-2">
 						<div className="w-full h-full rounded-xl overflow-hidden">
 							<div
-								className="rounded-xl bg-gray-200 block"
+								className="rounded-xl bg-gray-200 tw-block"
 								style={{
 									position: 'relative',
 									paddingTop: '56.25%',

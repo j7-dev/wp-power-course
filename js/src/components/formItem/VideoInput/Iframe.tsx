@@ -100,7 +100,7 @@ const Iframe: FC<{
 					>
 						<div className="w-full h-full rounded-xl overflow-hidden">
 							<div
-								className={`rounded-xl bg-gray-200 ${watchField ? 'block' : 'tw-hidden'}`}
+								className={`rounded-xl bg-gray-200 ${watchField ? 'tw-block' : 'tw-hidden'}`}
 								style={{
 									position: 'relative',
 									paddingTop: '56.25%',

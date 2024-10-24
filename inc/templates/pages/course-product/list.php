@@ -25,7 +25,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 $regular_price = (float) $product->get_regular_price();
 
-$regular_price_html = $regular_price ? '<del class="block text-xs text-gray-600">NT$' . $regular_price . '</del>' : '';
+$regular_price_html = $regular_price ? '<del class="tw-block text-xs text-gray-600">NT$' . $regular_price . '</del>' : '';
 
 $product_name = $product->get_name();
 
@@ -41,7 +41,7 @@ printf(
 	</div>
 	<div class="w-2/3">
 		<h6 class="text-sm font-semibold mb-1">%2$s</h6>
-		<del class="block text-xs text-gray-600">%3$s</del>
+		<del class="tw-block text-xs text-gray-600">%3$s</del>
 	</div>
 </div>',
 	$product_image_url,

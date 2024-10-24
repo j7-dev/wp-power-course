@@ -15,9 +15,8 @@ import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
 import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
-import { toFormData } from '@/utils'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { siteUrl, course_permalink_structure } from '@/utils'
+import { siteUrl, course_permalink_structure, toFormData } from '@/utils'
 
 export const CoursesEdit = () => {
 	// 初始化資料
@@ -47,6 +46,12 @@ export const CoursesEdit = () => {
 			children: <CourseBundles />,
 		},
 		{
+			key: 'Chapters',
+			forceRender: false,
+			label: '章節管理',
+			children: <SortableChapters />,
+		},
+		{
 			key: 'CourseQA',
 			forceRender: true,
 			label: 'QA設定',
@@ -69,12 +74,6 @@ export const CoursesEdit = () => {
 			forceRender: true,
 			label: '學員管理',
 			children: <CourseStudents />,
-		},
-		{
-			key: 'Chapters',
-			forceRender: false,
-			label: '章節管理',
-			children: <SortableChapters />,
 		},
 	]
 

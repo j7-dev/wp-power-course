@@ -213,7 +213,9 @@ const BundleForm: FC<{
 				}}
 			/>
 
-			<div className="border-2 border-dashed border-blue-500 rounded-xl p-4 mb-8">
+			<div
+				className={`border-2 border-dashed rounded-xl p-4 mb-8 ${selectedProducts.length ? 'border-blue-500' : 'border-red-500'}`}
+			>
 				{/* 當前課程方案 */}
 				<div
 					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
@@ -251,7 +253,7 @@ const BundleForm: FC<{
 						onClick={() => setShowList(!showList)}
 					/>
 					<div
-						className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 h-[30rem] overflow-y-auto ${showList ? 'block' : 'tw-hidden'}`}
+						className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 h-[30rem] overflow-y-auto ${showList ? 'tw-block' : 'tw-hidden'}`}
 						onMouseLeave={() => setShowList(false)}
 					>
 						<List

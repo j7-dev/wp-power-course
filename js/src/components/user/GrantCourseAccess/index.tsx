@@ -62,7 +62,7 @@ const GrantCourseAccessComponent = ({
 
 	return (
 		<>
-			{label && <label className="block mb-2">{label}</label>}
+			{label && <label className="tw-block mb-2">{label}</label>}
 			<Space.Compact className="w-full">
 				<Select {...selectProps} />
 				<DatePicker
