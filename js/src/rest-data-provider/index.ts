@@ -25,8 +25,9 @@ export const dataProvider = (
 		const query: {
 			paged?: number
 			posts_per_page?: number
-			orderby?: TOrderBy
-			order?: TOrder
+
+			// orderby?: TOrderBy
+			// order?: TOrder
 		} = {}
 
 		if (mode === 'server') {
@@ -34,15 +35,10 @@ export const dataProvider = (
 			query.posts_per_page = pageSize
 		}
 
-		const generatedSort = generateSort(sorters)
-		if (generatedSort) {
-			const { _sort, _order } = generatedSort
-			query.orderby = _sort.join(',')
-			query.order = _order.join(',')
-		}
+		const sortQueryString = generateSort(sorters)
 
 		const { data, headers } = await httpClient[requestMethod](
-			`${url}?${stringify(query)}&${stringify(queryFilters, { arrayFormat: 'bracket' })}`,
+			`${url}?${stringify(query)}&${stringify(queryFilters, { arrayFormat: 'bracket' })}&${sortQueryString}`,
 			{
 				headers: headersFromMeta,
 			},
@@ -195,15 +191,8 @@ export const dataProvider = (
 		let requestUrl = `${url}?`
 
 		if (sorters) {
-			const generatedSort = generateSort(sorters)
-			if (generatedSort) {
-				const { _sort, _order } = generatedSort
-				const sortQuery = {
-					orderby: _sort.join(','),
-					order: _order.join(','),
-				}
-				requestUrl = `${requestUrl}&${stringify(sortQuery)}`
-			}
+			const sortQueryString = generateSort(sorters)
+			requestUrl = `${requestUrl}&${sortQueryString}`
 		}
 
 		if (filters) {
