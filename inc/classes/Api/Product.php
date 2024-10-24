@@ -525,8 +525,8 @@ final class Product {
 			'regular_price'                             => $product->get_regular_price(),
 			'sale_price'                                => $product->get_sale_price(),
 			'on_sale'                                   => $product->is_on_sale(),
-			'date_on_sale_from'                         => $product->get_date_on_sale_from(),
-			'date_on_sale_to'                           => $product->get_date_on_sale_to(),
+			'date_on_sale_from'                         => $product->get_date_on_sale_from()?->getTimestamp(),
+			'date_on_sale_to'                           => $product->get_date_on_sale_to()?->getTimestamp(),
 			'total_sales'                               => $product->get_total_sales(),
 
 			// Get Product Stock
@@ -569,7 +569,7 @@ final class Product {
 			// Bundle 商品包含的商品 ids
 			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => (array) $unique_include_product_ids,
 
-			'sale_date_range'                           => [ (int) $product->get_meta( 'sale_from' ), (int) $product->get_meta( 'sale_to' ) ],
+			'sale_date_range'                           => [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                                   => [],
 			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),

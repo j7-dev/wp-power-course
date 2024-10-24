@@ -53,11 +53,11 @@ const EditBundleComponent = ({
 
 			// 處理日期欄位 sale_date_range
 
-			const sale_from =
+			const date_on_sale_from =
 				(sale_date_range[0] as any) instanceof dayjs
 					? (sale_date_range[0] as Dayjs).unix()
 					: sale_date_range[0]
-			const sale_to =
+			const date_on_sale_to =
 				(sale_date_range[1] as any) instanceof dayjs
 					? (sale_date_range[1] as Dayjs).unix()
 					: sale_date_range[1]
@@ -65,8 +65,8 @@ const EditBundleComponent = ({
 			const formattedValues = {
 				...values,
 				product_type: 'power_bundle_product', // 創建綑綁商品
-				sale_from,
-				sale_to,
+				date_on_sale_from,
+				date_on_sale_to,
 				sale_date_range: undefined,
 			}
 			onFinish(toFormData(formattedValues))
