@@ -52,7 +52,7 @@ const index = () => {
 
 				<FileUpload
 					uploadProps={{
-						className: 'mt-4 block w-full [&_.ant-upload]:w-full',
+						className: 'mt-4 tw-block w-full [&_.ant-upload]:w-full',
 						action: `${apiUrl}/users/upload-students`,
 					}}
 					buttonProps={{

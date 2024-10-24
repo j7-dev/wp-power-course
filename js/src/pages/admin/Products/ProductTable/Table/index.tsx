@@ -135,7 +135,7 @@ const Main = () => {
 							</div>
 							<div className="mb-4 flex gap-x-6">
 								<div>
-									<label className="block mb-2">批量操作</label>
+									<label className="tw-block mb-2">批量操作</label>
 									<div className="flex gap-x-4">
 										<UpdateBoundCourses
 											product_ids={selectedRowKeys as string[]}
@@ -155,7 +155,7 @@ const Main = () => {
 								</div>
 								{!!gcdItems.length && (
 									<div className="flex-1">
-										<label className="block mb-2">選擇課程</label>
+										<label className="tw-block mb-2">選擇課程</label>
 										<GcdItemsTags />
 									</div>
 								)}

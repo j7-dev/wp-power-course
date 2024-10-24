@@ -144,7 +144,7 @@ const CourseDescriptionComponent = () => {
 					<DescriptionDrawer />
 
 					<div className="mb-8">
-						<label className="mb-3 block">課程封面圖</label>
+						<label className="mb-3 tw-block">課程封面圖</label>
 						<FileUpload />
 						<Item hidden name={['files']} label="課程封面圖">
 							<Input />
