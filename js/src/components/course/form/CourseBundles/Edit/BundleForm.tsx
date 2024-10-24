@@ -192,11 +192,7 @@ const BundleForm: FC<{
 			>
 				<Input />
 			</Item>
-			<Item
-				name={['description']}
-				label="銷售方案說明"
-				normalize={(value) => value.replace(/\n/g, '<br>')}
-			>
+			<Item name={['purchase_note']} label="銷售方案說明">
 				<Input.TextArea rows={8} />
 			</Item>
 
