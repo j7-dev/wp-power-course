@@ -83,7 +83,6 @@ export type TCourseRecord = TCourseBaseRecord & {
 	extra_student_count: number
 	feature_video: TVideo
 	trial_video: TVideo
-	bundle_ids: string[]
 }
 
 export type TChapterRecord = {
