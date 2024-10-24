@@ -5,7 +5,7 @@ export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品
 
 export const OPTIONS = [
 	{ label: '合購優惠', value: 'bundle' },
-	{ label: '定期定額', value: 'subscription' },
+	{ label: '🚧 定期定額 (開發中...)', value: 'subscription', disabled: true },
 	{ label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
