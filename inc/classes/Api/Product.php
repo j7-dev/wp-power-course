@@ -66,6 +66,10 @@ final class Product {
 			'method'   => 'post',
 		],
 		[
+			'endpoint' => 'bundle_products/sort',
+			'method'   => 'post',
+		],
+		[
 			'endpoint' => 'bundle_products/(?P<id>\d+)',
 			'method'   => 'delete',
 		],
@@ -605,16 +609,15 @@ final class Product {
 	public function post_bundle_products_callback( $request ) {
 
 		$body_params = $request->get_body_params() ?? [];
-		$file_params = $request->get_file_params();
-
 		$body_params = WP::sanitize_text_field_deep( $body_params );
-
-		$product = new BundleProduct();
+		$file_params = $request->get_file_params();
 
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
 			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+
+		$product = new BundleProduct();
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -639,6 +642,57 @@ final class Product {
 					'id' => (string) $product->get_id(),
 				],
 			]
+		);
+	}
+
+	/**
+	 * 排序
+	 *
+	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function post_bundle_products_sort_callback( $request ) {
+		$body_params             = $request->get_json_params() ?? [];
+		$body_params             = WP::sanitize_text_field_deep( $body_params );
+		$include_required_params = WP::include_required_params( $body_params, [ 'sort_list' ] );
+		if ($include_required_params !== true) {
+			return $include_required_params;
+		}
+
+		/**
+		 * @var array<int, array{id: int, menu_order: int}>
+		 */
+		$sort_list = $body_params['sort_list'] ?? [];
+
+		$success_ids = [];
+		$failed_ids  = [];
+		foreach ($sort_list as $sort_item) {
+			$id         = $sort_item['id'];
+			$menu_order = $sort_item['menu_order'];
+			$result     = \wp_update_post(
+				[
+					'ID'         => $id,
+					'menu_order' => $menu_order,
+				]
+				);
+			if (is_numeric($result)) {
+				$success_ids[] = $id;
+			} else {
+				$failed_ids[] = $id;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'sort_success',
+				'message' => '排序成功',
+				'data'    => [
+					'success_ids' => $success_ids,
+					'failed_ids'  => $failed_ids,
+				],
+			],
 		);
 	}
 
