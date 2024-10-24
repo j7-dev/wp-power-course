@@ -162,15 +162,8 @@ export const dataProvider = (
 		let requestUrl = `${url}?`
 
 		if (sorters) {
-			const generatedSort = generateSort(sorters)
-			if (generatedSort) {
-				const { _sort, _order } = generatedSort
-				const sortQuery = {
-					orderby: _sort.join(','),
-					order: _order.join(','),
-				}
-				requestUrl = `${requestUrl}&${stringify(sortQuery)}`
-			}
+			const sortQueryString = generateSort(sorters)
+			requestUrl = `${requestUrl}&${sortQueryString}`
 		}
 
 		if (filters) {

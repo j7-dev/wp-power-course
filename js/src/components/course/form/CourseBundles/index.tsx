@@ -68,6 +68,10 @@ const CourseBundlesComponent = () => {
 				field: 'menu_order',
 				order: 'asc',
 			},
+			{
+				field: 'date',
+				order: 'desc',
+			},
 		],
 		pagination: {
 			pageSize: -1,

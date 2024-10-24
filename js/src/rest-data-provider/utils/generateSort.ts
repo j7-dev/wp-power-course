@@ -1,18 +1,25 @@
 import { CrudSorting } from '@refinedev/core'
 
-export const generateSort = (sorters?: CrudSorting) => {
-	if (sorters && sorters.length > 0) {
-		const _sort: string[] = []
-		const _order: string[] = []
+// unset($args['order']);
+// $args['orderby'] = [
+// 	'menu_order' => 'ASC',
+// 	'date'       => 'DESC',
+// ];
 
-		sorters.map((item) => {
-			_sort.push(item.field)
-			_order.push(item.order)
-		})
+// orderby['menu_order'] = 'ASC'
+// orderby['date'] = 'DESC'
 
-		return {
-			_sort,
-			_order,
-		}
+// sorters {field:string, order:string}[]
+export const generateSort = (sorters?: CrudSorting): string => {
+	if (!Array.isArray(sorters)) {
+		return ''
 	}
+
+	const sortQueryString = sorters
+		.map(({ field, order }) => {
+			return `orderby[${field}]=${order}`
+		})
+		.join('&')
+
+	return sortQueryString
 }
