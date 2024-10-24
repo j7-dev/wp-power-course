@@ -33,6 +33,9 @@ $purchase_note = \wpautop( $bundle_product->get_purchase_note() );
 
 $bundle_type_label = $bundle_product->get_meta( 'bundle_type_label' );
 
+$is_on_sale      = $bundle_product->is_on_sale();
+$date_on_sale_to = $bundle_product->get_date_on_sale_to()?->date('Y/m/d H:i');
+
 echo '<div class="w-full bg-white shadow-lg rounded p-6">';
 printf(
 /*html*/'
@@ -84,4 +87,12 @@ Plugin::get(
 );
 
 echo '</div>';
+
+if ($is_on_sale && $date_on_sale_to) {
+	printf(
+	/*html*/'<p class="text-gray-500 text-xs text-center mt-2 mb-0">限時優惠至 %s</p>',
+	$date_on_sale_to
+	);
+}
+
 echo '</div>';
