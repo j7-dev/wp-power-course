@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useLayoutEffect } from 'react'
 import { Form, Switch } from 'antd'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
@@ -7,6 +7,8 @@ import { toFormData } from '@/utils'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import BundleForm from './BundleForm'
 import dayjs, { Dayjs } from 'dayjs'
+import { useAtom, useSetAtom, useAtomValue } from 'jotai'
+import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
 
 const EditBundleComponent = ({
 	record,
@@ -16,6 +18,10 @@ const EditBundleComponent = ({
 	course: TCourseRecord
 }) => {
 	const { id, name } = record
+
+	const selectedProducts = useAtomValue(selectedProductsAtom)
+	const [theCourse, setTheCourse] = useAtom(courseAtom)
+	const setBundleProduct = useSetAtom(bundleProductAtom)
 
 	// 初始化資料
 	const { formProps, form, saveButtonProps, mutation, onFinish } =
@@ -33,11 +39,14 @@ const EditBundleComponent = ({
 
 	const watchStatus = Form.useWatch(['status'], form)
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		form.setFieldsValue(record)
+		setBundleProduct(record)
 	}, [record])
 
-	const [selectedProducts, setSelectedProducts] = useState<TProductRecord[]>([])
+	useLayoutEffect(() => {
+		setTheCourse(course)
+	}, [course])
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (
@@ -71,6 +80,10 @@ const EditBundleComponent = ({
 			}
 			onFinish(toFormData(formattedValues))
 		})
+	}
+
+	if (!theCourse) {
+		return null
 	}
 
 	return (
@@ -112,12 +125,7 @@ const EditBundleComponent = ({
 			)}
 		>
 			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
-				<BundleForm
-					course={course}
-					record={record}
-					selectedProducts={selectedProducts}
-					setSelectedProducts={setSelectedProducts}
-				/>
+				<BundleForm />
 			</Form>
 		</Edit>
 	)
