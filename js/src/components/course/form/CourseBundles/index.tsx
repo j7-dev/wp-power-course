@@ -70,15 +70,6 @@ const CourseBundlesComponent = () => {
 
 	const ref = useRef<SortableListRef>(null)
 
-	useEffect(() => {
-		if (!isFetching) {
-			form.setFieldValue(
-				['bundle_ids'],
-				bundleProducts.map(({ id }) => id),
-			)
-		}
-	}, [isFetching])
-
 	// 創建
 	const { mutate: create, isLoading: isCreating } = useCreate()
 	const handleCreate = () => {
@@ -107,7 +98,6 @@ const CourseBundlesComponent = () => {
 	return (
 		<>
 			<div className="gap-6 p-6">
-				<Item name={['bundle_ids']} hidden />
 				<div className="mb-8">
 					<Button type="primary" onClick={handleCreate} loading={isCreating}>
 						新增

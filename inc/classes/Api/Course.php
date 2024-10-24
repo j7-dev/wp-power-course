@@ -516,8 +516,8 @@ final class Course {
 		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
 		unset( $meta_data['files'] ); // files 會上傳，不用存
 
-		// 將 teacher_ids, bundle_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
-		$array_keys = [ 'teacher_ids', 'bundle_ids' ];
+		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
+		$array_keys = [ 'teacher_ids' ];
 		foreach ($array_keys as $meta_key) {
 			$array_value = [];
 			if (isset($meta_data[ $meta_key ])) {
