@@ -40,6 +40,7 @@ const ListItem = ({
 				<ProductName
 					record={record}
 					onClick={() => setSelectedProduct(record)}
+					hideImage={true}
 				/>
 			</div>
 
