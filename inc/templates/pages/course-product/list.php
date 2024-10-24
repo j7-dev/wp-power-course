@@ -35,11 +35,11 @@ $regular_price_html = \wc_price( $regular_price );
 
 printf(
 	'
-<div class="flex gap-5">
-	<div class="group w-1/3 aspect-video rounded overflow-hidden">
+<div class="grid grid-cols-[1fr_2fr] gap-5">
+	<div class="group aspect-video rounded overflow-hidden">
 		<img class="w-full h-full object-cover group-hover:scale-125 transition duration-300 ease-in-out" src="%1$s" alt="%2$s" loading="lazy">
 	</div>
-	<div class="w-2/3">
+	<div>
 		<h6 class="text-sm font-semibold mb-1">%2$s</h6>
 		<del class="tw-block text-xs text-gray-600">%3$s</del>
 	</div>
