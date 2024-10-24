@@ -197,15 +197,17 @@ final class Templates {
 			return;
 		}
 
+		global $post;
+
 		$admin_bar->add_menu(
 			[
 				'id'     => Plugin::$kebab,
 				'parent' => null,
 				'group'  => null,
-				'title'  => '課程列表', // you can use img tag with image link. it will show the image icon Instead of the title.
-				'href'   => \admin_url('admin.php?page=' . Plugin::$kebab),
+				'title'  => '編輯課程', // you can use img tag with image link. it will show the image icon Instead of the title.
+				'href'   => \admin_url("admin.php?page=power-course#/courses/edit/{$post->ID}"),
 				'meta'   => [
-					'title' => \__( '課程列表', 'power_course' ), // This title will show on hover
+					'title' => \__( '編輯課程', 'power_course' ), // This title will show on hover
 				],
 			]
 		);

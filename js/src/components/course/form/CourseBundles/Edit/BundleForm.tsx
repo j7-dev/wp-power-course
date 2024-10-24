@@ -341,7 +341,6 @@ const BundleForm: FC<{
 			<Item
 				name={['sale_price']}
 				label="方案折扣價"
-				tooltip="折扣價不能超過原價"
 				help={
 					<div className="mb-4">
 						<div className="grid grid-cols-2 gap-x-4">
@@ -369,7 +368,7 @@ const BundleForm: FC<{
 							</div>
 						</div>
 						{watchSalePrice > watchRegularPrice && (
-							<p className="text-red-500 m-0">折扣價不能超過原價</p>
+							<p className="text-red-500 m-0">折扣價超過原價</p>
 						)}
 					</div>
 				}

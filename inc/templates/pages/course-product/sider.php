@@ -24,31 +24,29 @@ $args = wp_parse_args( $args, $default_args );
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
-?>
 
-<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">
+echo '<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
 
-	<?php Plugin::get( 'card/single-product' ); ?>
-	<?php
-	$bundle_ids = CourseUtils::get_bundles_by_product( (int) $product->get_id(), true );
-	foreach ( $bundle_ids as $bundle_id ) {
-		$bundle_product = \wc_get_product( $bundle_id );
-		if ( ! $bundle_product ) {
-			continue;
-		}
+Plugin::get( 'card/single-product' );
 
-		$bundle_product = new BundleProduct( $bundle_product );
-		if ( 'publish' !== $bundle_product->get_status() ) {
-			continue;
-		}
-		Plugin::get(
-			'card/bundle-product',
-			[
-				'bundle_product' => $bundle_product,
-			]
-			);
+$bundle_ids = CourseUtils::get_bundles_by_product( (int) $product->get_id(), true );
+foreach ( $bundle_ids as $bundle_id ) {
+	$bundle_product = \wc_get_product( $bundle_id );
+	if ( ! $bundle_product ) {
+		continue;
 	}
-	?>
+
+	$bundle_product = new BundleProduct( $bundle_product );
+	if ( 'publish' !== $bundle_product->get_status() ) {
+		continue;
+	}
+	Plugin::get(
+		'card/bundle-product',
+		[
+			'bundle_product' => $bundle_product,
+		]
+		);
+}
 
 
-</div>
+echo '</div>';

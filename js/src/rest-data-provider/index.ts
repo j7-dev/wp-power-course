@@ -11,7 +11,7 @@ const { stringify } = queryString
 export const dataProvider = (
 	apiUrl: string,
 	httpClient: AxiosInstance = axiosInstance,
-): Omit<Required<DataProvider>, 'updateMany' | 'deleteMany'> => ({
+): Omit<Required<DataProvider>, 'deleteMany'> => ({
 	getList: async ({ resource, pagination, filters, sorters, meta }) => {
 		const url = `${apiUrl}/${resource}`
 
@@ -90,10 +90,15 @@ export const dataProvider = (
 	createMany: async ({ resource, variables, meta }) => {
 		const url = `${apiUrl}/${resource}`
 
+		const formattedVariables = {
+			...variables,
+			action: 'create',
+		}
+
 		const { headers, method } = meta ?? {}
 		const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
 
-		const { data } = await httpClient[requestMethod](url, variables, {
+		const { data } = await httpClient[requestMethod](url, formattedVariables, {
 			headers: {
 				'Content-Type': 'multipart/form-data;',
 				...headers,
@@ -121,6 +126,27 @@ export const dataProvider = (
 		return {
 			data,
 		}
+	},
+
+	updateMany: async ({ resource, ids, variables, meta }) => {
+		const url = `${apiUrl}/${resource}`
+		const formattedVariables = {
+			...variables,
+			ids,
+			action: 'update',
+		}
+
+		const { headers, method } = meta ?? {}
+		const requestMethod = (method as THttpMethodsWithBody) ?? 'post'
+
+		const result = await httpClient[requestMethod](url, formattedVariables, {
+			headers: {
+				'Content-Type': 'multipart/form-data;',
+				...headers,
+			},
+		})
+
+		return result
 	},
 
 	getOne: async ({ resource, id, meta }) => {
