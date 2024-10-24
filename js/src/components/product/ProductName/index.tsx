@@ -9,27 +9,30 @@ import { EyeOutlined } from '@ant-design/icons'
 export const ProductName: FC<{
 	record: TProductRecord | TCourseRecord | TChapterRecord
 	onClick?: () => void
-}> = ({ record, onClick }) => {
+	hideImage?: boolean
+}> = ({ record, onClick, hideImage = false }) => {
 	const { id, sku = '', name, images } = record
 	const image_url = images?.[0]?.url || defaultImage
 
 	return (
 		<>
 			<div className="flex">
-				<div className="mr-4">
-					<Image
-						className="rounded-md object-cover"
-						preview={{
-							mask: <EyeOutlined />,
-							maskClassName: 'rounded-md',
-							forceRender: true,
-						}}
-						width={72}
-						height={40}
-						src={image_url || defaultImage}
-						fallback={defaultImage}
-					/>
-				</div>
+				{!hideImage && (
+					<div className="mr-4">
+						<Image
+							className="rounded-md object-cover"
+							preview={{
+								mask: <EyeOutlined />,
+								maskClassName: 'rounded-md',
+								forceRender: true,
+							}}
+							width={72}
+							height={40}
+							src={image_url || defaultImage}
+							fallback={defaultImage}
+						/>
+					</div>
+				)}
 				<div className="flex-1">
 					<p
 						className="mb-1 text-primary hover:text-primary/70 cursor-pointer"

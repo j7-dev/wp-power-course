@@ -398,20 +398,6 @@ const BundleForm: FC<{
 					label: '銷售期間',
 				}}
 			/>
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-				<div>
-					<label className="mb-3 block">課程封面圖</label>
-					<div className="mb-8">
-						<FileUpload />
-						<Item hidden name={['files']} label="課程封面圖">
-							<Input />
-						</Item>
-						<Item hidden name={['images']}>
-							<Input />
-						</Item>
-					</div>
-				</div>
-			</div>
 
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
