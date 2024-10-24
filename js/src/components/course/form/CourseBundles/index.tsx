@@ -1,8 +1,15 @@
-import React, { useRef, useEffect, memo, useState } from 'react'
-import { Button, Form, Empty } from 'antd'
+import React, { useRef, memo, useState } from 'react'
+import { Button, Empty, message } from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { RenderItem } from '@ant-design/pro-editor/es/SortableList/type'
-import { useList, useCreate, useParsed, useOne } from '@refinedev/core'
+import {
+	useList,
+	useCreate,
+	useParsed,
+	useOne,
+	useCustomMutation,
+	useApiUrl,
+} from '@refinedev/core'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import ListItem from './ListItem'
@@ -11,7 +18,6 @@ import { EditBundle } from './Edit'
 
 export type TRenderItemOptions = Parameters<RenderItem<TProductRecord>>[1]
 
-const { Item } = Form
 const LoadingItems = ({ className }: { className?: string }) => (
 	<div>
 		{new Array(4).fill(null).map((_, index) => (
@@ -24,20 +30,21 @@ const LoadingItems = ({ className }: { className?: string }) => (
 )
 
 const CourseBundlesComponent = () => {
+	// 取得課程 record
 	const { id: courseId } = useParsed()
 	const { data: courseData } = useOne<TCourseRecord>({
 		resource: 'courses',
 		id: courseId,
 		meta: {
+			// 為了避免重複 query，所以加入 meta 與列表的 queryKey 一樣
 			label: '課程列表',
 			id: courseId,
 		},
 	})
 	const course = courseData?.data
 
-	const form = Form.useFormInstance()
-
-	const { data, isFetching, isLoading } = useList<TProductRecord>({
+	// 取得銷售方案列表
+	const { data, isLoading } = useList<TProductRecord>({
 		resource: 'bundle_products',
 		filters: [
 			{
@@ -56,6 +63,12 @@ const CourseBundlesComponent = () => {
 				value: 'power_bundle_product',
 			},
 		],
+		sorters: [
+			{
+				field: 'menu_order',
+				order: 'asc',
+			},
+		],
 		pagination: {
 			pageSize: -1,
 		},
@@ -65,12 +78,11 @@ const CourseBundlesComponent = () => {
 			cacheTime: 0,
 		},
 	})
-
 	const bundleProducts = data?.data || []
 
 	const ref = useRef<SortableListRef>(null)
 
-	// 創建
+	// 創建銷售方案
 	const { mutate: create, isLoading: isCreating } = useCreate()
 	const handleCreate = () => {
 		const values = {
@@ -95,6 +107,10 @@ const CourseBundlesComponent = () => {
 		null,
 	)
 
+	// 批次變更，排序用
+	const { mutate: sort } = useCustomMutation()
+	const apiUrl = useApiUrl()
+
 	return (
 		<>
 			<div className="gap-6 p-6">
@@ -111,7 +127,28 @@ const CourseBundlesComponent = () => {
 							value={bundleProducts}
 							ref={ref}
 							onChange={(newList) => {
-								console.log('⭐  newList:', newList)
+								const sort_list = newList.map(({ id }, index) => ({
+									id,
+									menu_order: index,
+								}))
+
+								sort(
+									{
+										url: `${apiUrl}/bundle_products/sort`,
+										method: 'post',
+										values: {
+											sort_list,
+										},
+									},
+									{
+										onSuccess: () => {
+											message.success({
+												content: '排序儲存成功',
+												key: 'bundle-sorting',
+											})
+										},
+									},
+								)
 
 								// TODO 修改每個 bundle product 的 menu order
 							}}
