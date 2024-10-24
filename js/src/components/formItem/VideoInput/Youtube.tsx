@@ -13,6 +13,10 @@ const Youtube: FC<FormItemProps> = (formItemProps) => {
 			return `https://www.youtube.com/watch?v=${videoId}`
 		}
 
+		if (videoId) {
+			return `https://www.youtube.com/watch?v=${videoId}`
+		}
+
 		return ''
 	}
 	const getEmbedVideoUrl = (videoId: string | null) =>

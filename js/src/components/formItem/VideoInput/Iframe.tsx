@@ -37,7 +37,6 @@ const Iframe: FC<{
 	const [vIdOrUrl, setVIdOrUrl] = useState('')
 	const form = Form.useFormInstance()
 	const { name } = formItemProps
-	const recordId = Form.useWatch(['id'], form)
 	const watchField = Form.useWatch(name, form)
 	const platFormName = type.toUpperCase()
 
