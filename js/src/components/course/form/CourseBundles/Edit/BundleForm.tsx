@@ -1,11 +1,7 @@
 import { memo } from 'react'
 import { Form, Select, Input, Switch } from 'antd'
-import { RangePicker } from '@/components/formItem'
 import BundleTypes from './BundleTypes'
 import { OPTIONS, INCLUDED_PRODUCT_IDS_FIELD_NAME } from './utils'
-import { useAtomValue } from 'jotai'
-import { courseAtom } from './atom'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 // TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?
@@ -15,12 +11,8 @@ import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 const { Item } = Form
 
 const BundleForm = () => {
-	const course = useAtomValue(courseAtom)
-	const { id } = course as TCourseRecord
-
 	return (
 		<>
-			<Item name={['link_course_ids']} initialValue={[id]} hidden />
 			<Item
 				name={['bundle_type']}
 				label="銷售方案種類"
@@ -55,18 +47,10 @@ const BundleForm = () => {
 
 			<BundleTypes />
 
-			<RangePicker
-				formItemProps={{
-					name: ['sale_date_range'],
-					label: '銷售期間',
-				}}
-			/>
-
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
 					<Switch />
 				</Item>
-
 				<Item name={['status']} hidden />
 			</div>
 		</>
