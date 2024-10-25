@@ -54,6 +54,9 @@ printf(
 );
 
 foreach ( $product_ids as $product_id ) :
+	if (!is_numeric($product_id)) {
+		continue;
+	}
 	$product = \wc_get_product( $product_id );
 	echo '<div>';
 	Plugin::get(

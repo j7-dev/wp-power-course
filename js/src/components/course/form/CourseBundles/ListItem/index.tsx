@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import {
 	ProductName,
 	ProductPrice,
@@ -17,10 +17,10 @@ const ListItem = ({
 	options,
 	setSelectedProduct,
 }: {
-	record: TProductRecord
+	record: TBundleProductRecord
 	options: TRenderItemOptions
 	setSelectedProduct: React.Dispatch<
-		React.SetStateAction<TProductRecord | null>
+		React.SetStateAction<TBundleProductRecord | null>
 	>
 }) => {
 	const { id, status } = record
@@ -67,7 +67,7 @@ const ListItem = ({
 							deleteProduct({
 								resource: 'bundle_products',
 								id,
-								mutationMode: 'undoable',
+								mutationMode: 'optimistic',
 							}),
 					}}
 				/>

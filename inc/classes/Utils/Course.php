@@ -250,8 +250,10 @@ abstract class Course {
 			'post_status' => $post_status,
 			'meta_key'    => 'link_course_ids',
 			'meta_value'  => (string) $product_id,
-			'orderby'     => 'menu_order',
-			'order'       => 'ASC',
+			'orderby'     => [
+				'menu_order' => 'ASC',
+				'post_date'  => 'DESC',
+			],
 		];
 
 		if ($return_ids) {

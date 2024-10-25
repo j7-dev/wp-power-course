@@ -1,11 +1,11 @@
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 
 export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
 export const OPTIONS = [
 	{ label: '合購優惠', value: 'bundle' },
-	{ label: '🚧 定期定額 (開發中...)', value: 'subscription', disabled: true },
+	{ label: '定期定額', value: 'subscription' },
 	{ label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
@@ -20,7 +20,7 @@ export const getPrice = ({
 }: {
 	isFetching?: boolean
 	type: 'regular_price' | 'sale_price'
-	products: TProductRecord[] | undefined
+	products: TBundleProductRecord[] | undefined
 	course: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
 	excludeMainCourse?: boolean
