@@ -6,7 +6,7 @@ import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
 import { HttpError, useCreate } from '@refinedev/core'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	onSearch,
@@ -24,7 +24,7 @@ import DeleteButton from './DeleteButton'
 
 const Main = () => {
 	const { tableProps, searchFormProps } = useTable<
-		TCourseRecord,
+		TCourseBaseRecord,
 		HttpError,
 		TFilterProps
 	>({
@@ -38,7 +38,7 @@ const Main = () => {
 	const { valueLabelMapper } = useValueLabelMapper()
 
 	const { rowSelection, selectedRowKeys, setSelectedRowKeys } =
-		useRowSelection<TCourseRecord>({
+		useRowSelection<TCourseBaseRecord>({
 			getCheckboxProps: (record) => {
 				const isVariation = getIsVariation(record?.type)
 				return {
@@ -112,7 +112,7 @@ const Main = () => {
 					/>
 				</div>
 				<Table
-					{...(defaultTableProps as unknown as TableProps<TCourseRecord>)}
+					{...(defaultTableProps as unknown as TableProps<TCourseBaseRecord>)}
 					{...tableProps}
 					pagination={{
 						...tableProps.pagination,

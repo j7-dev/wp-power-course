@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Modal, Button } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Modal, Button, Space } from 'antd'
 import {
 	CourseDescription,
 	CourseQA,
@@ -126,12 +126,13 @@ export const CoursesEdit = () => {
 	return (
 		<div className="sticky-card-actions sticky-tabs-nav">
 			<Edit
+				resource="courses"
 				title={
 					<>
 						{watchName} <sub className="text-gray-500">#{watchId}</sub>
 					</>
 				}
-				resource="courses"
+				headerButtons={() => null}
 				saveButtonProps={{
 					...saveButtonProps,
 					children: '儲存',
@@ -150,22 +151,37 @@ export const CoursesEdit = () => {
 							}}
 						/>
 						{defaultButtons}
-						<a
-							href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
-							target="_blank"
-							rel="noreferrer"
-						>
-							<Button className="ml-4" color="primary" variant="filled">
-								前往銷售頁
-							</Button>
-						</a>
 					</>
 				)}
 				isLoading={query?.isLoading}
 			>
 				{/* 這邊這個 form 只是為了調整 style */}
 				<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
-					<Tabs items={items} />
+					<Tabs
+						items={items}
+						tabBarExtraContent={
+							<>
+								<a
+									href={`${siteUrl}/classroom/${watchSlug}`}
+									target="_blank"
+									rel="noreferrer"
+								>
+									<Button className="ml-4" type="default">
+										前往教室
+									</Button>
+								</a>
+								<a
+									href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
+									target="_blank"
+									rel="noreferrer"
+								>
+									<Button className="ml-4" type="default">
+										前往銷售頁
+									</Button>
+								</a>
+							</>
+						}
+					/>
 				</Form>
 			</Edit>
 

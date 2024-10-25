@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { TChapterRecord, TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
@@ -7,7 +7,7 @@ import { Image } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
 
 export const ProductName: FC<{
-	record: TProductRecord | TCourseRecord | TChapterRecord
+	record: TProductRecord | TCourseBaseRecord
 	onClick?: () => void
 	hideImage?: boolean
 }> = ({ record, onClick, hideImage = false }) => {

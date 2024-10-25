@@ -81,6 +81,8 @@ export type TProductRecord = {
 	backorders_allowed: boolean
 	backordered: boolean
 	low_stock_amount: number | null
+	categories: TTerm[]
+	tags: TTerm[]
 	upsell_ids: number[]
 	cross_sell_ids: number[]
 	variations: number[]

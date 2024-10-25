@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table, TableProps, Tag } from 'antd'
-import { TChapterRecord, TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import {
 	ProductName,
 	ProductPrice,
@@ -15,10 +15,10 @@ import { useNavigation } from '@refinedev/core'
 
 const useColumns = () => {
 	const { edit } = useNavigation()
-	const onClick = (record: TCourseRecord) => () => {
+	const onClick = (record: TCourseBaseRecord) => () => {
 		edit('courses', record.id)
 	}
-	const columns: TableProps<TCourseRecord>['columns'] = [
+	const columns: TableProps<TCourseBaseRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
 		{
 			title: '商品名稱',

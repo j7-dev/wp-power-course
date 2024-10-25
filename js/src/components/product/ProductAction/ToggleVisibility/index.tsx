@@ -4,13 +4,13 @@ import {
 	EyeInvisibleOutlined,
 	LoadingOutlined,
 } from '@ant-design/icons'
-import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { Tooltip } from 'antd'
 import { useUpdate } from '@refinedev/core'
 import { toFormData } from '@/utils'
 
 const ToggleVisibility: FC<{
-	record: TCourseRecord | TChapterRecord
+	record: TCourseBaseRecord
 }> = ({ record }) => {
 	const { catalog_visibility = 'visible', id } = record
 	const isVisible = catalog_visibility !== 'hidden'
