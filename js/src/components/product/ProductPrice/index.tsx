@@ -1,11 +1,11 @@
 import { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { renderHTML } from 'antd-toolkit'
 import './style.scss'
 
 export const ProductPrice: FC<{
-	record: TProductRecord | TCourseRecord
+	record: TProductRecord | TCourseBaseRecord
 }> = ({ record }) => {
 	const { price_html } = record
 	if (!price_html) return null

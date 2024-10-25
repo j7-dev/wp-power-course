@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Badge, Tooltip } from 'antd'
 import useOptions, {
@@ -15,7 +15,7 @@ const COLOR_GRADE = {
 }
 
 export const ProductTotalSales: FC<{
-	record: TProductRecord | TCourseRecord | TChapterRecord
+	record: TProductRecord | TCourseBaseRecord
 	optionParams?: TUseOptionsParams
 }> = ({
 	record,
