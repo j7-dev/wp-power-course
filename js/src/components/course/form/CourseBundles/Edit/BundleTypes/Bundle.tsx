@@ -1,11 +1,11 @@
 import React, { useState, memo, useEffect } from 'react'
 import { Form, Input, Tag, List, InputNumber } from 'antd'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { PopconfirmDelete, Heading } from '@/components/general'
-import { FiSwitch } from '@/components/formItem'
+import { FiSwitch, RangePicker } from '@/components/formItem'
 import {
 	CheckOutlined,
 	PlusOutlined,
@@ -46,7 +46,7 @@ const Bundle = () => {
 		setSearchKeyWord(value)
 	}
 
-	const searchProductsResult = useList<TProductRecord>({
+	const searchProductsResult = useList<TBundleProductRecord>({
 		resource: 'products',
 		filters: [
 			{
@@ -78,7 +78,7 @@ const Bundle = () => {
 	const searchProducts = searchProductsResult.data?.data || []
 
 	// 處理點擊商品，有可能是加入也可能是移除
-	const handleClick = (product: TProductRecord) => () => {
+	const handleClick = (product: TBundleProductRecord) => () => {
 		const isInclude = selectedProducts?.some(({ id }) => id === product.id)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
@@ -100,7 +100,7 @@ const Bundle = () => {
 
 	// 初始狀態
 	const { data: initProductsData, isFetching: initIsFetching } =
-		useList<TProductRecord>({
+		useList<TBundleProductRecord>({
 			resource: 'products',
 			filters: [
 				{
@@ -338,6 +338,13 @@ const Bundle = () => {
 					controls={false}
 				/>
 			</Item>
+
+			<RangePicker
+				formItemProps={{
+					name: ['sale_date_range'],
+					label: '銷售期間',
+				}}
+			/>
 		</>
 	)
 }

@@ -14,6 +14,7 @@ namespace J7\PowerCourse\BundleProduct;
  */
 final class BundleProduct extends \WC_Product {
 
+	// DELETE 起初是因為前端篩選商品需要用到，但現在沒有使用到
 	public const PRODUCT_TYPE = 'power_bundle_product';
 
 	public const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
@@ -55,9 +56,9 @@ final class BundleProduct extends \WC_Product {
 		if ( ! is_numeric( $product ) ) {
 			$product = $product->get_id();
 		}
-		$included_products = \get_post_meta( $product, self::INCLUDE_PRODUCT_IDS_META_KEY, false );
+		$bundle_type = \get_post_meta( $product, 'bundle_type', true );
 
-		return ! ! $included_products;
+		return ! ! $bundle_type;
 	}
 
 	/**

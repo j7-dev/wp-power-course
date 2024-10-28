@@ -331,7 +331,6 @@ final class Product {
 			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
 			 */
 			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-
 			foreach ($bind_courses_data as $index => $bind_course_data) {
 				$bind_course_id = $bind_course_data['id'] ?? 0;
 
@@ -484,6 +483,7 @@ final class Product {
 		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$price_html = Base::get_price_html( $product );
+
 		$product_id = $product->get_id();
 
 		$bind_courses_data           = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
@@ -502,6 +502,14 @@ final class Product {
 			$bind_courses_data
 		)
 			);
+
+		$subscription_price           = $product->get_meta( '_subscription_price' );
+		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
+		$subscription_period          = $product->get_meta( '_subscription_period' );
+		$subscription_length          = $product->get_meta( '_subscription_length' );
+		$subscription_sign_up_fee     = $product->get_meta( '_subscription_sign_up_fee' );
+		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
+		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
 
 		$base_array = [
 			// Get Product General Info
@@ -575,6 +583,16 @@ final class Product {
 			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
 			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
 			'bind_courses_data'                         => $formatted_bind_courses_data,
+			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
+
+			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
+			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
+			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
+			'_subscription_period'                      => $subscription_period ?: 'month',
+			'_subscription_length'                      => is_numeric($subscription_length) ? (int) $subscription_length : 0,
+			'_subscription_sign_up_fee'                 => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
+			'_subscription_trial_length'                => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
+			'_subscription_trial_period'                => $subscription_trial_period ?: 'day',
 
 		] + $children;
 
@@ -724,7 +742,7 @@ final class Product {
 				400
 			);
 		}
-		$product = new BundleProduct( $product );
+		// $product = new BundleProduct( $product );
 
 		[
 			'data' => $data,
@@ -745,6 +763,27 @@ final class Product {
 		}
 
 		$product->save_meta_data();
+
+		if ('subscription' === $meta_data['bundle_type']) {
+			if (!class_exists('WC_Product_Subscription')) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 'subscription_class_not_found',
+						'message' => 'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+					],
+					400
+				);
+			}
+
+			$result = \wp_set_object_terms($id, 'subscription', 'product_type');
+			\wc_delete_product_transients($id);
+			if (\is_wp_error($result)) {
+				return $result;
+			}
+			// subscription 商品類型，不需要 exclude_main_course 和 pbp_product_ids
+			\delete_post_meta($id, 'exclude_main_course');
+			\delete_post_meta($id, 'pbp_product_ids');
+		}
 
 		return new \WP_REST_Response(
 			[
@@ -817,17 +856,21 @@ final class Product {
 	 * @return array
 	 */
 	public static function handle_special_fields( $meta_data, $product ) {
-		$array_meta_keys = [
+		$update_array_meta_keys = [
 			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
 			'link_course_ids', // 用來表示 bundle product 連結的課程
 		];
-		$unset_meta_keys = [
+		$add_array_meta_keys    = [
+			'bind_course_ids', // 綁定的課程
+		];
+		$unset_meta_keys        = [
 			'product_type', // product_type 就不用處理了，前端會帶
 		];
 
 		$product_id = $product->get_id();
 
-		foreach ($array_meta_keys as $meta_key) {
+		// 直接更新 array 的 meta data
+		foreach ($update_array_meta_keys as $meta_key) {
 			if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
 				// 先刪除原本的 meta data
 				$meta_values = $meta_data[ $meta_key ];
@@ -836,6 +879,46 @@ final class Product {
 			}
 		}
 
+		// 添加 array 的 meta data
+		foreach ($add_array_meta_keys as $meta_key) {
+			if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
+				// 先刪除原本的 meta data
+				$meta_values = $meta_data[ $meta_key ];
+				WcProduct::add_meta_array( $product_id, $meta_key, $meta_values );
+				unset( $meta_data[ $meta_key ] );
+
+				if ('bind_course_ids' !== $meta_key) {
+					continue;
+				}
+				$product_id = $product->get_id();
+				foreach ($meta_values as $course_id) {
+					$bind_courses_data = \get_post_meta($product_id, 'bind_courses_data', true) ?: [];
+					$bind_course_ids   = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? 0, $bind_courses_data);
+
+					$included = false;
+					foreach ($bind_courses_data as $bind_course_data) {
+						if (\in_array($course_id, $bind_course_ids)) {
+							// 如果這個商品原本就有綁定了，就不需要再添加
+							$included = true;
+							continue;
+						}
+					}
+
+					// 如果這個商品原本沒有  就添加
+					if (!$included) {
+						$bind_courses_data[] = [
+							'id'          => $course_id,
+							'limit_type'  => \get_post_meta($course_id, 'limit_type', true) ?: 'unlimited',
+							'limit_value' => \get_post_meta($course_id, 'limit_value', true) ?: '',
+							'limit_unit'  => \get_post_meta($course_id, 'limit_unit', true) ?: '',
+						];
+						\update_post_meta($product_id, 'bind_courses_data', $bind_courses_data);
+					}
+				}
+			}
+		}
+
+		// 刪除不需要的 meta data
 		foreach ($unset_meta_keys as $meta_key) {
 			if ( isset( $meta_data[ $meta_key ] ) ) {
 				unset( $meta_data[ $meta_key ] );

@@ -20,12 +20,9 @@ $args = wp_parse_args( $args, $default_args );
 	'product' => $product,
 ] = $args;
 
-if ( ! ( $product instanceof BundleProduct ) ) {
-	throw new \Exception( 'product 不是 BundleProduct' );
+if ( ! ( $product instanceof \WC_Product_Subscription ) ) {
+	throw new \Exception( 'product 不是 WC_Product_Subscription' );
 }
-
-
-$pbp_product_ids = $product->get_product_ids();
 
 $product_name = $product->get_name();
 
@@ -53,21 +50,6 @@ printf(
 	$purchase_note
 );
 
-foreach ( $pbp_product_ids as $pbp_product_id ) :
-	if (!is_numeric($pbp_product_id)) {
-		continue;
-	}
-	$pbp_product = \wc_get_product( $pbp_product_id );
-	echo '<div>';
-	Plugin::get(
-		'course-product/list',
-		[
-			'product' => $pbp_product,
-		]
-		);
-	echo '</div>';
-	Plugin::get( 'divider' );
-endforeach;
 
 echo '<div class="flex gap-3 justify-between items-end">';
 
