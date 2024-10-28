@@ -1,5 +1,9 @@
 import React from 'react'
 import { toFormData as axiosToFormData, GenericFormData } from 'axios'
+import { clsx, ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export const cn = (...args: ClassValue[]) => twMerge(clsx(args))
 
 export const windowOuterWidth = window?.outerWidth || 1200
 

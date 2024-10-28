@@ -393,7 +393,7 @@ final class Course {
 			'chapters' => $chapters,
 		] : [];
 
-		$bundle_ids = CourseUtils::get_bundles_by_product( $product->get_id(), return_ids: true);
+		$bundle_ids = CourseUtils::get_linked_products_by_product_id( $product->get_id(), return_ids: true);
 
 		$extra_array = [
 			'purchase_note'              => $product->get_purchase_note(),

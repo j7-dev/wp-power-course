@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\BundleProduct\BundleProduct;
 
 
 /**
@@ -240,9 +241,9 @@ abstract class Course {
 	 * @param bool|null                 $return_ids 是否只回傳 id
 	 * @param array<string>|null|string $post_status 文章狀態
 	 *
-	 * @return array<\WP_Post|int> bundle_ids (銷售方案)
+	 * @return array<BundleProduct|\WC_Product_Subscription|int> bundle_ids (銷售方案)
 	 */
-	public static function get_bundles_by_product( int $product_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
+	public static function get_linked_products_by_product_id( int $product_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
 
 		$args = [
 			'post_type'   => 'product',
@@ -250,15 +251,36 @@ abstract class Course {
 			'post_status' => $post_status,
 			'meta_key'    => 'link_course_ids',
 			'meta_value'  => (string) $product_id,
-			'orderby'     => 'menu_order',
-			'order'       => 'ASC',
+			'fields'      => 'ids',
+			'orderby'     => [
+				'menu_order' => 'ASC',
+				'post_date'  => 'DESC',
+			],
 		];
-
+		$ids  = \get_posts($args);
 		if ($return_ids) {
-			$args['fields'] = 'ids';// 只取 id
+			return $ids;
 		}
+		$products = [];
+		foreach ($ids as $id) {
+			$product = \wc_get_product($id);
+			if (!$product) {
+				continue;
+			}
+			$bundle_type = $product->get_meta( 'bundle_type' );
+			if ('bundle' === $bundle_type) {
+				$product    = new BundleProduct($product);
+				$products[] = $product;
+				continue;
+			}
 
-		return \get_posts($args);
+			if ('subscription' === $bundle_type) {
+				$product    = new \WC_Product_Subscription($product);
+				$products[] = $product;
+				continue;
+			}
+		}
+		return $products;
 	}
 
 	/**

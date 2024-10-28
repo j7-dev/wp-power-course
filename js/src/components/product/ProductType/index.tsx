@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
-import { TCourseRecord, TChapterRecord } from '@/pages/admin/Courses/List/types'
+import React, { FC, memo } from 'react'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Tag, Tooltip } from 'antd'
 import {
 	StarFilled,
@@ -8,19 +8,30 @@ import {
 	CloudFilled,
 } from '@ant-design/icons'
 import { IoMdDownload } from 'react-icons/io'
-import { productTypes } from '@/utils'
+import { productTypes, getBundleType } from '@/utils'
 
-export const ProductType: FC<{ record: TCourseRecord | TChapterRecord }> = ({
-	record,
-}) => {
+const ProductTypeComponent: FC<{ record: TProductRecord }> = ({ record }) => {
 	const type = record?.type || ''
+	const bundle_type = record?.bundle_type || ''
+	const link_course_ids = record?.link_course_ids || ''
 	if (!type || 'chapter' === type) return null
 	const tag = productTypes.find((productType) => productType.value === type)
 	return (
 		<div className="flex items-center gap-2">
-			<Tag bordered={false} color={tag?.color} className="m-0">
-				{tag?.label}
-			</Tag>
+			{!bundle_type && (
+				<Tag bordered={false} color={tag?.color} className="m-0">
+					{tag?.label}
+				</Tag>
+			)}
+			{bundle_type && (
+				<Tooltip
+					title={`此商品為 #${link_course_ids} 的 ${getBundleType(bundle_type)?.label} 銷售方案`}
+				>
+					<Tag bordered={false} color="purple" className="m-0">
+						銷售方案
+					</Tag>
+				</Tooltip>
+			)}
 
 			<Tooltip
 				zIndex={1000000 + 20}
@@ -57,3 +68,5 @@ export const ProductType: FC<{ record: TCourseRecord | TChapterRecord }> = ({
 		</div>
 	)
 }
+
+export const ProductType = memo(ProductTypeComponent)

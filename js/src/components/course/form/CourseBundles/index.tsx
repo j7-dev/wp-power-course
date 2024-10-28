@@ -10,13 +10,13 @@ import {
 	useCustomMutation,
 	useApiUrl,
 } from '@refinedev/core'
-import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import ListItem from './ListItem'
 import { toFormData } from '@/utils'
 import { EditBundle } from './Edit'
 
-export type TRenderItemOptions = Parameters<RenderItem<TProductRecord>>[1]
+export type TRenderItemOptions = Parameters<RenderItem<TBundleProductRecord>>[1]
 
 const LoadingItems = ({ className }: { className?: string }) => (
 	<div>
@@ -44,7 +44,7 @@ const CourseBundlesComponent = () => {
 	const course = courseData?.data
 
 	// 取得銷售方案列表
-	const { data, isLoading } = useList<TProductRecord>({
+	const { data, isLoading } = useList<TBundleProductRecord>({
 		resource: 'bundle_products',
 		filters: [
 			{
@@ -60,7 +60,7 @@ const CourseBundlesComponent = () => {
 			{
 				field: 'type',
 				operator: 'eq',
-				value: 'power_bundle_product',
+				value: ['power_bundle_product', 'subscription'],
 			},
 		],
 		sorters: [
@@ -107,9 +107,8 @@ const CourseBundlesComponent = () => {
 	}
 
 	// 選中的商品
-	const [selectedProduct, setSelectedProduct] = useState<TProductRecord | null>(
-		null,
-	)
+	const [selectedProduct, setSelectedProduct] =
+		useState<TBundleProductRecord | null>(null)
 
 	// 批次變更，排序用
 	const { mutate: sort } = useCustomMutation()
@@ -124,10 +123,10 @@ const CourseBundlesComponent = () => {
 					</Button>
 				</div>
 
-				<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-6">
 					{isLoading && <LoadingItems />}
 					{!isLoading && (
-						<SortableList<TProductRecord>
+						<SortableList<TBundleProductRecord>
 							value={bundleProducts}
 							ref={ref}
 							onChange={(newList) => {
@@ -153,13 +152,11 @@ const CourseBundlesComponent = () => {
 										},
 									},
 								)
-
-								// TODO 修改每個 bundle product 的 menu order
 							}}
 							getItemStyles={() => ({ padding: '16px' })}
 							renderEmpty={() => <Empty description="目前沒有銷售方案" />}
 							renderItem={(
-								item: TProductRecord,
+								item: TBundleProductRecord,
 								options: TRenderItemOptions,
 							) => (
 								<ListItem

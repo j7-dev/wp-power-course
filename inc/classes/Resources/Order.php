@@ -205,7 +205,6 @@ final class Order {
 			$expire_date = CourseUtils::calc_expire_date( $limit_type, $limit_value, $limit_unit );
 
 			AVLCourseMeta::update( $bind_course_id, $customer_id, 'expire_date', $expire_date);
-
 		}
 	}
 

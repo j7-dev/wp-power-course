@@ -54,6 +54,7 @@ export type TBindCoursesData = {
 export type TProductRecord = {
 	id: string
 	type: TProductType
+	bundle_type: 'bundle' | 'subscription' | ''
 	depth: number
 	name: string
 	slug: string
@@ -103,6 +104,18 @@ export type TProductRecord = {
 	bundle_type_label: string
 	exclude_main_course: 'yes' | 'no' | ''
 	bind_courses_data: TBindCoursesData[]
+	link_course_ids: string
+}
+
+export type TBundleProductRecord = TProductRecord & {
+	bundle_type_label: string
+	_subscription_price?: number
+	_subscription_period_interval?: number
+	_subscription_period?: 'day' | 'week' | 'month' | 'year'
+	_subscription_length?: number
+	_subscription_sign_up_fee?: number
+	_subscription_trial_length?: number
+	_subscription_trial_period?: 'day' | 'week' | 'month' | 'year'
 }
 
 export type TProductVariation = TProductRecord & {
