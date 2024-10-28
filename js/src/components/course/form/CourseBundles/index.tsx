@@ -152,8 +152,6 @@ const CourseBundlesComponent = () => {
 										},
 									},
 								)
-
-								// TODO 修改每個 bundle product 的 menu order
 							}}
 							getItemStyles={() => ({ padding: '16px' })}
 							renderEmpty={() => <Empty description="目前沒有銷售方案" />}

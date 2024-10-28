@@ -43,7 +43,7 @@ final class Course {
 		}
 
 		$chapter_ids      = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids       = (array) CourseUtils::get_bundles_by_product(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids       = (array) CourseUtils::get_linked_products_by_product_id(  $id, true, [ 'any', 'trash' ] );
 		$deleted_post_ids = [];
 
 		foreach ([ ...$chapter_ids, ...$bundle_ids ] as $post_id) {
@@ -121,7 +121,7 @@ final class Course {
 		}
 
 		$chapter_ids = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids  = (array) CourseUtils::get_bundles_by_product(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids  = (array) CourseUtils::get_linked_products_by_product_id(  $id, true, [ 'any', 'trash' ] );
 
 		$restored_post_ids = [];
 
