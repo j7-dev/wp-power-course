@@ -91,36 +91,55 @@ abstract class Base {
 			return '';
 		}
 
-		if ( '' === $sale_price) {
-			return sprintf(
-				/*html*/'
-		<span class="regular-price">
-				<span class="woocommerce-Price-amount amount">
-					%1$s
-				</span>
-		</span>
-		',
-				\wc_price($regular_price),
-				);
+		$product_type = $product->get_type();
+		return match ($product_type) {
+			'subscription' => self::get_subscription_product_price_html($product),
+			default => $product->get_price_html(),
+		};
+	}
+
+	/**
+	 * 取得訂閱商品價格
+	 *
+	 * @param \WC_Product $product 商品
+	 *
+	 * @return string
+	 */
+	private static function get_subscription_product_price_html( \WC_Product $product ): string {
+		if (!class_exists('\WC_Product_Subscription')) {
+			return $product->get_price_html();
 		}
 
+		$fields = [
+			'_subscription_price',
+			'_subscription_period',
+			'_subscription_period_interval',
+			'_subscription_length',
+		];
+
+		foreach ($fields as $field) {
+			$value    = $product->get_meta($field);
+			${$field} = $value;
+		}
+
+		$_subscription_period_label = match ($_subscription_period) {
+			'day' => '天',
+			'week' => '週',
+			'month' => '月',
+			'year' => '年',
+		};
+
 		return sprintf(
-		/*html*/'
-		<span class="sale-price">
-			<del aria-hidden="true">
+			/*html*/'
 				<span class="woocommerce-Price-amount amount">
 					%1$s
 				</span>
-			</del>
-			<ins>
-				<span class="woocommerce-Price-amount amount">
-					%2$s
-				</span>
-			</ins>
-		</span>
-		',
-		\wc_price($regular_price),
-		\wc_price($sale_price)
+				/ %2$s%3$s%4$s
+			',
+			\wc_price( (float) $_subscription_price),
+			$_subscription_period_interval > 1 ? "{$_subscription_period_interval} " : '',
+			$_subscription_period_label,
+			$_subscription_length ? "<p class='text-gray-600/50 text-sm'>持續 {$_subscription_length} {$_subscription_period_label}</p>" : ''
 		);
 	}
 

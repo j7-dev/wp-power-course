@@ -89,6 +89,26 @@ div .pc-rating input[checked] ~ input {
 			@apply lg:hidden;
 		}
 	}
+
+	// price
+	.pc-price-html {
+		> .woocommerce-Price-amount {
+			@apply text-gray-600 text-2xl font-semibold;
+		}
+		> .sale-price {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			del {
+				order: 0;
+				@apply text-gray-600/50 text-base;
+			}
+			ins {
+				order: 1;
+				@apply text-red-400 text-2xl font-semibold;
+			}
+		}
+	}
 }
 
 // 不知道為什麼背景有填色
@@ -136,9 +156,7 @@ div .pc-rating input[checked] ~ input {
 
 // My Account 我的學習 icon
 
-.woocommerce-MyAccount-navigation
-	ul
-	li.woocommerce-MyAccount-navigation-link--courses {
+.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
 	a {
 		&::before {
 			content: "";

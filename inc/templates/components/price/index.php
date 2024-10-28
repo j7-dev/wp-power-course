@@ -3,6 +3,8 @@
  * Price component
  */
 
+use J7\PowerCourse\Utils\Base;
+
 $default_args = [
 	'product' => null,
 	'size'    => 'large',
@@ -22,6 +24,14 @@ $args = wp_parse_args( $args, $default_args );
 if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
+
+$price_html = Base::get_price_html( $product );
+echo '<div class="pc-price-html">';
+echo $price_html;
+echo '</div>';
+return;
+
+
 $is_on_sale    = $product->is_on_sale();
 $regular_price = $product->get_regular_price();
 $sale_price    = $product->get_sale_price();

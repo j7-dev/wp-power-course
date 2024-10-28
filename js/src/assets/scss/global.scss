@@ -10,7 +10,10 @@
 body {
 	margin: 0 !important;
 }
-
+// Woocommerce 的 $product->get_price_html() 會產生 .screen-reader-text 的 span，這邊把它隱藏
+.screen-reader-text {
+	display: none !important;
+}
 div[class^="ant-"] {
 	a {
 		&:focus {

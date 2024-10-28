@@ -502,6 +502,14 @@ final class Product {
 		)
 			);
 
+		$subscription_price           = $product->get_meta( '_subscription_price' );
+		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
+		$subscription_period          = $product->get_meta( '_subscription_period' );
+		$subscription_length          = $product->get_meta( '_subscription_length' );
+		$subscription_sign_up_fee     = $product->get_meta( '_subscription_sign_up_fee' );
+		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
+		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
+
 		$base_array = [
 			// Get Product General Info
 			'id'                                        => (string) $product_id,
@@ -576,13 +584,13 @@ final class Product {
 			'bind_courses_data'                         => $formatted_bind_courses_data,
 
 			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
-			'_subscription_price'                       => $product->get_meta( '_subscription_price' ),
-			'_subscription_period_interval'             => $product->get_meta( '_subscription_period_interval' ),
-			'_subscription_period'                      => $product->get_meta( '_subscription_period' ),
-			'_subscription_length'                      => $product->get_meta( '_subscription_length' ),
-			'_subscription_sign_up_fee'                 => $product->get_meta( '_subscription_sign_up_fee' ),
-			'_subscription_trial_length'                => $product->get_meta( '_subscription_trial_length' ),
-			'_subscription_trial_period'                => $product->get_meta( '_subscription_trial_period' ),
+			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
+			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
+			'_subscription_period'                      => $subscription_period ?: 'month',
+			'_subscription_length'                      => is_numeric($subscription_length) ? (int) $subscription_length : 0,
+			'_subscription_sign_up_fee'                 => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
+			'_subscription_trial_length'                => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
+			'_subscription_trial_period'                => $subscription_trial_period ?: 'day',
 		] + $children;
 
 		return array_merge(
