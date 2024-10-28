@@ -39,12 +39,14 @@
 		"antd-toolkit": "^1.1.16",
 		"axios": "^1.6.8",
 		"canvas-confetti": "^1.9.3",
+		"clsx": "^2.1.1",
 		"hls.js": "^1.5.14",
 		"jotai": "^2.8.3",
 		"query-string": "^9.0.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
-		"react-icons": "^5.2.1"
+		"react-icons": "^5.2.1",
+		"tailwind-merge": "^2.5.4"
 	},
 	"devDependencies": {
 		"@kucrut/vite-for-wp": "^0.8.0",

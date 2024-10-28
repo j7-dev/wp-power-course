@@ -84,13 +84,6 @@ abstract class Base {
 	 * @return string 產品價格的 HTML 字串。
 	 */
 	public static function get_price_html( \WC_Product $product ): string {
-		$regular_price = $product->get_regular_price(); // 可能為 0 也可能為 ""
-		$sale_price    = $product->get_sale_price(); // 可能為 0 也可能為 ""
-
-		if ('' === $regular_price && '' === $sale_price) {
-			return '';
-		}
-
 		$product_type = $product->get_type();
 		return match ($product_type) {
 			'subscription' => self::get_subscription_product_price_html($product),
@@ -127,6 +120,7 @@ abstract class Base {
 			'week' => '週',
 			'month' => '月',
 			'year' => '年',
+			default => '',
 		};
 
 		return sprintf(
@@ -139,7 +133,7 @@ abstract class Base {
 			\wc_price( (float) $_subscription_price),
 			$_subscription_period_interval > 1 ? "{$_subscription_period_interval} " : '',
 			$_subscription_period_label,
-			$_subscription_length ? "<p class='text-gray-600/50 text-sm'>持續 {$_subscription_length} {$_subscription_period_label}</p>" : ''
+			$_subscription_length ? "<p class='text-gray-600/50 text-sm mb-0'>持續 {$_subscription_length} {$_subscription_period_label}</p>" : ''
 		);
 	}
 

@@ -1,7 +1,8 @@
 import React, { memo, FC } from 'react'
 import { TProductRecord } from '@/components/product/ProductTable/types'
-import { Typography, Tag } from 'antd'
+import { Typography, Tag, Tooltip } from 'antd'
 import dayjs from 'dayjs'
+import { cn } from '@/utils'
 
 const { Text } = Typography
 
@@ -28,26 +29,33 @@ const getLimitLabel = (
 
 const ProductBoundCoursesComponent: FC<{
 	record: TProductRecord
-}> = ({ record }) => {
+	className?: string
+	hideName?: boolean
+}> = ({ record, className, hideName = false }) => {
 	const { bind_courses_data = [] } = record
 	return bind_courses_data.map(
 		({ id, name, limit_type, limit_value, limit_unit }) => {
 			return (
-				<div key={id} className="grid grid-cols-[12rem_8rem] gap-1 my-1">
+				<div
+					key={id}
+					className={cn('grid grid-cols-[12rem_8rem] gap-1 my-1', className)}
+				>
 					<div>
-						<Text
-							ellipsis={{
-								tooltip: (
-									<>
-										<sub className="text-gray-500">#{id}</sub>{' '}
-										{name || '未知的課程名稱'}
-									</>
-								),
-							}}
-						>
-							<sub className="text-gray-500">#{id}</sub>{' '}
-							{name || '未知的課程名稱'}
-						</Text>
+						{hideName && (
+							<Tooltip title={name || '未知的課程名稱'}>
+								<sub className="text-gray-500">#{id}</sub>
+							</Tooltip>
+						)}
+						{!hideName && (
+							<Text
+								ellipsis={{
+									tooltip: name || '未知的課程名稱',
+								}}
+							>
+								<sub className="text-gray-500">#{id}</sub>{' '}
+								{name || '未知的課程名稱'}
+							</Text>
+						)}
 					</div>
 
 					<div>
