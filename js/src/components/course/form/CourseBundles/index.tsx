@@ -123,7 +123,7 @@ const CourseBundlesComponent = () => {
 					</Button>
 				</div>
 
-				<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+				<div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-6">
 					{isLoading && <LoadingItems />}
 					{!isLoading && (
 						<SortableList<TBundleProductRecord>

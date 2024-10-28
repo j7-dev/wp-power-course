@@ -7,6 +7,7 @@ import {
 	ProductTotalSales,
 	ProductCat,
 	ProductBoundCourses,
+	ProductType,
 } from '@/components/product'
 import { getPostStatus, siteUrl, course_permalink_structure } from '@/utils'
 
@@ -35,9 +36,15 @@ const useColumns = () => {
 			),
 		},
 		{
+			title: '商品名稱',
+			dataIndex: 'name',
+			render: (_, record) => <ProductType record={record} />,
+		},
+		{
 			title: '狀態',
 			dataIndex: 'status',
 			width: 80,
+			align: 'center',
 			render: (_, record) => (
 				<Tag color={getPostStatus(record?.status)?.color}>
 					{getPostStatus(record?.status)?.label}
@@ -47,7 +54,8 @@ const useColumns = () => {
 		{
 			title: '總銷量',
 			dataIndex: 'total_sales',
-			width: 150,
+			width: 80,
+			align: 'center',
 			render: (_, record) => <ProductTotalSales record={record} />,
 		},
 		{

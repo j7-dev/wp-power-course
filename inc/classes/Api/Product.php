@@ -483,6 +483,7 @@ final class Product {
 		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$price_html = Base::get_price_html( $product );
+
 		$product_id = $product->get_id();
 
 		$bind_courses_data           = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
@@ -582,6 +583,7 @@ final class Product {
 			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
 			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
 			'bind_courses_data'                         => $formatted_bind_courses_data,
+			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
 
 			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
 			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
@@ -591,6 +593,7 @@ final class Product {
 			'_subscription_sign_up_fee'                 => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
 			'_subscription_trial_length'                => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
 			'_subscription_trial_period'                => $subscription_trial_period ?: 'day',
+
 		] + $children;
 
 		return array_merge(

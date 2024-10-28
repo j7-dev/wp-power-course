@@ -4,6 +4,7 @@ import {
 	ProductName,
 	ProductPrice,
 	ProductTotalSales,
+	ProductBoundCourses,
 } from '@/components/product'
 import { getPostStatus, getBundleType } from '@/utils'
 import { Tag } from 'antd'
@@ -28,7 +29,7 @@ const ListItem = ({
 	const { mutate: deleteProduct } = useDelete()
 
 	return (
-		<div className="grid gap-x-2 grid-cols-[1rem_1fr_4rem_3rem_2rem_6rem_1rem] w-full">
+		<div className="grid gap-x-2 grid-cols-[1rem_1fr_10rem_4rem_3rem_2rem_6rem_1rem] w-full">
 			<div className="self-center">
 				<HolderOutlined
 					className="cursor-grab hover:bg-gray-200 rounded-lg py-3 px-0.5"
@@ -41,6 +42,14 @@ const ListItem = ({
 					record={record}
 					onClick={() => setSelectedProduct(record)}
 					hideImage={true}
+				/>
+			</div>
+
+			<div className="self-center justify-self-end">
+				<ProductBoundCourses
+					record={record}
+					className="grid-cols-[2rem_6rem]"
+					hideName
 				/>
 			</div>
 

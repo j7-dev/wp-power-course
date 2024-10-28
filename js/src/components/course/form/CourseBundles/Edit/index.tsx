@@ -1,5 +1,5 @@
 import React, { memo, useEffect } from 'react'
-import { Form, Switch } from 'antd'
+import { Form, Switch, Alert } from 'antd'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
@@ -9,6 +9,7 @@ import BundleForm from './BundleForm'
 import dayjs, { Dayjs } from 'dayjs'
 import { useAtom, useSetAtom, useAtomValue } from 'jotai'
 import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
+import { useLink } from '@refinedev/core'
 
 const EditBundleComponent = ({
 	record,
@@ -17,6 +18,7 @@ const EditBundleComponent = ({
 	record: TBundleProductRecord
 	course: TCourseRecord
 }) => {
+	const Link = useLink()
 	const { id, name } = record
 
 	const selectedProducts = useAtomValue(selectedProductsAtom)
@@ -128,6 +130,30 @@ const EditBundleComponent = ({
 			)}
 		>
 			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
+				<Alert
+					className="mb-4"
+					message="注意事項"
+					description={
+						<ol className="pl-4">
+							<li>
+								<b>合購優惠</b>
+								：可以不綁定此課程商品，如果不綁定此課程，就不會自動給予課程權限，可以當作其他加購商品使用
+							</li>
+							<li>
+								<b>定期定額</b>
+								：預設會把課程觀看期限綁定在，此銷售方案的定期定額商品上，請先確認已經儲存觀看期限
+							</li>
+							<li>
+								銷售方案本身就是商品，皆可以在
+								<Link to="/products"> 課程權限綁定 </Link>
+								再額外調整課程權限以及課程觀看期限
+							</li>
+						</ol>
+					}
+					type="warning"
+					showIcon
+					closable
+				/>
 				<BundleForm />
 			</Form>
 		</Edit>

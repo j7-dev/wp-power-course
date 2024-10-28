@@ -158,6 +158,9 @@ div .pc-rating input[checked] ~ input {
 
 .woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
 	a {
+		i {
+			display: none;
+		}
 		&::before {
 			content: "";
 			aspect-ratio: 0.7576;
@@ -168,17 +171,17 @@ div .pc-rating input[checked] ~ input {
 		}
 	}
 
+	a:hover {
+		&::before {
+			background: url("../svg/learn-white.svg") no-repeat center center;
+		}
+	}
+
 	&.is-active {
 		a {
 			&::before {
 				background: url("../svg/learn-white.svg") no-repeat center center;
 			}
-		}
-	}
-
-	&:hover {
-		&::before {
-			background: url("../svg/learn-white.svg") no-repeat center center;
 		}
 	}
 }
