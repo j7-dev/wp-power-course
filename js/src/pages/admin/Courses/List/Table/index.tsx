@@ -16,10 +16,8 @@ import {
 } from '@/components/product/ProductTable/utils'
 import { getInitialFilters, getIsVariation } from '@/utils'
 import useValueLabelMapper from '@/pages/admin/Courses/List/hooks/useValueLabelMapper'
-import { useSetAtom } from 'jotai'
 import useColumns from '@/pages/admin/Courses/List/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
-import { coursesAtom } from '@/pages/admin/Courses/List'
 import DeleteButton from './DeleteButton'
 
 const Main = () => {
@@ -47,12 +45,6 @@ const Main = () => {
 				}
 			},
 		})
-
-	const setCourses = useSetAtom(coursesAtom)
-
-	useEffect(() => {
-		setCourses([...(tableProps?.dataSource || [])])
-	}, [tableProps?.dataSource])
 
 	const columns = useColumns()
 
