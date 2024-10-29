@@ -193,19 +193,39 @@ final class Templates {
 	 * @return void
 	 */
 	public function admin_bar_item( \WP_Admin_Bar $admin_bar ): void {
+
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		global $post;
+		$post_id           = (int) $post->ID;
+		$is_course_product = CourseUtils::is_course_product( $post_id );
 
+		if (!$is_course_product) {
+			// 不是課程銷售頁就顯示課程列表
+			$admin_bar->add_menu(
+				[
+					'id'     => Plugin::$kebab,
+					'parent' => null,
+					'group'  => null,
+					'title'  => '課程列表', // you can use img tag with image link. it will show the image icon Instead of the title.
+					'href'   => \admin_url('admin.php?page=power-course#/courses'),
+					'meta'   => [
+						'title' => \__( '課程列表', 'power_course' ), // This title will show on hover
+					],
+				]
+			);
+			return;
+		}
+		// 是課程銷售頁就顯示課程編輯
 		$admin_bar->add_menu(
 			[
 				'id'     => Plugin::$kebab,
 				'parent' => null,
 				'group'  => null,
 				'title'  => '編輯課程', // you can use img tag with image link. it will show the image icon Instead of the title.
-				'href'   => \admin_url("admin.php?page=power-course#/courses/edit/{$post->ID}"),
+				'href'   => \admin_url("admin.php?page=power-course#/courses/edit/{$post_id}"),
 				'meta'   => [
 					'title' => \__( '編輯課程', 'power_course' ), // This title will show on hover
 				],
