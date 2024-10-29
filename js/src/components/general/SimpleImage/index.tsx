@@ -1,5 +1,6 @@
 import { FC, HTMLAttributes } from 'react'
 import defaultImage from '@/assets/images/defaultImage.jpg'
+import { cn } from '@/utils'
 
 type SimpleImageProps = {
 	src: string
@@ -17,7 +18,7 @@ export const SimpleImage: FC<SimpleImageProps> = ({
 	...rest
 }) => {
 	return (
-		<div className={`relative ${className} ${ratio}`} {...rest}>
+		<div className={cn('relative', className, ratio)} {...rest}>
 			<img
 				src={src}
 				loading="lazy"

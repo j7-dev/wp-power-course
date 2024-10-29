@@ -37,7 +37,7 @@ printf(
 	'
 <div class="grid grid-cols-[1fr_2fr] gap-5">
 	<div class="group aspect-video rounded overflow-hidden">
-		<img class="w-full h-full object-cover group-hover:scale-125 transition duration-300 ease-in-out" src="%1$s" alt="%2$s" loading="lazy">
+		<img class="w-full h-full object-cover group-hover:scale-110 transition duration-300 ease-in-out" src="%1$s" alt="%2$s" loading="lazy">
 	</div>
 	<div>
 		<h6 class="text-sm font-semibold mb-1">%2$s</h6>

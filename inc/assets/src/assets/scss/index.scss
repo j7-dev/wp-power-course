@@ -90,7 +90,7 @@ div .pc-rating input[checked] ~ input {
 		}
 	}
 
-	// price
+	// price 銷售頁
 	.pc-price-html {
 		> .woocommerce-Price-amount {
 			@apply text-gray-600 text-2xl font-semibold;
@@ -101,7 +101,7 @@ div .pc-rating input[checked] ~ input {
 			align-items: start;
 			del {
 				order: 0;
-				@apply text-gray-600/50 text-base;
+				@apply text-gray-500 text-base;
 			}
 			ins {
 				order: 1;
@@ -130,6 +130,15 @@ div .pc-rating input[checked] ~ input {
 			content: url("../svg/play.svg");
 			@apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-10 tracking-wide cursor-pointer transition duration-300 ease-in-out;
 		}
+
+		&-product {
+			&::before {
+				content: "";
+			}
+			&::after {
+				content: "";
+			}
+		}
 	}
 
 	&__image {
@@ -151,6 +160,24 @@ div .pc-rating input[checked] ~ input {
 		margin: 0rem 0rem 0rem 0rem !important;
 		font-weight: 300 !important;
 		font-size: 0.75rem !important;
+	}
+
+	&__price {
+		> .woocommerce-Price-amount {
+			@apply text-blue-500 text-2xl font-semibold;
+		}
+		> .sale-price {
+			display: flex;
+			gap: 0.5rem;
+			align-items: end;
+			justify-content: start;
+			ins {
+				@apply text-red-400 text-2xl font-semibold;
+			}
+			del {
+				@apply text-gray-500 text-sm font-normal;
+			}
+		}
 	}
 }
 
@@ -242,6 +269,10 @@ div#tab-content-description {
 		overflow: hidden;
 		animation: loading5 1.5s ease-in-out 0s infinite;
 	}
+}
+// 貨幣符號間距
+.woocommerce-Price-currencySymbol {
+	margin-right: 0.25rem;
 }
 
 @keyframes loading5 {

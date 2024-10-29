@@ -1,24 +1,18 @@
-import React from 'react'
-import { Result } from 'antd'
+import { memo } from 'react'
+import { Tabs, TabsProps } from 'antd'
+
+import General from './General'
+
+const items: TabsProps['items'] = [
+	{
+		key: 'general',
+		label: '一般',
+		children: <General />,
+	},
+]
 
 const index = () => {
-	return (
-		<Result
-			icon={
-				<>
-					<iframe
-						src="https://giphy.com/embed/JIX9t2j0ZTN9S"
-						width="480"
-						height="480"
-						frameBorder="0"
-						className="giphy-embed"
-						allowFullScreen
-					></iframe>
-				</>
-			}
-			title="🚧...施工中...🚧"
-		/>
-	)
+	return <Tabs defaultActiveKey="general" items={items} />
 }
 
-export default index
+export default memo(index)
