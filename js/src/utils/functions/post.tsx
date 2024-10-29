@@ -1,3 +1,5 @@
+// DELETE
+
 export const getPostStatus = (status: string) => {
 	switch (status) {
 		case 'pending':

@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs'
 
 /**
+ * DELETE
  * 格式化日期範圍選擇器的值
  *
  * @param {unknown} values                - 要格式化的值
@@ -29,6 +30,7 @@ export function formatRangePickerValue(
 }
 
 /**
+ * DELETE
  * 解析日期範圍選擇器的值
  *
  * @param {unknown} values - 要解析的值
@@ -81,6 +83,7 @@ export function formatDatePickerValue(
 }
 
 /**
+ * DELETE
  * 解析日期選擇器的值
  *
  * @param {unknown} value - 要解析的值

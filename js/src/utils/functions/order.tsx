@@ -1,3 +1,4 @@
+//DELETE
 export const getOrderStatus = (status: string) => {
 	const rmPrefixStatus = status.replace('wc-', '')
 	switch (rmPrefixStatus) {

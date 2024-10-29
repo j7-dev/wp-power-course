@@ -1,3 +1,5 @@
+// DELETE
+
 import { SelectProps } from 'antd'
 
 export const defaultSelectProps: SelectProps = {

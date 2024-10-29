@@ -1,3 +1,4 @@
+// DELETE
 /**
  * 取得最大公約數
  * @param items
