@@ -51,7 +51,7 @@ if ( 'none' !== $video_type ) {
 } else {
 	printf(
 		'<div class="group w-full md:rounded-2xl aspect-video overflow-hidden">
-			<img src="%1$s" class="h-full w-full object-cover group-hover:scale-125 duration-300 transition ease-in-out" alt="%2$s" loading="lazy">
+			<img src="%1$s" class="h-full w-full object-cover group-hover:scale-110 duration-300 transition ease-in-out" alt="%2$s" loading="lazy">
 			</div>',
 		$image_url,
 		$product_name
