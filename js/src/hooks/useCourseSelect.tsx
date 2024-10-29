@@ -29,10 +29,8 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 		},
 	}
 
-	const { selectProps: refineSelectProps } = useSelect<TCourseRecord>({
+	const { selectProps: refineSelectProps, query } = useSelect<TCourseRecord>({
 		resource: 'courses',
-		optionLabel: 'name',
-		optionValue: 'id',
 		debounce: 500,
 		pagination: {
 			pageSize: 20,
@@ -47,10 +45,17 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 		],
 	})
 
+	const courses = query.data?.data ?? []
+	const options = courses.map((course) => ({
+		label: course.name,
+		value: course.id,
+	}))
+
 	const mergedSelectProps: SelectProps = {
-		...refineSelectProps,
 		...defaultSelectProps,
 		...selectProps,
+		...refineSelectProps,
+		options,
 	}
 
 	return {
