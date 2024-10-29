@@ -10,7 +10,10 @@ import {
 import { IoMdDownload } from 'react-icons/io'
 import { productTypes, getBundleType } from '@/utils'
 
-const ProductTypeComponent: FC<{ record: TProductRecord }> = ({ record }) => {
+const ProductTypeComponent: FC<{
+	record: TProductRecord
+	hideDownloadable?: boolean
+}> = ({ record, hideDownloadable = true }) => {
 	const type = record?.type || ''
 	const bundle_type = record?.bundle_type || ''
 	const link_course_ids = record?.link_course_ids || ''
@@ -55,16 +58,18 @@ const ProductTypeComponent: FC<{ record: TProductRecord }> = ({ record }) => {
 				)}
 			</Tooltip>
 
-			<Tooltip
-				zIndex={1000000 + 20}
-				title={`${record?.downloadable ? '' : '不'}可下載`}
-			>
-				{record?.downloadable ? (
-					<IoMdDownload className="text-gray-900" />
-				) : (
-					<IoMdDownload className="text-gray-400" />
-				)}
-			</Tooltip>
+			{!hideDownloadable && (
+				<Tooltip
+					zIndex={1000000 + 20}
+					title={`${record?.downloadable ? '' : '不'}可下載`}
+				>
+					{record?.downloadable ? (
+						<IoMdDownload className="text-gray-900" />
+					) : (
+						<IoMdDownload className="text-gray-400" />
+					)}
+				</Tooltip>
+			)}
 		</div>
 	)
 }
