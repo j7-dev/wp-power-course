@@ -69,13 +69,17 @@ if (!$is_popular && !$is_featured) {
 $tags_html .= '</div>';
 
 // 課程時長
-$course_hour        = (int) $product->get_meta( 'course_hour' );
-$course_minute      = (int) $product->get_meta( 'course_minute' );
+$course_hour   = (int) $product->get_meta( 'course_hour' );
+$course_minute = (int) $product->get_meta( 'course_minute' );
+
 $course_length      = "{$course_hour} 小時 {$course_minute} 分";
+$course_length      = $course_hour + $course_minute > 0 ? $course_length : '-';
 $course_length_html = Plugin::get('icon/clock', null, false) . $course_length;
 
 // 學員人數
 $total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+$show_total_student = $product->get_meta( 'show_total_student' ) == 'yes';
+$total_student      = $show_total_student ? $total_student : '-';
 $total_student_html = Plugin::get('icon/team', null, false) . $total_student;
 
 printf(
