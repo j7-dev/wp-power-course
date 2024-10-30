@@ -1,5 +1,5 @@
 import React, { memo, useEffect } from 'react'
-import { Form, Switch, Alert } from 'antd'
+import { Form, Switch, Alert, message } from 'antd'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
@@ -51,45 +51,47 @@ const EditBundleComponent = ({
 	}, [course])
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
-	const handleOnFinish = (
-		values: Partial<TBundleProductRecord> & {
+	const handleOnFinish = () => {
+		const values = form.getFieldsValue() as Partial<TBundleProductRecord> & {
 			bundle_type: 'bundle' | 'subscription'
 			sale_date_range: [Dayjs | number, Dayjs | number]
-		},
-	) => {
+		}
 		if (!selectedProducts?.length && values?.bundle_type === 'bundle') {
+			message.error('請至少選擇一個商品')
 			return
 		}
-		form.validateFields().then(() => {
-			const sale_date_range = values?.sale_date_range || [null, null]
+		form
+			.validateFields()
+			.then(() => {
+				const sale_date_range = values?.sale_date_range || [null, null]
 
-			// 處理日期欄位 sale_date_range
+				// 處理日期欄位 sale_date_range
 
-			const date_on_sale_from =
-				(sale_date_range[0] as any) instanceof dayjs
-					? (sale_date_range[0] as Dayjs).unix()
-					: sale_date_range[0]
-			const date_on_sale_to =
-				(sale_date_range[1] as any) instanceof dayjs
-					? (sale_date_range[1] as Dayjs).unix()
-					: sale_date_range[1]
+				const date_on_sale_from =
+					(sale_date_range[0] as any) instanceof dayjs
+						? (sale_date_range[0] as Dayjs).unix()
+						: sale_date_range[0]
+				const date_on_sale_to =
+					(sale_date_range[1] as any) instanceof dayjs
+						? (sale_date_range[1] as Dayjs).unix()
+						: sale_date_range[1]
 
-			const formattedValues = {
-				...values,
-
-				// product_type: 'power_bundle_product', // 創建綑綁商品
-				date_on_sale_from,
-				date_on_sale_to,
-				sale_date_range: undefined,
-			}
-			onFinish(toFormData(formattedValues))
-		})
+				const formattedValues = {
+					...values,
+					date_on_sale_from,
+					date_on_sale_to,
+					sale_date_range: undefined,
+				}
+				onFinish(toFormData(formattedValues))
+			})
+			.catch((error) => {
+				message.error('請檢查是否有欄位尚未填寫')
+			})
 	}
 
 	if (!theCourse) {
 		return null
 	}
-
 	return (
 		<Edit
 			resource="bundle_products"
@@ -107,8 +109,7 @@ const EditBundleComponent = ({
 				children: '儲存銷售方案',
 				icon: null,
 				loading: mutation?.isLoading,
-
-				// disabled: !selectedProducts?.length,
+				onClick: handleOnFinish,
 			}}
 			footerButtons={({ defaultButtons }) => (
 				<>
@@ -129,7 +130,7 @@ const EditBundleComponent = ({
 				</>
 			)}
 		>
-			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
+			<Form {...formProps} layout="vertical">
 				<Alert
 					className="mb-4"
 					message="注意事項"

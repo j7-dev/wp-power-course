@@ -199,7 +199,7 @@ final class Templates {
 		}
 
 		global $post;
-		$post_id           = (int) $post->ID;
+		$post_id           = (int) $post?->ID;
 		$is_course_product = CourseUtils::is_course_product( $post_id );
 
 		if (!$is_course_product) {

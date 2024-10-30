@@ -60,7 +60,7 @@ const CourseBundlesComponent = () => {
 			{
 				field: 'type',
 				operator: 'eq',
-				value: ['power_bundle_product', 'subscription'],
+				value: ['simple', 'power_bundle_product', 'subscription'],
 			},
 		],
 		sorters: [
@@ -93,7 +93,6 @@ const CourseBundlesComponent = () => {
 			status: 'draft',
 			bundle_type: 'bundle',
 			name: '銷售方案',
-			product_type: 'power_bundle_product', // 創建綑綁商品
 			link_course_ids: [courseId],
 		}
 
