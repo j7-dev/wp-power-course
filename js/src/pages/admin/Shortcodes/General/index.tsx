@@ -1,79 +1,193 @@
-import { memo } from 'react'
-import { Typography } from 'antd'
-import { SimpleImage, Heading } from '@/components/general'
-import shortcode_courses from '@/assets/images/shortcode_courses.jpg'
+import { memo, useState } from 'react'
+import {
+	Typography,
+	Form,
+	Card,
+	InputNumber,
+	Slider,
+	SliderSingleProps,
+	Select,
+} from 'antd'
+import { Heading } from '@/components/general'
+import { useCourseSelect } from '@/hooks'
+import useOptions from '@/components/product/ProductTable/hooks/useOptions'
+import {
+	keyLabelMapper,
+	termToOptions,
+} from '@/components/product/ProductTable/utils'
+import { defaultSelectProps } from '@/utils'
+import CourseCard, { EXAMPLES } from './CourseCard'
 
+const { Item } = Form
 const { Text } = Typography
 
-const EXAMPLES = [
-	{
-		code: '[pc_courses]',
-		title: '預設',
-		description: '預設 3 欄顯示，抓取 12 個課程，由最新排序到最舊',
-	},
-	{
-		code: '[pc_courses columns="4"]',
-		title: '4 欄顯示',
-		description: '範例為顯示 4 欄佈局，支援 2,3,4 欄顯示',
-	},
-	{
-		code: '[pc_courses include="2030,2035,2066"]',
-		title: '只顯示包含的課程 id',
-		description: '範例為只顯示 2030,2035,2066 的課程',
-	},
-	{
-		code: '[pc_courses include="2030,2035,2066"]',
-		title: '只顯示包含的課程 id',
-		description: '範例為只顯示 2030,2035,2066 的課程',
-	},
-	{
-		code: '[pc_courses limit="4"]',
-		title: '抓取指定數量課程',
-		description: '範例為緊抓取 4 個課程，limit="-1" 時為抓取所有課程',
-	},
-	{
-		code: '[pc_courses order="ASC" orderby="modified"]',
-		title: '排序調整',
-		description:
-			'範例為由修改時間最新排序到最舊，order 支援 ASC, DESC，orderby 支援 none, ID, name, type, rand, date, modified',
-	},
+const marks: SliderSingleProps['marks'] = {
+	2: '2',
+	3: '3',
+	4: '4',
+}
 
-	{
-		code: '[pc_courses tag="tag1,tag2" category="category1,category2"]',
-		title: '篩選指定標籤或分類的課程',
-		description:
-			'範例為篩選 tag1,tag2 標籤，或 category1,category2 分類的課程，其中 tag1, tag2 與 category1, category2 皆為 slug',
-	},
-]
+const General = () => {
+	const [shortcode, setShortcode] = useState('[pc_courses]')
+	const { selectProps } = useCourseSelect()
+	const { options } = useOptions({
+		endpoint: 'courses/options',
+	})
+	const { product_cats = [], product_tags = [] } = options
+	const [form] = Form.useForm()
 
-const index = () => {
+	const handleValuesChange = () => {
+		const values = form.getFieldsValue()
+		const valuesToShortCodeString = Object.keys(values).reduce((acc, key) => {
+			const value = values[key]
+
+			if (!value) {
+				// 如果 undefined 就不加上
+				return acc
+			}
+
+			if (Array.isArray(value) && value?.length === 0) {
+				// 如果是 [] 也不加上
+				return acc
+			}
+
+			if ('columns' === key && value === 3) {
+				// 如果 columns 是 3 就不加上
+				return acc
+			}
+
+			if ('limit' === key && value === 12) {
+				// 如果 limit 是 12 就不加上
+				return acc
+			}
+
+			acc += ` ${key}="${value}"`
+			return acc
+		}, '')
+		setShortcode(`[pc_courses${valuesToShortCodeString}]`)
+	}
+
+	const watchLimit = Form.useWatch(['limit'], form) || 12
+	const watchColumns = Form.useWatch(['columns'], form) || 3
+	const gridClass = () => {
+		if (watchColumns === 2) return 'lg:grid-cols-2'
+		if (watchColumns === 3) return 'lg:grid-cols-3'
+		if (watchColumns === 4) return 'lg:grid-cols-4'
+	}
+
 	return (
-		<div className="grid grid-cols-[1fr_3fr] gap-8">
-			<div>
-				<Heading className="mt-8">課程列表</Heading>
+		<Card>
+			<Heading className="mt-8">課程列表</Heading>
+			<div className="grid grid-cols-1 md:grid-cols-[25rem_1fr] gap-8">
+				<div>
+					<Form
+						form={form}
+						labelCol={{ span: 8 }}
+						wrapperCol={{ span: 14 }}
+						layout="horizontal"
+						onValuesChange={handleValuesChange}
+					>
+						<Item
+							name={['limit']}
+							label="顯示數量"
+							tooltip="預設 12"
+							initialValue={12}
+						>
+							<InputNumber className="w-full" min={0} max={100} />
+						</Item>
+						<Item
+							name={['columns']}
+							label="欄位"
+							tooltip="預設 3"
+							initialValue={3}
+						>
+							<Slider marks={marks} min={2} max={4} />
+						</Item>
+						<Item name={['include']} label="只包含指定課程">
+							<Select {...selectProps} />
+						</Item>
+						<Item name={['order']} label="排序調整">
+							<Select
+								className="w-full"
+								allowClear
+								options={[
+									{
+										value: 'ASC',
+										label: '升序 (ASC)',
+									},
+									{
+										value: 'DESC',
+										label: '降序 (ASC)',
+									},
+								]}
+							/>
+						</Item>
+						<Item name={['orderby']} label="排序依據">
+							<Select
+								className="w-full"
+								allowClear
+								options={[
+									{
+										value: 'ID',
+										label: 'ID',
+									},
+									{
+										value: 'name',
+										label: '名稱',
+									},
+									{
+										value: 'rand',
+										label: '隨機',
+									},
+									{
+										value: 'date',
+										label: '發布時間',
+									},
+									{
+										value: 'modified',
+										label: '修改時間',
+									},
+								]}
+							/>
+						</Item>
+						<Item
+							name={['product_category_id']}
+							label={keyLabelMapper('product_category_id')}
+						>
+							<Select
+								{...defaultSelectProps}
+								options={termToOptions(product_cats)}
+								placeholder="可多選"
+							/>
+						</Item>
 
-				{EXAMPLES.map(({ code, title, description }) => (
-					<div key="code" className="mb-8">
-						<p className="font-bold text-base mb-2">{title}</p>
-						<p className="text-xs mb-2">{description}</p>
-						<Text className="text-base" copyable code>
-							{code}
-						</Text>
+						<Item
+							name={['product_tag_id']}
+							label={keyLabelMapper('product_tag_id')}
+						>
+							<Select
+								{...defaultSelectProps}
+								options={termToOptions(product_tags)}
+								placeholder="可多選"
+							/>
+						</Item>
+					</Form>
+					<Text key="copy" code className="m-0 text-base" copyable>
+						{shortcode}
+					</Text>
+				</div>
+				<div>
+					{/* 預覽 */}
+					<div className={`grid grid-cols-2 gap-x-5 gap-y-14 ${gridClass()}`}>
+						{new Array(watchLimit).fill(null).map((_, index) => {
+							const example_index = index % EXAMPLES.length
+							return <CourseCard key={index} {...EXAMPLES[example_index]} />
+						})}
 					</div>
-				))}
-			</div>
-			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto">
-				<p className="font-bold mb-4">外觀</p>
-				<div className="mb-4">
-					<SimpleImage
-						src={shortcode_courses}
-						ratio="aspect-[3.1]"
-						className="w-full"
-					/>
 				</div>
 			</div>
-		</div>
+		</Card>
 	)
 }
 
-export default memo(index)
+export default memo(General)

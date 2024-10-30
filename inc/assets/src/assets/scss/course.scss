@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+$primary: #377cfb;
+
+// daisyUI 的 rate 組件與 tailwind CSS 的樣式衝突，所以要加上以下 CSS
+div .pc-rating input:checked ~ input,
+div .pc-rating input[aria-checked="true"] ~ input,
+div .pc-rating input[checked] ~ input {
+	--tw-bg-opacity: 0.2 !important;
+}
+.tailwind {
+	// 留言、評價分頁的樣式
+	.pc-pagination {
+		> div {
+			width: 2rem;
+			height: 2rem;
+			border-radius: 0.75rem;
+			border: 1px solid #e5e7eb;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #6b7280;
+			font-size: 0.75rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			&:hover,
+			&.current {
+				color: $primary;
+			}
+			&.current {
+				border: 1px solid $primary;
+				cursor: default;
+			}
+			&.disabled {
+				color: #6b7280;
+				border: 1px solid #e5e7eb;
+				cursor: not-allowed;
+			}
+
+			&.pc-pagination__prev,
+			&.pc-pagination__next {
+				svg path {
+					fill: #6b7280;
+					transition: all 0.3s ease;
+				}
+
+				&:not(.disabled):hover {
+					svg path {
+						fill: $primary;
+					}
+				}
+			}
+		}
+	}
+
+	.ajax_add_to_cart.loading {
+		svg {
+			// AJAX 加入購物車時，loading 時原本圖示不顯示
+			display: none !important;
+		}
+
+		&:hover {
+			// hover 時 loading 顯示為白色
+			&:after {
+				color: #fff;
+			}
+		}
+	}
+	.add_to_cart_button {
+		&.added {
+			svg path {
+				fill: $primary;
+			}
+		}
+	}
+
+	// classroom
+	#pc-classroom-body {
+		#tab-nav-chapter,
+		#tab-content-chapter {
+			@apply lg:hidden;
+		}
+	}
+
+	// price 銷售頁
+	.pc-price-html {
+		> .woocommerce-Price-amount {
+			@apply text-gray-600 text-2xl font-semibold;
+		}
+		> .sale-price {
+			display: flex;
+			flex-direction: column;
+			align-items: start;
+			del {
+				order: 0;
+				@apply text-gray-500 text-base;
+			}
+			ins {
+				order: 1;
+				@apply text-red-400 text-2xl font-semibold;
+			}
+		}
+	}
+}
+
+// 不知道為什麼背景有填色
+.pc-btn-outline {
+	background-color: transparent;
+}
+
+// My Account 頁面的課程卡片樣式
+.pc-course-card {
+	&__image-wrap {
+		@apply w-full aspect-video rounded-md overflow-hidden mb-3 relative;
+
+		&::before {
+			content: "進入上課教室";
+			@apply opacity-0 hover:opacity-100 absolute inset-0 bg-black/30 flex items-center justify-center text-white font-bold text-base z-10 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+		}
+
+		&::after {
+			content: url("../svg/play.svg");
+			@apply opacity-100 hover:opacity-0 absolute inset-0 flex items-center justify-center text-white text-base z-10 tracking-wide cursor-pointer transition duration-300 ease-in-out;
+		}
+
+		&-product {
+			&::before {
+				content: "";
+			}
+			&::after {
+				content: "";
+			}
+		}
+	}
+
+	&__image {
+		height: 100% !important;
+		width: 100% !important;
+		object-fit: cover !important;
+	}
+
+	&__name {
+		margin: 0rem 0rem 0.5rem 0rem !important;
+		height: 3rem !important;
+		font-weight: 600 !important;
+		font-size: 1.125rem !important;
+		line-height: 1.5rem !important;
+		@apply line-clamp-2;
+	}
+
+	&__teachers {
+		margin: 0rem 0rem 0rem 0rem !important;
+		font-weight: 300 !important;
+		font-size: 0.75rem !important;
+	}
+
+	&__price {
+		> .woocommerce-Price-amount {
+			@apply text-blue-500 text-2xl font-semibold;
+		}
+		> .sale-price {
+			display: flex;
+			gap: 0.5rem;
+			align-items: end;
+			justify-content: start;
+			ins {
+				order: 1;
+				@apply text-red-400 text-2xl font-semibold;
+			}
+			del {
+				order: 2;
+				@apply text-gray-500 text-sm font-normal;
+			}
+		}
+	}
+}
+
+// My Account 我的學習 icon
+
+.woocommerce-MyAccount-navigation
+	ul
+	li.woocommerce-MyAccount-navigation-link--courses {
+	a {
+		i {
+			display: none;
+		}
+		&::before {
+			content: "";
+			aspect-ratio: 0.7576;
+			background: url("../svg/learn.svg") no-repeat center center;
+			background-size: contain;
+			width: 1.25rem;
+			display: inline-block;
+		}
+	}
+
+	a:hover {
+		&::before {
+			background: url("../svg/learn-white.svg") no-repeat center center;
+		}
+	}
+
+	&.is-active {
+		a {
+			&::before {
+				background: url("../svg/learn-white.svg") no-repeat center center;
+			}
+		}
+	}
+}
+
+// 水平翻轉
+// .flip-horizontal {
+// 	transform: scale(-1, 1);
+// 	transition: transform 0.3s ease;
+// }
+
+// course product tab
+// Notion 編輯器 HTML 內容
+div#tab-content-description {
+	img:not([class]) {
+		max-width: 100%;
+		width: 100%;
+	}
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		margin-bottom: 0.5rem;
+		margin-top: 0rem;
+		white-space: pre-line;
+		&:empty {
+			// 空白行
+			min-height: 1.75em;
+		}
+	}
+	blockquote {
+		border-left-color: #e5e7eb !important;
+		border-left-width: 2px !important;
+		line-height: 1.75rem !important;
+		margin: 8px 0 0 !important;
+		padding-left: 1.5rem !important;
+	}
+}
+
+// 留言的 loading 樣式
+.animate-pulse-2 {
+	position: relative;
+	overflow: hidden;
+	&::after {
+		content: "";
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(243, 244, 246, 0.75);
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		animation: loading5 1.5s ease-in-out 0s infinite;
+	}
+}
+// 貨幣符號間距
+.woocommerce-Price-currencySymbol {
+	margin-right: 0.25em;
+}
+
+@keyframes loading5 {
+	0% {
+		transform: translateX(-175%);
+	}
+	100% {
+		transform: translateX(175%);
+	}
+}
