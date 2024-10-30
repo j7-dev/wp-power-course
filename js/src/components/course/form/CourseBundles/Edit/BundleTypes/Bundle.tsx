@@ -65,7 +65,7 @@ const Bundle = () => {
 				value: [courseId],
 			},
 			{
-				field: 'product_type',
+				field: 'type',
 				operator: 'eq',
 				value: 'simple',
 			},
