@@ -13,6 +13,7 @@ $default_args = [
 		'meta' => [],
 	],
 	'thumbnail_url' => '',
+	'hide_marquee'  => false,
 ];
 
 /**
@@ -28,6 +29,7 @@ $args = \wp_parse_args( $args, $default_args );
 	'class'      => $class,
 	'video_info'   => $video_info,
 	'thumbnail_url' => $thumbnail_url,
+	'hide_marquee' => $hide_marquee,
 ] = $args;
 
 $video_type = $video_info['type'] ?? 'none';
@@ -53,5 +55,6 @@ Plugin::get(
 		'video_info'    => $video_info,
 		'class'         => $class,
 		'thumbnail_url' => $thumbnail_url,
+		'hide_marquee'  => $hide_marquee,
 	]
 );

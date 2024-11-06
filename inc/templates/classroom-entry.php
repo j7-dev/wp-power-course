@@ -88,9 +88,11 @@ if (!current_user_can('manage_options')) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 			<?php echo $doc_title; ?>
 			<?php
-			if ( Base::has_shortcode( \get_the_content(null, false, $keep_chapter) ) ) {
-				\wp_head();
-			}
+			\wp_head();
+			// 如果有短代碼就載入 wp_head
+			// if ( Base::has_shortcode( \get_the_content(null, false, $keep_chapter) ) ) {
+			// 	\wp_head();
+			// }
 			?>
 			<link rel="stylesheet" id="wp-power-course-css" href="<?php echo Plugin::$url . '/inc/assets/dist/css/index.css?ver=' . Plugin::$version; ?>"  media='all' />
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
@@ -107,12 +109,13 @@ if (!current_user_can('manage_options')) {
 			echo '</div>';
 
 
+
 			// TODO 需要測試會不會重複載入 script
 			// if ( Base::has_shortcode( \get_the_content(null, false, $keep_chapter) ) ) {
 			// 	\wp_footer();
 			// }
 
-			\do_action( 'pc_classroom_footer' );
+			// \do_action( 'pc_classroom_footer' );
 
 			printf(
 			/*html*/'
@@ -121,12 +124,11 @@ if (!current_user_can('manage_options')) {
 					"nonce": "%1$s",
 				}
 			</script>
-			<script id="wp-power-course-js" src="%2$s"></script>
 			',
-			\wp_create_nonce( 'wp_rest' ),
-			Plugin::$url . '/inc/assets/dist/index.js?ver=' . Plugin::$version
+			\wp_create_nonce( 'wp_rest' )
 			);
-			?>
+			\wp_footer();
+			 ?>
 </body>
 </html>
 <?php // phpcs:enabled

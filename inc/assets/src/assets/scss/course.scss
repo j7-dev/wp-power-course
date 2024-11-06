@@ -104,6 +104,16 @@ div .pc-rating input[checked] ~ input {
 			}
 		}
 	}
+
+	// 影片浮水印的 padding
+	.rfm-marquee .rfm-child {
+		padding: 0.5rem 0;
+	}
+
+	--audio-border-radius: 0px;
+	--audio-border: none;
+	--video-border-radius: 0px;
+	--video-border: none;
 }
 
 // 不知道為什麼背景有填色
@@ -272,11 +282,6 @@ div#tab-content-description {
 // 貨幣符號間距
 .woocommerce-Price-currencySymbol {
 	margin-right: 0.25em;
-}
-
-// 影片浮水印的 padding
-.rfm-marquee .rfm-child {
-	padding: 0.5rem 0;
 }
 
 @keyframes loading5 {
