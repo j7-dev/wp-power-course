@@ -1,11 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { app1Selector } from '@/utils'
+import { app1Selector, app2Selector } from '@/utils'
 import { StyleProvider } from '@ant-design/cssinjs'
 
 const App1 = React.lazy(() => import('./App1'))
-
+const App2 = React.lazy(() => import('./App2'))
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
@@ -39,3 +39,9 @@ mapping.forEach(({ els, App }) => {
 		})
 	}
 })
+
+ReactDOM.createRoot(document.querySelector(app2Selector)).render(
+	<React.StrictMode>
+		<App2 />
+	</React.StrictMode>,
+)
