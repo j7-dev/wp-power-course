@@ -13,6 +13,7 @@ const getMarqueeProps = (style?: React.CSSProperties) => {
 			color,
 			fontSize: '1.5rem',
 			fontWeight: 'bold',
+			pointerEvents: 'none',
 		},
 	} as MarqueeProps
 }
