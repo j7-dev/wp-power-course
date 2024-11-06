@@ -1,6 +1,8 @@
 import { memo } from 'react'
-import { Form, Input, InputNumber, ColorPicker, Color, Alert } from 'antd'
-import { Heading } from '@/components/general'
+import { Form, Input, InputNumber, ColorPicker, Alert } from 'antd'
+import { Heading, SimpleImage } from '@/components/general'
+import cantPlayVideo from '@/assets/images/cant_play.jpg'
+
 const { Item } = Form
 
 const index = () => {
@@ -40,7 +42,7 @@ const index = () => {
 				<Item
 					name={['pc_marquee_color']}
 					label="影片浮水印顏色"
-					normalize={(value: Color) => value.toRgbString()}
+					normalize={(value) => value.toRgbString()}
 				>
 					<ColorPicker
 						defaultFormat="rgb"
@@ -56,7 +58,10 @@ const index = () => {
 					/>
 				</Item>
 			</div>
-			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto"></div>
+			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto">
+				<Heading className="mt-8">使用 Bunny 影片無法撥放嗎?</Heading>
+				<SimpleImage src={cantPlayVideo} ratio="aspect-[2.1]" />
+			</div>
 		</div>
 	)
 }
