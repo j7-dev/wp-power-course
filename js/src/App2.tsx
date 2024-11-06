@@ -17,6 +17,8 @@ export type TApp2Props = {
 	marquee_color: string
 }
 
+let showMarquee = false
+
 const App2 = ({
 	src,
 	marquee_text,
@@ -37,6 +39,7 @@ const App2 = ({
 			posterLoad="eager"
 			onPlaying={() => {
 				setIsPlaying(true)
+				showMarquee = true
 			}}
 			onPause={() => {
 				setIsPlaying(false)
@@ -49,11 +52,12 @@ const App2 = ({
 			<DefaultVideoLayout icons={defaultLayoutIcons} colorScheme="dark" />
 
 			<div
-				className={`absolute h-full w-full top-0 left-0 ${isPlaying ? 'tw-block' : 'tw-hidden'}`}
+				className={`absolute h-full w-full top-0 left-0 ${showMarquee ? 'tw-block' : 'tw-hidden'}`}
 			>
 				<Marquee
 					qty={Number(marquee_qty)}
 					text={marquee_text}
+					isPlaying={isPlaying}
 					style={{
 						color: marquee_color,
 					}}
