@@ -55,7 +55,8 @@ if ( 'none' !== $video_type ) {
 	Plugin::get(
 	'video',
 	[
-		'video_info' => $trial_video,
+		'video_info'   => $trial_video,
+		'hide_marquee' => true,
 	],
 	false
 	)

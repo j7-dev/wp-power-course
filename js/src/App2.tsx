@@ -5,6 +5,7 @@ import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react'
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
+	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
 import { Marquee } from '@/components/general'
 
@@ -44,7 +45,8 @@ const App2 = ({
 			<MediaProvider>
 				<Poster className="vds-poster" />
 			</MediaProvider>
-			<DefaultVideoLayout icons={defaultLayoutIcons} />
+			<DefaultAudioLayout icons={defaultLayoutIcons} colorScheme="dark" />
+			<DefaultVideoLayout icons={defaultLayoutIcons} colorScheme="dark" />
 
 			<div
 				className={`absolute h-full w-full top-0 left-0 ${isPlaying ? 'tw-block' : 'tw-hidden'}`}

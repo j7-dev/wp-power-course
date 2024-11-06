@@ -11,6 +11,7 @@ use J7\PowerCourse\Plugin;
 $default_args = [
 	'class'         => 'rounded-xl',
 	'thumbnail_url' => '',
+	'hide_marquee'  => false,
 	'video_info'    => [
 		'type' => 'youtube',
 		'id'   => '',
@@ -30,6 +31,7 @@ $args = wp_parse_args( $args, $default_args );
 [
 	'class'      => $class,
 	'thumbnail_url' => $thumbnail_url,
+	'hide_marquee'  => $hide_marquee,
 	'video_info'   => $video_info,
 ] = $args;
 
@@ -62,13 +64,13 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 $wp_current_user = \wp_get_current_user();
 $email           = $wp_current_user ? $wp_current_user->user_email : '';
 
-$marquee_qty   = \get_option( 'pc_marquee_qty', '3' );
+$marquee_qty   = $hide_marquee ? '0' : \get_option( 'pc_marquee_qty', '3' );
 $marquee_color = \get_option( 'pc_marquee_color', 'rgba(205, 205, 205, 0.5)' );
 
 
 printf(
 /*html*/'
-<div class="pc-vidstack relative aspect-video"
+<div class="pc-vidstack relative aspect-video %1$s !overflow-hidden"
 	data-src="%2$s"
 	data-marquee_text="%3$s"
 	data-thumbnail_url="%4$s"

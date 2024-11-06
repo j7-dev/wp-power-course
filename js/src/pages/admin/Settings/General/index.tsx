@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Form, Input, InputNumber, ColorPicker, Color } from 'antd'
+import { Form, Input, InputNumber, ColorPicker, Color, Alert } from 'antd'
 import { Heading } from '@/components/general'
 const { Item } = Form
 
@@ -16,10 +16,23 @@ const index = () => {
 					<Input allowClear />
 				</Item>
 
-				<Heading className="mt-8">影片浮水印設定</Heading>
+				<Heading className="mt-8">教室影片浮水印設定</Heading>
+				<Alert
+					className="mb-4"
+					message="防止自己努力錄製的心血被盜錄"
+					description={
+						<ol className="pl-4">
+							<li>浮水印顯示當前用戶的 Email</li>
+							<li>開啟動態浮水印，嚇阻有心人士盜錄</li>
+							<li>只有教室影片才會顯示動態浮水印，銷售頁影片不會顯示</li>
+						</ol>
+					}
+					type="info"
+					showIcon
+				/>
 				<Item
 					name={['pc_marquee_qty']}
-					label="影片浮水印數量"
+					label="教室影片浮水印數量"
 					help="填 0 就不顯示浮水印，建議數量 3~10，太多會影響觀影體驗"
 				>
 					<InputNumber min={0} max={30} className="w-full" />
