@@ -25,10 +25,11 @@ const index = () => {
 					/>
 				</Item>
 			</div>
-			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto">
+			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto">
 				<p className="font-bold mb-4">說明</p>
 				<Alert
 					message="沒有 Bunny 帳號？"
+					className="mb-4"
 					description={
 						<>
 							若還沒有 Bunny 帳號，可以

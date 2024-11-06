@@ -59,7 +59,7 @@ const index = () => {
 					}}
 				/>
 			</div>
-			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto"></div>
+			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto"></div>
 		</div>
 	)
 }

@@ -52,6 +52,8 @@ final class Option {
 		'fix_video_and_tabs_mobile'  => 'yes', // 手機板時，影片以及 tabs 黏性(sticky)置頂
 		'pc_header_offset'           => '0', // 黏性的偏移距離
 		'hide_courses_in_main_query' => 'no', // 是否在主查詢中隱藏課程
+		'pc_marquee_qty'             => 3, // 跑馬燈數量
+		'pc_marquee_color'           => 'rgba(255, 255, 255, 0.5)', // 跑馬燈顏色
 	];
 
 	/**

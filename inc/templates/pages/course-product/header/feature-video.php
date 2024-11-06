@@ -44,13 +44,14 @@ if ( 'none' !== $video_type ) {
 	Plugin::get(
 		'video',
 		[
-			'video_info' => $feature_video,
-			'class'      => 'md:rounded-2xl',
+			'video_info'    => $feature_video,
+			'class'         => 'md:rounded-2xl',
+			'thumbnail_url' => $image_url,
 		]
 	);
 } else {
 	printf(
-		'<div class="group w-full md:rounded-2xl aspect-video overflow-hidden">
+		/*html*/'<div class="group w-full md:rounded-2xl aspect-video overflow-hidden">
 			<img src="%1$s" class="h-full w-full object-cover group-hover:scale-110 duration-300 transition ease-in-out" alt="%2$s" loading="lazy">
 			</div>',
 		$image_url,

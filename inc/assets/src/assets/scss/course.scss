@@ -274,6 +274,11 @@ div#tab-content-description {
 	margin-right: 0.25em;
 }
 
+// 影片浮水印的 padding
+.rfm-marquee .rfm-child {
+	padding: 0.5rem 0;
+}
+
 @keyframes loading5 {
 	0% {
 		transform: translateX(-175%);

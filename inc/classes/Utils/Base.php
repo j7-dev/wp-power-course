@@ -15,7 +15,7 @@ use J7\WpUtils\Classes\WC;
 abstract class Base {
 	public const BASE_URL      = '/';
 	public const APP1_SELECTOR = '#power_course';
-	public const APP2_SELECTOR = '#power_course_metabox';
+	public const APP2_SELECTOR = '.pc-vidstack';
 	public const API_TIMEOUT   = '30000';
 	public const DEFAULT_IMAGE = 'https://placehold.co/800x600/1677ff/white?text=%3Cimg%20/%3E';
 	public const PRIMARY_COLOR = '#1677ff';
