@@ -152,4 +152,24 @@ abstract class Base {
 
 		return false;
 	}
+
+
+	/**
+	 * 取得真實 IP
+	 * TODO 添加到 wp-utils
+	 *
+	 * @return string
+	 */
+	public static function get_real_ip(): string {
+		// phpcs:disable
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'] ?? '';
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'] ?? '';
+		}
+		// phpcs:enable
+		return (string) $ip;
+	}
 }

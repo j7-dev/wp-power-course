@@ -7,6 +7,7 @@
  */
 
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Utils\Base;
 
 $default_args = [
 	'class'         => 'rounded-xl',
@@ -63,6 +64,7 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 
 $wp_current_user = \wp_get_current_user();
 $email           = $wp_current_user ? $wp_current_user->user_email : '';
+$ip              = Base::get_real_ip();
 
 $marquee_qty   = $hide_marquee ? '0' : \get_option( 'pc_marquee_qty', '3' );
 $marquee_color = \get_option( 'pc_marquee_color', 'rgba(205, 205, 205, 0.5)' );
@@ -82,7 +84,7 @@ printf(
 ',
 	$class,
 	$src,
-	$email,
+	"{$email}, IP:{$ip}",
 	$thumbnail_url,
 	$marquee_qty,
 	$marquee_color
