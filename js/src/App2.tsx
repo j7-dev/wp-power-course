@@ -8,13 +8,21 @@ import {
 } from '@vidstack/react/player/layouts/default'
 import { Marquee } from '@/components/general'
 
-const display_name = 'jerry liu'
-const src = 'youtube/0rp3pP2Xwhs'
-const title = 'Sprite Fight'
-const thumbnail_url = 'https://i.ytimg.com/vi/pFk41rmWpRM/maxresdefault.jpg'
-const MARQUEE_QTY = 3
+export type TApp2Props = {
+	src: string
+	marquee_text: string
+	thumbnail_url: string
+	marquee_qty: string
+	marquee_color: string
+}
 
-const App2 = () => {
+const App2 = ({
+	src,
+	marquee_text,
+	thumbnail_url,
+	marquee_qty,
+	marquee_color,
+}: TApp2Props) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	return (
 		<MediaPlayer
@@ -24,8 +32,7 @@ const App2 = () => {
 			logLevel="warn"
 			crossOrigin
 			playsInline
-			title={title}
-			poster={thumbnail_url}
+			poster={thumbnail_url || undefined}
 			posterLoad="eager"
 			onPlaying={() => {
 				setIsPlaying(true)
@@ -42,7 +49,13 @@ const App2 = () => {
 			<div
 				className={`absolute h-full w-full top-0 left-0 ${isPlaying ? 'tw-block' : 'tw-hidden'}`}
 			>
-				<Marquee qty={MARQUEE_QTY} text={display_name} />
+				<Marquee
+					qty={Number(marquee_qty)}
+					text={marquee_text}
+					style={{
+						color: marquee_color,
+					}}
+				/>
 			</div>
 		</MediaPlayer>
 	)

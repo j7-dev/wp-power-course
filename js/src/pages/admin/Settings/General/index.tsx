@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Form, Input } from 'antd'
+import { Form, Input, InputNumber, ColorPicker, Color } from 'antd'
 import { Heading } from '@/components/general'
 const { Item } = Form
 
@@ -15,8 +15,35 @@ const index = () => {
 				>
 					<Input allowClear />
 				</Item>
+
+				<Heading className="mt-8">影片浮水印設定</Heading>
+				<Item
+					name={['pc_marquee_qty']}
+					label="影片浮水印數量"
+					help="填 0 就不顯示浮水印，建議數量 3~10，太多會影響觀影體驗"
+				>
+					<InputNumber min={0} max={30} className="w-full" />
+				</Item>
+				<Item
+					name={['pc_marquee_color']}
+					label="影片浮水印顏色"
+					normalize={(value: Color) => value.toRgbString()}
+				>
+					<ColorPicker
+						defaultFormat="rgb"
+						presets={[
+							{
+								label: '預設',
+								colors: [
+									'rgba(255, 255, 255, 0.5)',
+									'rgba(200, 200, 200, 0.5)',
+								],
+							},
+						]}
+					/>
+				</Item>
 			</div>
-			<div className="flex-1 h-auto md:h-screen md:overflow-y-auto"></div>
+			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto"></div>
 		</div>
 	)
 }
