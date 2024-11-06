@@ -1,28 +1,9 @@
 import React, { memo, useState, useEffect } from 'react'
-import { default as FastMarquee, MarqueeProps } from 'react-fast-marquee'
+import { default as FastMarquee } from 'react-fast-marquee'
+import { useWindowSize } from '@uidotdev/usehooks'
+import { round } from 'lodash-es'
 
-const getMarqueeProps = (
-	style: React.CSSProperties,
-	isPlaying: boolean,
-	speed: number,
-	top: number,
-) => {
-	const color = style?.color || 'rgba(255, 255, 255, 0.5)'
-	return {
-		play: isPlaying,
-		speed,
-		style: {
-			position: 'absolute',
-			width: '100%',
-			top: `${top}%`,
-			left: '0%',
-			color,
-			fontSize: '1.5rem',
-			fontWeight: 'bold',
-			pointerEvents: 'none',
-		},
-	} as MarqueeProps
-}
+const baseSize = 1.5
 
 export const MarqueeComponent = ({
 	qty,
@@ -36,6 +17,8 @@ export const MarqueeComponent = ({
 	isPlaying: boolean
 }) => {
 	const [randomProps, setRandomProps] = useState<[number, number][]>([]) // [speed, top][]
+	const { width } = useWindowSize()
+	const fontSize = Math.max(round(baseSize * ((width || 1980) / 1980), 2), 0.75) // 至少 0.75rem
 
 	useEffect(() => {
 		// 初始化時，隨機出 qty 個 [speed, top]
@@ -56,12 +39,18 @@ export const MarqueeComponent = ({
 			{new Array(qty).fill(0).map((_, index) => (
 				<FastMarquee
 					key={index}
-					{...getMarqueeProps(
-						style,
-						isPlaying,
-						randomProps?.[index]?.[0],
-						randomProps?.[index]?.[1],
-					)}
+					play={isPlaying}
+					speed={randomProps?.[index]?.[0]}
+					style={{
+						position: 'absolute',
+						width: '100%',
+						top: `${randomProps?.[index]?.[1]}%`,
+						left: '0%',
+						color: style?.color || 'rgba(255, 255, 255, 0.5)',
+						fontSize: `${fontSize}rem`,
+						fontWeight: 'bold',
+						pointerEvents: 'none',
+					}}
 				>
 					{text}
 				</FastMarquee>
