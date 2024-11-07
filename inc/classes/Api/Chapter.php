@@ -12,9 +12,10 @@ use J7\PowerCourse\Resources\Chapter\Factory as ChapterFactory;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Utils\Base;
+
 
 
 /**
@@ -150,7 +151,7 @@ final class Chapter {
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []
-		$body_params = Base::format_empty_array( $body_params );
+		$body_params = General::format_empty_array( $body_params );
 
 		[
 			'data'      => $data,

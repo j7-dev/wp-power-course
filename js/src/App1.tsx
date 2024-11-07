@@ -28,6 +28,7 @@ import Students from '@/pages/admin/Students'
 import Products from '@/pages/admin/Products'
 import Settings from '@/pages/admin/Settings'
 import Shortcodes from '@/pages/admin/Shortcodes'
+import Emails from '@/pages/admin/Emails/List'
 import MediaLibraryPage from '@/pages/admin/MediaLibraryPage'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -114,6 +115,7 @@ function App() {
 						<Route path="shortcodes" element={<Shortcodes />} />
 						<Route path="settings" element={<Settings />} />
 						<Route path="dashboard" element={<Dashboard />} />
+						<Route path="emails" element={<Emails />} />
 						<Route path="media-library" element={<MediaLibraryPage />} />
 
 						<Route path="*" element={<ErrorComponent />} />
