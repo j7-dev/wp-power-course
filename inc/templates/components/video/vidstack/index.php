@@ -10,10 +10,10 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 
 $default_args = [
-	'class'         => 'rounded-xl',
-	'thumbnail_url' => '',
-	'hide_marquee'  => false,
-	'video_info'    => [
+	'class'          => 'rounded-xl',
+	'thumbnail_url'  => '',
+	'hide_watermark' => false,
+	'video_info'     => [
 		'type' => 'youtube',
 		'id'   => '',
 		'meta' => [],
@@ -32,7 +32,7 @@ $args = wp_parse_args( $args, $default_args );
 [
 	'class'      => $class,
 	'thumbnail_url' => $thumbnail_url,
-	'hide_marquee'  => $hide_marquee,
+	'hide_watermark'  => $hide_watermark,
 	'video_info'   => $video_info,
 ] = $args;
 
@@ -64,28 +64,36 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 
 $wp_current_user = \wp_get_current_user();
 $email           = $wp_current_user ? $wp_current_user->user_email : '';
+$display_name    = $wp_current_user ? $wp_current_user->display_name : '';
+$username        = $wp_current_user ? $wp_current_user->user_login : '';
 $ip              = Base::get_real_ip();
 
-$marquee_qty   = $hide_marquee ? '0' : \get_option( 'pc_marquee_qty', '3' );
-$marquee_color = \get_option( 'pc_marquee_color', 'rgba(205, 205, 205, 0.5)' );
+$watermark_qty      = $hide_watermark ? '0' : \get_option( 'pc_watermark_qty', '3' );
+$watermark_color    = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)' );
+$watermark_interval = \get_option( 'pc_watermark_interval', '10' );
+$watermark_text     = \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 IP:{ip} <br /> Email:{email}' );
+
+$watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}' ], [ $email, $ip, $display_name, $username ], $watermark_text );
 
 
 printf(
 /*html*/'
 <div class="pc-vidstack relative aspect-video %1$s !overflow-hidden"
 	data-src="%2$s"
-	data-marquee_text="%3$s"
-	data-thumbnail_url="%4$s"
-	data-marquee_qty="%5$s"
-	data-marquee_color="%6$s"
+	data-thumbnail_url="%3$s"
+	data-watermark_text="%4$s"
+	data-watermark_qty="%5$s"
+	data-watermark_color="%6$s"
+	data-watermark_interval="%7$s"
 >
 	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
 </div>
 ',
 	$class,
 	$src,
-	"{$email}, IP:{$ip}",
 	$thumbnail_url,
-	$marquee_qty,
-	$marquee_color
+	$watermark_text,
+	$watermark_qty,
+	$watermark_color,
+	$watermark_interval
 );

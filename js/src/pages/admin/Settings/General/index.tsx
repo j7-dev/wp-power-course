@@ -33,15 +33,29 @@ const index = () => {
 					showIcon
 				/>
 				<Item
-					name={['pc_marquee_qty']}
-					label="教室影片浮水印數量"
-					help="填 0 就不顯示浮水印，建議數量 3~10，太多會影響觀影體驗"
+					name={['pc_watermark_qty']}
+					label="浮水印數量"
+					tooltip="填 0 就不顯示浮水印，建議數量 3~10，太多會影響觀影體驗"
 				>
 					<InputNumber min={0} max={30} className="w-full" />
 				</Item>
 				<Item
-					name={['pc_marquee_color']}
-					label="影片浮水印顏色"
+					name={['pc_watermark_interval']}
+					label="浮水印更新間隔"
+					tooltip="單位: 秒，建議數量 5~10，太多會影響觀影體驗"
+				>
+					<InputNumber min={1} max={3000} className="w-full" />
+				</Item>
+				<Item
+					name={['pc_watermark_text']}
+					label="浮水印文字"
+					tooltip="可用變數 {display_name} {email} {ip} {username}，也支援 <br /> 換行"
+				>
+					<Input allowClear placeholder="{display_name}正在觀看 用戶IP:{ip}" />
+				</Item>
+				<Item
+					name={['pc_watermark_color']}
+					label="浮水印顏色"
 					normalize={(value) => value.toRgbString()}
 				>
 					<ColorPicker

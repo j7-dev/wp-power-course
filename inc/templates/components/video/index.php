@@ -6,14 +6,14 @@
 use J7\PowerCourse\Plugin;
 
 $default_args = [
-	'class'         => 'rounded-xl',
-	'video_info'    => [
+	'class'          => 'rounded-xl',
+	'video_info'     => [
 		'type' => 'youtube',
 		'id'   => '',
 		'meta' => [],
 	],
-	'thumbnail_url' => '',
-	'hide_marquee'  => false,
+	'thumbnail_url'  => '',
+	'hide_watermark' => false,
 ];
 
 /**
@@ -29,7 +29,7 @@ $args = \wp_parse_args( $args, $default_args );
 	'class'      => $class,
 	'video_info'   => $video_info,
 	'thumbnail_url' => $thumbnail_url,
-	'hide_marquee' => $hide_marquee,
+	'hide_watermark' => $hide_watermark,
 ] = $args;
 
 $video_type = $video_info['type'] ?? 'none';
@@ -52,9 +52,9 @@ if ('code' === $video_type) {
 Plugin::get(
 	'video/vidstack',
 	[
-		'video_info'    => $video_info,
-		'class'         => $class,
-		'thumbnail_url' => $thumbnail_url,
-		'hide_marquee'  => $hide_marquee,
+		'video_info'     => $video_info,
+		'class'          => $class,
+		'thumbnail_url'  => $thumbnail_url,
+		'hide_watermark' => $hide_watermark,
 	]
 );

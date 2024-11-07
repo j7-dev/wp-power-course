@@ -41,7 +41,7 @@ final class Option {
 	/**
 	 * Fields
 	 *
-	 * @var array<string, string> $fields 允許獲取 & 儲存的選項
+	 * @var array<string, string> $fields 允許獲取 & 預設值
 	 */
 	private $fields = [
 		'bunny_library_id'           => '',
@@ -52,8 +52,10 @@ final class Option {
 		'fix_video_and_tabs_mobile'  => 'yes', // 手機板時，影片以及 tabs 黏性(sticky)置頂
 		'pc_header_offset'           => '0', // 黏性的偏移距離
 		'hide_courses_in_main_query' => 'no', // 是否在主查詢中隱藏課程
-		'pc_marquee_qty'             => 3, // 跑馬燈數量
-		'pc_marquee_color'           => 'rgba(255, 255, 255, 0.5)', // 跑馬燈顏色
+		'pc_watermark_qty'           => 3, // 浮水印數量
+		'pc_watermark_color'         => 'rgba(255, 255, 255, 0.5)', // 浮水印顏色
+		'pc_watermark_interval'      => 10, // 浮水印間隔
+		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 IP:{ip} <br /> Email:{email}', // 浮水印文字
 	];
 
 	/**
@@ -111,7 +113,7 @@ final class Option {
 	public function post_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_json_params();
 
-		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
 
 		$allowed_fields = array_keys( $this->fields );
 
