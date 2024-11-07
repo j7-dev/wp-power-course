@@ -49,7 +49,7 @@ const index = () => {
 				<Item
 					name={['pc_watermark_text']}
 					label="浮水印文字"
-					tooltip="可用變數 {display_name} {email} {ip} {username}，也支援 <br /> 換行"
+					tooltip="可用變數 {display_name} {email} {ip} {username} {post_title}，也支援 <br /> 換行"
 				>
 					<Input allowClear placeholder="{display_name}正在觀看 用戶IP:{ip}" />
 				</Item>

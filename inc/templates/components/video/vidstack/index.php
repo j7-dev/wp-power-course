@@ -67,13 +67,15 @@ $email           = $wp_current_user ? $wp_current_user->user_email : '';
 $display_name    = $wp_current_user ? $wp_current_user->display_name : '';
 $username        = $wp_current_user ? $wp_current_user->user_login : '';
 $ip              = Base::get_real_ip();
+global $chapter;
+$post_title = $chapter ? $chapter?->post_title : '';
 
 $watermark_qty      = $hide_watermark ? '0' : \get_option( 'pc_watermark_qty', '3' );
 $watermark_color    = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)' );
 $watermark_interval = \get_option( 'pc_watermark_interval', '10' );
-$watermark_text     = \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 IP:{ip} <br /> Email:{email}' );
+$watermark_text     = \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}' );
 
-$watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}' ], [ $email, $ip, $display_name, $username ], $watermark_text );
+$watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}', '{post_title}' ], [ $email, $ip, $display_name, $username, $post_title ], $watermark_text );
 
 
 printf(
