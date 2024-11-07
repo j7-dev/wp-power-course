@@ -52,7 +52,7 @@ final class Option {
 		'fix_video_and_tabs_mobile'  => 'yes', // 手機板時，影片以及 tabs 黏性(sticky)置頂
 		'pc_header_offset'           => '0', // 黏性的偏移距離
 		'hide_courses_in_main_query' => 'no', // 是否在主查詢中隱藏課程
-		'pc_watermark_qty'           => 3, // 浮水印數量
+		'pc_watermark_qty'           => 0, // 浮水印數量
 		'pc_watermark_color'         => 'rgba(255, 255, 255, 0.5)', // 浮水印顏色
 		'pc_watermark_interval'      => 10, // 浮水印間隔
 		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
