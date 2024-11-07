@@ -1,7 +1,7 @@
 {
 	"name": "wp-power-course",
 	"private": true,
-	"version": "0.3.15",
+	"version": "0.3.16",
 	"type": "module",
 	"scripts": {
 		"bootstrap": "yarn && composer install --no-interaction",
