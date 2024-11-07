@@ -7,24 +7,26 @@ import {
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
-import { Marquee } from '@/components/general'
+import { WaterMark } from '@/components/general'
 
 export type TApp2Props = {
 	src: string
-	marquee_text: string
 	thumbnail_url: string
-	marquee_qty: string
-	marquee_color: string
+	watermark_text: string
+	watermark_qty: string
+	watermark_color: string
+	watermark_interval: string
 }
 
-let showMarquee = false
+let showWatermark = false
 
 const App2 = ({
 	src,
-	marquee_text,
 	thumbnail_url,
-	marquee_qty,
-	marquee_color,
+	watermark_text,
+	watermark_qty,
+	watermark_color,
+	watermark_interval,
 }: TApp2Props) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	return (
@@ -39,7 +41,7 @@ const App2 = ({
 			posterLoad="eager"
 			onPlaying={() => {
 				setIsPlaying(true)
-				showMarquee = true
+				showWatermark = true
 			}}
 			onPause={() => {
 				setIsPlaying(false)
@@ -52,14 +54,15 @@ const App2 = ({
 			<DefaultVideoLayout icons={defaultLayoutIcons} colorScheme="dark" />
 
 			<div
-				className={`absolute h-full w-full top-0 left-0 ${showMarquee ? 'tw-block' : 'tw-hidden'}`}
+				className={`absolute h-full w-full top-0 left-0 ${showWatermark ? 'tw-block' : 'tw-hidden'}`}
 			>
-				<Marquee
-					qty={Number(marquee_qty)}
-					text={marquee_text}
+				<WaterMark
+					interval={Number(watermark_interval)}
+					qty={Number(watermark_qty)}
+					text={watermark_text}
 					isPlaying={isPlaying}
 					style={{
-						color: marquee_color,
+						color: watermark_color,
 					}}
 				/>
 			</div>
