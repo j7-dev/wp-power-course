@@ -45,8 +45,8 @@ final class Factory {
 			],
 		);
 
-		$post_parent = (int) $args['post_parent'];
-		$parent_post_type = \get_post_type($post_parent);
+		$post_parent        = (int) $args['post_parent'];
+		$parent_post_type   = \get_post_type($post_parent);
 		$default_post_title = $parent_post_type === CPT::POST_TYPE ? '新單元' : '新章節';
 
 		$args['post_title']    = $args['post_title'] ?? $default_post_title;
@@ -220,9 +220,10 @@ final class Factory {
 	 * 把 key 轉換/重新命名，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
+	 * TODO 新增到 wp-utils
 	 *
 	 * @param array $args    Arguments.
-	 * @param bool  $keep_id Keep id.
+	 * @param bool  $keep_id Keep id. 是否保留 id 欄位
 	 *
 	 * @return array
 	 */

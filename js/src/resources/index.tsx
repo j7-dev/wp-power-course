@@ -5,6 +5,7 @@ import {
 	CodeOutlined,
 	SettingOutlined,
 	ProductOutlined,
+	MailOutlined,
 } from '@ant-design/icons'
 import { FaPhotoVideo } from 'react-icons/fa'
 import { PiStudent } from 'react-icons/pi'
@@ -81,6 +82,14 @@ export const resources = [
 		meta: {
 			label: '分析',
 			icon: <LineChartOutlined />,
+		},
+	},
+	{
+		name: 'emails',
+		list: '/emails',
+		meta: {
+			label: 'Email 管理',
+			icon: <MailOutlined />,
 		},
 	},
 ]

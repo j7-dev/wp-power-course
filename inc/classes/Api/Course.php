@@ -16,6 +16,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\General;
 
 
 
@@ -463,7 +464,7 @@ final class Course {
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
-		$body_params = Base::format_empty_array( $body_params );
+		$body_params = General::format_empty_array( $body_params );
 
 		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();
 
