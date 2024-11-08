@@ -1,23 +1,23 @@
 import React from 'react'
 import { Table, TableProps, Input, Tag, Space } from 'antd'
-import { TEmailRecord } from '@/pages/admin/Emails/List/types'
+import { TEmailListRecord } from '@/pages/admin/Emails/types'
 import { useNavigation } from '@refinedev/core'
 import { getPostStatus } from '@/utils'
 import { ProductName } from '@/components/product'
 
 const useColumns = () => {
 	const { edit } = useNavigation()
-	const onClick = (record: TEmailRecord) => () => {
+	const onClick = (record: TEmailListRecord) => () => {
 		edit('emails', record.id)
 	}
-	const columns: TableProps<TEmailRecord>['columns'] = [
+	const columns: TableProps<TEmailListRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
 		{
 			title: '主旨',
 			dataIndex: 'name',
 			width: 300,
 			render: (name: string, record) => (
-				<ProductName<TEmailRecord>
+				<ProductName<TEmailListRecord>
 					record={record}
 					hideImage
 					onClick={onClick(record)}

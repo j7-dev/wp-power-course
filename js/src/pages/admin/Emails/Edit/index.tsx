@@ -1,91 +1,67 @@
-import { useState, useRef, useMemo } from 'react'
-import Easymail, {
-	EasymailLangType,
-	EasymailSkinType,
-	EasymailRefProps,
-} from 'easy-mail-editor'
-import mjml2html from 'mjml-browser'
-import Head from './Head'
-import { tpl } from './tpl'
-import { Card } from 'antd'
+import { Switch, Form, Empty } from 'antd'
+import { Edit, useForm } from '@refinedev/antd'
+import { useParsed } from '@refinedev/core'
+import EmailEditor from './EmailEditor'
 
-const dataList: any[] = []
-const id = '1'
+// import { EmailEditorProvider } from './EasyEmail/components/Provider/EmailEditorProvider'
 
-const Emails = () => {
-	const [lang, setLang] = useState<EasymailLangType>('en_US')
-	const [skin, setSkin] = useState<EasymailSkinType>('light')
+const EmailsEdit = () => {
+	const { id } = useParsed()
 
-	const ref = useRef<EasymailRefProps>(null)
-	const rejectRef = useRef<Promise<string>>(null)
+	// 初始化資料
+	const { formProps, form, saveButtonProps, mutation, onFinish, query } =
+		useForm({
+			action: 'edit',
+			resource: 'emails',
+			dataProviderName: 'power-email',
+			id,
+			redirect: false,
+			invalidates: ['list'],
+			warnWhenUnsavedChanges: true,
+		})
+	const record = query?.data?.data
+	const watchStatus = Form.useWatch(['status'], form)
 
-	// const appData = useMemo(() => {
-	// 	if (id == '-1') return undefined
-	// 	return dataList.find((i) => i.id === Number(id))?.tree
-	// }, [id])
-
-	const handleSave = () => {
-		console.log(ref.current?.getData().mjml)
+	if (!record) {
+		return <Empty className="mt-[10rem]" description="找不到 Email" />
 	}
-
-	const handleExport = (key: string) => {
-		const fileName = dataList.find((i) => i.id === Number(id))?.name
-		const { mjml, json } = (ref.current as EasymailRefProps)?.getData()
-		if (key === '1') {
-			console.log(mjml2html(mjml).html)
-		} else if (key === '2') {
-			console.log(mjml)
-		} else {
-			console.log(JSON.stringify(json, null, 2))
-		}
-	}
-
-	const getEditorMjmlJson = () => {
-		return ref.current?.getData()
-	}
+	const { name } = record
 
 	return (
 		<>
-			<Head
-				id={id}
-				lang={lang}
-				setLang={setLang}
-				skin={skin}
-				setSkin={setSkin}
-				handleSave={handleSave}
-				handleExport={handleExport}
-			></Head>
-
-			<Card>
-				<Easymail
-					lang={lang}
-					width="100%"
-					height="calc(100vh - 150px)"
-					skin={skin}
-					// colorPrimary={''}
-					ref={ref}
-					value={tpl}
-					// tinymceLink={tinymceLink}
-					onUpload={(file: File) => {
-						return new Promise((resolve, reject) => {
-							rejectRef.current = reject
-							setTimeout(async () => {
-								try {
-									// const url = await fileToBase64(file)
-									// resolve({ url })
-								} catch (error) {
-									reject('upload error')
-								}
-							}, 5000)
-						})
-					}}
-					onUploadFocusChange={() => {
-						rejectRef.current('error')
-						rejectRef.current = null
-					}}
-				/>
-			</Card>
+			<Edit
+				resource="emails"
+				recordItemId={id}
+				headerButtons={() => null}
+				title={
+					<>
+						《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
+					</>
+				}
+				saveButtonProps={{
+					...saveButtonProps,
+					children: '儲存 Email',
+					icon: null,
+					loading: mutation?.isLoading,
+				}}
+				footerButtons={({ defaultButtons }) => (
+					<>
+						<Switch
+							className="mr-4"
+							checkedChildren="發佈"
+							unCheckedChildren="草稿"
+							value={watchStatus === 'publish'}
+							onChange={(checked) => {
+								form.setFieldValue(['status'], checked ? 'publish' : 'draft')
+							}}
+						/>
+						{defaultButtons}
+					</>
+				)}
+			>
+				<EmailEditor />
+			</Edit>
 		</>
 	)
 }
-export default Emails
+export default EmailsEdit

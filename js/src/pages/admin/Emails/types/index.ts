@@ -1,3 +1,5 @@
+export type TEmailListRecord = Omit<TEmailRecord, 'description'>
+
 export type TEmailRecord = {
 	id: string
 	name: string

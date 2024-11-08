@@ -1,7 +1,7 @@
 import Table from '@/pages/admin/Emails/List/Table'
 import { List } from '@refinedev/antd'
 
-const EmailList = () => {
+const EmailsList = () => {
 	return (
 		<List>
 			<Table />
@@ -9,4 +9,4 @@ const EmailList = () => {
 	)
 }
 
-export default EmailList
+export default EmailsList

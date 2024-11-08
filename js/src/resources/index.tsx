@@ -87,6 +87,7 @@ export const resources = [
 	{
 		name: 'emails',
 		list: '/emails',
+		edit: '/emails/edit/:id',
 		meta: {
 			label: 'Email 管理',
 			icon: <MailOutlined />,

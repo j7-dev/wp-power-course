@@ -122,6 +122,25 @@ final class Email {
 
 
 	/**
+	 * Get email callback
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response|\WP_Error
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_emails_with_id_callback( $request ) { // phpcs:ignore
+		$id = $request['id'];
+
+		$email = new EmailResource( (int) $id );
+
+		$response = new \WP_REST_Response( $email );
+
+		return $response;
+	}
+
+
+	/**
 	 * 處理並分離產品資訊
 	 *
 	 * 根據請求分離產品資訊，並處理描述欄位。
