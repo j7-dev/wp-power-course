@@ -3,7 +3,7 @@ import { useTable } from '@refinedev/antd'
 import { Table, Button, TableProps, Card } from 'antd'
 import { useRowSelection } from 'antd-toolkit'
 import { HttpError, useCreate } from '@refinedev/core'
-import { TEmailRecord } from '@/pages/admin/Emails/List/types'
+import { TEmailListRecord } from '@/pages/admin/Emails/types'
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	getDefaultPaginationProps,
@@ -14,13 +14,13 @@ import { PlusOutlined } from '@ant-design/icons'
 import DeleteButton from './DeleteButton'
 
 const Main = () => {
-	const { tableProps } = useTable<TEmailRecord, HttpError, TFilterProps>({
+	const { tableProps } = useTable<TEmailListRecord, HttpError, TFilterProps>({
 		resource: 'emails',
 		dataProviderName: 'power-email',
 	})
 
 	const { rowSelection, selectedRowKeys, setSelectedRowKeys } =
-		useRowSelection<TEmailRecord>()
+		useRowSelection<TEmailListRecord>()
 
 	const columns = useColumns()
 
@@ -56,7 +56,7 @@ const Main = () => {
 				/>
 			</div>
 			<Table
-				{...(defaultTableProps as unknown as TableProps<TEmailRecord>)}
+				{...(defaultTableProps as unknown as TableProps<TEmailListRecord>)}
 				{...tableProps}
 				pagination={{
 					...tableProps.pagination,

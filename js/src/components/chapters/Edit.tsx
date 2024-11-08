@@ -52,7 +52,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			headerButtons={() => null}
 			title={
 				<>
-					《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
+					《編輯 Email》 {name} <sub className="text-gray-500">#{id}</sub>
 				</>
 			}
 			saveButtonProps={{
