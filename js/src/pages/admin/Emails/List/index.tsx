@@ -1,8 +1,7 @@
-import React from 'react'
+import Table from '@/pages/admin/Emails/List/Table'
 import { List } from '@refinedev/antd'
-import Table from './Table'
 
-const Emails = () => {
+const EmailList = () => {
 	return (
 		<List>
 			<Table />
@@ -10,4 +9,4 @@ const Emails = () => {
 	)
 }
 
-export default Emails
+export default EmailList

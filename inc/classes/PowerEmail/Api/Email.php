@@ -167,6 +167,7 @@ final class Email {
 
 		$post_id = \wp_insert_post(
 			[
+				'post_type'    => EmailCPT::POST_TYPE,
 				'post_title'   => __('New Email', 'power-email'),
 				'post_content' => '',
 				'post_status'  => 'draft',
