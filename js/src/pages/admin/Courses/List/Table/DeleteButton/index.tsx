@@ -47,7 +47,7 @@ const DeleteButton = ({
 							resource: 'courses',
 							ids: selectedRowKeys as string[],
 							invalidates: ['list'],
-							mutationMode: 'undoable',
+							mutationMode: 'optimistic',
 							successNotification: (data, ids, resource) => {
 								return {
 									message: `課程 ${ids?.map((id) => `#${id}`).join(', ')} 已刪除成功`,

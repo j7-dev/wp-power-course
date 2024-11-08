@@ -11,16 +11,11 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email;
  * Class Email
  */
 final class Email {
-	/**
-	 * @var string Email 欄位前綴
-	 */
-	public static string $prefix = 'pe_';
-
 
 	/**
-	 * @var int Email ID
+	 * @var string Email ID
 	 */
-	public int $ID;
+	public string $id;
 
 	/**
 	 * @var string Email 狀態
@@ -30,12 +25,13 @@ final class Email {
 	/**
 	 * @var string Email 主旨
 	 */
-	public string $subject;
+	public string $name;
 
 	/**
-	 * @var string Email 內容
+	 * @var string Email 內容，存放 mjml
+	 * @see https://mjml.io/
 	 */
-	public string $content;
+	public string $description;
 
 	/**
 	 * @var string Email Hook 動作名稱
@@ -52,6 +48,15 @@ final class Email {
 	 */
 	public string $operator;
 
+	/**
+	 * @var string Email 建立時間
+	 */
+	public string $date_created;
+
+	/**
+	 * @var string Email 修改時間
+	 */
+	public string $date_modified;
 
 	/**
 	 * @var array Email post meta 欄位
@@ -67,15 +72,16 @@ final class Email {
 	 * @param \WP_Post|int $post Post object or post ID.
 	 */
 	public function __construct( $post ) {
-		$post          = $post instanceof \WP_Post ? $post : \get_post( $post );
-		$this->ID      = $post->ID;
-		$this->status  = $post->post_status;
-		$this->subject = $post->post_title;
-		$this->content = $post->post_content;
+		$post                = $post instanceof \WP_Post ? $post : \get_post( $post );
+		$this->id            = (string) $post->ID;
+		$this->status        = $post->post_status;
+		$this->name          = $post->post_title;
+		$this->description   = $post->post_content;
+		$this->date_created  = $post->post_date;
+		$this->date_modified = $post->post_modified;
 
-		$prefix = self::$prefix;
 		foreach ( self::$meta_keys as $key ) {
-			$this->$key = \get_post_meta( $this->ID, "{$prefix}{$key}", true );
+			$this->$key = \get_post_meta( $this->id, $key, true );
 		}
 	}
 }
