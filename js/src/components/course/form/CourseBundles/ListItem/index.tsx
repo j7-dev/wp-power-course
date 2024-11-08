@@ -38,7 +38,7 @@ const ListItem = ({
 			</div>
 
 			<div className="self-center">
-				<ProductName
+				<ProductName<TBundleProductRecord>
 					record={record}
 					onClick={() => setSelectedProduct(record)}
 					hideImage={true}

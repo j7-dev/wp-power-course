@@ -20,7 +20,7 @@ const useColumns = () => {
 			dataIndex: 'name',
 			width: 300,
 			render: (_, record) => (
-				<ProductName
+				<ProductName<TProductRecord>
 					record={record}
 					onClick={
 						'variation' === record?.type

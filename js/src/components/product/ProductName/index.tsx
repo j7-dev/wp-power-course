@@ -1,18 +1,27 @@
-import { FC } from 'react'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
-import { TProductRecord } from '@/components/product/ProductTable/types'
 import defaultImage from '@/assets/images/defaultImage.jpg'
 import { renderHTML } from 'antd-toolkit'
 import { Image } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
 
-export const ProductName: FC<{
-	record: TProductRecord | TCourseBaseRecord
+type TBaseRecord = {
+	id: string
+	name: string
+}
+
+type TProductNameProps<T extends TBaseRecord> = {
+	record: T
 	onClick?: () => void
 	hideImage?: boolean
-}> = ({ record, onClick, hideImage = false }) => {
-	const { id, sku = '', name, images } = record
-	const image_url = images?.[0]?.url || defaultImage
+}
+
+export const ProductName = <T extends TBaseRecord>({
+	record,
+	onClick,
+	hideImage = false,
+}: TProductNameProps<T>) => {
+	// @ts-expect-error
+	const { id = '', sku = '', name = '', images = [] } = record
+	const image_url = hideImage ? undefined : images?.[0]?.url || defaultImage
 
 	return (
 		<>
