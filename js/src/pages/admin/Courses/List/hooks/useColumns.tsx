@@ -26,7 +26,10 @@ const useColumns = () => {
 			width: 300,
 			key: 'name',
 			render: (_, record) => (
-				<ProductName record={record} onClick={onClick(record)} />
+				<ProductName<TCourseBaseRecord>
+					record={record}
+					onClick={onClick(record)}
+				/>
 			),
 		},
 		{
