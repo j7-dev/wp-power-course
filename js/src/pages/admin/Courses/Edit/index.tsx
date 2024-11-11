@@ -155,7 +155,6 @@ export const CoursesEdit = () => {
 				)}
 				isLoading={query?.isLoading}
 			>
-				{/* 這邊這個 form 只是為了調整 style */}
 				<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
 					<Tabs
 						items={items}

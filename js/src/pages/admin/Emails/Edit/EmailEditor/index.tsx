@@ -1,93 +1,101 @@
-import { useParams } from 'react-router-dom'
-import { useMemo, useRef, useState } from 'react'
-import Head from './Head'
-import Easymail, {
-	EasymailLangType,
-	EasymailRefProps,
-	EasymailSkinType,
-} from 'easy-mail-editor'
-import mjml2html from 'mjml-browser'
+import React, { memo } from 'react'
+import {
+	BlockManager,
+	BasicType,
+	AdvancedType,
+	IBlockData,
+} from 'easy-email-core'
+import {
+	EmailEditor,
+	EmailEditorProvider,
+	IEmailTemplate,
+} from 'easy-email-editor'
+import type { FormApi, FormState } from 'final-form'
+import { ExtensionProps, StandardLayout } from 'easy-email-extensions'
+import type { HttpError } from '@refinedev/core'
+import type { UseFormReturnType } from '@refinedev/antd'
+import type { TEmailRecord } from '@/pages/admin/Emails/types'
+import type { FormInstance } from 'antd'
+import parseJson from 'parse-json'
 
-const dataList: any[] = []
-const Detail = (): JSX.Element => {
-	const { id } = useParams()
+import 'easy-email-editor/lib/style.css'
+import 'easy-email-extensions/lib/style.css'
 
-	const [lang, setLang] = useState<EasymailLangType>('en_US')
-	const [skin, setSkin] = useState<EasymailSkinType>('light')
+// theme, If you need to change the theme, you can make a duplicate in https://arco.design/themes/design/1799/setting/base/Color
+import '@arco-themes/react-easy-email-theme/css/arco.css'
 
-	const ref = useRef<EasymailRefProps>(null)
+const initBlock = BlockManager.getBlockByType(BasicType.PAGE)!.create({})
 
-	const appData = useMemo(() => {
-		if (id === '-1') return undefined
-		return dataList.find((i) => i.id === Number(id))?.tree
-	}, [id])
+function getInitContent(form: FormInstance, defaultBlock: IBlockData) {
+	const initContentString = form.getFieldValue(['short_description'])
 
-	/* <------------------------------------ **** STATE END **** ------------------------------------ */
-	/* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
-	/************* This section will include this component parameter *************/
-	/* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
-	/* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
-	/************* This section will include this component general function *************/
-	const handleSave = () => {
-		console.log(ref.current?.getData().mjml)
-	}
-
-	const handleExport = (key: string) => {
-		const fileName = dataList.find((i) => i.id === Number(id))?.name
-		const { mjml, json } = (ref.current as EasymailRefProps)?.getData()
-		if (key === '1') {
-			console.log(mjml2html(mjml).html)
-		} else if (key === '2') {
-			console.log(mjml)
-		} else {
-			console.log(JSON.stringify(json, null, 2))
+	let initContent = defaultBlock
+	if (initContentString) {
+		try {
+			initContent = parseJson(initContentString) as any
+		} catch (error) {
+			console.log('parse JSON error: ', error)
 		}
 	}
+	return initContent
+}
 
-	/* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
-	/* <------------------------------------ **** EFFECT START **** ------------------------------------ */
-	/************* This section will include this component general function *************/
-	/* <------------------------------------ **** EFFECT END **** ------------------------------------ */
+/**
+ * Easy Email Editor
+ * @see https://github.com/zalify/easy-email-editor
+ * @param {UseFormReturnType} props - UseFormReturnType
+ * @return {JSX.Element}
+ */
+const CustomEmailEditor = (
+	props: UseFormReturnType<
+		TEmailRecord,
+		HttpError,
+		{},
+		TEmailRecord,
+		TEmailRecord,
+		HttpError
+	>,
+) => {
+	const { formProps, form, saveButtonProps, mutation, onFinish, query } = props
+
+	const initialValues: IEmailTemplate = query?.isLoading
+		? {
+				subject: '',
+				subTitle: '',
+				content: initBlock,
+			}
+		: {
+				subject: form.getFieldValue(['name']),
+				subTitle: '',
+				content: getInitContent(form, initBlock),
+			}
+
 	return (
-		<>
-			<Head
-				id={id}
-				lang={lang}
-				setLang={setLang}
-				skin={skin}
-				setSkin={setSkin}
-				handleSave={handleSave}
-				handleExport={handleExport}
-			></Head>
-
-			<Easymail
-				lang={lang}
-				width="100vw"
-				height="calc(100vh - 60px)"
-				skin={skin}
-				ref={ref}
-				value={appData}
-				// onUpload={(file: File) => {
-				//   return new Promise((resolve, reject) => {
-				//     rejectRef.current = reject;
-				//     setTimeout(async () => {
-				//       try {
-				//         const url = await fileToBase64(file);
-				//         resolve({ url });
-				//       } catch (error) {
-				//         reject("upload error");
-				//       }
-				//     }, 5000);
-				//   });
-				// }}
-				onUploadFocusChange={() => {
-					// rejectRef.current("error");
-					// rejectRef.current = null;
-				}}
-			></Easymail>
-		</>
+		<EmailEditorProvider
+			data={initialValues}
+			height={'calc(100vh - 72px)'}
+			dashed={false}
+			onUploadImage={(file) => {
+				console.log('⭐  onUploadImage file:', file)
+				return Promise.resolve('')
+			}}
+		>
+			{(
+				formState: FormState<IEmailTemplate>,
+				helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
+			) => {
+				form.setFieldValue(['name'], formState?.values?.subject || '')
+				form.setFieldValue(['short_description'], formState?.values?.content)
+				return (
+					<>
+						<StandardLayout showSourceCode={true}>
+							<EmailEditor />
+						</StandardLayout>
+					</>
+				)
+			}}
+		</EmailEditorProvider>
 	)
 }
-export default Detail
 
-/* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */
+export default memo(CustomEmailEditor)

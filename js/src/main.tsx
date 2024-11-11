@@ -29,13 +29,11 @@ mapping.forEach(({ els, App }) => {
 	if (!!els) {
 		els.forEach((el) => {
 			ReactDOM.createRoot(el).render(
-				<React.StrictMode>
-					<QueryClientProvider client={queryClient}>
-						<StyleProvider hashPriority="low">
-							<App />
-						</StyleProvider>
-					</QueryClientProvider>
-				</React.StrictMode>,
+				<QueryClientProvider client={queryClient}>
+					<StyleProvider hashPriority="low">
+						<App />
+					</StyleProvider>
+				</QueryClientProvider>,
 			)
 		})
 	}

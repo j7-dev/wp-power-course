@@ -45,7 +45,12 @@ final class Email {
 			'permission_callback' => null,
 		],
 		[
-			'endpoint'            => 'emails',
+			'endpoint'            => 'emails/(?P<id>\d+)',
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
+		[
+			'endpoint'            => 'emails/(?P<id>\d+)',
 			'method'              => 'delete',
 			'permission_callback' => null,
 		],
@@ -156,7 +161,8 @@ final class Email {
 		$body_params = WP::converter( $body_params );
 
 		$skip_keys   = [
-			'post_content',
+			'post_content', // email html 內容
+			'post_excerpt', // email json 內容
 		];
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
@@ -218,6 +224,11 @@ final class Email {
 	 */
 	public function post_emails_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
+		$body_params = $request->get_body_params();
+		ob_start();
+		var_dump($body_params);
+		\J7\WpUtils\Classes\ErrorLog::info('body_params: ' . ob_get_clean());
+
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
@@ -251,19 +262,17 @@ final class Email {
 	 * @return \WP_REST_Response
 	 * @phpstan-ignore-next-line
 	 */
-	public function delete_emails_callback( $request ): \WP_REST_Response {
-		$body_params = $request->get_body_params();
-		$ids         = $body_params['ids'] ?? [];
-		foreach ($ids as $id) {
-			\wp_trash_post( $id );
-		}
+	public function delete_emails_with_id_callback( $request ): \WP_REST_Response {
+		$id = $request['id'];
+
+		\wp_trash_post( $id );
 
 		return new \WP_REST_Response(
 			[
 				'code'    => 'delete_success',
 				'message' => '刪除成功',
 				'data'    => [
-					'ids' => $ids,
+					'id' => $id,
 				],
 			]
 		);
