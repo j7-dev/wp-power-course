@@ -4,7 +4,7 @@ export type TEmailRecord = {
 	id: string
 	name: string
 	status: string
-	description: string
+	short_description: string
 	action_name: string
 	days: number
 	operator: string

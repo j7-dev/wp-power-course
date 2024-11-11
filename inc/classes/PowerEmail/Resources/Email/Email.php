@@ -28,10 +28,16 @@ final class Email {
 	public string $name;
 
 	/**
-	 * @var string Email 內容，存放 mjml
+	 * @var string Email 內容，存放 email html
 	 * @see https://mjml.io/
 	 */
 	public string $description;
+
+	/**
+	 * @var string Email 內容，存放 json 格式
+	 * @see https://github.com/zalify/easy-email-editor
+	 */
+	public string $short_description;
 
 	/**
 	 * @var string Email Hook 動作名稱
@@ -76,6 +82,7 @@ final class Email {
 		$this->id            = (string) $post->ID;
 		$this->status        = $post->post_status;
 		$this->name          = $post->post_title;
+		$this->short_description   = $post->post_excerpt;
 		$this->description   = $post->post_content;
 		$this->date_created  = $post->post_date;
 		$this->date_modified = $post->post_modified;

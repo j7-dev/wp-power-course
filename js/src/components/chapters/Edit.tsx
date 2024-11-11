@@ -25,7 +25,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			enabled: false,
 		},
 
-		invalidates: ['list'],
+		invalidates: ['list', 'detail'],
 		warnWhenUnsavedChanges: true,
 	})
 

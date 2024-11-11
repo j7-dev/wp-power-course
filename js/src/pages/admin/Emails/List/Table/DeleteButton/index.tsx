@@ -15,6 +15,7 @@ const DeleteButton = ({
 		deleteMany(
 			{
 				resource: 'emails',
+				dataProviderName: 'power-email',
 				ids: selectedRowKeys as string[],
 				invalidates: ['list'],
 				mutationMode: 'optimistic',
