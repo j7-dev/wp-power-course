@@ -2,18 +2,13 @@ import { Switch, Form, Empty } from 'antd'
 import { Edit, useForm } from '@refinedev/antd'
 import { useParsed, HttpError } from '@refinedev/core'
 import EmailEditor from './EmailEditor'
-import type { TEmailRecord } from '@/pages/admin/Emails/types'
+import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 import mjml2html from 'mjml-browser'
-import { JsonToMjml, IBlockData } from 'easy-email-core'
+import { JsonToMjml } from 'j7-easy-email-core'
 
 // import { EmailEditorProvider } from './EasyEmail/components/Provider/EmailEditorProvider'
 
 const { Item } = Form
-
-type TFormValues = {
-	name: string
-	short_description: IBlockData
-}
 
 const EmailsEdit = () => {
 	const { id } = useParsed()
@@ -33,15 +28,12 @@ const EmailsEdit = () => {
 	const record = query?.data?.data
 	const watchStatus = Form.useWatch(['status'], form)
 
-	if (!record) {
+	if (!record && query?.isSuccess) {
 		return <Empty className="mt-[10rem]" description="找不到 Email" />
 	}
-	const { name } = record
+	const { name = '' } = record || {}
 
-	const handleSubmit = (values: {
-		name: string
-		short_description: IBlockData
-	}) => {
+	const handleSubmit = (values: TFormValues) => {
 		// 要存的時候才將 json 轉成 html
 
 		onFinish({
@@ -56,7 +48,7 @@ const EmailsEdit = () => {
 					minify: true,
 				},
 			)?.html,
-		})
+		} as TFormValues)
 	}
 
 	return (
@@ -93,8 +85,7 @@ const EmailsEdit = () => {
 			>
 				<Form {...formProps} layout="vertical" onFinish={handleSubmit}>
 					<Item hidden name={['name']} />
-					{/* 存 html ， 這樣 php 可以直接用 */}
-
+					<Item name={['status']} hidden />
 					{/* 存 json ， 才不會跑版 */}
 					<Item hidden name={['short_description']} />
 
