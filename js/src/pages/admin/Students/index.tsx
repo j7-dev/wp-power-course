@@ -1,10 +1,10 @@
 import React from 'react'
-import StudentTable from './StudentTable'
+import { UserTable } from '@/components/user'
 
 const index = () => {
 	return (
 		<>
-			<StudentTable />
+			<UserTable canGrantCourseAccess={true} />
 		</>
 	)
 }
