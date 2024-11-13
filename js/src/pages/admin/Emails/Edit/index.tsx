@@ -4,7 +4,7 @@ import { useParsed, HttpError } from '@refinedev/core'
 import EmailEditor from './EmailEditor'
 import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 import mjml2html from 'mjml-browser'
-import { JsonToMjml } from 'j7-easy-email-core'
+import { JsonToMjml, IBlockData } from 'j7-easy-email-core'
 
 // import { EmailEditorProvider } from './EasyEmail/components/Provider/EmailEditorProvider'
 
@@ -41,8 +41,9 @@ const EmailsEdit = () => {
 			short_description: JSON.stringify(values.short_description),
 			description: mjml2html(
 				JsonToMjml({
-					data: values.short_description,
+					data: values.short_description as IBlockData<any, any>,
 					mode: 'production',
+					context: values.short_description as IBlockData<any, any>,
 				}),
 				{
 					minify: true,

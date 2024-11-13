@@ -10,7 +10,7 @@ import {
 	Button,
 	TableProps,
 } from 'antd'
-import useColumns from '@/pages/admin/Students/StudentTable/hooks/useColumns'
+import useColumns from '@/components/user/UserTable/hooks/useColumns'
 import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'

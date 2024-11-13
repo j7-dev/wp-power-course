@@ -18,6 +18,6 @@ final class Bootstrap {
 	 */
 	public function __construct() {
 		Resources\Email\CPT::instance();
-		Api\Email::instance();
+		Resources\Email\Api::instance();
 	}
 }

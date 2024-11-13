@@ -12,13 +12,13 @@ type TUseColumnsParams = {
 const { Text } = Typography
 
 const useColumns = (params?: TUseColumnsParams) => {
-	const show = params?.onClick
+	const handleClick = params?.onClick
 	const columns: TableProps<TUserRecord>['columns'] = [
 		{
 			title: '會員',
 			dataIndex: 'id',
 			width: 180,
-			render: (_, record) => <UserName record={record} onClick={show} />,
+			render: (_, record) => <UserName record={record} onClick={handleClick} />,
 		},
 		{
 			title: '已開通課程',

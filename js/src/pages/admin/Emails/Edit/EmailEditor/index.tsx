@@ -106,7 +106,7 @@ const CustomEmailEditor = (
 
 				return (
 					<>
-						<StandardLayout showSourceCode={true}>
+						<StandardLayout showSourceCode={false}>
 							{query?.isLoading ? (
 								<div className="p-8">
 									<div className="h-[calc(100vh-15rem)] w-full bg-gray-100 animate-pulse" />

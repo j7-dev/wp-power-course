@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\PowerEmail\Api;
+namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
@@ -14,9 +14,9 @@ use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 
 
 /**
- * Class Email
+ * Class Api
  */
-final class Email {
+final class Api {
 	use \J7\WpUtils\Traits\SingletonTrait;
 	use \J7\WpUtils\Traits\ApiRegisterTrait;
 
@@ -41,6 +41,11 @@ final class Email {
 		],
 		[
 			'endpoint'            => 'emails',
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
+		[
+			'endpoint'            => 'emails/send',
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
@@ -114,7 +119,7 @@ final class Email {
 
 		$post_ids = $results->posts;
 
-		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( $post_id ), $post_ids ));
+		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false ), $post_ids ));
 
 		$response = new \WP_REST_Response( $emails );
 
@@ -224,11 +229,6 @@ final class Email {
 	 */
 	public function post_emails_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$body_params = $request->get_body_params();
-		ob_start();
-		var_dump($body_params);
-		\J7\WpUtils\Classes\ErrorLog::info('body_params: ' . ob_get_clean());
-
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
@@ -252,6 +252,42 @@ final class Email {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Post Email Send callback
+	 * 立即發送電子郵件
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_emails_send_callback( $request ): \WP_REST_Response|\WP_Error {
+		$body_params = $request->get_json_params();
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'email_ids', 'user_ids' ] );
+		if ( $include_required_params !== true ) {
+			return $include_required_params;
+		}
+
+		$email_ids = $body_params['email_ids'];
+		$user_ids  = $body_params['user_ids'];
+
+		foreach ( $email_ids as $email_id ) {
+			$email = new EmailResource( (int) $email_id );
+			$email->send( $user_ids );
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'send_success',
+				'message' => '發送成功',
+				'data'    => [
+					'email_ids' => $email_ids,
+					'user_ids'  => $user_ids,
+				],
+			]
+			);
 	}
 
 	/**
