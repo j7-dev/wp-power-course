@@ -1,13 +1,14 @@
 import { FC } from 'react'
 import { Progress, Tooltip } from 'antd'
 import { TFileInQueue } from '@/bunny/MediaLibrary'
+import { bunny_library_id } from '@/utils'
 
 const FileEncodeProgress: FC<{
 	fileInQueue: TFileInQueue
 }> = ({ fileInQueue }) => {
 	const { status = 'active', videoId = '', encodeProgress } = fileInQueue
 
-	const bunnyUrl = `https://dash.bunny.net/stream/244459/library/videos?videoId=${videoId}&page=1&search=${videoId}#noscroll`
+	const bunnyUrl = `https://dash.bunny.net/stream/${bunny_library_id}/library/videos?videoId=${videoId}&page=1&search=${videoId}#noscroll`
 
 	return (
 		<>
