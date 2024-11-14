@@ -47,19 +47,10 @@ final class Email {
 	public string $subject = '';
 
 	/**
-	 * @var string Email Hook 動作名稱
+	 * @var array Email 寄送條件
 	 */
-	public string $action_name;
+	public $condition;
 
-	/**
-	 * @var string Email N 天{前後}發送
-	 */
-	public string $days;
-
-	/**
-	 * @var string Email 操作 'after' | 'before'
-	 */
-	public string $operator;
 
 	/**
 	 * @var string Email 建立時間
@@ -76,9 +67,7 @@ final class Email {
 	 */
 	public static array $meta_keys = [
 		'subject',
-		'action_name',
-		'days',
-		'operator',
+		'condition',
 	];
 
 	/**

@@ -129,6 +129,10 @@ final class Api {
 
 		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false ), $post_ids ));
 
+		ob_start();
+		var_dump($emails);
+		\J7\WpUtils\Classes\ErrorLog::info('get_emails_callback: ' . ob_get_clean());
+
 		$response = new \WP_REST_Response( $emails );
 
 		// set pagination in header
@@ -236,6 +240,11 @@ final class Api {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_emails_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
+		$body_params = $request->get_body_params();
+
+		ob_start();
+		var_dump($body_params);
+		\J7\WpUtils\Classes\ErrorLog::info('' . ob_get_clean());
 
 		[
 			'data'      => $data,

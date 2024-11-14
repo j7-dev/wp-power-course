@@ -95,11 +95,6 @@ final class Chapter {
 
 		$params = WP::sanitize_text_field_deep( $params, false );
 
-		$include_required_params = WP::include_required_params( $params, [ 'post_parent' ] );
-		if ( $include_required_params !== true ) {
-			return $include_required_params;
-		}
-
 		$default_args = [
 			'post_type'      => ChapterCPT::POST_TYPE,
 			'posts_per_page' => - 1,
@@ -117,9 +112,7 @@ final class Chapter {
 			$default_args,
 		);
 
-		$chapters = array_values(
-			\get_children($args)
-		);
+		$chapters = \get_posts($args);
 		$chapters = array_values(array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters ));
 
 		$response = new \WP_REST_Response( $chapters );
