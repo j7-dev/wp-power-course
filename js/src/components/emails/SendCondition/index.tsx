@@ -7,7 +7,7 @@ export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-[1fr_32rem] gap-x-4">
 			<Tabs
-				defaultActiveKey="specific"
+				defaultActiveKey="condition"
 				items={[
 					{
 						label: '發給指定用戶',
