@@ -11,7 +11,7 @@ namespace J7\PowerCourse\Resources;
 use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Resources\Course\LifeCycle;
 
 /**
  * Class Order
@@ -173,7 +173,7 @@ final class Order {
 	}
 
 	/**
-	 * 處理綑綁課程
+	 * 開通銷售方案中包含的課程
 	 *
 	 * @param int                    $customer_id 用戶ID。
 	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
@@ -182,59 +182,38 @@ final class Order {
 	public function handle_bind_courses( int $customer_id, $item ): void {
 		// 從訂單拿 _bind_courses_data
 		$bind_courses_data = $item->get_meta( '_bind_courses_data' ) ?: [];
-		// 先檢查用戶有沒有買過
-		$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
-		if (!\is_array($avl_course_ids)) {
-			$avl_course_ids = [];
-		}
 
 		foreach ($bind_courses_data as $bind_course_data) {
 			$bind_course_id = (int) $bind_course_data['id'] ?? 0;
 			if (!$bind_course_id) {
 				continue;
 			}
-			// 如果沒買過就新增
-			if (!\in_array($bind_course_id, $avl_course_ids)) {
-				\add_user_meta( $customer_id, 'avl_course_ids', $bind_course_id );
-			}
 
 			$limit_type  = (string) $bind_course_data['limit_type'] ?? 'unlimited';
 			$limit_value = (int) $bind_course_data['limit_value'] ?? 0;
 			$limit_unit  = (string) $bind_course_data['limit_unit'] ?? '';
-
 			$expire_date = CourseUtils::calc_expire_date( $limit_type, $limit_value, $limit_unit );
 
-			AVLCourseMeta::update( $bind_course_id, $customer_id, 'expire_date', $expire_date);
+			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $bind_course_id, $expire_date );
 		}
 	}
 
 
 	/**
-	 * 處理單一課程
+	 * 開通單一課程
 	 *
 	 * @param int                    $customer_id 用戶ID。
 	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
 	 * @return void
 	 */
 	public function handle_single_course( int $customer_id, $item ): void {
-		$product_id = $item->get_product_id();
-		// 先檢查用戶有沒有買過
-		$avl_course_ids = \get_user_meta($customer_id, 'avl_course_ids');
-		if (!\is_array($avl_course_ids)) {
-			$avl_course_ids = [];
-		}
-		// 如果沒買過就新增
-		if (!\in_array($product_id, $avl_course_ids)) {
-			\add_user_meta( $customer_id, 'avl_course_ids', $product_id );
-		}
+		$product_id = (int) $item->get_product_id();
 
-		// 將課程限制條件紀錄到訂單
 		$limit_type  = (string) $item->get_meta( '_limit_type' );
 		$limit_value = (int) $item->get_meta( '_limit_value' );
 		$limit_unit  = (string) $item->get_meta( '_limit_unit' );
-
 		$expire_date = CourseUtils::calc_expire_date( $limit_type, $limit_value, $limit_unit );
 
-		AVLCourseMeta::update( $product_id, $customer_id, 'expire_date', $expire_date);
+		\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $product_id, $expire_date );
 	}
 }

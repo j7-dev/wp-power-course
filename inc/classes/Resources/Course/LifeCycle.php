@@ -1,29 +1,60 @@
 <?php
 /**
- * Course 相關
+ * Course 生命週期相關
  */
 
 declare( strict_types=1 );
 
-namespace J7\PowerCourse\Resources;
+namespace J7\PowerCourse\Resources\Course;
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Utils\AVLCourseMeta;
 
 /**
- * Class Course
+ * Class LifeCycle
  */
-final class Course {
+final class LifeCycle {
 	use \J7\WpUtils\Traits\SingletonTrait;
+
+	// 開通用戶權限的鉤子
+	const ADD_STUDENT_TO_COURSE_ACTION = 'power_course_add_student_to_course';
 
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_student_to_course' ], 10, 3 );
+
 		\add_action('before_delete_post', [ __CLASS__, 'delete_course_and_related_items' ], 10, 2);
 		\add_action('trashed_post', [ __CLASS__, 'delete_course_and_related_items' ], 10, 2);
 		\add_action('untrash_post', [ __CLASS__, 'untrash_course_and_related_items' ], 10, 2);
+	}
+
+	/**
+	 * 新增學員到課程，開通用戶課程權限
+	 *
+	 * @param int $user_id 用戶 id
+	 * @param int $course_id 課程 id
+	 * @param int $expire_date 到期日 10位 timestamp
+	 * @return void
+	 * @throws \Exception 新增學員失敗
+	 */
+	public static function add_student_to_course( int $user_id, int $course_id, int $expire_date ): void {
+		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
+		if (!\is_array($current_avl_course_ids)) {
+			$current_avl_course_ids = [];
+		}
+		// 先檢查用戶有沒有買過，沒買過才新增 user_meta
+		if (!\in_array($course_id, $current_avl_course_ids)) {
+			\add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
+		}
+
+		$update_success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
+		if ( false === $update_success) {
+			throw new \Exception('新增學員失敗');
+		}
 	}
 
 	/**
