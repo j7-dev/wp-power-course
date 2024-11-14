@@ -12,8 +12,6 @@ import {
 import useColumns from '@/pages/admin/Emails/List/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
 import DeleteButton from './DeleteButton'
-import SendCondition from './SendCondition'
-
 const Main = () => {
 	const { tableProps } = useTable<TEmailListRecord, HttpError, TFilterProps>({
 		resource: 'emails',
@@ -57,8 +55,6 @@ const Main = () => {
 					setSelectedRowKeys={setSelectedRowKeys}
 				/>
 			</div>
-
-			<SendCondition email_ids={selectedRowKeys as string[]} />
 			<Table
 				{...(defaultTableProps as unknown as TableProps<TEmailListRecord>)}
 				{...tableProps}

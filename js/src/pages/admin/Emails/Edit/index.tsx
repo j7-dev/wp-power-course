@@ -5,6 +5,7 @@ import EmailEditor from './EmailEditor'
 import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 import mjml2html from 'mjml-browser'
 import { JsonToMjml, IBlockData } from 'j7-easy-email-core'
+import { SendCondition } from '@/components/emails'
 
 // import { EmailEditorProvider } from './EasyEmail/components/Provider/EmailEditorProvider'
 
@@ -89,6 +90,8 @@ const EmailsEdit = () => {
 					<Item name={['status']} hidden />
 					{/* 存 json ， 才不會跑版 */}
 					<Item hidden name={['short_description']} />
+
+					<SendCondition email_ids={[id] as string[]} />
 
 					<EmailEditor {...formReturn} />
 				</Form>

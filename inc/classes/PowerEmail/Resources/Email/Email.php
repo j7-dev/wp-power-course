@@ -105,19 +105,18 @@ final class Email {
 	}
 
 	/**
-	 * 寄送 Email
+	 * 立即寄送 Email
 	 *
 	 * @param array $user_ids 使用者 ID 陣列
 	 */
-	public function send( $user_ids ) {
+	public function send_now( $user_ids ) {
 		$html    = $this->description;
 		$subject = $this->subject;
-		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 		foreach ( $user_ids as $user_id ) {
 			$user           = \get_user_by( 'ID', $user_id );
 			$user_email     = $user->user_email;
 			$formatted_html = UserReplace::get_formatted_html( $html, $user );
-			\wp_mail( $user_email, $subject, $formatted_html, $headers );
+			\wp_mail( $user_email, $subject, $formatted_html, CPT::$email_headers );
 		}
 	}
 }
