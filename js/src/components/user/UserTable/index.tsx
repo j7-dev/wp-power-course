@@ -9,7 +9,6 @@ import {
 	Button,
 	Modal,
 	CardProps,
-	Tooltip,
 } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection, FilterTags } from 'antd-toolkit'
@@ -200,15 +199,21 @@ const UserTableComponent = ({
 
 				<SelectedUser
 					user_ids={selectedUserIds}
-					onClick={() => {
+					onClear={() => {
 						setSelectedUserIds([])
+					}}
+					onSelected={() => {
+						const searchForm = searchFormProps?.form
+						if (!searchForm) return
+						searchForm.setFieldValue(['include'], selectedUserIds)
+						searchForm.submit()
 					}}
 				/>
 
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
 					{...tableProps}
-					className=""
+					className="h-[500px]"
 					columns={columns}
 					rowSelection={rowSelection}
 					pagination={{
@@ -291,8 +296,14 @@ const UserTableComponent = ({
 
 				<SelectedUser
 					user_ids={selectedUserIds}
-					onClick={() => {
+					onClear={() => {
 						setSelectedUserIds([])
+					}}
+					onSelected={() => {
+						const searchForm = searchFormProps?.form
+						if (!searchForm) return
+						searchForm.setFieldValue(['include'], selectedUserIds)
+						searchForm.submit()
 					}}
 				/>
 

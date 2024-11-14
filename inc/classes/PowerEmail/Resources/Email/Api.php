@@ -45,7 +45,12 @@ final class Api {
 			'permission_callback' => null,
 		],
 		[
-			'endpoint'            => 'emails/send',
+			'endpoint'            => 'emails/send-now',
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
+		[
+			'endpoint'            => 'emails/send-schedule',
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
@@ -61,11 +66,14 @@ final class Api {
 		],
 	];
 
+	const SEND_SCHEDULE_HOOK = 'power_email_send_schedule';
+
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_emails' ] );
+		\add_action( self::SEND_SCHEDULE_HOOK, [ $this, 'send_schedule_callback' ], 10, 2 );
 	}
 
 	/**
@@ -255,14 +263,14 @@ final class Api {
 	}
 
 	/**
-	 * Post Email Send callback
+	 * Post Email Send Now callback
 	 * 立即發送電子郵件
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error
 	 * @phpstan-ignore-next-line
 	 */
-	public function post_emails_send_callback( $request ): \WP_REST_Response|\WP_Error {
+	public function post_emails_send_now_callback( $request ): \WP_REST_Response|\WP_Error {
 		$body_params = $request->get_json_params();
 
 		$include_required_params = WP::include_required_params( $body_params, [ 'email_ids', 'user_ids' ] );
@@ -275,7 +283,7 @@ final class Api {
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
-			$email->send( $user_ids );
+			$email->send_now( $user_ids );
 		}
 
 		return new \WP_REST_Response(
@@ -288,6 +296,71 @@ final class Api {
 				],
 			]
 			);
+	}
+
+
+
+	/**
+	 * Post Email Send Schedule callback
+	 * 排程發送電子郵件
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_emails_send_schedule_callback( $request ): \WP_REST_Response|\WP_Error {
+		$body_params = $request->get_json_params();
+
+		$include_required_params = WP::include_required_params( $body_params, [ 'email_ids', 'user_ids', 'timestamp' ] );
+		if ( $include_required_params !== true ) {
+			return $include_required_params;
+		}
+
+		$email_ids = $body_params['email_ids'];
+		$user_ids  = $body_params['user_ids'];
+		$timestamp = $body_params['timestamp'];
+
+		$action_id = \as_schedule_single_action(
+			$timestamp,
+			self::SEND_SCHEDULE_HOOK,
+			[
+				'email_ids' => $email_ids,
+				'user_ids'  => $user_ids,
+			]
+			);
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'schedule_success',
+				'message' => '排程成功',
+				'data'    => [
+					'action_id' => $action_id,
+				],
+			]
+			);
+	}
+
+	/**
+	 * Send schedule callback
+	 * 排程發信，時間到後的觸發動作
+	 *
+	 * @param array $email_ids 電子郵件 ID 陣列
+	 * @param array $user_ids 使用者 ID 陣列
+	 */
+	public function send_schedule_callback( $email_ids, $user_ids ) {
+		ob_start();
+		var_dump(
+			[
+				'email_ids' => $email_ids,
+				'user_ids'  => $user_ids,
+			]
+			);
+		\J7\WpUtils\Classes\ErrorLog::info( '排程觸發：' . ob_get_clean() );
+
+		foreach ( $email_ids as $email_id ) {
+			$email = new EmailResource( (int) $email_id );
+			$email->send_now( $user_ids );
+		}
 	}
 
 	/**

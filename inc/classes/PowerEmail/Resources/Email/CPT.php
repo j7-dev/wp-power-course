@@ -16,6 +16,14 @@ final class CPT {
 	public const POST_TYPE = 'pe_email';
 
 	/**
+	 * Email headers
+	 * used in wp_mail
+	 *
+	 * @var array
+	 */
+	public static $email_headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {

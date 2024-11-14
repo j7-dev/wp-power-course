@@ -3,11 +3,11 @@ import { Tabs } from 'antd'
 import Specific from './Specific'
 import Condition from './Condition'
 
-const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
+export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 	return (
-		<>
+		<div className="grid grid-cols-1 lg:grid-cols-[1fr_32rem] gap-x-4">
 			<Tabs
-				defaultActiveKey="1"
+				defaultActiveKey="specific"
 				items={[
 					{
 						label: '發給指定用戶',
@@ -21,8 +21,16 @@ const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 					},
 				]}
 			/>
-		</>
+			<Tabs
+				defaultActiveKey="avl_variables"
+				items={[
+					{
+						label: '可用變數',
+						key: 'Variables',
+						children: 'Variables',
+					},
+				]}
+			/>
+		</div>
 	)
 }
-
-export default SendCondition
