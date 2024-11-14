@@ -30,7 +30,7 @@ final class Bootstrap {
 		Resources\Chapter\CPT::instance();
 		Resources\Order::instance();
 		Resources\Comment::instance();
-		Resources\Course::instance();
+		Resources\Course\LifeCycle::instance();
 
 		Admin\Entry::instance();
 		Admin\Product::instance();

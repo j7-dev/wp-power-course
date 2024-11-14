@@ -17,6 +17,7 @@ use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
+use J7\PowerCourse\Resources\Course\LifeCycle;
 
 
 
@@ -634,16 +635,7 @@ final class Course {
 		$success = true;
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
-				$current_avl_course_ids = (array) \get_user_meta( $user_id, 'avl_course_ids' );
-				if (\in_array($course_id, $current_avl_course_ids)) {
-					continue;
-				}
-				$mid            = \add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
-				$update_success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
-				if (false === $mid || false === $update_success) {
-					$success = false;
-					break;
-				}
+				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, (int) $expire_date );
 			}
 		}
 
