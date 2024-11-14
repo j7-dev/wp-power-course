@@ -34,7 +34,6 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 		['condition', 'sending', 'range'],
 		form,
 	)
-	console.log('⭐  watchSendingRange:', watchSendingRange)
 
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
 		resource: 'courses',
@@ -97,12 +96,24 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					<Select
 						options={[
 							{
+								label: '開通課程時',
+								value: TriggerAt.COURSE_OPEN,
+							},
+							{
 								label: '完成課程時',
 								value: TriggerAt.COURSE_FINISH,
 							},
 							{
-								label: '完成章節時',
+								label: '課程開課時',
+								value: TriggerAt.COURSE_SCHEDULE,
+							},
+							{
+								label: '完成單元時',
 								value: TriggerAt.CHAPTER_FINISH,
+							},
+							{
+								label: '進入單元時',
+								value: TriggerAt.CHAPTER_ENTER,
 							},
 						]}
 					/>
@@ -112,26 +123,30 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					className="flex-1"
 					label="選擇課程"
 					name={['condition', 'course_ids']}
-					tooltip="可多選，可搜尋關鍵字，留空不填 = 全選所有課程"
+					tooltip="可多選，可搜尋關鍵字"
+					help="留空不填 = 全選所有課程"
 				>
 					<Select
 						{...defaultSelectProps}
 						{...courseSelectProps}
-						placeholder="可多選，可搜尋關鍵字，留空不填 = 全選所有課程"
+						placeholder="可多選，可搜尋關鍵字"
 					/>
 				</Item>
 
-				{watchTriggerAt === TriggerAt.CHAPTER_FINISH && (
+				{[TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
+					watchTriggerAt,
+				) && (
 					<Item
-						label="選擇章節"
+						label="選擇單元"
 						name={['condition', 'chapter_ids']}
 						className="flex-1"
-						tooltip="可多選，可搜尋關鍵字，留空不填 = 全選該課程底下的所有章節"
+						tooltip="可多選，可搜尋關鍵字"
+						help="留空不填 = 全選所有單元"
 					>
 						<Select
 							{...defaultSelectProps}
 							{...chapterSelectProps}
-							placeholder="可多選，可搜尋關鍵字，留空不填 = 全選該課程底下的所有章節"
+							placeholder="可多選，可搜尋關鍵字"
 						/>
 					</Item>
 				)}
@@ -145,15 +160,15 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					<Select
 						options={[
 							{
-								label: '任何一個完成時',
+								label: '任何一個達成時',
 								value: TriggerCondition.EACH,
 							},
 							{
-								label: '全部完成時',
+								label: '全部達成時',
 								value: TriggerCondition.ALL,
 							},
 							{
-								label: '完成任意數量時',
+								label: '達成指定數量時',
 								value: TriggerCondition.QUANTITY_GREATER_THAN,
 							},
 						]}
