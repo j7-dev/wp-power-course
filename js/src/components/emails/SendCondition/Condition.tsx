@@ -2,14 +2,17 @@ import React from 'react'
 import { Form, Select, InputNumber, Space, TimePicker, Input } from 'antd'
 import { TriggerAt, TriggerCondition, SendingType, SendingUnit } from './enum'
 import { useSelect } from '@refinedev/antd'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
+import {
+	TCourseBaseRecord,
+	TChapterRecord,
+} from '@/pages/admin/Courses/List/types'
 import { defaultSelectProps } from '@/utils'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 const { Item } = Form
 
 const Condition = ({ email_ids }: { email_ids: string[] }) => {
-	const [form] = Form.useForm()
+	const form = Form.useFormInstance()
 	const watchTriggerAt = Form.useWatch(
 		['condition', TriggerAt.FIELD_NAME],
 		form,
@@ -18,6 +21,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 		['condition', TriggerCondition.FIELD_NAME],
 		form,
 	)
+	const watchCourseIds = Form.useWatch(['condition', 'course_ids'], form)
 	const watchSendingType = Form.useWatch(
 		['condition', 'sending', SendingType.FIELD_NAME],
 		form,
@@ -26,6 +30,11 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 		['condition', 'sending', SendingUnit.FIELD_NAME],
 		form,
 	)
+	const watchSendingRange = Form.useWatch(
+		['condition', 'sending', 'range'],
+		form,
+	)
+	console.log('⭐  watchSendingRange:', watchSendingRange)
 
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
 		resource: 'courses',
@@ -40,8 +49,44 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 		],
 	})
 
+	const { selectProps: chapterSelectProps } = useSelect<TChapterRecord>({
+		resource: 'chapters',
+		optionLabel: 'name',
+		optionValue: 'id',
+		onSearch: (value) => [
+			{
+				field: 's',
+				operator: 'eq',
+				value,
+			},
+		],
+		filters: watchCourseIds
+			? [
+					{
+						field: 'posts_per_page',
+						operator: 'eq',
+						value: 100,
+					},
+					{
+						field: 'post_parent__in',
+						operator: 'eq',
+						value: watchCourseIds,
+					},
+				]
+			: [
+					{
+						field: 'post_parent__in',
+						operator: 'eq',
+						value: watchCourseIds,
+					},
+				],
+		queryOptions: {
+			enabled: watchTriggerAt === TriggerAt.CHAPTER_FINISH,
+		},
+	})
+
 	return (
-		<Form layout="vertical" form={form}>
+		<>
 			<Space.Compact block>
 				<Item
 					label="觸發時機"
@@ -67,11 +112,12 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					className="flex-1"
 					label="選擇課程"
 					name={['condition', 'course_ids']}
+					tooltip="可多選，可搜尋關鍵字，留空不填 = 全選所有課程"
 				>
 					<Select
 						{...defaultSelectProps}
 						{...courseSelectProps}
-						placeholder="可多選"
+						placeholder="可多選，可搜尋關鍵字，留空不填 = 全選所有課程"
 					/>
 				</Item>
 
@@ -80,18 +126,12 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 						label="選擇章節"
 						name={['condition', 'chapter_ids']}
 						className="flex-1"
+						tooltip="可多選，可搜尋關鍵字，留空不填 = 全選該課程底下的所有章節"
 					>
 						<Select
-							options={[
-								{
-									label: '完成課程時',
-									value: 'course_finish',
-								},
-								{
-									label: '完成章節時',
-									value: 'chapter_finish',
-								},
-							]}
+							{...defaultSelectProps}
+							{...chapterSelectProps}
+							placeholder="可多選，可搜尋關鍵字，留空不填 = 全選該課程底下的所有章節"
 						/>
 					</Item>
 				)}
@@ -105,7 +145,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					<Select
 						options={[
 							{
-								label: '每一個完成時',
+								label: '任何一個完成時',
 								value: TriggerCondition.EACH,
 							},
 							{
@@ -127,7 +167,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 						name={['condition', 'qty']}
 						initialValue={1}
 					>
-						<InputNumber className="w-20" />
+						<InputNumber min={1} className="w-20" />
 					</Item>
 				)}
 			</Space.Compact>
@@ -135,18 +175,18 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 			<Space.Compact block>
 				<Item
 					name={['condition', 'sending', SendingType.FIELD_NAME]}
-					className="w-48"
-					label="寄送"
+					className="w-40"
+					label="完成上述觸發條件後"
 					initialValue={SendingType.NOW}
 				>
 					<Select
 						options={[
 							{
-								label: '完成條件後立即寄送',
+								label: '立即寄送',
 								value: SendingType.NOW,
 							},
 							{
-								label: '完成條件後延遲寄送',
+								label: '延遲寄送',
 								value: SendingType.LATER,
 							},
 						]}
@@ -159,8 +199,9 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							name={['condition', 'sending', 'value']}
 							label=" "
 							className="w-20"
+							initialValue={1}
 						>
-							<InputNumber className="w-full" />
+							<InputNumber min={1} className="w-full" />
 						</Item>
 
 						<Item
@@ -189,14 +230,29 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 
 						{watchSendingUnit === SendingUnit.DAY && (
 							<>
-								<Item label=" " className="w-[2.5rem]">
-									<Input defaultValue="的" className="pointer-events-none" />
+								<Item label=" " className="w-20">
+									<Input defaultValue="後的" className="pointer-events-none" />
 								</Item>
 
 								<Item
 									name={['condition', 'sending', 'range']}
 									label=" "
 									className="w-60"
+									normalize={(values: [Dayjs, Dayjs] | undefined) =>
+										values ? values?.map((v) => v?.format('HH:mm')) : []
+									}
+									getValueProps={(values: [Dayjs, Dayjs] | undefined) => {
+										if (!Array.isArray(values)) {
+											return {
+												value: undefined,
+											}
+										}
+
+										// format('HH:mm') to Dayjs
+										return {
+											value: values?.map((v) => dayjs(v, 'HH:mm')),
+										}
+									}}
 								>
 									<TimePicker.RangePicker
 										defaultValue={[
@@ -212,7 +268,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					</>
 				)}
 			</Space.Compact>
-		</Form>
+		</>
 	)
 }
 
