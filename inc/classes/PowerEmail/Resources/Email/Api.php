@@ -129,10 +129,6 @@ final class Api {
 
 		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false ), $post_ids ));
 
-		ob_start();
-		var_dump($emails);
-		\J7\WpUtils\Classes\ErrorLog::info('get_emails_callback: ' . ob_get_clean());
-
 		$response = new \WP_REST_Response( $emails );
 
 		// set pagination in header
@@ -240,11 +236,6 @@ final class Api {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_emails_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
-		$body_params = $request->get_body_params();
-
-		ob_start();
-		var_dump($body_params);
-		\J7\WpUtils\Classes\ErrorLog::info('' . ob_get_clean());
 
 		[
 			'data'      => $data,
@@ -357,15 +348,6 @@ final class Api {
 	 * @param array $user_ids 使用者 ID 陣列
 	 */
 	public function send_schedule_callback( $email_ids, $user_ids ) {
-		ob_start();
-		var_dump(
-			[
-				'email_ids' => $email_ids,
-				'user_ids'  => $user_ids,
-			]
-			);
-		\J7\WpUtils\Classes\ErrorLog::info( '排程觸發：' . ob_get_clean() );
-
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
 			$email->send_now( $user_ids );
