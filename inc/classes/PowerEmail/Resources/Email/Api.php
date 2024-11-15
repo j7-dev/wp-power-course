@@ -12,6 +12,7 @@ use J7\WpUtils\Classes\General;
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
+use J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 
 
 /**
@@ -63,6 +64,12 @@ final class Api {
 		[
 			'endpoint'            => 'emails/(?P<id>\d+)',
 			'method'              => 'delete',
+			'permission_callback' => null,
+		],
+
+		[
+			'endpoint'            => 'emails/options',
+			'method'              => 'get',
 			'permission_callback' => null,
 		],
 	];
@@ -362,6 +369,23 @@ final class Api {
 				'data'    => [
 					'id' => $id,
 				],
+			]
+		);
+	}
+
+	/**
+	 * Get Email Options callback
+	 * 取得電子郵件選項
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_emails_options_callback( $request ): \WP_REST_Response {
+		return new \WP_REST_Response(
+			[
+				'course_schema' => Replace\Course::$schema,
+				'user_schema'   => Replace\User::$schema,
 			]
 		);
 	}
