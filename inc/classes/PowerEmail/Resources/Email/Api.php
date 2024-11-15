@@ -11,6 +11,7 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
+use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 
 
 /**
@@ -66,14 +67,11 @@ final class Api {
 		],
 	];
 
-	const SEND_SCHEDULE_HOOK = 'power_email_send_schedule';
-
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_emails' ] );
-		\add_action( self::SEND_SCHEDULE_HOOK, [ $this, 'send_schedule_callback' ], 10, 2 );
 	}
 
 	/**
@@ -283,7 +281,9 @@ final class Api {
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
-			$email->send_now( $user_ids );
+			foreach ( $user_ids as $user_id ) {
+				$email->send_email( (int) $user_id );
+			}
 		}
 
 		return new \WP_REST_Response(
@@ -322,7 +322,7 @@ final class Api {
 
 		$action_id = \as_schedule_single_action(
 			$timestamp,
-			self::SEND_SCHEDULE_HOOK,
+			At::SEND_SCHEDULE_ACTION,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
@@ -340,19 +340,7 @@ final class Api {
 			);
 	}
 
-	/**
-	 * Send schedule callback
-	 * 排程發信，時間到後的觸發動作
-	 *
-	 * @param array $email_ids 電子郵件 ID 陣列
-	 * @param array $user_ids 使用者 ID 陣列
-	 */
-	public function send_schedule_callback( $email_ids, $user_ids ) {
-		foreach ( $email_ids as $email_id ) {
-			$email = new EmailResource( (int) $email_id );
-			$email->send_now( $user_ids );
-		}
-	}
+
 
 	/**
 	 * Delete Email callback

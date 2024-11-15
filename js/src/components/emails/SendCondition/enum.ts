@@ -1,6 +1,6 @@
 export enum TriggerAt {
 	FIELD_NAME = 'trigger_at',
-	COURSE_OPEN = 'course_open',
+	COURSE_GRANTED = 'course_granted',
 	COURSE_FINISH = 'course_finish',
 	COURSE_SCHEDULE = 'course_schedule',
 	CHAPTER_FINISH = 'chapter_finish',
