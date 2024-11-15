@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Resources\Course;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 
 /**
  * Class LifeCycle
@@ -51,8 +52,10 @@ final class LifeCycle {
 			\add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
 		}
 
-		$update_success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
-		if ( false === $update_success) {
+		$update_success1 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
+		$at              = At::instance();
+		$update_success2 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, "{$at->trigger_at['course_granted']['slug']}_at", time() );
+		if ( false === $update_success1 || false === $update_success2) {
 			throw new \Exception('新增學員失敗');
 		}
 	}

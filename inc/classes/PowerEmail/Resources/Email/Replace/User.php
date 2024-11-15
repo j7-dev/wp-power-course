@@ -13,6 +13,8 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 abstract class User {
 
 	/**
+	 * TODO
+	 *
 	 * @var array<string, string> 使用者資料取代字串的 Schema
 	 */
 	public static $schema = [

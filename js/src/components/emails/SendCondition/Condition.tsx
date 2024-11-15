@@ -13,10 +13,7 @@ const { Item } = Form
 
 const Condition = ({ email_ids }: { email_ids: string[] }) => {
 	const form = Form.useFormInstance()
-	const watchTriggerAt = Form.useWatch(
-		['condition', TriggerAt.FIELD_NAME],
-		form,
-	)
+	const watchTriggerAt = Form.useWatch([TriggerAt.FIELD_NAME], form)
 	const watchTriggerCondition = Form.useWatch(
 		['condition', TriggerCondition.FIELD_NAME],
 		form,
@@ -89,7 +86,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 			<Space.Compact block>
 				<Item
 					label="觸發時機"
-					name={['condition', TriggerAt.FIELD_NAME]}
+					name={[TriggerAt.FIELD_NAME]}
 					initialValue={TriggerAt.COURSE_FINISH}
 					className="w-32"
 				>
@@ -97,7 +94,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 						options={[
 							{
 								label: '開通課程時',
-								value: TriggerAt.COURSE_OPEN,
+								value: TriggerAt.COURSE_GRANTED,
 							},
 							{
 								label: '完成課程時',

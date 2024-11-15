@@ -19,5 +19,6 @@ final class Bootstrap {
 	public function __construct() {
 		Resources\Email\CPT::instance();
 		Resources\Email\Api::instance();
+		Resources\Email\Trigger\At::instance();
 	}
 }
