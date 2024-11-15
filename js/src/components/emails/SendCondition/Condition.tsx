@@ -13,6 +13,7 @@ const { Item } = Form
 
 const Condition = ({ email_ids }: { email_ids: string[] }) => {
 	const form = Form.useFormInstance()
+
 	const watchTriggerAt = Form.useWatch([TriggerAt.FIELD_NAME], form)
 	const watchTriggerCondition = Form.useWatch(
 		['condition', TriggerCondition.FIELD_NAME],
@@ -25,10 +26,6 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 	)
 	const watchSendingUnit = Form.useWatch(
 		['condition', 'sending', SendingUnit.FIELD_NAME],
-		form,
-	)
-	const watchSendingRange = Form.useWatch(
-		['condition', 'sending', 'range'],
 		form,
 	)
 
@@ -87,7 +84,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 				<Item
 					label="觸發時機"
 					name={[TriggerAt.FIELD_NAME]}
-					initialValue={TriggerAt.COURSE_FINISH}
+					initialValue={TriggerAt.COURSE_GRANTED}
 					className="w-32"
 				>
 					<Select
@@ -99,18 +96,22 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '完成課程時',
 								value: TriggerAt.COURSE_FINISH,
+								disabled: true, // TODO 之後開放
 							},
 							{
 								label: '課程開課時',
 								value: TriggerAt.COURSE_SCHEDULE,
+								disabled: true, // TODO 之後開放
 							},
 							{
 								label: '完成單元時',
 								value: TriggerAt.CHAPTER_FINISH,
+								disabled: true, // TODO 之後開放
 							},
 							{
 								label: '進入單元時',
 								value: TriggerAt.CHAPTER_ENTER,
+								disabled: true, // TODO 之後開放
 							},
 						]}
 					/>
@@ -163,10 +164,12 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '全部達成時',
 								value: TriggerCondition.ALL,
+								disabled: [TriggerAt.COURSE_GRANTED].includes(watchTriggerAt),
 							},
 							{
 								label: '達成指定數量時',
 								value: TriggerCondition.QUANTITY_GREATER_THAN,
+								disabled: [TriggerAt.COURSE_GRANTED].includes(watchTriggerAt),
 							},
 						]}
 					/>

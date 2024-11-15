@@ -1,13 +1,18 @@
 import React from 'react'
-import { Tabs } from 'antd'
+import { Tabs, Form } from 'antd'
 import Specific from './Specific'
 import Condition from './Condition'
+import Variables from './Variables'
 
 export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
+	const form = Form.useFormInstance()
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-[1fr_32rem] gap-x-4">
 			<Tabs
 				defaultActiveKey="condition"
+				onChange={() => {
+					form.resetFields()
+				}}
 				items={[
 					{
 						label: '發給指定用戶',
@@ -27,7 +32,7 @@ export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 					{
 						label: '可用變數',
 						key: 'Variables',
-						children: 'Variables',
+						children: <Variables />,
 					},
 				]}
 			/>

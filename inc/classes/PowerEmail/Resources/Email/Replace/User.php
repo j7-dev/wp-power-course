@@ -13,15 +13,13 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 abstract class User {
 
 	/**
-	 * TODO
-	 *
 	 * @var array<string, string> 使用者資料取代字串的 Schema
 	 */
 	public static $schema = [
-		'display_name' => '顯示名稱',
-		'email'        => '電子郵件',
-		'ID'           => 'ID',
-		'user_login'   => '帳號',
+		'display_name' => '用戶的顯示名稱',
+		'email'        => '用戶的電子郵件',
+		'ID'           => '用戶的ID',
+		'user_login'   => '用戶的帳號',
 	];
 
 	/**
