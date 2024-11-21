@@ -119,12 +119,15 @@ final class Email {
 		$user       = \get_user_by( 'ID', $user_id );
 		$user_email = $user->user_email;
 		$html       = UserReplace::get_formatted_html( $html, $user );
-		return \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		$sent       = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		if ($sent) {
+			\do_action('power_email_after_send_email', $this, $user_id, 0);
+		}
+		return $sent;
 	}
 
 	/**
 	 * 是否可以寄送
-	 * TODO
 	 *
 	 * @param int $user_id 使用者 ID
 	 * @param int $course_id 課程 ID
@@ -137,15 +140,13 @@ final class Email {
 		}
 
 		$course_ids = $this->condition->course_ids; // 要發的課程 ID
+		// 如果不在指定的課程 id 列表內，也不是全部課程，就不寄送
 		if ( !in_array( $course_id, $course_ids ) && !empty( $course_ids ) ) {
 			return false;
 		}
 
-		// 目前先判斷 each 就好
-		// TODO 其他條件 all, qty_greater_than 再慢慢加
-		// if ('each' === $condition->trigger_condition) {
-		return true;
-		// }
+		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
+		return \apply_filters( 'power_email_can_send', true, $this, $user_id, $course_id );
 	}
 
 
@@ -190,6 +191,7 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_course_email( int $user_id, int $course_id ): bool {
+
 		if ( !$this->can_send($user_id, $course_id) ) {
 			return false;
 		}
@@ -209,7 +211,11 @@ final class Email {
 			return false;
 		}
 		$html = CourseReplace::get_formatted_html( $html, $course_product );
-		return \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		$sent = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		if ($sent) {
+			\do_action('power_email_after_send_email', $this, $user_id, $course_id);
+		}
+		return $sent;
 	}
 
 	/**
@@ -283,5 +289,20 @@ final class Email {
 		}
 
 		return $next_timestamp;
+	}
+
+
+	/**
+	 * 是否已寄送
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @return bool
+	 */
+	public function is_sent( int $user_id ): bool {
+		$sent_user_ids = \get_post_meta( $this->id, 'sent_user_ids', true );
+		if (!is_array($sent_user_ids)) {
+			return false;
+		}
+		return \in_array( $user_id, $sent_user_ids );
 	}
 }

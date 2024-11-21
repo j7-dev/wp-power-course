@@ -28,6 +28,7 @@ final class CPT {
 	 */
 	public function __construct() {
 		\add_action( 'init', [ $this, 'init' ] );
+		\add_action( 'power_email_after_send_email', [ $this, 'record_user_id_after_send_email' ], 10, 3 );
 	}
 
 
@@ -106,5 +107,32 @@ final class CPT {
 		];
 
 		\register_post_type( self::POST_TYPE, $args );
+	}
+
+	/**
+	 * After send email
+	 *
+	 * @param Email $email 信件
+	 * @param int   $user_id 使用者 ID
+	 * @param int   $course_id 課程 ID
+	 */
+	public function record_user_id_after_send_email( Email $email, int $user_id, int $course_id ): void {
+		$sent_user_ids = \get_post_meta( $email->id, 'sent_user_ids', true );
+		if (!is_array($sent_user_ids)) {
+			$sent_user_ids = [];
+		}
+		$in_array = \in_array( $user_id, $sent_user_ids );
+		if ( $in_array ) {
+			return;
+		}
+
+		\update_post_meta(
+			$email->id,
+			'sent_user_ids',
+			[
+				...$sent_user_ids,
+				$user_id,
+			]
+			);
 	}
 }

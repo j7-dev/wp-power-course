@@ -42,11 +42,13 @@ final class At {
 	 */
 	public function __construct() {
 
-		// 開通課程權限後
+		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
 		\add_action( self::SEND_COURSE_GRANTED_ACTION, [ $this, 'send_course_granted_callback' ], 10, 3 );
+		\add_filter( 'power_email_can_send', [ $this, 'course_granted_trigger_condition' ], 10, 4 );
+		// ---- END 開通課程權限後 ----//
 
-		// 寄送指定用戶 emails
+		// ---- 寄送指定用戶 emails ----//
 		\add_action( self::SEND_USERS_ACTION, [ $this, 'send_users_callback' ], 10, 2 );
 	}
 
@@ -99,6 +101,49 @@ final class At {
 	public function send_course_granted_callback( int $email_id, int $user_id, int $course_id ): void {
 		$email = new EmailResource( (int) $email_id );
 		$email->send_course_email( (int) $user_id, (int) $course_id );
+	}
+
+	/**
+	 * 開通課程權限後的觸發條件
+	 * 根據觸發條件不同決定要不要寄 Email
+	 *
+	 * @param bool          $can_send 是否可以寄信
+	 * @param EmailResource $email 信件
+	 * @param int           $user_id 用戶 ID
+	 * @param int           $course_id 課程 ID
+	 * @return bool
+	 */
+	public function course_granted_trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id ): bool {
+		$course_ids = $email->condition->course_ids;
+		$is_sent    = $email->is_sent( $user_id );
+		if (empty($course_ids)) {
+			$course_ids = \get_posts(
+				[
+					'post_type'      => 'product',
+					'posts_per_page' => -1,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+					'meta_key'       => '_is_course',
+					'meta_value'     => 'yes',
+				]
+			);
+		}
+		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
+
+		if ('all' === $email->condition->trigger_condition && !$is_sent) {
+			// 使用 array_diff 找出在 $course_ids 中但不在 $current_avl_course_ids 中的元素
+			// 如果 $course_ids 中的所有元素都在 $current_avl_course_ids 中存在
+			$diff = empty(array_diff($course_ids, $current_avl_course_ids));
+			return $diff;
+		}
+
+		if ('qty_greater_than' === $email->condition->trigger_condition && !$is_sent) {
+			// 找出相同的 課程 id
+			$intersect = array_intersect($course_ids, $current_avl_course_ids);
+
+			return count($intersect) >= $email->condition->qty;
+		}
+		return $can_send;
 	}
 
 
