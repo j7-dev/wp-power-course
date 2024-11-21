@@ -13,7 +13,6 @@ const Variables = () => {
 	const form = Form.useFormInstance()
 
 	const watchTriggerAt = Form.useWatch([TriggerAt.FIELD_NAME], form)
-	console.log('⭐  watchTriggerAt:', watchTriggerAt)
 
 	const handleCopy = (key: string) => async () => {
 		await copyToClipboard(`{${key}}`)

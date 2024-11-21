@@ -1,24 +1,38 @@
-import React, { memo } from 'react'
+import React, { memo, lazy, Suspense } from 'react'
 import { BlockManager, BasicType, IBlockData } from 'j7-easy-email-core'
-import {
-	EmailEditor,
-	EmailEditorProvider,
-	IEmailTemplate,
-} from 'j7-easy-email-editor'
 import type { FormApi, FormState } from 'final-form'
-import { StandardLayout } from 'j7-easy-email-extensions'
 import { useApiUrl, HttpError } from '@refinedev/core'
 import type { UseFormReturnType } from '@refinedev/antd'
 import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 import type { FormInstance } from 'antd'
 import parseJson from 'parse-json'
 import { axiosInstance } from '@/rest-data-provider/utils'
+import { IEmailTemplate } from 'j7-easy-email-editor'
 
-import 'j7-easy-email-editor/lib/style.css'
-import 'j7-easy-email-extensions/lib/style.css'
+const EmailEditor = lazy(() =>
+	Promise.all([
+		import('j7-easy-email-editor'),
+		import('j7-easy-email-editor/lib/style.css'),
+		import('j7-easy-email-extensions/lib/style.css'),
 
-// theme, If you need to change the theme, you can make a duplicate in https://arco.design/themes/design/1799/setting/base/Color
-import '@arco-themes/react-easy-email-theme/css/arco.css'
+		// theme, If you need to change the theme, you can make a duplicate in https://arco.design/themes/design/1799/setting/base/Color
+		import('@arco-themes/react-easy-email-theme/css/arco.css'),
+	]).then(([module]) => ({
+		default: module.EmailEditor,
+	})),
+)
+
+const EmailEditorProvider = lazy(() =>
+	import('j7-easy-email-editor').then((module) => ({
+		default: module.EmailEditorProvider,
+	})),
+)
+
+const StandardLayout = lazy(() =>
+	import('j7-easy-email-extensions').then((module) => ({
+		default: module.StandardLayout,
+	})),
+)
 
 const initBlock = BlockManager.getBlockByType(BasicType.PAGE)!.create({})
 
@@ -65,7 +79,7 @@ const CustomEmailEditor = (
 
 	const initialValues: IEmailTemplate = query?.isSuccess
 		? {
-				subject: form.getFieldValue(['name']),
+				subject: form.getFieldValue(['subject']),
 				subTitle: '',
 				content: getInitContent(form, initBlock),
 			}
@@ -78,47 +92,48 @@ const CustomEmailEditor = (
 	const apiUrl = useApiUrl()
 
 	return (
-		<EmailEditorProvider
-			data={initialValues}
-			height={'calc(100vh - 15rem)'}
-			dashed={false}
-			onUploadImage={async (file) => {
-				const res = await axiosInstance.post(
-					`${apiUrl}/upload`,
-					{
-						files: file,
-					},
-					{
-						headers: {
-							'Content-Type': 'multipart/form-data;',
-						},
-					},
-				)
-				return res?.data?.data?.url
-			}}
+		<Suspense
+			fallback={
+				<div className="h-full w-full flex justify-center items-center">
+					Loading...
+				</div>
+			}
 		>
-			{(
-				formState: FormState<IEmailTemplate>,
-				helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
-			) => {
-				form.setFieldValue(['name'], formState?.values?.subject || '')
-				form.setFieldValue(['short_description'], formState?.values?.content)
+			<EmailEditorProvider
+				data={initialValues}
+				dashed={false}
+				onUploadImage={async (file) => {
+					const res = await axiosInstance.post(
+						`${apiUrl}/upload`,
+						{
+							files: file,
+						},
+						{
+							headers: {
+								'Content-Type': 'multipart/form-data;',
+							},
+						},
+					)
+					return res?.data?.data?.url
+				}}
+			>
+				{(
+					formState: FormState<IEmailTemplate>,
+					helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
+				) => {
+					form.setFieldValue(['subject'], formState?.values?.subject || '')
+					form.setFieldValue(['short_description'], formState?.values?.content)
 
-				return (
-					<>
-						<StandardLayout showSourceCode={false}>
-							{query?.isLoading ? (
-								<div className="p-8">
-									<div className="h-[calc(100vh-15rem)] w-full bg-gray-100 animate-pulse" />
-								</div>
-							) : (
+					return (
+						<>
+							<StandardLayout showSourceCode={false}>
 								<EmailEditor />
-							)}
-						</StandardLayout>
-					</>
-				)
-			}}
-		</EmailEditorProvider>
+							</StandardLayout>
+						</>
+					)
+				}}
+			</EmailEditorProvider>
+		</Suspense>
 	)
 }
 
