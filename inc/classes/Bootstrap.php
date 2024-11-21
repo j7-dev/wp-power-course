@@ -65,9 +65,6 @@ final class Bootstrap {
 		// 排程只執行一次的兼容設定
 		\add_action( 'init', [ __CLASS__, 'compatibility_action_scheduler' ] );
 		\add_action( self::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'compatibility' ]);
-
-		// 註冊每5分鐘執行一次的 action scheduler
-		\add_action( 'init', [ __CLASS__, 'register_power_course_cron' ] );
 	}
 
 
@@ -244,20 +241,5 @@ final class Bootstrap {
 
 		// 註記已經執行過相容設定
 		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
-	}
-
-	/**
-	 * 註冊每5分鐘執行一次的 action scheduler
-	 *
-	 * @return void
-	 */
-	public static function register_power_course_cron(): void {
-		if ( !\function_exists( 'as_schedule_recurring_action' ) ) {
-			return;
-		}
-
-		if ( !\as_next_scheduled_action( self::CRON_ACTION ) ) {
-			\as_schedule_recurring_action( time(), 5 * MINUTE_IN_SECONDS, self::CRON_ACTION );
-		}
 	}
 }

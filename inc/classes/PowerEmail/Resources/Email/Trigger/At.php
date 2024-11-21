@@ -12,6 +12,7 @@ use J7\PowerCourse\Bootstrap;
 use J7\PowerCourse\PowerEmail\Resources\Email;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\WpUtils\Classes\WP;
+use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 
 /**
  * Class At 觸發發信時機點
@@ -19,8 +20,8 @@ use J7\WpUtils\Classes\WP;
 final class At {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const SEND_SCHEDULE_ACTION = 'power_email_send_schedule'; // 用戶排程發信
-
+	const SEND_USERS_ACTION          = 'power_email_send_users'; // 寄給用戶的 AS hook
+	const SEND_COURSE_GRANTED_ACTION = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
 
 	/**
 	 * 觸發發信時機點
@@ -42,17 +43,23 @@ final class At {
 	public function __construct() {
 
 		// 開通課程權限後
-		\add_action( Bootstrap::CRON_ACTION, [ $this, "send_{$this->trigger_at['course_granted']['slug']}_emails" ] );
+		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
+		\add_action( self::SEND_COURSE_GRANTED_ACTION, [ $this, 'send_course_granted_callback' ], 10, 3 );
 
-		// 排程寄送指定用戶 emails
-		\add_action( self::SEND_SCHEDULE_ACTION, [ $this, 'send_schedule_callback' ], 10, 2 );
+		// 寄送指定用戶 emails
+		\add_action( self::SEND_USERS_ACTION, [ $this, 'send_users_callback' ], 10, 2 );
 	}
 
 	/**
-	 * 觸發開通課程權限後
+	 * 安排 觸發開通課程權限 的寄送時機
+	 *
+	 * @param int $user_id 用戶ID
+	 * @param int $course_id 課程ID
+	 * @param int $expire_date 課程到期日
+	 *
+	 * @return void
 	 */
-	public function send_course_granted_emails(): void {
-
+	public function schedule_course_granted_email( int $user_id, int $course_id, int $expire_date ): void {
 		$course_granted_email_ids = \get_posts(
 			[
 				'post_type'      => Email\CPT::POST_TYPE,
@@ -65,106 +72,44 @@ final class At {
 			);
 
 		foreach ( $course_granted_email_ids as $course_granted_email_id ) {
-			$email  = new EmailResource( (int) $course_granted_email_id );
-			$offset = $email->get_offset_seconds(); // 偏移量
-			if ( null ===$offset ) {
+			$email = new EmailResource( (int) $course_granted_email_id );
+
+			$timestamp = $email->get_sending_timestamp();
+
+			if ( null === $timestamp ) {
 				continue;
 			}
-			/**
-			 * 取得已經開通課程的紀錄
-			 *
-			 * @var array<int, array{user_id: string, course_id: string, course_granted_sent_at:string}>
-			 */
-			$records = $this->get_course_granted_records( $offset );
 
-			foreach ( $records as $record ) {
-				// 檢查必要參數
-				$include_required_params = WP::include_required_params( $record, [ 'user_id', 'course_id', 'course_granted_sent_at' ] );
-				if ( $include_required_params !== true ) {
-					\J7\WpUtils\Classes\ErrorLog::info( 'send_course_granted_emails 缺少必要參數：' . $include_required_params->get_error_message() );
-					continue;
-				}
-
-				[
-					'user_id' => $user_id,
-					'course_id' => $course_id,
-				] = $record;
-
-				// 檢查是否發信過
-				$has_sent = AVLCourseMeta::get( (int) $record['user_id'], (int) $record['course_id'], "{$this->trigger_at['course_granted']['slug']}_sent_at" );
-
-				if ( $has_sent ) {
-					continue;
-				}
-
-				$send_success = $email->send_course_granted_email( (int) $user_id, (int) $course_id );
-
-				if ( $send_success ) {
-					AVLCourseMeta::update( (int) $user_id, (int) $course_id, "{$this->trigger_at['course_granted']['slug']}_sent_at", time() );
-				}
+			if (0 === $timestamp) { // 立即寄送
+				\as_enqueue_async_action( self::SEND_COURSE_GRANTED_ACTION, [ (int) $course_granted_email_id, $user_id, $course_id ] );
+				continue;
 			}
+
+			\as_schedule_single_action( $timestamp, self::SEND_COURSE_GRANTED_ACTION, [ (int) $course_granted_email_id, $user_id, $course_id ] );
 		}
 	}
 
 	/**
-	 * 取得已經開通課程的紀錄，包含已經寄送的
+	 * 寄送開通課程權限後的 Email
 	 *
-	 * @param int $offset 偏移量
-	 * @return array<int, array{user_id: string, course_id: string, course_granted_sent_at:string}>
+	 * @param int $email_id 電子郵件 ID
+	 * @param int $user_id 用戶 ID
+	 * @param int $course_id 課程 ID
 	 */
-	private function get_course_granted_records( int $offset = 0 ): array {
-		global $wpdb;
-		if ( !$offset ) {
-			/**
-		 * 取得已經開通課程的紀錄
-		 *
-		 * @var array<int, array{user_id: string, course_id: string}>
-		 */
-			$records = $wpdb->get_results(
-			$wpdb->prepare(
-			"SELECT
-					course_id,
-					user_id,
-					meta_value AS course_granted_sent_at
-					FROM {$wpdb->prefix}pc_avl_coursemeta
-					WHERE meta_key = '%1\$s'",
-					"{$this->trigger_at['course_granted']['slug']}_at",
-			),
-				\ARRAY_A
-			);
-			return $records;
-		}
-
-		/**
-		 * 取得已經開通 N天 課程的紀錄
-		 * course_granted_at + offset >= current_timestamp
-		 *
-		 * @var array<int, array{user_id: string, course_id: string}>
-		 */
-		$records = $wpdb->get_results(
-		$wpdb->prepare(
-		"SELECT course_id, user_id
-				FROM {$wpdb->prefix}pc_avl_coursemeta
-				WHERE meta_key = '%1\$s'
-				AND meta_value >= %2\$d",
-				"{$this->trigger_at['course_granted']['slug']}_at",
-				time() - $offset
-		),
-			\ARRAY_A
-		);
-
-		return $records;
+	public function send_course_granted_callback( int $email_id, int $user_id, int $course_id ): void {
+		$email = new EmailResource( (int) $email_id );
+		$email->send_course_email( (int) $user_id, (int) $course_id );
 	}
 
 
 	/**
-	 * Send schedule callback
-	 * 指定用戶的排程發信，時間到後的觸發動作
+	 * Send users callback
+	 * 指定用戶的發信
 	 *
 	 * @param array $email_ids 電子郵件 ID 陣列
 	 * @param array $user_ids 使用者 ID 陣列
 	 */
-	public function send_schedule_callback( $email_ids, $user_ids ) {
+	public function send_users_callback( array $email_ids, array $user_ids ): void {
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
 			foreach ( $user_ids as $user_id ) {
