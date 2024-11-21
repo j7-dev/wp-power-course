@@ -35,19 +35,21 @@ const useColumns = () => {
 				</Tag>
 			),
 		},
-		{
-			title: '發送時機',
-			width: 240,
-			align: 'center',
-			dataIndex: 'action_name',
-			render: (_value: string, record, index) => (
-				<Space.Compact>
-					<Input className="pointer-events-none" value={record.action_name} />
-					<Input className="pointer-events-none" value={record.days} />
-					<Input className="pointer-events-none" value={record.operator} />
-				</Space.Compact>
-			),
-		},
+
+		// {
+		// 	title: '發送時機',
+		// 	width: 240,
+		// 	align: 'center',
+		// 	dataIndex: 'condition',
+		// 	render: (condition) => (
+		// 		<Space.Compact>
+		// 			<Input
+		// 				className="pointer-events-none"
+		// 				value={condition?.trigger_at as string}
+		// 			/>
+		// 		</Space.Compact>
+		// 	),
+		// },
 		{
 			title: '上次修改時間',
 			align: 'right',

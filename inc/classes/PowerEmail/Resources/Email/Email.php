@@ -28,7 +28,7 @@ final class Email {
 	public string $status;
 
 	/**
-	 * @var string Email 主旨
+	 * @var string Email 名稱
 	 */
 	public string $name;
 
@@ -114,10 +114,11 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_email( int $user_id ): bool {
-		$html       = $this->description;
-		$subject    = $this->subject;
+		$html = $this->description;
+
 		$user       = \get_user_by( 'ID', $user_id );
 		$user_email = $user->user_email;
+		$subject    = UserReplace::get_formatted_html( $this->subject, $user );
 		$html       = UserReplace::get_formatted_html( $html, $user );
 		$sent       = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {
@@ -196,8 +197,7 @@ final class Email {
 			return false;
 		}
 
-		$html    = $this->description;
-		$subject = $this->subject;
+		$html = $this->description;
 
 		$user = \get_user_by( 'ID', $user_id );
 		if (!$user) {
@@ -210,8 +210,9 @@ final class Email {
 		if (!$course_product) {
 			return false;
 		}
-		$html = CourseReplace::get_formatted_html( $html, $course_product );
-		$sent = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		$subject = CourseReplace::get_formatted_html( $this->subject, $course_product );
+		$html    = CourseReplace::get_formatted_html( $html, $course_product );
+		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {
 			\do_action('power_email_after_send_email', $this, $user_id, $course_id);
 		}

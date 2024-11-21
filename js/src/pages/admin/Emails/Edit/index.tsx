@@ -1,4 +1,4 @@
-import { Switch, Form, Empty } from 'antd'
+import { Switch, Form, Empty, Input } from 'antd'
 import { Edit, useForm } from '@refinedev/antd'
 import { useParsed, HttpError } from '@refinedev/core'
 import EmailEditor from './EmailEditor'
@@ -54,7 +54,7 @@ const EmailsEdit = () => {
 	}
 
 	return (
-		<>
+		<div className="sticky-card-actions">
 			<Edit
 				resource="emails"
 				recordItemId={id}
@@ -84,9 +84,25 @@ const EmailsEdit = () => {
 						{defaultButtons}
 					</>
 				)}
+				isLoading={query?.isLoading}
 			>
 				<Form {...formProps} layout="vertical" onFinish={handleSubmit}>
-					<Item hidden name={['name']} />
+					<div className="grid grid-cols-2 gap-4">
+						<Item
+							label="Email 名稱"
+							name={['name']}
+							tooltip="僅用於內部管理識別用，不會寄送給用戶"
+						>
+							<Input allowClear />
+						</Item>
+						<Item
+							label="Email 主旨"
+							name={['subject']}
+							tooltip="信件主旨，會寄送給用戶"
+						>
+							<Input allowClear />
+						</Item>
+					</div>
 					<Item name={['status']} hidden />
 					{/* 存 json ， 才不會跑版 */}
 					<Item hidden name={['short_description']} />
@@ -96,7 +112,7 @@ const EmailsEdit = () => {
 					<EmailEditor {...formReturn} />
 				</Form>
 			</Edit>
-		</>
+		</div>
 	)
 }
 export default EmailsEdit

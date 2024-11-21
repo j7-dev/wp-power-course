@@ -27,10 +27,12 @@
 		ul.ant-card-actions {
 			position: sticky;
 			bottom: 0;
+			z-index: 10;
 		}
 		.ant-card {
 			ul.ant-card-actions {
 				bottom: 3.5rem;
+				z-index: 11;
 			}
 		}
 	}
