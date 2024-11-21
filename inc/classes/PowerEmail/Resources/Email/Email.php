@@ -9,6 +9,7 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
 use J7\PowerCourse\PowerEmail\Resources\Email\Replace\User as UserReplace;
 use J7\PowerCourse\PowerEmail\Resources\Email\Replace\Course as CourseReplace;
+use J7\WpUtils\Classes\WP;
 
 
 /**
@@ -49,9 +50,9 @@ final class Email {
 	public string $subject = '';
 
 	/**
-	 * @var Trigger\Condition|null Email 寄送條件
+	 * @var Trigger\Condition|array|null Email 寄送條件
 	 */
-	public Trigger\Condition|null $condition = null;
+	public Trigger\Condition|array|null $condition = null;
 
 
 	/**
@@ -76,8 +77,9 @@ final class Email {
 	 *
 	 * @param \WP_Post|int $post Post object or post ID.
 	 * @param bool         $show_description 是否顯示 Email 內容
+	 * @param bool         $api_format 是否為 API 格式
 	 */
-	public function __construct( $post, $show_description = true ) {
+	public function __construct( $post, $show_description = true, $api_format = false ) {
 		$post         = $post instanceof \WP_Post ? $post : \get_post( $post );
 		$this->id     = (string) $post->ID;
 		$this->status = $post->post_status;
@@ -101,7 +103,7 @@ final class Email {
 
 		$condition_array['trigger_at'] = \get_post_meta( $this->id, 'trigger_at', true );
 		if ( $condition_array ) {
-			$this->condition = new Trigger\Condition( $condition_array );
+			$this->condition = $api_format ? $condition_array : new Trigger\Condition( $condition_array );
 		}
 	}
 
@@ -121,21 +123,8 @@ final class Email {
 	}
 
 	/**
-	 * 寄送課程授權後 Email
-	 *
-	 * @param int $user_id 使用者 ID
-	 * @param int $course_id 課程 ID
-	 * @return bool 是否寄送成功
-	 */
-	public function send_course_granted_email( int $user_id, int $course_id ): bool {
-		if ( !$this->can_send($user_id, $course_id) ) {
-			return false;
-		}
-		return $this->send_course_email( $user_id, $course_id );
-	}
-
-	/**
 	 * 是否可以寄送
+	 * TODO
 	 *
 	 * @param int $user_id 使用者 ID
 	 * @param int $course_id 課程 ID
@@ -144,11 +133,6 @@ final class Email {
 	public function can_send( int $user_id, int $course_id ): bool {
 		$condition = $this->condition;
 		if (!$condition) {
-			return false;
-		}
-
-		// 是否在開始 & 結束範圍內
-		if ( !$this->is_in_range() ) {
 			return false;
 		}
 
@@ -167,6 +151,8 @@ final class Email {
 
 	/**
 	 * 是否在範圍內
+	 *
+	 * @deprecated
 	 *
 	 * @return bool
 	 */
@@ -203,7 +189,11 @@ final class Email {
 	 * @param int $course_id 課程 ID
 	 * @return bool 是否寄送成功
 	 */
-	private function send_course_email( int $user_id, int $course_id ): bool {
+	public function send_course_email( int $user_id, int $course_id ): bool {
+		if ( !$this->can_send($user_id, $course_id) ) {
+			return false;
+		}
+
 		$html    = $this->description;
 		$subject = $this->subject;
 
@@ -225,43 +215,73 @@ final class Email {
 	/**
 	 * 取得 秒 偏移量
 	 * 例如: 開通課程 7天 後寄送，這個 7天，86400 * 7 就是偏移量
+	 * 這邊只要先判斷 延遲 N 天|小時|分鐘 就好，指定時間區段寄送，等個別事件發生時再來判斷
 	 *
-	 * @return int|null 偏移量
+	 * @return int 偏移量
 	 */
-	public function get_offset_seconds(): int|null {
-		$condition = $this->condition;
-		if (!$condition) {
-			return null;
-		}
-
-		if ('send_now' === $condition->sending_type) {
-			return 0;
-		}
-
-		// 目前先判斷 course_granted 課程開通 就好
-		// TODO 其他條件 course_finish | course_schedule | chapter_finish | chapter_enter 再慢慢加
-		return match ( $condition->trigger_at ) {
-			'course_granted' => $this->get_course_granted_offset_seconds(),
-			default => null,
-		};
-	}
-
-
-	/**
-	 * 取得課程開通後寄送的秒偏移量
-	 *
-	 * @return int|null 偏移量
-	 */
-	private function get_course_granted_offset_seconds(): int|null {
+	private function get_offset_seconds(): int {
 		$condition = $this->condition;
 
 		$value = (int) $condition->sending_value ?? 0;
 		$unit  = $condition->sending_unit ?? 'day';
 
+		// 這邊只要先判斷 延遲 N 天|小時|分鐘 就好，指定時間區段寄送，等個別事件發生時再來判斷
 		return match ($unit) {
 			'day' => DAY_IN_SECONDS * $value,
 			'hour' => HOUR_IN_SECONDS * $value,
 			'minute' => MINUTE_IN_SECONDS * $value,
 		};
+	}
+
+	/**
+	 * 取得寄送時間戳記
+	 *
+	 * @return int|null 0 表示立即寄送，null 表示不寄送
+	 */
+	public function get_sending_timestamp(): int|null {
+		$condition = $this->condition;
+		if (!$condition) {
+			return null;
+		}
+
+		$now = time();
+
+		if ('send_now' === $condition->sending_type) {
+			return 0;
+		}
+		$offset = $this->get_offset_seconds();
+
+		$unit          = $condition->sending_unit ?? 'day';
+		$sending_range = $condition->sending_range;
+
+		$day_timestamp = $now + $offset; // 延遲 N 天後的 timestamp
+		if ($sending_range) {
+			$start         = $sending_range[0]; // 開始時間 HH:MM
+			$day_timestamp = self::get_target_local_timestamp($day_timestamp, $start);
+		}
+
+		return match ($unit) {
+			'day' => $day_timestamp,
+			default => $now + $offset,
+		};
+	}
+
+	/**
+	 * 取得距離 $timestamp 最近的下一個本地時間 HH:MM 的 timestamp
+	 *
+	 * @param int    $timestamp 時間戳記
+	 * @param string $hh_mm_str 時間 HH:MM
+	 * @return int
+	 */
+	public static function get_target_local_timestamp( int $timestamp, string $hh_mm_str ): int {
+		// 本地時間的 timestamp
+		$input_date_string = \wp_date('Y-m-d', $timestamp);
+		$next_timestamp    = WP::wp_strtotime("{$input_date_string} {$hh_mm_str}"); // 先用同一天時間算 timestamp
+
+		if ($next_timestamp < $timestamp) {
+			$next_timestamp = WP::wp_strtotime('+1 day', $next_timestamp);
+		}
+
+		return $next_timestamp;
 	}
 }

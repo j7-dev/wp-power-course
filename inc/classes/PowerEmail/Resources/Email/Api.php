@@ -132,7 +132,7 @@ final class Api {
 
 		$post_ids = $results->posts;
 
-		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false ), $post_ids ));
+		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false, true ), $post_ids ));
 
 		$response = new \WP_REST_Response( $emails );
 
@@ -155,7 +155,7 @@ final class Api {
 	public function get_emails_with_id_callback( $request ) { // phpcs:ignore
 		$id = $request['id'];
 
-		$email = new EmailResource( (int) $id );
+		$email = new EmailResource( (int) $id, true, true );
 
 		$response = new \WP_REST_Response( $email );
 
@@ -286,20 +286,20 @@ final class Api {
 		$email_ids = $body_params['email_ids'];
 		$user_ids  = $body_params['user_ids'];
 
-		foreach ( $email_ids as $email_id ) {
-			$email = new EmailResource( (int) $email_id );
-			foreach ( $user_ids as $user_id ) {
-				$email->send_email( (int) $user_id );
-			}
-		}
+		$action_id = \as_enqueue_async_action(
+			At::SEND_USERS_ACTION,
+			[
+				'email_ids' => $email_ids,
+				'user_ids'  => $user_ids,
+			]
+			);
 
 		return new \WP_REST_Response(
 			[
 				'code'    => 'send_success',
 				'message' => '發送成功',
 				'data'    => [
-					'email_ids' => $email_ids,
-					'user_ids'  => $user_ids,
+					'action_id' => $action_id,
 				],
 			]
 			);
@@ -329,7 +329,7 @@ final class Api {
 
 		$action_id = \as_schedule_single_action(
 			$timestamp,
-			At::SEND_SCHEDULE_ACTION,
+			At::SEND_USERS_ACTION,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
