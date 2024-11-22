@@ -36,3 +36,13 @@ export type TFormValues = {
 	short_description: IBlockData | string
 	description: string
 }
+
+export type TAsRecord = {
+	id: string
+	hook: string
+	args: Array<any>
+	name: string
+	priority: number
+	schedule: string
+	is_finished: boolean
+}
