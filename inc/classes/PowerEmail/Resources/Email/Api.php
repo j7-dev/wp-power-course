@@ -395,13 +395,98 @@ final class Api extends ApiBase {
 	 */
 	public function get_emails_scheduled_actions_callback( $request ): \WP_REST_Response {
 		$args = [
-			'hook'     => EmailCPT::AS_HOOK,
+			'hook'     => 'payuni_atm_check', // EmailCPT::AS_HOOK,
 			'status'   => '', // ActionScheduler_Store::STATUS_COMPLETE or ActionScheduler_Store::STATUS_PENDING.
 			'per_page' => 20,                  // -1 表示取得所有
 			'order'    => 'DESC',
 			// 'group' => 'your_group',           // 指定 action group
 		];
-		$scheduled_actions = \as_get_scheduled_actions($args);
-		return new \WP_REST_Response( $scheduled_actions );
+
+		[
+			'count' => $total,
+			'actions' => $actions,
+		] = $this->as_get_scheduled_actions( $args );
+
+		$formatted_scheduled_actions = [];
+		foreach ($actions as $action_id => $action) {
+			/**
+			 * @var \ActionScheduler_SimpleSchedule $schedule
+			 */
+			$schedule = $action->get_schedule();
+
+			$action_arr                    = [
+				'id'          => (string) $action_id,
+				'hook'        => $action->get_hook(),
+				'args'        => $action->get_args(),
+				'name'        => $action->get_group(),
+				'priority'    => $action->get_priority(),
+				'schedule'    => $schedule->get_date()?->format('Y-m-d H:i:s'),
+				'is_finished' => $action->is_finished(),
+			];
+			$formatted_scheduled_actions[] = $action_arr;
+		}
+
+		$response    = new \WP_REST_Response( $formatted_scheduled_actions );
+		$total_pages = ceil( $total / (int) ( $args['per_page'] ?? 20 ) );
+
+		// set pagination in header
+		$response->header( 'X-WP-Total', $total );
+		$response->header( 'X-WP-TotalPages', $total_pages );
+
+		return $response;
+	}
+
+
+
+
+	/**
+	 * 改寫原本 woocommerce 的 as_get_scheduled_actions
+	 * 因為原本只有 return 結果，沒有 return count，這樣無法做分頁
+	 *
+	 * @see as_get_scheduled_actions in woocommerce
+	 *
+	 * @param array<string, mixed> $args 查詢參數
+	 * @param string               $return_format OBJECT | ARRAY_A
+	 * @return array{count: int, actions: array<int, \ActionScheduler_Action>}
+	 */
+	private function as_get_scheduled_actions( $args = [], $return_format = OBJECT ) {
+		if ( ! \ActionScheduler::is_initialized( __FUNCTION__ ) ) {
+			return [];
+		}
+		/**
+		 * @var \ActionScheduler_DBStore $store
+		 * 預設是 ActionScheduler_wpPostStore 但測試結果是 return ActionScheduler_DBStore
+		 */
+		$store = \ActionScheduler::store();
+
+		foreach ( [ 'date', 'modified' ] as $key ) {
+			if ( isset( $args[ $key ] ) ) {
+				$args[ $key ] = as_get_datetime_object( $args[ $key ] );
+			}
+		}
+		$count_args = $args;
+		$count_args['per_page'] = -1;
+		$count = $store->query_actions( $count_args, 'count' );
+		$ids   = $store->query_actions( $args );
+
+		if ( 'ids' === $return_format || 'int' === $return_format ) {
+			return $ids;
+		}
+
+		$actions = [];
+		foreach ( $ids as $action_id ) {
+			$actions[ $action_id ] = $store->fetch_action( $action_id );
+		}
+
+		if ( ARRAY_A == $return_format ) {
+			foreach ( $actions as $action_id => $action_object ) {
+				$actions[ $action_id ] = get_object_vars( $action_object );
+			}
+		}
+
+		return [
+			'count'   => (int) $count,
+			'actions' => $actions,
+		];
 	}
 }

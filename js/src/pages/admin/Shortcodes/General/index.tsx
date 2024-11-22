@@ -106,22 +106,6 @@ const General = () => {
 						<Item name={['include']} label="只包含指定課程">
 							<Select {...selectProps} />
 						</Item>
-						<Item name={['order']} label="排序調整">
-							<Select
-								className="w-full"
-								allowClear
-								options={[
-									{
-										value: 'ASC',
-										label: '升序 (ASC)',
-									},
-									{
-										value: 'DESC',
-										label: '降序 (ASC)',
-									},
-								]}
-							/>
-						</Item>
 						<Item name={['orderby']} label="排序依據">
 							<Select
 								className="w-full"
@@ -146,6 +130,22 @@ const General = () => {
 									{
 										value: 'modified',
 										label: '修改時間',
+									},
+								]}
+							/>
+						</Item>
+						<Item name={['order']} label="排序調整">
+							<Select
+								className="w-full"
+								allowClear
+								options={[
+									{
+										value: 'ASC',
+										label: '升序 (ASC)',
+									},
+									{
+										value: 'DESC',
+										label: '降序 (ASC)',
 									},
 								]}
 							/>
