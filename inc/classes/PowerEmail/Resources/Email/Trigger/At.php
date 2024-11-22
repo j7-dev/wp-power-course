@@ -7,11 +7,9 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
-use J7\PowerCourse\Utils\AVLCourseMeta;
-use J7\PowerCourse\Bootstrap;
 use J7\PowerCourse\PowerEmail\Resources\Email;
+use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
-use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 
 /**
@@ -20,8 +18,8 @@ use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 final class At {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const SEND_USERS_ACTION          = 'power_email_send_users'; // 寄給用戶的 AS hook
-	const SEND_COURSE_GRANTED_ACTION = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
+	const SEND_USERS_GROUP          = 'power_email_send_users'; // 寄給用戶的 AS hook
+	const SEND_COURSE_GRANTED_GROUP = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
 
 	/**
 	 * 觸發發信時機點
@@ -44,12 +42,12 @@ final class At {
 
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
-		\add_action( self::SEND_COURSE_GRANTED_ACTION, [ $this, 'send_course_granted_callback' ], 10, 3 );
+		\add_action( self::SEND_COURSE_GRANTED_GROUP, [ $this, 'send_course_granted_callback' ], 10, 3 );
 		\add_filter( 'power_email_can_send', [ $this, 'course_granted_trigger_condition' ], 10, 4 );
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 寄送指定用戶 emails ----//
-		\add_action( self::SEND_USERS_ACTION, [ $this, 'send_users_callback' ], 10, 2 );
+		\add_action( self::SEND_USERS_GROUP, [ $this, 'send_users_callback' ], 10, 2 );
 	}
 
 	/**
@@ -83,11 +81,11 @@ final class At {
 			}
 
 			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( self::SEND_COURSE_GRANTED_ACTION, [ (int) $course_granted_email_id, $user_id, $course_id ] );
+				\as_enqueue_async_action( EmailCPT::AS_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::SEND_COURSE_GRANTED_GROUP, );
 				continue;
 			}
 
-			\as_schedule_single_action( $timestamp, self::SEND_COURSE_GRANTED_ACTION, [ (int) $course_granted_email_id, $user_id, $course_id ] );
+			\as_schedule_single_action( $timestamp, EmailCPT::AS_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::SEND_COURSE_GRANTED_GROUP );
 		}
 	}
 

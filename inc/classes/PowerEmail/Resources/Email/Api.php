@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
@@ -18,9 +19,15 @@ use J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 /**
  * Class Api
  */
-final class Api {
+final class Api extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * Namespace
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'power-email';
 
 	/**
 	 * APIs
@@ -66,33 +73,17 @@ final class Api {
 			'method'              => 'delete',
 			'permission_callback' => null,
 		],
-
 		[
 			'endpoint'            => 'emails/options',
 			'method'              => 'get',
 			'permission_callback' => null,
 		],
+		[
+			'endpoint'            => 'emails/scheduled-actions',
+			'method'              => 'get',
+			'permission_callback' => null,
+		],
 	];
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_emails' ] );
-	}
-
-	/**
-	 * Register Email API
-	 *
-	 * @return void
-	 */
-	public function register_api_emails(): void {
-		$this->register_apis(
-			apis: $this->apis,
-			namespace: 'power-email',
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
-		);
-	}
 
 	/**
 	 * Get emails callback
@@ -287,11 +278,12 @@ final class Api {
 		$user_ids  = $body_params['user_ids'];
 
 		$action_id = \as_enqueue_async_action(
-			At::SEND_USERS_ACTION,
+			EmailCPT::AS_HOOK,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
-			]
+			],
+			At::SEND_USERS_GROUP,
 			);
 
 		return new \WP_REST_Response(
@@ -329,11 +321,12 @@ final class Api {
 
 		$action_id = \as_schedule_single_action(
 			$timestamp,
-			At::SEND_USERS_ACTION,
+			EmailCPT::AS_HOOK,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
-			]
+			],
+			At::SEND_USERS_GROUP,
 			);
 
 		return new \WP_REST_Response(
@@ -388,5 +381,27 @@ final class Api {
 				'user_schema'   => Replace\User::$schema,
 			]
 		);
+	}
+
+	/**
+	 * Get Email Scheduled Actions callback
+	 * 取得排程動作
+	 *
+	 * @see as_get_scheduled_actions in woocommerce
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 * @phpstan-ignore-next-line
+	 */
+	public function get_emails_scheduled_actions_callback( $request ): \WP_REST_Response {
+		$args = [
+			'hook'     => EmailCPT::AS_HOOK,
+			'status'   => '', // ActionScheduler_Store::STATUS_COMPLETE or ActionScheduler_Store::STATUS_PENDING.
+			'per_page' => 20,                  // -1 表示取得所有
+			'order'    => 'DESC',
+			// 'group' => 'your_group',           // 指定 action group
+		];
+		$scheduled_actions = \as_get_scheduled_actions($args);
+		return new \WP_REST_Response( $scheduled_actions );
 	}
 }
