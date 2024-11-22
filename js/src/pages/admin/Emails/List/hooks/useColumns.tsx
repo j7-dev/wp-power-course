@@ -13,7 +13,7 @@ const useColumns = () => {
 	const columns: TableProps<TEmailListRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
 		{
-			title: '主旨',
+			title: 'Email 名稱',
 			dataIndex: 'name',
 			width: 300,
 			render: (name: string, record) => (
@@ -24,6 +24,7 @@ const useColumns = () => {
 				/>
 			),
 		},
+
 		{
 			title: '狀態',
 			width: 64,
@@ -34,6 +35,11 @@ const useColumns = () => {
 					{getPostStatus(status)?.label}
 				</Tag>
 			),
+		},
+		{
+			title: 'Email 主旨',
+			dataIndex: 'subject',
+			width: 300,
 		},
 
 		// {
