@@ -4,7 +4,7 @@ import { Form, Tooltip, Tag, message } from 'antd'
 import { TriggerAt } from './enum'
 import { useCopyToClipboard } from '@uidotdev/usehooks'
 
-const Variables = () => {
+const Variables = ({ activeKey }: { activeKey: string }) => {
 	const { data } = useSendCondition()
 	const schema = data?.data || {}
 	const { user_schema = {}, course_schema = {} } = schema
@@ -17,6 +17,20 @@ const Variables = () => {
 	const handleCopy = (key: string) => async () => {
 		await copyToClipboard(`{${key}}`)
 		message.success(`已複製 {${key}}`)
+	}
+
+	if ('specific' === activeKey) {
+		return Object.keys(user_schema).map((key) => (
+			<Tooltip key={key} title={user_schema?.[key]}>
+				<Tag
+					color="#eee"
+					className="rounded-xl !text-gray-600 px-3 cursor-pointer mb-2"
+					onClick={handleCopy(key)}
+				>
+					{`{${key}}`}
+				</Tag>
+			</Tooltip>
+		))
 	}
 
 	if ([TriggerAt.COURSE_GRANTED].includes(watchTriggerAt)) {
@@ -37,18 +51,6 @@ const Variables = () => {
 			</Tooltip>
 		))
 	}
-
-	return Object.keys(user_schema).map((key) => (
-		<Tooltip key={key} title={user_schema?.[key]}>
-			<Tag
-				color="#eee"
-				className="rounded-xl !text-gray-600 px-3 cursor-pointer mb-2"
-				onClick={handleCopy(key)}
-			>
-				{`{${key}}`}
-			</Tag>
-		</Tooltip>
-	))
 }
 
 export default Variables
