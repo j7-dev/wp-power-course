@@ -7,8 +7,6 @@ import mjml2html from 'mjml-browser'
 import { JsonToMjml, IBlockData } from 'j7-easy-email-core'
 import { SendCondition } from '@/components/emails'
 
-// import { EmailEditorProvider } from './EasyEmail/components/Provider/EmailEditorProvider'
-
 const { Item } = Form
 
 const EmailsEdit = () => {
@@ -36,6 +34,10 @@ const EmailsEdit = () => {
 
 	const handleSubmit = (values: TFormValues) => {
 		// 要存的時候才將 json 轉成 html
+		console.log(
+			'handleSubmit values.short_description',
+			values.short_description,
+		)
 
 		onFinish({
 			...values,

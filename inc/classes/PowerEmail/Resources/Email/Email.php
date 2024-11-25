@@ -50,6 +50,11 @@ final class Email {
 	public string $subject = '';
 
 	/**
+	 * @var string Email 寄送條件
+	 */
+	public string $trigger_at = '';
+
+	/**
 	 * @var Trigger\Condition|array|null Email 寄送條件
 	 */
 	public Trigger\Condition|array|null $condition = null;
@@ -101,7 +106,8 @@ final class Email {
 			return;
 		}
 
-		$condition_array['trigger_at'] = \get_post_meta( $this->id, 'trigger_at', true );
+		$this->trigger_at              = \get_post_meta( $this->id, 'trigger_at', true );
+		$condition_array['trigger_at'] = $this->trigger_at;
 		if ( $condition_array ) {
 			$this->condition = $api_format ? $condition_array : new Trigger\Condition( $condition_array );
 		}
@@ -204,13 +210,14 @@ final class Email {
 			return false;
 		}
 		$user_email = $user->user_email;
+		$subject    = UserReplace::get_formatted_html( $this->subject, $user );
 		$html       = UserReplace::get_formatted_html( $html, $user );
 
 		$course_product = \wc_get_product($course_id);
 		if (!$course_product) {
 			return false;
 		}
-		$subject = CourseReplace::get_formatted_html( $this->subject, $course_product );
+		$subject = CourseReplace::get_formatted_html( $subject, $course_product );
 		$html    = CourseReplace::get_formatted_html( $html, $course_product );
 		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {

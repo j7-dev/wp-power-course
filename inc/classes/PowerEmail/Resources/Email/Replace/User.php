@@ -17,7 +17,7 @@ abstract class User {
 	 */
 	public static $schema = [
 		'display_name' => '用戶的顯示名稱',
-		'email'        => '用戶的電子郵件',
+		'user_email'   => '用戶的電子郵件',
 		'ID'           => '用戶的ID',
 		'user_login'   => '用戶的帳號',
 	];
@@ -36,7 +36,8 @@ abstract class User {
 			$schema_values[] = $user->get( $key );
 		}
 
-		$formatted_html = str_replace( $schema_keys, array_values( self::$schema ), $html );
+		$formatted_html = str_replace( $schema_keys, $schema_values, $html );
+
 		return $formatted_html;
 	}
 }

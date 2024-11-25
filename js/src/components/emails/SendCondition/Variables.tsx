@@ -33,7 +33,9 @@ const Variables = ({ activeKey }: { activeKey: string }) => {
 		))
 	}
 
-	if ([TriggerAt.COURSE_GRANTED].includes(watchTriggerAt)) {
+	if (
+		[TriggerAt.COURSE_GRANTED, TriggerAt.COURSE_LAUNCH].includes(watchTriggerAt)
+	) {
 		const avl_schema = {
 			...user_schema,
 			...course_schema,

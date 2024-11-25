@@ -18,6 +18,8 @@ use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 final class At {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
+	const AS_GROUP = 'power_email';
+
 	const SEND_USERS_HOOK          = 'power_email_send_users'; // 寄給用戶的 AS hook
 	const SEND_COURSE_GRANTED_HOOK = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
 	const SEND_COURSE_LAUNCH_HOOK  = 'power_email_send_course_launch'; // 課程開課時寄送的 AS hook
@@ -91,11 +93,11 @@ final class At {
 			}
 
 			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ]);
+				\as_enqueue_async_action( self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::AS_GROUP);
 				continue;
 			}
 
-			\as_schedule_single_action( $timestamp, self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ] );
+			\as_schedule_single_action( $timestamp, self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::AS_GROUP );
 		}
 	}
 
@@ -200,11 +202,11 @@ final class At {
 			}
 
 			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ]);
+				\as_enqueue_async_action( self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ], self::AS_GROUP);
 				continue;
 			}
 
-			\as_schedule_single_action( $timestamp, self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ] );
+			\as_schedule_single_action( $timestamp, self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ], self::AS_GROUP );
 		}
 	}
 
@@ -218,5 +220,10 @@ final class At {
 	public function send_course_launch_callback( int $email_id, int $user_id, int $course_id ): void {
 		$email = new EmailResource(  $email_id );
 		$email->send_course_email(  $user_id, $course_id );
+
+		// 註記已經寄過信了
+		if ('local' !== \wp_get_environment_type()) {
+			\update_post_meta( $course_id, 'course_schedule_email_sent', 'yes' );
+		}
 	}
 }
