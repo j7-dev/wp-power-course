@@ -24,7 +24,7 @@ final class Bootstrap {
 	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
 
 	const SCHEDULE_ACTION          = 'power_course_schedule_action';
-	const SCHEDULE_ACTION_INTERVAL = 5 * MINUTE_IN_SECONDS;
+	const SCHEDULE_ACTION_INTERVAL = 10 * MINUTE_IN_SECONDS;
 
 	/**
 	 * Constructor
