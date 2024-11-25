@@ -51,11 +51,11 @@ abstract class Course {
 			}
 
 			$method          = "get_{$key}";
-			$schema_values[] = $course->$method($key);
+			$schema_values[] = $course->$method();
 		}
 
 		$schema_keys    = array_map( fn( $key ) => '{' . $key . '}', array_keys( self::$schema ) );
-		$formatted_html = str_replace( $schema_keys, array_values( self::$schema ), $html );
+		$formatted_html = str_replace( $schema_keys, $schema_values, $html );
 		return $formatted_html;
 	}
 }

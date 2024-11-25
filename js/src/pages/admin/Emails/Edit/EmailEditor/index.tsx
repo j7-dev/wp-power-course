@@ -121,9 +121,7 @@ const CustomEmailEditor = (
 					formState: FormState<IEmailTemplate>,
 					helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
 				) => {
-					form.setFieldValue(['subject'], formState?.values?.subject || '')
 					form.setFieldValue(['short_description'], formState?.values?.content)
-
 					return (
 						<>
 							<StandardLayout showSourceCode={false}>

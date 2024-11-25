@@ -283,6 +283,7 @@ final class Api extends ApiBase {
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
 			],
+			At::AS_GROUP
 			);
 
 		return new \WP_REST_Response(
@@ -325,6 +326,7 @@ final class Api extends ApiBase {
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
 			],
+			At::AS_GROUP
 			);
 
 		return new \WP_REST_Response(
@@ -393,7 +395,7 @@ final class Api extends ApiBase {
 	 */
 	public function get_emails_scheduled_actions_callback( $request ): \WP_REST_Response {
 		$args = [
-			'hook'     => 'payuni_atm_check', // EmailCPT::AS_HOOK,
+			'group'    => At::AS_GROUP, // EmailCPT::AS_HOOK,
 			'status'   => '', // ActionScheduler_Store::STATUS_COMPLETE or ActionScheduler_Store::STATUS_PENDING.
 			'per_page' => 20,                  // -1 表示取得所有
 			'order'    => 'DESC',
@@ -414,9 +416,9 @@ final class Api extends ApiBase {
 
 			$action_arr                    = [
 				'id'          => (string) $action_id,
-				'hook'        => $action->get_hook(),
+				'name'        => $action->get_hook(),
 				'args'        => $action->get_args(),
-				'name'        => $action->get_group(),
+				'group'       => $action->get_group(),
 				'priority'    => $action->get_priority(),
 				'schedule'    => $schedule->get_date()?->format('Y-m-d H:i:s'),
 				'is_finished' => $action->is_finished(),
