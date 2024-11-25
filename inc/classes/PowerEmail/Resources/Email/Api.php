@@ -278,12 +278,11 @@ final class Api extends ApiBase {
 		$user_ids  = $body_params['user_ids'];
 
 		$action_id = \as_enqueue_async_action(
-			EmailCPT::AS_HOOK,
+			At::SEND_USERS_HOOK,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
 			],
-			At::SEND_USERS_GROUP,
 			);
 
 		return new \WP_REST_Response(
@@ -321,12 +320,11 @@ final class Api extends ApiBase {
 
 		$action_id = \as_schedule_single_action(
 			$timestamp,
-			EmailCPT::AS_HOOK,
+			At::SEND_USERS_HOOK,
 			[
 				'email_ids' => $email_ids,
 				'user_ids'  => $user_ids,
 			],
-			At::SEND_USERS_GROUP,
 			);
 
 		return new \WP_REST_Response(
@@ -464,10 +462,10 @@ final class Api extends ApiBase {
 				$args[ $key ] = as_get_datetime_object( $args[ $key ] );
 			}
 		}
-		$count_args = $args;
+		$count_args             = $args;
 		$count_args['per_page'] = -1;
-		$count = $store->query_actions( $count_args, 'count' );
-		$ids   = $store->query_actions( $args );
+		$count                  = $store->query_actions( $count_args, 'count' );
+		$ids                    = $store->query_actions( $args );
 
 		if ( 'ids' === $return_format || 'int' === $return_format ) {
 			return $ids;

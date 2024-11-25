@@ -15,8 +15,6 @@ final class CPT {
 
 	public const POST_TYPE = 'pe_email';
 
-	public const AS_HOOK = 'as_power_email_email';
-
 	/**
 	 * Email headers
 	 * used in wp_mail
