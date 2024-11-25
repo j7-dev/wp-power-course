@@ -11,6 +11,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
+use J7\PowerCourse\Bootstrap;
 
 /**
  * Class LifeCycle
@@ -21,6 +22,8 @@ final class LifeCycle {
 	// 開通用戶權限的鉤子
 	const ADD_STUDENT_TO_COURSE_ACTION = 'power_course_add_student_to_course';
 
+	// 課程開課的鉤子
+	const COURSE_LAUNCH_ACTION = 'power_course_course_launch';
 
 	/**
 	 * Constructor
@@ -28,9 +31,13 @@ final class LifeCycle {
 	public function __construct() {
 		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_student_to_course' ], 10, 3 );
 
+		// 刪除課程
 		\add_action('before_delete_post', [ __CLASS__, 'delete_course_and_related_items' ], 10, 2);
 		\add_action('trashed_post', [ __CLASS__, 'delete_course_and_related_items' ], 10, 2);
 		\add_action('untrash_post', [ __CLASS__, 'untrash_course_and_related_items' ], 10, 2);
+
+		// 課程開課，透過定時任務去看課程開課時機
+		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
 	}
 
 	/**
@@ -173,5 +180,44 @@ final class LifeCycle {
 		}
 
 		return $restored_post_ids;
+	}
+
+	/**
+	 * 課程開課
+	 *
+	 * @return void
+	 */
+	public static function register_course_launch(): void {
+
+		// 找出沒有寄信(course_schedule_email_sent !== yes)，且現在時間 timestamp > 開課時間的課程 course_schedule
+		global $wpdb;
+
+		$course_ids = $wpdb->get_col(
+		$wpdb->prepare(
+		"SELECT p.ID
+        FROM {$wpdb->posts} p
+        LEFT JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'course_schedule_email_sent'
+        JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'course_schedule'
+        WHERE p.post_type = 'product'
+        AND p.post_status = 'publish'
+        AND (pm1.meta_value IS NULL OR pm1.meta_value != 'yes')
+        AND pm2.meta_value < %d",
+		time()
+		)
+		);
+
+		foreach ($course_ids as $course_id) {
+			// 找出能上課程的用戶
+			$user_ids = \get_users(
+				[
+					'meta_key'   => 'avl_course_ids',
+					'meta_value' => $course_id,
+				]
+				);
+
+			foreach ($user_ids   as $user_id) {
+				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
+			}
+		}
 	}
 }
