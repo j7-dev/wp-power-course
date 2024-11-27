@@ -2,8 +2,9 @@ import React from 'react'
 import { Table, TableProps, Tag } from 'antd'
 import { TAsRecord } from '@/pages/admin/Emails/types'
 import { useNavigation } from '@refinedev/core'
-import { getPostStatus } from '@/utils'
+import { getASStatus } from '@/utils'
 import { ProductName } from '@/components/product'
+import { renderHTML } from 'antd-toolkit'
 
 const useAsColumns = () => {
 	const { edit } = useNavigation()
@@ -13,14 +14,15 @@ const useAsColumns = () => {
 	const columns: TableProps<TAsRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
 		{
-			title: 'Email 名稱',
-			dataIndex: 'name',
+			title: 'Hook 名稱',
+			dataIndex: 'hook',
 			width: 180,
-			render: (name: string, record) => (
-				<ProductName<TAsRecord>
+			render: (hook: string, record) => (
+				<ProductName<TAsRecord & any>
 					record={record}
 					hideImage
 					onClick={onClick(record)}
+					label={hook}
 				/>
 			),
 		},
@@ -29,17 +31,12 @@ const useAsColumns = () => {
 			title: '狀態',
 			width: 64,
 			align: 'center',
-			dataIndex: 'is_finished',
-			render: (is_finished: boolean) => (
-				<Tag color={is_finished ? 'blue' : 'orange'}>
-					{is_finished ? '已結束' : '未結束'}
+			dataIndex: 'status_name',
+			render: (status_name: string) => (
+				<Tag color={getASStatus(status_name).color}>
+					{getASStatus(status_name).label}
 				</Tag>
 			),
-		},
-		{
-			title: '順序',
-			dataIndex: 'priority',
-			width: 64,
 		},
 		{
 			title: '變數',
@@ -47,6 +44,24 @@ const useAsColumns = () => {
 			align: 'center',
 			dataIndex: 'args',
 			render: (args) => JSON.stringify(args),
+		},
+		{
+			title: <p className="text-center m-0">Log</p>,
+			width: 240,
+			dataIndex: 'log_entries',
+			render: (log_entries) => renderHTML(log_entries),
+		},
+		{
+			title: '重複執行',
+			width: 120,
+			align: 'center',
+			dataIndex: 'recurrence',
+		},
+		{
+			title: 'Claim Id',
+			width: 60,
+			align: 'center',
+			dataIndex: 'claim_id',
 		},
 		{
 			title: '執行時間',

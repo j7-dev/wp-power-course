@@ -12,12 +12,14 @@ type TProductNameProps<T extends TBaseRecord> = {
 	record: T
 	onClick?: () => void
 	hideImage?: boolean
+	label?: string
 }
 
 export const ProductName = <T extends TBaseRecord>({
 	record,
 	onClick,
 	hideImage = false,
+	label,
 }: TProductNameProps<T>) => {
 	// @ts-expect-error
 	const { id = '', sku = '', name = '', images = [] } = record
@@ -47,7 +49,7 @@ export const ProductName = <T extends TBaseRecord>({
 						className="mb-1 text-primary hover:text-primary/70 cursor-pointer"
 						onClick={onClick ? onClick : undefined}
 					>
-						{renderHTML(name)}
+						{renderHTML(label ? label : name)}
 					</p>
 					<div className="flex text-[0.675rem] text-gray-500">
 						<span className="pr-3">{`ID: ${id}`}</span>

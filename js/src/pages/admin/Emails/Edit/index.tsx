@@ -76,8 +76,8 @@ const EmailsEdit = () => {
 					<>
 						<Switch
 							className="mr-4"
-							checkedChildren="發佈"
-							unCheckedChildren="草稿"
+							checkedChildren="啟用"
+							unCheckedChildren="停用"
 							value={watchStatus === 'publish'}
 							onChange={(checked) => {
 								form.setFieldValue(['status'], checked ? 'publish' : 'draft')

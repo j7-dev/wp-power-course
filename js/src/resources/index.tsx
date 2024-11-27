@@ -89,7 +89,7 @@ export const resources = [
 		list: '/emails',
 		edit: '/emails/edit/:id',
 		meta: {
-			label: 'Email 管理',
+			label: 'Email 模板管理',
 			icon: <MailOutlined />,
 		},
 	},
