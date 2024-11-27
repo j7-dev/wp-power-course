@@ -17,7 +17,7 @@ final class Condition {
 
 	/**
 	 * @var string 觸發時機點
-	 * course_granted | course_finish | course_schedule | chapter_finish | chapter_enter
+	 * course_granted | course_finish | course_launch | chapter_finish | chapter_enter
 	 * 開通課程時       | 完成課程時     | 課程開課時        | 完成單元時       | 進入單元時
 	 */
 	public string $trigger_at = '';
@@ -83,7 +83,7 @@ final class Condition {
 		$this->course_ids        = ( (array) $condition['course_ids'] ?? null );
 		$this->chapter_ids       = $condition['chapter_ids'] ?? null;
 		$this->trigger_condition = $condition['trigger_condition'];
-		$this->qty               = $condition['qty'] ?? null;
+		$this->qty               = (int) ( $condition['qty'] ) ?? null;
 		$this->sending_type      = $condition['sending']['type'] ?? 'send_now';
 		$this->sending_value     = $condition['sending']['value'] ?? null;
 		$this->sending_unit      = $condition['sending']['unit'] ?? null;

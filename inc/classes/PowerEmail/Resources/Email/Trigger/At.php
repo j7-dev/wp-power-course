@@ -50,13 +50,14 @@ final class At {
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
 		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_granted_callback' ], 10, 3 );
-		\add_filter( 'power_email_can_send', [ $this, 'course_granted_trigger_condition' ], 10, 4 );
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 課程開課時 ----//
 		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 10, 2 );
 		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_launch_callback' ], 10, 3 );
 		// ---- END 課程開課時 ----//
+
+		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 100, 4 );
 
 		// ---- 寄送指定用戶 emails ----//
 		\add_action( self::SEND_USERS_HOOK, [ $this, 'send_users_callback' ], 10, 2 );
@@ -72,6 +73,16 @@ final class At {
 	 * @return void
 	 */
 	public function schedule_course_granted_email( int $user_id, int $course_id, int $expire_date ): void {
+		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
+		if (!\is_array($current_avl_course_ids)) {
+			$current_avl_course_ids = [];
+		}
+		// 因為直接更新用戶課程權限時，會帶全部的課程 id，所以需要檢查課程 id 是否已經在原本客戶的權限裡面
+		// 我們只需要對新增的課程權限部分寄送課程開通信件
+		if (!\in_array($course_id, $current_avl_course_ids)) {
+			return;
+		}
+
 		$course_granted_email_ids = \get_posts(
 			[
 				'post_type'      => Email\CPT::POST_TYPE,
@@ -114,7 +125,7 @@ final class At {
 	}
 
 	/**
-	 * 開通課程權限後的觸發條件
+	 * 觸發條件
 	 * 根據觸發條件不同決定要不要寄 Email
 	 *
 	 * @param bool          $can_send 是否可以寄信
@@ -123,7 +134,14 @@ final class At {
 	 * @param int           $course_id 課程 ID
 	 * @return bool
 	 */
-	public function course_granted_trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id ): bool {
+	public function trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id ): bool {
+
+		// 如果原本就不能寄信，就不用檢查觸發條件
+		// 如果不存在 課程 id，也直接返回就好
+		if (!$can_send || !$course_id) {
+			return $can_send;
+		}
+
 		$course_ids = $email->condition->course_ids;
 		$is_sent    = $email->is_sent( $user_id );
 		if (empty($course_ids)) {
@@ -153,7 +171,10 @@ final class At {
 
 			return count($intersect) >= $email->condition->qty;
 		}
-		return $can_send;
+
+		// 就會變任一個都符合的條件
+		// 因為所有條件都判斷完了，這邊應該 return false!?
+		return false;
 	}
 
 
@@ -222,8 +243,10 @@ final class At {
 		$email->send_course_email(  $user_id, $course_id );
 
 		// 註記已經寄過信了
-		if ('local' !== \wp_get_environment_type()) {
-			\update_post_meta( $course_id, 'course_schedule_email_sent', 'yes' );
-		}
+		// if ('local' !== \wp_get_environment_type()) {
+
+		// TODO 如果修改開課時間，要清除此註記
+		\update_post_meta( $course_id, 'course_schedule_email_sent', 'yes' );
+		// }
 	}
 }

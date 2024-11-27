@@ -9,6 +9,11 @@ import {
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
 import useAsColumns from '@/pages/admin/Emails/List/hooks/useAsColumns'
+
+/**
+ * TODO Action Scheduler 紀錄
+ * 之後再實作
+ */
 const Main = () => {
 	const { tableProps } = useTable<TAsRecord, HttpError, TFilterProps>({
 		resource: 'emails/scheduled-actions',
