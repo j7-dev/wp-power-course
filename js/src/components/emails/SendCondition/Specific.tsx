@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import {
 	Form,
-	Select,
 	Button,
 	Modal,
 	Space,
 	DatePicker,
 	Tooltip,
 	DatePickerProps,
+	message,
 } from 'antd'
 import { useModal } from '@refinedev/antd'
 import {
@@ -19,8 +19,6 @@ import { useAtom } from 'jotai'
 import { ArrowsAltOutlined, ExclamationCircleFilled } from '@ant-design/icons'
 import { useCustomMutation, useApiUrl } from '@refinedev/core'
 import dayjs, { Dayjs } from 'dayjs'
-
-const { Item } = Form
 
 const disabledDate: DatePickerProps['disabledDate'] = (current) => {
 	// Can not select days before today and today
@@ -52,28 +50,48 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 	const apiUrl = useApiUrl('power-email')
 	const { mutate: SendEmail, isLoading } = useCustomMutation()
 	const handleSendNow = () => {
-		SendEmail({
-			url: `${apiUrl}/emails/send-now`,
-			method: 'post',
-			values: {
-				email_ids,
-				user_ids: selectedUserIds,
+		SendEmail(
+			{
+				url: `${apiUrl}/emails/send-now`,
+				method: 'post',
+				values: {
+					email_ids,
+					user_ids: selectedUserIds,
+				},
 			},
-		})
+			{
+				onSuccess: () => {
+					message.success('Email 發送成功')
+				},
+				onError: () => {
+					message.error('Email 發送失敗')
+				},
+			},
+		)
 	}
 
 	// 排程
 	const [time, setTime] = useState<Dayjs | null>(null)
 	const handleSendSchedule = () => {
-		SendEmail({
-			url: `${apiUrl}/emails/send-schedule`,
-			method: 'post',
-			values: {
-				email_ids,
-				user_ids: selectedUserIds,
-				timestamp: time?.unix(), // 10位
+		SendEmail(
+			{
+				url: `${apiUrl}/emails/send-schedule`,
+				method: 'post',
+				values: {
+					email_ids,
+					user_ids: selectedUserIds,
+					timestamp: time?.unix(), // 10位
+				},
 			},
-		})
+			{
+				onSuccess: () => {
+					message.success('Email 排程成功')
+				},
+				onError: () => {
+					message.error('Email 排程失敗')
+				},
+			},
+		)
 	}
 
 	return (
@@ -111,6 +129,7 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 								<Button
 									onClick={handleSendSchedule}
 									disabled={!time || email_ids.length !== 1}
+									loading={isLoading}
 								>
 									排程發送
 								</Button>
@@ -123,7 +142,7 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 								type="primary"
 								onClick={handleSendNow}
 								loading={isLoading}
-								disabled={email_ids.length !== 1}
+								disabled={email_ids.length !== 1 || !selectedUserIds.length}
 							>
 								立即發送
 							</Button>
