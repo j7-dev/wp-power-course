@@ -15,14 +15,14 @@ export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 				}}
 				items={[
 					{
-						label: '發給指定用戶',
-						key: 'specific',
-						children: <Specific email_ids={email_ids} />,
-					},
-					{
 						label: '設定發信時機',
 						key: 'condition',
 						children: <Condition email_ids={email_ids} />,
+					},
+					{
+						label: '手動發給指定用戶',
+						key: 'specific',
+						children: <Specific email_ids={email_ids} />,
 					},
 				]}
 			/>

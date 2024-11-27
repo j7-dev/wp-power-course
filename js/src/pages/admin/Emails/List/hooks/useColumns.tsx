@@ -32,7 +32,7 @@ const useColumns = () => {
 			dataIndex: 'status',
 			render: (status: string) => (
 				<Tag color={getPostStatus(status)?.color}>
-					{getPostStatus(status)?.label}
+					{status === 'publish' ? '啟用' : '停用'}
 				</Tag>
 			),
 		},
