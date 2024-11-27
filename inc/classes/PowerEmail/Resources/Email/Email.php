@@ -120,6 +120,9 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_email( int $user_id ): bool {
+		if ( !$this->can_send($user_id) ) {
+			return false;
+		}
 		$html = $this->description;
 
 		$user       = \get_user_by( 'ID', $user_id );
@@ -136,24 +139,30 @@ final class Email {
 	/**
 	 * 是否可以寄送
 	 *
-	 * @param int $user_id 使用者 ID
-	 * @param int $course_id 課程 ID
+	 * @param int  $user_id 使用者 ID
+	 * @param ?int $course_id 課程 ID
 	 * @return bool
 	 */
-	public function can_send( int $user_id, int $course_id ): bool {
+	public function can_send( int $user_id, ?int $course_id = 0 ): bool {
+		$can_send = true;
+		if (!$course_id) {
+			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+		}
+
 		$condition = $this->condition;
 		if (!$condition) {
-			return false;
+			$can_send = false;
+			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
 		}
 
 		$course_ids = $this->condition->course_ids; // 要發的課程 ID
 		// 如果不在指定的課程 id 列表內，也不是全部課程，就不寄送
 		if ( !in_array( $course_id, $course_ids ) && !empty( $course_ids ) ) {
-			return false;
+			$can_send = false;
 		}
 
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
-		return \apply_filters( 'power_email_can_send', true, $this, $user_id, $course_id );
+		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
 	}
 
 

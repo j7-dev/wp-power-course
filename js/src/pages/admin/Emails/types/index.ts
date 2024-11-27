@@ -37,11 +37,12 @@ export type TFormValues = {
 	description: string
 }
 
+// Action Scheduler 紀錄
 export type TAsRecord = {
 	id: string
-	hook: string
-	args: Array<any>
 	name: string
+	args: Array<any>
+	group: string
 	priority: number
 	schedule: string
 	is_finished: boolean

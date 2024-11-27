@@ -163,14 +163,10 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '全部達成時',
 								value: TriggerCondition.ALL,
-
-								disabled: [TriggerAt.COURSE_GRANTED].includes(watchTriggerAt),
 							},
 							{
 								label: '達成指定數量時',
 								value: TriggerCondition.QUANTITY_GREATER_THAN,
-
-								disabled: [TriggerAt.COURSE_GRANTED].includes(watchTriggerAt),
 							},
 						]}
 					/>
