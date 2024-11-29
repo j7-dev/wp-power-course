@@ -24,6 +24,7 @@
 		"replace-string": "node ./replace-string.cjs"
 	},
 	"dependencies": {
+		"@ant-design/charts": "^2.2.3",
 		"@ant-design/pro-components": "2.8.1",
 		"@ant-design/pro-editor": "1.3.0",
 		"@arco-themes/react-easy-email-theme": "^0.0.3",

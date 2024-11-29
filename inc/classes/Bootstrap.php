@@ -48,6 +48,7 @@ final class Bootstrap {
 		Api\Upload::instance();
 		Api\Option::instance();
 		Api\Comment::instance();
+		Api\Reports\Revenue::instance();
 
 		Templates\Templates::instance();
 		Templates\Ajax::instance();

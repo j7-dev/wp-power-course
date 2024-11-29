@@ -228,9 +228,6 @@ export const dataProvider = (
 				axiosResponse = await httpClient.get(requestUrl)
 				break
 		}
-
-		const { data } = axiosResponse
-
-		return Promise.resolve({ data })
+		return Promise.resolve(axiosResponse)
 	},
 })

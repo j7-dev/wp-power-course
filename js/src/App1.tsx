@@ -43,6 +43,7 @@ function App() {
 				dataProvider={{
 					default: dataProvider(`${apiUrl}/${kebab}`),
 					'power-email': dataProvider(`${apiUrl}/power-email`),
+					'wc-analytics': dataProvider(`${apiUrl}/wc-analytics`),
 					'wp-rest': dataProvider(`${apiUrl}/wp/v2`),
 					'wc-rest': dataProvider(`${apiUrl}/wc/v3`),
 					'wc-store': dataProvider(`${apiUrl}/wc/store/v1`),
