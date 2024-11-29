@@ -7,19 +7,19 @@ import useRevenue from './hooks/useRevenue'
 const cards = [
 	{
 		title: '淨營業額',
-		slug: 'netRevenue',
+		slug: 'net_revenue',
 	},
 	{
 		title: '實際成交營業額',
-		slug: 'actualRevenue',
+		slug: 'total_sales',
 	},
 	{
 		title: '退款金額',
-		slug: 'refundAmount',
+		slug: 'refunds',
 	},
 	{
 		title: '淨訂單數',
-		slug: 'netOrderCount',
+		slug: 'orders_count',
 	},
 	{
 		title: '實際成交訂單數',
@@ -41,18 +41,50 @@ const cards = [
 		title: '單元完成數量',
 		slug: 'completedUnitCount',
 	},
+
+	// 以下為 WC 原本就有的數據
+	{
+		title: '售出的商品數量',
+		slug: 'num_items_sold',
+	},
+	{
+		title: '優惠券金額',
+		slug: 'coupons',
+	},
+	{
+		title: '優惠券數量',
+		slug: 'coupons_count',
+	},
+	{
+		title: '稅金',
+		slug: 'taxes',
+	},
+	{
+		title: '運費',
+		slug: 'shipping',
+	},
+	{
+		title: '平均訂單商品數量',
+		slug: 'avg_items_per_order',
+	},
+	{
+		title: '平均訂單金額',
+		slug: 'avg_order_value',
+	},
+	{
+		title: '客戶數量',
+		slug: 'total_customers',
+	},
 ]
 
 const index = () => {
-	const { data, isLoading } = useRevenue()
-	const revenueData = data?.data
+	const { result, filterProps } = useRevenue()
+	const revenueData = result?.data?.data
 	const intervals = revenueData?.intervals || []
-	console.log('⭐  intervals:', intervals)
 
 	const config = {
 		data: intervals,
 		xField: 'interval',
-		yField: 'net_revenue',
 		point: {
 			shapeField: 'square',
 			sizeField: 1,
@@ -70,7 +102,7 @@ const index = () => {
 	return (
 		<>
 			<div className="mb-4">
-				<Filter />
+				<Filter {...filterProps} />
 			</div>
 			<div className="grid grid-cols-3 gap-4">
 				<Card>
@@ -90,7 +122,7 @@ const index = () => {
 
 				{cards.map((card) => (
 					<Card key={card.slug} title={card.title}>
-						<Line {...config} className="aspect-video" />
+						<Line {...config} className="aspect-video" yField={card.slug} />
 					</Card>
 				))}
 			</div>
