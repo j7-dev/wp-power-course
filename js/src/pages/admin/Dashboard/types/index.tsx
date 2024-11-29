@@ -1,18 +1,18 @@
 export type TTotals = {
-	orders_count: 0
-	num_items_sold: 0
-	gross_sales: 0
-	total_sales: 0
-	coupons: 0
-	coupons_count: 0
-	refunds: 0
-	taxes: 0
-	shipping: 0
-	net_revenue: 0
-	avg_items_per_order: 0
-	avg_order_value: 0
-	total_customers: 0
-	products: 0
+	orders_count: number
+	num_items_sold: number
+	gross_sales: number // 毛收入 原始的銷售總額 商品原價 × 銷售數量
+	total_sales: number // 總銷售額(收到的錢) = 毛收入 - 優惠券折扣 - 退款 + 運費
+	coupons: number
+	coupons_count: number
+	refunds: number
+	taxes: number
+	shipping: number
+	net_revenue: number // 淨收入 = 總銷售額 - 運費
+	avg_items_per_order: number
+	avg_order_value: number
+	total_customers: number
+	products: number
 	segments: any[]
 }
 

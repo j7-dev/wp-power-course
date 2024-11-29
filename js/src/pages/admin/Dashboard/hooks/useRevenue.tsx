@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
 	useCustom,
 	useApiUrl,
@@ -7,20 +7,30 @@ import {
 	UseLoadingOvertimeReturnType,
 } from '@refinedev/core'
 import { QueryObserverResult } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { TRevenue, TFormattedRevenue } from '../types'
 
-const query = {
+const defaultQuery = {
 	order: 'asc',
 	interval: 'day',
 	per_page: 100,
-	after: '2024-10-01T00:00:00',
-	before: '2024-11-29T23:59:59',
+	after: dayjs().add(-7, 'd').startOf('day').format('YYYY-MM-DDTHH:mm:ss'),
+	before: dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
+	fields: [
+		'total_sales',
+		'net_revenue',
+		'refunds',
+		'shipping',
+	],
 	_locale: 'user',
 	page: 1,
 }
 
+export type TQuery = typeof defaultQuery
+
 const useRevenue = () => {
 	const apiUrl = useApiUrl()
+	const [query, setQuery] = useState(defaultQuery)
 
 	const result = useCustom<TRevenue>({
 		url: `${apiUrl}/reports/revenue/stats`,
@@ -29,7 +39,6 @@ const useRevenue = () => {
 			query,
 		},
 	})
-	console.log('⭐  result:', result)
 
 	// 格式化新的 result
 	const formattedResult = getFormattedResult(result)
@@ -38,7 +47,17 @@ const useRevenue = () => {
 	const totalPages = Number(result?.data?.headers?.['x-wp-totalpages']) || 1
 	const total = Number(result?.data?.headers?.['x-wp-total']) || 1
 
-	return formattedResult
+	return {
+		result: formattedResult,
+		filterProps: {
+			isFetching: result.isFetching,
+			isLoading: result.isLoading,
+			setQuery,
+			query,
+			totalPages,
+			total,
+		},
+	}
 }
 
 /**
@@ -71,7 +90,8 @@ function getFormattedResult(
 				intervals: formatIntervals,
 			},
 		},
-	}
+	} as QueryObserverResult<CustomResponse<TFormattedRevenue>, HttpError> &
+		UseLoadingOvertimeReturnType
 
 	return formatResult
 }
