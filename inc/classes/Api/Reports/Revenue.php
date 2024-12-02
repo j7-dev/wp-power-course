@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api\Reports;
 
 use J7\WpUtils\Classes\ApiBase;
-use J7\PowerCourse\Plugin;
 
 /**
  * Revenue Api
@@ -38,6 +37,30 @@ final class Revenue extends ApiBase {
 			'permission_callback' => null,
 		],
 	];
+
+
+	/**
+	 * 報表欄位
+	 *
+	 * @var array<string, string>
+	 */
+	protected $extra_report_columns = [
+		// 取得退款訂單數量
+		'refunded_orders_count'     => 'SUM( CASE WHEN wp_wc_order_stats.status = "wc-refunded" THEN 1 ELSE 0 END ) as refunded_orders_count',
+		// 取得不包含退款的訂單數量
+		'non_refunded_orders_count' => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status != "wc-refunded" THEN 1 ELSE 0 END ) as non_refunded_orders_count',
+	];
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		parent::__construct();
+
+		\add_filter( 'woocommerce_admin_report_columns', [ $this, 'add_report_columns' ], 100, 3 );
+	}
+
+
 
 
 	public function get_reports_revenue_stats_callback( $request ) { // phpcs:ignore
@@ -110,7 +133,12 @@ final class Revenue extends ApiBase {
 		 *     pages: int
 		 * } $data
 		 */
-		$data = (array) $query->get_data();
+		$data = json_decode(json_encode($query->get_data()), true);
+
+		$extra_report_keys = array_keys($this->extra_report_columns);
+		foreach ($extra_report_keys as $extra_report_key) {
+			$data['totals'][ $extra_report_key ] = (float) $data['totals'][ $extra_report_key ] ?? 0;
+		}
 
 		// 如果沒有找到數據，返回空響應
 		if (empty($data)) {
@@ -134,5 +162,18 @@ final class Revenue extends ApiBase {
 			$response_data,
 			200
 		);
+	}
+
+
+	/**
+	 * 添加報表欄位
+	 *
+	 * @param array<string, string> $columns 欄位 + 查詢語句
+	 * @param string                $context 資料表名稱 orders_stats
+	 * @param string                $table_name 資料表名稱 wp_wc_order_stats
+	 * @return array<string, string>
+	 */
+	public function add_report_columns( $columns, $context, $table_name ) {
+		return array_merge($columns, $this->extra_report_columns);
 	}
 }

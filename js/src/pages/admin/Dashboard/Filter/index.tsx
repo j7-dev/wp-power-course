@@ -155,6 +155,8 @@ const index = ({ setQuery, isFetching }: TFilterProps) => {
 						'net_revenue',
 						'refunds',
 						'shipping',
+						'refunded_orders_count',
+						'non_refunded_orders_count',
 					]}
 				/>
 				<Button type="primary" htmlType="submit" loading={isFetching}>
