@@ -5,6 +5,7 @@ import {
 	CustomResponse,
 	HttpError,
 	UseLoadingOvertimeReturnType,
+	CrudFilter,
 } from '@refinedev/core'
 import { QueryObserverResult } from '@tanstack/react-query'
 import dayjs from 'dayjs'
@@ -36,7 +37,7 @@ const useRevenue = () => {
 		url: `${apiUrl}/reports/revenue/stats`,
 		method: 'get',
 		config: {
-			query,
+			filters: getFormattedFilter(query),
 		},
 	})
 
@@ -94,6 +95,15 @@ function getFormattedResult(
 		UseLoadingOvertimeReturnType
 
 	return formatResult
+}
+
+function getFormattedFilter(query: TQuery) {
+	const filters = Object.keys(query).map((key) => ({
+		field: key,
+		operator: 'eq',
+		value: query[key as keyof typeof query],
+	})) as CrudFilter[]
+	return filters
 }
 
 export default useRevenue
