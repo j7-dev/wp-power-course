@@ -22,6 +22,8 @@ const defaultQuery = {
 		'net_revenue',
 		'refunds',
 		'shipping',
+		'refunded_orders_count',
+		'non_refunded_orders_count',
 	],
 	_locale: 'user',
 	page: 1,
