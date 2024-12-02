@@ -79,7 +79,7 @@ export const dataProvider = (
 		const requestMethod = (method as THttpMethods) ?? 'get'
 
 		const { data } = await httpClient[requestMethod](
-			`${apiUrl}/${resource}?${stringify({ id: ids })}`,
+			`${apiUrl}/${resource}?${stringify({ id: ids }, { arrayFormat: 'bracket' })}`,
 			{ headers },
 		)
 
@@ -168,11 +168,11 @@ export const dataProvider = (
 
 		if (filters) {
 			const filterQuery = generateFilter(filters)
-			requestUrl = `${requestUrl}&${stringify(filterQuery)}`
+			requestUrl = `${requestUrl}&${stringify(filterQuery, { arrayFormat: 'bracket' })}`
 		}
 
 		if (query) {
-			requestUrl = `${requestUrl}&${stringify(query)}`
+			requestUrl = `${requestUrl}&${stringify(query, { arrayFormat: 'bracket' })}`
 		}
 
 		if (headers) {
