@@ -7,7 +7,6 @@ declare (strict_types = 1);
 
 namespace J7\PowerCourse;
 
-use J7\WpUtils\Classes\Meta;
 use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
 use J7\PowerCourse\Utils\Course as CourseUtils;
@@ -48,7 +47,7 @@ final class Bootstrap {
 		Api\Upload::instance();
 		Api\Option::instance();
 		Api\Comment::instance();
-		Api\Reports\Revenue::instance();
+		Api\OverrideWCReports\Revenue\Api::instance();
 
 		Templates\Templates::instance();
 		Templates\Ajax::instance();
@@ -216,33 +215,30 @@ final class Bootstrap {
 	 * @return void
 	 */
 	public static function compatibility(): void {
-		$args = [
-			'post_type'    => 'product',
-			'numberposts'  => -1,
-			'meta_key'     => BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
-			'meta_compare' => 'EXISTS',
-			'fields'       => 'ids',
-		];
-		// 找出所有的銷售方案
-		$product_ids = \get_posts($args);
+		global $wpdb;
 
-		foreach ($product_ids as $product_id) {
-			// 1. 找出所有的銷售方案，加上 bundle_type_label
-			\update_post_meta($product_id, 'bundle_type_label', '合購優惠');
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
-			// 找出所有銷售方案包含商品 ids
-			$pbp_product_ids = (array) \get_post_meta($product_id, BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY);
+		/** @var array<int, object{meta_id: string, meta_value: string}> */
+		$results = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT meta_id, meta_value FROM %1$s WHERE meta_key = "%2$s"',
+					$table_name,
+					'course_granted_at',
+				)
+			);
 
-			$course_ids = [];
-			foreach ($pbp_product_ids as $pbp_product_id) {
-				// 找出課程商品 id
-				if (CourseUtils::is_course_product( (int) $pbp_product_id)) {
-					$course_ids[] = $pbp_product_id;
-				}
+		foreach ($results as $item) {
+			if (!\is_numeric($item->meta_value)) {
+				continue;
 			}
-			$product = new Meta( (int) $product_id);
-
-			$product->add_array('link_course_ids', $course_ids);
+			$meta_id           = (int) $item->meta_id;
+			$timestamp_to_date = \wp_date('Y-m-d H:i:s', (int) $item->meta_value);
+			$wpdb->update(
+				$table_name,
+				[ 'meta_value' => $timestamp_to_date ],
+				[ 'meta_id' => $meta_id ]
+			);
 		}
 
 		// 註記已經執行過相容設定

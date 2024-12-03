@@ -707,7 +707,8 @@ final class Course {
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as $user_id) {
 				$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
-				$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id, 'expire_date' );
+				// 移除上課權限時，也把 avl_course_meta 相關資料刪除
+				$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id );
 				if (false === $success1 || false === $success2) {
 					$success = false;
 					break;

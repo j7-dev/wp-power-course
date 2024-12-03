@@ -61,7 +61,7 @@ final class LifeCycle {
 
 		$update_success1 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
 		$at              = At::instance();
-		$update_success2 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, "{$at->trigger_at['course_granted']['slug']}_at", time() );
+		$update_success2 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, "{$at->trigger_at['course_granted']['slug']}_at", \wp_date('Y-m-d H:i:s') ); // 紀錄 local time
 		if ( false === $update_success1 || false === $update_success2) {
 			throw new \Exception('新增學員失敗');
 		}

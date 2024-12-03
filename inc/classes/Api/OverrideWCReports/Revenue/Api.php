@@ -5,14 +5,14 @@
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\Api\Reports;
+namespace J7\PowerCourse\Api\OverrideWCReports\Revenue;
 
 use J7\WpUtils\Classes\ApiBase;
 
 /**
  * Revenue Api
  */
-final class Revenue extends ApiBase {
+final class Api extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -46,9 +46,26 @@ final class Revenue extends ApiBase {
 	 */
 	protected $extra_report_columns = [
 		// 取得退款訂單數量
-		'refunded_orders_count'     => 'SUM( CASE WHEN wp_wc_order_stats.status = "wc-refunded" THEN 1 ELSE 0 END ) as refunded_orders_count',
+		'refunded_orders_count'     => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status = "wc-refunded" THEN 1 ELSE 0 END ) as refunded_orders_count',
 		// 取得不包含退款的訂單數量
 		'non_refunded_orders_count' => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status != "wc-refunded" THEN 1 ELSE 0 END ) as non_refunded_orders_count',
+		// 取得學生數量
+		'student_count'             => 'COALESCE(SUM(student_count), 0) as student_count',
+	];
+
+
+	/**
+	 * 報表欄位型別 intval|floatval
+	 *
+	 * @var array<string, string>
+	 */
+	protected $extra_report_column_types = [
+		// 取得退款訂單數量
+		'refunded_orders_count'     => 'intval',
+		// 取得不包含退款的訂單數量
+		'non_refunded_orders_count' => 'intval',
+		// 取得學生數量
+		'student_count'             => 'intval',
 	];
 
 	/**
@@ -58,11 +75,17 @@ final class Revenue extends ApiBase {
 		parent::__construct();
 
 		\add_filter( 'woocommerce_admin_report_columns', [ $this, 'add_report_columns' ], 100, 3 );
+		\add_filter( 'woocommerce_rest_reports_column_types', [ $this, 'add_report_column_types' ], 100, 2 );
 	}
 
 
 
-
+	/**
+	 * 取得報表收入統計資料 API
+	 *
+	 * @param \WP_REST_Request $request 請求
+	 * @return \WP_REST_Response
+	 */
 	public function get_reports_revenue_stats_callback( $request ) { // phpcs:ignore
 		// 從請求中取得查詢參數
 		$params = $request->get_query_params();
@@ -81,16 +104,36 @@ final class Revenue extends ApiBase {
 			'orderby'             => $params['orderby'] ?? null,
 			'order'               => $params['order'] ?? null,
 			'segmentby'           => $params['segmentby'] ?? null,
-			'fields'              => $params['fields'] ?? null,
 			'force_cache_refresh' => $params['force_cache_refresh'] ?? false,
 			'date_type'           => $params['date_type'] ?? null,
+			'fields'              => [
+				'net_revenue',
+				'avg_order_value',
+				'orders_count',
+				'avg_items_per_order',
+				'num_items_sold',
+				'coupons',
+				'coupons_count',
+				'total_customers',
+				'total_sales',
+				'refunds',
+				// 'taxes',
+				'shipping',
+				'gross_sales',
+			],
+
 		];
+
+		$extra_report_keys = array_keys($this->extra_report_columns);
+		foreach ($extra_report_keys as $extra_report_key) {
+			$query_args['fields'][] = $extra_report_key;
+		}
 
 		// 移除空值
 		$query_args = array_filter($query_args);
 
 		// 使用 WooCommerce 的收入查詢來獲取數據
-		$query = new \Automattic\WooCommerce\Admin\API\Reports\Revenue\Query( $query_args );
+		$query = new Query( $query_args );
 
 		/**
 		 * @var array{
@@ -133,15 +176,12 @@ final class Revenue extends ApiBase {
 		 *     pages: int
 		 * } $data
 		 */
-		$data = json_decode(json_encode($query->get_data()), true);
+		$data = $query->get_data(); // 是物件
 
-		$extra_report_keys = array_keys($this->extra_report_columns);
-		foreach ($extra_report_keys as $extra_report_key) {
-			$data['totals'][ $extra_report_key ] = (float) $data['totals'][ $extra_report_key ] ?? 0;
-		}
+		$filtered_data = \apply_filters('power_course_reports_revenue_stats', $data, $query_args);
 
 		// 如果沒有找到數據，返回空響應
-		if (empty($data)) {
+		if (empty($filtered_data)) {
 			return new \WP_REST_Response(
 				[
 					'code'    => 200,
@@ -152,14 +192,8 @@ final class Revenue extends ApiBase {
 			);
 		}
 
-		// 準備響應數據，格式與 WooCommerce 收入統計 API 相同
-		$response_data = [
-			'totals'    => $data['totals'] ?? [],
-			'intervals' => $data['intervals'] ?? [],
-		];
-
 		return new \WP_REST_Response(
-			$response_data,
+			$filtered_data,
 			200
 		);
 	}
@@ -175,5 +209,17 @@ final class Revenue extends ApiBase {
 	 */
 	public function add_report_columns( $columns, $context, $table_name ) {
 		return array_merge($columns, $this->extra_report_columns);
+	}
+
+
+	/**
+	 * 添加報表欄位類型
+	 *
+	 * @param array<string, string> $column_types 欄位類型
+	 * @param array<string, mixed>  $array 數據
+	 * @return array<string, string>
+	 */
+	public function add_report_column_types( $column_types, $array ) {
+		return array_merge($column_types, $this->extra_report_column_types);
 	}
 }

@@ -23,15 +23,15 @@ const cards = [
 	},
 	{
 		title: '實際成交訂單數',
-		slug: 'completedOrderCount',
+		slug: 'non_refunded_orders_count',
 	},
 	{
-		title: '取消訂單數',
-		slug: 'canceledOrderCount',
+		title: '已退款訂單數',
+		slug: 'refunded_orders_count',
 	},
 	{
 		title: '學員數',
-		slug: 'studentCount',
+		slug: 'student_count',
 	},
 	{
 		title: '新學員數',
@@ -55,10 +55,11 @@ const cards = [
 		title: '優惠券數量',
 		slug: 'coupons_count',
 	},
-	{
-		title: '稅金',
-		slug: 'taxes',
-	},
+
+	// {
+	// 	title: '稅金',
+	// 	slug: 'taxes',
+	// },
 	{
 		title: '運費',
 		slug: 'shipping',
@@ -81,6 +82,7 @@ const index = () => {
 	const { result, filterProps } = useRevenue()
 	const revenueData = result?.data?.data
 	const intervals = revenueData?.intervals || []
+	console.log('⭐  intervals:', intervals)
 
 	const config = {
 		data: intervals,
