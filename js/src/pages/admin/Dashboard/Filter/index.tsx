@@ -147,18 +147,6 @@ const index = ({ setQuery, isFetching }: TFilterProps) => {
 						]}
 					/>
 				</Item>
-				<Item
-					name={['fields']}
-					hidden
-					initialValue={[
-						'total_sales',
-						'net_revenue',
-						'refunds',
-						'shipping',
-						'refunded_orders_count',
-						'non_refunded_orders_count',
-					]}
-				/>
 				<Button type="primary" htmlType="submit" loading={isFetching}>
 					查詢
 				</Button>

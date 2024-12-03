@@ -17,14 +17,6 @@ const defaultQuery = {
 	per_page: 100,
 	after: dayjs().add(-7, 'd').startOf('day').format('YYYY-MM-DDTHH:mm:ss'),
 	before: dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
-	fields: [
-		'total_sales',
-		'net_revenue',
-		'refunds',
-		'shipping',
-		'refunded_orders_count',
-		'non_refunded_orders_count',
-	],
 	_locale: 'user',
 	page: 1,
 }

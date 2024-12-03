@@ -6,7 +6,8 @@ export type TTotals = {
 	coupons: number
 	coupons_count: number
 	refunds: number
-	taxes: number
+
+	// taxes: number
 	shipping: number
 	net_revenue: number // 淨收入 = 總銷售額 - 運費
 	avg_items_per_order: number

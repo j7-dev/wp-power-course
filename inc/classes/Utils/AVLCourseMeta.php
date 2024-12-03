@@ -207,16 +207,27 @@ abstract class AVLCourseMeta {
 	/**
 	 * Deletes the available course meta for a specific course and user.
 	 *
-	 * @param int    $course_id   The ID of the course.
-	 * @param int    $user_id     The ID of the user.
-	 * @param string $meta_key    Optional. The meta key to delete. Default is null.
-	 * @param mixed  $meta_value  Optional. The meta value to delete. Default is an empty string.
+	 * @param int         $course_id   The ID of the course.
+	 * @param int         $user_id     The ID of the user.
+	 * @param string|null $meta_key    Optional. The meta key to delete. Default is null.
+	 * @param mixed       $meta_value  Optional. The meta value to delete. Default is an empty string.
 	 *
 	 * @return int|false 移除的數量, or false on error.
 	 */
-	public static function delete( int $course_id, int $user_id, string $meta_key = null, mixed $meta_value = '' ): int|false {
+	public static function delete( int $course_id, int $user_id, string|null $meta_key = null, mixed $meta_value = '' ): int|false {
 		global $wpdb;
 		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
+
+		if (null === $meta_key) {
+			return $wpdb->delete(
+				$table_name,
+				[
+					'course_id' => $course_id,
+					'user_id'   => $user_id,
+				],
+				[ '%d', '%d' ]
+			);
+		}
 
 		if (!empty($meta_value)) {
 			return $wpdb->delete(
