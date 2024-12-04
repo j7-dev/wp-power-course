@@ -44,6 +44,13 @@ final class AVLChapter {
 	public string|null $first_visit_at;
 
 	/**
+	 * 完成章節時間
+	 *
+	 * @var string|null
+	 */
+	public string|null $finished_at;
+
+	/**
 	 * Constructor
 	 *
 	 * @param int      $id Chapter ID.
@@ -54,6 +61,7 @@ final class AVLChapter {
 		$this->user_id        = $user_id ? $user_id : \get_current_user_id();
 		$this->course_id      = Utils::get_course_id( $id );
 		$this->first_visit_at = MetaCRUD::get( $id, $this->user_id, 'first_visit_at', true );
+		$this->finished_at    = MetaCRUD::get( $id, $this->user_id, 'finished_at', true );
 	}
 
 	/**

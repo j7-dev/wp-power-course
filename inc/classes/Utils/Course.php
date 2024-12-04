@@ -11,6 +11,7 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
 /**
@@ -195,11 +196,11 @@ abstract class Course {
 		if (!$user_id) {
 			$user_id = get_current_user_id();
 		}
-		$product_id              = $product->get_id();
-		$sub_chapters_count      = count(self::get_sub_chapters($product, true));
-		$finished_chapters_count = count(self::get_finished_chapters($product_id, $user_id, return_ids: true));
+		$product_id                  = $product->get_id();
+		$sub_chapters_count          = count(self::get_sub_chapters($product, true));
+		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, return_ids: true));
 
-		$progress = $sub_chapters_count ? round(( $finished_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
+		$progress = $sub_chapters_count ? round(( $finished_sub_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
 		$progress = min( 100, $progress );
 		return $progress;
 	}
@@ -212,21 +213,26 @@ abstract class Course {
 	 *
 	 * @return array<\WP_Post|string>
 	 */
-	public static function get_finished_chapters( int $course_id, ?int $user_id = 0, ?bool $return_ids = false ): array {
+	public static function get_finished_sub_chapters( int $course_id, ?int $user_id = 0, ?bool $return_ids = false ): array {
 		if (!$user_id) {
-			$user_id = get_current_user_id();
+			$user_id = \get_current_user_id();
 		}
-		$finished_chapter_ids = AVLCourseMeta::get($course_id, $user_id, 'finished_chapter_ids');
-		$finished_chapter_ids = \is_array($finished_chapter_ids) ? $finished_chapter_ids : [];
+
+		$all_sub_chapter_ids      = self::get_sub_chapters($course_id, true);
+		$finished_sub_chapter_ids = array_filter(
+			$all_sub_chapter_ids,
+			function ( $chapter_id ) use ( $user_id ) {
+				$avl_chapter = new AVLChapter( (int) $chapter_id, (int) $user_id);
+				return !!$avl_chapter->finished_at;
+			}
+			);
+
 		if ($return_ids) {
-			/**
-			 * @var array<string> $finished_chapter_ids
-			 */
-			return $finished_chapter_ids;
+			return $finished_sub_chapter_ids;
 		}
 
 		$chapters = [];
-		foreach ($finished_chapter_ids as $chapter_id) {
+		foreach ($finished_sub_chapter_ids as $chapter_id) {
 			$chapters[] = \get_post($chapter_id);
 		}
 
@@ -541,7 +547,7 @@ abstract class Course {
 		$the_product    = $the_product ?? $product;
 		$the_product_id = $the_product->get_id();
 		$user_id        = $user_id ?? \get_current_user_id();
-		$expire_date    = AVLCourseMeta::get($the_product_id, $user_id, 'expire_date', true);
+		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
 		return empty($expire_date) ? false : $expire_date < time();
 	}
 

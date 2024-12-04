@@ -8,6 +8,7 @@ declare (strict_types = 1);
 namespace J7\PowerCourse;
 
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
 
 /**
  * Class Compatibility
@@ -47,8 +48,11 @@ final class Compatibility {
 	 */
 	public static function compatibility(): void {
 
-		// START 相容性代碼
+		/**
+		 * ============== START 相容性代碼 ==============
+		 */
 
+		// 將 course_granted_at 從 timestamp 轉為 Y-m-d H:i:s
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
@@ -75,7 +79,7 @@ final class Compatibility {
 			);
 		}
 
-		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table
+		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table，沒有就建立
 		global $wpdb;
 		$table_name = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
 		$wpdb->query("SHOW TABLES LIKE '$table_name'"); // phpcs:ignore
@@ -83,10 +87,16 @@ final class Compatibility {
 			Plugin::create_chapter_table();
 		}
 
-		// 將 course_id 重新命名為 post_id
+		// 將 table course_id 重新命名為 post_id
 		self::alter_course_table_column();
 
-		// END 相容性代碼
+		// 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
+		self::convert_fields();
+
+		/**
+		 * ============== END 相容性代碼 ==============
+		 */
+
 		// ❗不要刪除此行，註記已經執行過相容設定
 		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
 	}
@@ -94,6 +104,8 @@ final class Compatibility {
 
 	/**
 	 * 重新命名 course_id 欄位為 post_id
+	 *
+	 * @deprecated
 	 *
 	 * @return void
 	 */
@@ -110,18 +122,61 @@ final class Compatibility {
 			return;
 		}
 
-		$column_type = $column_info->Type;
+		$column_type = $column_info->Type; //phpcs:ignore
 
 		// SQL 查詢來重新命名欄位
 		$sql = "ALTER TABLE {$table_name} CHANGE COLUMN course_id post_id {$column_type}";
 
 		// 執行查詢
-		$result = $wpdb->query($sql);
+		$result = $wpdb->query($sql); // phpcs:ignore
 
 		if ($result === false) {
 			error_log('無法重新命名欄位: ' . $wpdb->last_error);
 		} else {
 			error_log('欄位重新命名成功');
 		}
+	}
+
+
+	/**
+	 * 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
+	 *
+	 * @deprecated
+	 *
+	 * @return void
+	 */
+	public static function convert_fields(): void {
+		global $wpdb;
+
+		// 取得表格名稱前綴
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
+
+		// 取得所有 meta_key = 'finished_chapter_ids' 的資料
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT * FROM %1$s WHERE meta_key = "%2$s"',
+				$table_name,
+				'finished_chapter_ids',
+			)
+		);
+
+		foreach ($results as $item) {
+			$user_id    = (int) $item->user_id;
+			$course_id  = (int) $item->post_id;
+			$chapter_id = (int) $item->meta_value;
+
+			AVLChapterMeta::update(
+				$chapter_id,
+				$user_id,
+				'finished_at',
+				\wp_date('Y-m-d H:i:s'),
+			);
+		}
+
+		// 刪除 avl_coursemeta 的 finished_chapter_ids
+		$wpdb->delete(
+			$table_name,
+			[ 'meta_key' => 'finished_chapter_ids' ],
+		);
 	}
 }

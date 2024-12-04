@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Templates;
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
+use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 
@@ -120,8 +121,8 @@ final class Ajax {
 		// 獲取從前端發送的數據
 		$data       = WP::sanitize_text_field_deep($_POST);
 		$chapter_id = (int) $data['data']['chapter_id'];
-		$course_id  = (int) $data['data']['course_id'];
-		if ( ! $chapter_id || ! $course_id) {
+
+		if ( ! $chapter_id) {
 			\wp_send_json_error(
 				[
 					'code'    => '400',
@@ -131,11 +132,11 @@ final class Ajax {
 
 		}
 
-		AVLCourseMeta::add(
-			$course_id,
+		AVLChapterMeta::add(
+			(int) $chapter_id,
 			\get_current_user_id(),
-			'finished_chapter_ids',
-			$chapter_id
+			'finished_at',
+			\wp_date('Y-m-d H:i:s')
 		);
 
 		// 發送回應
