@@ -20,8 +20,6 @@ use J7\PowerCourse\BundleProduct\BundleProduct;
 final class Bootstrap {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
-
 	const SCHEDULE_ACTION          = 'power_course_schedule_action';
 	const SCHEDULE_ACTION_INTERVAL = 10 * MINUTE_IN_SECONDS;
 
@@ -29,6 +27,8 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
+		Compatibility::instance();
+
 		Resources\Chapter\CPT::instance();
 		Resources\Order::instance();
 		Resources\Comment::instance();
@@ -63,10 +63,6 @@ final class Bootstrap {
 		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );
 
 		\add_action( 'wp_loaded', [ __CLASS__, 'prevent_guest_checkout' ], 99 );
-
-		// 排程只執行一次的兼容設定
-		\add_action( 'init', [ __CLASS__, 'compatibility_action_scheduler' ] );
-		\add_action( self::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'compatibility' ]);
 
 		// 註冊每5分鐘執行一次的 action scheduler
 		\add_action( 'init', [ __CLASS__, 'register_power_course_cron' ] );
@@ -195,56 +191,6 @@ final class Bootstrap {
 			]
 		);
 	}
-
-	/**
-	 * 排程只執行一次的兼容設定
-	 *
-	 * @return void
-	 */
-	public static function compatibility_action_scheduler(): void {
-		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
-		if ($scheduled_version === Plugin::$version) {
-			return;
-		}
-		\as_enqueue_async_action( self::AS_COMPATIBILITY_ACTION, [] );
-	}
-
-	/**
-	 * 執行排程
-	 *
-	 * @return void
-	 */
-	public static function compatibility(): void {
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-
-		/** @var array<int, object{meta_id: string, meta_value: string}> */
-		$results = $wpdb->get_results(
-				$wpdb->prepare(
-					'SELECT meta_id, meta_value FROM %1$s WHERE meta_key = "%2$s"',
-					$table_name,
-					'course_granted_at',
-				)
-			);
-
-		foreach ($results as $item) {
-			if (!\is_numeric($item->meta_value)) {
-				continue;
-			}
-			$meta_id           = (int) $item->meta_id;
-			$timestamp_to_date = \wp_date('Y-m-d H:i:s', (int) $item->meta_value);
-			$wpdb->update(
-				$table_name,
-				[ 'meta_value' => $timestamp_to_date ],
-				[ 'meta_id' => $meta_id ]
-			);
-		}
-
-		// 註記已經執行過相容設定
-		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
-	}
-
 
 	/**
 	 * 註冊每5分鐘執行一次的 action scheduler
