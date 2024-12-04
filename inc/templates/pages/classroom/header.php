@@ -8,7 +8,7 @@ use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
-
+use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
 $default_args = [
@@ -49,8 +49,9 @@ $back_to_my_course_html = sprintf(
 
 // finish button html
 $user_id                    = \get_current_user_id();
-$finished_chapter_ids       = AVLCourseMeta::get($product_id, $user_id, 'finished_chapter_ids');
-$is_this_chapter_finished   = in_array( (string) $current_chapter_id, $finished_chapter_ids, true);
+$avl_chapter                = new AVLChapter( (int) $current_chapter_id, (int) $user_id );
+$finished_at                = $avl_chapter->finished_at;
+$is_this_chapter_finished   = !!$finished_at;
 $finish_chapter_button_html = '';
 $finish_chapter_button_html = sprintf(
 		/*html*/'

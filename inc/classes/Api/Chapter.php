@@ -7,23 +7,29 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Api;
 
-use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
-
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
+use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
 
 
 
 /**
  * Class Chapter
  */
-final class Chapter {
+final class Chapter extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * Namespace
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'power-course';
 
 	/**
 	 * APIs
@@ -60,26 +66,6 @@ final class Chapter {
 			'permission_callback' => 'is_user_logged_in',
 		],
 	];
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_chapters' ] );
-	}
-
-	/**
-	 * Register Course API
-	 *
-	 * @return void
-	 */
-	public function register_api_chapters(): void {
-		$this->register_apis(
-			apis: $this->apis,
-			namespace: Plugin::$kebab,
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
-		);
-	}
 
 	/**
 	 * Get chapters callback
@@ -326,22 +312,16 @@ final class Chapter {
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
 
-		$finished_chapters = AVLCourseMeta::get(
-			$course_id,
-			$user_id,
-			'finished_chapter_ids'
-		);
-
-		$is_this_chapter_finished = in_array( (string) $chapter_id, $finished_chapters, true );
+		$avl_chapter              = new AVLChapter( (int) $chapter_id, (int) $user_id );
+		$is_this_chapter_finished = !!$avl_chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
 		$product                  = \wc_get_product( $course_id );
 
 		if ($is_this_chapter_finished) {
-			$success  = AVLCourseMeta::delete(
-				$course_id,
+			$success  = AVLChapterMeta::delete(
+				(int) $chapter_id,
 				$user_id,
-				'finished_chapter_ids',
-				$chapter_id
+				'finished_at'
 			);
 			$progress = CourseUtils::get_course_progress( $product );
 
@@ -360,11 +340,11 @@ final class Chapter {
 			);
 		}
 
-		$success  = AVLCourseMeta::add(
-				$course_id,
-				$user_id,
-				'finished_chapter_ids',
-				$chapter_id
+		$success  = AVLChapterMeta::add(
+			(int) $chapter_id,
+			$user_id,
+			'finished_at',
+			\wp_date('Y-m-d H:i:s')
 			);
 		$progress = CourseUtils::get_course_progress( $product );
 		return new \WP_REST_Response(

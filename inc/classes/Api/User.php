@@ -13,6 +13,7 @@ use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 /**
  * Class Api
@@ -394,12 +395,13 @@ final class User {
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
 			$avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
 			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
-			$finished_chapter_ids             = AVLCourseMeta::get( $course_id, $user_id, 'finished_chapter_ids');
+
 			foreach ($all_chapter_ids as $j => $chapter_id) {
-				$avl_courses[ $i ]['chapters'][ $j ]['id']            = (string) $chapter_id;
-				$avl_courses[ $i ]['chapters'][ $j ]['name']          = \get_the_title($chapter_id);
+				$avl_chapter                                 = new AVLChapter( (int) $chapter_id, (int) $user_id );
+				$avl_courses[ $i ]['chapters'][ $j ]['id']   = (string) $chapter_id;
+				$avl_courses[ $i ]['chapters'][ $j ]['name'] = \get_the_title($chapter_id);
 				$avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = \in_array( (string) $chapter_id, $finished_chapter_ids, true);
+				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = !!$avl_chapter->finished_at;
 			}
 		}
 

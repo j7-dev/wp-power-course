@@ -31,9 +31,8 @@ if ( ! ( $chapter instanceof \WP_Post ) ) {
 	throw new \Exception( 'chapter 不是 WP_Post' );
 }
 
-$product_id           = $product->get_id();
-$chapter_id           = (int) $chapter->ID;
-$finished_chapter_ids = CourseUtils::get_finished_chapters( $product_id, return_ids: true );
+$product_id = $product->get_id();
+$chapter_id = (int) $chapter->ID;
 
 $args2 = [
 	'posts_per_page' => - 1,
@@ -59,9 +58,10 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$sub_chapters  = get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
-		$avl_chapter    = new AVLChapter( $sub_chapter->ID );
-		$is_finished    = in_array( (string) $sub_chapter->ID, $finished_chapter_ids, true );
+		$avl_chapter    = new AVLChapter( (int) $sub_chapter->ID );
 		$first_visit_at = $avl_chapter->first_visit_at;
+		$finished_at    = $avl_chapter->finished_at;
+
 
 		$icon_html = Plugin::get( 'icon/video', null, false );
 		$tooltip   = '點擊觀看';
@@ -69,9 +69,9 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			$icon_html = Plugin::get( 'icon/check', [ 'type' => 'outline' ], false );
 			$tooltip   = "已於 {$first_visit_at} 開始觀看";
 		}
-		if ( $is_finished ) {
+		if ( $finished_at ) {
 			$icon_html = Plugin::get( 'icon/check', null, false );
-			$tooltip   = '已完成';
+			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
 		$icon_html_with_tooltip = sprintf(
 			/*html*/'<div class="pc-tooltip pc-tooltip-right" data-tip="%1$s">%2$s</div>',

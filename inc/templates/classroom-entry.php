@@ -38,10 +38,10 @@ $doc_title = sprintf(
 /*html*/'<title>%1$s | %2$s - %3$s</title>',
 $chapter->post_title,
 $product->get_name(),
-get_bloginfo( 'name' )
+\get_bloginfo( 'name' )
 );
 
-$expire_date = AVLCourseMeta::get($product->get_id(), $current_user_id, 'expire_date', true);
+$expire_date = AVLCourseMeta::get( (int) $product->get_id(), $current_user_id, 'expire_date', true);
 $is_expired  = CourseUtils::is_expired($product, $current_user_id);
 
 \add_filter(
