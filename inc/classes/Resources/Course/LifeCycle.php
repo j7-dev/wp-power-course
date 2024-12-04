@@ -9,7 +9,7 @@ namespace J7\PowerCourse\Resources\Course;
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
-use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 use J7\PowerCourse\Bootstrap;
 

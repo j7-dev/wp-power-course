@@ -83,8 +83,45 @@ final class Compatibility {
 			Plugin::create_chapter_table();
 		}
 
+		// 將 course_id 重新命名為 post_id
+		self::alter_course_table_column();
+
 		// END 相容性代碼
 		// ❗不要刪除此行，註記已經執行過相容設定
 		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
+	}
+
+
+	/**
+	 * 重新命名 course_id 欄位為 post_id
+	 *
+	 * @return void
+	 */
+	private static function alter_course_table_column(): void {
+		global $wpdb;
+
+		// 取得表格名稱前綴
+		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
+
+		// 取得欄位的資料類型
+		$column_info = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'course_id'"); //phpcs:ignore
+		if (!$column_info) {
+			// 檢查如果 course_id 欄位不存在，則不執行
+			return;
+		}
+
+		$column_type = $column_info->Type;
+
+		// SQL 查詢來重新命名欄位
+		$sql = "ALTER TABLE {$table_name} CHANGE COLUMN course_id post_id {$column_type}";
+
+		// 執行查詢
+		$result = $wpdb->query($sql);
+
+		if ($result === false) {
+			error_log('無法重新命名欄位: ' . $wpdb->last_error);
+		} else {
+			error_log('欄位重新命名成功');
+		}
 	}
 }

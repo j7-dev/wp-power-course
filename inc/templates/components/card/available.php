@@ -7,7 +7,7 @@
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
