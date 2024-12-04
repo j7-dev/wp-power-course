@@ -274,6 +274,21 @@ abstract class Utils {
 	}
 
 	/**
+	 * 取得章節的課程 ID
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @return int|null
+	 */
+	public static function get_course_id( int $chapter_id ): int|null {
+		$ancestors = \get_post_ancestors( $chapter_id );
+		if ( empty( $ancestors ) ) {
+			return null;
+		}
+		// 取最後一個
+		return $ancestors[ count( $ancestors ) - 1 ];
+	}
+
+	/**
 	 * 檢查章節是否可存取
 	 *
 	 * @param int|null $chapter_id 章節 ID.
@@ -294,9 +309,7 @@ abstract class Utils {
 			$chapter_id = $chapter->ID;
 		}
 
-		$chapter_obj = new Chapter( (int) $chapter_id );
-
-		$course_id = $chapter_obj->get_course_id();
+		$course_id = self::get_course_id( $chapter_id );
 		if ( !$course_id ) {
 			return false;
 		}

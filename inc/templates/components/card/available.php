@@ -59,6 +59,15 @@ $badge_html = Plugin::get(
 	false
 	);
 
+
+$last_visit_info = AVLCourseMeta::get( $product_id, $current_user_id, 'last_visit_info', true );
+if ( $last_visit_info ) {
+	$goto_chapter_id = $last_visit_info['chapter_id'] ?? null;
+} else {
+	$goto_chapter_id = count($chapter_ids) > 0 ? $chapter_ids[0] : null;
+}
+$goto_classroom_link = $goto_chapter_id ? \site_url( 'classroom' ) . "/{$product->get_slug()}/{$goto_chapter_id}" : site_url( '404' );
+
 printf(
 	/*html*/'
 <div class="pc-course-card">
@@ -79,11 +88,7 @@ printf(
 	</div>
 </div>
 ',
-site_url( 'classroom' ) . sprintf(
-	'/%1$s/%2$s',
-	$product->get_slug(),
-	count($chapter_ids) > 0 ? $chapter_ids[0] : ''
-),
+$goto_classroom_link,
 $badge_html,
 	$product_image_url,
 	$name,

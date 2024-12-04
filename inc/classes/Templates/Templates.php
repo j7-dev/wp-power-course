@@ -156,7 +156,7 @@ final class Templates {
 								exit;
 							} else {
 								$first_sub_chapter_id = $sub_chapter_ids[0];
-								\wp_safe_redirect( site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
+								\wp_safe_redirect( \site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
 								exit;
 							}
 						}

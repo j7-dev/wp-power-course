@@ -5,9 +5,8 @@
 
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-
+use J7\PowerCourse\Resources\Chapter\AVLChapter;
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'] ?? null,
@@ -60,9 +59,25 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$sub_chapters  = get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
-		$chapter_length = (int) get_post_meta( $sub_chapter->ID, 'chapter_length', true );
+		$avl_chapter    = new AVLChapter( $sub_chapter->ID );
 		$is_finished    = in_array( (string) $sub_chapter->ID, $finished_chapter_ids, true );
-		$icon           = $is_finished ? 'icon/check' : 'icon/video';
+		$first_visit_at = $avl_chapter->first_visit_at;
+
+		$icon_html = Plugin::get( 'icon/video', null, false );
+		$tooltip   = '點擊觀看';
+		if ( $first_visit_at ) {
+			$icon_html = Plugin::get( 'icon/check', [ 'type' => 'outline' ], false );
+			$tooltip   = "已於 {$first_visit_at} 開始觀看";
+		}
+		if ( $is_finished ) {
+			$icon_html = Plugin::get( 'icon/check', null, false );
+			$tooltip   = '已完成';
+		}
+		$icon_html_with_tooltip = sprintf(
+			/*html*/'<div class="pc-tooltip pc-tooltip-right" data-tip="%1$s">%2$s</div>',
+			$tooltip,
+			$icon_html
+		);
 
 		$children_html .= sprintf(
 			/*html*/'
@@ -80,9 +95,9 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			site_url( "classroom/{$product->get_slug()}/{$sub_chapter->ID}" ),
 			$sub_chapter->ID === $chapter_id ? 'bg-primary/10' : '',
 			"classroom__sider-collapse__chapter-{$sub_chapter->ID}",
-			Plugin::get( $icon, null, false ),
+			$icon_html_with_tooltip,
 			$sub_chapter->post_title,
-			Base::get_video_length_by_seconds( $chapter_length )
+			$avl_chapter->get_chapter_length( true )
 		);
 	endforeach;
 
