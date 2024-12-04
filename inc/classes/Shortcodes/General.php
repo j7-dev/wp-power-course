@@ -22,6 +22,7 @@ final class General {
 	 */
 	public static array $shortcodes = [
 		'pc_courses',
+		'pc_my_courses',
 	];
 
 	/**
@@ -34,7 +35,7 @@ final class General {
 	}
 
 	/**
-	 * 短碼 pc_courses callback
+	 * 課程列表短碼 pc_courses callback
 	 *
 	 * @param array $params 短碼參數
 	 * @return string
@@ -82,6 +83,22 @@ final class General {
 			],
 			false
 			);
+
+		return $html;
+	}
+
+	/**
+	 * 我的課程短碼 pc_my_courses callback
+	 *
+	 * @param array $params 短碼參數
+	 * @return string
+	 */
+	public static function pc_my_courses_callback( array $params ): string {
+		$html = Plugin::get(
+			'my-account',
+			null,
+			false
+		);
 
 		return $html;
 	}
