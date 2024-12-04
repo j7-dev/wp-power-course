@@ -8,12 +8,12 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\Factory as ChapterFactory;
+use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
-use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 
@@ -113,7 +113,7 @@ final class Chapter {
 		);
 
 		$chapters = \get_posts($args);
-		$chapters = array_values(array_map( [ ChapterFactory::class, 'format_chapter_details' ], $chapters ));
+		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
 
 		$response = new \WP_REST_Response( $chapters );
 
@@ -135,7 +135,7 @@ final class Chapter {
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		$body_params = ChapterFactory::converter( $body_params );
+		$body_params = ChapterUtils::converter( $body_params );
 
 		$skip_keys   = [
 			'chapter_video',
@@ -190,7 +190,7 @@ final class Chapter {
 		foreach ($post_parents as $post_parent) {
 			$data['post_parent'] = $post_parent;
 			for ($i = 0; $i < $qty; $i++) {
-				$post_id = ChapterFactory::create_chapter( $data );
+				$post_id = ChapterUtils::create_chapter( $data );
 				if (is_numeric($post_id)) {
 					$success_ids[] = $post_id;
 				} else {
@@ -230,7 +230,7 @@ final class Chapter {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$sort_result = ChapterFactory::sort_chapters( (array) $body_params );
+		$sort_result = ChapterUtils::sort_chapters( (array) $body_params );
 
 		if ( $sort_result !== true ) {
 			return $sort_result;
@@ -263,7 +263,7 @@ final class Chapter {
 
 		$data['meta_input'] = $meta_data;
 
-		$update_result = ChapterFactory::update_chapter( $id, $data );
+		$update_result = ChapterUtils::update_chapter( $id, $data );
 
 		if ( \is_wp_error( $update_result ) ) {
 			return $update_result;

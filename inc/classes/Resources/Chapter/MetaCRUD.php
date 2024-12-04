@@ -6,14 +6,14 @@
 
 declare ( strict_types=1 );
 
-namespace J7\PowerCourse\Utils;
+namespace J7\PowerCourse\Resources\Chapter;
 
 use J7\PowerCourse\Plugin;
-
+use J7\PowerCourse\Utils\MetaCRUD as AbstractMetaCRUD;
 /**
- * Class AVLChapterMeta
+ * Class MetaCRUD
  */
-abstract class AVLChapterMeta extends MetaCRUD {
+abstract class MetaCRUD extends AbstractMetaCRUD {
 	/**
 	 * 對應的 table name with wpdb prefix
 	 *

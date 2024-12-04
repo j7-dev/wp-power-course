@@ -3,7 +3,7 @@
  * Plugin Name:       Power Course | WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
  * Description:       WordPress 最好用的課程外掛
- * Version:           0.4.2rc1
+ * Version:           0.4.2rc2
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            J7
@@ -154,12 +154,12 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 
 				$sql = "CREATE TABLE $table_name (
 										meta_id bigint(20) NOT NULL AUTO_INCREMENT,
-										chapter_id bigint(20) NOT NULL,
+										post_id bigint(20) NOT NULL,
 										user_id bigint(20) NOT NULL,
 										meta_key varchar(255) DEFAULT NULL,
 										meta_value longtext,
 										PRIMARY KEY  (meta_id),
-										KEY chapter_id (chapter_id),
+										KEY post_id (post_id),
 										KEY user_id (user_id),
 										KEY meta_key (meta_key(191))
 								) $charset_collate;";

@@ -3,6 +3,7 @@
  * 對 AVL Coursemeta / ChapterMeta 等 table 的 CRUD 抽象
  * AVLCourse = 用戶可以上的課程，額外資訊就是 AVLCourseMeta
  * AVLChapter = 章節，額外資訊就是 AVLChapterMeta
+ * TODO 新增到 wp-utils
  */
 
 declare ( strict_types=1 );
@@ -24,20 +25,20 @@ abstract class MetaCRUD {
 	/**
 	 * Adds a meta value for a specific course and user in the AVL Course Meta class.
 	 *
-	 * @param int    $course_id The ID of the course.
+	 * @param int    $post_id The ID of the course.
 	 * @param int    $user_id The ID of the user.
 	 * @param string $meta_key The key of the meta value.
 	 * @param mixed  $meta_value The value of the meta data.
 	 * @param bool   $unique Optional. Whether the same key should not be added. Default is false.
 	 * @return int|false The ID of the newly added meta data, or false on failure.
 	 */
-	public static function add( int $course_id, int $user_id, string $meta_key, mixed $meta_value, ?bool $unique = false ): int|false {
+	public static function add( int $post_id, int $user_id, string $meta_key, mixed $meta_value, ?bool $unique = false ): int|false {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . static::$table_name;
 
 		$data = [
-			'course_id'  => $course_id,
+			'post_id'    => $post_id,
 			'user_id'    => $user_id,
 			'meta_key'   => $meta_key,
 			'meta_value' => \maybe_serialize( $meta_value ),
@@ -52,9 +53,9 @@ abstract class MetaCRUD {
 		} else {
 			$exists = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT meta_id FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+					"SELECT meta_id FROM %1\$s WHERE post_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
 					$table_name,
-					$course_id,
+					$post_id,
 					$user_id,
 					$meta_key
 				)
@@ -81,7 +82,7 @@ abstract class MetaCRUD {
 	/**
 	 * Updates the meta value for a specific course and user in the AVL course meta table.
 	 *
-	 * @param int    $course_id   The ID of the course.
+	 * @param int    $post_id   The ID of the course.
 	 * @param int    $user_id     The ID of the user.
 	 * @param string $meta_key    The meta key.
 	 * @param mixed  $meta_value  The meta value.
@@ -89,7 +90,7 @@ abstract class MetaCRUD {
 	 *
 	 * @return int|false The number of rows affected on success, or false on failure.
 	 */
-	public static function update( int $course_id, int $user_id, string $meta_key, mixed $meta_value, mixed $prev_value = null ): int|false {
+	public static function update( int $post_id, int $user_id, string $meta_key, mixed $meta_value, mixed $prev_value = null ): int|false {
 
 		global $wpdb;
 
@@ -97,9 +98,9 @@ abstract class MetaCRUD {
 
 		$exists = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT meta_id FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+				"SELECT meta_id FROM %1\$s WHERE post_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
 				$table_name,
-				$course_id,
+				$post_id,
 				$user_id,
 				$meta_key
 			)
@@ -109,7 +110,7 @@ abstract class MetaCRUD {
 			return $wpdb->insert(
 				$table_name,
 				[
-					'course_id'  => $course_id,
+					'post_id'    => $post_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
 					'meta_value' => \maybe_serialize( $meta_value ),
@@ -125,9 +126,9 @@ abstract class MetaCRUD {
 					'meta_value' => \maybe_serialize( $meta_value ),
 				],
 				[ // where
-					'course_id' => $course_id,
-					'user_id'   => $user_id,
-					'meta_key'  => $meta_key,
+					'post_id'  => $post_id,
+					'user_id'  => $user_id,
+					'meta_key' => $meta_key,
 				],
 				[ // format
 					'%s',
@@ -145,7 +146,7 @@ abstract class MetaCRUD {
 					'meta_value' => \maybe_serialize( $meta_value ),
 				],
 				[ // where
-					'course_id'  => $course_id,
+					'post_id'    => $post_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
 					'meta_value' => \maybe_serialize( $prev_value ),
@@ -167,14 +168,14 @@ abstract class MetaCRUD {
 	/**
 	 * Retrieves the available course meta for a specific course and user.
 	 *
-	 * @param int    $course_id The ID of the course.
+	 * @param int    $post_id The ID of the course.
 	 * @param int    $user_id   The ID of the user.
 	 * @param string $meta_key  The meta key to retrieve.
 	 * @param bool   $single    Optional. Whether to return a single value or an array of values. Default is false.
 	 *
 	 * @return mixed The course meta value(s).
 	 */
-	public static function get( int $course_id, int $user_id, string $meta_key, ?bool $single = false ) {
+	public static function get( int $post_id, int $user_id, string $meta_key, ?bool $single = false ) {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . static::$table_name;
@@ -182,9 +183,9 @@ abstract class MetaCRUD {
 		if (empty($meta_key)) {
 			$results = $wpdb->get_results(
 				$wpdb->prepare(
-					'SELECT meta_key, meta_value FROM %1$s WHERE course_id = %2$d AND user_id = %3$d',
+					'SELECT meta_key, meta_value FROM %1$s WHERE post_id = %2$d AND user_id = %3$d',
 					$table_name,
-					$course_id,
+					$post_id,
 					$user_id
 				)
 			);
@@ -193,9 +194,9 @@ abstract class MetaCRUD {
 
 		$meta_value = $wpdb->get_col(
 			$wpdb->prepare(
-				"SELECT meta_value FROM %1\$s WHERE course_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
+				"SELECT meta_value FROM %1\$s WHERE post_id = %2\$d AND user_id = %3\$d AND meta_key = '%4\$s'",
 				$table_name,
-				$course_id,
+				$post_id,
 				$user_id,
 				$meta_key
 			)
@@ -214,14 +215,14 @@ abstract class MetaCRUD {
 	/**
 	 * Deletes the available course meta for a specific course and user.
 	 *
-	 * @param int         $course_id   The ID of the course.
+	 * @param int         $post_id   The ID of the course.
 	 * @param int         $user_id     The ID of the user.
 	 * @param string|null $meta_key    Optional. The meta key to delete. Default is null.
 	 * @param mixed       $meta_value  Optional. The meta value to delete. Default is an empty string.
 	 *
 	 * @return int|false 移除的數量, or false on error.
 	 */
-	public static function delete( int $course_id, int $user_id, string|null $meta_key = null, mixed $meta_value = '' ): int|false {
+	public static function delete( int $post_id, int $user_id, string|null $meta_key = null, mixed $meta_value = '' ): int|false {
 		global $wpdb;
 		$table_name = $wpdb->prefix . static::$table_name;
 
@@ -229,8 +230,8 @@ abstract class MetaCRUD {
 			return $wpdb->delete(
 				$table_name,
 				[
-					'course_id' => $course_id,
-					'user_id'   => $user_id,
+					'post_id' => $post_id,
+					'user_id' => $user_id,
 				],
 				[ '%d', '%d' ]
 			);
@@ -240,7 +241,7 @@ abstract class MetaCRUD {
 			return $wpdb->delete(
 				$table_name,
 				[
-					'course_id'  => $course_id,
+					'post_id'    => $post_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
 					'meta_value' => \maybe_serialize($meta_value),
@@ -256,9 +257,9 @@ abstract class MetaCRUD {
 			return $wpdb->delete(
 				$table_name,
 				[
-					'course_id' => $course_id,
-					'user_id'   => $user_id,
-					'meta_key'  => $meta_key,
+					'post_id'  => $post_id,
+					'user_id'  => $user_id,
+					'meta_key' => $meta_key,
 				],
 				[
 					'%d',

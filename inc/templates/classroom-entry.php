@@ -16,9 +16,9 @@
  */
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Utils\AVLCourseMeta;
+use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -77,6 +77,8 @@ if (!current_user_can('manage_options')) {
 		exit;
 	}
 }
+
+do_action('power_course_before_classroom_render');
 
 // phpcs:disable
 ?>

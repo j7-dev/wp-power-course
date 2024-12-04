@@ -1,7 +1,6 @@
 <?php
 /**
- * Factory
- * 我希望 new ChapterFactory() 時，能夠創建一個新的 Chapter 物件
+ * Chapter Utils
  */
 
 declare(strict_types=1);
@@ -9,22 +8,14 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Resources\Chapter;
 
 use J7\WpUtils\Classes\WP;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
- * Class Factory
+ * Class Utils
  */
-final class Factory {
+abstract class Utils {
 
 	const TEMPLATE = '';
-
-	/**
-	 * Constructor
-	 *
-	 * @param array $args Arguments.
-	 */
-	public function __construct( $args = [] ) {
-		self::create_chapter($args);
-	}
 
 	/**
 	 * Create a new chapter
@@ -37,7 +28,7 @@ final class Factory {
 	 *
 	 * @return int|\WP_Error
 	 */
-	public static function create_chapter( array $args ): int|\WP_Error {
+	public static function create_chapter( array $args = [] ): int|\WP_Error {
 		WP::include_required_params(
 			$args,
 			[
@@ -280,5 +271,41 @@ final class Factory {
 		$update_result = \wp_update_post($args);
 
 		return $update_result;
+	}
+
+	/**
+	 * 檢查章節是否可存取
+	 *
+	 * @param int|null $chapter_id 章節 ID.
+	 * @param int|null $user_id 用戶 ID.
+	 * @return bool
+	 */
+	public static function is_avl( ?int $chapter_id = 0, ?int $user_id = null ): bool {
+		$user_id = $user_id ?? \get_current_user_id();
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		if (!$chapter_id) {
+			global $chapter;
+			if (!( $chapter instanceof \WP_Post )) {
+				return false;
+			}
+			$chapter_id = $chapter->ID;
+		}
+
+		$chapter_obj = new Chapter( (int) $chapter_id );
+
+		$course_id = $chapter_obj->get_course_id();
+		if ( !$course_id ) {
+			return false;
+		}
+
+		$can_access_course = CourseUtils::is_avl( (int) $course_id, (int) $user_id);
+		if ( !$can_access_course ) {
+			return false;
+		}
+
+		return true; // 可能可以 apply filters
 	}
 }
