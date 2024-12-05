@@ -10,6 +10,7 @@ import {
 import { QueryObserverResult } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { TRevenue, TFormattedRevenue } from '../types'
+import { Form } from 'antd'
 
 const defaultQuery = {
 	order: 'asc',
@@ -42,6 +43,8 @@ const useRevenue = () => {
 	const totalPages = Number(result?.data?.headers?.['x-wp-totalpages']) || 1
 	const total = Number(result?.data?.headers?.['x-wp-total']) || 1
 
+	const [form] = Form.useForm()
+
 	return {
 		result: formattedResult,
 		filterProps: {
@@ -51,6 +54,7 @@ const useRevenue = () => {
 			query,
 			totalPages,
 			total,
+			form,
 		},
 	}
 }
