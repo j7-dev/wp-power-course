@@ -5,9 +5,10 @@
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\Api\OverrideWCReports\Revenue;
+namespace J7\PowerCourse\Api\Reports\Revenue;
 
 use J7\WpUtils\Classes\ApiBase;
+use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
 
 /**
  * Revenue Api
@@ -50,9 +51,9 @@ final class Api extends ApiBase {
 		// 取得不包含退款的訂單數量
 		'non_refunded_orders_count' => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status != "wc-refunded" THEN 1 ELSE 0 END ) as non_refunded_orders_count',
 		// 取得學生數量
-		'student_count'             => 'COALESCE(SUM(student_count), 0) as student_count',
+		// 'student_count'             => 'COALESCE(SUM(student_count), 0) as student_count',
 		// 完成的章節數量
-		'finished_chapters_count'   => 'COALESCE(SUM(finished_chapters_count), 0) as finished_chapters_count',
+		// 'finished_chapters_count'   => 'COALESCE(SUM(finished_chapters_count), 0) as finished_chapters_count',
 	];
 
 
@@ -67,9 +68,9 @@ final class Api extends ApiBase {
 		// 取得不包含退款的訂單數量
 		'non_refunded_orders_count' => 'intval',
 		// 取得學生數量
-		'student_count'             => 'intval',
+		// 'student_count'             => 'intval',
 		// 完成的章節數量
-		'finished_chapters_count'   => 'intval',
+		// 'finished_chapters_count'   => 'intval',
 	];
 
 	/**
@@ -80,6 +81,7 @@ final class Api extends ApiBase {
 
 		\add_filter( 'woocommerce_admin_report_columns', [ $this, 'add_report_columns' ], 100, 3 );
 		\add_filter( 'woocommerce_rest_reports_column_types', [ $this, 'add_report_column_types' ], 100, 2 );
+		\add_filter( 'woocommerce_analytics_report_should_use_cache', [ $this, 'disable_cache_in_local' ], 100, 2 );
 	}
 
 
@@ -102,7 +104,7 @@ final class Api extends ApiBase {
 		$query_args = [
 			'before'              => $params['before'] ?? null,
 			'after'               => $params['after'] ?? null,
-			'interval'            => $params['interval'] ?? '週',
+			'interval'            => $params['interval'] ?? 'day',
 			'page'                => $params['page'],
 			'per_page'            => $params['per_page'],
 			'orderby'             => $params['orderby'] ?? null,
@@ -225,5 +227,16 @@ final class Api extends ApiBase {
 	 */
 	public function add_report_column_types( $column_types, $array ) {
 		return array_merge($column_types, $this->extra_report_column_types);
+	}
+
+	/**
+	 * 禁用本地報表的快取
+	 *
+	 * @param bool   $should_cache 是否快取資料
+	 * @param string $cache_key 快取鍵
+	 * @return bool
+	 */
+	public function disable_cache_in_local( $should_cache, $cache_key ) {
+		return 'local' !== \wp_get_environment_type();
 	}
 }

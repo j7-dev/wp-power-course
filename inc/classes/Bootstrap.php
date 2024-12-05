@@ -48,7 +48,7 @@ final class Bootstrap {
 		Api\Upload::instance();
 		Api\Option::instance();
 		Api\Comment::instance();
-		Api\OverrideWCReports\Revenue\Api::instance();
+		Api\Reports\Revenue\Api::instance();
 
 		Templates\Templates::instance();
 		Templates\Ajax::instance();
