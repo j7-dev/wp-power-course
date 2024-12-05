@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api\Reports\Revenue;
 
 use J7\WpUtils\Classes\ApiBase;
+use J7\WpUtils\Classes\General;
 use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
 
 /**
  * Revenue Api
@@ -253,7 +253,7 @@ final class Api extends ApiBase {
 	 */
 	public function extend_student_count_stats( object $data, array $query_args ): object { // phpcs:ignore
 		global $wpdb;
-		$sql = $this->get_sql_group_by_day( $query_args );
+		$sql = $this->get_course_sql( $query_args );
 		/** @var array<int, array{time_interval: string, record_value: string}> $results */
 		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
 		$total_student_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
@@ -261,7 +261,7 @@ final class Api extends ApiBase {
 		$data->totals->student_count = $total_student_count;
 		$data->intervals             = array_map(
 				function ( $interval ) use ( $results ) {
-					$target                               = Base::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
+					$target                               = General::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
 					$interval['subtotals']->student_count = $target ? (float) $target['record_value'] : 0;
 					return $interval;
 				},
@@ -272,19 +272,38 @@ final class Api extends ApiBase {
 
 	/**
 	 * 擴展完成的章節數量統計
+	 *
+	 *  @param object{totals: object{finished_chapters_count: int}, intervals: array<array{subtotals: object{finished_chapters_count: int}}>}                                                                $data 數據
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @return object{totals: array{finished_chapters_count: int}, intervals: array<array{subtotals: array{finished_chapters_count: int}}>}
 	 */
 	public function extend_finished_chapters_count_stats( $data, $query_args ) {
+		global $wpdb;
+		$sql = $this->get_chapter_sql( $query_args );
+		/** @var array<int, array{time_interval: string, record_value: string}> $results */
+		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
+		$total_finished_chapters_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
+
+		$data->totals->finished_chapters_count = $total_finished_chapters_count;
+		$data->intervals                       = array_map(
+				function ( $interval ) use ( $results ) {
+					$target = General::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
+					$interval['subtotals']->finished_chapters_count = $target ? (float) $target['record_value'] : 0;
+					return $interval;
+				},
+			$data->intervals
+			);
 		return $data;
 	}
 
 
 	/**
-	 * 取得每日學生數量統計的 SQL 語句
+	 * 取得學生數量統計的 SQL 語句
 	 *
 	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
 	 * @return string
 	 */
-	private function get_sql_group_by_day( array $query_args ): string {
+	private function get_course_sql( array $query_args ): string {
 
 		global $wpdb;
 		$prefix     = $wpdb->prefix;
@@ -292,11 +311,14 @@ final class Api extends ApiBase {
 
 		[
 			'before' => $before,
-			'after' => $after
+			'after' => $after,
+			'interval' => $interval,
 		] = $query_args;
 
+		$date_format = $this->get_date_format( $interval );
+
 		return "SELECT
-					DATE(meta_value) as time_interval,
+					{$date_format} as time_interval,
 					COUNT(DISTINCT user_id) as record_value
 			FROM
 					{$table_name}
@@ -304,8 +326,60 @@ final class Api extends ApiBase {
 					meta_key = 'course_granted_at'
 					AND meta_value BETWEEN '{$after}' AND '{$before}'
 			GROUP BY
-					DATE(meta_value)
+					time_interval
 			ORDER BY
 					time_interval ASC;";
+	}
+
+
+	/**
+	 * 取得完成的章節數量統計的 SQL 語句
+	 *
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @return string
+	 */
+	private function get_chapter_sql( array $query_args ): string {
+
+		global $wpdb;
+		$prefix     = $wpdb->prefix;
+		$table_name = $prefix . Plugin::CHAPTER_TABLE_NAME;
+
+		[
+			'before' => $before,
+			'after' => $after,
+			'interval' => $interval,
+		] = $query_args;
+
+		$date_format = $this->get_date_format( $interval );
+
+		return "SELECT
+					{$date_format} as time_interval,
+					COUNT(meta_value) as record_value
+			FROM
+					{$table_name}
+			WHERE
+					meta_key = 'finished_at'
+					AND meta_value BETWEEN '{$after}' AND '{$before}'
+			GROUP BY
+					time_interval
+			ORDER BY
+					time_interval ASC;";
+	}
+
+	/**
+	 * 取得日期SQL格式
+	 *
+	 * @param string $interval 間隔
+	 * @return string
+	 */
+	private function get_date_format( string $interval ): string {
+		return match ($interval) {
+			'day' => 'DATE(meta_value)',
+			'week' => 'DATE_FORMAT(meta_value, "%x-%v")',
+			'month' => 'DATE_FORMAT(meta_value, "%x-%m")',
+			'quarter' => 'CONCAT(YEAR(meta_value), "-", QUARTER(meta_value))',
+			'year' => 'DATE_FORMAT(meta_value, "%x")',
+			default => 'DATE(meta_value)',
+		};
 	}
 }

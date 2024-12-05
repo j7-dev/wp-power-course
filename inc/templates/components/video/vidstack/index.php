@@ -7,7 +7,7 @@
  */
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
+use J7\WpUtils\Classes\General;
 
 $default_args = [
 	'class'          => 'rounded-xl',
@@ -66,7 +66,7 @@ $wp_current_user = \wp_get_current_user();
 $email           = $wp_current_user ? $wp_current_user->user_email : '';
 $display_name    = $wp_current_user ? $wp_current_user->display_name : '';
 $username        = $wp_current_user ? $wp_current_user->user_login : '';
-$ip              = Base::get_real_ip();
+$ip              = General::get_client_ip() ?? '';
 global $chapter;
 $post_title = $chapter ? $chapter?->post_title : '';
 

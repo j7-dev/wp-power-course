@@ -131,43 +131,4 @@ abstract class Base {
 
 		return false;
 	}
-
-
-	/**
-	 * 取得真實 IP
-	 * TODO 添加到 wp-utils
-	 *
-	 * @return string
-	 */
-	public static function get_real_ip(): string {
-		// phpcs:disable
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'] ?? '';
-		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '';
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-		}
-		// phpcs:enable
-		return (string) $ip;
-	}
-
-
-	/**
-	 * Array Find
-	 * TODO 添加到 wp-utils
-	 *
-	 * @param array<array-key, mixed> $array 陣列
-	 * @param callable                $callback 回調函數
-	 *
-	 * @return mixed|null
-	 */
-	public static function array_find( array $array, callable $callback ) {
-		foreach ( $array as $key => $item ) {
-			if ( $callback( $item, $key ) ) {
-				return $item;
-			}
-		}
-		return null;
-	}
 }
