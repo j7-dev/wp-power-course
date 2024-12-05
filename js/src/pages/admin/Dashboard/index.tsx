@@ -34,10 +34,6 @@ const cards = [
 		slug: 'student_count',
 	},
 	{
-		title: '新學員數',
-		slug: 'newStudentCount',
-	},
-	{
 		title: '單元完成數量',
 		slug: 'completedUnitCount',
 	},
