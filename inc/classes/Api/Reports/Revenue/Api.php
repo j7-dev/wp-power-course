@@ -9,6 +9,8 @@ namespace J7\PowerCourse\Api\Reports\Revenue;
 
 use J7\WpUtils\Classes\ApiBase;
 use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
+use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Utils\Base;
 
 /**
  * Revenue Api
@@ -82,6 +84,8 @@ final class Api extends ApiBase {
 		\add_filter( 'woocommerce_admin_report_columns', [ $this, 'add_report_columns' ], 100, 3 );
 		\add_filter( 'woocommerce_rest_reports_column_types', [ $this, 'add_report_column_types' ], 100, 2 );
 		\add_filter( 'woocommerce_analytics_report_should_use_cache', [ $this, 'disable_cache_in_local' ], 100, 2 );
+		\add_filter('power_course_reports_revenue_stats', [ $this, 'extend_student_count_stats' ], 100, 2 );
+		\add_filter('power_course_reports_revenue_stats', [ $this, 'extend_finished_chapters_count_stats' ], 110, 2 );
 	}
 
 
@@ -142,8 +146,8 @@ final class Api extends ApiBase {
 		$query = new Query( $query_args );
 
 		/**
-		 * @var array{
-		 *     totals: array{
+		 * @var object{
+		 *     totals: object{
 		 *         orders_count: int,
 		 *         num_items_sold: int,
 		 *         total_sales: float,
@@ -163,7 +167,7 @@ final class Api extends ApiBase {
 		 *         date_start_gmt: string,
 		 *         date_end: string,
 		 *         date_end_gmt: string,
-		 *         subtotals: array{
+		 *         subtotals: object{
 		 *             orders_count: int,
 		 *             num_items_sold: int,
 		 *             total_sales: float,
@@ -238,5 +242,70 @@ final class Api extends ApiBase {
 	 */
 	public function disable_cache_in_local( $should_cache, $cache_key ) {
 		return 'local' !== \wp_get_environment_type();
+	}
+
+	/**
+	 * 擴展學生數量統計
+	 *
+	 * @param object{totals: object{student_count: int}, intervals: array<array{subtotals: object{student_count: int}}>}                                                                                    $data 數據
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @return object{totals: array{student_count: int}, intervals: array<array{subtotals: array{student_count: int}}>}
+	 */
+	public function extend_student_count_stats( object $data, array $query_args ): object { // phpcs:ignore
+		global $wpdb;
+		$sql = $this->get_sql_group_by_day( $query_args );
+		/** @var array<int, array{time_interval: string, record_value: string}> $results */
+		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
+		$total_student_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
+
+		$data->totals->student_count = $total_student_count;
+		$data->intervals             = array_map(
+				function ( $interval ) use ( $results ) {
+					$target                               = Base::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
+					$interval['subtotals']->student_count = $target ? (float) $target['record_value'] : 0;
+					return $interval;
+				},
+			$data->intervals
+			);
+		return $data;
+	}
+
+	/**
+	 * 擴展完成的章節數量統計
+	 */
+	public function extend_finished_chapters_count_stats( $data, $query_args ) {
+		return $data;
+	}
+
+
+	/**
+	 * 取得每日學生數量統計的 SQL 語句
+	 *
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @return string
+	 */
+	private function get_sql_group_by_day( array $query_args ): string {
+
+		global $wpdb;
+		$prefix     = $wpdb->prefix;
+		$table_name = $prefix . Plugin::COURSE_TABLE_NAME;
+
+		[
+			'before' => $before,
+			'after' => $after
+		] = $query_args;
+
+		return "SELECT
+					DATE(meta_value) as time_interval,
+					COUNT(DISTINCT user_id) as record_value
+			FROM
+					{$table_name}
+			WHERE
+					meta_key = 'course_granted_at'
+					AND meta_value BETWEEN '{$after}' AND '{$before}'
+			GROUP BY
+					DATE(meta_value)
+			ORDER BY
+					time_interval ASC;";
 	}
 }
