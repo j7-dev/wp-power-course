@@ -22,11 +22,11 @@ final class Query extends WCQuery {
 	 */
 	public function get_data() {
 
-		$args = apply_filters( 'woocommerce_analytics_revenue_query_args', $this->get_query_vars() );
+		$args = \apply_filters( 'woocommerce_analytics_revenue_query_args', $this->get_query_vars() );
 
 		$data_store = DataStore::instance();
 		$results    = $data_store->get_data( $args );
 
-		return apply_filters( 'woocommerce_analytics_revenue_select_query', $results, $args );
+		return \apply_filters( 'woocommerce_analytics_revenue_select_query', $results, $args );
 	}
 }
