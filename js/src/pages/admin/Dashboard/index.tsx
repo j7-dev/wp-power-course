@@ -35,7 +35,7 @@ const cards = [
 	},
 	{
 		title: '單元完成數量',
-		slug: 'completedUnitCount',
+		slug: 'finished_chapters_count',
 	},
 
 	// 以下為 WC 原本就有的數據

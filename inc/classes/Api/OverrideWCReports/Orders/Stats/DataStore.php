@@ -49,7 +49,8 @@ final class DataStore extends WCDataStore {
 						0 as gross_sales,
 						0 as refunded_orders_count,
 						0 as non_refunded_orders_count,
-						course_meta.student_count as student_count
+						course_meta.student_count as student_count,
+						course_meta.finished_chapters_count as finished_chapters_count
 						';
 
 	/**
@@ -75,12 +76,16 @@ final class DataStore extends WCDataStore {
 		/** @var \DateTime $after */
 		$after = $query_args['after'];
 		global $wpdb;
-		$course_table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
+		$course_table_name  = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
+		$chapter_table_name = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
 
-		// $student_join = "LEFT JOIN {$table_name} as avl ON avl.meta_key = '{$meta_key}'
-		// AND avl.meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'";
-
-		$student_join = "LEFT JOIN (
+		$join_start = 'LEFT JOIN ';
+		$join_table = "(
+			SELECT
+					COALESCE(course.granted_date, chapter.chapter_date) AS date,
+					COALESCE(course.student_count, 0) AS student_count,
+					COALESCE(chapter.finished_chapters_count, 0) AS finished_chapters_count
+			FROM (
 					SELECT
 							DATE_FORMAT(meta_value, '%Y-%m-%d') AS granted_date,
 							COUNT(DISTINCT user_id) AS student_count
@@ -90,23 +95,73 @@ final class DataStore extends WCDataStore {
 							meta_key = 'course_granted_at'
 							AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
 					GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
-			) course_meta ON DATE_FORMAT(wp_wc_order_stats.date_paid, '%Y-%m-%d') = course_meta.granted_date";
+			) course
+			LEFT JOIN (
+					SELECT
+							DATE_FORMAT(meta_value, '%Y-%m-%d') AS chapter_date,
+							COUNT(*) AS finished_chapters_count
+					FROM
+							{$chapter_table_name}
+					WHERE
+							meta_key = 'finished_at'
+							AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
+					GROUP BY
+							DATE_FORMAT(meta_value, '%Y-%m-%d')
+			) chapter ON course.granted_date = chapter.chapter_date
 
-		$this->total_query->add_sql_clause( 'left_join', $student_join );
-		$this->interval_query->add_sql_clause( 'left_join', $student_join );
+			UNION
 
-		$this->compose_course_union_query( $datastore, $query_args, $params );
+			SELECT
+					chapter.chapter_date AS date,
+					0 AS student_count,
+					chapter.finished_chapters_count
+			FROM (
+					SELECT
+							DATE_FORMAT(meta_value, '%Y-%m-%d') AS chapter_date,
+							COUNT(*) AS finished_chapters_count
+					FROM
+							{$chapter_table_name}
+					WHERE
+							meta_key = 'finished_at'
+							AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
+					GROUP BY
+							DATE_FORMAT(meta_value, '%Y-%m-%d')
+			) chapter
+			LEFT JOIN (
+					SELECT
+							DATE_FORMAT(meta_value, '%Y-%m-%d') AS granted_date,
+							COUNT(DISTINCT user_id) AS student_count
+					FROM
+							{$course_table_name}
+					WHERE
+							meta_key = 'course_granted_at'
+							AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
+					GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
+			) course ON chapter.chapter_date = course.granted_date
+			WHERE course.granted_date IS NULL
+
+		) course_meta";
+
+		$join_end = "  ON DATE_FORMAT(wp_wc_order_stats.date_paid, '%Y-%m-%d') = course_meta.date";
+
+		$join = $join_start . $join_table . $join_end;
+
+		$this->total_query->add_sql_clause( 'left_join', $join );
+		$this->interval_query->add_sql_clause( 'left_join', $join );
+
+		$this->compose_course_union_query( $join_table, $datastore, $query_args, $params );
 	}
 
 	/**
 	 * Compose course union query
 	 *
+	 * @param string                            $join_table Join table name
 	 * @param self                              $datastore Datastore instance
 	 * @param array                             $query_args Query parameters.
 	 * @param array{offset: int, per_page: int} $params                  Query limit parameters.
 	 * @return void
 	 */
-	private function compose_course_union_query( self $datastore, $query_args, $params ): void {
+	private function compose_course_union_query( string $join_table, self $datastore, $query_args, $params ): void {
 		/** @var \DateTime $before */
 		$before = $query_args['before'];
 		/** @var \DateTime $after */
@@ -122,17 +177,7 @@ final class DataStore extends WCDataStore {
 
 		$this->total_union_query->add_sql_clause(
 		'from',
-		"
-						(
-						SELECT
-						DATE_FORMAT(meta_value, '%Y-%m-%d') AS granted_date,
-						COUNT(DISTINCT user_id) AS student_count
-						FROM {$course_table_name}
-						WHERE meta_key = 'course_granted_at'
-						AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
-						GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
-						) course_meta
-		"
+		$join_table
 		);
 
 		$this->total_union_query->add_sql_clause(
@@ -141,7 +186,7 @@ final class DataStore extends WCDataStore {
 		SELECT DISTINCT DATE_FORMAT(date_paid, '%Y-%m-%d') AS order_date
 		FROM {$wpdb->prefix}wc_order_stats
 		WHERE date_paid BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
-		) orders ON course_meta.granted_date = orders.order_date
+		) orders ON course_meta.date = orders.order_date
 		"
 		);
 
@@ -161,7 +206,7 @@ final class DataStore extends WCDataStore {
 		$this->interval_union_query->add_sql_clause(
 			'select',
 			'
-						course_meta.granted_date AS time_interval,
+						course_meta.date AS time_interval,
 						NULL AS datetime_anchor,
 						' . $this->base_select
 			);
@@ -268,7 +313,10 @@ final class DataStore extends WCDataStore {
 		$unique_coupons             = $this->get_unique_coupon_count( $totals_query['from_clause'], $totals_query['where_time_clause'], $totals_query['where_clause'] );
 		$totals[0]['coupons_count'] = $unique_coupons;
 		$totals[0]['segments']      = $segmenter->get_totals_segments( $totals_query, $table_name );
-		$totals                     = (object) $this->cast_numbers( $totals[0] );
+
+		$totals[0]['student_count']           = array_reduce($totals, fn( $acc, $item ) => $acc + (float) $item['student_count'], 0);
+		$totals[0]['finished_chapters_count'] = array_reduce($totals, fn( $acc, $item ) => $acc + (float) $item['finished_chapters_count'], 0);
+		$totals                               = (object) $this->cast_numbers( $totals[0] );
 
 		$this->interval_query->add_sql_clause( 'select', $this->get_sql_clause( 'select' ) . ' AS time_interval' );
 		$this->interval_query->add_sql_clause( 'left_join', $coupon_join );
@@ -333,7 +381,7 @@ final class DataStore extends WCDataStore {
 	 * @return bool
 	 */
 	protected function set_cached_data( $cache_key, $value ) {
-		if ( $this->should_use_cache() ) {
+		if ( $this->should_use_cache() && 'local' !== \wp_get_environment_type() ) {
 			$transient_version = Cache::get_version();
 			$transient_value   = [
 				'version' => $transient_version,
