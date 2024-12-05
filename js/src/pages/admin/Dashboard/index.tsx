@@ -1,8 +1,9 @@
 import React from 'react'
-import { Statistic, Card } from 'antd'
-import { Line } from '@ant-design/plots'
+import { Statistic, Card, Form } from 'antd'
+import { Line, LineConfig } from '@ant-design/plots'
 import Filter from './Filter'
 import useRevenue from './hooks/useRevenue'
+import dayjs from 'dayjs'
 
 const cards = [
 	{
@@ -78,22 +79,26 @@ const index = () => {
 	const { result, filterProps } = useRevenue()
 	const revenueData = result?.data?.data
 	const intervals = revenueData?.intervals || []
+	const form = filterProps.form
+	const watchInterval = Form.useWatch(['interval'], form)
+
 	console.log('⭐  intervals:', intervals)
 
-	const config = {
+	const config: LineConfig = {
 		data: intervals,
 		xField: 'interval',
 		point: {
 			shapeField: 'square',
 			sizeField: 1,
 		},
-		interaction: {
-			tooltip: {
-				marker: false,
-			},
+		tooltip: {
+			items: [
+				{ name: '值', channel: 'y' },
+			],
 		},
 		style: {
 			lineWidth: 2,
+			shape: 'smooth',
 		},
 	}
 
@@ -120,7 +125,27 @@ const index = () => {
 
 				{cards.map((card) => (
 					<Card key={card.slug} title={card.title}>
-						<Line {...config} className="aspect-video" yField={card.slug} />
+						<Line
+							{...config}
+							className="aspect-video"
+							yField={card.slug}
+							tooltip={{
+								title: ({ date_start, date_end, interval }) => {
+									if ('day' === watchInterval) {
+										return interval
+									}
+
+									if (date_start && date_end) {
+										const dateStart = dayjs(date_start).format('YYYY-MM-DD')
+										const dateEnd = dayjs(date_end).format('YYYY-MM-DD')
+										return `${dateStart} ~ ${dateEnd}`
+									}
+								},
+								items: [
+									{ name: card.title, channel: 'y' },
+								],
+							}}
+						/>
 					</Card>
 				))}
 			</div>

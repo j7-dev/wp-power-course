@@ -6,27 +6,16 @@ import {
 	Select,
 	Form,
 	Checkbox,
+	FormInstance,
 } from 'antd'
 import { useSelect } from '@refinedev/antd'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { defaultSelectProps } from '@/utils'
 import { TQuery } from '../hooks/useRevenue'
 
 const { RangePicker } = DatePicker
 const { Item } = Form
-
-const onRangeChange = (
-	dates: null | (Dayjs | null)[],
-	dateStrings: string[],
-) => {
-	if (dates) {
-		console.log('From: ', dates[0], ', to: ', dates[1])
-		console.log('From: ', dateStrings[0], ', to: ', dateStrings[1])
-	} else {
-		console.log('Clear')
-	}
-}
 
 const rangePresets: TimeRangePickerProps['presets'] = [
 	{
@@ -59,10 +48,10 @@ export type TFilterProps = {
 	query: TQuery
 	totalPages: number
 	total: number
+	form: FormInstance
 }
 
-const index = ({ setQuery, isFetching }: TFilterProps) => {
-	const [form] = Form.useForm()
+const index = ({ setQuery, isFetching, form }: TFilterProps) => {
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
 		resource: 'courses',
 		optionLabel: 'name',
@@ -108,7 +97,6 @@ const index = ({ setQuery, isFetching }: TFilterProps) => {
 				>
 					<RangePicker
 						presets={rangePresets}
-						onChange={onRangeChange}
 						disabledDate={(current) =>
 							current && current > dayjs().endOf('day')
 						}
