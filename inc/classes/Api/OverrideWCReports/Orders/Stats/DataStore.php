@@ -30,6 +30,7 @@ final class DataStore extends WCDataStore {
 
 	/**
 	 * Base select
+	 * UNION JOIN 的基礎欄位
 	 *
 	 * @var string
 	 */
@@ -74,8 +75,7 @@ final class DataStore extends WCDataStore {
 		/** @var \DateTime $after */
 		$after = $query_args['after'];
 		global $wpdb;
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-		$meta_key   = 'course_granted_at';
+		$course_table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
 		// $student_join = "LEFT JOIN {$table_name} as avl ON avl.meta_key = '{$meta_key}'
 		// AND avl.meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'";
@@ -85,35 +85,34 @@ final class DataStore extends WCDataStore {
 							DATE_FORMAT(meta_value, '%Y-%m-%d') AS granted_date,
 							COUNT(DISTINCT user_id) AS student_count
 					FROM
-							{$table_name}
+							{$course_table_name}
 					WHERE
-							meta_key = '{$meta_key}'
+							meta_key = 'course_granted_at'
 							AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
-							GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
+					GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
 			) course_meta ON DATE_FORMAT(wp_wc_order_stats.date_paid, '%Y-%m-%d') = course_meta.granted_date";
 
 		$this->total_query->add_sql_clause( 'left_join', $student_join );
 		$this->interval_query->add_sql_clause( 'left_join', $student_join );
 
-		$this->compose_union_query( $datastore, $query_args, $params );
+		$this->compose_course_union_query( $datastore, $query_args, $params );
 	}
 
 	/**
-	 * Modify the query
+	 * Compose course union query
 	 *
 	 * @param self                              $datastore Datastore instance
 	 * @param array                             $query_args Query parameters.
 	 * @param array{offset: int, per_page: int} $params                  Query limit parameters.
 	 * @return void
 	 */
-	private function compose_union_query( self $datastore, $query_args, $params ): void {
+	private function compose_course_union_query( self $datastore, $query_args, $params ): void {
 		/** @var \DateTime $before */
 		$before = $query_args['before'];
 		/** @var \DateTime $after */
 		$after = $query_args['after'];
 		global $wpdb;
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-		$meta_key   = 'course_granted_at';
+		$course_table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
 		$this->total_union_query = new SqlQuery( $this->context . '_total_union' );
 		$this->total_union_query->add_sql_clause(
@@ -128,8 +127,8 @@ final class DataStore extends WCDataStore {
 						SELECT
 						DATE_FORMAT(meta_value, '%Y-%m-%d') AS granted_date,
 						COUNT(DISTINCT user_id) AS student_count
-						FROM {$table_name}
-						WHERE meta_key = '{$meta_key}'
+						FROM {$course_table_name}
+						WHERE meta_key = 'course_granted_at'
 						AND meta_value BETWEEN '{$after->format('Y-m-d H:i:s')}' AND '{$before->format('Y-m-d H:i:s')}'
 						GROUP BY DATE_FORMAT(meta_value, '%Y-%m-%d')
 						) course_meta
