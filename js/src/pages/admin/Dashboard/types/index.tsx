@@ -30,6 +30,8 @@ export type TIntervalBase = {
 	date_start_gmt: string // '2022-12-31 16:00:00'
 	date_end: string // '2023-01-01 23:59:59'
 	date_end_gmt: string // '2023-01-01 15:59:59'
+	interval_compared: string // '2023-01-01' // 用來比較的時間段，如果跟去年比較，這個欄位會顯示今年的值
+	dataLabel: string // '今年'
 }
 
 export type TRevenue = {
@@ -46,5 +48,6 @@ export type TFormattedRevenue = {
 
 export type TViewTypeProps = {
 	revenueData: TFormattedRevenue | undefined
+	lastYearRevenueData: TFormattedRevenue | undefined
 	form: FormInstance
 }
