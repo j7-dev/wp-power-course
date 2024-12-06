@@ -8,9 +8,10 @@ import {
 	Checkbox,
 	Tooltip,
 	FormInstance,
+	DatePickerProps,
 } from 'antd'
 import { useSelect } from '@refinedev/antd'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { defaultSelectProps } from '@/utils'
 import { TQuery } from '../hooks/useRevenue'
@@ -43,6 +44,21 @@ const rangePresets: TimeRangePickerProps['presets'] = [
 	},
 	{ label: '年初至今', value: [dayjs().startOf('year'), dayjs().endOf('day')] },
 ]
+
+// Disabled 366 days from the selected date
+const disabled366DaysDate: DatePickerProps['disabledDate'] = (
+	current,
+	{ from, type },
+) => {
+	if (current && current > dayjs().endOf('day')) {
+		return true
+	}
+	if (from) {
+		return Math.abs(current.diff(from, 'days')) >= 366
+	}
+
+	return false
+}
 
 export type TFilterProps = {
 	isFetching: boolean
@@ -108,9 +124,7 @@ const index = ({
 				>
 					<RangePicker
 						presets={rangePresets}
-						disabledDate={(current) =>
-							current && current > dayjs().endOf('day')
-						}
+						disabledDate={disabled366DaysDate}
 						placeholder={['開始日期', '結束日期']}
 						allowClear={false}
 						className="w-[20rem]"

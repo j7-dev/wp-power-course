@@ -105,6 +105,8 @@ function getFormattedResult(
 ): QueryObserverResult<CustomResponse<TFormattedRevenue>, HttpError> &
 	UseLoadingOvertimeReturnType {
 	const intervals = result?.data?.data?.intervals || []
+	const lastIntervals = intervals[intervals.length - 1]
+
 	const formatIntervals = intervals.map(({ subtotals, ...restInterval }) => {
 		const interval_compared = isLastYear
 			? Number(restInterval?.interval?.slice(0, 4)) +
@@ -124,7 +126,7 @@ function getFormattedResult(
 		const newInterval = {
 			...restInterval,
 			...roundedSubtotals,
-			dataLabel: `${restInterval?.interval?.slice(0, 4)}年`,
+			dataLabel: `${lastIntervals?.interval?.slice(0, 4)}年`,
 			interval_compared,
 		}
 		return newInterval
