@@ -222,7 +222,7 @@ final class Product {
 
 		$std_response = match ($action) {
 			'update' => WcProduct::multi_update( $ids, $data, $meta_data ),
-			'create' => WcProduct::multi_create( $qty, $data, $meta_data ),
+			'create' => WcProduct::multi_create( $qty, $data['product_type'] ?? 'simple' ),
 			default => [
 				'code'    => 'post_failed',
 				'message' => '修改失敗，未知的 action',
