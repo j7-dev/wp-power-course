@@ -156,6 +156,9 @@ final class Product {
 			$default_args,
 		);
 
+		$data_type = $args['data_type'] ?? null;
+		unset( $args['data_type'] );
+
 		if ( isset( $args['price_range'] ) ) {
 			$args['meta_query']             = [];
 			$args['meta_query']['relation'] = 'AND';
@@ -176,7 +179,10 @@ final class Product {
 		$products = $results->products;
 		$products = array_filter($products);
 
-		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
+		$formatted_products = match ($data_type) {
+			'tree_select' => array_values(array_map( [ $this, 'format_tree_select' ], $products )),
+			default => array_values(array_map( [ $this, 'format_product_details' ], $products )),
+		};
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -526,7 +532,7 @@ final class Product {
 			// 'menu_order'         => $product?->get_menu_order(),
 			'virtual'                                   => $product->get_virtual(),
 			'downloadable'                              => $product->get_downloadable(),
-			'permalink'                                 => get_permalink( $product->get_id() ),
+			'permalink'                                 => \get_permalink( $product_id ),
 
 			// Get Product Prices
 			'price_html'                                => $price_html,
@@ -600,6 +606,49 @@ final class Product {
 			$description_array,
 			$base_array
 		);
+	}
+
+
+	/**
+	 * Format product Tree Select
+	 *
+	 * @see https://ant.design/components/tree-select-cn
+	 *
+	 * @param \WC_Product $product Product.
+	 * @return array
+	 */
+	public function format_tree_select( $product) { // phpcs:ignore
+
+		if ( ! ( $product instanceof \WC_Product ) ) {
+			return [];
+		}
+
+		$variation_ids = $product?->get_children(); // get variations
+		$children      = [];
+		if ( ! empty( $variation_ids ) ) {
+			$variation_products = array_map( 'wc_get_product', $variation_ids );
+			$variation_products = array_filter($variation_products);
+			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
+			$children           = [
+				'children'  => $children_details,
+				'parent_id' => (string) $product?->get_id(),
+			];
+		}
+
+		$product_id = $product->get_id();
+
+		$base_array = [
+			// Get Product General Info
+			'id'        => (string) $product_id,
+			'type'      => $product->get_type(),
+			'name'      => $product->get_name(),
+			'slug'      => $product->get_slug(),
+			'permalink' => \get_permalink( $product_id ),
+			'is_course' => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+
+		] + $children;
+
+		return $base_array;
 	}
 
 	/**
