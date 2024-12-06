@@ -21,7 +21,7 @@ const defaultQuery = {
 	before: dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
 	_locale: 'user',
 	page: 1,
-	compare_last_year: true,
+	compare_last_year: false,
 }
 
 export type TQuery = typeof defaultQuery

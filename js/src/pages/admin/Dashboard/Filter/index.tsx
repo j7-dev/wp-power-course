@@ -11,7 +11,7 @@ import {
 	DatePickerProps,
 } from 'antd'
 import { useSelect } from '@refinedev/antd'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { defaultSelectProps } from '@/utils'
 import { TQuery } from '../hooks/useRevenue'
@@ -170,7 +170,7 @@ const index = ({
 					<Checkbox>只顯示課程</Checkbox>
 					<Item
 						name={['compare_last_year']}
-						initialValue={true}
+						initialValue={false}
 						noStyle
 						valuePropName="checked"
 					>
