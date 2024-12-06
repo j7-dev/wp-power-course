@@ -1,12 +1,10 @@
 import React from 'react'
-import { Statistic, Card, Form } from 'antd'
-import { Line, LineConfig } from '@ant-design/plots'
 import Filter from './Filter'
 import useRevenue from './hooks/useRevenue'
-import dayjs from 'dayjs'
-import { TTotals } from './types'
+import DefaultView from './ViewType/DefaultView'
+import AreaView from './ViewType/AreaView'
 
-const cards = [
+export const cards = [
 	{
 		title: '淨營業額',
 		slug: 'net_revenue',
@@ -91,75 +89,38 @@ const cards = [
 	},
 ]
 
-const index = () => {
-	const { result, filterProps } = useRevenue()
-	const revenueData = result?.data?.data
-	const intervals = revenueData?.intervals || []
-	const form = filterProps.form
-	const watchInterval = Form.useWatch(['interval'], form)
-
-	console.log('⭐  intervals:', intervals)
-
-	const config: LineConfig = {
-		data: intervals,
-		xField: 'interval',
-		point: {
-			shapeField: 'square',
-			sizeField: 1,
-		},
-		style: {
-			lineWidth: 2,
-			shape: 'smooth',
-		},
+// 避免刻度太密集
+export const tickFilter = (
+	datum: string,
+	index: number,
+	datums: string[],
+): boolean => {
+	const length = datums?.length || 0
+	if (length > 12 && (length % 3 === 0 || length % 4 === 0)) {
+		if (length % 3 === 0) {
+			return (index + 1) % 3 === 0
+		}
+		if (length % 2 === 0) {
+			return (index + 1) % 2 === 0
+		}
 	}
+
+	return true
+}
+
+const index = () => {
+	const { filterProps, viewTypeProps } = useRevenue()
+
+	const viewType = filterProps.viewType
 
 	return (
 		<>
 			<div className="mb-4">
 				<Filter {...filterProps} />
 			</div>
-			<div className="grid grid-cols-3 gap-4">
-				{cards.map((card) => {
-					const total = revenueData?.totals?.[card.slug as keyof TTotals] || 0
-					return (
-						<Card
-							key={card.slug}
-							title={card.title}
-							extra={
-								<span className="text-sm text-gray-500">
-									共
-									<span className="text-2xl text-primary font-semibold mx-2">
-										{total.toLocaleString()}
-									</span>
-									{card.unit}
-								</span>
-							}
-						>
-							<Line
-								{...config}
-								className="aspect-video"
-								yField={card.slug}
-								tooltip={{
-									title: ({ date_start, date_end, interval }) => {
-										if ('day' === watchInterval) {
-											return interval
-										}
 
-										if (date_start && date_end) {
-											const dateStart = dayjs(date_start).format('YYYY-MM-DD')
-											const dateEnd = dayjs(date_end).format('YYYY-MM-DD')
-											return `${dateStart} ~ ${dateEnd}`
-										}
-									},
-									items: [
-										{ name: card.title, channel: 'y' },
-									],
-								}}
-							/>
-						</Card>
-					)
-				})}
-			</div>
+			{'default' === viewType && <DefaultView {...viewTypeProps} />}
+			{'area' === viewType && <AreaView {...viewTypeProps} />}
 		</>
 	)
 }

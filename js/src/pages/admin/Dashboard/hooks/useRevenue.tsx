@@ -9,7 +9,7 @@ import {
 } from '@refinedev/core'
 import { QueryObserverResult } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { TRevenue, TFormattedRevenue } from '../types'
+import { TRevenue, TFormattedRevenue, EViewType } from '../types'
 import { Form } from 'antd'
 
 const defaultQuery = {
@@ -27,6 +27,7 @@ export type TQuery = typeof defaultQuery
 const useRevenue = () => {
 	const apiUrl = useApiUrl()
 	const [query, setQuery] = useState(defaultQuery)
+	const [viewType, setViewType] = useState(EViewType.DEFAULT)
 
 	const result = useCustom<TRevenue>({
 		url: `${apiUrl}/reports/revenue/stats`,
@@ -54,6 +55,12 @@ const useRevenue = () => {
 			query,
 			totalPages,
 			total,
+			form,
+			viewType,
+			setViewType,
+		},
+		viewTypeProps: {
+			revenueData: formattedResult?.data?.data,
 			form,
 		},
 	}
