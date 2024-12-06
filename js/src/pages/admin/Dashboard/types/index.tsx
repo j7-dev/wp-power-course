@@ -1,3 +1,10 @@
+import { FormInstance } from 'antd'
+
+export enum EViewType {
+	DEFAULT = 'default',
+	AREA = 'area', // 面積比較圖
+}
+
 export type TTotals = {
 	orders_count: number
 	num_items_sold: number
@@ -35,4 +42,9 @@ export type TRevenue = {
 export type TFormattedRevenue = {
 	totals: TTotals
 	intervals: (TIntervalBase & TTotals)[]
+}
+
+export type TViewTypeProps = {
+	revenueData: TFormattedRevenue | undefined
+	form: FormInstance
 }

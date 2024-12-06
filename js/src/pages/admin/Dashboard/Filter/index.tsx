@@ -6,6 +6,7 @@ import {
 	Select,
 	Form,
 	Checkbox,
+	Tooltip,
 	FormInstance,
 } from 'antd'
 import { useSelect } from '@refinedev/antd'
@@ -13,6 +14,8 @@ import dayjs from 'dayjs'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { defaultSelectProps } from '@/utils'
 import { TQuery } from '../hooks/useRevenue'
+import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons'
+import { EViewType } from '../types'
 
 const { RangePicker } = DatePicker
 const { Item } = Form
@@ -49,9 +52,17 @@ export type TFilterProps = {
 	totalPages: number
 	total: number
 	form: FormInstance
+	viewType: EViewType
+	setViewType: React.Dispatch<React.SetStateAction<EViewType>>
 }
 
-const index = ({ setQuery, isFetching, form }: TFilterProps) => {
+const index = ({
+	setQuery,
+	isFetching,
+	form,
+	viewType,
+	setViewType,
+}: TFilterProps) => {
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
 		resource: 'courses',
 		optionLabel: 'name',
@@ -140,9 +151,25 @@ const index = ({ setQuery, isFetching, form }: TFilterProps) => {
 				</Button>
 			</div>
 
-			<div className="flex items-center gap-x-4">
-				<Checkbox>只顯示課程</Checkbox>
-				<Checkbox>與去年同期比較</Checkbox>
+			<div className="flex justify-between">
+				<div className="flex items-center gap-x-4">
+					<Checkbox>只顯示課程</Checkbox>
+					<Checkbox>與去年同期比較</Checkbox>
+				</div>
+				<div className="flex items-center gap-x-2">
+					<Tooltip title="分開顯示">
+						<LineChartOutlined
+							className={`text-xl ${EViewType.DEFAULT === viewType ? 'text-primary' : 'text-gray-500'}`}
+							onClick={() => setViewType(EViewType.DEFAULT)}
+						/>
+					</Tooltip>
+					<Tooltip title="堆疊比較">
+						<AreaChartOutlined
+							className={`text-xl ${EViewType.AREA === viewType ? 'text-primary' : 'text-gray-500'}`}
+							onClick={() => setViewType(EViewType.AREA)}
+						/>
+					</Tooltip>
+				</div>
 			</div>
 		</Form>
 	)
