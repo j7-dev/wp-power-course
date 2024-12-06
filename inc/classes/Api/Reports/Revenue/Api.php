@@ -52,10 +52,6 @@ final class Api extends ApiBase {
 		'refunded_orders_count'     => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status = "wc-refunded" THEN 1 ELSE 0 END ) as refunded_orders_count',
 		// 取得不包含退款的訂單數量
 		'non_refunded_orders_count' => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status != "wc-refunded" THEN 1 ELSE 0 END ) as non_refunded_orders_count',
-		// 取得學生數量
-		// 'student_count'             => 'COALESCE(SUM(student_count), 0) as student_count',
-		// 完成的章節數量
-		// 'finished_chapters_count'   => 'COALESCE(SUM(finished_chapters_count), 0) as finished_chapters_count',
 	];
 
 
@@ -69,10 +65,6 @@ final class Api extends ApiBase {
 		'refunded_orders_count'     => 'intval',
 		// 取得不包含退款的訂單數量
 		'non_refunded_orders_count' => 'intval',
-		// 取得學生數量
-		// 'student_count'             => 'intval',
-		// 完成的章節數量
-		// 'finished_chapters_count'   => 'intval',
 	];
 
 	/**

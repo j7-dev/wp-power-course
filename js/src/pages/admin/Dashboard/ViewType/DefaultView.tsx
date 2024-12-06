@@ -1,17 +1,30 @@
 import React, { memo } from 'react'
-import { Card, Form } from 'antd'
+import { Card, Form, Tooltip } from 'antd'
 import { Line, LineConfig } from '@ant-design/plots'
 import dayjs from 'dayjs'
 import { TTotals, TViewTypeProps } from '../types'
 import { cards, tickFilter } from '../index'
+import { round } from 'lodash-es'
+import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons'
 
-const Default = ({ revenueData, form }: TViewTypeProps) => {
+const Default = ({
+	revenueData,
+	lastYearRevenueData,
+	form,
+}: TViewTypeProps) => {
+	const isLastYear = form.getFieldValue(['compare_last_year'])
+
 	const intervals = revenueData?.intervals || []
+	const lastYearIntervals = isLastYear
+		? lastYearRevenueData?.intervals || []
+		: []
+
 	const watchInterval = Form.useWatch(['interval'], form)
 
 	const config: LineConfig = {
-		data: intervals,
-		xField: 'interval',
+		data: [...intervals, ...lastYearIntervals],
+		xField: 'interval_compared',
+		colorField: isLastYear ? 'dataLabel' : undefined,
 		point: {
 			shapeField: 'square',
 			sizeField: 1,
@@ -38,17 +51,51 @@ const Default = ({ revenueData, form }: TViewTypeProps) => {
 		<>
 			<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
 				{cards.map((card) => {
-					const total = revenueData?.totals?.[card.slug as keyof TTotals] || 0
+					const total =
+						(revenueData?.totals?.[card.slug as keyof TTotals] as number) || 0
+					const lastYearTotal = isLastYear
+						? (lastYearRevenueData?.totals?.[
+								card.slug as keyof TTotals
+							] as number) || 0
+						: 0
+
+					const isGreater = total > lastYearTotal
+					const percentage = lastYearTotal
+						? round(((total - lastYearTotal) / lastYearTotal) * 100, 2)
+						: '∞'
+
+					const thisYear = revenueData?.intervals?.[0]?.interval?.slice(0, 4)
+					const lastYear = Number(thisYear) - 1
 					return (
 						<Card
 							key={card.slug}
 							title={card.title}
 							extra={
 								<span className="text-sm text-gray-500">
+									{isLastYear && (
+										<Tooltip
+											title={`${lastYear}年共 ${lastYearTotal.toLocaleString()} ${card.unit}`}
+										>
+											<span
+												className={`inline-flex items-center mr-2 gap-x-1 ${isGreater ? 'text-red-500' : 'text-green-500'}`}
+											>
+												{isGreater ? (
+													<CaretUpOutlined />
+												) : (
+													<CaretDownOutlined />
+												)}
+												{percentage}%
+											</span>
+										</Tooltip>
+									)}
 									共
-									<span className="text-2xl text-primary font-semibold mx-2">
-										{total.toLocaleString()}
-									</span>
+									<Tooltip
+										title={`${thisYear}年共 ${total.toLocaleString()} ${card.unit}`}
+									>
+										<span className="text-2xl text-primary font-semibold mx-2">
+											{total.toLocaleString()}
+										</span>
+									</Tooltip>
 									{card.unit}
 								</span>
 							}
@@ -59,7 +106,19 @@ const Default = ({ revenueData, form }: TViewTypeProps) => {
 								yField={card.slug}
 								height={300}
 								tooltip={{
-									title: ({ date_start, date_end, interval }) => {
+									title: ({
+										date_start,
+										date_end,
+										interval,
+										interval_compared,
+									}) => {
+										// 如果不是今年的數據，就不顯示
+										if (
+											interval.slice(0, 4) !== interval_compared.slice(0, 4)
+										) {
+											return null
+										}
+
 										if ('day' === watchInterval) {
 											return interval
 										}

@@ -154,7 +154,14 @@ const index = ({
 			<div className="flex justify-between">
 				<div className="flex items-center gap-x-4">
 					<Checkbox>只顯示課程</Checkbox>
-					<Checkbox>與去年同期比較</Checkbox>
+					<Item
+						name={['compare_last_year']}
+						initialValue={true}
+						noStyle
+						valuePropName="checked"
+					>
+						<Checkbox>與去年同期比較</Checkbox>
+					</Item>
 				</div>
 				<div className="flex items-center gap-x-2">
 					<Tooltip title="分開顯示">
