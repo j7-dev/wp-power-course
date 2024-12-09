@@ -14,6 +14,7 @@ use J7\WpUtils\Classes\WC;
 use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 
 
@@ -615,21 +616,22 @@ final class Product {
 	 * @see https://ant.design/components/tree-select-cn
 	 *
 	 * @param \WC_Product $product Product.
+	 * @param bool        $with_children 是否包含子商品
 	 * @return array
 	 */
-	public function format_tree_select( $product) { // phpcs:ignore
+	public function format_tree_select( $product, $with_children = true) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
 		}
 
-		$variation_ids = $product?->get_children(); // get variations
-		$children      = [];
-		if ( ! empty( $variation_ids ) ) {
-			$variation_products = array_map( 'wc_get_product', $variation_ids );
-			$variation_products = array_filter($variation_products);
-			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
-			$children           = [
+		// 取出銷售方案
+		$bundles  = CourseUtils::get_bundles_by_course_id( $product->get_id());
+		$children = [];
+		if ( ! empty( $bundles ) && $with_children ) {
+
+			$children_details = array_values(array_map( fn( $bundle ) => $this->format_tree_select($bundle, false), $bundles ));
+			$children         = [
 				'children'  => $children_details,
 				'parent_id' => (string) $product?->get_id(),
 			];
@@ -989,7 +991,7 @@ final class Product {
 		$default_args = [
 			'taxonomy'   => 'product_cat',
 			'fields'     => 'id=>name',
-			'hide_empty' => true,
+			'hide_empty' => false,
 			'orderby'    => 'name',
 			'order'      => 'ASC',
 		];
