@@ -29,7 +29,7 @@ echo '<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
 
 Plugin::get( 'card/single-product' );
 
-$linked_products = CourseUtils::get_linked_products_by_product_id( (int) $product->get_id() );
+$linked_products = CourseUtils::get_bundles_by_course_id( (int) $product->get_id() );
 foreach ( $linked_products as $linked_product ) {
 	if ( 'publish' !== $linked_product->get_status() ) {
 		continue;

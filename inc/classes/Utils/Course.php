@@ -240,23 +240,23 @@ abstract class Course {
 	}
 
 	/**
-	 * 取得 bundle_ids (銷售方案) by product
-	 * 用商品反查有哪些銷售方案
+	 * 取得 bundle_ids (銷售方案) by course_id
+	 * 查找課程有哪些銷售方案
 	 *
-	 * @param int                       $product_id 商品 id
+	 * @param int                       $course_id 課程 id
 	 * @param bool|null                 $return_ids 是否只回傳 id
 	 * @param array<string>|null|string $post_status 文章狀態
 	 *
 	 * @return array<BundleProduct|\WC_Product_Subscription|int> bundle_ids (銷售方案)
 	 */
-	public static function get_linked_products_by_product_id( int $product_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
+	public static function get_bundles_by_course_id( int $course_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
 
 		$args = [
 			'post_type'   => 'product',
 			'numberposts' => - 1,
 			'post_status' => $post_status,
 			'meta_key'    => 'link_course_ids',
-			'meta_value'  => (string) $product_id,
+			'meta_value'  => (string) $course_id,
 			'fields'      => 'ids',
 			'orderby'     => [
 				'menu_order' => 'ASC',
@@ -635,7 +635,7 @@ abstract class Course {
 	 */
 	public static function has_bought( int|array $target_product_ids, ?array $args = null ): bool {
 		$defaults = [
-			'user_id' => get_current_user_id(),               // 用户 ID 查询
+			'user_id' => \get_current_user_id(),               // 用户 ID 查询
 			'status'  => [ 'wc-completed' ],                  // 訂單狀態
 		];
 
