@@ -36,6 +36,9 @@ final class LifeCycle {
 		\add_action('trashed_post', [ __CLASS__, 'delete_course_and_related_items' ], 10, 2);
 		\add_action('untrash_post', [ __CLASS__, 'untrash_course_and_related_items' ], 10, 2);
 
+		// 課程更新時，清除寄信註記
+		\add_action('pre_post_update', [ __CLASS__, 'clear_course_schedule_email_sent' ], 10, 2);
+
 		// 課程開課，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
 	}
@@ -189,20 +192,18 @@ final class LifeCycle {
 	 */
 	public static function register_course_launch(): void {
 
-		// 找出沒有寄信(course_schedule_email_sent !== yes)，且現在時間 timestamp > 開課時間的課程 course_schedule
+		// 現在時間 timestamp > 開課時間的課程 course_schedule
 		global $wpdb;
 
 		$course_ids = $wpdb->get_col(
 		$wpdb->prepare(
 		"SELECT p.ID
         FROM {$wpdb->posts} p
-        LEFT JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'course_schedule_email_sent'
-        JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'course_schedule'
+        LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'course_schedule'
         WHERE p.post_type = 'product'
         AND p.post_status = 'publish'
-        AND (pm1.meta_value IS NULL OR pm1.meta_value != 'yes')
-        AND pm2.meta_value < %d
-				AND pm2.meta_value > 0",
+        AND pm.meta_value < %d
+				AND pm.meta_value > 0",
 		time()
 		)
 		);
@@ -219,6 +220,21 @@ final class LifeCycle {
 			foreach ($user_ids   as $user_id) {
 				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
 			}
+		}
+	}
+
+	/**
+	 * 更新開課時間，清除寄信註記
+	 * 更新前，已確認是 update 才會觸發( create 不會觸發)
+	 *
+	 * @param int                  $post_id 課程 id
+	 * @param array<string, mixed> $new_data 新資料
+	 */
+	public static function clear_course_schedule_email_sent( int $post_id, array $new_data ): void {
+		$old_course_schedule = \get_post_meta( $post_id, 'course_schedule', true );
+		$new_course_schedule = $new_data['course_schedule'] ?? 0;
+		if ($old_course_schedule !== $new_course_schedule) {
+			\delete_post_meta( $post_id, 'course_schedule_email_sent' );
 		}
 	}
 }
