@@ -6,22 +6,25 @@ import AreaView from './ViewType/AreaView'
 
 export const cards = [
 	{
+		title: '總營業額',
+		slug: 'total_sales',
+		unit: '元',
+		tooltip:
+			'總營業額 ( 收到的錢 ) = 原始的銷售總額 ( 商品原價 × 銷售數量 ) - 優惠券折扣 - 退款 + 運費',
+	},
+	{
 		title: '淨營業額',
 		slug: 'net_revenue',
 		unit: '元',
+		tooltip: '淨收入 = 總營業額 - 運費',
 	},
 	{
-		title: '實際成交營業額',
-		slug: 'total_sales',
+		title: '運費',
+		slug: 'shipping',
 		unit: '元',
 	},
 	{
-		title: '退款金額',
-		slug: 'refunds',
-		unit: '元',
-	},
-	{
-		title: '淨訂單數',
+		title: '總訂單數',
 		slug: 'orders_count',
 		unit: '個',
 	},
@@ -29,11 +32,17 @@ export const cards = [
 		title: '實際成交訂單數',
 		slug: 'non_refunded_orders_count',
 		unit: '個',
+		tooltip: '實際成交訂單數 = 總訂單數 - 退款訂單數',
 	},
 	{
 		title: '已退款訂單數',
 		slug: 'refunded_orders_count',
 		unit: '個',
+	},
+	{
+		title: '退款金額',
+		slug: 'refunds',
+		unit: '元',
 	},
 	{
 		title: '學員數',
@@ -67,11 +76,7 @@ export const cards = [
 	// 	title: '稅金',
 	// 	slug: 'taxes',
 	// },
-	{
-		title: '運費',
-		slug: 'shipping',
-		unit: '元',
-	},
+
 	{
 		title: '平均訂單商品數量',
 		slug: 'avg_items_per_order',

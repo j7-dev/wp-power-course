@@ -10,6 +10,8 @@ namespace J7\PowerCourse\Api\Reports\Revenue;
 use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\General;
 use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
+use Automattic\WooCommerce\Admin\API\Reports\GenericQuery as ProductQuery;
+
 use J7\PowerCourse\Plugin;
 
 /**
@@ -97,7 +99,7 @@ final class Api extends ApiBase {
 		$params['per_page'] = 10000; // 設定一個大數值以一次性取得所有記錄
 
 		// 準備查詢參數，模仿 WooCommerce 的收入統計控制器
-		$query_args = [
+		$default_args = [
 			'before'              => $params['before'] ?? null,
 			'after'               => $params['after'] ?? null,
 			'interval'            => $params['interval'] ?? 'day',
@@ -123,8 +125,9 @@ final class Api extends ApiBase {
 				'shipping',
 				'gross_sales',
 			],
-
 		];
+
+		$query_args = \wp_parse_args( $params, $default_args );
 
 		$extra_report_keys = array_keys($this->extra_report_columns);
 		foreach ($extra_report_keys as $extra_report_key) {
@@ -135,7 +138,11 @@ final class Api extends ApiBase {
 		$query_args = array_filter($query_args);
 
 		// 使用 WooCommerce 的收入查詢來獲取數據
-		$query = new Query( $query_args );
+		if (isset($query_args['products'])) {
+			$query = new ProductQuery( $query_args, 'products-stats' );
+		} else {
+			$query = new Query( $query_args );
+		}
 
 		/**
 		 * @var object{

@@ -39,6 +39,10 @@ final class Product {
 			'method'   => 'get',
 		],
 		[
+			'endpoint' => 'products/select',
+			'method'   => 'get',
+		],
+		[
 			'endpoint' => 'products',
 			'method'   => 'post',
 		],
@@ -157,9 +161,6 @@ final class Product {
 			$default_args,
 		);
 
-		$data_type = $args['data_type'] ?? null;
-		unset( $args['data_type'] );
-
 		if ( isset( $args['price_range'] ) ) {
 			$args['meta_query']             = [];
 			$args['meta_query']['relation'] = 'AND';
@@ -180,10 +181,54 @@ final class Product {
 		$products = $results->products;
 		$products = array_filter($products);
 
-		$formatted_products = match ($data_type) {
-			'tree_select' => array_values(array_map( [ $this, 'format_tree_select' ], $products )),
-			default => array_values(array_map( [ $this, 'format_product_details' ], $products )),
-		};
+		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
+
+		$response = new \WP_REST_Response( $formatted_products );
+
+		// set pagination in header
+		$response->header( 'X-WP-Total', $total );
+		$response->header( 'X-WP-TotalPages', $total_pages );
+
+		return $response;
+	}
+
+
+	/**
+	 * Get products tree select callback
+	 * 用 WP Query 而不是 wc_get_products
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 */
+	public function get_products_select_callback( $request ) { // phpcs:ignore
+
+		$params = $request->get_query_params() ?? [];
+
+		$params = WP::sanitize_text_field_deep( $params, false );
+
+		$default_args = [
+			'post_status'    => [ 'publish' ],
+			'post_type'      => 'product',
+			'posts_per_page' => 20,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'fields'         => 'ids',
+		];
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		$results = new \WP_Query( $args );
+
+		$total       = $results->found_posts;
+		$total_pages = $results->max_num_pages;
+
+		$product_ids        = $results->posts;
+		$products           = array_map(fn( $product_id ) => \wc_get_product( $product_id ), $product_ids);
+		$products           = array_filter($products);
+		$formatted_products = array_values(array_map( [ $this, 'format_select' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
@@ -611,32 +656,19 @@ final class Product {
 
 
 	/**
-	 * Format product Tree Select
-	 *
-	 * @see https://ant.design/components/tree-select-cn
+	 * Format product Select
 	 *
 	 * @param \WC_Product $product Product.
-	 * @param bool        $with_children 是否包含子商品
 	 * @return array
 	 */
-	public function format_tree_select( $product, $with_children = true) { // phpcs:ignore
+	public function format_select( $product) { // phpcs:ignore
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
 		}
 
 		// 取出銷售方案
-		$bundles  = CourseUtils::get_bundles_by_course_id( $product->get_id());
-		$children = [];
-		if ( ! empty( $bundles ) && $with_children ) {
-
-			$children_details = array_values(array_map( fn( $bundle ) => $this->format_tree_select($bundle, false), $bundles ));
-			$children         = [
-				'children'  => $children_details,
-				'parent_id' => (string) $product?->get_id(),
-			];
-		}
-
+		// $bundles  = CourseUtils::get_bundles_by_course_id( $product->get_id());
 		$product_id = $product->get_id();
 
 		$base_array = [
@@ -646,9 +678,8 @@ final class Product {
 			'name'      => $product->get_name(),
 			'slug'      => $product->get_slug(),
 			'permalink' => \get_permalink( $product_id ),
-			'is_course' => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-
-		] + $children;
+			'is_course' => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ) === 'yes',
+		];
 
 		return $base_array;
 	}

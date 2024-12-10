@@ -5,7 +5,11 @@ import dayjs from 'dayjs'
 import { TTotals, TViewTypeProps } from '../types'
 import { cards, tickFilter } from '../index'
 import { round } from 'lodash-es'
-import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons'
+import {
+	CaretUpOutlined,
+	CaretDownOutlined,
+	QuestionCircleOutlined,
+} from '@ant-design/icons'
 
 const Default = ({
 	revenueData,
@@ -51,6 +55,11 @@ const Default = ({
 		<>
 			<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
 				{cards.map((card) => {
+					// 檢查 revenueData?.totals 是否有 card.slug 這個 key
+					if (undefined === revenueData?.totals?.[card.slug as keyof TTotals]) {
+						return null
+					}
+
 					const total =
 						(revenueData?.totals?.[card.slug as keyof TTotals] as number) || 0
 					const lastYearTotal = isLastYear
@@ -69,7 +78,16 @@ const Default = ({
 					return (
 						<Card
 							key={card.slug}
-							title={card.title}
+							title={
+								<>
+									{card.title}
+									{card.tooltip && (
+										<Tooltip title={card.tooltip}>
+											<QuestionCircleOutlined className="ml-2 text-gray-500" />
+										</Tooltip>
+									)}
+								</>
+							}
 							extra={
 								<span className="text-sm text-gray-500">
 									{isLastYear && (

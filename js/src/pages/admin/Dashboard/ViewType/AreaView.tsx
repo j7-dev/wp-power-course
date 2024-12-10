@@ -20,13 +20,20 @@ function formatStackedAreaData(
 	if (!intervals.length) return []
 
 	const data = cards.reduce((acc, card) => {
-		const slugItems: TData[] = intervals.map((interval) => ({
-			interval: interval.interval,
-			date_start: interval.date_start,
-			date_end: interval.date_end,
-			value: interval?.[card.slug as keyof TTotals] as number,
-			key: card.title,
-		}))
+		// 取其中一個 interval 的查看是否有 key 為 card.slug 的值
+		if (undefined === intervals?.[0]?.[card.slug as keyof TTotals]) {
+			return acc
+		}
+
+		const slugItems: TData[] = intervals.map((interval) => {
+			return {
+				interval: interval.interval,
+				date_start: interval.date_start,
+				date_end: interval.date_end,
+				value: interval?.[card.slug as keyof TTotals] as number,
+				key: card.title,
+			}
+		})
 
 		return [
 			...acc,
