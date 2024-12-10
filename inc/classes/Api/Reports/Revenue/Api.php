@@ -49,12 +49,7 @@ final class Api extends ApiBase {
 	 *
 	 * @var array<string, string>
 	 */
-	protected $extra_report_columns = [
-		// 取得退款訂單數量
-		'refunded_orders_count'     => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status = "wc-refunded" THEN 1 ELSE 0 END ) as refunded_orders_count',
-		// 取得不包含退款的訂單數量
-		'non_refunded_orders_count' => 'SUM( CASE WHEN wp_wc_order_stats.parent_id = 0 AND wp_wc_order_stats.status != "wc-refunded" THEN 1 ELSE 0 END ) as non_refunded_orders_count',
-	];
+	protected $extra_report_columns = [];
 
 
 	/**
@@ -74,6 +69,14 @@ final class Api extends ApiBase {
 	 */
 	public function __construct() {
 		parent::__construct();
+
+		global $wpdb;
+		$this->extra_report_columns = [
+			// 取得退款訂單數量
+			'refunded_orders_count'     => "SUM( CASE WHEN {$wpdb->prefix}wc_order_stats.parent_id = 0 AND {$wpdb->prefix}wc_order_stats.status = \"wc-refunded\" THEN 1 ELSE 0 END ) as refunded_orders_count",
+			// 取得不包含退款的訂單數量
+			'non_refunded_orders_count' => "SUM( CASE WHEN {$wpdb->prefix}wc_order_stats.parent_id = 0 AND {$wpdb->prefix}wc_order_stats.status != \"wc-refunded\" THEN 1 ELSE 0 END ) as non_refunded_orders_count",
+		];
 
 		\add_filter( 'woocommerce_admin_report_columns', [ $this, 'add_report_columns' ], 100, 3 );
 		\add_filter( 'woocommerce_rest_reports_column_types', [ $this, 'add_report_column_types' ], 100, 2 );
@@ -369,6 +372,7 @@ final class Api extends ApiBase {
 			}
 		}
 
+		$where_clause = '';
 		if (!empty($chapter_ids_in_specific_course)) {
 			$where_clause = 'AND post_id IN (' . implode(',', $chapter_ids_in_specific_course) . ')';
 		}
