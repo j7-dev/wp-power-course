@@ -123,3 +123,12 @@ export type TProductVariation = TProductRecord & {
 	parent_id: string
 	attributes: { [key: string]: string }
 }
+
+export type TProductSelectOption = {
+	id: string
+	type: TProductType
+	name: string
+	slug: string
+	permalink: string
+	is_course: boolean
+}

@@ -16,7 +16,7 @@ import { round } from 'lodash-es'
 const defaultQuery = {
 	order: 'asc',
 	interval: 'day',
-	per_page: 100,
+	per_page: 10000,
 	after: dayjs().add(-7, 'd').startOf('day').format('YYYY-MM-DDTHH:mm:ss'),
 	before: dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
 	_locale: 'user',
