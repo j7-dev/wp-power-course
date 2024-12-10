@@ -207,7 +207,6 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_course_email( int $user_id, int $course_id ): bool {
-
 		if ( !$this->can_send($user_id, $course_id) ) {
 			return false;
 		}
@@ -316,6 +315,10 @@ final class Email {
 	 * @return bool
 	 */
 	public function is_sent( int $user_id ): bool {
+		if ('local' === \wp_get_environment_type()) {
+			return false;
+		}
+		// TODO 這樣紀錄沒有記錄到 user 與 course 的關係，需要額外開表處理
 		$sent_user_ids = \get_post_meta( $this->id, 'sent_user_ids', true );
 		if (!is_array($sent_user_ids)) {
 			return false;
