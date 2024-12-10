@@ -11,6 +11,8 @@ use J7\PowerCourse\PowerEmail\Resources\Email;
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
+use J7\PowerCourse\Resources\Chapter\LifeCycle as ChapterLifeCycle;
+
 
 /**
  * Class At 觸發發信時機點
@@ -23,6 +25,8 @@ final class At {
 	const SEND_USERS_HOOK          = 'power_email_send_users'; // 寄給用戶的 AS hook
 	const SEND_COURSE_GRANTED_HOOK = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
 	const SEND_COURSE_LAUNCH_HOOK  = 'power_email_send_course_launch'; // 課程開課時寄送的 AS hook
+	const SEND_CHAPTER_ENTER_HOOK  = 'power_email_send_chapter_enter'; // 進入單元時寄送的 AS hook
+
 
 	/**
 	 * 觸發發信時機點
@@ -35,10 +39,16 @@ final class At {
 		'course_granted' => [
 			'label' => '開通課程權限後',
 			'slug'  => 'course_granted',
+			'hook'  => self::SEND_COURSE_GRANTED_HOOK,
 		],
 		'course_launch' => [
 			'label' => '課程開課時',
 			'slug'  => 'course_launch',
+		],
+		'chapter_enter' => [
+			'label' => '進入單元時',
+			'slug'  => 'chapter_enter',
+			'hook'  => self::SEND_CHAPTER_ENTER_HOOK,
 		],
 	];
 
@@ -49,13 +59,18 @@ final class At {
 
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
-		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_granted_callback' ], 10, 3 );
+		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_email' ], 10, 3 );
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 課程開課時 ----//
-		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 10, 2 );
-		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_launch_callback' ], 10, 3 );
+		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
+		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_email' ], 10, 3 );
 		// ---- END 課程開課時 ----//
+
+		// ---- 進入單元時 ----//
+		\add_action( ChapterLifeCycle::CHAPTER_ENTER_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
+		\add_action( self::SEND_CHAPTER_ENTER_HOOK, [ $this, 'send_course_email' ], 10, 2 );
+		// ---- END 進入單元時 ----//
 
 		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 100, 4 );
 
@@ -83,45 +98,13 @@ final class At {
 			return;
 		}
 
-		$course_granted_email_ids = \get_posts(
+		$this->schedule_email(
+			'course_granted',
 			[
-				'post_type'      => Email\CPT::POST_TYPE,
-				'posts_per_page' => -1,
-				'post_status'    => 'publish',
-				'fields'         => 'ids',
-				'meta_key'       => 'trigger_at',
-				'meta_value'     => $this->trigger_at['course_granted']['slug'],
+				'user_id'   => $user_id,
+				'course_id' => $course_id,
 			]
 			);
-
-		foreach ( $course_granted_email_ids as $course_granted_email_id ) {
-			$email = new EmailResource( (int) $course_granted_email_id );
-
-			$timestamp = $email->get_sending_timestamp();
-
-			if ( null === $timestamp ) {
-				continue;
-			}
-
-			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::AS_GROUP);
-				continue;
-			}
-
-			\as_schedule_single_action( $timestamp, self::SEND_COURSE_GRANTED_HOOK, [ (int) $course_granted_email_id, $user_id, $course_id ], self::AS_GROUP );
-		}
-	}
-
-	/**
-	 * 寄送開通課程權限後的 Email
-	 *
-	 * @param int $email_id 電子郵件 ID
-	 * @param int $user_id 用戶 ID
-	 * @param int $course_id 課程 ID
-	 */
-	public function send_course_granted_callback( int $email_id, int $user_id, int $course_id ): void {
-		$email = new EmailResource( (int) $email_id );
-		$email->send_course_email( (int) $user_id, (int) $course_id );
 	}
 
 	/**
@@ -157,6 +140,10 @@ final class At {
 			);
 		}
 		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
+
+		if ('each' === $email->condition->trigger_condition && !$is_sent) {
+			return true;
+		}
 
 		if ('all' === $email->condition->trigger_condition && !$is_sent) {
 			// 使用 array_diff 找出在 $course_ids 中但不在 $current_avl_course_ids 中的元素
@@ -202,6 +189,53 @@ final class At {
 	 * @param int $course_id 課程 ID
 	 */
 	public function course_launch_email( int $user_id, int $course_id ): void {
+		$this->schedule_email(
+			'course_launch',
+			[
+				'user_id'   => $user_id,
+				'course_id' => $course_id,
+			]
+			);
+	}
+
+	/**
+	 * 課程開課時的 Email
+	 *
+	 * @param \WP_Post    $chapter 章節文章物件
+	 * @param \WC_Product $product 課程
+	 */
+	public function chapter_enter_email( $chapter, $product ): void {
+		$user_id   = \get_current_user_id();
+		$course_id = $product->get_id();
+
+		$this->schedule_email(
+			'chapter_enter',
+			[
+				'user_id'    => $user_id,
+				'course_id'  => $course_id,
+				'chapter_id' => $chapter->ID,
+			]
+			);
+	}
+
+	/**
+	 * 發送課程的 Email
+	 *
+	 * @param array{email_id: int, user_id: int, course_id: int, context: string} $args 參數
+	 */
+	public function send_course_email( $args ): void {
+		$email = new EmailResource(  $args['email_id'] );
+		$email->send_course_email(  $args['user_id'], $args['course_id'] );
+	}
+
+
+	/**
+	 * 找出觸發時機的 Email，排程
+	 *
+	 * @param string $context 觸發條件
+	 * @param array  $args 參數
+	 */
+	private function schedule_email( string $context, ?array $args ): void {
 		$email_ids = \get_posts(
 			[
 				'post_type'      => Email\CPT::POST_TYPE,
@@ -209,9 +243,11 @@ final class At {
 				'post_status'    => 'publish',
 				'fields'         => 'ids',
 				'meta_key'       => 'trigger_at',
-				'meta_value'     => $this->trigger_at['course_launch']['slug'],
+				'meta_value'     => $this->trigger_at[ $context ]['slug'],
 			]
 			);
+
+		$hook = $this->trigger_at[ $context ]['hook'];
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
@@ -222,38 +258,19 @@ final class At {
 				continue;
 			}
 
+			$default_args = [
+				'email_id' => $email_id,
+				'context'  => $context,
+			];
+
+			$args = \wp_parse_args($args, $default_args   );
+
 			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ], self::AS_GROUP);
+				\as_enqueue_async_action( $hook, [ $args ], self::AS_GROUP);
 				continue;
 			}
 
-			\as_schedule_single_action( $timestamp, self::SEND_COURSE_LAUNCH_HOOK, [ (int) $email_id, $user_id, $course_id ], self::AS_GROUP );
-		}
-	}
-
-	/**
-	 * 寄送課程開課時的 Email
-	 *
-	 * @param int $email_id 電子郵件 ID
-	 * @param int $user_id 用戶 ID
-	 * @param int $course_id 課程 ID
-	 */
-	public function send_course_launch_callback( int $email_id, int $user_id, int $course_id ): void {
-		$sent_email_ids = \get_post_meta( $course_id, 'course_schedule_email_sent' );
-		if (!\is_array($sent_email_ids)) {
-			$sent_email_ids = [];
-		}
-
-		if (\in_array($email_id, $sent_email_ids)) {
-			return;
-		}
-
-		$email = new EmailResource(  $email_id );
-		$email->send_course_email(  $user_id, $course_id );
-
-		// 註記已經寄過信了
-		if ('local' !== \wp_get_environment_type()) {
-			\add_post_meta( $course_id, 'course_schedule_email_sent', $email_id );
+			\as_schedule_single_action( $timestamp, $hook, [ $args ], self::AS_GROUP );
 		}
 	}
 }

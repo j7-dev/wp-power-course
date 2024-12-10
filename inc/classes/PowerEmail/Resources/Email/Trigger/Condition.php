@@ -83,7 +83,7 @@ final class Condition {
 		$this->course_ids        = ( (array) $condition['course_ids'] ?? null );
 		$this->chapter_ids       = $condition['chapter_ids'] ?? null;
 		$this->trigger_condition = $condition['trigger_condition'];
-		$this->qty               = (int) ( $condition['qty'] ) ?? null;
+		$this->qty               = (int) ( $condition['qty'] ?? null );
 		$this->sending_type      = $condition['sending']['type'] ?? 'send_now';
 		$this->sending_value     = $condition['sending']['value'] ?? null;
 		$this->sending_unit      = $condition['sending']['unit'] ?? null;

@@ -234,7 +234,8 @@ final class LifeCycle {
 		$old_course_schedule = \get_post_meta( $post_id, 'course_schedule', true );
 		$new_course_schedule = $new_data['course_schedule'] ?? 0;
 		if ($old_course_schedule !== $new_course_schedule) {
-			\delete_post_meta( $post_id, 'course_schedule_email_sent' );
+			// 要清除註記
+
 		}
 	}
 }

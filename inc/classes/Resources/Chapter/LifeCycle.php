@@ -16,6 +16,8 @@ use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 final class LifeCycle {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
+	const CHAPTER_ENTER_ACTION = 'power_course_visit_chapter';
+
 	/**
 	 * Constructor
 	 */
@@ -25,8 +27,8 @@ final class LifeCycle {
 		\add_action( 'power_course_before_classroom_render', [ __CLASS__, 'register_visit_chapter' ] );
 
 		// 進入章節時要註記
-		\add_action( 'power_course_visit_chapter', [ __CLASS__, 'save_first_visit_time' ], 10, 2 );
-		\add_action( 'power_course_visit_chapter', [ __CLASS__, 'save_last_visit_info' ], 10, 2 );
+		\add_action( self::CHAPTER_ENTER_ACTION, [ __CLASS__, 'save_first_visit_time' ], 10, 2 );
+		\add_action( self::CHAPTER_ENTER_ACTION, [ __CLASS__, 'save_last_visit_info' ], 10, 2 );
 
 		// 上完章節後要註記
 	}
