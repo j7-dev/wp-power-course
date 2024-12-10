@@ -239,14 +239,21 @@ final class At {
 	 * @param int $course_id 課程 ID
 	 */
 	public function send_course_launch_callback( int $email_id, int $user_id, int $course_id ): void {
+		$sent_email_ids = \get_post_meta( $course_id, 'course_schedule_email_sent' );
+		if (!\is_array($sent_email_ids)) {
+			$sent_email_ids = [];
+		}
+
+		if (\in_array($email_id, $sent_email_ids)) {
+			return;
+		}
+
 		$email = new EmailResource(  $email_id );
 		$email->send_course_email(  $user_id, $course_id );
 
 		// 註記已經寄過信了
-		// if ('local' !== \wp_get_environment_type()) {
-
-		// TODO 如果修改開課時間，要清除此註記
-		\update_post_meta( $course_id, 'course_schedule_email_sent', 'yes' );
-		// }
+		if ('local' !== \wp_get_environment_type()) {
+			\add_post_meta( $course_id, 'course_schedule_email_sent', $email_id );
+		}
 	}
 }
