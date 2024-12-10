@@ -11,7 +11,7 @@ use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\General;
 use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
 use Automattic\WooCommerce\Admin\API\Reports\GenericQuery as ProductQuery;
-
+use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Plugin;
 
 /**
@@ -138,7 +138,10 @@ final class Api extends ApiBase {
 		$query_args = array_filter($query_args);
 
 		// 使用 WooCommerce 的收入查詢來獲取數據
-		if (isset($query_args['products'])) {
+		if (!empty($query_args['product_includes'])) {
+			$query_args['context']  = 'view';
+			$query_args['fields'][] = 'items_sold';
+			// $query_args['fields'][] = 'products_count'; // WC 原本報表有帶，但其實不需要知道產品總數
 			$query = new ProductQuery( $query_args, 'products-stats' );
 		} else {
 			$query = new Query( $query_args );
@@ -246,8 +249,8 @@ final class Api extends ApiBase {
 	/**
 	 * 擴展學生數量統計
 	 *
-	 * @param object{totals: object{student_count: int}, intervals: array<array{subtotals: object{student_count: int}}>}                                                                                    $data 數據
-	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @param object{totals: object{student_count: int}, intervals: array<array{subtotals: object{student_count: int}}>}                                                                                                                $data 數據
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
 	 * @return object{totals: array{student_count: int}, intervals: array<array{subtotals: array{student_count: int}}>}
 	 */
 	public function extend_student_count_stats( object $data, array $query_args ): object { // phpcs:ignore
@@ -272,13 +275,14 @@ final class Api extends ApiBase {
 	/**
 	 * 擴展完成的章節數量統計
 	 *
-	 *  @param object{totals: object{finished_chapters_count: int}, intervals: array<array{subtotals: object{finished_chapters_count: int}}>}                                                                $data 數據
-	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 *  @param object{totals: object{finished_chapters_count: int}, intervals: array<array{subtotals: object{finished_chapters_count: int}}>}                                                                                            $data 數據
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
 	 * @return object{totals: array{finished_chapters_count: int}, intervals: array<array{subtotals: array{finished_chapters_count: int}}>}
 	 */
 	public function extend_finished_chapters_count_stats( $data, $query_args ) {
 		global $wpdb;
 		$sql = $this->get_chapter_sql( $query_args );
+
 		/** @var array<int, array{time_interval: string, record_value: string}> $results */
 		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
 		$total_finished_chapters_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
@@ -299,7 +303,7 @@ final class Api extends ApiBase {
 	/**
 	 * 取得學生數量統計的 SQL 語句
 	 *
-	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
 	 * @return string
 	 */
 	private function get_course_sql( array $query_args ): string {
@@ -316,6 +320,11 @@ final class Api extends ApiBase {
 
 		$date_format = $this->get_date_format( $interval );
 
+		$where_clause = '';
+		if (!empty($query_args['product_includes'])) {
+			$where_clause = 'AND post_id IN (' . implode(',', $query_args['product_includes']) . ')';
+		}
+
 		return "SELECT
 					{$date_format} as time_interval,
 					COUNT(DISTINCT user_id) as record_value
@@ -323,6 +332,7 @@ final class Api extends ApiBase {
 					{$table_name}
 			WHERE
 					meta_key = 'course_granted_at'
+					{$where_clause}
 					AND meta_value BETWEEN '{$after}' AND '{$before}'
 			GROUP BY
 					time_interval
@@ -334,7 +344,7 @@ final class Api extends ApiBase {
 	/**
 	 * 取得完成的章節數量統計的 SQL 語句
 	 *
-	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[]} $query_args 查詢參數
+	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
 	 * @return string
 	 */
 	private function get_chapter_sql( array $query_args ): string {
@@ -351,6 +361,18 @@ final class Api extends ApiBase {
 
 		$date_format = $this->get_date_format( $interval );
 
+		$chapter_ids_in_specific_course = [];
+		if (!empty($query_args['product_includes'])) {
+			foreach ($query_args['product_includes'] as $course_id) {
+				$chapter_ids_in_single_course   = CourseUtils::get_sub_chapters( (int) $course_id, true);
+				$chapter_ids_in_specific_course = array_merge($chapter_ids_in_specific_course, $chapter_ids_in_single_course);
+			}
+		}
+
+		if (!empty($chapter_ids_in_specific_course)) {
+			$where_clause = 'AND post_id IN (' . implode(',', $chapter_ids_in_specific_course) . ')';
+		}
+
 		return "SELECT
 					{$date_format} as time_interval,
 					COUNT(meta_value) as record_value
@@ -358,6 +380,7 @@ final class Api extends ApiBase {
 					{$table_name}
 			WHERE
 					meta_key = 'finished_at'
+					{$where_clause}
 					AND meta_value BETWEEN '{$after}' AND '{$before}'
 			GROUP BY
 					time_interval

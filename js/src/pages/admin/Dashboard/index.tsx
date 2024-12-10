@@ -62,6 +62,11 @@ export const cards = [
 		unit: '個',
 	},
 	{
+		title: '售出數量',
+		slug: 'items_sold', // product query 才會出現
+		unit: '個',
+	},
+	{
 		title: '優惠券金額',
 		slug: 'coupons',
 		unit: '元',

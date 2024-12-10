@@ -154,7 +154,7 @@ const index = ({
 			per_page: 10000,
 			order: 'asc',
 			_locale: 'user',
-			products: [...products, ...bundle_products]?.join(','),
+			product_includes: [...products, ...bundle_products],
 		}
 		setQuery(query)
 	}
