@@ -83,7 +83,7 @@ const Default = ({
 									{card.title}
 									{card.tooltip && (
 										<Tooltip title={card.tooltip}>
-											<QuestionCircleOutlined className="ml-2 text-gray-500" />
+											<QuestionCircleOutlined className="ml-2 text-gray-300 cursor-pointer" />
 										</Tooltip>
 									)}
 								</>
