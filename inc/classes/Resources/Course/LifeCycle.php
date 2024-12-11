@@ -11,6 +11,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
+use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\PowerCourse\Bootstrap;
 
 /**
@@ -37,7 +38,7 @@ final class LifeCycle {
 		\add_action('untrash_post', [ __CLASS__, 'untrash_course_and_related_items' ], 10, 2);
 
 		// 課程更新時，清除寄信註記
-		\add_action('pre_post_update', [ __CLASS__, 'clear_course_schedule_email_sent' ], 10, 2);
+		\add_action('pre_post_update', [ __CLASS__, 'clear_course_launch_action_done' ], 10, 2);
 
 		// 課程開課，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
@@ -192,18 +193,20 @@ final class LifeCycle {
 	 */
 	public static function register_course_launch(): void {
 
-		// 現在時間 timestamp > 開課時間的課程 course_schedule
+		// 找出沒有寄信(course_launch_action_done !== yes)，且現在時間 timestamp > 開課時間的課程 course_schedule
 		global $wpdb;
 
 		$course_ids = $wpdb->get_col(
 		$wpdb->prepare(
 		"SELECT p.ID
         FROM {$wpdb->posts} p
-        LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'course_schedule'
+        LEFT JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'course_launch_action_done'
+        JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'course_schedule'
         WHERE p.post_type = 'product'
         AND p.post_status = 'publish'
-        AND pm.meta_value < %d
-				AND pm.meta_value > 0",
+        AND (pm1.meta_value IS NULL OR pm1.meta_value != 'yes')
+        AND pm2.meta_value < %d
+				AND pm2.meta_value > 0",
 		time()
 		)
 		);
@@ -212,14 +215,27 @@ final class LifeCycle {
 			// 找出能上課程的用戶
 			$user_ids = \get_users(
 				[
+					'fields'     => 'ID',
 					'meta_key'   => 'avl_course_ids',
 					'meta_value' => $course_id,
 				]
 				);
 
+			ob_start();
+			var_dump(
+					[
+						'course_id' => $course_id,
+						'user_ids'  => $user_ids,
+					]
+					);
+			\J7\WpUtils\Classes\ErrorLog::info('register_course_launch: ' . ob_get_clean());
+
 			foreach ($user_ids as $user_id) {
 				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
 			}
+
+			// 註記已經執行過開課動作了
+			\update_post_meta($course_id, 'course_launch_action_done', 'yes');
 		}
 	}
 
@@ -230,12 +246,12 @@ final class LifeCycle {
 	 * @param int                  $post_id 課程 id
 	 * @param array<string, mixed> $new_data 新資料
 	 */
-	public static function clear_course_schedule_email_sent( int $post_id, array $new_data ): void {
+	public static function clear_course_launch_action_done( int $post_id, array $new_data ): void {
 		$old_course_schedule = \get_post_meta( $post_id, 'course_schedule', true );
 		$new_course_schedule = $new_data['course_schedule'] ?? 0;
 		if ($old_course_schedule !== $new_course_schedule) {
 			// 要清除註記
-
+			\delete_post_meta( $post_id, 'course_launch_action_done' );
 		}
 	}
 }

@@ -41,10 +41,11 @@ final class At {
 			'slug'  => 'course_granted',
 			'hook'  => self::SEND_COURSE_GRANTED_HOOK,
 		],
-		// 'course_launch' => [
-		// 'label' => '課程開課時',
-		// 'slug'  => 'course_launch',
-		// ],
+		'course_launch' => [
+			'label' => '課程開課時',
+			'slug'  => 'course_launch',
+			'hook'  => self::SEND_COURSE_LAUNCH_HOOK,
+		],
 		'chapter_enter' => [
 			'label' => '進入單元時',
 			'slug'  => 'chapter_enter',
@@ -176,11 +177,6 @@ final class At {
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
 			foreach ( $user_ids as $user_id ) {
-				$can_send = $email->can_send( (int) $user_id);
-				$can_send = \apply_filters( 'power_email_can_send', $can_send, $email, (int) $user_id, 0 );
-				if ( !$can_send ) {
-					continue;
-				}
 				$email->send_email( (int) $user_id );
 			}
 		}
@@ -259,7 +255,6 @@ final class At {
 
 			// 如果不該發信，就不該排程
 			$can_send = $email->can_send( (int) $args['user_id'], (int) $args['course_id']);
-			$can_send = \apply_filters( 'power_email_can_send', $can_send, $email, (int) $args['user_id'], (int) $args['course_id'] );
 
 			if (!$can_send) {
 				continue;

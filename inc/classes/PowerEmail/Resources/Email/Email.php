@@ -150,7 +150,7 @@ final class Email {
 		$can_send = true;
 		if (!$course_id) {
 			// 沒有 course_id 的情況是對用戶直接寄信
-			return $can_send;
+			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
 		}
 
 		$condition = $this->condition;
@@ -164,7 +164,7 @@ final class Email {
 			$can_send = false;
 		}
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
-		return $can_send;
+		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
 	}
 
 
@@ -316,7 +316,7 @@ final class Email {
 	 * @return bool
 	 */
 	public function is_sent( int $post_id, int $user_id, int $email_id ): bool {
-		$find_record = EmailRecord::get($post_id, $user_id, $email_id);
+		$find_record = EmailRecord::get($post_id, $user_id, $email_id, 1);
 		return !!$find_record;
 	}
 }
