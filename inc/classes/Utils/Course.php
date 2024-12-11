@@ -404,7 +404,7 @@ abstract class Course {
 			'offset'      => 0,                                   // 跳過的数量
 			// 'orderby' => 'date', // TODO 排序字段
 			'order'       => 'DESC',                              // 排序
-			'user_id'     => get_current_user_id(),               // 用户 ID 查询
+			'user_id'     => \get_current_user_id(),               // 用户 ID 查询
 			'status'      => [ 'wc-completed' ],                  // 訂單狀態
 		];
 

@@ -24,15 +24,27 @@ abstract class CRUD {
 	/**
 	 * 取得紀錄
 	 *
-	 * @param int $post_id 課程/章節 ID
-	 * @param int $user_id 使用者 ID
-	 * @param int $email_id 信件 ID
-	 * @return array|null
+	 * @param int  $post_id 課程/章節 ID
+	 * @param ?int $user_id 使用者 ID
+	 * @param ?int $email_id 信件 ID
+	 * @param ?int $mark_as_sent 是否已寄送
+	 * @return array<int, object{id: int, post_id: int, user_id: int, email_id: int, email_subject: string, trigger_at: string, mark_as_sent: int, email_date: string}>
 	 */
-	public static function get( int $post_id, int $user_id, int $email_id ): array|null {
+	public static function get( int $post_id, ?int $user_id = 0, ?int $email_id = 0, ?int $mark_as_sent = null ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . static::$table_name;
-		return $wpdb->get_row("SELECT * FROM $table_name WHERE post_id = $post_id AND user_id = $user_id AND email_id = $email_id", ARRAY_A); // phpcs:ignore
+
+		$where = "post_id = $post_id";
+		if ( $user_id ) {
+			$where .= " AND user_id = $user_id";
+		}
+		if ( $email_id ) {
+			$where .= " AND email_id = $email_id";
+		}
+		if ( $mark_as_sent !== null ) {
+			$where .= " AND mark_as_sent = $mark_as_sent";
+		}
+		return $wpdb->get_results("SELECT * FROM $table_name WHERE $where"); // phpcs:ignore
 	}
 
 
@@ -48,7 +60,6 @@ abstract class CRUD {
 	 */
 	public static function add( int $post_id, int $user_id, int $email_id, ?string $email_subject = '', ?string $trigger_at = '' ): int|false {
 		global $wpdb;
-
 		$table_name = $wpdb->prefix . static::$table_name;
 
 		$data = [
@@ -58,6 +69,7 @@ abstract class CRUD {
 			'email_subject' => $email_subject,
 			'trigger_at'    => $trigger_at,
 			'email_date'    => \wp_date('Y-m-d H:i:s'),
+			'mark_as_sent'  => 1,
 		];
 		return $wpdb->insert(
 				$table_name,
@@ -68,15 +80,13 @@ abstract class CRUD {
 
 	/**
 	 * 更新 record
-	 * TODO 尚未測試過
 	 *
-	 * @param int    $id 紀錄 ID
-	 * @param string $key 欄位名稱
-	 * @param mixed  $value 欄位值
+	 * @param int                  $id 紀錄 ID
+	 * @param array<string, mixed> $data 要更新的資料
 	 *
 	 * @return int|false The number of rows affected on success, or false on failure.
 	 */
-	public static function update( int $id, string $key, $value ): int|false {
+	public static function update( int $id, array $data ): int|false {
 
 		global $wpdb;
 
@@ -84,15 +94,11 @@ abstract class CRUD {
 
 		return $wpdb->update(
 				$table_name,
-				[ // data
-					$key => \maybe_serialize( $value ),
-				],
+				$data,
 				[ // where
 					'id' => $id,
 				],
-				[ // format
-					'%s',
-				],
+				null,
 				[ // where format
 					'%d',
 				]

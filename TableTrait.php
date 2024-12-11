@@ -116,6 +116,7 @@ trait TableTrait {
 										email_id bigint(20) NOT NULL,
 										email_subject varchar(255) DEFAULT NULL,
 										trigger_at varchar(30) DEFAULT NULL,
+										mark_as_sent tinyint(1) DEFAULT 0,
 										email_date datetime DEFAULT NULL,
 										PRIMARY KEY  (id),
 										KEY post_id (post_id),
