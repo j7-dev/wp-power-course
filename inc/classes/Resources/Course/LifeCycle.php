@@ -26,6 +26,8 @@ final class LifeCycle {
 	// 課程開課的鉤子
 	const COURSE_LAUNCH_ACTION = 'power_course_course_launch';
 
+	const BEFORE_UPDATE_PRODUCT_META_ACTION = 'power_course_before_update_product_meta';
+
 	/**
 	 * Constructor
 	 */
@@ -38,7 +40,7 @@ final class LifeCycle {
 		\add_action('untrash_post', [ __CLASS__, 'untrash_course_and_related_items' ], 10, 2);
 
 		// 課程更新時，清除寄信註記
-		\add_action('pre_post_update', [ __CLASS__, 'clear_course_launch_action_done' ], 10, 2);
+		\add_action(self::BEFORE_UPDATE_PRODUCT_META_ACTION, [ __CLASS__, 'clear_course_launch_action_done' ], 10, 2);
 
 		// 課程開課，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
@@ -221,15 +223,6 @@ final class LifeCycle {
 				]
 				);
 
-			ob_start();
-			var_dump(
-					[
-						'course_id' => $course_id,
-						'user_ids'  => $user_ids,
-					]
-					);
-			\J7\WpUtils\Classes\ErrorLog::info('register_course_launch: ' . ob_get_clean());
-
 			foreach ($user_ids as $user_id) {
 				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
 			}
@@ -243,15 +236,18 @@ final class LifeCycle {
 	 * 更新開課時間，清除寄信註記
 	 * 更新前，已確認是 update 才會觸發( create 不會觸發)
 	 *
-	 * @param int                  $post_id 課程 id
-	 * @param array<string, mixed> $new_data 新資料
+	 * @param \WC_Product          $product 課程
+	 * @param array<string, mixed> $meta_data 更新資料
 	 */
-	public static function clear_course_launch_action_done( int $post_id, array $new_data ): void {
-		$old_course_schedule = \get_post_meta( $post_id, 'course_schedule', true );
-		$new_course_schedule = $new_data['course_schedule'] ?? 0;
+	public static function clear_course_launch_action_done( \WC_Product $product, array $meta_data ): void {
+
+		$product_id          = $product->get_id();
+		$old_course_schedule = $product->get_meta('course_schedule');
+		$new_course_schedule = $meta_data['course_schedule'];
+
 		if ($old_course_schedule !== $new_course_schedule) {
 			// 要清除註記
-			\delete_post_meta( $post_id, 'course_launch_action_done' );
+			\delete_post_meta($product_id, 'course_launch_action_done');
 		}
 	}
 }
