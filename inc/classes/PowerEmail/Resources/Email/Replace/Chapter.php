@@ -1,6 +1,6 @@
 <?php
 /**
- * Email User Replace
+ * Email Chapter Replace
  */
 
 declare( strict_types=1 );
@@ -8,18 +8,22 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 
 /**
- * Class User
+ * Class Chapter
  */
-abstract class User extends ReplaceBase {
+abstract class Chapter extends ReplaceBase {
+
+	/**
+	 * 前綴
+	 *
+	 * @var string
+	 */
+	public static $prefix = 'chapter_';
 
 	/**
 	 * @var array<string, string> 使用者資料取代字串的 Schema
 	 */
 	public static $schema = [
-		'display_name' => '用戶的顯示名稱',
-		'user_email'   => '用戶的電子郵件',
-		'ID'           => '用戶的ID',
-		'user_login'   => '用戶的帳號',
+		'title' => '章節名稱',
 	];
 
 	/**
@@ -32,19 +36,24 @@ abstract class User extends ReplaceBase {
 	 * @return string 格式化後的 HTML
 	 */
 	public static function replace_string( $html, $user_id, $course_id, $chapter_id ): string {
-		$user = \get_user_by( 'ID', $user_id );
-		if (!$user) {
+		if (!$chapter_id) {
 			return $html;
 		}
 
-		$schema_keys   = array_map( fn( $key ) => '{' . $key . '}', array_keys( self::$schema ) );
-		$schema_values = [];
-		foreach ( self::$schema as $key => $value ) {
-			$schema_values[] = $user->get( $key );
+		$chapter = \get_post( $chapter_id );
+		if (!$chapter) {
+			return $html;
 		}
 
-		$formatted_html = str_replace( $schema_keys, $schema_values, $html );
+		$schema_values = [];
 
+		foreach ( self::$schema as $key => $value ) {
+			$post_key        = 'post_' . $key;
+			$schema_values[] = $chapter->$post_key;
+		}
+
+		$schema_keys    = array_map( fn( $key ) => '{' . self::$prefix . $key . '}', array_keys( self::$schema ) );
+		$formatted_html = str_replace( $schema_keys, $schema_values, $html );
 		return $formatted_html;
 	}
 }

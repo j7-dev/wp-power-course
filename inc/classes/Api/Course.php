@@ -711,13 +711,14 @@ final class Course {
 				$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
 				// 移除上課權限時，也把 avl_course_meta 相關資料刪除
 				$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id );
+				\do_action(LifeCycle::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id);
+
 				if (false === $success1 || false === $success2) {
 					$success = false;
 					break;
 				}
 			}
 		}
-
 		return new \WP_REST_Response(
 			[
 				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',

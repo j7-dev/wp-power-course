@@ -26,7 +26,11 @@ final class LifeCycle {
 	// 課程開課的鉤子
 	const COURSE_LAUNCH_ACTION = 'power_course_course_launch';
 
+	// 課程更新前
 	const BEFORE_UPDATE_PRODUCT_META_ACTION = 'power_course_before_update_product_meta';
+
+	// 移除學員後
+	const AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION = 'power_course_after_remove_student_from_course';
 
 	/**
 	 * Constructor
@@ -44,6 +48,9 @@ final class LifeCycle {
 
 		// 課程開課，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
+
+		// 移除學員後，將課程以後權的發信改為 mark_as_sent 改成 0
+		\add_action(self::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'update_email_mark_as_sent' ], 10, 2);
 	}
 
 	/**
@@ -249,5 +256,25 @@ final class LifeCycle {
 			// 要清除註記
 			\delete_post_meta($product_id, 'course_launch_action_done');
 		}
+	}
+
+	/**
+	 * 更新寄信註記
+	 *
+	 * @param int $user_id 用戶 id
+	 * @param int $course_id 課程 id
+	 */
+	public static function update_email_mark_as_sent( int $user_id, int $course_id ): void {
+		$where = [
+			'user_id'    => $user_id,
+			'post_id'    => $course_id,
+			'trigger_at' => 'course_granted',
+		];
+
+		$data = [
+			'mark_as_sent' => 0,
+		];
+
+		EmailRecord::update($where, $data);
 	}
 }

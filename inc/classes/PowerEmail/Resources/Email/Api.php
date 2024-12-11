@@ -429,8 +429,8 @@ final class Api extends ApiBase {
 	public function get_emails_options_callback( $request ): \WP_REST_Response {
 		return new \WP_REST_Response(
 			[
-				'course_schema' => Replace\Course::$schema,
-				'user_schema'   => Replace\User::$schema,
+				'course_schema' => Replace\Course::get_schemas(),
+				'user_schema'   => Replace\User::get_schemas(),
 			]
 		);
 	}

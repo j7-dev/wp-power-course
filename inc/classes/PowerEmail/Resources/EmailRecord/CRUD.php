@@ -81,12 +81,12 @@ abstract class CRUD {
 	/**
 	 * 更新 record
 	 *
-	 * @param int                  $id 紀錄 ID
+	 * @param array<string, mixed> $where 要更新的資料
 	 * @param array<string, mixed> $data 要更新的資料
 	 *
 	 * @return int|false The number of rows affected on success, or false on failure.
 	 */
-	public static function update( int $id, array $data ): int|false {
+	public static function update( array $where, array $data ): int|false {
 
 		global $wpdb;
 
@@ -95,9 +95,7 @@ abstract class CRUD {
 		return $wpdb->update(
 				$table_name,
 				$data,
-				[ // where
-					'id' => $id,
-				],
+				$where,
 				null,
 				[ // where format
 					'%d',
