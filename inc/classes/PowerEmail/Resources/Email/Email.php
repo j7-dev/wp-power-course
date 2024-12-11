@@ -7,8 +7,7 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
-use J7\PowerCourse\PowerEmail\Resources\Email\Replace\User as UserReplace;
-use J7\PowerCourse\PowerEmail\Resources\Email\Replace\Course as CourseReplace;
+use J7\PowerCourse\PowerEmail\Resources\Email\Replace;
 use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\WpUtils\Classes\WP;
 
@@ -117,6 +116,16 @@ final class Email {
 		if ( $condition_array ) {
 			$this->condition = $api_format ? $condition_array : new Trigger\Condition( $condition_array );
 		}
+
+		$replace_classes = [
+			Replace\User::class,
+			Replace\Course::class,
+			Replace\Chapter::class,
+		];
+		foreach ($replace_classes as $key => $replace_class) {
+			\add_filter('power_email_course_subject', [ $replace_class, 'replace_string' ], $key * 10, 4);
+			\add_filter('power_email_course_html', [ $replace_class, 'replace_string' ], $key * 10, 4);
+		}
 	}
 
 	/**
@@ -126,13 +135,12 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_email( int $user_id ): bool {
-		$html = $this->description;
-
 		$user       = \get_user_by( 'ID', $user_id );
 		$user_email = $user->user_email;
-		$subject    = UserReplace::get_formatted_html( $this->subject, $user );
-		$html       = UserReplace::get_formatted_html( $html, $user );
-		$sent       = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+
+		$subject = \apply_filters('power_email_course_subject', $this->subject, $user_id, 0, 0);
+		$html    = \apply_filters('power_email_course_html', $this->description, $user_id, 0, 0);
+		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {
 			\do_action('power_email_after_send_email', $this, $user_id, 0);
 		}
@@ -204,27 +212,21 @@ final class Email {
 	/**
 	 * 寄送課程 Email
 	 *
-	 * @param int $user_id 使用者 ID
-	 * @param int $course_id 課程 ID
+	 * @param int  $user_id 使用者 ID
+	 * @param int  $course_id 課程 ID
+	 * @param ?int $chapter_id 章節 ID
 	 * @return bool 是否寄送成功
 	 */
-	public function send_course_email( int $user_id, int $course_id ): bool {
-		$html = $this->description;
+	public function send_course_email( int $user_id, int $course_id, int $chapter_id = 0 ): bool {
 
 		$user = \get_user_by( 'ID', $user_id );
 		if (!$user) {
 			return false;
 		}
 		$user_email = $user->user_email;
-		$subject    = UserReplace::get_formatted_html( $this->subject, $user );
-		$html       = UserReplace::get_formatted_html( $html, $user );
+		$subject    = \apply_filters('power_email_course_subject', $this->subject, $user_id, $course_id, $chapter_id);
+		$html       = \apply_filters('power_email_course_html', $this->description, $user_id, $course_id, $chapter_id);
 
-		$course_product = \wc_get_product($course_id);
-		if (!$course_product) {
-			return false;
-		}
-		$subject                 = CourseReplace::get_formatted_html( $subject, $course_product );
-		$html                    = CourseReplace::get_formatted_html( $html, $course_product );
 		$sent                    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		$this->formatted_subject = $subject;
 		if ($sent) {

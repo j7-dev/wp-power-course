@@ -222,11 +222,11 @@ final class At {
 	/**
 	 * 發送課程的 Email
 	 *
-	 * @param array{email_id: int, user_id: int, course_id: int, context: string} $args 參數
+	 * @param array{email_id: int, user_id: int, course_id: int, chapter_id: ?int, context: string} $args 參數
 	 */
 	public function send_course_email( $args ): void {
 		$email = new EmailResource(  $args['email_id'] );
-		$email->send_course_email(  $args['user_id'], $args['course_id'] );
+		$email->send_course_email(  $args['user_id'], $args['course_id'], $args['chapter_id'] ?? 0 );
 	}
 
 
