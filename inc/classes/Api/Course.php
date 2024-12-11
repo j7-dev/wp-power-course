@@ -537,6 +537,8 @@ final class Course {
 			}
 		}
 
+		\do_action(LifeCycle::BEFORE_UPDATE_PRODUCT_META_ACTION, $product, $meta_data);
+
 		// 最後再來處理剩餘的 meta_data
 		foreach ( $meta_data as $key => $value ) {
 			$product->update_meta_data( $key, $value );
