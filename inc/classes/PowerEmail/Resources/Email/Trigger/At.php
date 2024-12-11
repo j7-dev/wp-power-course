@@ -41,10 +41,10 @@ final class At {
 			'slug'  => 'course_granted',
 			'hook'  => self::SEND_COURSE_GRANTED_HOOK,
 		],
-		'course_launch' => [
-			'label' => '課程開課時',
-			'slug'  => 'course_launch',
-		],
+		// 'course_launch' => [
+		// 'label' => '課程開課時',
+		// 'slug'  => 'course_launch',
+		// ],
 		'chapter_enter' => [
 			'label' => '進入單元時',
 			'slug'  => 'chapter_enter',
@@ -59,20 +59,20 @@ final class At {
 
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
-		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_email' ], 10, 3 );
+		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_email' ], 10 );
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 課程開課時 ----//
 		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
-		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_email' ], 10, 3 );
+		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_email' ], 10 );
 		// ---- END 課程開課時 ----//
 
 		// ---- 進入單元時 ----//
 		\add_action( ChapterLifeCycle::CHAPTER_ENTER_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
-		\add_action( self::SEND_CHAPTER_ENTER_HOOK, [ $this, 'send_course_email' ], 10, 2 );
+		\add_action( self::SEND_CHAPTER_ENTER_HOOK, [ $this, 'send_course_email' ], 10 );
 		// ---- END 進入單元時 ----//
 
-		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 100, 4 );
+		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 20, 4 );
 
 		// ---- 寄送指定用戶 emails ----//
 		\add_action( self::SEND_USERS_HOOK, [ $this, 'send_users_callback' ], 10, 2 );
@@ -126,7 +126,7 @@ final class At {
 		}
 
 		$course_ids = $email->condition->course_ids;
-		$is_sent    = $email->is_sent( $user_id );
+		$is_sent    = $email->is_sent($course_id, $user_id, (int) $email->id);
 		if (empty($course_ids)) {
 			$course_ids = \get_posts(
 				[
@@ -176,6 +176,11 @@ final class At {
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
 			foreach ( $user_ids as $user_id ) {
+				$can_send = $email->can_send( (int) $user_id);
+				$can_send = \apply_filters( 'power_email_can_send', $can_send, $email, (int) $user_id, 0 );
+				if ( !$can_send ) {
+					continue;
+				}
 				$email->send_email( (int) $user_id );
 			}
 		}
@@ -251,6 +256,14 @@ final class At {
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
+
+			// 如果不該發信，就不該排程
+			$can_send = $email->can_send( (int) $args['user_id'], (int) $args['course_id']);
+			$can_send = \apply_filters( 'power_email_can_send', $can_send, $email, (int) $args['user_id'], (int) $args['course_id'] );
+
+			if (!$can_send) {
+				continue;
+			}
 
 			$timestamp = $email->get_sending_timestamp();
 
