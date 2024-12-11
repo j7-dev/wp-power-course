@@ -7,6 +7,7 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
+use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 /**
  * Class CPT
  */
@@ -117,22 +118,12 @@ final class CPT {
 	 * @param int   $course_id 課程 ID
 	 */
 	public function record_user_id_after_send_email( Email $email, int $user_id, int $course_id ): void {
-		$sent_user_ids = \get_post_meta( $email->id, 'sent_user_ids', true );
-		if (!is_array($sent_user_ids)) {
-			$sent_user_ids = [];
-		}
-		$in_array = \in_array( $user_id, $sent_user_ids );
-		if ( $in_array ) {
-			return;
-		}
-
-		\update_post_meta(
-			$email->id,
-			'sent_user_ids',
-			[
-				...$sent_user_ids,
-				$user_id,
-			]
-			);
+		EmailRecord::add(
+			$course_id,
+			$user_id,
+			(int) $email->id,
+			$email->formatted_subject,
+			$email->trigger_at,
+		);
 	}
 }

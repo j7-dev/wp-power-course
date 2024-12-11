@@ -217,7 +217,7 @@ final class LifeCycle {
 				]
 				);
 
-			foreach ($user_ids   as $user_id) {
+			foreach ($user_ids as $user_id) {
 				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
 			}
 		}

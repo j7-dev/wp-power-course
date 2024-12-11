@@ -9,6 +9,7 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
 use J7\PowerCourse\PowerEmail\Resources\Email\Replace\User as UserReplace;
 use J7\PowerCourse\PowerEmail\Resources\Email\Replace\Course as CourseReplace;
+use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\WpUtils\Classes\WP;
 
 
@@ -48,6 +49,11 @@ final class Email {
 	 * @var string Email 主旨
 	 */
 	public string $subject = '';
+
+	/**
+	 * @var string Email 主旨
+	 */
+	public string $formatted_subject = '';
 
 	/**
 	 * @var string Email 寄送條件
@@ -120,9 +126,6 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_email( int $user_id ): bool {
-		if ( !$this->can_send($user_id) ) {
-			return false;
-		}
 		$html = $this->description;
 
 		$user       = \get_user_by( 'ID', $user_id );
@@ -146,13 +149,13 @@ final class Email {
 	public function can_send( int $user_id, ?int $course_id = 0 ): bool {
 		$can_send = true;
 		if (!$course_id) {
-			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+			// 沒有 course_id 的情況是對用戶直接寄信
+			return $can_send;
 		}
 
 		$condition = $this->condition;
 		if (!$condition) {
-			$can_send = false;
-			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+			return false; // 沒有條件就不用判斷了，就是不能寄信
 		}
 
 		$course_ids = $this->condition->course_ids; // 要發的課程 ID
@@ -160,9 +163,8 @@ final class Email {
 		if ( !in_array( $course_id, $course_ids ) && !empty( $course_ids ) ) {
 			$can_send = false;
 		}
-
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
-		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+		return $can_send;
 	}
 
 
@@ -207,10 +209,6 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_course_email( int $user_id, int $course_id ): bool {
-		if ( !$this->can_send($user_id, $course_id) ) {
-			return false;
-		}
-
 		$html = $this->description;
 
 		$user = \get_user_by( 'ID', $user_id );
@@ -225,9 +223,10 @@ final class Email {
 		if (!$course_product) {
 			return false;
 		}
-		$subject = CourseReplace::get_formatted_html( $subject, $course_product );
-		$html    = CourseReplace::get_formatted_html( $html, $course_product );
-		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		$subject                 = CourseReplace::get_formatted_html( $subject, $course_product );
+		$html                    = CourseReplace::get_formatted_html( $html, $course_product );
+		$sent                    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
+		$this->formatted_subject = $subject;
 		if ($sent) {
 			\do_action('power_email_after_send_email', $this, $user_id, $course_id);
 		}
@@ -311,18 +310,13 @@ final class Email {
 	/**
 	 * 是否已寄送
 	 *
+	 * @param int $post_id 文章/課程/章節 ID
 	 * @param int $user_id 使用者 ID
+	 * @param int $email_id 信件 ID
 	 * @return bool
 	 */
-	public function is_sent( int $user_id ): bool {
-		if ('local' === \wp_get_environment_type()) {
-			return false;
-		}
-		// TODO 這樣紀錄沒有記錄到 user 與 course 的關係，需要額外開表處理
-		$sent_user_ids = \get_post_meta( $this->id, 'sent_user_ids', true );
-		if (!is_array($sent_user_ids)) {
-			return false;
-		}
-		return \in_array( $user_id, $sent_user_ids );
+	public function is_sent( int $post_id, int $user_id, int $email_id ): bool {
+		$find_record = EmailRecord::get($post_id, $user_id, $email_id);
+		return !!$find_record;
 	}
 }

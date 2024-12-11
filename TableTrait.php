@@ -114,7 +114,6 @@ trait TableTrait {
 										post_id bigint(20) NOT NULL,
 										user_id bigint(20) NOT NULL,
 										email_id bigint(20) NOT NULL,
-										action_id bigint(20) NOT NULL,
 										email_subject varchar(255) DEFAULT NULL,
 										trigger_at varchar(30) DEFAULT NULL,
 										email_date datetime DEFAULT NULL,
