@@ -1,6 +1,7 @@
 <?php
 /**
  * Compatibility 不同版本間的相容性設定
+ * from v0.5.0
  */
 
 declare (strict_types = 1);
@@ -15,6 +16,7 @@ use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
  */
 final class Compatibility {
 	use \J7\WpUtils\Traits\SingletonTrait;
+	use \J7\PowerCourse\TableTrait;
 
 	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
 
@@ -53,6 +55,35 @@ final class Compatibility {
 		 */
 
 		// 將 course_granted_at 從 timestamp 轉為 Y-m-d H:i:s
+		self::convert_timestamp_to_date();
+
+		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table，沒有就建立
+		self::create_chapter_table();
+
+		// 判斷是否已經有 wp_pc_email_records 這張 table，沒有就建立
+		self::create_email_records_table();
+
+		// 將 table course_id 重新命名為 post_id
+		self::alter_course_table_column();
+
+		// 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
+		self::convert_fields();
+
+		/**
+		 * ============== END 相容性代碼 ==============
+		 */
+
+		// ❗不要刪除此行，註記已經執行過相容設定
+		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
+	}
+
+	/**
+	 * 將 course_granted_at 從 timestamp 轉為 Y-m-d H:i:s
+	 *
+	 * @deprecated
+	 * @return void
+	 */
+	private static function convert_timestamp_to_date(): void {
 		global $wpdb;
 
 		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
@@ -78,29 +109,7 @@ final class Compatibility {
 				[ 'meta_id' => $meta_id ]
 			);
 		}
-
-		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table，沒有就建立
-		global $wpdb;
-		$table_name = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
-		$wpdb->query("SHOW TABLES LIKE '$table_name'"); // phpcs:ignore
-		if ($wpdb->num_rows === 0) {
-			Plugin::create_chapter_table();
-		}
-
-		// 將 table course_id 重新命名為 post_id
-		self::alter_course_table_column();
-
-		// 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
-		self::convert_fields();
-
-		/**
-		 * ============== END 相容性代碼 ==============
-		 */
-
-		// ❗不要刪除此行，註記已經執行過相容設定
-		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
 	}
-
 
 	/**
 	 * 重新命名 course_id 欄位為 post_id
@@ -145,7 +154,7 @@ final class Compatibility {
 	 *
 	 * @return void
 	 */
-	public static function convert_fields(): void {
+	private static function convert_fields(): void {
 		global $wpdb;
 
 		// 取得表格名稱前綴
