@@ -258,6 +258,9 @@ final class Api extends ApiBase {
 				'post_content' => '',
 				'post_status'  => 'draft',
 				'post_author'  => \get_current_user_id(),
+				'meta_input'   => [
+					'trigger_at' => 'course_granted',
+				],
 			]
 			);
 
@@ -429,8 +432,9 @@ final class Api extends ApiBase {
 	public function get_emails_options_callback( $request ): \WP_REST_Response {
 		return new \WP_REST_Response(
 			[
-				'course_schema' => Replace\Course::get_schemas(),
-				'user_schema'   => Replace\User::get_schemas(),
+				'course_schema'  => Replace\Course::get_schemas(),
+				'user_schema'    => Replace\User::get_schemas(),
+				'chapter_schema' => Replace\Chapter::get_schemas(),
 			]
 		);
 	}

@@ -7,7 +7,7 @@ import { useCopyToClipboard } from '@uidotdev/usehooks'
 const Variables = ({ activeKey }: { activeKey: string }) => {
 	const { data } = useSendCondition()
 	const schema = data?.data || {}
-	const { user_schema = {}, course_schema = {} } = schema
+	const { user_schema = {}, course_schema = {}, chapter_schema = {} } = schema
 	const [, copyToClipboard] = useCopyToClipboard()
 
 	const form = Form.useFormInstance()
@@ -33,26 +33,23 @@ const Variables = ({ activeKey }: { activeKey: string }) => {
 		))
 	}
 
-	if (
-		[TriggerAt.COURSE_GRANTED, TriggerAt.COURSE_LAUNCH].includes(watchTriggerAt)
-	) {
-		const avl_schema = {
-			...user_schema,
-			...course_schema,
-		}
-
-		return Object.keys(avl_schema).map((key) => (
-			<Tooltip key={key} title={avl_schema?.[key]}>
-				<Tag
-					color="#eee"
-					className="rounded-xl !text-gray-600 px-3 cursor-pointer mb-2"
-					onClick={handleCopy(key)}
-				>
-					{`{${key}}`}
-				</Tag>
-			</Tooltip>
-		))
+	const avl_schema = {
+		...user_schema,
+		...course_schema,
+		...chapter_schema,
 	}
+
+	return Object.keys(avl_schema).map((key) => (
+		<Tooltip key={key} title={avl_schema?.[key]}>
+			<Tag
+				color="#eee"
+				className="rounded-xl !text-gray-600 px-3 cursor-pointer mb-2"
+				onClick={handleCopy(key)}
+			>
+				{`{${key}}`}
+			</Tag>
+		</Tooltip>
+	))
 }
 
 export default Variables

@@ -142,7 +142,7 @@ final class Email {
 		$html    = \apply_filters('power_email_course_html', $this->description, $user_id, 0, 0);
 		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {
-			\do_action('power_email_after_send_email', $this, $user_id, 0);
+			\do_action('power_email_after_send_email', $this, $user_id, 0, 0);
 		}
 		return $sent;
 	}
@@ -152,13 +152,14 @@ final class Email {
 	 *
 	 * @param int  $user_id 使用者 ID
 	 * @param ?int $course_id 課程 ID
+	 * @param ?int $chapter_id 章節 ID
 	 * @return bool
 	 */
-	public function can_send( int $user_id, ?int $course_id = 0 ): bool {
+	public function can_send( int $user_id, ?int $course_id = 0, ?int $chapter_id = 0 ): bool {
 		$can_send = true;
 		if (!$course_id) {
 			// 沒有 course_id 的情況是對用戶直接寄信
-			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
 		}
 
 		$condition = $this->condition;
@@ -167,12 +168,19 @@ final class Email {
 		}
 
 		$course_ids = $this->condition->course_ids; // 要發的課程 ID
-		// 如果不在指定的課程 id 列表內，也不是全部課程，就不寄送
+		// 如果不在指定的課程 id 列表內，也不是選擇全部課程，就不寄送
 		if ( !in_array( $course_id, $course_ids ) && !empty( $course_ids ) ) {
 			$can_send = false;
 		}
+
+		// $chapter_ids = $this->condition->chapter_ids; // 要發的章節 ID
+		// // 如果不在指定的章節 id 列表內，也不是選擇全部章節，就不寄送
+		// if ( !in_array( $chapter_id, $chapter_ids ) && !empty( $chapter_ids ) && $chapter_id ) {
+		// $can_send = false;
+		// }
+
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
-		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id );
+		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
 	}
 
 
@@ -230,7 +238,7 @@ final class Email {
 		$sent                    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		$this->formatted_subject = $subject;
 		if ($sent) {
-			\do_action('power_email_after_send_email', $this, $user_id, $course_id);
+			\do_action('power_email_after_send_email', $this, $user_id, $course_id, $chapter_id);
 		}
 		return $sent;
 	}
@@ -318,7 +326,16 @@ final class Email {
 	 * @return bool
 	 */
 	public function is_sent( int $post_id, int $user_id, int $email_id ): bool {
-		$find_record = EmailRecord::get($post_id, $user_id, $email_id, 1);
+		$find_record = EmailRecord::get(
+			[
+				'post_id'      => $post_id,
+				'user_id'      => $user_id,
+				'email_id'     => $email_id,
+				'trigger_at'   => $this->trigger_at,
+				'mark_as_sent' => 1,
+			]
+			);
+
 		return !!$find_record;
 	}
 }

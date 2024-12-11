@@ -22,11 +22,11 @@ final class At {
 
 	const AS_GROUP = 'power_email';
 
-	const SEND_USERS_HOOK          = 'power_email_send_users'; // 寄給用戶的 AS hook
-	const SEND_COURSE_GRANTED_HOOK = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
-	const SEND_COURSE_LAUNCH_HOOK  = 'power_email_send_course_launch'; // 課程開課時寄送的 AS hook
-	const SEND_CHAPTER_ENTER_HOOK  = 'power_email_send_chapter_enter'; // 進入單元時寄送的 AS hook
-
+	const SEND_USERS_HOOK            = 'power_email_send_users'; // 寄給用戶的 AS hook
+	const SEND_COURSE_GRANTED_HOOK   = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
+	const SEND_COURSE_LAUNCH_HOOK    = 'power_email_send_course_launch'; // 課程開課時寄送的 AS hook
+	const SEND_CHAPTER_ENTER_HOOK    = 'power_email_send_chapter_enter'; // 進入單元時寄送的 AS hook
+	const SEND_CHAPTER_FINISHED_HOOK = 'power_email_send_chapter_finish'; // 完成單元時寄送的 AS hook
 
 	/**
 	 * 觸發發信時機點
@@ -51,6 +51,11 @@ final class At {
 			'slug'  => 'chapter_enter',
 			'hook'  => self::SEND_CHAPTER_ENTER_HOOK,
 		],
+		'chapter_finish' => [
+			'label' => '完成單元時',
+			'slug'  => 'chapter_finish',
+			'hook'  => self::SEND_CHAPTER_FINISHED_HOOK,
+		],
 	];
 
 	/**
@@ -73,7 +78,12 @@ final class At {
 		\add_action( self::SEND_CHAPTER_ENTER_HOOK, [ $this, 'send_course_email' ], 10 );
 		// ---- END 進入單元時 ----//
 
-		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 20, 4 );
+		// ---- 完成單元時 ----//
+		\add_action( ChapterLifeCycle::CHAPTER_FINISHED_ACTION, [ $this, 'chapter_finish_email' ], 10, 3 );
+		\add_action( self::SEND_CHAPTER_FINISHED_HOOK, [ $this, 'send_course_email' ], 10 );
+		// ---- END 完成單元時 ----//
+
+		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 20, 5 );
 
 		// ---- 寄送指定用戶 emails ----//
 		\add_action( self::SEND_USERS_HOOK, [ $this, 'send_users_callback' ], 10, 2 );
@@ -116,10 +126,10 @@ final class At {
 	 * @param EmailResource $email 信件
 	 * @param int           $user_id 用戶 ID
 	 * @param int           $course_id 課程 ID
+	 * @param int           $chapter_id 章節 ID
 	 * @return bool
 	 */
-	public function trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id ): bool {
-
+	public function trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id, int $chapter_id ): bool {
 		// 如果原本就不能寄信，就不用檢查觸發條件
 		// 如果不存在 課程 id，也直接返回就好
 		if (!$can_send || !$course_id) {
@@ -127,7 +137,12 @@ final class At {
 		}
 
 		$course_ids = $email->condition->course_ids;
-		$is_sent    = $email->is_sent($course_id, $user_id, (int) $email->id);
+
+		$post_id = $chapter_id ? $chapter_id : $course_id;
+		$is_sent = $email->is_sent($post_id, $user_id, (int) $email->id);
+		ob_start();
+		var_dump($is_sent);
+		\J7\WpUtils\Classes\ErrorLog::info('is_sent ' . ob_get_clean());
 		if (empty($course_ids)) {
 			$course_ids = \get_posts(
 				[
@@ -200,7 +215,7 @@ final class At {
 	}
 
 	/**
-	 * 課程開課時的 Email
+	 * 進入章節時的 Email
 	 *
 	 * @param \WP_Post    $chapter 章節文章物件
 	 * @param \WC_Product $product 課程
@@ -218,6 +233,26 @@ final class At {
 			]
 			);
 	}
+
+	/**
+	 * 完成章節時的 Email
+	 *
+	 * @param int $chapter_id 章節 ID
+	 * @param int $course_id 課程 ID
+	 * @param int $user_id 用戶 ID
+	 */
+	public function chapter_finish_email( int $chapter_id, int $course_id, int $user_id ): void {
+		$this->schedule_email(
+			'chapter_finish',
+			[
+				'user_id'    => $user_id,
+				'course_id'  => $course_id,
+				'chapter_id' => $chapter_id,
+			]
+			);
+	}
+
+
 
 	/**
 	 * 發送課程的 Email
@@ -254,7 +289,7 @@ final class At {
 			$email = new EmailResource( (int) $email_id );
 
 			// 如果不該發信，就不該排程
-			$can_send = $email->can_send( (int) $args['user_id'], (int) $args['course_id']);
+			$can_send = $email->can_send( (int) $args['user_id'], (int) $args['course_id'], (int) ( $args['chapter_id'] ?? 0 ));
 
 			if (!$can_send) {
 				continue;

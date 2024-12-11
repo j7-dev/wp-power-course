@@ -29,7 +29,7 @@ final class CPT {
 	 */
 	public function __construct() {
 		\add_action( 'init', [ $this, 'init' ] );
-		\add_action( 'power_email_after_send_email', [ $this, 'record_user_id_after_send_email' ], 10, 3 );
+		\add_action( 'power_email_after_send_email', [ $this, 'record_user_id_after_send_email' ], 10, 4 );
 	}
 
 
@@ -116,10 +116,11 @@ final class CPT {
 	 * @param Email $email 信件
 	 * @param int   $user_id 使用者 ID
 	 * @param int   $course_id 課程 ID
+	 * @param ?int  $chapter_id 單元 ID
 	 */
-	public function record_user_id_after_send_email( Email $email, int $user_id, int $course_id ): void {
+	public function record_user_id_after_send_email( Email $email, int $user_id, int $course_id, int $chapter_id ): void {
 		EmailRecord::add(
-			$course_id,
+			$chapter_id ? $chapter_id : $course_id,
 			$user_id,
 			(int) $email->id,
 			$email->formatted_subject,

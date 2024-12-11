@@ -15,6 +15,7 @@ use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\Resources\Chapter\LifeCycle as ChapterLifeCycle;
 
 
 
@@ -347,6 +348,9 @@ final class Chapter extends ApiBase {
 			\wp_date('Y-m-d H:i:s')
 			);
 		$progress = CourseUtils::get_course_progress( $product );
+
+		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',

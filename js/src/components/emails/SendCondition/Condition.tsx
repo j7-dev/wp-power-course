@@ -74,7 +74,9 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					},
 				],
 		queryOptions: {
-			enabled: watchTriggerAt === TriggerAt.CHAPTER_FINISH,
+			enabled: [TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
+				watchTriggerAt,
+			),
 		},
 	})
 
@@ -105,12 +107,10 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '完成單元時',
 								value: TriggerAt.CHAPTER_FINISH,
-								disabled: true, // TODO 之後開放
 							},
 							{
 								label: '進入單元時',
 								value: TriggerAt.CHAPTER_ENTER,
-								disabled: true, // TODO 之後開放
 							},
 						]}
 					/>

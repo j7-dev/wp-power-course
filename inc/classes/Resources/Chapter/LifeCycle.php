@@ -18,6 +18,9 @@ final class LifeCycle {
 
 	const CHAPTER_ENTER_ACTION = 'power_course_visit_chapter';
 
+	const CHAPTER_FINISHED_ACTION = 'power_course_chapter_finished';
+
+
 	/**
 	 * Constructor
 	 */
@@ -48,7 +51,7 @@ final class LifeCycle {
 			return;
 		}
 
-		\do_action( 'power_course_visit_chapter', $chapter, $product );
+		\do_action( self::CHAPTER_ENTER_ACTION, $chapter, $product );
 	}
 
 	/**

@@ -7,6 +7,7 @@ declare ( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\EmailRecord;
 
+use J7\PowerCourse\PowerEmail\Resources\Email\Email;
 use J7\PowerCourse\Plugin;
 
 /**
@@ -24,26 +25,19 @@ abstract class CRUD {
 	/**
 	 * 取得紀錄
 	 *
-	 * @param int  $post_id 課程/章節 ID
-	 * @param ?int $user_id 使用者 ID
-	 * @param ?int $email_id 信件 ID
-	 * @param ?int $mark_as_sent 是否已寄送
+	 * @param array{id:string, post_id:string, user_id:string, email_id:string, email_subject:string, trigger_at:string, mark_as_sent:string, email_date:string} $where 要查詢的條件
 	 * @return array<int, object{id: int, post_id: int, user_id: int, email_id: int, email_subject: string, trigger_at: string, mark_as_sent: int, email_date: string}>
 	 */
-	public static function get( int $post_id, ?int $user_id = 0, ?int $email_id = 0, ?int $mark_as_sent = null ) {
+	public static function get( array $where ) {
 		global $wpdb;
 		$table_name = $wpdb->prefix . static::$table_name;
 
-		$where = "post_id = $post_id";
-		if ( $user_id ) {
-			$where .= " AND user_id = $user_id";
+		$where_arr = [];
+		foreach ($where as $key => $value) {
+			$where_arr[] = "{$key} = '{$value}'";
 		}
-		if ( $email_id ) {
-			$where .= " AND email_id = $email_id";
-		}
-		if ( $mark_as_sent !== null ) {
-			$where .= " AND mark_as_sent = $mark_as_sent";
-		}
+
+		$where = implode(' AND ', $where_arr);
 		return $wpdb->get_results("SELECT * FROM $table_name WHERE $where"); // phpcs:ignore
 	}
 
@@ -56,24 +50,47 @@ abstract class CRUD {
 	 * @param int    $email_id 信件 ID
 	 * @param string $email_subject 信件主題
 	 * @param string $trigger_at 觸發時間
+	 * @param bool   $unique 是否單一紀錄
 	 * @return int|false The ID of the newly added meta data, or false on failure.
 	 */
-	public static function add( int $post_id, int $user_id, int $email_id, ?string $email_subject = '', ?string $trigger_at = '' ): int|false {
+	public static function add( int $post_id, int $user_id, int $email_id, ?string $email_subject = '', ?string $trigger_at = '', bool $unique = true ): int|false {
 		global $wpdb;
 		$table_name = $wpdb->prefix . static::$table_name;
 
+		$where = [
+			'post_id'  => $post_id,
+			'user_id'  => $user_id,
+			'email_id' => $email_id,
+		];
+
 		$data = [
-			'post_id'       => $post_id,
-			'user_id'       => $user_id,
-			'email_id'      => $email_id,
 			'email_subject' => $email_subject,
 			'trigger_at'    => $trigger_at,
 			'email_date'    => \wp_date('Y-m-d H:i:s'),
 			'mark_as_sent'  => 1,
 		];
+
+		if ($unique) {
+			// 檢查紀錄是否存在
+			$record = self::get(
+				[
+					'post_id'    => $post_id,
+					'user_id'    => $user_id,
+					'email_id'   => $email_id,
+					'trigger_at' => $trigger_at,
+				]
+				);
+			if ($record) {
+				return self::update(
+					$where,
+					$data
+					);
+			}
+		}
+
 		return $wpdb->insert(
 				$table_name,
-				$data,
+				array_merge($where, $data),
 				[ '%d', '%d', '%d', '%s', '%s', '%s' ]
 			);
 	}
