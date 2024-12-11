@@ -69,7 +69,6 @@ final class Bootstrap {
 		\add_action( 'init', [ __CLASS__, 'register_power_course_cron' ] );
 	}
 
-
 	/**
 	 * Prevent guest checkout
 	 * 當購物車中有課程商品時，不允許訪客結帳
