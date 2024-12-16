@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Form, Select, InputNumber, Space, TimePicker, Input } from 'antd'
 import { TriggerAt, TriggerCondition, SendingType, SendingUnit } from './enum'
 import { useSelect } from '@refinedev/antd'
@@ -79,6 +79,15 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 			),
 		},
 	})
+
+	useEffect(() => {
+		if (watchTriggerAt === TriggerAt.COURSE_LAUNCH) {
+			form.setFieldValue(
+				['condition', TriggerCondition.FIELD_NAME],
+				TriggerCondition.EACH,
+			)
+		}
+	}, [watchTriggerAt])
 
 	return (
 		<>
@@ -163,10 +172,12 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '全部達成時',
 								value: TriggerCondition.ALL,
+								disabled: [TriggerAt.COURSE_LAUNCH].includes(watchTriggerAt),
 							},
 							{
 								label: '達成指定數量時',
 								value: TriggerCondition.QUANTITY_GREATER_THAN,
+								disabled: [TriggerAt.COURSE_LAUNCH].includes(watchTriggerAt),
 							},
 						]}
 					/>
