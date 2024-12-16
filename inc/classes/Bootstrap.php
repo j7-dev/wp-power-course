@@ -47,6 +47,7 @@ final class Bootstrap {
 		Api\Chapter::instance();
 		Api\Upload::instance();
 		Api\Option::instance();
+		Api\Shortcode::instance();
 		Api\Comment::instance();
 		Api\Reports\Revenue\Api::instance();
 

@@ -8,13 +8,20 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\PowerCourse\Plugin;
+use J7\WpUtils\Classes\ApiBase;
 
 /**
  * Class Api
  */
-final class Upload {
+final class Upload extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * Namespace
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'power-course';
 
 	/**
 	 * APIs
@@ -30,26 +37,6 @@ final class Upload {
 			'method'   => 'post',
 		],
 	];
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_upload' ] );
-	}
-
-	/**
-	 * Register products API
-	 *
-	 * @return void
-	 */
-	public function register_api_upload(): void {
-		$this->register_apis(
-			apis: $this->apis,
-			namespace: Plugin::$kebab,
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
-		);
-	}
 
 	/**
 	 * Post upload callback
