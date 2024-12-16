@@ -254,14 +254,8 @@ final class Condition {
 	 */
 	private function get_current_ids( int $user_id ): array {
 		$current_ids = match ($this->trigger_at) {
-			'course_granted' => \get_user_meta($user_id, 'avl_course_ids', true) ?: [],
-			'course_finish' => $this->get_metatable_post_ids(
-				[
-					'user_id'  => $user_id,
-					'meta_key' => 'finished_at',
-				],
-				'course'
-				),
+			'course_granted' => \get_user_meta($user_id, 'avl_course_ids') ?: [],
+			'course_finish' => CourseUtils::get_finished_course_ids($user_id),
 			'chapter_finish' => $this->get_metatable_post_ids(
 				[
 					'user_id'  => $user_id,

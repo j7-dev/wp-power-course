@@ -187,16 +187,22 @@ abstract class Course {
 	/**
 	 * 取得課程進度
 	 *
-	 * @param \WC_Product $product 課程商品
-	 * @param int|null    $user_id 用户 ID
+	 * @param \WC_Product|int $product 課程商品
+	 * @param int|null        $user_id 用户 ID
 	 *
 	 * @return float
 	 */
-	public static function get_course_progress( \WC_Product $product, ?int $user_id = 0 ): float {
+	public static function get_course_progress( \WC_Product|int $product, ?int $user_id = 0 ): float {
 		if (!$user_id) {
 			$user_id = get_current_user_id();
 		}
-		$product_id                  = $product->get_id();
+		$product_id = $product instanceof \WC_Product ? $product->get_id() : $product;
+		$product    = $product instanceof \WC_Product ? $product : \wc_get_product($product_id);
+
+		if (!$product) {
+			return 0;
+		}
+
 		$sub_chapters_count          = count(self::get_sub_chapters($product, true));
 		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, return_ids: true));
 
@@ -204,6 +210,21 @@ abstract class Course {
 		$progress = min( 100, $progress );
 		return $progress;
 	}
+
+	/**
+	 * 取得用戶已經上完的課程 ids
+	 *
+	 * @param int $user_id 用戶 id
+	 * @return array<int|string> 課程 ids
+	 */
+	public static function get_finished_course_ids( int $user_id ): array {
+		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids') ?: [];
+
+		$avl_course_ids = array_filter($avl_course_ids, fn( $course_id ) => self::get_course_progress( (int) $course_id, $user_id) === (float) 100 );
+
+		return $avl_course_ids;
+	}
+
 	/**
 	 * 取得已完成章節
 	 *
