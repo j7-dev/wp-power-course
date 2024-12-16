@@ -25,8 +25,6 @@ if (!defined('ABSPATH')) {
 
 if (!\class_exists('J7\PowerCourse\Plugin')) {
 	require_once __DIR__ . '/vendor/autoload.php';
-	require_once __DIR__ . '/TableTrait.php';
-
 
 	/**
 	 * Class Plugin
@@ -34,7 +32,6 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 	final class Plugin {
 		use \J7\WpUtils\Traits\PluginTrait;
 		use \J7\WpUtils\Traits\SingletonTrait;
-		use \J7\PowerCourse\TableTrait;
 
 		const COURSE_TABLE_NAME        = 'pc_avl_coursemeta';
 		const CHAPTER_TABLE_NAME       = 'pc_avl_chaptermeta';
@@ -45,7 +42,6 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 * Constructor
 		 */
 		public function __construct() {
-
 			self::$template_page_names = [ 'course-product', 'classroom', 'my-account', '404' ];
 
 			$this->required_plugins = [
@@ -81,9 +77,10 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 * @throws \Exception Exception.
 		 */
 		public function activate(): void {
-			self::create_course_table();
-			self::create_chapter_table();
-			self::create_email_records_table();
+			require_once __DIR__ . '/AbstractTable.php';
+			AbstractTable::create_course_table();
+			AbstractTable::create_chapter_table();
+			AbstractTable::create_email_records_table();
 			self::set_default_product_meta();
 		}
 
