@@ -31,17 +31,7 @@ const CoursePriceComponent = () => {
 	}, [watchIsFree])
 	return (
 		<div className="grid grid-cols-2 gap-4">
-			<Item
-				name={['regular_price']}
-				label="原價"
-				initialValue={0}
-				rules={[
-					{
-						required: true,
-						message: '請輸入原價',
-					},
-				]}
-			>
+			<Item name={['regular_price']} label="原價" initialValue={0}>
 				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
 			</Item>
 			<Item name={['sale_price']} label="折扣價">
