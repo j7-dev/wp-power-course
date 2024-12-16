@@ -124,7 +124,6 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 							{
 								label: '完成課程時',
 								value: TriggerAt.COURSE_FINISH,
-								disabled: true, // TODO 之後開放
 							},
 							{
 								label: '課程開課時',
