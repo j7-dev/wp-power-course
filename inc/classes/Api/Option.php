@@ -8,14 +8,20 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Api;
 
 use J7\WpUtils\Classes\WP;
-use J7\PowerCourse\Plugin;
+use J7\WpUtils\Classes\ApiBase;
 
 /**
  * Option Api
  */
-final class Option {
+final class Option extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * Namespace
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'power-course';
 
 	/**
 	 * APIs
@@ -25,7 +31,7 @@ final class Option {
 	 * - method: 'get' | 'post' | 'patch' | 'delete'
 	 * - permission_callback : callable
 	 */
-	private $apis = [
+	protected $apis = [
 		[
 			'endpoint'            => 'options',
 			'method'              => 'get',
@@ -57,26 +63,6 @@ final class Option {
 		'pc_watermark_interval'      => 10, // 浮水印間隔
 		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
 	];
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
-	}
-
-	/**
-	 * Register products API
-	 *
-	 * @return void
-	 */
-	public function register_api_products(): void {
-		$this->register_apis(
-		apis: $this->apis,
-		namespace: Plugin::$kebab,
-		default_permission_callback: fn() => \current_user_can( 'manage_options' ),
-		);
-	}
 
 	/**
 	 * 獲取選項
