@@ -248,9 +248,10 @@ final class Chapter extends ApiBase {
 			'meta_data' => $meta_data,
 		] = $this->separator( $request );
 
+		$data['ID']         = $id;
 		$data['meta_input'] = $meta_data;
 
-		$update_result = ChapterUtils::update_chapter( $id, $data );
+		$update_result = \wp_update_post($data);
 
 		if ( \is_wp_error( $update_result ) ) {
 			return $update_result;
