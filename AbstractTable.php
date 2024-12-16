@@ -7,18 +7,21 @@ namespace J7\PowerCourse;
 
 use J7\WpUtils\Classes\WP;
 
-if ( trait_exists( 'TableTrait' ) ) {
+if ( class_exists( 'AbstractTable' ) ) {
 	return;
 }
 
-trait TableTrait {
+/**
+ * 抽象類別，用來創建 table
+ */
+abstract class AbstractTable {
 	/**
 	 * 創建課程 meta table
 	 *
 	 * @return void
 	 * @throws \Exception Exception.
 	 */
-	private static function create_course_table(): void {
+	public static function create_course_table(): void {
 		try {
 			global $wpdb;
 			$table_name      = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
@@ -57,7 +60,7 @@ trait TableTrait {
 	 * @return void
 	 * @throws \Exception Exception.
 	 */
-	private static function create_chapter_table(): void {
+	public static function create_chapter_table(): void {
 		try {
 			global $wpdb;
 			$table_name      = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
@@ -96,7 +99,7 @@ trait TableTrait {
 	 * @return void
 	 * @throws \Exception Exception.
 	 */
-	private static function create_email_records_table(): void {
+	public static function create_email_records_table(): void {
 		try {
 			global $wpdb;
 			$table_name      = $wpdb->prefix . Plugin::EMAIL_RECORDS_TABLE_NAME;

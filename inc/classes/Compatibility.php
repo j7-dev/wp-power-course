@@ -10,13 +10,13 @@ namespace J7\PowerCourse;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\AbstractTable;
 
 /**
  * Class Compatibility
  */
 final class Compatibility {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\PowerCourse\TableTrait;
 
 	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
 
@@ -58,10 +58,10 @@ final class Compatibility {
 		self::convert_timestamp_to_date();
 
 		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table，沒有就建立
-		self::create_chapter_table();
+		AbstractTable::create_chapter_table();
 
 		// 判斷是否已經有 wp_pc_email_records 這張 table，沒有就建立
-		self::create_email_records_table();
+		AbstractTable::create_email_records_table();
 
 		// 將 table course_id 重新命名為 post_id
 		self::alter_course_table_column();
