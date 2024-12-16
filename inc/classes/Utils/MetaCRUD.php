@@ -212,6 +212,39 @@ abstract class MetaCRUD {
 		}
 	}
 
+
+	/**
+	 * 查詢 AVL 的 metatable
+	 *
+	 * @param array $select 要查詢的欄位
+	 * @param array $where 要查詢的條件
+	 * @return array
+	 */
+	public static function query( array $select, array $where ): array {
+		global $wpdb;
+
+		$select_sql  = implode(', ', $select);
+		$where_array = [];
+		foreach ($where as $key => $value) {
+			$where_array[] = "{$key} = '{$value}'";
+		}
+		$where_sql = implode(' AND ', $where_array);
+
+		$table_name = $wpdb->prefix . static::$table_name;
+		$results    = $wpdb->get_results(
+			stripslashes( // phpcs:ignore
+			$wpdb->prepare(
+				'SELECT %1$s FROM %2$s WHERE %3$s',
+				$select_sql,
+				$table_name,
+				$where_sql,
+			)
+		)
+			);
+
+		return $results;
+	}
+
 	/**
 	 * Deletes the available course meta for a specific course and user.
 	 *

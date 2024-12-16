@@ -7,7 +7,6 @@ declare ( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\EmailRecord;
 
-use J7\PowerCourse\PowerEmail\Resources\Email\Email;
 use J7\PowerCourse\Plugin;
 
 /**

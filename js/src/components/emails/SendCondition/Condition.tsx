@@ -1,7 +1,17 @@
 import React, { useEffect } from 'react'
-import { Form, Select, InputNumber, Space, TimePicker, Input } from 'antd'
+import {
+	Form,
+	Select,
+	InputNumber,
+	Space,
+	TimePicker,
+	Input,
+	SelectProps,
+} from 'antd'
 import { TriggerAt, TriggerCondition, SendingType, SendingUnit } from './enum'
 import { useSelect } from '@refinedev/antd'
+import { BaseOption, GetListResponse } from '@refinedev/core'
+import type { QueryObserverResult } from '@tanstack/react-query'
 import {
 	TCourseBaseRecord,
 	TChapterRecord,
@@ -42,43 +52,50 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 		],
 	})
 
-	const { selectProps: chapterSelectProps } = useSelect<TChapterRecord>({
-		resource: 'chapters',
-		optionLabel: 'name',
-		optionValue: 'id',
-		onSearch: (value) => [
-			{
-				field: 's',
-				operator: 'eq',
-				value,
+	const { selectProps: chapterSelectProps, query: chapterQuery } =
+		useSelect<TChapterRecord>({
+			resource: 'chapters',
+			optionLabel: 'name',
+			optionValue: 'id',
+			onSearch: (value) => [
+				{
+					field: 's',
+					operator: 'eq',
+					value,
+				},
+			],
+			filters: watchCourseIds
+				? [
+						{
+							field: 'posts_per_page',
+							operator: 'eq',
+							value: 100,
+						},
+						{
+							field: 'post_parent__in',
+							operator: 'eq',
+							value: watchCourseIds,
+						},
+					]
+				: [
+						{
+							field: 'posts_per_page',
+							operator: 'eq',
+							value: 100,
+						},
+					],
+			queryOptions: {
+				enabled: [TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
+					watchTriggerAt,
+				),
 			},
-		],
-		filters: watchCourseIds
-			? [
-					{
-						field: 'posts_per_page',
-						operator: 'eq',
-						value: 100,
-					},
-					{
-						field: 'post_parent__in',
-						operator: 'eq',
-						value: watchCourseIds,
-					},
-				]
-			: [
-					{
-						field: 'post_parent__in',
-						operator: 'eq',
-						value: watchCourseIds,
-					},
-				],
-		queryOptions: {
-			enabled: [TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
-				watchTriggerAt,
-			),
-		},
-	})
+		})
+
+	// 將 option 分組
+	const formattedChapterSelectProps = formatChapterSelectProps(
+		chapterSelectProps,
+		chapterQuery,
+	)
 
 	useEffect(() => {
 		if (watchTriggerAt === TriggerAt.COURSE_LAUNCH) {
@@ -151,7 +168,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					>
 						<Select
 							{...defaultSelectProps}
-							{...chapterSelectProps}
+							{...formattedChapterSelectProps}
 							placeholder="可多選，可搜尋關鍵字"
 						/>
 					</Item>
@@ -296,3 +313,38 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 }
 
 export default Condition
+
+// 將 option 分組
+function formatChapterSelectProps(
+	props: SelectProps<BaseOption, any>,
+	query: QueryObserverResult<GetListResponse<TChapterRecord>>,
+) {
+	const chapters = query.data?.data || []
+	const newOptions = chapters.reduce(
+		(acc, curr) => {
+			const sub_chapters = curr?.chapters || []
+			if (sub_chapters.length === 0) {
+				return acc
+			}
+
+			const newOption = {
+				label: <>{curr.name}</>,
+				options: sub_chapters.map((sub_chapter) => ({
+					label: sub_chapter.name,
+					value: sub_chapter.id,
+				})),
+			}
+
+			acc?.push(newOption)
+			return acc
+		},
+		[] as SelectProps['options'],
+	)
+
+	const newProps = {
+		...props,
+		options: newOptions,
+	}
+
+	return newProps
+}

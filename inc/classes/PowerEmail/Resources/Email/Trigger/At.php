@@ -8,7 +8,6 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
 use J7\PowerCourse\PowerEmail\Resources\Email;
-use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 use J7\PowerCourse\Resources\Chapter\LifeCycle as ChapterLifeCycle;
@@ -132,52 +131,15 @@ final class At {
 	public function trigger_condition( bool $can_send, EmailResource $email, int $user_id, int $course_id, int $chapter_id ): bool {
 		// 如果原本就不能寄信，就不用檢查觸發條件
 		// 如果不存在 課程 id，也直接返回就好
+		// 沒有 course_id 的情況是對用戶直接寄信
 		if (!$can_send || !$course_id) {
 			return $can_send;
 		}
 
-		$course_ids = $email->condition->course_ids;
-
 		$post_id = $chapter_id ? $chapter_id : $course_id;
 		$is_sent = $email->is_sent($post_id, $user_id, (int) $email->id);
-		ob_start();
-		var_dump($is_sent);
-		\J7\WpUtils\Classes\ErrorLog::info('is_sent ' . ob_get_clean());
-		if (empty($course_ids)) {
-			$course_ids = \get_posts(
-				[
-					'post_type'      => 'product',
-					'posts_per_page' => -1,
-					'post_status'    => 'publish',
-					'fields'         => 'ids',
-					'meta_key'       => '_is_course',
-					'meta_value'     => 'yes',
-				]
-			);
-		}
-		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
 
-		if ('each' === $email->condition->trigger_condition && !$is_sent) {
-			return true;
-		}
-
-		if ('all' === $email->condition->trigger_condition && !$is_sent) {
-			// 使用 array_diff 找出在 $course_ids 中但不在 $current_avl_course_ids 中的元素
-			// 如果 $course_ids 中的所有元素都在 $current_avl_course_ids 中存在
-			$diff = empty(array_diff($course_ids, $current_avl_course_ids));
-			return $diff;
-		}
-
-		if ('qty_greater_than' === $email->condition->trigger_condition && !$is_sent) {
-			// 找出相同的 課程 id
-			$intersect = array_intersect($course_ids, $current_avl_course_ids);
-
-			return count($intersect) >= $email->condition->qty;
-		}
-
-		// 就會變任一個都符合的條件
-		// 因為所有條件都判斷完了，這邊應該 return false!?
-		return false;
+		return $is_sent ? false : $email->condition->can_trigger($user_id, $course_id, $chapter_id);
 	}
 
 

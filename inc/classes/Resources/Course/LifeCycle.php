@@ -234,7 +234,7 @@ final class LifeCycle {
 				\do_action(self::COURSE_LAUNCH_ACTION, (int) $user_id, (int) $course_id);
 			}
 
-			// 註記已經執行過開課動作了
+			// 註記已經執行過開課動作了，但不代表寄信
 			\update_post_meta($course_id, 'course_launch_action_done', 'yes');
 		}
 	}
