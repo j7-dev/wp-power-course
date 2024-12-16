@@ -8,6 +8,10 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
+use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 
 /**
  * Class Condition 觸發發信時機點
@@ -23,6 +27,11 @@ final class Condition {
 	public string $trigger_at = '';
 
 	/**
+	 * @var array<string> 屬於課程的觸發時機點，反之為屬於章節/單元的觸發時機點
+	 */
+	private array $course_trigger_at = [ 'course_granted', 'course_finish', 'course_launch' ];
+
+	/**
 	 * @var array<string> 課程 ID 陣列
 	 */
 	public array $course_ids = [];
@@ -32,6 +41,11 @@ final class Condition {
 	 */
 	public array|null $chapter_ids = null;
 
+
+	/**
+	 * @var array<string> 課程/章節/單元 ID 陣列
+	 */
+	private array $required_ids = [];
 
 	/**
 	 * @var string 觸發條件
@@ -77,16 +91,230 @@ final class Condition {
 	 *
 	 * @param array $condition 觸發條件
 	 */
-	public function __construct( $condition ) {
+	public function __construct( array $condition ) {
 		$at                      = At::instance();
 		$this->trigger_at        = $condition['trigger_at'] ?? $at->trigger_at['course_granted']['slug'];
-		$this->course_ids        = ( (array) $condition['course_ids'] ?? null );
-		$this->chapter_ids       = $condition['chapter_ids'] ?? null;
 		$this->trigger_condition = $condition['trigger_condition'];
+		$this->course_ids        = ( (array) $condition['course_ids'] ?? null );
+		$this->chapter_ids       = ( (array) $condition['chapter_ids'] ?? null );
 		$this->qty               = (int) ( $condition['qty'] ?? null );
 		$this->sending_type      = $condition['sending']['type'] ?? 'send_now';
 		$this->sending_value     = $condition['sending']['value'] ?? null;
 		$this->sending_unit      = $condition['sending']['unit'] ?? null;
 		$this->sending_range     = $condition['sending']['range'] ?? null;
+
+		$this->set_required_ids();
+	}
+
+
+	/**
+	 * 依照不同條件，取得 required_ids (可能是課程/章節/單元 ID)
+	 * 判斷是否屬於課程的觸發時機點，反之為屬於章節/單元的觸發時機點
+	 *
+	 * @return void
+	 */
+	private function set_required_ids(): void {
+		// 先判斷是否是課程的觸發時機點
+		if ( in_array( $this->trigger_at, $this->course_trigger_at, true) ) {
+			if ( !empty( $this->course_ids ) ) {
+				$this->required_ids = $this->course_ids;
+				return;
+			}
+
+			$course_ids = \get_posts(
+				[
+					'post_type'      => 'product',
+					'posts_per_page' => -1,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+					'meta_key'       => '_is_course',
+					'meta_value'     => 'yes',
+				]
+				);
+
+			$this->required_ids = $course_ids;
+			return;
+		}
+
+		// 章節/單元的觸發時機點
+
+		// 第一種可能: 不指定課程 & 不指定章節 -> 取得所有章節
+		if ( empty( $this->course_ids ) && empty( $this->chapter_ids ) ) {
+			$chapter_ids = \get_posts(
+				[
+					'post_type'      => ChapterCPT::POST_TYPE,
+					'posts_per_page' => -1,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+				]
+				);
+
+			$this->required_ids = $chapter_ids;
+			return;
+		}
+
+		// 第二種可能: 指定課程 & 不指定章節 -> 把課程子章節都加總起來
+		if ( !empty( $this->course_ids ) && empty( $this->chapter_ids ) ) {
+			$chapter_ids = [];
+			foreach ( $this->course_ids as $course_id ) {
+				$course_chapter_ids = CourseUtils::get_sub_chapters( (int) $course_id, true);
+				$chapter_ids        = array_merge( $chapter_ids, $course_chapter_ids );
+			}
+
+			$this->required_ids = $chapter_ids;
+			return;
+		}
+
+		// 第三種可能: (不)指定課程 & 指定章節 -> 取得指定章節
+		if ( !empty( $this->chapter_ids ) ) {
+			$this->required_ids = $this->chapter_ids;
+			return;
+		}
+
+		// 如果都不符合以上條件，則回傳空陣列
+		$this->required_ids = [];
+		return;
+	}
+
+
+	/**
+	 * 是否可以觸發
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @param int $course_id 課程 ID
+	 * @param int $chapter_id 章節 ID
+	 * @return bool
+	 */
+	public function can_trigger( int $user_id, int $course_id, int $chapter_id ): bool {
+		return match ($this->trigger_condition) {
+			'each' => $this->is_each_trigger_condition_met($user_id, $course_id, $chapter_id),
+			'all' => $this->is_all_trigger_condition_met($user_id),
+			'qty_greater_than' => $this->is_qty_greater_than_trigger_condition_met($user_id),
+			default => false,
+			// 就會變任一個都符合的條件
+			// 因為所有條件都判斷完了，default 應該 return false!?
+		};
+	}
+
+	/**
+	 * 是否任一達成
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @param int $course_id 課程 ID
+	 * @param int $chapter_id 章節 ID
+	 * @return bool
+	 */
+	private function is_each_trigger_condition_met( int $user_id, int $course_id, int $chapter_id ): bool {
+		// 判斷是否是課程的時機點
+		if ( in_array( $this->trigger_at, $this->course_trigger_at, true) ) {
+			// 如果不在指定的課程 id 列表內，也不是選擇全部課程，就不寄送
+			return in_array( $course_id, $this->required_ids );
+		}
+
+		return in_array( $chapter_id, $this->required_ids );
+	}
+
+
+	/**
+	 * 是否全部達成
+	 * 使用 array_diff 找出在 $required_ids 中但不在 $current_ids 中的元素
+	 * 如果 $required_ids 中的所有元素都在 $current_ids 中存在就回傳 true
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @return bool
+	 */
+	private function is_all_trigger_condition_met( int $user_id ): bool {
+		$current_ids = $this->get_current_ids($user_id);
+
+		$diff = empty(array_diff($this->required_ids, $current_ids));
+		return $diff;
+	}
+
+	/**
+	 * 是否達成指定數量
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @return bool
+	 */
+	private function is_qty_greater_than_trigger_condition_met( int $user_id ): bool {
+		$current_ids = $this->get_current_ids($user_id);
+
+		// 找出相同的 課程 id
+		$intersect = array_intersect($this->required_ids, $current_ids);
+
+		return count($intersect) >= $this->qty;
+	}
+
+
+	/**
+	 * 取得 current_ids 用來做比較
+	 *
+	 * @param int $user_id 使用者 ID
+	 * @return array<string|int> current_ids 陣列
+	 */
+	private function get_current_ids( int $user_id ): array {
+		$current_ids = match ($this->trigger_at) {
+			'course_granted' => \get_user_meta($user_id, 'avl_course_ids', true) ?: [],
+			'course_finish' => $this->get_metatable_post_ids(
+				[
+					'user_id'  => $user_id,
+					'meta_key' => 'finished_at',
+				],
+				'course'
+				),
+			'chapter_finish' => $this->get_metatable_post_ids(
+				[
+					'user_id'  => $user_id,
+					'meta_key' => 'finished_at',
+				],
+				'chapter'
+				),
+			'chapter_enter' => $this->get_metatable_post_ids(
+				[
+					'user_id'  => $user_id,
+					'meta_key' => 'first_visit_at',
+				],
+				'chapter'
+				),
+			'course_launch' => [], // 開課時只有 each 不需要判斷
+			default => [],
+		};
+
+		if ( !is_array( $current_ids ) ) {
+			$current_ids = [];
+		}
+
+		return $current_ids;
+	}
+
+	/**
+	 * 取得 post_ids
+	 *
+	 * @param array  $where 查詢條件
+	 * @param string $table_slug 資料表 course |chapter
+	 * @return array<string|int> post_ids 陣列
+	 */
+	private function get_metatable_post_ids( array $where, string $table_slug ): array {
+
+		$class = match ($table_slug) {
+			'course' => AVLCourseMeta::class,
+			'chapter' => AVLChapterMeta::class,
+			default => null,
+		};
+
+		if ( $class ) {
+			$results = \call_user_func(
+				[ $class, 'query' ],
+				[
+					'post_id',
+				],
+				$where
+				);
+
+			$post_ids = \wp_list_pluck($results, 'post_id');
+			return $post_ids;
+		}
+
+		return [];
 	}
 }

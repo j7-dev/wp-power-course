@@ -87,7 +87,7 @@ final class Email {
 	 *
 	 * @param \WP_Post|int $post Post object or post ID.
 	 * @param bool         $show_description 是否顯示 Email 內容
-	 * @param bool         $api_format 是否為 API 格式
+	 * @param bool         $api_format 是否為 API 格式，true 直接回傳 array 不是的話會 new Condition
 	 */
 	public function __construct( $post, $show_description = true, $api_format = false ) {
 		$post         = $post instanceof \WP_Post ? $post : \get_post( $post );
@@ -156,28 +156,11 @@ final class Email {
 	 * @return bool
 	 */
 	public function can_send( int $user_id, ?int $course_id = 0, ?int $chapter_id = 0 ): bool {
-		$can_send = true;
-		if (!$course_id) {
-			// 沒有 course_id 的情況是對用戶直接寄信
-			return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
-		}
-
+		$can_send  = true;
 		$condition = $this->condition;
 		if (!$condition) {
 			return false; // 沒有條件就不用判斷了，就是不能寄信
 		}
-
-		$course_ids = $this->condition->course_ids; // 要發的課程 ID
-		// 如果不在指定的課程 id 列表內，也不是選擇全部課程，就不寄送
-		if ( !in_array( $course_id, $course_ids ) && !empty( $course_ids ) ) {
-			$can_send = false;
-		}
-
-		// $chapter_ids = $this->condition->chapter_ids; // 要發的章節 ID
-		// // 如果不在指定的章節 id 列表內，也不是選擇全部章節，就不寄送
-		// if ( !in_array( $chapter_id, $chapter_ids ) && !empty( $chapter_ids ) && $chapter_id ) {
-		// $can_send = false;
-		// }
 
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
 		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
