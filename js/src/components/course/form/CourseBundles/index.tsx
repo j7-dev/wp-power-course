@@ -90,7 +90,7 @@ const CourseBundlesComponent = () => {
 	const { mutate: create, isLoading: isCreating } = useCreate()
 	const handleCreate = () => {
 		const values = {
-			status: 'draft',
+			status: 'publish',
 			bundle_type: 'bundle',
 			name: '銷售方案',
 			link_course_ids: [courseId],
