@@ -77,7 +77,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 * @throws \Exception Exception.
 		 */
 		public function activate(): void {
-			require_once __DIR__ . '/AbstractTable.php';
+			require_once __DIR__ . '/inc/classes/AbstractTable.php';
 			AbstractTable::create_course_table();
 			AbstractTable::create_chapter_table();
 			AbstractTable::create_email_records_table();
