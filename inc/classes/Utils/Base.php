@@ -89,12 +89,21 @@ abstract class Base {
 			'_subscription_length',
 		];
 
+		$values = [];
 		foreach ($fields as $field) {
-			$value    = $product->get_meta($field);
-			${$field} = $value;
+			$value            = $product->get_meta($field);
+			$values[ $field ] = $value;
 		}
+		/**
+		 * @var array{
+		 *  _subscription_price: string,
+		 *  _subscription_period: string,
+		 *  _subscription_period_interval: int,
+		 *  _subscription_length: int,
+		 * } $values
+		 */
 
-		$_subscription_period_label = match ($_subscription_period) {
+		$_subscription_period_label = match ($values['_subscription_period']) {
 			'day' => '天',
 			'week' => '週',
 			'month' => '月',
@@ -109,10 +118,10 @@ abstract class Base {
 				</span>
 				/ %2$s%3$s%4$s
 			',
-			\wc_price( (float) $_subscription_price),
-			$_subscription_period_interval > 1 ? "{$_subscription_period_interval} " : '',
+			\wc_price( (float) $values['_subscription_price']),
+			$values['_subscription_period_interval'] > 1 ? "{$values['_subscription_period_interval']} " : '',
 			$_subscription_period_label,
-			$_subscription_length ? "<p class='text-gray-600/50 text-sm mb-0'>持續 {$_subscription_length} {$_subscription_period_label}</p>" : ''
+			$values['_subscription_length'] ? "<p class='text-gray-600/50 text-sm mb-0'>持續 {$values['_subscription_length']} {$_subscription_period_label}</p>" : ''
 		);
 	}
 
