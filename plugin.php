@@ -12,7 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       power-course
  * Domain Path:       /languages
- * Tags: LMS, online course, vite, react, tailwind, typescript, react-query, scss, WordPress, WordPress plugin, refine
+ * Tags: LMS, online course, online learning, e-learning, e-learning platform
  */
 
 declare(strict_types=1);
