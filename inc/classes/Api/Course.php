@@ -7,8 +7,8 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\Api;
 
+use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Base;
@@ -24,9 +24,15 @@ use J7\PowerCourse\Resources\Course\LifeCycle;
 /**
  * Class Course
  */
-final class Course {
+final class Course extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
+
+	/**
+	 * Namespace
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'power-course';
 
 	/**
 	 * APIs
@@ -84,7 +90,7 @@ final class Course {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_course' ] );
+		parent::__construct();
 		\add_filter( 'wp_kses_allowed_html', [ $this, 'extend_wpkses_post_tags' ], 10, 2 );
 	}
 
@@ -113,20 +119,6 @@ final class Course {
 		}
 		return $tags;
 	}
-
-	/**
-	 * Register Course API
-	 *
-	 * @return void
-	 */
-	public function register_api_course(): void {
-		$this->register_apis(
-			apis: $this->apis,
-			namespace: Plugin::$kebab,
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
-		);
-	}
-
 
 	/**
 	 * Get courses callback
@@ -172,6 +164,7 @@ final class Course {
 		// unset( $args['price_range'] );
 		// }
 
+		/** @var object{total:int, max_num_pages:int, products:array<int, \WC_Product>} */
 		$results     = \wc_get_products( $args );
 		$total       = $results->total;
 		$total_pages = $results->max_num_pages;
@@ -183,8 +176,8 @@ final class Course {
 		$response = new \WP_REST_Response( $formatted_products );
 
 		// set pagination in header
-		$response->header( 'X-WP-Total', $total );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$response->header( 'X-WP-Total', (string) $total );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 
 		return $response;
 	}
@@ -210,7 +203,17 @@ final class Course {
 				);
 		}
 
-		$product           = \wc_get_product( $id );
+		$product = \wc_get_product( $id );
+
+		if (!$product) {
+			return new \WP_REST_Response(
+				[
+					'message' => 'product not found',
+				],
+				404
+				);
+		}
+
 		$formatted_product = $this->format_course_records( $product );
 
 		$response = new \WP_REST_Response( $formatted_product );
@@ -257,6 +260,7 @@ final class Course {
 				]
 			)
 		);
+		// @phpstan-ignore-next-line
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
 		// 把子章節的時間加總
 		$course_length = array_reduce(
@@ -389,6 +393,7 @@ final class Course {
 				]
 			)
 		);
+		// @phpstan-ignore-next-line
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
 
 		$children = ! ! $chapters ? [
@@ -465,10 +470,12 @@ final class Course {
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
-		$body_params = General::format_empty_array( $body_params );
+		/** @var array<string, mixed|string> $body_params */
+		$body_params = is_array($body_params) ? General::format_empty_array($body_params) : [];
 
 		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();
 
+		// @phpstan-ignore-next-line
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
@@ -509,8 +516,8 @@ final class Course {
 	/**
 	 * 儲存課程的元資料
 	 *
-	 * @param \WC_Product          $product 代表 WooCommerce 產品的物件
-	 * @param array<string, mixed> $meta_data 需要更新的元資料陣列
+	 * @param \WC_Product                        $product 代表 WooCommerce 產品的物件
+	 * @param array<string, array<mixed>|string> $meta_data 需要更��的元資料陣列
 	 * @return void
 	 */
 	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): void {
@@ -521,6 +528,7 @@ final class Course {
 		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
 		$array_keys = [ 'teacher_ids' ];
 		foreach ($array_keys as $meta_key) {
+
 			$array_value = [];
 			if (isset($meta_data[ $meta_key ])) {
 				$array_value = $meta_data[ $meta_key ];
@@ -531,6 +539,7 @@ final class Course {
 				// 先刪除現有的 teacher_ids
 				$product->delete_meta_data($meta_key);
 
+				/** @var array<string, array<mixed>|string> $array_value */
 				foreach ($array_value as $meta_value) {
 					$product->add_meta_data($meta_key, $meta_value);
 				}
@@ -560,6 +569,7 @@ final class Course {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_courses_callback( $request ) {
+		/** @var array<string, array<mixed>|string> $meta_data */
 		[
 			'product' => $product,
 			'data'      => $data,
@@ -590,6 +600,7 @@ final class Course {
 	 * @return \WP_REST_Response
 	 */
 	public function post_courses_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+		/** @var array<string, array<mixed>|string> $meta_data */
 		[
 			'product' => $product,
 			'data'      => $data,
@@ -634,7 +645,6 @@ final class Course {
 			);
 		}
 
-		$success = true;
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
 				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, (int) $expire_date );
@@ -643,14 +653,14 @@ final class Course {
 
 		return new \WP_REST_Response(
 			[
-				'code'    => $success ? 'add_students_success' : 'add_students_failed',
-				'message' => $success ? '新增學員成功' : '新增學員失敗',
+				'code'    => 'add_students_success',
+				'message' => '新增學員成功',
 				'data'    => [
 					'user_ids'   => \implode(',', $user_ids),
 					'course_ids' => \implode(',', $course_ids),
 				],
 			],
-			$success ? 200 : 400
+			200
 		);
 	}
 
@@ -722,7 +732,7 @@ final class Course {
 		return new \WP_REST_Response(
 			[
 				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',
-				'message' => $success ? '移除學員成功' : '移除學員失敗',
+				'message' => $success ? '移除學員成功' : '移���學員失敗',
 				'data'    => [
 					'user_ids'   => \implode(',', $user_ids),
 					'course_ids' => \implode(',', $course_ids),
@@ -783,7 +793,7 @@ final class Course {
 
 		$params = WP::sanitize_text_field_deep( $params, false );
 
-		$formatted_terms = Product::format_terms( $params );
+		$formatted_terms = is_array($params) ? Product::format_terms( $params ) : [];
 
 		return $formatted_terms;
 	}
