@@ -34,7 +34,7 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 	}, [watchDepth])
 
 	return (
-		<Form form={form}>
+		<Form form={form} className="w-full">
 			<div className="flex gap-x-4">
 				<Button
 					type="primary"

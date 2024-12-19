@@ -52,6 +52,11 @@ final class Chapter extends ApiBase {
 			'permission_callback' => null,
 		],
 		[
+			'endpoint'            => 'chapters',
+			'method'              => 'delete',
+			'permission_callback' => null,
+		],
+		[
 			'endpoint'            => 'chapters/sort',
 			'method'              => 'post',
 			'permission_callback' => null,
@@ -88,8 +93,8 @@ final class Chapter extends ApiBase {
 			'post_status'    => 'any',
 			'orderby'        => [
 				'menu_order' => 'ASC',
-				'date'       => 'DESC',
-				'ID'         => 'DESC',
+				'ID'         => 'ASC',
+				'date'       => 'ASC',
 			],
 
 		];
@@ -190,7 +195,6 @@ final class Chapter extends ApiBase {
 			$success_ids
 		);
 	}
-
 
 	/**
 	 * Post Chapter Sort callback
@@ -354,5 +358,37 @@ final class Chapter extends ApiBase {
 				],
 				$success ? 200 : 400
 			);
+	}
+
+	/**
+	 * 批量刪除章節資料
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 * @throws \Exception 當刪除章節資料失敗時拋出異常
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_chapters_callback( $request ): \WP_REST_Response|\WP_Error {
+
+		$body_params = $request->get_json_params();
+
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+
+		$ids = (array) $body_params['ids'];
+
+		foreach ($ids as $id) {
+			$result = \wp_trash_post( $id );
+			if (!$result) {
+				throw new \Exception(__('刪除章節資料失敗', 'powerhouse') . " #{$id}");
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'delete_success',
+				'message' => '刪除成功',
+				'data'    => $ids,
+			]
+		);
 	}
 }
