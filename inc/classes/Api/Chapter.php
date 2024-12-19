@@ -189,17 +189,6 @@ final class Chapter extends ApiBase {
 		return new \WP_REST_Response(
 			$success_ids
 		);
-
-		// return new \WP_REST_Response(
-		// [
-		// 'code'    => 'create_success',
-		// 'message' => '新增成功',
-		// 'data'    => [
-		// 'success_ids' => $success_ids,
-		// 'failed_ids'  => $failed_ids,
-		// ],
-		// ]
-		// );
 	}
 
 
