@@ -146,6 +146,7 @@ const SortableChaptersComponent = () => {
 								{
 									resource: 'chapters',
 									ids: selectedIds,
+									mutationMode: 'optimistic',
 								},
 								{
 									onSuccess: () => {

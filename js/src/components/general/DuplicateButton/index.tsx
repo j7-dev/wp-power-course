@@ -1,11 +1,17 @@
 import { FC, memo } from 'react'
 import { CopyOutlined } from '@ant-design/icons'
 import { Button, Tooltip } from 'antd'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import {
+	useCustomMutation,
+	useApiUrl,
+	useInvalidate,
+	UseInvalidateProp,
+} from '@refinedev/core'
 
 const DuplicateButtonComponent: FC<{
 	id: string
-}> = ({ id }) => {
+	invalidateProps: UseInvalidateProp
+}> = ({ id, invalidateProps }) => {
 	const { mutate: duplicate, isLoading } = useCustomMutation()
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
@@ -20,8 +26,9 @@ const DuplicateButtonComponent: FC<{
 			{
 				onSuccess: (data, variables, context) => {
 					invalidate({
-						resource: 'chapters',
+						// @ts-ignore
 						invalidates: ['list'],
+						...invalidateProps,
 					})
 				},
 			},
