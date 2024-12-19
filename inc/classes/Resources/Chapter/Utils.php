@@ -83,8 +83,11 @@ abstract class Utils {
 					'post_type'   => CPT::POST_TYPE,
 					'numberposts' => -1,
 					'post_status' => 'any',
-					'orderby'     => 'menu_order',
-					'order'       => 'ASC',
+					'orderby'     => [
+						'menu_order' => 'ASC',
+						'ID'         => 'ASC',
+						'date'       => 'ASC',
+					],
 				]
 			)
 		);

@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
-import { Form, message } from 'antd'
+import { Form, message, Button } from 'antd'
 import NodeRender from './NodeRender'
 import { chapterToTreeNode, treeToParams } from './utils'
 import {
@@ -10,9 +10,12 @@ import {
 	useInvalidate,
 	useList,
 	HttpError,
+	useDeleteMany,
 } from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
 import { ChapterEdit } from '@/components/chapters'
+import { PopconfirmDelete } from '@/components/general'
+
 import AddChapters from './AddChapters'
 
 const LoadingChapters = () => (
@@ -120,16 +123,53 @@ const SortableChaptersComponent = () => {
 		null,
 	)
 
+	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批量刪除選中的 ids
+
+	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
+
 	return (
 		<>
-			<div className="mb-8">
+			<div className="mb-8 flex gap-x-4 justify-between items-center">
 				<AddChapters records={chapters} />
+				<Button
+					type="default"
+					className="relative top-1"
+					disabled={!selectedIds.length}
+					onClick={() => setSelectedIds([])}
+				>
+					清空選取
+				</Button>
+				<PopconfirmDelete
+					popconfirmProps={{
+						onConfirm: () =>
+							deleteMany(
+								{
+									resource: 'chapters',
+									ids: selectedIds,
+								},
+								{
+									onSuccess: () => {
+										setSelectedIds([])
+									},
+								},
+							),
+					}}
+					buttonProps={{
+						type: 'primary',
+						danger: true,
+						className: 'relative top-1',
+						loading: isDeleteManyLoading,
+						disabled: !selectedIds.length,
+						children: `批量刪除 ${selectedIds.length ? `(${selectedIds.length})` : ''}`,
+					}}
+				/>
 			</div>
 			<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 				{isListLoading && <LoadingChapters />}
 				{!isListLoading && (
 					<SortableTree
 						hideAdd
+						hideRemove
 						treeData={treeData}
 						onTreeDataChange={(data: TreeData<TChapterRecord>) => {
 							const from = data?.map((item) => ({
@@ -148,14 +188,14 @@ const SortableChaptersComponent = () => {
 								handleSave(data)
 							}
 						}}
-						renderContent={(node) => {
-							return (
-								<NodeRender
-									node={node}
-									setSelectedChapter={setSelectedChapter}
-								/>
-							)
-						}}
+						renderContent={(node) => (
+							<NodeRender
+								node={node}
+								setSelectedChapter={setSelectedChapter}
+								selectedIds={selectedIds}
+								setSelectedIds={setSelectedIds}
+							/>
+						)}
 						indentationWidth={48}
 						sortableRule={({ activeNode, projected }) => {
 							const activeNodeHasChild = !!activeNode.children.length

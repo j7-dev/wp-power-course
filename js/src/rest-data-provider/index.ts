@@ -175,6 +175,28 @@ export const dataProvider = (
 		}
 	},
 
+	deleteMany: async ({ resource, ids, variables, meta }) => {
+		const url = `${apiUrl}/${resource}`
+
+		const { headers, method } = meta ?? {}
+		const requestMethod = (method as THttpMethodsWithBody) ?? 'delete'
+
+		const { data } = await httpClient[requestMethod](url, {
+			data: {
+				...variables,
+				ids,
+			},
+			headers: {
+				'Content-Type': 'application/json;',
+				...headers,
+			},
+		})
+
+		return {
+			data,
+		}
+	},
+
 	getApiUrl: () => {
 		return apiUrl
 	},
