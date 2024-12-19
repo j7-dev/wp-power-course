@@ -1,0 +1,256 @@
+<?php
+/**
+ * Duplicate
+ * 複製文章功能的抽象類
+ */
+
+declare ( strict_types=1 );
+
+namespace J7\PowerCourse\Utils;
+
+use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
+use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+
+
+/**
+ * Class Duplicate
+ */
+final class Duplicate {
+
+	/**
+	 * 要排除的 meta key
+	 *
+	 * @var array<string>
+	 */
+	protected static array $exclude_meta_keys = [
+		'_edit_lock',
+		'_edit_last',
+	];
+
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 4 );
+	}
+
+
+	/**
+	 * 複製文章/Email
+	 *
+	 * @param int      $post_id 要複製的文章 ID
+	 * @param bool     $copy_terms 是否複製分類
+	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 *
+	 * @return int 複製後的文章 ID
+	 * @throws \Exception Exception
+	 */
+	public function process( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+
+		$object_type = self::get_object_type( $post_id );
+
+		$new_id = match ( $object_type ) {
+			'product' => self::duplicate_product( $post_id, $copy_terms, $new_parent ),
+			default => self::duplicate_post( $post_id, $copy_terms, $new_parent ),
+		};
+
+		\do_action( 'power_course_after_duplicate_post', $this, $post_id, $new_id, $new_parent );
+
+		return $new_id;
+	}
+
+	/**
+	 * 取得物件類型
+	 *
+	 * @param int $post_id 文章 ID
+	 *
+	 * @return string 物件類型 email, chapter, course 或 post_type
+	 */
+	private static function get_object_type( int $post_id ): string {
+		$post = \get_post( $post_id );
+		if (!$post) {
+			return '';
+		}
+
+		$is_course = \get_post_meta( $post_id, '_is_course', true ) === 'yes';
+
+		return match ($post->post_type) {
+			EmailCPT::POST_TYPE => 'email',
+			ChapterCPT::POST_TYPE => 'chapter',
+			'product' => $is_course ? 'course' : 'product',
+			default => $post->post_type,
+		};
+	}
+
+	/**
+	 * 複製文章/Email
+	 *
+	 * @param int      $post_id 要複製的文章 ID
+	 * @param bool     $copy_terms 是否複製分類
+	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 *
+	 * @return int 複製後的文章 ID
+	 * @throws \Exception Exception
+	 */
+	public static function duplicate_post( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+		$post = \get_post($post_id);
+		if (!$post) {
+			throw new \Exception(__('文章不存在', 'power-course'));
+		}
+
+		// 複製文章並設為草稿
+		$post->ID          = null;
+		$post->post_title .= ' (複製)';
+
+		// $post->post_status = 'draft';
+
+		// 插入新文章
+		$new_id = \wp_insert_post( (array) $post );
+
+		if (!\is_numeric($new_id)) {
+			throw new \Exception(__('複製文章失敗', 'power-course') . ' ' . $new_id->get_error_message());
+		}
+
+		// 複製 meta
+		$metas = \get_post_meta($post_id);
+		foreach ($metas as $key => $values) {
+			foreach ($values as $value) {
+				if (in_array($key, self::$exclude_meta_keys, true)) {
+					continue;
+				}
+
+				\add_post_meta($new_id, $key, \maybe_unserialize($value));
+			}
+		}
+
+		// 複製文章 terms
+		if ($copy_terms) {
+			$success = self::duplicate_terms($post_id, $new_id);
+		}
+
+		if (\is_numeric($new_parent)) {
+			\wp_update_post(
+				[
+					'ID'          => $new_id,
+					'post_parent' => $new_parent,
+				]
+			);
+		}
+
+		return $new_id;
+	}
+
+	/**
+	 * 複製產品
+	 * TODO $new_parent 應該只有可變商品會用到!?
+	 *
+	 * @param int      $post_id 要複製的文章 ID
+	 * @param bool     $copy_terms 是否複製分類
+	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 *
+	 * @return int 複製後的商品 ID
+	 * @throws \Exception Exception
+	 */
+	public static function duplicate_product( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+		$product = \wc_get_product($post_id);
+		if (!$product) {
+			throw new \Exception(__('產品不存在', 'power-course'));
+		}
+
+		// 使用 WC_Admin_Duplicate_Product 複製產品
+		$duplicate      = new \WC_Admin_Duplicate_Product($product);
+		$new_product    = $duplicate->product_duplicate($product);
+		$new_product_id = $new_product->get_id();
+
+		// 如果需要複製分類
+		if ($copy_terms) {
+			self::duplicate_terms($post_id, $new_product_id);
+		}
+
+		return $new_product_id;
+	}
+
+	/**
+	 * 複製項目的分類關係
+	 *
+	 * @param int|\WP_Post|\WC_Product $source 來源項目（可以是 ID、Post 物件或 Product 物件）
+	 * @param int                      $target_id 目標項目 ID
+	 *
+	 * @return bool 設定 term 是否成功
+	 * @throws \Exception Exception
+	 */
+	public static function duplicate_terms( $source, int $target_id ): bool {
+		// 取得來源 ID 和類型
+		$source_id = 0;
+		$post_type = '';
+
+		if (is_numeric($source)) {
+			$source_id = (int) $source;
+			$post      = \get_post($source_id);
+			$post_type = $post ? $post->post_type : '';
+		} elseif ($source instanceof \WC_Product) {
+			$source_id = $source->get_id();
+			$post_type = 'product';
+		} elseif ($source instanceof \WP_Post) {
+			$source_id = $source->ID;
+			$post_type = $source->post_type;
+		}
+
+		if (!$source_id || !$post_type) {
+			return false;
+		}
+
+		// 取得該類型的所有分類法
+		$taxonomies = \get_object_taxonomies($post_type);
+
+		foreach ($taxonomies as $taxonomy) {
+			$terms = \wp_get_object_terms($source_id, $taxonomy);
+			if (!empty($terms) && !\is_wp_error($terms)) {
+				$term_ids = \wp_list_pluck($terms, 'term_id');
+				$result   = \wp_set_object_terms($target_id, $term_ids, $taxonomy);
+				if (\is_wp_error($result)) {
+					throw new \Exception($result->get_error_message());
+				}
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * 複製子文章
+	 *
+	 * @param self $duplicate 複製物件
+	 * @param int  $post_id 文章 ID
+	 * @param int  $new_id 複製後的文章 ID
+	 * @param int  $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 *
+	 * @return void
+	 */
+	public static function duplicate_children_post( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0 ): void {
+		if (!$new_parent) {
+			return;
+		}
+
+		$allowed_post_types = [
+			'post',
+			'product',
+			ChapterCPT::POST_TYPE,
+			EmailCPT::POST_TYPE,
+		];
+
+		/** @var array<int> $children_ids */
+		$children_ids = \get_children(
+			[
+				'post_parent' => $post_id,
+				'post_type'   => $allowed_post_types,
+				'numberposts' => -1,
+				'fields'      => 'ids',
+			]
+			);
+
+		foreach ($children_ids as $child_id) {
+			$duplicate->process($child_id, true, $new_id);
+		}
+	}
+}

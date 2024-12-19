@@ -9,7 +9,7 @@ namespace J7\PowerCourse\Api;
 
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\ApiBase;
-
+use J7\PowerCourse\Utils\Duplicate;
 /**
  * Option Api
  */
@@ -39,6 +39,11 @@ final class Option extends ApiBase {
 		],
 		[
 			'endpoint'            => 'options',
+			'method'              => 'post',
+			'permission_callback' => null,
+		],
+		[
+			'endpoint'            => 'duplicate/(?P<id>\d+)',
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
@@ -114,6 +119,39 @@ final class Option extends ApiBase {
 				'code'    => 'post_user_success',
 				'message' => '修改成功',
 				'data'    => $body_params,
+			],
+			200
+			);
+	}
+
+
+	/**
+	 * 複製
+	 *
+	 * @param \WP_REST_Request $request 包含更新選項所需資料的REST請求對象。
+	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回選項資料，失敗時返回錯誤訊息。
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_duplicate_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
+		$id = $request['id'] ?? null;
+
+		if (!$id || !is_numeric( $id ) ) {
+			return new \WP_REST_Response(
+				[
+					'message' => 'id is required',
+				],
+				400
+			);
+		}
+
+		$duplicate = new Duplicate();
+		$new_id    = $duplicate->process( (int) $id, true, true );
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'post_duplicate_success',
+				'message' => '複製成功',
+				'data'    => $new_id,
 			],
 			200
 			);
