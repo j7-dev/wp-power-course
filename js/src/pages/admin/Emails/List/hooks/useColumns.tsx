@@ -1,9 +1,10 @@
 import React from 'react'
-import { Table, TableProps, Input, Tag, Space } from 'antd'
+import { Table, TableProps, Tag } from 'antd'
 import { TEmailListRecord } from '@/pages/admin/Emails/types'
 import { useNavigation } from '@refinedev/core'
 import { getPostStatus } from '@/utils'
 import { ProductName } from '@/components/product'
+import { DuplicateButton } from '@/components/general'
 
 const useColumns = () => {
 	const { edit } = useNavigation()
@@ -61,6 +62,21 @@ const useColumns = () => {
 			align: 'right',
 			dataIndex: 'date_modified',
 			width: 160,
+		},
+		{
+			title: '操作',
+			dataIndex: '_actions',
+			key: '_actions',
+			width: 48,
+			render: (_, record) => (
+				<DuplicateButton
+					id={record.id}
+					invalidateProps={{
+						resource: 'emails',
+						dataProviderName: 'power-email',
+					}}
+				/>
+			),
 		},
 	]
 

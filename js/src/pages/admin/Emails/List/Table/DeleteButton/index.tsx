@@ -17,7 +17,6 @@ const DeleteButton = ({
 				resource: 'emails',
 				dataProviderName: 'power-email',
 				ids: selectedRowKeys as string[],
-				invalidates: ['list'],
 				mutationMode: 'optimistic',
 				successNotification: (data, ids, resource) => {
 					return {
@@ -34,7 +33,6 @@ const DeleteButton = ({
 			},
 			{
 				onSuccess: () => {
-					close()
 					setSelectedRowKeys([])
 				},
 			},

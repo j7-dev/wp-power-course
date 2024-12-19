@@ -54,6 +54,11 @@ final class Api extends ApiBase {
 			'permission_callback' => null,
 		],
 		[
+			'endpoint'            => 'emails',
+			'method'              => 'delete',
+			'permission_callback' => null,
+		],
+		[
 			'endpoint'            => 'emails/send-now',
 			'method'              => 'post',
 			'permission_callback' => null,
@@ -395,7 +400,39 @@ final class Api extends ApiBase {
 			);
 	}
 
+	/**
+	 * Delete Email callback
+	 * 刪除電子郵件
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response
+	 * @throws \Exception 當刪除電子郵件失敗時拋出異常
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_emails_callback( $request ): \WP_REST_Response {
+		$body_params = $request->get_json_params();
 
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+
+		$ids = (array) $body_params['ids'];
+
+		foreach ($ids as $id) {
+			$result = \wp_trash_post( $id );
+			if (!$result) {
+				throw new \Exception(__('刪除章節資料失敗', 'powerhouse') . " #{$id}");
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'delete_success',
+				'message' => '刪除成功',
+				'data'    => [
+					'ids' => $ids,
+				],
+			]
+		);
+	}
 
 	/**
 	 * Delete Email callback

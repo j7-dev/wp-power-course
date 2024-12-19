@@ -46,7 +46,6 @@ const DeleteButton = ({
 						{
 							resource: 'courses',
 							ids: selectedRowKeys as string[],
-							invalidates: ['list'],
 							mutationMode: 'optimistic',
 							successNotification: (data, ids, resource) => {
 								return {

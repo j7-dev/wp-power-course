@@ -53,7 +53,12 @@ const NodeRender: FC<{
 			</div>
 
 			<div className="flex gap-2">
-				<DuplicateButton id={record?.id} />
+				<DuplicateButton
+					id={record?.id}
+					invalidateProps={{
+						resource: 'chapters',
+					}}
+				/>
 				<PopconfirmDelete
 					popconfirmProps={{
 						onConfirm: handleDelete,
