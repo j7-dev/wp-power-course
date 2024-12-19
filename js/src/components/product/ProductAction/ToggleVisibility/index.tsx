@@ -1,11 +1,7 @@
 import React, { FC } from 'react'
-import {
-	EyeOutlined,
-	EyeInvisibleOutlined,
-	LoadingOutlined,
-} from '@ant-design/icons'
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
-import { Tooltip } from 'antd'
+import { Tooltip, Button } from 'antd'
 import { useUpdate } from '@refinedev/core'
 import { toFormData } from '@/utils'
 
@@ -31,22 +27,22 @@ const ToggleVisibility: FC<{
 		})
 	}
 
-	if (isLoading) {
-		return <LoadingOutlined className="text-gray-400 cursor-pointer" />
-	}
-
 	return (
 		<Tooltip
 			title={`調整商品型錄可見度隱藏，目前為${isVisible ? '可見' : '隱藏'}`}
 		>
 			{isVisible ? (
-				<EyeOutlined
-					className="text-gray-400 cursor-pointer w-6 flex justify-center"
+				<Button
+					loading={isLoading}
+					type="text"
+					icon={<EyeOutlined className="text-gray-500" />}
 					onClick={handleToggle}
 				/>
 			) : (
-				<EyeInvisibleOutlined
-					className="text-yellow-700 cursor-pointer w-6 flex justify-center"
+				<Button
+					loading={isLoading}
+					type="text"
+					icon={<EyeInvisibleOutlined className="text-yellow-700" />}
 					onClick={handleToggle}
 				/>
 			)}

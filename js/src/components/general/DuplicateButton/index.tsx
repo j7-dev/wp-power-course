@@ -1,6 +1,6 @@
 import { FC, memo } from 'react'
 import { CopyOutlined } from '@ant-design/icons'
-import { Button, Tooltip } from 'antd'
+import { Button, Tooltip, TooltipProps } from 'antd'
 import {
 	useCustomMutation,
 	useApiUrl,
@@ -10,8 +10,9 @@ import {
 
 const DuplicateButtonComponent: FC<{
 	id: string
-	invalidateProps: UseInvalidateProp
-}> = ({ id, invalidateProps }) => {
+	tooltipProps?: TooltipProps
+	invalidateProps: Omit<UseInvalidateProp, 'invalidates'>
+}> = ({ id, invalidateProps, tooltipProps }) => {
 	const { mutate: duplicate, isLoading } = useCustomMutation()
 	const apiUrl = useApiUrl()
 	const invalidate = useInvalidate()
@@ -26,7 +27,6 @@ const DuplicateButtonComponent: FC<{
 			{
 				onSuccess: (data, variables, context) => {
 					invalidate({
-						// @ts-ignore
 						invalidates: ['list'],
 						...invalidateProps,
 					})
@@ -37,7 +37,7 @@ const DuplicateButtonComponent: FC<{
 
 	return (
 		<>
-			<Tooltip title="複製">
+			<Tooltip title="複製" {...tooltipProps}>
 				<Button
 					type="text"
 					className="text-gray-500"

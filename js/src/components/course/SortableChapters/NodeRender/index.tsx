@@ -8,7 +8,7 @@ import {
 	DuplicateButton,
 	PopconfirmDelete,
 } from '@/components/general'
-import { Checkbox, CheckboxProps } from 'antd'
+import { Checkbox, CheckboxProps, Tooltip } from 'antd'
 
 const NodeRender: FC<{
 	node: FlattenNode<TChapterRecord>
@@ -58,9 +58,13 @@ const NodeRender: FC<{
 					invalidateProps={{
 						resource: 'chapters',
 					}}
+					tooltipProps={{ title: '複製章節/單元' }}
 				/>
+
 				<PopconfirmDelete
+					tooltipProps={{ title: '刪除' }}
 					popconfirmProps={{
+						description: '刪除會連同子單元也一起刪除',
 						onConfirm: handleDelete,
 					}}
 				/>

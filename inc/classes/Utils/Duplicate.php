@@ -32,6 +32,7 @@ final class Duplicate {
 	 */
 	public function __construct() {
 		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 4 );
+		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_bundle_product' ], 10, 4 );
 	}
 
 
@@ -142,7 +143,6 @@ final class Duplicate {
 
 	/**
 	 * 複製產品
-	 * TODO $new_parent 應該只有可變商品會用到!?
 	 *
 	 * @param int      $post_id 要複製的文章 ID
 	 * @param bool     $copy_terms 是否複製分類
@@ -165,6 +165,12 @@ final class Duplicate {
 		// 如果需要複製分類
 		if ($copy_terms) {
 			self::duplicate_terms($post_id, $new_product_id);
+		}
+
+		if (is_numeric($new_parent)) {
+			// 更新銷售方案的的 link_course_ids
+			$new_product->update_meta_data('link_course_ids', $new_parent);
+			$new_product->save_meta_data();
 		}
 
 		return $new_product_id;
@@ -251,6 +257,42 @@ final class Duplicate {
 
 		foreach ($children_ids as $child_id) {
 			$duplicate->process($child_id, true, $new_id);
+		}
+	}
+
+
+	/**
+	 * 複製銷售方案
+	 *
+	 * @param self $duplicate 複製物件
+	 * @param int  $post_id 文章 ID
+	 * @param int  $new_id 複製後的文章 ID
+	 * @param int  $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 *
+	 * @return void
+	 */
+	public static function duplicate_bundle_product( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0 ): void {
+		if (!$new_parent) {
+			return;
+		}
+
+		// 原課程身上的銷售方案
+		$bundle_product_ids = \get_posts(
+			[
+				'post_type'   => 'product',
+				'numberposts' => -1,
+				'meta_key'    => 'link_course_ids',
+				'meta_value'  => $post_id,
+				'fields'      => 'ids',
+			]
+		);
+
+		if (!is_array($bundle_product_ids)) {
+			return;
+		}
+
+		foreach ($bundle_product_ids as $bundle_product_id) {
+			$duplicate->process($bundle_product_id, true, $new_id);
 		}
 	}
 }

@@ -379,7 +379,7 @@ final class Chapter extends ApiBase {
 		foreach ($ids as $id) {
 			$result = \wp_trash_post( $id );
 			if (!$result) {
-				throw new \Exception(__('刪除章節資料失敗', 'powerhouse') . " #{$id}");
+				throw new \Exception(__('刪除章節資料失敗', 'power-course') . " #{$id}");
 			}
 		}
 

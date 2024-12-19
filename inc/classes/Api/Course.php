@@ -73,6 +73,10 @@ final class Course extends ApiBase {
 			'method'   => 'post',
 		],
 		[
+			'endpoint' => 'courses',
+			'method'   => 'delete',
+		],
+		[
 			'endpoint' => 'courses/(?P<id>\d+)',
 			'method'   => 'delete',
 		],
@@ -739,6 +743,39 @@ final class Course extends ApiBase {
 				],
 			],
 			$success ? 200 : 400
+		);
+	}
+
+
+	/**
+	 * 刪除課程
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response
+	 * @throws \Exception 當刪除課程資料失敗時拋出異常
+	 * @phpstan-ignore-next-line
+	 */
+	public function delete_courses_callback( $request ) {
+		$body_params = $request->get_json_params();
+
+		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+
+		$ids = (array) $body_params['ids'];
+
+		foreach ($ids as $id) {
+			$result = \wp_delete_post( $id, true );
+			if (!$result) {
+				throw new \Exception(__('刪除課程資料失敗', 'power-course') . " #{$id}");
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'delete_success',
+				'message' => '刪除成功',
+				'data'    => $ids,
+			]
 		);
 	}
 
