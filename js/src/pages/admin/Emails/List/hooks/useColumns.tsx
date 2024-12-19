@@ -75,6 +75,7 @@ const useColumns = () => {
 						resource: 'emails',
 						dataProviderName: 'power-email',
 					}}
+					tooltipProps={{ title: '複製 Email' }}
 				/>
 			),
 		},

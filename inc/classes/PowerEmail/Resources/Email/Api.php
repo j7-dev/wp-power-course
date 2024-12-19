@@ -419,7 +419,7 @@ final class Api extends ApiBase {
 		foreach ($ids as $id) {
 			$result = \wp_trash_post( $id );
 			if (!$result) {
-				throw new \Exception(__('刪除章節資料失敗', 'powerhouse') . " #{$id}");
+				throw new \Exception(__('刪除電子郵件資料失敗', 'power-email') . " #{$id}");
 			}
 		}
 
