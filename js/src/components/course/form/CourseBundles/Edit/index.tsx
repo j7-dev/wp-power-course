@@ -53,7 +53,7 @@ const EditBundleComponent = ({
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = () => {
 		const values = form.getFieldsValue() as Partial<TBundleProductRecord> & {
-			bundle_type: 'bundle' | 'subscription'
+			bundle_type: 'bundle'
 			sale_date_range: [Dayjs | number, Dayjs | number]
 		}
 		if (!selectedProducts?.length && values?.bundle_type === 'bundle') {

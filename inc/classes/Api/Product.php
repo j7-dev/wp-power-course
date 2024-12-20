@@ -846,7 +846,7 @@ final class Product {
 
 		$product->save_meta_data();
 
-		if ('subscription' === $meta_data['bundle_type']) {
+		if ('subscription' === $meta_data['type']) {
 			if (!class_exists('WC_Product_Subscription')) {
 				return new \WP_REST_Response(
 					[

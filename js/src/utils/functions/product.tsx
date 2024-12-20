@@ -1,6 +1,7 @@
 import { TProduct as TProductStoreApi } from '@/types/wcStoreApi'
 import { TProduct as TProductRestApi } from '@/types/wcRestApi'
 import defaultImage from '@/assets/images/defaultImage.jpg'
+import { BUNDLE_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
 
 export const getProductImageSrc = (
 	product: TProductStoreApi | TProductRestApi,
@@ -12,21 +13,5 @@ export const getProductImageSrc = (
 }
 
 export const getBundleType = (bundleType: string) => {
-	switch (bundleType) {
-		case 'subscription':
-			return {
-				label: '定期定額',
-				color: 'purple',
-			}
-		case 'bundle':
-			return {
-				label: '合購方案',
-				color: 'cyan',
-			}
-		default:
-			return {
-				label: bundleType,
-				color: 'default',
-			}
-	}
+	return BUNDLE_TYPE_OPTIONS.find((option) => option.value === bundleType)
 }

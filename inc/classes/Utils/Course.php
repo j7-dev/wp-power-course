@@ -295,18 +295,13 @@ abstract class Course {
 			if (!$product) {
 				continue;
 			}
-			$bundle_type = $product->get_meta( 'bundle_type' );
-			if ('bundle' === $bundle_type) {
+			$product_type = $product->get_type();
+			if ('simple' === $product_type) {
 				$product    = new BundleProduct($product);
 				$products[] = $product;
 				continue;
 			}
-
-			if ('subscription' === $bundle_type) {
-				$product    = new \WC_Product_Subscription($product);
-				$products[] = $product;
-				continue;
-			}
+			$products[] = $product;
 		}
 		return $products;
 	}

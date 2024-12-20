@@ -5,9 +5,9 @@ import { Form } from 'antd'
 
 const BundleTypes = () => {
 	const bundleProductForm = Form.useFormInstance()
-	const watchBundleType = Form.useWatch(['bundle_type'], bundleProductForm)
+	const watchProductType = Form.useWatch(['product_type'], bundleProductForm)
 
-	if ('subscription' === watchBundleType) {
+	if ('subscription' === watchProductType) {
 		return <Subscription />
 	}
 

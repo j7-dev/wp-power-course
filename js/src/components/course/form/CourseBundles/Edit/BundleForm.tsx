@@ -1,7 +1,11 @@
 import { memo } from 'react'
 import { Form, Select, Input, Switch } from 'antd'
 import BundleTypes from './BundleTypes'
-import { OPTIONS, INCLUDED_PRODUCT_IDS_FIELD_NAME } from './utils'
+import {
+	BUNDLE_TYPE_OPTIONS,
+	INCLUDED_PRODUCT_IDS_FIELD_NAME,
+	PRODUCT_TYPE_OPTIONS,
+} from './utils'
 
 // TODO 目前只支援簡單商品
 // TODO 如何結合可變商品?
@@ -16,9 +20,16 @@ const BundleForm = () => {
 			<Item
 				name={['bundle_type']}
 				label="銷售方案種類"
-				initialValue={OPTIONS[0].value}
+				initialValue={BUNDLE_TYPE_OPTIONS[0].value}
 			>
-				<Select options={OPTIONS} />
+				<Select options={BUNDLE_TYPE_OPTIONS} />
+			</Item>
+			<Item
+				name={['type']}
+				label="商品種類"
+				initialValue={PRODUCT_TYPE_OPTIONS[0].value}
+			>
+				<Select options={PRODUCT_TYPE_OPTIONS} />
 			</Item>
 			<Item
 				name={['bundle_type_label']}
