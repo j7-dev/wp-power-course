@@ -34,8 +34,9 @@ foreach ( $linked_products as $linked_product ) {
 	if ( 'publish' !== $linked_product->get_status() ) {
 		continue;
 	}
-	$bundle_type = $linked_product->get_meta( 'bundle_type' );
-	if ('bundle' === $bundle_type) {
+	$product_type = $linked_product->get_type();
+
+	if (BundleProduct::PRODUCT_TYPE === $product_type) {
 		Plugin::get(
 		'card/bundle-product',
 		[
@@ -45,7 +46,7 @@ foreach ( $linked_products as $linked_product ) {
 		continue;
 	}
 
-	if ('subscription' === $bundle_type) {
+	if ('subscription' === $product_type) {
 		Plugin::get(
 		'card/subscription-product',
 		[

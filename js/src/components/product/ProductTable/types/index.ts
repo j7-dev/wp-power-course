@@ -54,7 +54,7 @@ export type TBindCoursesData = {
 export type TProductRecord = {
 	id: string
 	type: TProductType
-	bundle_type: 'bundle' | 'subscription' | ''
+	bundle_type: 'bundle' | ''
 	depth: number
 	name: string
 	slug: string
