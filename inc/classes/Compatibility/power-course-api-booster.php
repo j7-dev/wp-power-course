@@ -80,6 +80,7 @@ final class ApiBooster {
 			'powerhouse/plugin.php',
 			'woocommerce/woocommerce.php',
 			'power-course/plugin.php',
+			'woocommerce-subscriptions/woocommerce-subscriptions.php',
 		];
 
 		// 檢查是否所有必要的插件都已經載入
