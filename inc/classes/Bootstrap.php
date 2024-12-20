@@ -27,7 +27,7 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
-		Compatibility::instance();
+		Compatibility\Compatibility::instance();
 
 		Resources\Chapter\CPT::instance();
 		Resources\Order::instance();
@@ -50,6 +50,7 @@ final class Bootstrap {
 		Api\Shortcode::instance();
 		Api\Comment::instance();
 		Api\Reports\Revenue\Api::instance();
+		// Api\Optimize\MoveFile::instance();
 
 		Templates\Templates::instance();
 		Templates\Ajax::instance();

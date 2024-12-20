@@ -6,7 +6,7 @@
 
 declare (strict_types = 1);
 
-namespace J7\PowerCourse;
+namespace J7\PowerCourse\Compatibility;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
@@ -24,6 +24,13 @@ final class Compatibility {
 	 * Constructor
 	 */
 	public function __construct() {
+		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
+		if ($scheduled_version === Plugin::$version) {
+			return;
+		}
+
+		// ApiOptimize::instance();
+
 		// 排程只執行一次的兼容設定
 		\add_action( 'init', [ __CLASS__, 'compatibility_action_scheduler' ] );
 		\add_action( self::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'compatibility' ]);
@@ -36,10 +43,6 @@ final class Compatibility {
 	 * @return void
 	 */
 	public static function compatibility_action_scheduler(): void {
-		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
-		if ($scheduled_version === Plugin::$version) {
-			return;
-		}
 		\as_enqueue_async_action( self::AS_COMPATIBILITY_ACTION, [] );
 	}
 
