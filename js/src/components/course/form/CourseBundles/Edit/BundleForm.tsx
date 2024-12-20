@@ -346,6 +346,13 @@ const BundleForm = () => {
 				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
 					<Switch />
 				</Item>
+
+				<FiSwitch
+					formItemProps={{
+						name: ['follow_subscription'],
+						label: '跟隨訂閱',
+					}}
+				/>
 				<Item name={['status']} hidden />
 			</div>
 		</>
