@@ -1,11 +1,11 @@
 import React, { useEffect, memo } from 'react'
-import { Form, InputNumber, Input, DatePickerProps } from 'antd'
-import { FiSwitch, DatePicker } from '@/components/formItem'
+import { Form, InputNumber, Input, DatePickerProps, Select } from 'antd'
+import { FiSwitch, DatePicker, RangePicker } from '@/components/formItem'
 import dayjs from 'dayjs'
+import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
+import ProductPriceFields from './ProductPriceFields'
 
 const { Item } = Form
-
-// TODO 把日期改成 Range Picker
 
 const CoursePriceComponent = () => {
 	const form = Form.useFormInstance()
@@ -30,54 +30,39 @@ const CoursePriceComponent = () => {
 		}
 	}, [watchIsFree])
 	return (
-		<div className="grid grid-cols-2 gap-4">
-			<Item name={['regular_price']} label="原價" initialValue={0}>
-				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
-			</Item>
-			<Item name={['sale_price']} label="折扣價">
-				<InputNumber className="w-full" min={0} disabled={watchIsFree} />
-			</Item>
-
-			<DatePicker
-				formItemProps={{
-					name: ['date_on_sale_from'],
-					label: '折扣價開始時間',
-				}}
-				datePickerProps={{
-					disabled: watchIsFree,
-				}}
-			/>
-
-			<DatePicker
-				formItemProps={{
-					name: ['date_on_sale_to'],
-					label: '折扣價結束時間',
-				}}
-				datePickerProps={{
-					disabled: watchIsFree,
-					disabledDate,
-				}}
-			/>
-
-			<div className="grid grid-cols-2 gap-4">
-				<FiSwitch
-					formItemProps={{
-						name: ['is_free'],
-						label: '這是免費課程',
-					}}
-				/>
-				<FiSwitch
-					formItemProps={{
-						name: ['hide_single_course'],
-						label: '隱藏購買單堂課',
-					}}
-				/>
+		<>
+			<div className="grid grid-cols-3 gap-6">
+				<div>
+					<Item
+						name={['type']}
+						label="課程商品種類"
+						initialValue={PRODUCT_TYPE_OPTIONS[0].value}
+					>
+						<Select options={PRODUCT_TYPE_OPTIONS} />
+					</Item>
+					<ProductPriceFields />
+				</div>
+				<div>
+					<Item name={['purchase_note']} label="購買備註">
+						<Input.TextArea rows={6} />
+					</Item>
+					<div className="grid grid-cols-2 gap-4">
+						<FiSwitch
+							formItemProps={{
+								name: ['is_free'],
+								label: '這是免費課程',
+							}}
+						/>
+						<FiSwitch
+							formItemProps={{
+								name: ['hide_single_course'],
+								label: '隱藏購買單堂課',
+							}}
+						/>
+					</div>
+				</div>
 			</div>
-
-			<Item name={['purchase_note']} label="購買備註">
-				<Input.TextArea rows={4} />
-			</Item>
-		</div>
+		</>
 	)
 }
 

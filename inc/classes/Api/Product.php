@@ -563,7 +563,8 @@ final class Product {
 		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
 		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
 
-		$base_array = [
+		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
+		$base_array      = [
 			// Get Product General Info
 			'id'                                        => (string) $product_id,
 			'type'                                      => $product->get_type(),
@@ -585,8 +586,9 @@ final class Product {
 			'regular_price'                             => $product->get_regular_price(),
 			'sale_price'                                => $product->get_sale_price(),
 			'on_sale'                                   => $product->is_on_sale(),
-			'date_on_sale_from'                         => $product->get_date_on_sale_from()?->getTimestamp(),
-			'date_on_sale_to'                           => $product->get_date_on_sale_to()?->getTimestamp(),
+			'sale_date_range'                           => $sale_date_range,
+			'date_on_sale_from'                         => $sale_date_range[0],
+			'date_on_sale_to'                           => $sale_date_range[1],
 			'total_sales'                               => $product->get_total_sales(),
 
 			// Get Product Stock
@@ -629,7 +631,6 @@ final class Product {
 			// Bundle 商品包含的商品 ids
 			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => (array) $unique_include_product_ids,
 
-			'sale_date_range'                           => [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ],
 			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                                   => [],
 			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),

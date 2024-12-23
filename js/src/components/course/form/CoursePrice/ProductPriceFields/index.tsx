@@ -3,11 +3,7 @@ import Simple from './Simple'
 import Subscription from './Subscription'
 import { Form } from 'antd'
 
-const ProductTypes = ({
-	bundlePrices,
-}: {
-	bundlePrices: { regular_price: React.ReactNode; sale_price: React.ReactNode }
-}) => {
+const ProductPriceFields = () => {
 	const bundleProductForm = Form.useFormInstance()
 	const watchProductType = Form.useWatch(['type'], bundleProductForm)
 
@@ -15,7 +11,7 @@ const ProductTypes = ({
 		return <Subscription />
 	}
 
-	return <Simple bundlePrices={bundlePrices} />
+	return <Simple />
 }
 
-export default ProductTypes
+export default ProductPriceFields

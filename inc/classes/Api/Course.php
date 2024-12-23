@@ -302,6 +302,8 @@ final class Course extends ApiBase {
 			);
 		$tag_ids       = array_column( $tags, 'id' );
 
+		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
+
 		$base_array = [
 			// Get Product General Info
 			'id'                 => (string) $product_id,
@@ -326,8 +328,9 @@ final class Course extends ApiBase {
 			'regular_price'      => $regular_price,
 			'sale_price'         => $sale_price,
 			'on_sale'            => $product->is_on_sale(),
-			'date_on_sale_from'  => $product->get_date_on_sale_from()?->getTimestamp(),
-			'date_on_sale_to'    => $product->get_date_on_sale_to()?->getTimestamp(),
+			'sale_date_range'    => $sale_date_range,
+			'date_on_sale_from'  => $sale_date_range[0],
+			'date_on_sale_to'    => $sale_date_range[1],
 			'total_sales'        => $product->get_total_sales(),
 
 			// Get Product Stock
