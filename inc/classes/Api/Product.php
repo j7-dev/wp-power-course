@@ -638,6 +638,7 @@ final class Product {
 			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
 
 			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
+			'follow_subscription'                       => (string) $product->get_meta( 'follow_subscription' ),
 			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
 			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
 			'_subscription_period'                      => $subscription_period ?: 'month',
@@ -831,9 +832,39 @@ final class Product {
 			'meta_data' => $meta_data,
 			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
+		// type 會被儲存為商品的類型，不需要再額外存進 meta data
+		$is_subscription = 'subscription' === $meta_data['type'];
+		unset($meta_data['type']);
+
+		if ($is_subscription && !class_exists('WC_Product_Subscription')) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'subscription_class_not_found',
+					'message' => 'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+				],
+				400
+			);
+		}
+
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
 			$product->$method_name( $value );
+		}
+
+		if (!$is_subscription) {
+			$fields_to_delete = [
+				'follow_subscription',
+				'_subscription_price',
+				'_subscription_period_interval',
+				'_subscription_period',
+				'_subscription_length',
+				'_subscription_sign_up_fee',
+				'_subscription_trial_length',
+				'_subscription_trial_period',
+			];
+			foreach ($fields_to_delete as $field) {
+				$product->delete_meta_data($field);
+			}
 		}
 
 		$product->save();
@@ -846,25 +877,10 @@ final class Product {
 
 		$product->save_meta_data();
 
-		if ('subscription' === $meta_data['type']) {
-			if (!class_exists('WC_Product_Subscription')) {
-				return new \WP_REST_Response(
-					[
-						'code'    => 'subscription_class_not_found',
-						'message' => 'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
-					],
-					400
-				);
-			}
-
-			$result = \wp_set_object_terms($id, 'subscription', 'product_type');
-			\wc_delete_product_transients($id);
-			if (\is_wp_error($result)) {
-				return $result;
-			}
-			// subscription 商品類型，不需要 exclude_main_course 和 pbp_product_ids
-			\delete_post_meta($id, 'exclude_main_course');
-			\delete_post_meta($id, 'pbp_product_ids');
+		$result = \wp_set_object_terms($id, $is_subscription ? 'subscription' : 'simple', 'product_type');
+		\wc_delete_product_transients($id);
+		if (\is_wp_error($result)) {
+			return $result;
 		}
 
 		return new \WP_REST_Response(
