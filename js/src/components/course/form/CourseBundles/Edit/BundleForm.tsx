@@ -42,6 +42,8 @@ const BundleForm = () => {
 	const watchExcludeMainCourse =
 		Form.useWatch(['exclude_main_course'], bundleProductForm) === 'yes'
 
+	const watchProductType = Form.useWatch(['type'], bundleProductForm)
+
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
 		setShowList(true)
@@ -244,7 +246,7 @@ const BundleForm = () => {
 				</div>
 				<div className="text-primary">
 					<ExclamationCircleOutlined className="mr-2" />
-					也可以不加入產品，創建課程的定期定額銷售方案
+					您也可以選擇不加入產品，單純創建課程的定期定額銷售方案
 				</div>
 				<div className="relative mb-2">
 					<Search
@@ -344,12 +346,15 @@ const BundleForm = () => {
 					<Switch />
 				</Item>
 
-				<FiSwitch
-					formItemProps={{
-						name: ['follow_subscription'],
-						label: '跟隨訂閱',
-					}}
-				/>
+				{watchProductType === 'subscription' && (
+					<FiSwitch
+						formItemProps={{
+							name: ['follow_subscription'],
+							label: '跟隨訂閱',
+						}}
+					/>
+				)}
+
 				<Item name={['status']} hidden />
 			</div>
 		</>
