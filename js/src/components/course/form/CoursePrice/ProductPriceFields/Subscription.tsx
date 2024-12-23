@@ -1,11 +1,9 @@
 import React, { memo, useEffect } from 'react'
 import { Form, Input, InputNumber, Select, Space } from 'antd'
-import { useParsed } from '@refinedev/core'
-import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '../utils'
 
 const { Item } = Form
 
-enum SUBSCRIPTION {
+export enum SUBSCRIPTION {
 	PRICE = '_subscription_price', // 訂閱價格每 M 個月 [N 元] - number
 	PERIOD_INTERVAL = '_subscription_period_interval', // 訂閱價格每 [M 個] 月 N 元 - number
 	PERIOD = '_subscription_period', // 訂閱價格每 M 個 [月] N 元 - day | week | month | year
@@ -42,7 +40,6 @@ const lengthOptions = new Array(31).fill(0).map((_, index) => ({
 }))
 
 const Subscription = () => {
-	const { id: courseId } = useParsed()
 	const form = Form.useFormInstance()
 	const watchPeriod = Form.useWatch(SUBSCRIPTION.PERIOD, form)
 	const watchPeriodLabel = watchPeriod
@@ -57,18 +54,6 @@ const Subscription = () => {
 
 	return (
 		<>
-			<Item
-				name="bind_course_ids"
-				label="綁定課程"
-				initialValue={[courseId]}
-				hidden
-			/>
-			<Item
-				name={INCLUDED_PRODUCT_IDS_FIELD_NAME}
-				label="連接商品"
-				initialValue={[]}
-				hidden
-			/>
 			<Item name={['regular_price']} label="原價" hidden />
 
 			<div className="mb-6">

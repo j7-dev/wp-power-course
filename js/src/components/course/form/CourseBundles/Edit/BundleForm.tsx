@@ -20,7 +20,7 @@ import {
 	getPrice,
 } from './utils'
 import { useList } from '@refinedev/core'
-import ProductTypes from './ProductTypes'
+import ProductPriceFields from './ProductPriceFields'
 
 const { Search } = Input
 const { Item } = Form
@@ -338,7 +338,7 @@ const BundleForm = () => {
 					))}
 			</div>
 
-			<ProductTypes bundlePrices={bundlePrices} />
+			<ProductPriceFields bundlePrices={bundlePrices} />
 
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
