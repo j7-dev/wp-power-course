@@ -42,8 +42,6 @@ const BundleForm = () => {
 	const watchExcludeMainCourse =
 		Form.useWatch(['exclude_main_course'], bundleProductForm) === 'yes'
 
-	const watchProductType = Form.useWatch(['type'], bundleProductForm)
-
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
 		setShowList(true)
@@ -176,12 +174,13 @@ const BundleForm = () => {
 				name={['bundle_type']}
 				label="銷售方案種類"
 				initialValue={BUNDLE_TYPE_OPTIONS[0].value}
+				hidden={false}
 			>
 				<Select options={BUNDLE_TYPE_OPTIONS} />
 			</Item>
 			<Item
 				name={['type']}
-				label="商品種類"
+				label="銷售方案商品種類"
 				initialValue={PRODUCT_TYPE_OPTIONS[0].value}
 			>
 				<Select options={PRODUCT_TYPE_OPTIONS} />
@@ -345,16 +344,6 @@ const BundleForm = () => {
 				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
 					<Switch />
 				</Item>
-
-				{watchProductType === 'subscription' && (
-					<FiSwitch
-						formItemProps={{
-							name: ['follow_subscription'],
-							label: '跟隨訂閱',
-						}}
-					/>
-				)}
-
 				<Item name={['status']} hidden />
 			</div>
 		</>

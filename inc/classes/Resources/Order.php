@@ -53,6 +53,7 @@ final class Order {
 			}
 
 			// 如果是銷售方案商品，這訂單是購買銷售方案
+			// 就把銷售方案包含的商品，加到訂單中，且售價修改為 0
 			if ( BundleProduct::is_bundle_product( $product_id ) ) {
 				$bundle_product       = new BundleProduct( $product );
 				$included_product_ids = $bundle_product->get_product_ids(); // 綑綁的商品們
@@ -88,7 +89,8 @@ final class Order {
 	/**
 	 * 根據訂單項目儲存課程限制資訊到訂單項目元數據中。
 	 *
-	 * 此私有方法檢查傳入的訂單項目是否為 WooCommerce 的產品項目。如果是，則進一步檢查該產品是否被標記為課程商品。
+	 * 此方法檢查傳入的訂單項目是否為 WooCommerce 的產品項目
+	 * 如果是，則檢查該產品是否為課程商品
 	 * 對於課程商品，此方法會從產品中提取課程的限制條件（如限制類型、限制值和限制單位）並將這些資訊儲存到訂單項目的元數據中。
 	 * 這樣做可以在後續處理中輕鬆訪問和使用這些課程限制資訊。
 	 *

@@ -24,6 +24,7 @@ export const RangePicker: FC<{
 				className="w-full"
 				allowEmpty={[true, true]}
 				format="YYYY-MM-DD HH:mm"
+				placeholder={['開始日期', '結束日期']}
 				{...rangePickerProps}
 			/>
 		</Item>
