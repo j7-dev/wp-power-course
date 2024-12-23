@@ -1,4 +1,5 @@
 import { Dayjs } from 'dayjs'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 export type TFilterProps = Partial<{
 	s: string
@@ -46,10 +47,7 @@ export type TImage = {
 export type TBindCoursesData = {
 	id: string
 	name: string
-	limit_type: 'unlimited' | 'fixed' | 'assigned'
-	limit_value: number
-	limit_unit: 'second' | 'day' | 'month' | 'year'
-}
+} & TCoursesLimit
 
 export type TProductRecord = {
 	id: string

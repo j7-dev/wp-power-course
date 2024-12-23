@@ -2,12 +2,16 @@ import React, { memo } from 'react'
 import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
 import { DatePicker } from '@/components/formItem'
 import { useLink } from '@refinedev/core'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
 
 const WatchLimitComponent = () => {
 	const form = Form.useFormInstance()
-	const watchLimitType: string = Form.useWatch(['limit_type'], form)
+	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
+		['limit_type'],
+		form,
+	)
 
 	const handleReset = (value: string) => {
 		if ('unlimited' === value) {
@@ -21,6 +25,9 @@ const WatchLimitComponent = () => {
 				limit_value: undefined,
 				limit_unit: 'timestamp',
 			})
+		}
+		if ('follow_subscription' === value) {
+			form.setFieldsValue({ limit_value: '', limit_unit: '' })
 		}
 	}
 
