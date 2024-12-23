@@ -40,6 +40,8 @@ const EditBundleComponent = ({
 		})
 
 	const watchStatus = Form.useWatch(['status'], form)
+	const watchExcludeMainCourse =
+		Form.useWatch(['exclude_main_course'], form) === 'yes'
 
 	useEffect(() => {
 		form.setFieldsValue(record)
@@ -56,7 +58,11 @@ const EditBundleComponent = ({
 			bundle_type: 'bundle'
 			sale_date_range: [Dayjs | number, Dayjs | number]
 		}
-		if (!selectedProducts?.length && values?.bundle_type === 'bundle') {
+		if (
+			!selectedProducts?.length &&
+			values?.bundle_type === 'bundle' &&
+			watchExcludeMainCourse
+		) {
 			message.error('請至少選擇一個商品')
 			return
 		}
@@ -100,9 +106,9 @@ const EditBundleComponent = ({
 			goBack={null}
 			headerButtons={() => null}
 			title={
-				<>
+				<div className="pl-4">
 					《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
-				</>
+				</div>
 			}
 			saveButtonProps={{
 				...saveButtonProps,
@@ -129,6 +135,13 @@ const EditBundleComponent = ({
 					{defaultButtons}
 				</>
 			)}
+			wrapperProps={{
+				style: {
+					boxShadow: '0px 0px 16px 0px #ddd',
+					paddingTop: '1rem',
+					borderRadius: '0.5rem',
+				},
+			}}
 		>
 			<Form {...formProps} layout="vertical">
 				<Alert

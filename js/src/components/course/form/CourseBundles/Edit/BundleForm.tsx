@@ -44,6 +44,7 @@ const BundleForm = () => {
 
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
+		setShowList(true)
 	}
 
 	const searchProductsResult = useList<TBundleProductRecord>({
@@ -208,7 +209,7 @@ const BundleForm = () => {
 
 			<Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
 
-			<Heading className="mb-3">搭配你的銷售方案，請選擇要加入的商品</Heading>
+			<Heading className="mb-3">自由搭配你的銷售方案，選擇要加入的商品</Heading>
 			<FiSwitch
 				formItemProps={{
 					name: ['exclude_main_course'],
@@ -219,9 +220,7 @@ const BundleForm = () => {
 				}}
 			/>
 
-			<div
-				className={`border-2 border-dashed rounded-xl p-4 mb-8 ${selectedProducts.length ? 'border-blue-500' : 'border-red-500'}`}
-			>
+			<div className="border-2 border-dashed rounded-xl p-4 mb-8 border-blue-500">
 				{/* 當前課程方案 */}
 				<div
 					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
@@ -243,12 +242,10 @@ const BundleForm = () => {
 				>
 					<PlusOutlined />
 				</div>
-				{!selectedProducts.length && !initIsFetching && (
-					<div className="text-red-500">
-						<ExclamationCircleOutlined className="mr-2" />
-						請至少加入一款產品
-					</div>
-				)}
+				<div className="text-primary">
+					<ExclamationCircleOutlined className="mr-2" />
+					也可以不加入產品，創建課程的定期定額銷售方案
+				</div>
 				<div className="relative mb-2">
 					<Search
 						placeholder="請輸入關鍵字後按下 ENTER 搜尋，每次最多返回 20 筆資料"
@@ -259,7 +256,7 @@ const BundleForm = () => {
 						onClick={() => setShowList(!showList)}
 					/>
 					<div
-						className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 h-[30rem] overflow-y-auto ${showList ? 'tw-block' : 'tw-hidden'}`}
+						className={`absolute border border-solid border-gray-200 rounded-md shadow-lg top-[100%] w-full bg-white z-50 max-h-[30rem] overflow-y-auto ${showList ? 'tw-block' : 'tw-hidden'}`}
 						onMouseLeave={() => setShowList(false)}
 					>
 						<List
