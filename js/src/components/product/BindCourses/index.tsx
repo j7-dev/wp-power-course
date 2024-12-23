@@ -2,6 +2,7 @@ import React, { memo } from 'react'
 import { Select, Button, Space, message, Form } from 'antd'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { useCourseSelect } from '@/hooks'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const BindCoursesComponent = ({
 	product_ids,
@@ -18,11 +19,7 @@ const BindCoursesComponent = ({
 	const form = Form.useFormInstance()
 
 	const handleClick = () => {
-		const values: {
-			limit_type: string
-			limit_value: number
-			limit_unit: string
-		} = form.getFieldsValue()
+		const values: TCoursesLimit = form.getFieldsValue()
 		mutate(
 			{
 				url: `${apiUrl}/products/bind-courses`,

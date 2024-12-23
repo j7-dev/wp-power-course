@@ -639,7 +639,6 @@ final class Product {
 			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
 
 			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
-			'follow_subscription'                       => (string) $product->get_meta( 'follow_subscription' ),
 			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
 			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
 			'_subscription_period'                      => $subscription_period ?: 'month',
@@ -852,9 +851,9 @@ final class Product {
 			$product->$method_name( $value );
 		}
 
+		// 如果是非訂閱商品，則刪除訂閱商品的相關資料
 		if (!$is_subscription) {
 			$fields_to_delete = [
-				'follow_subscription',
 				'_subscription_price',
 				'_subscription_period_interval',
 				'_subscription_period',

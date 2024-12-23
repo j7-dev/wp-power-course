@@ -1,34 +1,44 @@
 import React, { useEffect, memo } from 'react'
-import { Form, InputNumber, Input, DatePickerProps, Select } from 'antd'
-import { FiSwitch, DatePicker, RangePicker } from '@/components/formItem'
-import dayjs from 'dayjs'
+import { Form, Input, Select } from 'antd'
+import { FiSwitch } from '@/components/formItem'
 import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
 import ProductPriceFields from './ProductPriceFields'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
 
 const CoursePriceComponent = () => {
 	const form = Form.useFormInstance()
 	const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
-	const watchDateOnSaleFrom = Form.useWatch(['date_on_sale_from'], form)
-
-	const disabledDate: DatePickerProps['disabledDate'] = (current) => {
-		if (watchDateOnSaleFrom) {
-			return current && current < dayjs.unix(watchDateOnSaleFrom).startOf('day')
-		}
-		return false
-	}
 
 	useEffect(() => {
 		if (watchIsFree) {
 			form.setFieldsValue({
 				regular_price: 0,
 				sale_price: 0,
-				date_on_sale_from: undefined,
-				date_on_sale_to: undefined,
+				sale_date_range: undefined,
 			})
 		}
 	}, [watchIsFree])
+
+	// 如果觀看期限選擇「跟隨訂閱」，則課程商品種類只能選擇「訂閱」
+	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
+		['limit_type'],
+		form,
+	)
+	const productTypeOptions = PRODUCT_TYPE_OPTIONS.map((option) => ({
+		...option,
+		disabled:
+			option.value !== 'subscription' &&
+			watchLimitType === 'follow_subscription',
+	}))
+
+	useEffect(() => {
+		if (watchLimitType === 'follow_subscription') {
+			form.setFieldsValue({ type: 'subscription' })
+		}
+	}, [watchLimitType])
+
 	return (
 		<>
 			<div className="grid grid-cols-3 gap-6">
@@ -36,9 +46,9 @@ const CoursePriceComponent = () => {
 					<Item
 						name={['type']}
 						label="課程商品種類"
-						initialValue={PRODUCT_TYPE_OPTIONS[0].value}
+						initialValue={productTypeOptions[0].value}
 					>
-						<Select options={PRODUCT_TYPE_OPTIONS} />
+						<Select options={productTypeOptions} />
 					</Item>
 					<ProductPriceFields />
 				</div>

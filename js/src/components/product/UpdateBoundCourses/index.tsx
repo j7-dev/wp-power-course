@@ -1,6 +1,7 @@
 import React, { memo } from 'react'
 import { Button, message, Form } from 'antd'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const UpdateBoundCoursesComponent = ({
 	product_ids,
@@ -17,11 +18,7 @@ const UpdateBoundCoursesComponent = ({
 	const form = Form.useFormInstance()
 
 	const handleUpdate = () => () => {
-		const values: {
-			limit_type: string
-			limit_value: number
-			limit_unit: string
-		} = form.getFieldsValue()
+		const values: TCoursesLimit = form.getFieldsValue()
 		mutate(
 			{
 				url: `${apiUrl}/products/update-bound-courses`,

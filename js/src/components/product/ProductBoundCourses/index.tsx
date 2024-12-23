@@ -3,6 +3,7 @@ import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Typography, Tag, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import { cn } from '@/utils'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Text } = Typography
 
@@ -13,17 +14,19 @@ const LIMIT_UNIT_LABEL = {
 }
 
 const getLimitLabel = (
-	limit_type: string,
-	limit_value: number,
-	limit_unit: string,
+	limit_type: TCoursesLimit['limit_type'],
+	limit_value: TCoursesLimit['limit_value'],
+	limit_unit: TCoursesLimit['limit_unit'],
 ) => {
 	switch (limit_type) {
 		case 'unlimited':
 			return '無期限'
+		case 'follow_subscription':
+			return '跟隨訂閱'
 		case 'fixed':
 			return `訂單完成後 ${limit_value} ${LIMIT_UNIT_LABEL?.[limit_unit as keyof typeof LIMIT_UNIT_LABEL] || ''}`
 		case 'assigned':
-			return `至 ${dayjs.unix(limit_value).format('YYYY/MM/DD HH:mm')}`
+			return `至 ${dayjs.unix(limit_value as number).format('YYYY/MM/DD HH:mm')}`
 	}
 }
 
