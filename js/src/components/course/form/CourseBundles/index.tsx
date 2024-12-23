@@ -23,7 +23,7 @@ const LoadingItems = ({ className }: { className?: string }) => (
 		{new Array(4).fill(null).map((_, index) => (
 			<div
 				key={index}
-				className={`h-[4.5rem] mb-1 bg-gray-100 rounded-md animate-pulse ${className}`}
+				className={`h-[2.5rem] ml-8 mr-4 mb-1 bg-gray-100 rounded-[0.25rem] animate-pulse ${className}`}
 			/>
 		))}
 	</div>
@@ -121,7 +121,6 @@ const CourseBundlesComponent = () => {
 						新增
 					</Button>
 				</div>
-
 				<div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-6">
 					{isLoading && <LoadingItems />}
 					{!isLoading && (
@@ -152,21 +151,21 @@ const CourseBundlesComponent = () => {
 									},
 								)
 							}}
-							getItemStyles={() => ({ padding: '16px' })}
+							getItemStyles={() => ({
+								padding: '0.5rem 1rem',
+							})}
 							renderEmpty={() => <Empty description="目前沒有銷售方案" />}
-							renderItem={(
-								item: TBundleProductRecord,
-								options: TRenderItemOptions,
-							) => (
+							renderContent={(item: TBundleProductRecord, index: number) => (
 								<ListItem
 									record={item}
-									options={options}
+									index={index}
 									setSelectedProduct={setSelectedProduct}
+									selectedProduct={selectedProduct}
 								/>
 							)}
+							hideRemove
 						/>
 					)}
-
 					{selectedProduct && course && (
 						<EditBundle record={selectedProduct} course={course} />
 					)}
