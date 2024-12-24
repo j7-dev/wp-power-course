@@ -64,8 +64,10 @@ abstract class Base {
 	 */
 	public static function get_price_html( \WC_Product $product ): string {
 		$product_type = $product->get_type();
+
 		return match ($product_type) {
 			'subscription' => self::get_subscription_product_price_html($product),
+			'variable-subscription' => self::get_subscription_product_price_html($product),
 			default => $product->get_price_html(),
 		};
 	}
