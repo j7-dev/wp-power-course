@@ -530,7 +530,52 @@ abstract class Course {
 		$the_product_id = $the_product->get_id();
 		$user_id        = $user_id ?? \get_current_user_id();
 		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
-		return empty($expire_date) ? false : $expire_date < time();
+
+		// 如果 $expire_date 不是 subscription_ 開頭，就以 timestamp 判斷
+		if (!str_starts_with( (string) $expire_date, 'subscription_')) {
+			return empty($expire_date) ? false : $expire_date < time();
+		}
+
+		// subscription_ 開頭，當作 "跟隨訂閱" 處理
+		$subscription_id = str_replace('subscription_', '', (string) $expire_date);
+		$subscription    = \wcs_get_subscription($subscription_id);
+		if (!$subscription) {
+			return true;
+		}
+		// 已啟用，代表還沒到期
+		return !$subscription->has_status('active');
+	}
+
+	/**
+	 * 取得課程過期時的提示文字
+	 *
+	 * @param \WC_Product|null $the_product 產品實例，預設為null。
+	 * @param int|null         $user_id 用戶ID，預設為null。
+	 * @return string
+	 */
+	public static function get_expired_label( ?\WC_Product $the_product = null, ?int $user_id = null ): string {
+		global $product;
+
+		$the_product = $the_product ?? $product;
+		$user_id     = $user_id ?? \get_current_user_id();
+		$expire_date = AVLCourseMeta::get( $the_product->get_id(), get_current_user_id(), 'expire_date', true );
+		$is_expired  = self::is_expired($the_product, $user_id);
+
+		$follow_subscription = str_starts_with( (string) $expire_date, 'subscription_');
+
+		if ($follow_subscription) {
+			$subscription_id = str_replace('subscription_', '', (string) $expire_date);
+			return $is_expired ? "訂閱 #{$subscription_id} 已到期" : "跟隨訂閱 #{$subscription_id}";
+		}
+
+		if ($is_expired) {
+			return sprintf(
+				'您的課程觀看期限已於 %1$s 到期',
+				\wp_date( 'Y/m/d H:i', (int) $expire_date )
+			);
+		}
+
+		return empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d H:i', (int) $expire_date);
 	}
 
 	/**
