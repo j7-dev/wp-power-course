@@ -43,7 +43,6 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 $teacher_name = count($teacher_ids) > 0 ? $teacher_name : '&nbsp;';
 
 $current_user_id   = get_current_user_id();
-$limit_labels      = CourseUtils::get_limit_label_by_product( $product );
 $expire_date       = AVLCourseMeta::get( $product_id, $current_user_id, 'expire_date', true );
 $expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d H:i', $expire_date);
 $is_expired        = CourseUtils::is_expired($product, $current_user_id);

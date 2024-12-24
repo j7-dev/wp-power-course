@@ -307,41 +307,6 @@ abstract class Course {
 	}
 
 	/**
-	 * 取得課程限制條件名稱
-	 *
-	 * @param \WC_Product $product 商品
-	 *
-	 * @return array{type:string, value:string}
-	 */
-	public static function get_limit_label_by_product( \WC_Product $product ): array {
-		$limit_type       = $product->get_meta( 'limit_type' );
-		$limit_type_label = match ( $limit_type ) {
-			'fixed'    => '固定時間',
-			'assigned' => '指定日期',
-			default    => '無限制',
-		};
-
-		$limit_unit  = $product->get_meta( 'limit_unit' );
-		$limit_value = $product->get_meta( 'limit_value' );
-
-		$limit_value_label = match ( $limit_unit ) {
-			'timestamp' => strlen($limit_value) !== 10 ? '' : \wp_date( 'Y-m-d H:i', $limit_value ),
-			'month'  => "{$limit_value} 月",
-			'year'   => "{$limit_value} 年",
-			default  => $limit_value ? "{$limit_value} 天" : '',
-		};
-
-		if ( 'unlimited' === $limit_type ) {
-			$limit_value_label = '';
-		}
-
-		return [
-			'type'  => $limit_type_label,
-			'value' => $limit_value_label,
-		];
-	}
-
-	/**
 	 * 查詢用戶可以上那些課程 ids
 	 *
 	 * @param int|null $user_id 用户 ID
@@ -566,35 +531,6 @@ abstract class Course {
 		$user_id        = $user_id ?? \get_current_user_id();
 		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
 		return empty($expire_date) ? false : $expire_date < time();
-	}
-
-
-	/**
-	 * 計算到期日 expire_date
-	 * $limit_type 'unlimited' | 'fixed' | 'assigned';
-	 * $limit_value int
-	 * $limit_unit 'timestamp' | 'day' | 'month' | 'year'
-	 *
-	 * @param string $limit_type 限制類型 'unlimited' | 'fixed' | 'assigned'
-	 * @param int    $limit_value 限制值
-	 * @param string $limit_unit 限制單位 'timestamp' | 'day' | 'month' | 'year'
-	 * @return int 到期日 timestamp
-	 */
-	public static function calc_expire_date( string $limit_type, int $limit_value, string $limit_unit ): int {
-
-		$expire_date = 0;
-
-		if ('assigned' === $limit_type) {
-			$expire_date = $limit_value; // timestamp
-		}
-		if ('fixed' === $limit_type) {
-			$expire_date_timestamp = (int) strtotime("+{$limit_value} {$limit_unit}");
-			// 將 timestamp 轉換為當天的日期，並固定在當天的 15:59:00
-			$expire_date_string = date('Y-m-d', $expire_date_timestamp) . ' 15:59:00';
-			$expire_date        = (int) strtotime($expire_date_string);
-		}
-
-		return $expire_date;
 	}
 
 	/**

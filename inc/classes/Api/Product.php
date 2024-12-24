@@ -14,7 +14,8 @@ use J7\WpUtils\Classes\WC;
 use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Course\Limit;
+use J7\PowerCourse\Resources\Course\BindCoursesData;
 
 
 
@@ -310,6 +311,7 @@ final class Product {
 
 		$product_ids = $body_params['product_ids'];
 		$course_ids  = $body_params['course_ids'];
+		$limit       = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
 
 		$success_ids = [];
 		$failed_ids  = [];
@@ -319,25 +321,18 @@ final class Product {
 				$failed_ids[] = $product_id;
 				continue;
 			}
-			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
 
-			$bind_courses_data_ids = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? '0', $bind_courses_data);
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id );
 
 			foreach ($course_ids as $course_id) {
-				if (\in_array($course_id, $bind_courses_data_ids)) {
-					// 如果原本的資料裡面有這次新增的，那就跳過不動
-					continue;
-				}
-				// 原本的資料沒有這次新增的，那就新增下去
-				$bind_courses_data[] = [
-					'id'          => $course_id,
-					'limit_type'  => $body_params['limit_type'],
-					'limit_value' => $body_params['limit_value'],
-					'limit_unit'  => $body_params['limit_unit'],
-				];
+				$bind_courses_data_instance->add_course_data(
+					(int) $course_id,
+					$limit
+				);
 			}
 
-			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$bind_courses_data_instance->save();
+
 			$success_ids[] = $product_id;
 		}
 
@@ -379,24 +374,13 @@ final class Product {
 		$success_ids = [];
 		$failed_ids  = [];
 		foreach ($product_ids as $product_id) {
-			/**
-			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
-			 */
-			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-			foreach ($bind_courses_data as $index => $bind_course_data) {
-				$bind_course_id = $bind_course_data['id'] ?? 0;
 
-				if (!\in_array($bind_course_id, $course_ids) || !$bind_course_id) {
-					// 如果原本的資料裡面找不到 course_id 就跳過
-					continue;
-				}
-
-				$bind_courses_data[ $index ]['limit_type']  = $body_params['limit_type'];
-				$bind_courses_data[ $index ]['limit_value'] = $body_params['limit_value'];
-				$bind_courses_data[ $index ]['limit_unit']  = $body_params['limit_unit'];
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id);
+			foreach ($course_ids as $course_id) {
+				$limit = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
+				$bind_courses_data_instance->update_course_data( (int) $course_id, $limit );
 			}
-
-			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$bind_courses_data_instance->save();
 			$success_ids[] = $product_id;
 		}
 
@@ -447,13 +431,11 @@ final class Product {
 				continue;
 			}
 
-			/**
-			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
-			 */
-			$bind_courses_data     = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-			$new_bind_courses_data = array_filter($bind_courses_data, fn( $bind_course_data ) => !\in_array($bind_course_data['id'], $course_ids));
-			\update_post_meta( $product_id, 'bind_courses_data', $new_bind_courses_data );
-
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id );
+			foreach ($course_ids as $course_id) {
+				$bind_courses_data_instance->remove_course_data( (int) $course_id );
+			}
+			$bind_courses_data_instance->save();
 			$success_ids[] = $product_id;
 		}
 
@@ -538,22 +520,8 @@ final class Product {
 
 		$product_id = $product->get_id();
 
-		$bind_courses_data           = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-		$formatted_bind_courses_data = array_values(
-			array_map(
-			function ( $bind_course_data ) {
-				$id = $bind_course_data['id'] ?? '';
-				return [
-					'id'          => $id,
-					'name'        => $id ? \get_the_title($id) : '',
-					'limit_type'  => $bind_course_data['limit_type'] ?? '',
-					'limit_value' => $bind_course_data['limit_value'] ?? '',
-					'limit_unit'  => $bind_course_data['limit_unit'] ?? '',
-				];
-			},
-			$bind_courses_data
-		)
-			);
+		$bind_courses_data_instance  = BindCoursesData::instance( (int) $product_id );
+		$formatted_bind_courses_data = $bind_courses_data_instance->get_data(ARRAY_N);
 
 		$subscription_price           = $product->get_meta( '_subscription_price' );
 		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
@@ -836,11 +804,11 @@ final class Product {
 		$is_subscription = 'subscription' === $meta_data['type'];
 		unset($meta_data['type']);
 
-		if ($is_subscription && !class_exists('WC_Product_Subscription')) {
+		if ($is_subscription && !class_exists('WC_Subscription')) {
 			return new \WP_REST_Response(
 				[
 					'code'    => 'subscription_class_not_found',
-					'message' => 'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+					'message' => 'WC_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
 				],
 				400
 			);
@@ -989,30 +957,13 @@ final class Product {
 					continue;
 				}
 				$product_id = $product->get_id();
+
+				$bind_courses_data_instance = BindCoursesData::instance( $product_id );
 				foreach ($meta_values as $course_id) {
-					$bind_courses_data = \get_post_meta($product_id, 'bind_courses_data', true) ?: [];
-					$bind_course_ids   = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? 0, $bind_courses_data);
-
-					$included = false;
-					foreach ($bind_courses_data as $bind_course_data) {
-						if (\in_array($course_id, $bind_course_ids)) {
-							// 如果這個商品原本就有綁定了，就不需要再添加
-							$included = true;
-							continue;
-						}
-					}
-
-					// 如果這個商品原本沒有  就添加
-					if (!$included) {
-						$bind_courses_data[] = [
-							'id'          => $course_id,
-							'limit_type'  => \get_post_meta($course_id, 'limit_type', true) ?: 'unlimited',
-							'limit_value' => \get_post_meta($course_id, 'limit_value', true) ?: '',
-							'limit_unit'  => \get_post_meta($course_id, 'limit_unit', true) ?: '',
-						];
-						\update_post_meta($product_id, 'bind_courses_data', $bind_courses_data);
-					}
+					$limit = Limit::instance( (int) $course_id );
+					$bind_courses_data_instance->add_course_data( (int) $course_id, $limit );
 				}
+				$bind_courses_data_instance->save();
 			}
 		}
 

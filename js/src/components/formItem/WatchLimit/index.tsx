@@ -96,7 +96,7 @@ const WatchLimitComponent = () => {
 			{'follow_subscription' === watchLimitType && (
 				<>
 					<Alert
-						className="mt-4"
+						className="my-4"
 						message="注意事項"
 						description={
 							<ol className="pl-4">

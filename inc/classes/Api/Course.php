@@ -18,6 +18,7 @@ use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
+use J7\PowerCourse\Resources\Course\Limit;
 
 
 
@@ -416,6 +417,7 @@ final class Course extends ApiBase {
 		$subscription_sign_up_fee     = $product->get_meta( '_subscription_sign_up_fee' );
 		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
 		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
+		$limit                        = Limit::instance($product);
 
 		$extra_array = [
 			'purchase_note'                 => $product->get_purchase_note(),
@@ -426,9 +428,9 @@ final class Course extends ApiBase {
 			'attributes'                    => WC::get_product_attribute_array( $product ),
 
 			'qa_list'                       => (array) $product->get_meta( 'qa_list' ),
-			'limit_type'                    => (string) $product->get_meta( 'limit_type' ) ?: 'unlimited',
-			'limit_value'                   => (int) $product->get_meta( 'limit_value' ) ?: 1,
-			'limit_unit'                    => (string) $product->get_meta( 'limit_unit' ) ?: 'day',
+			'limit_type'                    => $limit->limit_type,
+			'limit_value'                   => $limit->limit_value,
+			'limit_unit'                    => $limit->limit_unit,
 			'is_popular'                    => (string) $product->get_meta( 'is_popular' ),
 			'is_featured'                   => (string) $product->get_meta( 'is_featured' ),
 			'show_review'                   => (string) $product->get_meta( 'show_review' ),
@@ -547,10 +549,10 @@ final class Course extends ApiBase {
 		$is_subscription = 'subscription' === $meta_data['type'];
 		unset($meta_data['type']);
 
-		if ($is_subscription && !class_exists('WC_Product_Subscription')) {
+		if ($is_subscription && !class_exists('WC_Subscription')) {
 			return new \WP_Error(
 				'subscription_class_not_found',
-				'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+				'WC_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
 				400
 			);
 		}
@@ -714,7 +716,7 @@ final class Course extends ApiBase {
 
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
-				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, (int) $expire_date );
+				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date );
 			}
 		}
 

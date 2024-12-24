@@ -78,7 +78,7 @@ abstract class Base {
 	 * @return string
 	 */
 	private static function get_subscription_product_price_html( \WC_Product $product ): string {
-		if (!class_exists('\WC_Product_Subscription')) {
+		if (!class_exists('\WC_Subscription')) {
 			return $product->get_price_html();
 		}
 
