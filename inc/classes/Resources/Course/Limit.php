@@ -70,6 +70,10 @@ class Limit {
 			return (int) strtotime($expire_date_string);
 		}
 
+		if (!$order) {
+			return $expire_date;
+		}
+
 		// 所有條件都判斷完了，剩下的就是 follow_subscription
 		// 'follow_subscription' === $limit_type
 		if (!class_exists('WC_Subscription')) {

@@ -37,7 +37,6 @@ export const getPrice = ({
 	if (isFetching) {
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
 	}
-
 	const coursePrice = Number(course?.[type] || course?.regular_price || 0)
 	const total =
 		Number(
