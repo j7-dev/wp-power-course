@@ -58,7 +58,7 @@ const SortableChaptersComponent = () => {
 	const invalidate = useInvalidate()
 
 	const apiUrl = useApiUrl()
-	const { mutate, isLoading } = useCustomMutation()
+	const { mutate } = useCustomMutation()
 
 	useEffect(() => {
 		if (!isListFetching) {
@@ -111,7 +111,7 @@ const SortableChaptersComponent = () => {
 				},
 				onSettled: () => {
 					invalidate({
-						resource: 'courses',
+						resource: 'chapters',
 						invalidates: ['list'],
 					})
 				},
@@ -126,6 +126,23 @@ const SortableChaptersComponent = () => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批量刪除選中的 ids
 
 	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
+
+	useEffect(() => {
+		// 每次重新排序後，重新取得章節後，重新 set 選擇的章節
+		if (!isListFetching) {
+			const flattenChapters = chapters.reduce((acc, c) => {
+				acc.push(c)
+				if (c?.chapters) {
+					acc.push(...c?.chapters)
+				}
+				return acc
+			}, [] as TChapterRecord[])
+
+			setSelectedChapter(
+				flattenChapters.find((c) => c.id === selectedChapter?.id) || null,
+			)
+		}
+	}, [isListFetching])
 
 	return (
 		<>
@@ -192,6 +209,7 @@ const SortableChaptersComponent = () => {
 						renderContent={(node) => (
 							<NodeRender
 								node={node}
+								selectedChapter={selectedChapter}
 								setSelectedChapter={setSelectedChapter}
 								selectedIds={selectedIds}
 								setSelectedIds={setSelectedIds}
