@@ -21,21 +21,9 @@ const ProductTypeComponent: FC<{
 	const tag = productTypes.find((productType) => productType.value === type)
 	return (
 		<div className="flex items-center gap-2">
-			{!bundle_type && (
-				<Tag bordered={false} color={tag?.color} className="m-0">
-					{tag?.label}
-				</Tag>
-			)}
-			{bundle_type && (
-				<Tooltip
-					title={`此商品為 #${link_course_ids} 的 ${getBundleType(bundle_type)?.label} 銷售方案`}
-				>
-					<Tag bordered={false} color="purple" className="m-0">
-						銷售方案
-					</Tag>
-				</Tooltip>
-			)}
-
+			<Tag bordered={false} color={tag?.color} className="m-0">
+				{tag?.label}
+			</Tag>
 			<Tooltip
 				zIndex={1000000 + 20}
 				title={`${record?.featured ? '' : '非'}精選商品`}
@@ -68,6 +56,16 @@ const ProductTypeComponent: FC<{
 					) : (
 						<IoMdDownload className="text-gray-400" />
 					)}
+				</Tooltip>
+			)}
+
+			{bundle_type && (
+				<Tooltip
+					title={`此商品為 #${link_course_ids} 的 ${getBundleType(bundle_type)?.label} 銷售方案`}
+				>
+					<Tag bordered={false} color="purple" className="m-0">
+						銷售方案
+					</Tag>
 				</Tooltip>
 			)}
 		</div>

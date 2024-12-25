@@ -5,10 +5,17 @@ type TChapter = {
 	is_finished: boolean
 }
 
+export type TExpireDate = {
+	is_subscription: boolean
+	subscription_id: number | null
+	is_expired: boolean
+	timestamp: number | null
+}
+
 export type TAVLCourse = {
 	id: string
 	name: string
-	expire_date: number
+	expire_date: TExpireDate
 	chapters?: TChapter[]
 }
 

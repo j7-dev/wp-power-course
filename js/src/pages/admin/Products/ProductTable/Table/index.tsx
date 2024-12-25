@@ -32,6 +32,9 @@ import { useGCDItems } from '@/hooks'
 import { WatchLimit } from '@/components/formItem'
 
 const Main = () => {
+	const [form] = Form.useForm()
+	const watchLimitType = Form.useWatch(['limit_type'], form)
+
 	const { tableProps, searchFormProps } = useTable<
 		TProductRecord,
 		HttpError,
@@ -46,15 +49,46 @@ const Main = () => {
 
 	const { valueLabelMapper } = useValueLabelMapper()
 
-	const { rowSelection, selectedRowKeys } = useRowSelection<TProductRecord>({
-		getCheckboxProps: (record) => {
-			const isVariableProduct = record?.type?.startsWith('variable')
-			return {
-				disabled: !!isVariableProduct,
-				className: isVariableProduct ? 'tw-hidden' : '',
-			}
-		},
-	})
+	const { rowSelection, selectedRowKeys, setSelectedRowKeys } =
+		useRowSelection<TProductRecord>({
+			getCheckboxProps: (record) => {
+				// 當觀看期限選擇 follow_subscription "跟隨訂閱" 時，只能選擇訂閱商品
+				const isSubscriptionProduct = record?.type?.includes('subscription')
+				const disabledForFollowSubscription =
+					!isSubscriptionProduct && watchLimitType === 'follow_subscription'
+
+				// 可變商品的母體不必可選，變體可選就好
+				const isVariableProduct = record?.type?.startsWith('variable')
+				return {
+					disabled: !!isVariableProduct || disabledForFollowSubscription,
+					className: isVariableProduct ? 'tw-hidden' : '',
+				}
+			},
+		})
+
+	useEffect(() => {
+		if ('follow_subscription' === watchLimitType) {
+			const subscriptionProductIds = tableProps?.dataSource?.reduce(
+				(acc, product) => {
+					if ('subscription' === product.type) {
+						acc.push(product.id)
+					}
+					if ('variable-subscription' === product.type) {
+						const variationIds =
+							product?.children?.map((variation) => variation.id) || []
+						acc.push(...variationIds)
+					}
+					return acc
+				},
+				[] as string[],
+			)
+
+			const removeNonSubscriptionProductIds = selectedRowKeys?.filter((id) =>
+				subscriptionProductIds?.includes(id as string),
+			)
+			setSelectedRowKeys(removeNonSubscriptionProductIds)
+		}
+	}, [watchLimitType])
 
 	/*
 	 * 換頁時，將已加入的商品全局狀態同步到當前頁面的 selectedRowKeys 狀態
@@ -121,7 +155,7 @@ const Main = () => {
 				</div>
 			</Card>
 			<Card>
-				<Form layout="vertical">
+				<Form layout="vertical" form={form}>
 					<div className="grid grid-cols-4 gap-x-6">
 						<div>
 							<WatchLimit />
