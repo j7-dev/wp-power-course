@@ -14,7 +14,5 @@ export const UserWatchStatus: FC<{
 
 	if (!currentCourse) return <>出錯了！找不到課程</>
 
-	const expireDate = Number(currentCourse?.expire_date)
-
-	return <WatchStatusTag expireDate={expireDate} />
+	return <WatchStatusTag expireDate={currentCourse?.expire_date} />
 }

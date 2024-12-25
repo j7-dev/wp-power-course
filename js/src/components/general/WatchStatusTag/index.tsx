@@ -1,19 +1,55 @@
 import React, { memo } from 'react'
+import { Tag, Tooltip } from 'antd'
+import { TExpireDate } from '@/pages/admin/Courses/List/types/user'
 import dayjs from 'dayjs'
-import { Tag } from 'antd'
 
-const WatchStatusTagComponent = ({ expireDate }: { expireDate: number }) => {
-	const currentTimestamp = dayjs().unix()
-
-	if (!expireDate) {
-		return <Tag color="blue">無期限</Tag>
+const getColor = (expireDate: TExpireDate) => {
+	const { is_expired, timestamp } = expireDate
+	if (timestamp === 0) {
+		return 'blue'
 	}
 
-	if (currentTimestamp > expireDate) {
-		return <Tag color="magenta">已過期</Tag>
+	if (is_expired) {
+		return 'magenta'
 	}
 
-	return <Tag color="green">未過期</Tag>
+	return 'green'
+}
+
+const getLabel = (expireDate: TExpireDate) => {
+	const { is_subscription, is_expired, timestamp } = expireDate
+
+	if (timestamp === 0) {
+		return '無期限'
+	}
+
+	const label = is_expired ? '已過期' : '未過期'
+	const addonAfter = is_subscription ? '(訂閱)' : ''
+	return `${label}`
+}
+
+export const getWatchStatusTagTooltip = (expireDate: TExpireDate) => {
+	const { is_subscription, subscription_id, is_expired, timestamp } = expireDate
+	if (is_subscription) {
+		return `跟隨訂閱 #${subscription_id}`
+	}
+
+	if (!timestamp) return ''
+
+	return is_expired
+		? `已於 ${dayjs.unix(timestamp).format('YYYY/MM/DD HH:mm')} 過期`
+		: `可觀看至 ${dayjs.unix(timestamp).format('YYYY/MM/DD HH:mm')}`
+}
+
+const WatchStatusTagComponent = ({
+	expireDate,
+}: {
+	expireDate: TExpireDate
+}) => {
+	const color = getColor(expireDate)
+	const label = getLabel(expireDate)
+
+	return <Tag color={color}>{label}</Tag>
 }
 
 export const WatchStatusTag = memo(WatchStatusTagComponent)

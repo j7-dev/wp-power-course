@@ -27,7 +27,6 @@ final class Bootstrap {
 	 * Constructor
 	 */
 	public function __construct() {
-
 		Compatibility\Compatibility::instance();
 
 		Resources\Chapter\CPT::instance();

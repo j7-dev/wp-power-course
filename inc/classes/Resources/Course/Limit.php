@@ -53,7 +53,7 @@ class Limit {
 	 * @param ?\WC_Order $order 訂單
 	 * @return int|string 到期日 timestamp | subscription_{訂閱id}
 	 */
-	public function get_expire_date( ?\WC_Order $order ): int|string {
+	public function calc_expire_date( ?\WC_Order $order ): int|string {
 
 		$expire_date = 0;
 
@@ -61,7 +61,7 @@ class Limit {
 			return $expire_date;
 		}
 		if ('assigned' === $this->limit_type) {
-			return $this->limit_value; // timestamp
+			return (int) $this->limit_value; // timestamp
 		}
 		if ('fixed' === $this->limit_type) {
 			$expire_date_timestamp = (int) strtotime("+{$this->limit_value} {$this->limit_unit}");
@@ -86,6 +86,17 @@ class Limit {
 		}
 
 		return $expire_date;
+	}
+
+	/**
+	 * 取得 ExpireDate 實例
+	 *
+	 * @param ?\WC_Order $order 訂單
+	 * @return ExpireDate
+	 */
+	public function get_expire_date( ?\WC_Order $order ): ExpireDate {
+		$expire_date = $this->calc_expire_date($order);
+		return new ExpireDate($expire_date);
 	}
 
 	/**
