@@ -1,8 +1,9 @@
 import React, { useEffect, memo } from 'react'
-import { Form, Input, Select } from 'antd'
-import { FiSwitch } from '@/components/formItem'
+import { Form, Input, Select, InputNumber } from 'antd'
+import { FiSwitch, RangePicker } from '@/components/formItem'
 import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
-import ProductPriceFields from './ProductPriceFields'
+import SubscriptionPriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Subscription'
+import SimplePriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Simple'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
@@ -39,6 +40,9 @@ const CoursePriceComponent = () => {
 		}
 	}, [watchLimitType])
 
+	const watchProductType = Form.useWatch(['type'], form)
+	const isSubscription = watchProductType === 'subscription'
+
 	return (
 		<>
 			<div className="grid grid-cols-3 gap-6">
@@ -50,7 +54,10 @@ const CoursePriceComponent = () => {
 					>
 						<Select options={productTypeOptions} />
 					</Item>
-					<ProductPriceFields />
+
+					{isSubscription && <SubscriptionPriceFields />}
+
+					<SimplePriceFields />
 				</div>
 				<div>
 					<Item name={['purchase_note']} label="購買備註">
