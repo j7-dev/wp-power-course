@@ -67,7 +67,7 @@ abstract class Base {
 
 		return match ($product_type) {
 			'subscription' => self::get_subscription_product_price_html($product),
-			'variable-subscription' => self::get_subscription_product_price_html($product),
+			'variable-subscription' => '',
 			default => $product->get_price_html(),
 		};
 	}
