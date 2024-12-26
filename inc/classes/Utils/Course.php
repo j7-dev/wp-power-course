@@ -11,7 +11,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
@@ -261,50 +261,6 @@ abstract class Course {
 		return $chapters;
 	}
 
-	/**
-	 * 取得 bundle_ids (銷售方案) by course_id
-	 * 查找課程有哪些銷售方案
-	 *
-	 * @param int                       $course_id 課程 id
-	 * @param bool|null                 $return_ids 是否只回傳 id
-	 * @param array<string>|null|string $post_status 文章狀態
-	 *
-	 * @return array<BundleProduct|\WC_Product_Subscription|int> bundle_ids (銷售方案)
-	 */
-	public static function get_bundles_by_course_id( int $course_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
-
-		$args = [
-			'post_type'   => 'product',
-			'numberposts' => - 1,
-			'post_status' => $post_status,
-			'meta_key'    => 'link_course_ids',
-			'meta_value'  => (string) $course_id,
-			'fields'      => 'ids',
-			'orderby'     => [
-				'menu_order' => 'ASC',
-				'post_date'  => 'DESC',
-			],
-		];
-		$ids  = \get_posts($args);
-		if ($return_ids) {
-			return $ids;
-		}
-		$products = [];
-		foreach ($ids as $id) {
-			$product = \wc_get_product($id);
-			if (!$product) {
-				continue;
-			}
-			$product_type = $product->get_type();
-			if ('simple' === $product_type) {
-				$product    = new BundleProduct($product);
-				$products[] = $product;
-				continue;
-			}
-			$products[] = $product;
-		}
-		return $products;
-	}
 
 	/**
 	 * 查詢用戶可以上那些課程 ids

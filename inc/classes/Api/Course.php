@@ -19,7 +19,7 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\Course\Limit;
-
+use J7\PowerCourse\BundleProduct\Helper;
 
 
 /**
@@ -408,7 +408,7 @@ final class Course extends ApiBase {
 			'chapters' => $chapters,
 		] : [];
 
-		$bundle_ids = CourseUtils::get_bundles_by_course_id( $product->get_id(), return_ids: true);
+		$bundle_ids = Helper::get_bundle_products( $product->get_id(), true);
 
 		$subscription_price           = $product->get_meta( '_subscription_price' );
 		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );

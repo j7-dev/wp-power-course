@@ -3,7 +3,6 @@ parameters:
 	paths:
 		- plugin.php
 		- inc/
-		- modules/
 	ignoreErrors:
 		- '#Access to constant .* on an unknown class#'
 		- '#Constant .* not found#'

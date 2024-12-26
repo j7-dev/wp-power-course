@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\WpUtils\Classes\General;
+use J7\PowerCourse\BundleProduct\Helper;
 
 /**
  * Class ProductQuery
@@ -118,7 +118,7 @@ final class ProductQuery {
 
 		$meta_key = $query->get('meta_key');
 		// 只有在 power course api 取得時，還有課程銷售頁可見
-		if (General::in_url([ '/wp-json/power-course' ]) || 'link_course_ids' === $meta_key) {
+		if (General::in_url([ '/wp-json/power-course' ]) || Helper::LINK_COURSE_IDS_META_KEY === $meta_key) {
 			return;
 		}
 
