@@ -11,7 +11,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\WC;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
 use J7\PowerCourse\Resources\Course\Limit;
@@ -107,11 +107,11 @@ final class Product {
 					];
 				}
 
-				if ( isset($query_vars['link_course_ids']) ) {
+				if ( isset($query_vars[ Helper::LINK_COURSE_IDS_META_KEY ]) ) {
 					$query['meta_query'][] = [
 						[
-							'key'   => 'link_course_ids',
-							'value' => $query_vars['link_course_ids'],
+							'key'   => Helper::LINK_COURSE_IDS_META_KEY,
+							'value' => $query_vars[ Helper::LINK_COURSE_IDS_META_KEY ],
 						],
 					];
 				}
@@ -467,9 +467,9 @@ final class Product {
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
 		}
-
-		$date_created  = $product?->get_date_created();
-		$date_modified = $product?->get_date_modified();
+		$product_id    = $product->get_id();
+		$date_created  = $product->get_date_created();
+		$date_modified = $product->get_date_modified();
 
 		$image_id          = $product->get_image_id();
 		$gallery_image_ids = $product->get_gallery_image_ids();
@@ -478,11 +478,11 @@ final class Product {
 		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
 
 		$description_array = $with_description ? [
-			'description'       => $product?->get_description(),
-			'short_description' => $product?->get_short_description(),
+			'description'       => $product->get_description(),
+			'short_description' => $product->get_short_description(),
 		] : [];
 
-		$low_stock_amount = ( '' === $product?->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
+		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
 
 		$variation_ids = $product?->get_children(); // get variations
 		$children      = [];
@@ -492,7 +492,7 @@ final class Product {
 			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
 			$children           = [
 				'children'  => $children_details,
-				'parent_id' => (string) $product?->get_id(),
+				'parent_id' => (string) $product_id,
 			];
 		}
 
@@ -513,8 +513,6 @@ final class Product {
 				$attributes_arr[ urldecode( $key ) ] = $attribute;
 			}
 		}
-		$include_product_ids        = (array) \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
-		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$price_html = Base::get_price_html( $product );
 
@@ -534,56 +532,56 @@ final class Product {
 		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
 		$base_array      = [
 			// Get Product General Info
-			'id'                                        => (string) $product_id,
-			'type'                                      => $product->get_type(),
-			'name'                                      => $product->get_name(),
-			'slug'                                      => $product->get_slug(),
-			'date_created'                              => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'                             => $date_modified->date( 'Y-m-d H:i:s' ),
-			'status'                                    => $product->get_status(),
-			'featured'                                  => $product->get_featured(),
-			'catalog_visibility'                        => $product->get_catalog_visibility(),
-			'sku'                                       => $product->get_sku(),
+			'id'                                 => (string) $product_id,
+			'type'                               => $product->get_type(),
+			'name'                               => $product->get_name(),
+			'slug'                               => $product->get_slug(),
+			'date_created'                       => $date_created->date( 'Y-m-d H:i:s' ),
+			'date_modified'                      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'status'                             => $product->get_status(),
+			'featured'                           => $product->get_featured(),
+			'catalog_visibility'                 => $product->get_catalog_visibility(),
+			'sku'                                => $product->get_sku(),
 			// 'menu_order'         => $product?->get_menu_order(),
-			'virtual'                                   => $product->get_virtual(),
-			'downloadable'                              => $product->get_downloadable(),
-			'permalink'                                 => \get_permalink( $product_id ),
+			'virtual'                            => $product->get_virtual(),
+			'downloadable'                       => $product->get_downloadable(),
+			'permalink'                          => \get_permalink( $product_id ),
 
 			// Get Product Prices
-			'price_html'                                => $price_html,
-			'regular_price'                             => $product->get_regular_price(),
-			'sale_price'                                => $product->get_sale_price(),
-			'on_sale'                                   => $product->is_on_sale(),
-			'sale_date_range'                           => $sale_date_range,
-			'date_on_sale_from'                         => $sale_date_range[0],
-			'date_on_sale_to'                           => $sale_date_range[1],
-			'total_sales'                               => $product->get_total_sales(),
+			'price_html'                         => $price_html,
+			'regular_price'                      => $product->get_regular_price(),
+			'sale_price'                         => $product->get_sale_price(),
+			'on_sale'                            => $product->is_on_sale(),
+			'sale_date_range'                    => $sale_date_range,
+			'date_on_sale_from'                  => $sale_date_range[0],
+			'date_on_sale_to'                    => $sale_date_range[1],
+			'total_sales'                        => $product->get_total_sales(),
 
 			// Get Product Stock
-			'stock'                                     => $product->get_stock_quantity(),
-			'stock_status'                              => $product->get_stock_status(),
-			'manage_stock'                              => $product->get_manage_stock(),
-			'stock_quantity'                            => $product->get_stock_quantity(),
-			'backorders'                                => $product->get_backorders(),
-			'backorders_allowed'                        => $product->backorders_allowed(),
-			'backordered'                               => $product->is_on_backorder(),
-			'low_stock_amount'                          => $low_stock_amount,
+			'stock'                              => $product->get_stock_quantity(),
+			'stock_status'                       => $product->get_stock_status(),
+			'manage_stock'                       => $product->get_manage_stock(),
+			'stock_quantity'                     => $product->get_stock_quantity(),
+			'backorders'                         => $product->get_backorders(),
+			'backorders_allowed'                 => $product->backorders_allowed(),
+			'backordered'                        => $product->is_on_backorder(),
+			'low_stock_amount'                   => $low_stock_amount,
 
 			// Get Linked Products
-			'upsell_ids'                                => array_map( 'strval', $product?->get_upsell_ids() ),
-			'cross_sell_ids'                            => array_map( 'strval', $product?->get_cross_sell_ids() ),
+			'upsell_ids'                         => array_map( 'strval', $product?->get_upsell_ids() ),
+			'cross_sell_ids'                     => array_map( 'strval', $product?->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
-			'attributes'                                => $attributes_arr,
+			'attributes'                         => $attributes_arr,
 
 			// Get Product Taxonomies
-			'categories'                                => self::format_terms(
+			'categories'                         => self::format_terms(
 				[
 					'taxonomy'   => 'product_cat',
 					'object_ids' => $product_id,
 				]
 				),
-			'tags'                                      => self::format_terms(
+			'tags'                               => self::format_terms(
 				[
 					'taxonomy'   => 'product_tag',
 					'object_ids' => $product_id,
@@ -591,29 +589,29 @@ final class Product {
 				),
 
 			// Get Product Images
-			'images'                                    => $images,
+			'images'                             => $images,
 
-			'is_course'                                 => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'                                 => (string) $product->get_parent_id(),
+			'is_course'                          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => (array) $unique_include_product_ids,
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( Helper::instance( $product ) )->get_product_ids(),
 
-			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
-			'qa_list'                                   => [],
-			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
-			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
-			'bind_courses_data'                         => $formatted_bind_courses_data,
-			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
+			'is_free'                            => (string) $product->get_meta( 'is_free' ),
+			'qa_list'                            => [],
+			'bundle_type_label'                  => (string) $product->get_meta( 'bundle_type_label' ),
+			'exclude_main_course'                => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
+			'bind_courses_data'                  => $formatted_bind_courses_data,
+			Helper::LINK_COURSE_IDS_META_KEY     => $product->get_meta( Helper::LINK_COURSE_IDS_META_KEY ),
 
-			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
-			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
-			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
-			'_subscription_period'                      => $subscription_period ?: 'month',
-			'_subscription_length'                      => is_numeric($subscription_length) ? (int) $subscription_length : 0,
-			'_subscription_sign_up_fee'                 => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
-			'_subscription_trial_length'                => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
-			'_subscription_trial_period'                => $subscription_trial_period ?: 'day',
+			'bundle_type'                        => (string) $product->get_meta( 'bundle_type' ),
+			'_subscription_price'                => is_numeric($subscription_price) ? (float) $subscription_price : null,
+			'_subscription_period_interval'      => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
+			'_subscription_period'               => $subscription_period ?: 'month',
+			'_subscription_length'               => is_numeric($subscription_length) ? (int) $subscription_length : 0,
+			'_subscription_sign_up_fee'          => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
+			'_subscription_trial_length'         => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
+			'_subscription_trial_period'         => $subscription_trial_period ?: 'day',
 
 		] + $children;
 
@@ -637,7 +635,7 @@ final class Product {
 		}
 
 		// 取出銷售方案
-		// $bundles  = CourseUtils::get_bundles_by_course_id( $product->get_id());
+		// $bundles  =Helper::get_bundle_products( $product->get_id());
 		$product_id = $product->get_id();
 
 		$base_array = [
@@ -686,7 +684,7 @@ final class Product {
 			'meta_data' => $meta_data,
 			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
-		$product = new BundleProduct();
+		$product = new \WC_Product_Simple();
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -923,8 +921,8 @@ final class Product {
 	 */
 	public static function handle_special_fields( $meta_data, $product ) {
 		$update_array_meta_keys = [
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
-			'link_course_ids', // 用來表示 bundle product 連結的課程
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
+			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程
 		];
 		$add_array_meta_keys    = [
 			'bind_course_ids', // 綁定的課程

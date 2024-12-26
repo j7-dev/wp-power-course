@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Utils;
 
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\BundleProduct\Helper;
 
 
 /**
@@ -169,7 +170,7 @@ final class Duplicate {
 
 		if (is_numeric($new_parent)) {
 			// 更新銷售方案的的 link_course_ids
-			$new_product->update_meta_data('link_course_ids', $new_parent);
+			$new_product->update_meta_data(Helper::LINK_COURSE_IDS_META_KEY, $new_parent);
 			$new_product->save_meta_data();
 		}
 
@@ -281,7 +282,7 @@ final class Duplicate {
 			[
 				'post_type'   => 'product',
 				'numberposts' => -1,
-				'meta_key'    => 'link_course_ids',
+				'meta_key'    => Helper::LINK_COURSE_IDS_META_KEY,
 				'meta_value'  => $post_id,
 				'fields'      => 'ids',
 			]

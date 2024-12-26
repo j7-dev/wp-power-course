@@ -8,7 +8,7 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\Resources;
 
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Course\LifeCycle;
@@ -60,9 +60,9 @@ final class Order {
 
 			// 如果是銷售方案商品，這訂單是購買銷售方案
 			// 就把銷售方案包含的商品，加到訂單中，且售價修改為 0
-			if ( BundleProduct::is_bundle_product( $product_id ) ) {
-				$bundle_product       = new BundleProduct( $product );
-				$included_product_ids = $bundle_product->get_product_ids(); // 綑綁的商品們
+			$helper = Helper::instance( $product );
+			if ( $helper?->is_bundle_product ) {
+				$included_product_ids = $helper?->get_product_ids() ?? []; // 綑綁的商品們
 
 				foreach ( $included_product_ids as $included_product_id ) {
 					$included_product = \wc_get_product( $included_product_id );
@@ -74,7 +74,7 @@ final class Order {
 						$included_product,
 						1, // TODO: 應該也要記錄數量
 						[
-							'name'     => $bundle_product->get_name() . ' - ' . $included_product->get_name(),
+							'name'     => $product->get_name() . ' - ' . $included_product->get_name(),
 							'subtotal' => 0,
 							'total'    => 0,
 						]

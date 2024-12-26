@@ -13,6 +13,7 @@ use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\PowerCourse\Bootstrap;
+use J7\PowerCourse\BundleProduct\Helper;
 
 /**
  * Class LifeCycle
@@ -97,7 +98,7 @@ final class LifeCycle {
 		}
 
 		$chapter_ids      = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids       = (array) CourseUtils::get_bundles_by_course_id(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids       = Helper::get_bundle_products(  $id, true, [ 'any', 'trash' ] );
 		$deleted_post_ids = [];
 
 		foreach ([ ...$chapter_ids, ...$bundle_ids ] as $post_id) {
@@ -175,7 +176,7 @@ final class LifeCycle {
 		}
 
 		$chapter_ids = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids  = (array) CourseUtils::get_bundles_by_course_id(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids  = Helper::get_bundle_products(  $id, true, [ 'any', 'trash' ] );
 
 		$restored_post_ids = [];
 
