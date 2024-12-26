@@ -28,7 +28,6 @@ final class Bootstrap {
 	 */
 	public function __construct() {
 		Compatibility\Compatibility::instance();
-		// Compatibility\ApiOptimize::instance();
 
 		Resources\Chapter\CPT::instance();
 		Resources\Order::instance();
