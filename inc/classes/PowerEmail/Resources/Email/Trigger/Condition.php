@@ -95,8 +95,8 @@ final class Condition {
 		$at                      = At::instance();
 		$this->trigger_at        = $condition['trigger_at'] ?? $at->trigger_at['course_granted']['slug'];
 		$this->trigger_condition = $condition['trigger_condition'];
-		$this->course_ids        = ( (array) $condition['course_ids'] ?? null );
-		$this->chapter_ids       = ( (array) $condition['chapter_ids'] ?? null );
+		$this->course_ids        = (array) ( @$condition['course_ids'] ?? [] );
+		$this->chapter_ids       = (array) ( @$condition['chapter_ids'] ?? [] );
 		$this->qty               = (int) ( $condition['qty'] ?? null );
 		$this->sending_type      = $condition['sending']['type'] ?? 'send_now';
 		$this->sending_value     = $condition['sending']['value'] ?? null;
@@ -250,7 +250,7 @@ final class Condition {
 	 * 取得 current_ids 用來做比較
 	 *
 	 * @param int $user_id 使用者 ID
-	 * @return array<string|int> current_ids 陣列
+	 * @return array<int, int|string> current_ids 陣列
 	 */
 	private function get_current_ids( int $user_id ): array {
 		$current_ids = match ($this->trigger_at) {
@@ -278,14 +278,17 @@ final class Condition {
 			$current_ids = [];
 		}
 
+		/** @var array<int, int> */
+		$current_ids = array_values( array_map( 'intval', $current_ids ) );
+
 		return $current_ids;
 	}
 
 	/**
 	 * 取得 post_ids
 	 *
-	 * @param array  $where 查詢條件
-	 * @param string $table_slug 資料表 course |chapter
+	 * @param array<string, string|int> $where 查詢條件
+	 * @param string                    $table_slug 資料表 course |chapter
 	 * @return array<string|int> post_ids 陣列
 	 */
 	private function get_metatable_post_ids( array $where, string $table_slug ): array {
