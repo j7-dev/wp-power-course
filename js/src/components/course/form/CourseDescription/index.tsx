@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import { Form, Input, InputNumber, Select, Space } from 'antd'
+import { Form, Input, Select } from 'antd'
 import {
 	keyLabelMapper,
 	termToOptions,
@@ -11,13 +11,7 @@ import {
 	defaultSelectProps,
 } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
-import {
-	FiSwitch,
-	VideoInput,
-	DatePicker,
-	DescriptionDrawer,
-	WatchLimit,
-} from '@/components/formItem'
+import { FiSwitch, VideoInput, DescriptionDrawer } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
@@ -163,35 +157,6 @@ const CourseDescriptionComponent = () => {
 					</div>
 				</div>
 			</div>
-
-			<div className="min-h-[12rem] mb-12">
-				<Heading>課程資訊</Heading>
-
-				<div className="grid 2xl:grid-cols-3 gap-6">
-					<DatePicker
-						formItemProps={{
-							name: ['course_schedule'],
-							label: '開課時間',
-							className: 'mb-0',
-						}}
-					/>
-
-					<div>
-						<p className="mb-2">預計時長</p>
-						<Space.Compact block>
-							<Item name={['course_hour']} noStyle>
-								<InputNumber className="w-1/2" min={0} addonAfter="時" />
-							</Item>
-							<Item name={['course_minute']} noStyle>
-								<InputNumber className="w-1/2" min={0} addonAfter="分" />
-							</Item>
-						</Space.Compact>
-					</div>
-
-					<WatchLimit />
-				</div>
-			</div>
-
 			<div className="mb-12">
 				<Heading>講師資訊</Heading>
 				<ListSelect<TUserRecord>
