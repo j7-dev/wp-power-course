@@ -14,6 +14,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Course\BindCoursesData;
+use J7\PowerCourse\Resources\Course\BindCourseData;
 
 /**
  * Class Order
@@ -62,7 +63,7 @@ final class Order {
 			// 就把銷售方案包含的商品，加到訂單中，且售價修改為 0
 			$helper = Helper::instance( $product );
 			if ( $helper?->is_bundle_product ) {
-				$included_product_ids = $helper?->get_product_ids() ?? []; // 綑綁的商品們
+				$included_product_ids = $helper?->get_product_ids() ?: []; // 綑綁的商品們
 
 				foreach ( $included_product_ids as $included_product_id ) {
 					$included_product = \wc_get_product( $included_product_id );
@@ -122,12 +123,14 @@ final class Order {
 			// 將課程限制條件紀錄到訂單
 			$meta_keys = Limit::get_meta_keys();
 			foreach ( $meta_keys as $meta_key ) {
+				/** @var string $meta_value */
 				$meta_value = $product->get_meta( $meta_key );
 				$item->update_meta_data( "_{$meta_key}", $meta_value );
 			}
 			$item->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
 		}
 
+		/** @var array<int, array{id: int, name: string, limit_type: string, limit_value: int|null, limit_unit: string|null}> $bind_courses_data */
 		$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
 		if ( $bind_courses_data ) {
 			$item->update_meta_data( '_bind_courses_data', $bind_courses_data );
@@ -148,6 +151,10 @@ final class Order {
 	 */
 	public function add_meta_to_avl_course( int $order_id ): void {
 		$order = \wc_get_order($order_id);
+
+		if (!( $order instanceof \WC_Order )) {
+			return;
+		}
 
 		$items = $order->get_items();
 		foreach ( $items as $item ) {
@@ -190,10 +197,12 @@ final class Order {
 		}
 		// 從訂單拿 _bind_courses_data
 
+		/** @var array<int, array{id: int, name: string, limit_type: string, limit_value: int|null, limit_unit: string|null}> $bind_courses_data */
 		$bind_courses_data          = $item->get_meta( '_bind_courses_data' ) ?: [];
 		$bind_courses_data_instance = new BindCoursesData($bind_courses_data);
 
 		foreach ($bind_courses_data_instance->get_data() as $bind_course_data) {
+			/** @var BindCourseData $bind_course_data */
 			if (!$bind_course_data->course_id) {
 				continue;
 			}

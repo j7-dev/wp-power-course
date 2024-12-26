@@ -231,7 +231,6 @@ abstract class Base {
 	public static function wc_format_subscription_sale_price( $regular_price, $sale_price, $period_label ) {
 		// Format the prices.
 		$formatted_regular_price = is_numeric( $regular_price ) ? \wc_price( (float) $regular_price ) : $regular_price;
-		$formatted_regular_price = $formatted_regular_price . $period_label;
 		$formatted_sale_price    = is_numeric( $sale_price ) ? \wc_price( (float) $sale_price ) : $sale_price;
 		$formatted_sale_price    = $formatted_sale_price . $period_label;
 

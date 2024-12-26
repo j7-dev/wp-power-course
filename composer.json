@@ -37,7 +37,7 @@
 		"wp-coding-standards/wpcs": "@stable",
 		"dealerdirect/phpcodesniffer-composer-installer": "@stable",
 		"phpcompatibility/php-compatibility": "@stable",
-		"phpstan/phpstan": "^1.11.9",
+		"phpstan/phpstan": "^2.0.4",
 		"php-stubs/woocommerce-stubs": "^9.1",
 		"php-stubs/wordpress-stubs": "^6.6",
 		"phpstan/extension-installer": "^1.4.1"
