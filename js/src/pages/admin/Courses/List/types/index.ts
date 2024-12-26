@@ -54,36 +54,40 @@ export type TCourseBaseRecord = {
 	course_length: number
 }
 
-// Edit, Show, Create 會拿全部的欄位
-export type TCourseRecord = TCourseBaseRecord & {
-	purchase_note: string
-	description: string
-	short_description: string
-	upsell_ids: number[]
-	cross_sell_ids: number[]
-	attributes: TProductAttribute[]
-	chapters?: TChapterRecord[]
-	qa_list: {
-		question: string
-		answer: string
-	}[]
-	limit_type: string
-	limit_value: number
-	limit_unit: string
-	is_popular: 'yes' | 'no' | ''
-	is_featured: 'yes' | 'no' | ''
-	show_review: 'yes' | 'no' | ''
-	reviews_allowed: boolean
-	show_review_tab: 'yes' | 'no' | ''
-	show_review_list: 'yes' | 'no' | ''
-	show_total_student: 'yes' | 'no' | ''
-	enable_comment: 'yes' | 'no' | ''
-	hide_single_course: 'yes' | 'no' | ''
-	hide_courses_in_main_query: 'yes' | 'no' | ''
-	extra_student_count: number
-	feature_video: TVideo
-	trial_video: TVideo
+export type TCoursesLimit = {
+	limit_type: 'unlimited' | 'fixed' | 'assigned' | 'follow_subscription'
+	limit_value: number | ''
+	limit_unit: 'second' | 'day' | 'month' | 'year' | ''
 }
+
+// Edit, Show, Create 會拿全部的欄位
+export type TCourseRecord = TCourseBaseRecord &
+	TCoursesLimit & {
+		purchase_note: string
+		description: string
+		short_description: string
+		upsell_ids: number[]
+		cross_sell_ids: number[]
+		attributes: TProductAttribute[]
+		chapters?: TChapterRecord[]
+		qa_list: {
+			question: string
+			answer: string
+		}[]
+		is_popular: 'yes' | 'no' | ''
+		is_featured: 'yes' | 'no' | ''
+		show_review: 'yes' | 'no' | ''
+		reviews_allowed: boolean
+		show_review_tab: 'yes' | 'no' | ''
+		show_review_list: 'yes' | 'no' | ''
+		show_total_student: 'yes' | 'no' | ''
+		enable_comment: 'yes' | 'no' | ''
+		hide_single_course: 'yes' | 'no' | ''
+		hide_courses_in_main_query: 'yes' | 'no' | ''
+		extra_student_count: number
+		feature_video: TVideo
+		trial_video: TVideo
+	}
 
 export type TChapterRecord = {
 	id: string

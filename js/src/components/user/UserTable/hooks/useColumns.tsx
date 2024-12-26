@@ -2,8 +2,7 @@ import React from 'react'
 import { TableProps, Typography } from 'antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { UserName } from '@/components/user'
-import { WatchStatusTag } from '@/components/general'
-import dayjs from 'dayjs'
+import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
 
 type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
@@ -26,7 +25,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 			width: 240,
 			render: (avl_courses: TAVLCourse[]) => {
 				return avl_courses.map(({ id, name, expire_date }) => (
-					<div key={id} className="grid grid-cols-[12rem_4rem_8rem] gap-1 my-1">
+					<div key={id} className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1">
 						<div>
 							<Text
 								ellipsis={{
@@ -47,10 +46,8 @@ const useColumns = (params?: TUseColumnsParams) => {
 							<WatchStatusTag expireDate={expire_date} />
 						</div>
 
-						<div className="text-center">
-							{expire_date
-								? dayjs.unix(expire_date).format('YYYY/MM/DD HH:mm')
-								: ''}
+						<div className="text-left">
+							{getWatchStatusTagTooltip(expire_date)}
 						</div>
 					</div>
 				))

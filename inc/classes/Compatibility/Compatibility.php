@@ -72,6 +72,9 @@ final class Compatibility {
 		// 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
 		self::convert_fields();
 
+		// 將 bundle_type 統一為 'bundle'
+		self::bundle_type();
+
 		/**
 		 * ============== END 相容性代碼 ==============
 		 */
@@ -190,5 +193,29 @@ final class Compatibility {
 			$table_name,
 			[ 'meta_key' => 'finished_chapter_ids' ],
 		);
+	}
+
+	/**
+	 * 將 bundle_type 統一為 'bundle'
+	 *
+	 * @since 2024-12-26
+	 * @return void
+	 */
+	private static function bundle_type(): void {
+
+		global $wpdb;
+
+		try {
+			// 把非 bundle 的 meta_value 改為 bundle
+			$wpdb->get_results(
+			$wpdb->prepare(
+			'UPDATE %1$s SET meta_value = "bundle" WHERE meta_key = "bundle_type" AND meta_value != "bundle"',
+			$wpdb->postmeta,
+			)
+			);
+		} catch (\Throwable $th) {
+			// TEST 印出 ErrorLog 記得移除
+			\J7\WpUtils\Classes\ErrorLog::info( $th, 'bundle_type' );
+		}
 	}
 }

@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Admin;
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 
 /**
  * Class Product
@@ -84,7 +84,8 @@ final class Product {
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
 			$post_states['course'] = '課程商品';
 		}
-		if ( BundleProduct::is_bundle_product( $post->ID ) ) {
+		$helper = Helper::instance( $post->ID );
+		if ( $helper?->is_bundle_product ) {
 			$post_states['bundle'] = '銷售方案商品';
 		}
 		return $post_states;
@@ -99,7 +100,9 @@ final class Product {
 	 * @return array
 	 */
 	public static function modify_list_row_actions( array $actions, \WP_Post $post ): array {
-		if ( CourseUtils::is_course_product( $post->ID ) || BundleProduct::is_bundle_product( $post->ID ) ) {
+
+		$helper = Helper::instance( $post->ID );
+		if ( CourseUtils::is_course_product( $post->ID ) || $helper?->is_bundle_product ) {
 			unset( $actions['inline hide-if-no-js'] );
 			unset( $actions['trash'] );
 			$actions['edit'] = sprintf(
@@ -143,7 +146,8 @@ final class Product {
 	 * @return string
 	 */
 	public static function modify_edit_post_link( string $link, int $post_id, $context ): string {
-		if ( CourseUtils::is_course_product( $post_id ) || BundleProduct::is_bundle_product( $post_id ) ) {
+		$helper = Helper::instance( $post_id );
+		if ( CourseUtils::is_course_product( $post_id ) || $helper?->is_bundle_product ) {
 			$link = \admin_url("admin.php?page=power-course#/courses/edit/{$post_id}");
 		}
 
@@ -162,7 +166,8 @@ final class Product {
 	 */
 	public static function add_order_item_class( string $class, \WC_Order_Item_Product $item, \WC_Order $order ): string {
 		$product_id = $item->get_product_id();
-		if ( CourseUtils::is_course_product( $product_id ) || BundleProduct::is_bundle_product( $product_id ) ) {
+		$helper     = Helper::instance( $product_id );
+		if ( CourseUtils::is_course_product( $product_id ) || $helper?->is_bundle_product ) {
 			$class .= ' [&_.wc-order-item-name]:pointer-events-none';
 		}
 

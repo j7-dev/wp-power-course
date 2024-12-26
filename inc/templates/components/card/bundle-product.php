@@ -3,8 +3,9 @@
  * Bundle product card
  */
 
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Utils\Base;
 
 $default_args = [
 	'product' => null, // BundleProduct
@@ -20,12 +21,13 @@ $args = wp_parse_args( $args, $default_args );
 	'product' => $product,
 ] = $args;
 
-if ( ! ( $product instanceof BundleProduct ) ) {
+$helper = Helper::instance( $product );
+if ( ! $helper?->is_bundle_product ) {
 	throw new \Exception( 'product 不是 BundleProduct' );
 }
 
 
-$pbp_product_ids = $product->get_product_ids();
+$pbp_product_ids = $helper?->get_product_ids() ?? [];
 
 $product_name = $product->get_name();
 
@@ -90,6 +92,21 @@ Plugin::get(
 );
 
 echo '</div>';
+
+
+if ('subscription' === $product->get_type()) {
+	$product_meta_data = Base::get_subscription_product_meta_data_label( $product );
+	echo '<div class="grid grid-cols-2 gap-y-1.5 mt-2">';
+	foreach ($product_meta_data as $key => $meta_data) {
+		printf(
+		/*html*/'<span class="text-gray-500 text-xs %1$s">- %2$s</span>',
+		$key % 2 === 0 ? 'text-left' : 'text-right',
+		$meta_data
+		);
+	}
+	echo '</div>';
+}
+
 
 if ($is_on_sale && $date_on_sale_to) {
 	printf(

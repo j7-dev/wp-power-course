@@ -3,9 +3,8 @@
  * Sidebar for course product
  */
 
-use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\BundleProduct\Helper;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -29,31 +28,20 @@ echo '<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
 
 Plugin::get( 'card/single-product' );
 
-$linked_products = CourseUtils::get_bundles_by_course_id( (int) $product->get_id() );
+$linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 foreach ( $linked_products as $linked_product ) {
 	if ( 'publish' !== $linked_product->get_status() ) {
 		continue;
 	}
-	$bundle_type = $linked_product->get_meta( 'bundle_type' );
-	if ('bundle' === $bundle_type) {
-		Plugin::get(
+
+	Plugin::get(
 		'card/bundle-product',
 		[
 			'product' => $linked_product,
 		]
 		);
-		continue;
-	}
+	continue;
 
-	if ('subscription' === $bundle_type) {
-		Plugin::get(
-		'card/subscription-product',
-		[
-			'product' => $linked_product,
-		]
-		);
-		continue;
-	}
 }
 
 

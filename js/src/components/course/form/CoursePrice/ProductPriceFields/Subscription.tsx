@@ -1,11 +1,9 @@
 import React, { memo, useEffect } from 'react'
 import { Form, Input, InputNumber, Select, Space } from 'antd'
-import { useParsed } from '@refinedev/core'
-import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '../utils'
 
 const { Item } = Form
 
-enum SUBSCRIPTION {
+export enum SUBSCRIPTION {
 	PRICE = '_subscription_price', // 訂閱價格每 M 個月 [N 元] - number
 	PERIOD_INTERVAL = '_subscription_period_interval', // 訂閱價格每 [M 個] 月 N 元 - number
 	PERIOD = '_subscription_period', // 訂閱價格每 M 個 [月] N 元 - day | week | month | year
@@ -42,7 +40,6 @@ const lengthOptions = new Array(31).fill(0).map((_, index) => ({
 }))
 
 const Subscription = () => {
-	const { id: courseId } = useParsed()
 	const form = Form.useFormInstance()
 	const watchPeriod = Form.useWatch(SUBSCRIPTION.PERIOD, form)
 	const watchPeriodLabel = watchPeriod
@@ -57,18 +54,6 @@ const Subscription = () => {
 
 	return (
 		<>
-			<Item
-				name="bind_course_ids"
-				label="綁定課程"
-				initialValue={[courseId]}
-				hidden
-			/>
-			<Item
-				name={INCLUDED_PRODUCT_IDS_FIELD_NAME}
-				label="連接商品"
-				initialValue={[]}
-				hidden
-			/>
 			<Item name={['regular_price']} label="原價" hidden />
 
 			<div className="mb-6">
@@ -77,7 +62,7 @@ const Subscription = () => {
 					<Item name={SUBSCRIPTION.PRICE} noStyle rules={[{ required: true }]}>
 						<InputNumber className="w-[37%]" addonAfter="元" />
 					</Item>
-					<Item name={SUBSCRIPTION.PERIOD_INTERVAL} noStyle>
+					<Item name={SUBSCRIPTION.PERIOD_INTERVAL} noStyle initialValue={1}>
 						<InputNumber
 							className="w-[37%]"
 							addonBefore="每"
@@ -85,7 +70,7 @@ const Subscription = () => {
 							min={1}
 						/>
 					</Item>
-					<Item name={SUBSCRIPTION.PERIOD} noStyle>
+					<Item name={SUBSCRIPTION.PERIOD} noStyle initialValue="month">
 						<Select options={PERIOD_OPTIONS} className="w-[26%]" />
 					</Item>
 				</Space.Compact>
@@ -94,7 +79,12 @@ const Subscription = () => {
 			<div className="mb-6">
 				<label className="tw-block mb-2">續訂截止日(扣款期數)</label>
 				<Space.Compact block>
-					<Item name={SUBSCRIPTION.LENGTH} label="續訂截止日(扣款期數)" noStyle>
+					<Item
+						name={SUBSCRIPTION.LENGTH}
+						label="續訂截止日(扣款期數)"
+						noStyle
+						initialValue={0}
+					>
 						<Select options={lengthOptions} className="flex-1" />
 					</Item>
 					<Input
@@ -105,17 +95,21 @@ const Subscription = () => {
 				</Space.Compact>
 			</div>
 
-			<Item name={SUBSCRIPTION.SIGN_UP_FEE} label="註冊費 (NT$)">
+			<Item
+				name={SUBSCRIPTION.SIGN_UP_FEE}
+				label="註冊費 (NT$)"
+				initialValue={0}
+			>
 				<InputNumber className="w-full" />
 			</Item>
 
 			<div className="mb-6">
 				<label className="tw-block mb-2">免費試用</label>
 				<Space.Compact block>
-					<Item name={SUBSCRIPTION.TRIAL_LENGTH} noStyle>
+					<Item name={SUBSCRIPTION.TRIAL_LENGTH} noStyle initialValue={0}>
 						<InputNumber className="w-[74%]" addonAfter="個" />
 					</Item>
-					<Item name={SUBSCRIPTION.TRIAL_PERIOD} noStyle>
+					<Item name={SUBSCRIPTION.TRIAL_PERIOD} noStyle initialValue="month">
 						<Select options={PERIOD_OPTIONS} className="w-[26%]" />
 					</Item>
 				</Space.Compact>

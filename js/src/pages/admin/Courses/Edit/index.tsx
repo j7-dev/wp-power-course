@@ -16,7 +16,12 @@ import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { siteUrl, course_permalink_structure, toFormData } from '@/utils'
+import {
+	siteUrl,
+	course_permalink_structure,
+	toFormData,
+	formatDateRangeData,
+} from '@/utils'
 
 export const CoursesEdit = () => {
 	// 初始化資料
@@ -120,7 +125,11 @@ export const CoursesEdit = () => {
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (values: Partial<TCourseRecord>) => {
-		onFinish(toFormData(values))
+		const formattedValues = formatDateRangeData(values, 'sale_date_range', [
+			'date_on_sale_from',
+			'date_on_sale_to',
+		])
+		onFinish(toFormData(formattedValues))
 	}
 
 	return (

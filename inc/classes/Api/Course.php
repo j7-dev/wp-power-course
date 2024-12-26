@@ -18,7 +18,8 @@ use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
-
+use J7\PowerCourse\Resources\Course\Limit;
+use J7\PowerCourse\BundleProduct\Helper;
 
 
 /**
@@ -302,6 +303,8 @@ final class Course extends ApiBase {
 			);
 		$tag_ids       = array_column( $tags, 'id' );
 
+		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
+
 		$base_array = [
 			// Get Product General Info
 			'id'                 => (string) $product_id,
@@ -326,8 +329,9 @@ final class Course extends ApiBase {
 			'regular_price'      => $regular_price,
 			'sale_price'         => $sale_price,
 			'on_sale'            => $product->is_on_sale(),
-			'date_on_sale_from'  => $product->get_date_on_sale_from()?->getTimestamp(),
-			'date_on_sale_to'    => $product->get_date_on_sale_to()?->getTimestamp(),
+			'sale_date_range'    => $sale_date_range,
+			'date_on_sale_from'  => $sale_date_range[0],
+			'date_on_sale_to'    => $sale_date_range[1],
 			'total_sales'        => $product->get_total_sales(),
 
 			// Get Product Stock
@@ -404,43 +408,59 @@ final class Course extends ApiBase {
 			'chapters' => $chapters,
 		] : [];
 
-		$bundle_ids = CourseUtils::get_bundles_by_course_id( $product->get_id(), return_ids: true);
+		$bundle_ids = Helper::get_bundle_products( $product->get_id(), true);
+
+		$subscription_price           = $product->get_meta( '_subscription_price' );
+		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
+		$subscription_period          = $product->get_meta( '_subscription_period' );
+		$subscription_length          = $product->get_meta( '_subscription_length' );
+		$subscription_sign_up_fee     = $product->get_meta( '_subscription_sign_up_fee' );
+		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
+		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
+		$limit                        = Limit::instance($product);
 
 		$extra_array = [
-			'purchase_note'              => $product->get_purchase_note(),
-			'description'                => $product->get_description(),
-			'short_description'          => $product->get_short_description(),
-			'upsell_ids'                 => array_map( 'strval', $product->get_upsell_ids() ),
-			'cross_sell_ids'             => array_map( 'strval', $product->get_cross_sell_ids() ),
-			'attributes'                 => WC::get_product_attribute_array( $product ),
+			'purchase_note'                 => $product->get_purchase_note(),
+			'description'                   => $product->get_description(),
+			'short_description'             => $product->get_short_description(),
+			'upsell_ids'                    => array_map( 'strval', $product->get_upsell_ids() ),
+			'cross_sell_ids'                => array_map( 'strval', $product->get_cross_sell_ids() ),
+			'attributes'                    => WC::get_product_attribute_array( $product ),
 
-			'qa_list'                    => (array) $product->get_meta( 'qa_list' ),
-			'limit_type'                 => (string) $product->get_meta( 'limit_type' ) ?: 'unlimited',
-			'limit_value'                => (int) $product->get_meta( 'limit_value' ) ?: 1,
-			'limit_unit'                 => (string) $product->get_meta( 'limit_unit' ) ?: 'day',
-			'is_popular'                 => (string) $product->get_meta( 'is_popular' ),
-			'is_featured'                => (string) $product->get_meta( 'is_featured' ),
-			'show_review'                => (string) $product->get_meta( 'show_review' ),
-			'reviews_allowed'            => (bool) $product->get_reviews_allowed(),
-			'show_review_tab'            => (string) $product->get_meta( 'show_review_tab' ),
-			'show_review_list'           => (string) $product->get_meta( 'show_review_list' ),
-			'show_total_student'         => (string) $product->get_meta( 'show_total_student' ) ?: 'yes',
-			'enable_comment'             => (string) $product->get_meta( 'enable_comment' ),
-			'hide_single_course'         => (string) $product->get_meta( 'hide_single_course' ) ?: 'no',
-			'hide_courses_in_main_query' => (string) $product->get_meta( 'hide_courses_in_main_query' ) ?: 'no',
-			'extra_student_count'        => (int) $product->get_meta( 'extra_student_count' ),
-			'feature_video'              => $product->get_meta( 'feature_video' ) ?: [
+			'qa_list'                       => (array) $product->get_meta( 'qa_list' ),
+			'limit_type'                    => $limit->limit_type,
+			'limit_value'                   => $limit->limit_value,
+			'limit_unit'                    => $limit->limit_unit,
+			'is_popular'                    => (string) $product->get_meta( 'is_popular' ),
+			'is_featured'                   => (string) $product->get_meta( 'is_featured' ),
+			'show_review'                   => (string) $product->get_meta( 'show_review' ),
+			'reviews_allowed'               => (bool) $product->get_reviews_allowed(),
+			'show_review_tab'               => (string) $product->get_meta( 'show_review_tab' ),
+			'show_review_list'              => (string) $product->get_meta( 'show_review_list' ),
+			'show_total_student'            => (string) $product->get_meta( 'show_total_student' ) ?: 'yes',
+			'enable_comment'                => (string) $product->get_meta( 'enable_comment' ),
+			'hide_single_course'            => (string) $product->get_meta( 'hide_single_course' ) ?: 'no',
+			'hide_courses_in_main_query'    => (string) $product->get_meta( 'hide_courses_in_main_query' ) ?: 'no',
+			'extra_student_count'           => (int) $product->get_meta( 'extra_student_count' ),
+			'feature_video'                 => $product->get_meta( 'feature_video' ) ?: [
 				'type' => 'youtube',
 				'id'   => '',
 				'meta' => [],
 			],
-			'trial_video'                => $product->get_meta( 'trial_video' ) ?: [
+			'trial_video'                   => $product->get_meta( 'trial_video' ) ?: [
 				'type' => 'youtube',
 				'id'   => '',
 				'meta' => [],
 			],
 			// bundle product
-			'bundle_ids'                 => $bundle_ids,
+			'bundle_ids'                    => $bundle_ids,
+			'_subscription_price'           => is_numeric($subscription_price) ? (float) $subscription_price : null,
+			'_subscription_period_interval' => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
+			'_subscription_period'          => $subscription_period ?: 'month',
+			'_subscription_length'          => is_numeric($subscription_length) ? (int) $subscription_length : 0,
+			'_subscription_sign_up_fee'     => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
+			'_subscription_trial_length'    => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
+			'_subscription_trial_period'    => $subscription_trial_period ?: 'day',
 
 		] + $children;
 
@@ -521,10 +541,21 @@ final class Course extends ApiBase {
 	 * 儲存課程的元資料
 	 *
 	 * @param \WC_Product                        $product 代表 WooCommerce 產品的物件
-	 * @param array<string, array<mixed>|string> $meta_data 需要更��的元資料陣列
-	 * @return void
+	 * @param array<string, array<mixed>|string> $meta_data 需要更新的元資料陣列
+	 * @return \WP_Error|true
 	 */
-	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): void {
+	private function handle_save_course_meta_data( \WC_Product $product, array $meta_data ): \WP_Error|bool {
+		// type 會被儲存為商品的類型，不需要再額外存進 meta data
+		$is_subscription = 'subscription' === $meta_data['type'];
+		unset($meta_data['type']);
+
+		if ($is_subscription && !class_exists('WC_Subscription')) {
+			return new \WP_Error(
+				'subscription_class_not_found',
+				'WC_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+				400
+			);
+		}
 
 		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
 		unset( $meta_data['files'] ); // files 會上傳，不用存
@@ -550,6 +581,22 @@ final class Course extends ApiBase {
 			}
 		}
 
+		// 如果是非訂閱商品，則刪除訂閱商品的相關資料
+		if (!$is_subscription) {
+			$fields_to_delete = [
+				'_subscription_price',
+				'_subscription_period_interval',
+				'_subscription_period',
+				'_subscription_length',
+				'_subscription_sign_up_fee',
+				'_subscription_trial_length',
+				'_subscription_trial_period',
+			];
+			foreach ($fields_to_delete as $field) {
+				$product->delete_meta_data($field);
+			}
+		}
+
 		\do_action(LifeCycle::BEFORE_UPDATE_PRODUCT_META_ACTION, $product, $meta_data);
 
 		// 最後再來處理剩餘的 meta_data
@@ -560,6 +607,16 @@ final class Course extends ApiBase {
 		$product->update_meta_data( '_' . AdminProduct::PRODUCT_OPTION_NAME, 'yes' );
 
 		$product->save_meta_data();
+
+		$id     = $product->get_id();
+		$result = \wp_set_object_terms($id, $is_subscription ? 'subscription' : 'simple', 'product_type');
+		\wc_delete_product_transients($id);
+
+		if (\is_wp_error($result)) {
+			return $result;
+		}
+
+		return true;
 	}
 
 	/**
@@ -581,7 +638,11 @@ final class Course extends ApiBase {
 		] = $this->separator($request);
 
 		$this->handle_save_course_data($product, $data );
-		$this->handle_save_course_meta_data($product, $meta_data );
+		$result = $this->handle_save_course_meta_data($product, $meta_data );
+
+		if (true !== $result ) {
+			return $result;
+		}
 
 		return new \WP_REST_Response(
 			[
@@ -611,7 +672,11 @@ final class Course extends ApiBase {
 			'meta_data' => $meta_data,
 		] = $this->separator($request);
 		$this->handle_save_course_data($product, $data );
-		$this->handle_save_course_meta_data($product, $meta_data );
+		$result = $this->handle_save_course_meta_data($product, $meta_data );
+
+		if (true !== $result ) {
+			return $result;
+		}
 
 		return new \WP_REST_Response(
 			[
@@ -651,7 +716,7 @@ final class Course extends ApiBase {
 
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
-				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, (int) $expire_date );
+				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date );
 			}
 		}
 

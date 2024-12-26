@@ -14,6 +14,7 @@ use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
+use J7\PowerCourse\Resources\Course\ExpireDate;
 
 /**
  * Class Api
@@ -393,7 +394,7 @@ final class User {
 			$course_id                        = (int) $course_id;
 			$avl_courses[ $i ]['id']          = (string) $course_id;
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
-			$avl_courses[ $i ]['expire_date'] = (int) AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
+			$avl_courses[ $i ]['expire_date'] = ExpireDate::instance($course_id, $user_id)->to_array();
 			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
 
 			foreach ($all_chapter_ids as $j => $chapter_id) {

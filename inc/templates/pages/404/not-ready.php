@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $course_schedule_timestamp = $product->get_meta( 'course_schedule' );
 
 $message = sprintf(
-	'課程還沒開始，課程預計於 %1$s，開始',
+	'課程尚未開始，預計於 %1$s 開始',
 	\wp_date( 'Y/m/d H:i', $course_schedule_timestamp )
 );
 

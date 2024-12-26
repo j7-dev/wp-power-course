@@ -6,6 +6,7 @@
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
+use J7\PowerCourse\Resources\Course\Limit;
 
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -62,8 +63,9 @@ $course_minute                = (int) $product->get_meta( 'course_minute' );
 $count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
 
 
-$total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-$limit_labels       = CourseUtils::get_limit_label_by_product( $product );
+$total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+$limit_labels  = Limit::instance($product)->get_limit_label();
+
 $show_total_student = $product->get_meta( 'show_total_student' ) ?: 'yes';
 
 $items = [
@@ -85,7 +87,7 @@ $items = [
 	[
 		'icon'  => 'eye',
 		'label' => '觀看時間',
-		'value' =>"{$limit_labels['type']} {$limit_labels['value']}",
+		'value' =>"{$limit_labels->type} {$limit_labels->value}",
 	],
 ];
 

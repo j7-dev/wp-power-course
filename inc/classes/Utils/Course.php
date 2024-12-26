@@ -11,7 +11,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
@@ -261,90 +261,6 @@ abstract class Course {
 		return $chapters;
 	}
 
-	/**
-	 * 取得 bundle_ids (銷售方案) by course_id
-	 * 查找課程有哪些銷售方案
-	 *
-	 * @param int                       $course_id 課程 id
-	 * @param bool|null                 $return_ids 是否只回傳 id
-	 * @param array<string>|null|string $post_status 文章狀態
-	 *
-	 * @return array<BundleProduct|\WC_Product_Subscription|int> bundle_ids (銷售方案)
-	 */
-	public static function get_bundles_by_course_id( int $course_id, ?bool $return_ids = false, $post_status = [ 'any' ] ): array {
-
-		$args = [
-			'post_type'   => 'product',
-			'numberposts' => - 1,
-			'post_status' => $post_status,
-			'meta_key'    => 'link_course_ids',
-			'meta_value'  => (string) $course_id,
-			'fields'      => 'ids',
-			'orderby'     => [
-				'menu_order' => 'ASC',
-				'post_date'  => 'DESC',
-			],
-		];
-		$ids  = \get_posts($args);
-		if ($return_ids) {
-			return $ids;
-		}
-		$products = [];
-		foreach ($ids as $id) {
-			$product = \wc_get_product($id);
-			if (!$product) {
-				continue;
-			}
-			$bundle_type = $product->get_meta( 'bundle_type' );
-			if ('bundle' === $bundle_type) {
-				$product    = new BundleProduct($product);
-				$products[] = $product;
-				continue;
-			}
-
-			if ('subscription' === $bundle_type) {
-				$product    = new \WC_Product_Subscription($product);
-				$products[] = $product;
-				continue;
-			}
-		}
-		return $products;
-	}
-
-	/**
-	 * 取得課程限制條件名稱
-	 *
-	 * @param \WC_Product $product 商品
-	 *
-	 * @return array{type:string, value:string}
-	 */
-	public static function get_limit_label_by_product( \WC_Product $product ): array {
-		$limit_type       = $product->get_meta( 'limit_type' );
-		$limit_type_label = match ( $limit_type ) {
-			'fixed'    => '固定時間',
-			'assigned' => '指定日期',
-			default    => '無限制',
-		};
-
-		$limit_unit  = $product->get_meta( 'limit_unit' );
-		$limit_value = $product->get_meta( 'limit_value' );
-
-		$limit_value_label = match ( $limit_unit ) {
-			'timestamp' => strlen($limit_value) !== 10 ? '' : \wp_date( 'Y-m-d H:i', $limit_value ),
-			'month'  => "{$limit_value} 月",
-			'year'   => "{$limit_value} 年",
-			default  => $limit_value ? "{$limit_value} 天" : '',
-		};
-
-		if ( 'unlimited' === $limit_type ) {
-			$limit_value_label = '';
-		}
-
-		return [
-			'type'  => $limit_type_label,
-			'value' => $limit_value_label,
-		];
-	}
 
 	/**
 	 * 查詢用戶可以上那些課程 ids
@@ -570,36 +486,52 @@ abstract class Course {
 		$the_product_id = $the_product->get_id();
 		$user_id        = $user_id ?? \get_current_user_id();
 		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
-		return empty($expire_date) ? false : $expire_date < time();
+
+		// 如果 $expire_date 不是 subscription_ 開頭，就以 timestamp 判斷
+		if (!str_starts_with( (string) $expire_date, 'subscription_')) {
+			return empty($expire_date) ? false : $expire_date < time();
+		}
+
+		// subscription_ 開頭，當作 "跟隨訂閱" 處理
+		$subscription_id = str_replace('subscription_', '', (string) $expire_date);
+		$subscription    = \wcs_get_subscription($subscription_id);
+		if (!$subscription) {
+			return true;
+		}
+		// 已啟用，代表還沒到期
+		return !$subscription->has_status('active');
 	}
 
-
 	/**
-	 * 計算到期日 expire_date
-	 * $limit_type 'unlimited' | 'fixed' | 'assigned';
-	 * $limit_value int
-	 * $limit_unit 'timestamp' | 'day' | 'month' | 'year'
+	 * 取得課程過期時的提示文字
 	 *
-	 * @param string $limit_type 限制類型 'unlimited' | 'fixed' | 'assigned'
-	 * @param int    $limit_value 限制值
-	 * @param string $limit_unit 限制單位 'timestamp' | 'day' | 'month' | 'year'
-	 * @return int 到期日 timestamp
+	 * @param \WC_Product|null $the_product 產品實例，預設為null。
+	 * @param int|null         $user_id 用戶ID，預設為null。
+	 * @return string
 	 */
-	public static function calc_expire_date( string $limit_type, int $limit_value, string $limit_unit ): int {
+	public static function get_expired_label( ?\WC_Product $the_product = null, ?int $user_id = null ): string {
+		global $product;
 
-		$expire_date = 0;
+		$the_product = $the_product ?? $product;
+		$user_id     = $user_id ?? \get_current_user_id();
+		$expire_date = AVLCourseMeta::get( $the_product->get_id(), get_current_user_id(), 'expire_date', true );
+		$is_expired  = self::is_expired($the_product, $user_id);
 
-		if ('assigned' === $limit_type) {
-			$expire_date = $limit_value; // timestamp
+		$follow_subscription = str_starts_with( (string) $expire_date, 'subscription_');
+
+		if ($follow_subscription) {
+			$subscription_id = str_replace('subscription_', '', (string) $expire_date);
+			return $is_expired ? "訂閱 #{$subscription_id} 已到期" : "跟隨訂閱 #{$subscription_id}";
 		}
-		if ('fixed' === $limit_type) {
-			$expire_date_timestamp = (int) strtotime("+{$limit_value} {$limit_unit}");
-			// 將 timestamp 轉換為當天的日期，並固定在當天的 15:59:00
-			$expire_date_string = date('Y-m-d', $expire_date_timestamp) . ' 15:59:00';
-			$expire_date        = (int) strtotime($expire_date_string);
+
+		if ($is_expired) {
+			return sprintf(
+				'您的課程觀看期限已於 %1$s 到期',
+				\wp_date( 'Y/m/d H:i', (int) $expire_date )
+			);
 		}
 
-		return $expire_date;
+		return empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d H:i', (int) $expire_date);
 	}
 
 	/**

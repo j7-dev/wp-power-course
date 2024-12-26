@@ -1,11 +1,17 @@
 import React, { memo } from 'react'
-import { Form, Radio, Space, InputNumber, Select, Input } from 'antd'
+import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
 import { DatePicker } from '@/components/formItem'
+import { useLink } from '@refinedev/core'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
+
 const { Item } = Form
 
 const WatchLimitComponent = () => {
 	const form = Form.useFormInstance()
-	const watchLimitType: string = Form.useWatch(['limit_type'], form)
+	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
+		['limit_type'],
+		form,
+	)
 
 	const handleReset = (value: string) => {
 		if ('unlimited' === value) {
@@ -20,8 +26,12 @@ const WatchLimitComponent = () => {
 				limit_unit: 'timestamp',
 			})
 		}
+		if ('follow_subscription' === value) {
+			form.setFieldsValue({ limit_value: '', limit_unit: '' })
+		}
 	}
 
+	const Link = useLink()
 	return (
 		<div>
 			<Item label="觀看期限" name={['limit_type']} initialValue={'unlimited'}>
@@ -31,6 +41,7 @@ const WatchLimitComponent = () => {
 						{ label: '無期限', value: 'unlimited' },
 						{ label: '固定天數', value: 'fixed' },
 						{ label: '指定時間', value: 'assigned' },
+						{ label: '跟隨訂閱', value: 'follow_subscription' },
 					]}
 					optionType="button"
 					buttonStyle="solid"
@@ -80,6 +91,28 @@ const WatchLimitComponent = () => {
 					<Item name={['limit_unit']} initialValue="timestamp" hidden>
 						<Input />
 					</Item>
+				</>
+			)}
+			{'follow_subscription' === watchLimitType && (
+				<>
+					<Alert
+						className="my-4"
+						message="注意事項"
+						description={
+							<ol className="pl-4">
+								<li>選擇跟隨訂閱，課程就必須是訂閱商品</li>
+								<li>
+									你也可以選擇不跟隨訂閱，讓課程維持簡單商品，使用銷售方案創建定期定額銷售方案，再去
+									<Link to="/products"> 課程權限綁定 </Link>
+									調整課程觀看期限為跟隨訂閱
+								</li>
+							</ol>
+						}
+						type="warning"
+						showIcon
+					/>
+					<Item name={['limit_value']} initialValue="" hidden />
+					<Item name={['limit_unit']} initialValue="" hidden />
 				</>
 			)}
 		</div>

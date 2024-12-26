@@ -3,10 +3,19 @@ import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 
 export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
-export const OPTIONS = [
-	{ label: '合購優惠', value: 'bundle' },
+export const BUNDLE_TYPE_OPTIONS = [
+	{ label: '合購優惠', value: 'bundle', color: 'cyan' },
+	{
+		label: '🚧 團購優惠 (開發中...)',
+		value: 'groupbuy',
+		disabled: true,
+		color: 'purple',
+	},
+]
+
+export const PRODUCT_TYPE_OPTIONS = [
+	{ label: '簡單商品', value: 'simple' },
 	{ label: '定期定額', value: 'subscription' },
-	{ label: '🚧 團購優惠 (開發中...)', value: 'groupbuy', disabled: true },
 ]
 
 // 取得總金額
@@ -24,11 +33,10 @@ export const getPrice = ({
 	course: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
 	excludeMainCourse?: boolean
-}) => {
+}): React.ReactNode => {
 	if (isFetching) {
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
 	}
-
 	const coursePrice = Number(course?.[type] || course?.regular_price || 0)
 	const total =
 		Number(

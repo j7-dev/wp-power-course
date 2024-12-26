@@ -13,6 +13,7 @@ use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\PowerCourse\Bootstrap;
+use J7\PowerCourse\BundleProduct\Helper;
 
 /**
  * Class LifeCycle
@@ -56,13 +57,13 @@ final class LifeCycle {
 	/**
 	 * 新增學員到課程，開通用戶課程權限
 	 *
-	 * @param int $user_id 用戶 id
-	 * @param int $course_id 課程 id
-	 * @param int $expire_date 到期日 10位 timestamp
+	 * @param int        $user_id 用戶 id
+	 * @param int        $course_id 課程 id
+	 * @param int|string $expire_date 到期日 10位 timestamp | subscription_{訂閱id}
 	 * @return void
 	 * @throws \Exception 新增學員失敗
 	 */
-	public static function add_student_to_course( int $user_id, int $course_id, int $expire_date ): void {
+	public static function add_student_to_course( int $user_id, int $course_id, int|string $expire_date ): void {
 		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
 		if (!\is_array($current_avl_course_ids)) {
 			$current_avl_course_ids = [];
@@ -84,8 +85,8 @@ final class LifeCycle {
 	 * 刪除課程與相關項目
 	 * 刪除課程時連帶刪除子章節以及銷售方案(bundle product)
 	 *
-	 * @param int                $id 課程 id
-	 * @param ?string | \WP_Post $post_or_previous_status WP_Post(delete_post) 或 前一個狀態(trashed_post)
+	 * @param int              $id 課程 id
+	 * @param ?string|\WP_Post $post_or_previous_status WP_Post(delete_post) 或 前一個狀態(trashed_post)
 	 * @return array<int> 刪除的 post id
 	 */
 	public static function delete_course_and_related_items( int $id, $post_or_previous_status = null ): array {
@@ -97,7 +98,7 @@ final class LifeCycle {
 		}
 
 		$chapter_ids      = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids       = (array) CourseUtils::get_bundles_by_course_id(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids       = Helper::get_bundle_products(  $id, true, [ 'any', 'trash' ] );
 		$deleted_post_ids = [];
 
 		foreach ([ ...$chapter_ids, ...$bundle_ids ] as $post_id) {
@@ -175,7 +176,7 @@ final class LifeCycle {
 		}
 
 		$chapter_ids = (array) CourseUtils::get_all_chapters( $id, true, [ 'any', 'trash' ] );
-		$bundle_ids  = (array) CourseUtils::get_bundles_by_course_id(  $id, true, [ 'any', 'trash' ] );
+		$bundle_ids  = Helper::get_bundle_products(  $id, true, [ 'any', 'trash' ] );
 
 		$restored_post_ids = [];
 
