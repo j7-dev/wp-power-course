@@ -3,7 +3,6 @@
  * Bundle product card
  */
 
-use J7\PowerCourse\BundleProduct\BundleProduct;
 use J7\PowerCourse\Plugin;
 
 $default_args = [

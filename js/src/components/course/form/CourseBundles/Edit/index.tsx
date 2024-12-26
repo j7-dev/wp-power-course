@@ -3,10 +3,10 @@ import { Form, Switch, Alert, message } from 'antd'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
-import { toFormData } from '@/utils'
+import { toFormData, formatDateRangeData } from '@/utils'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import BundleForm from './BundleForm'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 import { useAtom, useSetAtom, useAtomValue } from 'jotai'
 import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
 import { useLink } from '@refinedev/core'
@@ -40,6 +40,8 @@ const EditBundleComponent = ({
 		})
 
 	const watchStatus = Form.useWatch(['status'], form)
+	const watchExcludeMainCourse =
+		Form.useWatch(['exclude_main_course'], form) === 'yes'
 
 	useEffect(() => {
 		form.setFieldsValue(record)
@@ -53,35 +55,24 @@ const EditBundleComponent = ({
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = () => {
 		const values = form.getFieldsValue() as Partial<TBundleProductRecord> & {
-			bundle_type: 'bundle' | 'subscription'
+			bundle_type: 'bundle'
 			sale_date_range: [Dayjs | number, Dayjs | number]
 		}
-		if (!selectedProducts?.length && values?.bundle_type === 'bundle') {
+		if (
+			!selectedProducts?.length &&
+			values?.bundle_type === 'bundle' &&
+			watchExcludeMainCourse
+		) {
 			message.error('請至少選擇一個商品')
 			return
 		}
 		form
 			.validateFields()
 			.then(() => {
-				const sale_date_range = values?.sale_date_range || [null, null]
-
-				// 處理日期欄位 sale_date_range
-
-				const date_on_sale_from =
-					(sale_date_range[0] as any) instanceof dayjs
-						? (sale_date_range[0] as Dayjs).unix()
-						: sale_date_range[0]
-				const date_on_sale_to =
-					(sale_date_range[1] as any) instanceof dayjs
-						? (sale_date_range[1] as Dayjs).unix()
-						: sale_date_range[1]
-
-				const formattedValues = {
-					...values,
-					date_on_sale_from,
-					date_on_sale_to,
-					sale_date_range: undefined,
-				}
+				const formattedValues = formatDateRangeData(values, 'sale_date_range', [
+					'date_on_sale_from',
+					'date_on_sale_to',
+				])
 				onFinish(toFormData(formattedValues))
 			})
 			.catch((error) => {
@@ -100,9 +91,9 @@ const EditBundleComponent = ({
 			goBack={null}
 			headerButtons={() => null}
 			title={
-				<>
+				<div className="pl-4">
 					《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
-				</>
+				</div>
 			}
 			saveButtonProps={{
 				...saveButtonProps,
@@ -129,6 +120,13 @@ const EditBundleComponent = ({
 					{defaultButtons}
 				</>
 			)}
+			wrapperProps={{
+				style: {
+					boxShadow: '0px 0px 16px 0px #ddd',
+					paddingTop: '1rem',
+					borderRadius: '0.5rem',
+				},
+			}}
 		>
 			<Form {...formProps} layout="vertical">
 				<Alert

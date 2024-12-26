@@ -47,6 +47,7 @@
         <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>
 				<exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
+				<exclude name="Universal.Classes.RequireFinalClass.NonFinalClassFound"/>
     </rule>
 
     <exclude-pattern>.idea/*</exclude-pattern>

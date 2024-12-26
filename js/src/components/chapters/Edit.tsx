@@ -51,9 +51,9 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			goBack={null}
 			headerButtons={() => null}
 			title={
-				<>
+				<div className="pl-4">
 					《編輯 Email》 {name} <sub className="text-gray-500">#{id}</sub>
-				</>
+				</div>
 			}
 			saveButtonProps={{
 				...saveButtonProps,
@@ -80,6 +80,13 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 					{defaultButtons}
 				</>
 			)}
+			wrapperProps={{
+				style: {
+					boxShadow: '0px 0px 16px 0px #ddd',
+					paddingTop: '1rem',
+					borderRadius: '0.5rem',
+				},
+			}}
 		>
 			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
 				<Item name={['name']} label={`${label}名稱`}>

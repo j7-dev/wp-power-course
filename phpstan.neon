@@ -3,12 +3,12 @@ parameters:
 	paths:
 		- plugin.php
 		- inc/
-		- modules/
 	ignoreErrors:
 		- '#Access to constant .* on an unknown class#'
 		- '#Constant .* not found#'
 		- '#Function .* not found#'
 		- '#Cannot cast mixed to .*#'
+		- '#Using nullsafe method call on non-nullable type .*#'
 	excludePaths:
 		- js/*
 		- vendor/*

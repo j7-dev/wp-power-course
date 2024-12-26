@@ -12,12 +12,19 @@ import { Checkbox, CheckboxProps, Tooltip } from 'antd'
 
 const NodeRender: FC<{
 	node: FlattenNode<TChapterRecord>
+	selectedChapter: TChapterRecord | null
 	setSelectedChapter: React.Dispatch<
 		React.SetStateAction<TChapterRecord | null>
 	>
 	selectedIds: string[]
 	setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>
-}> = ({ node, setSelectedChapter, selectedIds, setSelectedIds }) => {
+}> = ({
+	node,
+	selectedChapter,
+	setSelectedChapter,
+	selectedIds,
+	setSelectedIds,
+}) => {
 	const { removeNode } = useSortableTree()
 	const record = node.content
 	if (!record) {
@@ -36,10 +43,13 @@ const NodeRender: FC<{
 		}
 	}
 	const isChecked = selectedIds.includes(node.id as string)
+	const isSelectedChapter = selectedChapter?.id === node.id
 
 	const showPlaceholder = node?.children?.length === 0
 	return (
-		<div className="grid grid-cols-[1fr_3rem_7rem_4rem] gap-4 justify-start items-center">
+		<div
+			className={`grid grid-cols-[1fr_3rem_7rem_4rem] gap-4 justify-start items-center ${isSelectedChapter ? 'bg-[#e6f4ff]' : ''}`}
+		>
 			<div className="flex items-center">
 				{showPlaceholder && <div className="w-[28px] h-[28px]"></div>}
 				<Checkbox className="mr-2" onChange={handleCheck} checked={isChecked} />

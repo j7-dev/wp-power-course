@@ -91,13 +91,13 @@ final class At {
 	/**
 	 * 安排 觸發開通課程權限 的寄送時機
 	 *
-	 * @param int $user_id 用戶ID
-	 * @param int $course_id 課程ID
-	 * @param int $expire_date 課程到期日
+	 * @param int        $user_id 用戶ID
+	 * @param int        $course_id 課程ID
+	 * @param int|string $expire_date 課程到期日
 	 *
 	 * @return void
 	 */
-	public function schedule_course_granted_email( int $user_id, int $course_id, int $expire_date ): void {
+	public function schedule_course_granted_email( int $user_id, int $course_id, int|string $expire_date ): void {
 		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
 		if (!\is_array($current_avl_course_ids)) {
 			$current_avl_course_ids = [];

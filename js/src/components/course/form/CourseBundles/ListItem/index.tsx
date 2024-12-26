@@ -6,36 +6,38 @@ import {
 	ProductTotalSales,
 	ProductBoundCourses,
 } from '@/components/product'
-import { getPostStatus, getBundleType } from '@/utils'
+import { getPostStatus, productTypes } from '@/utils'
 import { Tag } from 'antd'
-import { TRenderItemOptions } from '../index'
-import { HolderOutlined } from '@ant-design/icons'
 import { DuplicateButton, PopconfirmDelete } from '@/components/general'
 import { useDelete } from '@refinedev/core'
 
 const ListItem = ({
 	record,
-	options,
+	index,
 	setSelectedProduct,
+	selectedProduct,
 }: {
 	record: TBundleProductRecord
-	options: TRenderItemOptions
+	index: number
 	setSelectedProduct: React.Dispatch<
 		React.SetStateAction<TBundleProductRecord | null>
 	>
+	selectedProduct: TBundleProductRecord | null
 }) => {
-	const { id, status, bundle_type } = record
-	const { index, listeners } = options
+	const { id, status, type } = record
+	const tag = productTypes.find((productType) => productType.value === type)
 	const { mutate: deleteProduct } = useDelete()
 
 	return (
-		<div className="grid gap-x-2 grid-cols-[1rem_1fr_10rem_4rem_3rem_2rem_6rem_4rem] w-full">
-			<div className="self-center">
+		<div
+			className={`grid gap-x-2 grid-cols-[1fr_10rem_4rem_3rem_2rem_6rem_4rem] w-full pl-2 rounded-[0.25rem] ${id === selectedProduct?.id ? 'bg-[#e6f4ff]' : 'bg-[rgba(0,0,0,0.02)]'}`}
+		>
+			{/* <div className="self-center">
 				<HolderOutlined
 					className="cursor-grab hover:bg-gray-200 rounded-lg py-3 px-0.5"
 					{...listeners}
 				/>
-			</div>
+			</div> */}
 
 			<div className="self-center">
 				<ProductName<TBundleProductRecord>
@@ -54,8 +56,8 @@ const ListItem = ({
 			</div>
 
 			<div className="self-center">
-				<Tag color={getBundleType(bundle_type)?.color}>
-					{getBundleType(bundle_type)?.label}
+				<Tag bordered={false} color={tag?.color} className="m-0">
+					{tag?.label}
 				</Tag>
 			</div>
 

@@ -6,7 +6,6 @@
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Utils\User as UserUtils;
 
 $default_args = [
@@ -41,14 +40,6 @@ foreach ( $teacher_ids as $key => $teacher_id ) {
 	$teacher_name .= $teacher->display_name . $connect;
 }
 $teacher_name = count($teacher_ids) > 0 ? $teacher_name : '&nbsp;';
-
-$current_user_id   = get_current_user_id();
-$limit_labels      = CourseUtils::get_limit_label_by_product( $product );
-$expire_date       = AVLCourseMeta::get( $product_id, $current_user_id, 'expire_date', true );
-$expire_date_label = empty($expire_date) ? '無限期' : '至' . \wp_date('Y/m/d H:i', $expire_date);
-$is_expired        = CourseUtils::is_expired($product, $current_user_id);
-$avl_status        = CourseUtils::get_avl_status($product, $current_user_id);
-
 
 // 標籤顯示
 $is_popular  = \get_post_meta( $product_id, 'is_popular', true ) === 'yes';

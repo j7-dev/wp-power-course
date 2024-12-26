@@ -11,10 +11,11 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\WC;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Course\Limit;
+use J7\PowerCourse\Resources\Course\BindCoursesData;
 
 
 
@@ -106,11 +107,11 @@ final class Product {
 					];
 				}
 
-				if ( isset($query_vars['link_course_ids']) ) {
+				if ( isset($query_vars[ Helper::LINK_COURSE_IDS_META_KEY ]) ) {
 					$query['meta_query'][] = [
 						[
-							'key'   => 'link_course_ids',
-							'value' => $query_vars['link_course_ids'],
+							'key'   => Helper::LINK_COURSE_IDS_META_KEY,
+							'value' => $query_vars[ Helper::LINK_COURSE_IDS_META_KEY ],
 						],
 					];
 				}
@@ -310,6 +311,7 @@ final class Product {
 
 		$product_ids = $body_params['product_ids'];
 		$course_ids  = $body_params['course_ids'];
+		$limit       = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
 
 		$success_ids = [];
 		$failed_ids  = [];
@@ -319,25 +321,18 @@ final class Product {
 				$failed_ids[] = $product_id;
 				continue;
 			}
-			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
 
-			$bind_courses_data_ids = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? '0', $bind_courses_data);
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id );
 
 			foreach ($course_ids as $course_id) {
-				if (\in_array($course_id, $bind_courses_data_ids)) {
-					// 如果原本的資料裡面有這次新增的，那就跳過不動
-					continue;
-				}
-				// 原本的資料沒有這次新增的，那就新增下去
-				$bind_courses_data[] = [
-					'id'          => $course_id,
-					'limit_type'  => $body_params['limit_type'],
-					'limit_value' => $body_params['limit_value'],
-					'limit_unit'  => $body_params['limit_unit'],
-				];
+				$bind_courses_data_instance->add_course_data(
+					(int) $course_id,
+					$limit
+				);
 			}
 
-			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$bind_courses_data_instance->save();
+
 			$success_ids[] = $product_id;
 		}
 
@@ -379,24 +374,13 @@ final class Product {
 		$success_ids = [];
 		$failed_ids  = [];
 		foreach ($product_ids as $product_id) {
-			/**
-			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
-			 */
-			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-			foreach ($bind_courses_data as $index => $bind_course_data) {
-				$bind_course_id = $bind_course_data['id'] ?? 0;
 
-				if (!\in_array($bind_course_id, $course_ids) || !$bind_course_id) {
-					// 如果原本的資料裡面找不到 course_id 就跳過
-					continue;
-				}
-
-				$bind_courses_data[ $index ]['limit_type']  = $body_params['limit_type'];
-				$bind_courses_data[ $index ]['limit_value'] = $body_params['limit_value'];
-				$bind_courses_data[ $index ]['limit_unit']  = $body_params['limit_unit'];
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id);
+			foreach ($course_ids as $course_id) {
+				$limit = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
+				$bind_courses_data_instance->update_course_data( (int) $course_id, $limit );
 			}
-
-			\update_post_meta( $product_id, 'bind_courses_data', $bind_courses_data );
+			$bind_courses_data_instance->save();
 			$success_ids[] = $product_id;
 		}
 
@@ -447,13 +431,11 @@ final class Product {
 				continue;
 			}
 
-			/**
-			 * @var array<int, array{id: int, limit_type: string, limit_value: string, limit_unit: string}>
-			 */
-			$bind_courses_data     = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-			$new_bind_courses_data = array_filter($bind_courses_data, fn( $bind_course_data ) => !\in_array($bind_course_data['id'], $course_ids));
-			\update_post_meta( $product_id, 'bind_courses_data', $new_bind_courses_data );
-
+			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id );
+			foreach ($course_ids as $course_id) {
+				$bind_courses_data_instance->remove_course_data( (int) $course_id );
+			}
+			$bind_courses_data_instance->save();
 			$success_ids[] = $product_id;
 		}
 
@@ -485,9 +467,9 @@ final class Product {
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
 		}
-
-		$date_created  = $product?->get_date_created();
-		$date_modified = $product?->get_date_modified();
+		$product_id    = $product->get_id();
+		$date_created  = $product->get_date_created();
+		$date_modified = $product->get_date_modified();
 
 		$image_id          = $product->get_image_id();
 		$gallery_image_ids = $product->get_gallery_image_ids();
@@ -496,11 +478,11 @@ final class Product {
 		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
 
 		$description_array = $with_description ? [
-			'description'       => $product?->get_description(),
-			'short_description' => $product?->get_short_description(),
+			'description'       => $product->get_description(),
+			'short_description' => $product->get_short_description(),
 		] : [];
 
-		$low_stock_amount = ( '' === $product?->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
+		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
 
 		$variation_ids = $product?->get_children(); // get variations
 		$children      = [];
@@ -510,7 +492,7 @@ final class Product {
 			$children_details   = array_values(array_map( [ $this, 'format_product_details' ], $variation_products ));
 			$children           = [
 				'children'  => $children_details,
-				'parent_id' => (string) $product?->get_id(),
+				'parent_id' => (string) $product_id,
 			];
 		}
 
@@ -531,29 +513,13 @@ final class Product {
 				$attributes_arr[ urldecode( $key ) ] = $attribute;
 			}
 		}
-		$include_product_ids        = (array) \get_post_meta( $product?->get_id(), BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY );
-		$unique_include_product_ids = array_values(array_unique( $include_product_ids )); // 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object
 
 		$price_html = Base::get_price_html( $product );
 
 		$product_id = $product->get_id();
 
-		$bind_courses_data           = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
-		$formatted_bind_courses_data = array_values(
-			array_map(
-			function ( $bind_course_data ) {
-				$id = $bind_course_data['id'] ?? '';
-				return [
-					'id'          => $id,
-					'name'        => $id ? \get_the_title($id) : '',
-					'limit_type'  => $bind_course_data['limit_type'] ?? '',
-					'limit_value' => $bind_course_data['limit_value'] ?? '',
-					'limit_unit'  => $bind_course_data['limit_unit'] ?? '',
-				];
-			},
-			$bind_courses_data
-		)
-			);
+		$bind_courses_data_instance  = BindCoursesData::instance( (int) $product_id );
+		$formatted_bind_courses_data = $bind_courses_data_instance->get_data(ARRAY_N);
 
 		$subscription_price           = $product->get_meta( '_subscription_price' );
 		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
@@ -563,57 +529,59 @@ final class Product {
 		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
 		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
 
-		$base_array = [
+		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
+		$base_array      = [
 			// Get Product General Info
-			'id'                                        => (string) $product_id,
-			'type'                                      => $product->get_type(),
-			'name'                                      => $product->get_name(),
-			'slug'                                      => $product->get_slug(),
-			'date_created'                              => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'                             => $date_modified->date( 'Y-m-d H:i:s' ),
-			'status'                                    => $product->get_status(),
-			'featured'                                  => $product->get_featured(),
-			'catalog_visibility'                        => $product->get_catalog_visibility(),
-			'sku'                                       => $product->get_sku(),
+			'id'                                 => (string) $product_id,
+			'type'                               => $product->get_type(),
+			'name'                               => $product->get_name(),
+			'slug'                               => $product->get_slug(),
+			'date_created'                       => $date_created->date( 'Y-m-d H:i:s' ),
+			'date_modified'                      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'status'                             => $product->get_status(),
+			'featured'                           => $product->get_featured(),
+			'catalog_visibility'                 => $product->get_catalog_visibility(),
+			'sku'                                => $product->get_sku(),
 			// 'menu_order'         => $product?->get_menu_order(),
-			'virtual'                                   => $product->get_virtual(),
-			'downloadable'                              => $product->get_downloadable(),
-			'permalink'                                 => \get_permalink( $product_id ),
+			'virtual'                            => $product->get_virtual(),
+			'downloadable'                       => $product->get_downloadable(),
+			'permalink'                          => \get_permalink( $product_id ),
 
 			// Get Product Prices
-			'price_html'                                => $price_html,
-			'regular_price'                             => $product->get_regular_price(),
-			'sale_price'                                => $product->get_sale_price(),
-			'on_sale'                                   => $product->is_on_sale(),
-			'date_on_sale_from'                         => $product->get_date_on_sale_from()?->getTimestamp(),
-			'date_on_sale_to'                           => $product->get_date_on_sale_to()?->getTimestamp(),
-			'total_sales'                               => $product->get_total_sales(),
+			'price_html'                         => $price_html,
+			'regular_price'                      => $product->get_regular_price(),
+			'sale_price'                         => $product->get_sale_price(),
+			'on_sale'                            => $product->is_on_sale(),
+			'sale_date_range'                    => $sale_date_range,
+			'date_on_sale_from'                  => $sale_date_range[0],
+			'date_on_sale_to'                    => $sale_date_range[1],
+			'total_sales'                        => $product->get_total_sales(),
 
 			// Get Product Stock
-			'stock'                                     => $product->get_stock_quantity(),
-			'stock_status'                              => $product->get_stock_status(),
-			'manage_stock'                              => $product->get_manage_stock(),
-			'stock_quantity'                            => $product->get_stock_quantity(),
-			'backorders'                                => $product->get_backorders(),
-			'backorders_allowed'                        => $product->backorders_allowed(),
-			'backordered'                               => $product->is_on_backorder(),
-			'low_stock_amount'                          => $low_stock_amount,
+			'stock'                              => $product->get_stock_quantity(),
+			'stock_status'                       => $product->get_stock_status(),
+			'manage_stock'                       => $product->get_manage_stock(),
+			'stock_quantity'                     => $product->get_stock_quantity(),
+			'backorders'                         => $product->get_backorders(),
+			'backorders_allowed'                 => $product->backorders_allowed(),
+			'backordered'                        => $product->is_on_backorder(),
+			'low_stock_amount'                   => $low_stock_amount,
 
 			// Get Linked Products
-			'upsell_ids'                                => array_map( 'strval', $product?->get_upsell_ids() ),
-			'cross_sell_ids'                            => array_map( 'strval', $product?->get_cross_sell_ids() ),
+			'upsell_ids'                         => array_map( 'strval', $product?->get_upsell_ids() ),
+			'cross_sell_ids'                     => array_map( 'strval', $product?->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
-			'attributes'                                => $attributes_arr,
+			'attributes'                         => $attributes_arr,
 
 			// Get Product Taxonomies
-			'categories'                                => self::format_terms(
+			'categories'                         => self::format_terms(
 				[
 					'taxonomy'   => 'product_cat',
 					'object_ids' => $product_id,
 				]
 				),
-			'tags'                                      => self::format_terms(
+			'tags'                               => self::format_terms(
 				[
 					'taxonomy'   => 'product_tag',
 					'object_ids' => $product_id,
@@ -621,30 +589,29 @@ final class Product {
 				),
 
 			// Get Product Images
-			'images'                                    => $images,
+			'images'                             => $images,
 
-			'is_course'                                 => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'parent_id'                                 => (string) $product->get_parent_id(),
+			'is_course'                          => $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY => (array) $unique_include_product_ids,
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( Helper::instance( $product ) )->get_product_ids(),
 
-			'sale_date_range'                           => [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ],
-			'is_free'                                   => (string) $product->get_meta( 'is_free' ),
-			'qa_list'                                   => [],
-			'bundle_type_label'                         => (string) $product->get_meta( 'bundle_type_label' ),
-			'exclude_main_course'                       => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
-			'bind_courses_data'                         => $formatted_bind_courses_data,
-			'link_course_ids'                           => $product->get_meta( 'link_course_ids' ),
+			'is_free'                            => (string) $product->get_meta( 'is_free' ),
+			'qa_list'                            => [],
+			'bundle_type_label'                  => (string) $product->get_meta( 'bundle_type_label' ),
+			'exclude_main_course'                => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
+			'bind_courses_data'                  => $formatted_bind_courses_data,
+			Helper::LINK_COURSE_IDS_META_KEY     => $product->get_meta( Helper::LINK_COURSE_IDS_META_KEY ),
 
-			'bundle_type'                               => (string) $product->get_meta( 'bundle_type' ),
-			'_subscription_price'                       => is_numeric($subscription_price) ? (float) $subscription_price : null,
-			'_subscription_period_interval'             => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
-			'_subscription_period'                      => $subscription_period ?: 'month',
-			'_subscription_length'                      => is_numeric($subscription_length) ? (int) $subscription_length : 0,
-			'_subscription_sign_up_fee'                 => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
-			'_subscription_trial_length'                => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
-			'_subscription_trial_period'                => $subscription_trial_period ?: 'day',
+			'bundle_type'                        => (string) $product->get_meta( 'bundle_type' ),
+			'_subscription_price'                => is_numeric($subscription_price) ? (float) $subscription_price : null,
+			'_subscription_period_interval'      => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
+			'_subscription_period'               => $subscription_period ?: 'month',
+			'_subscription_length'               => is_numeric($subscription_length) ? (int) $subscription_length : 0,
+			'_subscription_sign_up_fee'          => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
+			'_subscription_trial_length'         => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
+			'_subscription_trial_period'         => $subscription_trial_period ?: 'day',
 
 		] + $children;
 
@@ -668,7 +635,7 @@ final class Product {
 		}
 
 		// 取出銷售方案
-		// $bundles  = CourseUtils::get_bundles_by_course_id( $product->get_id());
+		// $bundles  =Helper::get_bundle_products( $product->get_id());
 		$product_id = $product->get_id();
 
 		$base_array = [
@@ -717,7 +684,7 @@ final class Product {
 			'meta_data' => $meta_data,
 			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
-		$product = new BundleProduct();
+		$product = new \WC_Product_Simple();
 
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
@@ -831,9 +798,39 @@ final class Product {
 			'meta_data' => $meta_data,
 			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
 
+		// type 會被儲存為商品的類型，不需要再額外存進 meta data
+		$is_subscription = 'subscription' === $meta_data['type'];
+		unset($meta_data['type']);
+
+		if ($is_subscription && !class_exists('WC_Subscription')) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'subscription_class_not_found',
+					'message' => 'WC_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
+				],
+				400
+			);
+		}
+
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
 			$product->$method_name( $value );
+		}
+
+		// 如果是非訂閱商品，則刪除訂閱商品的相關資料
+		if (!$is_subscription) {
+			$fields_to_delete = [
+				'_subscription_price',
+				'_subscription_period_interval',
+				'_subscription_period',
+				'_subscription_length',
+				'_subscription_sign_up_fee',
+				'_subscription_trial_length',
+				'_subscription_trial_period',
+			];
+			foreach ($fields_to_delete as $field) {
+				$product->delete_meta_data($field);
+			}
 		}
 
 		$product->save();
@@ -846,25 +843,10 @@ final class Product {
 
 		$product->save_meta_data();
 
-		if ('subscription' === $meta_data['bundle_type']) {
-			if (!class_exists('WC_Product_Subscription')) {
-				return new \WP_REST_Response(
-					[
-						'code'    => 'subscription_class_not_found',
-						'message' => 'WC_Product_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
-					],
-					400
-				);
-			}
-
-			$result = \wp_set_object_terms($id, 'subscription', 'product_type');
-			\wc_delete_product_transients($id);
-			if (\is_wp_error($result)) {
-				return $result;
-			}
-			// subscription 商品類型，不需要 exclude_main_course 和 pbp_product_ids
-			\delete_post_meta($id, 'exclude_main_course');
-			\delete_post_meta($id, 'pbp_product_ids');
+		$result = \wp_set_object_terms($id, $is_subscription ? 'subscription' : 'simple', 'product_type');
+		\wc_delete_product_transients($id);
+		if (\is_wp_error($result)) {
+			return $result;
 		}
 
 		return new \WP_REST_Response(
@@ -939,8 +921,8 @@ final class Product {
 	 */
 	public static function handle_special_fields( $meta_data, $product ) {
 		$update_array_meta_keys = [
-			BundleProduct::INCLUDE_PRODUCT_IDS_META_KEY,
-			'link_course_ids', // 用來表示 bundle product 連結的課程
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
+			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程
 		];
 		$add_array_meta_keys    = [
 			'bind_course_ids', // 綁定的課程
@@ -973,30 +955,13 @@ final class Product {
 					continue;
 				}
 				$product_id = $product->get_id();
+
+				$bind_courses_data_instance = BindCoursesData::instance( $product_id );
 				foreach ($meta_values as $course_id) {
-					$bind_courses_data = \get_post_meta($product_id, 'bind_courses_data', true) ?: [];
-					$bind_course_ids   = array_map(fn( $bind_course_data ) => $bind_course_data['id'] ?? 0, $bind_courses_data);
-
-					$included = false;
-					foreach ($bind_courses_data as $bind_course_data) {
-						if (\in_array($course_id, $bind_course_ids)) {
-							// 如果這個商品原本就有綁定了，就不需要再添加
-							$included = true;
-							continue;
-						}
-					}
-
-					// 如果這個商品原本沒有  就添加
-					if (!$included) {
-						$bind_courses_data[] = [
-							'id'          => $course_id,
-							'limit_type'  => \get_post_meta($course_id, 'limit_type', true) ?: 'unlimited',
-							'limit_value' => \get_post_meta($course_id, 'limit_value', true) ?: '',
-							'limit_unit'  => \get_post_meta($course_id, 'limit_unit', true) ?: '',
-						];
-						\update_post_meta($product_id, 'bind_courses_data', $bind_courses_data);
-					}
+					$limit = Limit::instance( (int) $course_id );
+					$bind_courses_data_instance->add_course_data( (int) $course_id, $limit );
 				}
+				$bind_courses_data_instance->save();
 			}
 		}
 

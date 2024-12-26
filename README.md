@@ -1,2 +1,7 @@
-		const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 綑綁商品裡面包含的商品 ids
-		const LINK_TO_BUNDLE_IDS_META_KEY  = 'pbp_bundle_ids'; // 此商品連結到哪個 bundle product ids
+
+
+## 常見 Q & A
+
+### 1. 銷售方案可以再加入銷售方案嗎
+
+不行，銷售方案目前只能加入簡單商品、簡易訂閱，且不能加入銷售方案

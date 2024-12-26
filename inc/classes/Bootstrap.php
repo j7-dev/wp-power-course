@@ -10,7 +10,7 @@ namespace J7\PowerCourse;
 use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\BundleProduct\BundleProduct;
+use J7\PowerCourse\BundleProduct\Helper;
 
 
 
@@ -50,7 +50,6 @@ final class Bootstrap {
 		Api\Shortcode::instance();
 		Api\Comment::instance();
 		Api\Reports\Revenue\Api::instance();
-		// Api\Optimize\MoveFile::instance();
 
 		Templates\Templates::instance();
 		Templates\Ajax::instance();
@@ -78,8 +77,8 @@ final class Bootstrap {
 	 * @return void
 	 */
 	public static function prevent_guest_checkout(): void {
-
-		if ( ! \WC() || ! \WC()?->cart ) {
+		// @phpstan-ignore-next-line
+		if ( ! \WC() || ! \WC()->cart ) {
 			return;
 		}
 		$cart_items     = \WC()->cart->get_cart_contents();
@@ -89,10 +88,18 @@ final class Bootstrap {
 			if (!$product_id) {
 				continue;
 			}
-			$is_course_product = CourseUtils::is_course_product( $product_id );
-			$is_bundle_product = BundleProduct::is_bundle_product( $product_id );
 
-			if ($is_course_product || $is_bundle_product) {
+			// 是否為課程商品
+			$is_course_product = CourseUtils::is_course_product( $product_id );
+
+			// 是否為銷售方案
+			$is_bundle_product = ( Helper::instance( $product_id ) )->is_bundle_product;
+
+			// 是否有綁開課權限
+			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true );
+
+			if ($is_course_product || $is_bundle_product || $bind_courses_data) {
+				// 滿足任何一個條件就避免訪客結帳
 				$include_course = true;
 				break;
 			}
