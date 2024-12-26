@@ -21,6 +21,7 @@ import {
 } from './utils'
 import { useList } from '@refinedev/core'
 import ProductPriceFields from './ProductPriceFields'
+import { productTypes } from '@/utils'
 
 const { Search } = Input
 const { Item } = Form
@@ -67,8 +68,18 @@ const BundleForm = () => {
 			},
 			{
 				field: 'type',
+				operator: 'in',
+				value: ['simple', 'subscription'],
+			},
+			{
+				field: 'meta_key',
 				operator: 'eq',
-				value: 'simple',
+				value: 'link_course_ids',
+			},
+			{
+				field: 'meta_compare',
+				operator: 'eq',
+				value: 'NOT EXISTS',
 			},
 		],
 		pagination: {
@@ -268,6 +279,9 @@ const BundleForm = () => {
 								const isInclude = selectedProducts?.some(
 									({ id: theId }) => theId === product.id,
 								)
+								const tag = productTypes.find(
+									(productType) => productType.value === product.type,
+								)
 								return (
 									<div
 										key={id}
@@ -279,7 +293,15 @@ const BundleForm = () => {
 											className="h-9 w-16 rounded object-cover"
 										/>
 										<div className="w-full">
-											{name} #{id} {renderHTML(price_html)}
+											<sub>#{id}</sub>
+											{name}
+											<br />
+											{renderHTML(price_html)}
+										</div>
+										<div>
+											<Tag bordered={false} color={tag?.color} className="m-0">
+												{tag?.label}
+											</Tag>
 										</div>
 										<div className="w-8 text-center">
 											{isInclude && <CheckOutlined className="text-blue-500" />}
@@ -292,35 +314,46 @@ const BundleForm = () => {
 				</div>
 
 				{!initIsFetching &&
-					selectedProducts?.map(({ id, images, name, price_html }) => (
-						<div
-							key={id}
-							className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2"
-						>
-							<div className="rounded aspect-video w-16 overflow-hidden">
-								<img
-									src={images?.[0]?.url || defaultImage}
-									className="w-full h-full rounded object-cover"
-								/>
+					selectedProducts?.map(({ id, images, name, price_html, type }) => {
+						const tag = productTypes.find(
+							(productType) => productType.value === type,
+						)
+
+						return (
+							<div
+								key={id}
+								className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2"
+							>
+								<div className="rounded aspect-video w-16 overflow-hidden">
+									<img
+										src={images?.[0]?.url || defaultImage}
+										className="w-full h-full rounded object-cover"
+									/>
+								</div>
+								<div className="flex-1">
+									{name} #{id} {renderHTML(price_html)}
+								</div>
+								<div>
+									<Tag bordered={false} color={tag?.color} className="m-0">
+										{tag?.label}
+									</Tag>
+								</div>
+								<div className="w-8 text-right">
+									<PopconfirmDelete
+										popconfirmProps={{
+											onConfirm: () => {
+												setSelectedProducts(
+													selectedProducts?.filter(
+														({ id: productId }) => productId !== id,
+													),
+												)
+											},
+										}}
+									/>
+								</div>
 							</div>
-							<div className="flex-1">
-								{name} #{id} {renderHTML(price_html)}
-							</div>
-							<div className="w-8 text-right">
-								<PopconfirmDelete
-									popconfirmProps={{
-										onConfirm: () => {
-											setSelectedProducts(
-												selectedProducts?.filter(
-													({ id: productId }) => productId !== id,
-												),
-											)
-										},
-									}}
-								/>
-							</div>
-						</div>
-					))}
+						)
+					})}
 
 				{/* Loading */}
 				{initIsFetching &&

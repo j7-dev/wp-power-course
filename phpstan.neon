@@ -8,6 +8,7 @@ parameters:
 		- '#Constant .* not found#'
 		- '#Function .* not found#'
 		- '#Cannot cast mixed to .*#'
+		- '#Using nullsafe method call on non-nullable type .*#'
 	excludePaths:
 		- js/*
 		- vendor/*
