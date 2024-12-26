@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { useEffect, memo } from 'react'
 import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
 import { DatePicker } from '@/components/formItem'
 import { useLink } from '@refinedev/core'
@@ -31,6 +31,17 @@ const WatchLimitComponent = () => {
 		}
 	}
 
+	const watchProductType = Form.useWatch(['type'], form)
+
+	useEffect(() => {
+		if (
+			watchProductType === 'simple' &&
+			watchLimitType === 'follow_subscription'
+		) {
+			form.setFieldValue(['limit_type'], 'unlimited')
+		}
+	}, [watchProductType])
+
 	const Link = useLink()
 	return (
 		<div>
@@ -41,7 +52,11 @@ const WatchLimitComponent = () => {
 						{ label: '無期限', value: 'unlimited' },
 						{ label: '固定天數', value: 'fixed' },
 						{ label: '指定時間', value: 'assigned' },
-						{ label: '跟隨訂閱', value: 'follow_subscription' },
+						{
+							label: '跟隨訂閱',
+							value: 'follow_subscription',
+							disabled: watchProductType === 'simple',
+						},
 					]}
 					optionType="button"
 					buttonStyle="solid"

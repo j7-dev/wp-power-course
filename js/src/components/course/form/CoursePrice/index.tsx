@@ -1,10 +1,10 @@
 import React, { useEffect, memo } from 'react'
-import { Form, Input, Select, InputNumber } from 'antd'
-import { FiSwitch, RangePicker } from '@/components/formItem'
+import { Form, Input, Select, InputNumber, Space } from 'antd'
+import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
 import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
 import SubscriptionPriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Subscription'
 import SimplePriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Simple'
-import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
+import { Heading } from '@/components/general'
 
 const { Item } = Form
 
@@ -22,24 +22,6 @@ const CoursePriceComponent = () => {
 		}
 	}, [watchIsFree])
 
-	// 如果觀看期限選擇「跟隨訂閱」，則課程商品種類只能選擇「訂閱」
-	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
-		['limit_type'],
-		form,
-	)
-	const productTypeOptions = PRODUCT_TYPE_OPTIONS.map((option) => ({
-		...option,
-		disabled:
-			option.value !== 'subscription' &&
-			watchLimitType === 'follow_subscription',
-	}))
-
-	useEffect(() => {
-		if (watchLimitType === 'follow_subscription') {
-			form.setFieldsValue({ type: 'subscription' })
-		}
-	}, [watchLimitType])
-
 	const watchProductType = Form.useWatch(['type'], form)
 	const isSubscription = watchProductType === 'subscription'
 
@@ -47,12 +29,13 @@ const CoursePriceComponent = () => {
 		<>
 			<div className="grid grid-cols-3 gap-6">
 				<div>
+					<Heading>課程訂價</Heading>
 					<Item
 						name={['type']}
 						label="課程商品種類"
-						initialValue={productTypeOptions[0].value}
+						initialValue={PRODUCT_TYPE_OPTIONS[0].value}
 					>
-						<Select options={productTypeOptions} />
+						<Select options={PRODUCT_TYPE_OPTIONS} />
 					</Item>
 
 					{isSubscription && <SubscriptionPriceFields />}
@@ -60,6 +43,7 @@ const CoursePriceComponent = () => {
 					<SimplePriceFields />
 				</div>
 				<div>
+					<Heading>購買備註</Heading>
 					<Item name={['purchase_note']} label="購買備註">
 						<Input.TextArea rows={6} />
 					</Item>
@@ -76,6 +60,34 @@ const CoursePriceComponent = () => {
 								label: '隱藏購買單堂課',
 							}}
 						/>
+					</div>
+				</div>
+
+				<div className="min-h-[12rem] mb-12">
+					<Heading>觀看期限</Heading>
+
+					<div className="flex flex-col gap-y-6">
+						<DatePicker
+							formItemProps={{
+								name: ['course_schedule'],
+								label: '開課時間',
+								className: 'mb-0',
+							}}
+						/>
+
+						<div>
+							<p className="mb-2">預計時長</p>
+							<Space.Compact block>
+								<Item name={['course_hour']} noStyle>
+									<InputNumber className="w-1/2" min={0} addonAfter="時" />
+								</Item>
+								<Item name={['course_minute']} noStyle>
+									<InputNumber className="w-1/2" min={0} addonAfter="分" />
+								</Item>
+							</Space.Compact>
+						</div>
+
+						<WatchLimit />
 					</div>
 				</div>
 			</div>
