@@ -25,7 +25,7 @@ final class ApiBooster {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action('muplugins_loaded', [ __CLASS__, 'only_load_required_plugins' ], 1);
+		\add_action('muplugins_loaded', [ __CLASS__, 'only_load_required_plugins' ], 100);
 	}
 
 	/**
@@ -80,6 +80,7 @@ final class ApiBooster {
 			'powerhouse/plugin.php',
 			'woocommerce/woocommerce.php',
 			'power-course/plugin.php',
+			'woocommerce-subscriptions/woocommerce-subscriptions.php',
 		];
 
 		// 檢查是否所有必要的插件都已經載入
@@ -88,7 +89,7 @@ final class ApiBooster {
 			return;
 		}
 
-		\add_filter('option_active_plugins', fn () => $required_plugins );
+		\add_filter('option_active_plugins', fn () => $required_plugins, 100 );
 	}
 }
 
