@@ -119,8 +119,10 @@ final class Ajax {
 		\check_ajax_referer(Plugin::$snake, 'security');
 
 		// 獲取從前端發送的數據
-		$data       = WP::sanitize_text_field_deep($_POST);
-		$chapter_id = (int) $data['data']['chapter_id'];
+		$data = WP::sanitize_text_field_deep($_POST);
+
+		// @phpstan-ignore-next-line
+		$chapter_id = (int) @$data['data']['chapter_id'];
 
 		if ( ! $chapter_id) {
 			\wp_send_json_error(

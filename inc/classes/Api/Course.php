@@ -238,6 +238,7 @@ final class Course extends ApiBase {
 	 */
 	public function format_course_base_records( $product ) { // phpcs:ignore
 
+		// @phpstan-ignore-next-line
 		if ( ! ( $product instanceof \WC_Product ) ) {
 			return [];
 		}
@@ -626,10 +627,10 @@ final class Course extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 * @phpstan-ignore-next-line
 	 */
-	public function post_courses_callback( $request ) {
+	public function post_courses_callback( $request ): \WP_REST_Response|\WP_Error {
 		/** @var array<string, array<mixed>|string> $meta_data */
 		[
 			'product' => $product,
@@ -662,9 +663,9 @@ final class Course extends ApiBase {
 	 *
 	 * @param \WP_REST_Request<array{'id': string}> $request Request.
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response|\WP_Error
 	 */
-	public function post_courses_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
+	public function post_courses_with_id_callback( \WP_REST_Request $request ):\WP_REST_Response|\WP_Error { // phpcs:ignore
 		/** @var array<string, array<mixed>|string> $meta_data */
 		[
 			'product' => $product,
@@ -826,10 +827,13 @@ final class Course extends ApiBase {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$ids = (array) $body_params['ids'];
+		// @phpstan-ignore-next-line
+		$ids = @$body_params['ids'];
+		$ids = is_array( $ids ) ? $ids : [];
 
 		foreach ($ids as $id) {
-			$result = \wp_delete_post( $id, true );
+			/** @var string $id */
+			$result = \wp_delete_post( (int) $id, true );
 			if (!$result) {
 				throw new \Exception(__('刪除課程資料失敗', 'power-course') . " #{$id}");
 			}

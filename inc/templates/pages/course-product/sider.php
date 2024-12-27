@@ -30,6 +30,7 @@ Plugin::get( 'card/single-product' );
 
 $linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 foreach ( $linked_products as $linked_product ) {
+	/** @var WC_Product $linked_product */
 	if ( 'publish' !== $linked_product->get_status() ) {
 		continue;
 	}
