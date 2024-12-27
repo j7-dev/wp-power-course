@@ -39,7 +39,7 @@ final class LifeCycle {
 	/**
 	 * 註冊進入章節的動作
 	 */
-	public static function register_visit_chapter() {
+	public static function register_visit_chapter(): void {
 		global $product, $chapter;
 		if ( ! $product || ! $chapter ) {
 			return;
@@ -60,7 +60,7 @@ final class LifeCycle {
 	 * @param \WP_Post    $chapter 章節文章物件
 	 * @param \WC_Product $product 課程
 	 */
-	public static function save_first_visit_time( $chapter, $product ) {
+	public static function save_first_visit_time( $chapter, $product ): void {
 		$meta_key = 'first_visit_at';
 		$user_id  = \get_current_user_id();
 
@@ -79,7 +79,7 @@ final class LifeCycle {
 	 * @param \WP_Post    $chapter 章節文章物件
 	 * @param \WC_Product $product 課程
 	 */
-	public static function save_last_visit_info( $chapter, $product ) {
+	public static function save_last_visit_info( $chapter, $product ): void {
 		$meta_key   = 'last_visit_info';
 		$meta_value = [
 			'chapter_id'    => $chapter->ID,

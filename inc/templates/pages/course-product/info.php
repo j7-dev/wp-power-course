@@ -10,6 +10,7 @@ use J7\PowerCourse\Plugin;
  */
 $items = $args;
 
+// @phpstan-ignore-next-line
 if ( ! is_array( $items ) ) {
 	echo 'items 必須是陣列';
 	$items = [];

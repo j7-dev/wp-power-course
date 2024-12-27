@@ -3,7 +3,7 @@
  * Plugin Name:       Power Course | WordPress 最好用的課程外掛
  * Plugin URI:        https://github.com/j7-dev/wp-power-course
  * Description:       WordPress 最好用的課程外掛
- * Version:           0.5.9
+ * Version:           0.5.10
  * Requires at least: 5.7
  * Requires PHP:      8.0
  * Author:            J7
@@ -36,7 +36,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		const COURSE_TABLE_NAME        = 'pc_avl_coursemeta';
 		const CHAPTER_TABLE_NAME       = 'pc_avl_chaptermeta';
 		const EMAIL_RECORDS_TABLE_NAME = 'pc_email_records';
-
+		const STUDENT_LOGS_TABLE_NAME  = 'pc_student_logs';
 
 		/**
 		 * Constructor
@@ -81,6 +81,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 			AbstractTable::create_course_table();
 			AbstractTable::create_chapter_table();
 			AbstractTable::create_email_records_table();
+			AbstractTable::create_student_logs_table();
 			self::set_default_product_meta();
 		}
 
