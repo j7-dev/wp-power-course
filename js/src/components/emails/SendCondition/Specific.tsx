@@ -159,7 +159,7 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 				zIndex={2000}
 			>
 				<UserTable
-					cardProps={null}
+					cardProps={{ showCard: false }}
 					tableProps={{
 						scroll: { y: 420 },
 					}}

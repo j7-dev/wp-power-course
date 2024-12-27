@@ -1,15 +1,7 @@
 import React, { memo, useEffect } from 'react'
 import { useTable, useModal } from '@refinedev/antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
-import {
-	Table,
-	TableProps,
-	Card,
-	FormInstance,
-	Button,
-	Modal,
-	CardProps,
-} from 'antd'
+import { Table, TableProps, FormInstance, Button, Modal, CardProps } from 'antd'
 import useColumns from './hooks/useColumns'
 import { useRowSelection, FilterTags } from 'antd-toolkit'
 import {
@@ -29,6 +21,8 @@ import CsvUpload from './CsvUpload'
 import { selectedUserIdsAtom } from './atom'
 import { useAtom } from 'jotai'
 import SelectedUser from './SelectedUser'
+import Card from './Card'
+import HistoryDrawer from './HistoryDrawer'
 
 const UserTableComponent = ({
 	canGrantCourseAccess = false,
@@ -37,7 +31,7 @@ const UserTableComponent = ({
 }: {
 	canGrantCourseAccess?: boolean
 	tableProps?: TableProps<TUserRecord>
-	cardProps?: CardProps | null
+	cardProps?: CardProps & { showCard?: boolean }
 }) => {
 	const [selectedUserIds, setSelectedUserIds] = useAtom(selectedUserIdsAtom)
 
@@ -142,101 +136,6 @@ const UserTableComponent = ({
 	// CSV 上傳 Modal
 	const { show, modalProps } = useModal()
 
-	if (null === cardProps) {
-		return (
-			<>
-				<Filter formProps={searchFormProps} />
-				<FilterTags
-					form={searchFormProps.form as FormInstance}
-					keyLabelMapper={keyLabelMapper}
-				/>
-				{canGrantCourseAccess && (
-					<>
-						<div className="mt-4">
-							<GrantCourseAccess
-								user_ids={selectedRowKeys as string[]}
-								label="添加其他課程"
-							/>
-						</div>
-
-						<div className="mt-4 flex gap-x-6 justify-between">
-							<div>
-								<label className="tw-block mb-2">批量操作</label>
-								<div className="flex gap-x-4">
-									<ModifyCourseExpireDate
-										user_ids={selectedRowKeys as string[]}
-										course_ids={selectedGCDs}
-										onSettled={() => {
-											setSelectedGCDs([])
-										}}
-									/>
-									<RemoveCourseAccess
-										user_ids={selectedRowKeys}
-										course_ids={selectedGCDs}
-										onSettled={() => {
-											setSelectedGCDs([])
-										}}
-									/>
-								</div>
-							</div>
-							{!!gcdItems.length && (
-								<div className="flex-1">
-									<label className="tw-block mb-2">選擇課程</label>
-									<GcdItemsTags />
-								</div>
-							)}
-							<Button
-								onClick={show}
-								color="primary"
-								variant="outlined"
-								className="self-end"
-							>
-								CSV 批次上傳學員權限
-							</Button>
-						</div>
-					</>
-				)}
-
-				<SelectedUser
-					user_ids={selectedUserIds}
-					onClear={() => {
-						setSelectedUserIds([])
-					}}
-					onSelected={() => {
-						const searchForm = searchFormProps?.form
-						if (!searchForm) return
-						searchForm.setFieldValue(['include'], selectedUserIds)
-						searchForm.submit()
-					}}
-				/>
-
-				<Table
-					{...(defaultTableProps as unknown as TableProps<TUserRecord>)}
-					{...tableProps}
-					className="h-[500px]"
-					columns={columns}
-					rowSelection={rowSelection}
-					pagination={{
-						...tableProps.pagination,
-						...getDefaultPaginationProps({ label: '學員' }),
-					}}
-					{...overrideTableProps}
-				/>
-
-				{canGrantCourseAccess && (
-					<Modal
-						{...modalProps}
-						centered
-						title="CSV 批次上傳學員權限"
-						footer={null}
-					>
-						<CsvUpload />
-					</Modal>
-				)}
-			</>
-		)
-	}
-
 	return (
 		<>
 			<Card title="篩選" bordered={false} className="mb-4" {...cardProps}>
@@ -330,6 +229,8 @@ const UserTableComponent = ({
 					<CsvUpload />
 				</Modal>
 			)}
+
+			<HistoryDrawer />
 		</>
 	)
 }
