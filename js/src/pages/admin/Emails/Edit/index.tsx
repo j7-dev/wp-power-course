@@ -34,11 +34,6 @@ const EmailsEdit = () => {
 
 	const handleSubmit = (values: TFormValues) => {
 		// 要存的時候才將 json 轉成 html
-		console.log(
-			'handleSubmit values.short_description',
-			values.short_description,
-		)
-
 		onFinish({
 			...values,
 			short_description: JSON.stringify(values.short_description),
@@ -94,6 +89,7 @@ const EmailsEdit = () => {
 							label="Email 名稱"
 							name={['name']}
 							tooltip="僅用於內部管理識別用，不會寄送給用戶"
+							rules={[{ required: true, message: '請輸入 Email 名稱' }]}
 						>
 							<Input allowClear />
 						</Item>

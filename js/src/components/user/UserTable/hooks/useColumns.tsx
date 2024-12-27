@@ -3,6 +3,8 @@ import { TableProps, Typography } from 'antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { UserName } from '@/components/user'
 import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
+import { useSetAtom } from 'jotai'
+import { historyDrawerAtom } from '../atom'
 
 type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
@@ -11,6 +13,7 @@ type TUseColumnsParams = {
 const { Text } = Typography
 
 const useColumns = (params?: TUseColumnsParams) => {
+	const setHistoryDrawerProps = useSetAtom(historyDrawerAtom)
 	const handleClick = params?.onClick
 	const columns: TableProps<TUserRecord>['columns'] = [
 		{
@@ -23,21 +26,34 @@ const useColumns = (params?: TUseColumnsParams) => {
 			title: '已開通課程',
 			dataIndex: 'avl_courses',
 			width: 240,
-			render: (avl_courses: TAVLCourse[]) => {
-				return avl_courses.map(({ id, name, expire_date }) => (
-					<div key={id} className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1">
+			render: (avl_courses: TAVLCourse[], { id: user_id }) => {
+				return avl_courses.map(({ id: course_id, name, expire_date }) => (
+					<div
+						key={course_id}
+						className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1"
+					>
 						<div>
 							<Text
+								className="cursor-pointer"
 								ellipsis={{
 									tooltip: (
 										<>
-											<sub className="text-gray-500">#{id}</sub>{' '}
+											<sub className="text-gray-500">#{course_id}</sub>{' '}
 											{name || '未知的課程名稱'}
 										</>
 									),
 								}}
+								onClick={() => {
+									setHistoryDrawerProps({
+										user_id,
+										course_id,
+										drawerProps: {
+											open: true,
+										},
+									})
+								}}
 							>
-								<sub className="text-gray-500">#{id}</sub>{' '}
+								<sub className="text-gray-500">#{course_id}</sub>{' '}
 								{name || '未知的課程名稱'}
 							</Text>
 						</div>

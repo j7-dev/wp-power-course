@@ -3,9 +3,12 @@ export enum TriggerAt {
 	COURSE_GRANTED = 'course_granted',
 	COURSE_FINISH = 'course_finish',
 	COURSE_LAUNCH = 'course_launch',
-	CHAPTER_FINISH = 'chapter_finish',
 	CHAPTER_ENTER = 'chapter_enter',
+	CHAPTER_FINISH = 'chapter_finish',
+	ORDER_CREATED = 'order_created', // 目前 email 沒有這個 trigger
 }
+
+export type TTriggerAt = (typeof TriggerAt)[keyof typeof TriggerAt]
 
 export enum TriggerCondition {
 	FIELD_NAME = 'trigger_condition',
