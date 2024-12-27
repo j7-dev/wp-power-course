@@ -8,19 +8,10 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\Api\Course;
 
-use J7\WpUtils\Classes\ApiBase;
-use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
-use J7\PowerCourse\Utils\Base;
-use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
-use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
-use J7\PowerCourse\Resources\Course\Limit;
-use J7\PowerCourse\BundleProduct\Helper;
+use J7\PowerCourse\Resources\StudentLog\CRUD as StudentLogCRUD;
 
 /**
  * Trait UserTrait
@@ -34,20 +25,22 @@ trait UserTrait {
 	 *
 	 * @return \WP_REST_Response
 	 */
-	final public function get_courses_student_history_callback( \WP_REST_Request $request ): \WP_REST_Response {
+	final public function get_courses_student_logs_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$params = $request->get_query_params();
 		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$user_id   = $params['user_id'] ?? 0;
 		$course_id = $params['course_id'] ?? 0;
 
-		return new \WP_REST_Response(
+		$crud = StudentLogCRUD::instance();
+		$logs = $crud->get_list(
 			[
-				'code'    => 'get_student_history_success',
-				'message' => '取得學員課程紀錄成功',
-			],
-			200
-		);
+				'user_id'   => $user_id,
+				'course_id' => $course_id,
+			]
+			);
+
+		return new \WP_REST_Response($logs);
 	}
 
 	/**

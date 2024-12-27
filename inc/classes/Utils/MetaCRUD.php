@@ -283,6 +283,7 @@ abstract class MetaCRUD {
 					'post_id'    => $post_id,
 					'user_id'    => $user_id,
 					'meta_key'   => $meta_key,
+					// @phpstan-ignore-next-line
 					'meta_value' => \maybe_serialize($meta_value),
 				],
 				[

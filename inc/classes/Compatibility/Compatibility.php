@@ -12,6 +12,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\AbstractTable;
 
+
 /**
  * Class Compatibility
  */
@@ -65,6 +66,9 @@ final class Compatibility {
 
 		// 判斷是否已經有 wp_pc_email_records 這張 table，沒有就建立
 		AbstractTable::create_email_records_table();
+
+		// 判斷是否已經有 wp_pc_student_logs 這張 table，沒有就建立
+		AbstractTable::create_student_logs_table();
 
 		// 將 table course_id 重新命名為 post_id
 		self::alter_course_table_column();
