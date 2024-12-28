@@ -174,7 +174,7 @@ class Limit {
 	 */
 	private function set_limit_type( string $limit_type ): void {
 		if (!in_array($limit_type, [ 'unlimited', 'fixed', 'assigned', 'follow_subscription' ], true)) {
-			throw new \Exception('Invalid limit type');
+			\J7\WpUtils\Classes\ErrorLog::info($limit_type, 'set_limit_type Invalid limit type');
 		}
 		$this->limit_type = $limit_type;
 	}
@@ -205,7 +205,7 @@ class Limit {
 			return;
 		}
 		if (!in_array($limit_unit, [ 'timestamp', 'day', 'month', 'year' ], true)) {
-			throw new \Exception('Invalid unit type');
+			\J7\WpUtils\Classes\ErrorLog::info($limit_unit, 'set_limit_unit Invalid limit unit');
 		}
 		$this->limit_unit = $limit_unit;
 	}
