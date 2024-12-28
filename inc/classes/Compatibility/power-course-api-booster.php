@@ -17,8 +17,8 @@ final class ApiBooster {
 	 * @var array<string>
 	 */
 	protected static $namespaces = [
-		'power-course',
-		'power-email',
+		'/wp-json/power-course',
+		'/wp-json/power-email',
 	];
 
 	/**
@@ -40,11 +40,10 @@ final class ApiBooster {
 	 * @return void
 	 */
 	public static function only_load_required_plugins(): void {
-
 		// 檢查是否為 "/wp-json/{$namespace}" API 請求
 		$some_strpos = false;
 		foreach (self::$namespaces as $namespace) {
-			if (strpos($_SERVER['REQUEST_URI'], '/wp-json/' . $namespace) !== false) { // phpcs:ignore
+			if (strpos($_SERVER['REQUEST_URI'],  $namespace) !== false) { // phpcs:ignore
 				$some_strpos = true;
 				break;
 			}
@@ -52,6 +51,22 @@ final class ApiBooster {
 		if (!$some_strpos) {
 			return;
 		}
+
+		// 只保留需要的插件
+		$required_plugins = [
+			'powerhouse/plugin.php',
+			'woocommerce/woocommerce.php',
+			'power-course/plugin.php',
+			'woocommerce-subscriptions/woocommerce-subscriptions.php',
+		];
+
+		// 檢查是否所有必要的插件都已經載入
+		// 取得所有已啟用的插件
+		// $active_plugins = (array) \get_option('active_plugins');
+		// $all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
+		// if (count($all_required_plugins_included) !== count($required_plugins)) {
+		// return;
+		// }
 
 		// 移除不必要的 WordPress 功能
 		$hooks_to_remove = [
@@ -75,23 +90,6 @@ final class ApiBooster {
 				},
 				-999999
 				);
-		}
-
-		// 取得所有已啟用的插件
-		$active_plugins = (array) \get_option('active_plugins');
-
-		// 只保留需要的插件
-		$required_plugins = [
-			'powerhouse/plugin.php',
-			'woocommerce/woocommerce.php',
-			'power-course/plugin.php',
-			'woocommerce-subscriptions/woocommerce-subscriptions.php',
-		];
-
-		// 檢查是否所有必要的插件都已經載入
-		$all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
-		if (count($all_required_plugins_included) !== count($required_plugins)) {
-			return;
 		}
 
 		\add_filter('option_active_plugins', fn () => $required_plugins, 100 );
