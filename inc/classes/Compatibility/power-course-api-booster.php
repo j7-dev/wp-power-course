@@ -25,6 +25,11 @@ final class ApiBooster {
 	 * Constructor.
 	 */
 	public function __construct() {
+		$enable = \get_option('pc_enable_api_booster', 'no') === 'yes';
+		if (!$enable) {
+			return;
+		}
+
 		\add_action('muplugins_loaded', [ __CLASS__, 'only_load_required_plugins' ], 100);
 	}
 
