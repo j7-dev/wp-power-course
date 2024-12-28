@@ -57,16 +57,20 @@ final class ApiBooster {
 			'powerhouse/plugin.php',
 			'woocommerce/woocommerce.php',
 			'power-course/plugin.php',
-			'woocommerce-subscriptions/woocommerce-subscriptions.php',
 		];
 
 		// 檢查是否所有必要的插件都已經載入
 		// 取得所有已啟用的插件
-		// $active_plugins = (array) \get_option('active_plugins');
-		// $all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
-		// if (count($all_required_plugins_included) !== count($required_plugins)) {
-		// return;
-		// }
+		$active_plugins                = (array) \get_option('active_plugins');
+		$all_required_plugins_included = array_intersect($required_plugins, $active_plugins);
+		if (count($all_required_plugins_included) !== count($required_plugins)) {
+			return;
+		}
+
+		// 如果 WooCommerce Subscriptions 已經啟用，則需要載入 WooCommerce Subscriptions
+		if (in_array('woocommerce-subscriptions/woocommerce-subscriptions.php', $active_plugins, true)) {
+			$required_plugins[] = 'woocommerce-subscriptions/woocommerce-subscriptions.php';
+		}
 
 		// 移除不必要的 WordPress 功能
 		$hooks_to_remove = [
