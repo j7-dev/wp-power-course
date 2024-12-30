@@ -37,18 +37,18 @@ final class At {
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 課程開課時 ----//
-		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
-		\add_action( ( new AtHelper(AtHelper::COURSE_LAUNCH) )->hook, [ $this, 'send_course_email' ], 10 );
+		\add_action( CourseLifeCycle::COURSE_LAUNCHED_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
+		\add_action( ( new AtHelper(AtHelper::COURSE_LAUNCHED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 課程開課時 ----//
 
 		// ---- 進入單元時 ----//
-		\add_action( ChapterLifeCycle::CHAPTER_ENTER_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
-		\add_action( ( new AtHelper(AtHelper::CHAPTER_ENTER) )->hook, [ $this, 'send_course_email' ], 10 );
+		\add_action( ChapterLifeCycle::CHAPTER_ENTERED_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
+		\add_action( ( new AtHelper(AtHelper::CHAPTER_ENTERED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 進入單元時 ----//
 
 		// ---- 完成單元時 ----//
 		\add_action( ChapterLifeCycle::CHAPTER_FINISHED_ACTION, [ $this, 'chapter_finish_email' ], 10, 3 );
-		\add_action( ( new AtHelper(AtHelper::CHAPTER_FINISH) )->hook, [ $this, 'send_course_email' ], 10 );
+		\add_action( ( new AtHelper(AtHelper::CHAPTER_FINISHED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 完成單元時 ----//
 
 		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 20, 5 );

@@ -10,6 +10,7 @@ namespace J7\PowerCourse\Resources\StudentLog;
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\AtHelper;
 
 /**
  * Class CRUD
@@ -39,20 +40,6 @@ final class CRUD {
 		'log_type'   => 'string',
 		'user_ip'    => 'string',
 		'created_at' => 'datetime',
-	];
-
-	/**
-	 * 紀錄類型
-	 *
-	 * @var array{course_granted: string, course_finish: string, course_launch: string, chapter_enter: string, chapter_finish: string, order_created: string}
-	 */
-	public array $log_type = [
-		'course_granted' => '課程授權',
-		'course_finish'  => '課程完成',
-		'course_launch'  => '課程開始',
-		'chapter_enter'  => '章節進入',
-		'chapter_finish' => '章節完成',
-		'order_created'  => '訂單建立', // 目前 email 沒有這個
 	];
 
 	/**
@@ -223,7 +210,7 @@ final class CRUD {
 	private function validate_args( array $args ): array {
 		$parsed_args = array_intersect_key( $args, $this->get_schema() );
 
-		if ( isset( $args['log_type'] ) && ! in_array( $args['log_type'], $this->log_type, true ) ) {
+		if ( isset( $args['log_type'] ) && ! in_array( $args['log_type'], AtHelper::$allowed_slugs, true ) ) {
 			$parsed_args['log_type'] = 'unknown';
 			\J7\WpUtils\Classes\ErrorLog::info( $args['log_type'], 'log_type 不在預期內' );
 		}

@@ -13,25 +13,29 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 final class AtHelper {
 
 	// 六個時機點
-	const COURSE_GRANTED = 'course_granted';
-	const COURSE_FINISH  = 'course_finish';
-	const COURSE_LAUNCH  = 'course_launch';
-	const CHAPTER_ENTER  = 'chapter_enter';
-	const CHAPTER_FINISH = 'chapter_finish';
-	const ORDER_CREATED  = 'order_created'; // 目前 email 沒有這個 trigger
+	const COURSE_GRANTED     = 'course_granted';
+	const COURSE_FINISHED    = 'course_finish';
+	const COURSE_LAUNCHED    = 'course_launch';
+	const CHAPTER_ENTERED    = 'chapter_enter';
+	const CHAPTER_FINISHED   = 'chapter_finish';
+	const ORDER_CREATED      = 'order_created'; // 目前 email 沒有這個 trigger
+	const CHAPTER_UNFINISHED = 'chapter_unfinished'; // 目前 email 沒有這個 trigger
+	const COURSE_REMOVED     = 'course_removed'; // 目前 email 沒有這個 trigger
 
 	/**
 	 * 允許的時機點
 	 *
 	 * @var array<string>
 	 */
-	private array $allowed_slugs = [
+	public static array $allowed_slugs = [
 		self::COURSE_GRANTED,
-		self::COURSE_FINISH,
-		self::COURSE_LAUNCH,
-		self::CHAPTER_ENTER,
-		self::CHAPTER_FINISH,
+		self::COURSE_FINISHED,
+		self::COURSE_LAUNCHED,
+		self::CHAPTER_ENTERED,
+		self::CHAPTER_FINISHED,
 		self::ORDER_CREATED, // 目前 email 沒有這個 trigger
+		self::CHAPTER_UNFINISHED, // 目前 email 沒有這個 trigger
+		self::COURSE_REMOVED, // 目前 email 沒有這個 trigger
 	];
 
 	/**
@@ -88,11 +92,13 @@ final class AtHelper {
 	private function set_label(): void {
 		$this->label = match ( $this->slug ) {
 			self::COURSE_GRANTED => '開通課程權限後',
-			self::COURSE_FINISH  => '課程完成時',
-			self::COURSE_LAUNCH  => '課程開課時',
-			self::CHAPTER_ENTER  => '進入單元時',
-			self::CHAPTER_FINISH => '完成單元時',
+			self::COURSE_FINISHED  => '課程完成時',
+			self::COURSE_LAUNCHED  => '課程開課時',
+			self::CHAPTER_ENTERED  => '進入單元時',
+			self::CHAPTER_FINISHED => '完成單元時',
 			self::ORDER_CREATED  => '訂單成立時',
+			self::CHAPTER_UNFINISHED => '單元未完成時',
+			self::COURSE_REMOVED => '管理員手動移除課程權限時',
 			default => '無效的時機點',
 		};
 	}
@@ -104,7 +110,7 @@ final class AtHelper {
 	 * @return void
 	 */
 	private function validate_slug( string $slug ): void {
-		if ( ! in_array( $slug, $this->allowed_slugs, true ) ) {
+		if ( ! in_array( $slug, self::$allowed_slugs, true ) ) {
 			\J7\WpUtils\Classes\ErrorLog::info( 'Invalid slug', $slug );
 			$this->slug = self::COURSE_GRANTED;
 		}

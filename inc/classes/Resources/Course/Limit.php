@@ -129,6 +129,7 @@ class Limit {
 			$limit_value_label = '';
 		}
 
+		/** @var string $limit_value_label */
 		return (object) [
 			'type'  => $limit_type_label,
 			'value' => $limit_value_label,
@@ -183,7 +184,6 @@ class Limit {
 	 * 設定限制值
 	 *
 	 * @param int|null $limit_value 限制值
-	 * @throws \Exception 如果限制值無效
 	 */
 	private function set_limit_value( int|null $limit_value ): void {
 		if (!$limit_value) {

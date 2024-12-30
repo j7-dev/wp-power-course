@@ -11,7 +11,6 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
