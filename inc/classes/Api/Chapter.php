@@ -326,12 +326,15 @@ final class Chapter extends ApiBase {
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {
-			$success  = AVLChapterMeta::delete(
+			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
 				$user_id,
 				'finished_at'
 			);
+
 			$progress = CourseUtils::get_course_progress( $product );
+
+			\do_action(ChapterLifeCycle::CHAPTER_UNFINISHEDED_ACTION, $chapter_id, $course_id, $user_id);
 
 			return new \WP_REST_Response(
 				[

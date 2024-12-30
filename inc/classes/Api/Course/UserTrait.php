@@ -70,7 +70,7 @@ trait UserTrait {
 
 		foreach ($course_ids as $course_id) {
 			foreach ($user_ids as  $user_id) {
-				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date );
+				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date, null );
 			}
 		}
 
@@ -156,7 +156,7 @@ trait UserTrait {
 		return new \WP_REST_Response(
 			[
 				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',
-				'message' => $success ? '移除學員成功' : '移���學員失敗',
+				'message' => $success ? '移除學員成功' : '移除學員失敗',
 				'data'    => [
 					'user_ids'   => \implode(',', $user_ids),
 					'course_ids' => \implode(',', $course_ids),

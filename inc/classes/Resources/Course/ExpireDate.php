@@ -73,7 +73,11 @@ class ExpireDate {
 			return;
 		}
 		/** @var int $expire_date */
-		$expire_date             = $this->expire_date;
+		$expire_date = $this->expire_date;
+		if ( ! $expire_date ) {
+			$this->expire_date_label = '無期限';
+			return;
+		}
 		$this->expire_date_label = \wp_date( $format ?? 'Y-m-d H:i:s', $expire_date ) ?: '無法取得時間';
 	}
 
