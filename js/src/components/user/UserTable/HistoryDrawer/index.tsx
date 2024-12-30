@@ -3,38 +3,41 @@ import { Drawer, Timeline } from 'antd'
 import { useAtom } from 'jotai'
 import { historyDrawerAtom } from '../atom'
 import { TimelineItemAdapter } from './adapter'
-import { TimelineSlug } from './types'
-import { TriggerAt } from '@/components/emails/SendCondition/enum'
+import { TimelineLogType } from './types'
+import { useList } from '@refinedev/core'
+
+type TStudentLog = any
 
 const index = () => {
 	const [historyDrawerProps, setHistoryDrawerProps] = useAtom(historyDrawerAtom)
 	const { user_id, course_id, drawerProps } = historyDrawerProps
 
-	const rawItems = [
-		{
-			slug: TriggerAt.ORDER_CREATED,
-			label: '2024-12-01 10:53 購買課程 #1234',
+	const { data, isLoading } = useList<TStudentLog>({
+		resource: 'courses/student-logs',
+		filters: [
+			{
+				field: 'user_id',
+				operator: 'eq',
+				value: user_id,
+			},
+			{
+				field: 'course_id',
+				operator: 'eq',
+				value: course_id,
+			},
+		],
+		pagination: {
+			pageSize: 20,
 		},
-		{
-			slug: TriggerAt.COURSE_GRANTED,
-			label: '2024-12-04 16:28 獲得課程權限 AAAAAA',
+		queryOptions: {
+			enabled: !!user_id && !!course_id,
 		},
-		{
-			slug: TriggerAt.CHAPTER_ENTER,
-			label: '2024-12-04 16:28 進入章節 OOOOOO',
-		},
-		{
-			slug: TriggerAt.CHAPTER_FINISH,
-			label: '2024-12-04 16:28 完成章節 AAAAAA',
-		},
-		{
-			slug: TriggerAt.COURSE_FINISH,
-			label: '2024-12-04 16:28 完成課程 AAAAAA',
-		},
-	]
+	})
 
-	const items = rawItems.map(({ slug, label }) => {
-		return new TimelineItemAdapter(slug as TimelineSlug, label).itemProps
+	const logs = data?.data || []
+
+	const items = logs.map(({ log_type, title }) => {
+		return new TimelineItemAdapter(log_type as TimelineLogType, title).itemProps
 	})
 
 	return (
@@ -50,6 +53,7 @@ const index = () => {
 				}))
 			}
 			{...drawerProps}
+			open
 		>
 			<Timeline items={items} />
 		</Drawer>

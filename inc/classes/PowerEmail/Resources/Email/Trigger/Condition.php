@@ -7,7 +7,6 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
-use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\At;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
@@ -32,18 +31,18 @@ final class Condition {
 	private array $course_trigger_at = [ 'course_granted', 'course_finish', 'course_launch' ];
 
 	/**
-	 * @var array<string> 課程 ID 陣列
+	 * @var array<string|int> 課程 ID 陣列
 	 */
 	public array $course_ids = [];
 
 	/**
-	 * @var array<string> 章節/單元 ID 陣列
+	 * @var array<string|int> 章節/單元 ID 陣列
 	 */
 	public array|null $chapter_ids = null;
 
 
 	/**
-	 * @var array<string> 課程/章節/單元 ID 陣列
+	 * @var array<string|int> 課程/章節/單元 ID 陣列
 	 */
 	private array $required_ids = [];
 
@@ -82,18 +81,17 @@ final class Condition {
 	public string|null $sending_unit = null;
 
 	/**
-	 * @var array|null 延遲寄送範圍 開始時間、結束時間 HH:MM
+	 * @var array<string>|null 延遲寄送範圍 開始時間、結束時間 [HH:MM, HH:MM]
 	 */
 	public array|null $sending_range = null;
 
 	/**
 	 * Constructor
 	 *
-	 * @param array $condition 觸發條件
+	 * @param array{trigger_at: ?string, trigger_condition: string, course_ids: ?array<string|int>, chapter_ids: ?array<string|int>, qty: ?int, sending: array{type: ?string, value: ?string, unit: ?string, range: ?array{start: string, end: string}}} $condition 觸發條件
 	 */
 	public function __construct( array $condition ) {
-		$at                      = At::instance();
-		$this->trigger_at        = $condition['trigger_at'] ?? $at->trigger_at['course_granted']['slug'];
+		$this->trigger_at        = $condition['trigger_at'] ?? AtHelper::COURSE_GRANTED;
 		$this->trigger_condition = $condition['trigger_condition'];
 		$this->course_ids        = (array) ( @$condition['course_ids'] ?? [] );
 		$this->chapter_ids       = (array) ( @$condition['chapter_ids'] ?? [] );
@@ -121,6 +119,7 @@ final class Condition {
 				return;
 			}
 
+			/** @var array<int, int> $course_ids */
 			$course_ids = \get_posts(
 				[
 					'post_type'      => 'product',
@@ -161,6 +160,7 @@ final class Condition {
 				$chapter_ids        = array_merge( $chapter_ids, $course_chapter_ids );
 			}
 
+			/** @var array<int, int> $chapter_ids */
 			$this->required_ids = $chapter_ids;
 			return;
 		}
@@ -173,7 +173,6 @@ final class Condition {
 
 		// 如果都不符合以上條件，則回傳空陣列
 		$this->required_ids = [];
-		return;
 	}
 
 
@@ -279,6 +278,7 @@ final class Condition {
 		}
 
 		/** @var array<int, int> */
+		// @phpstan-ignore-next-line
 		$current_ids = array_values( array_map( 'intval', $current_ids ) );
 
 		return $current_ids;

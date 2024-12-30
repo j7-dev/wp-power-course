@@ -21,11 +21,11 @@ trait UserTrait {
 	/**
 	 * 取得學員課程紀錄
 	 *
-	 * @param \WP_REST_Request
+	 * @param \WP_REST_Request<array<string, mixed>> $request Request.
 	 *
 	 * @return \WP_REST_Response
 	 */
-	final public function get_courses_student_logs_callback( \WP_REST_Request $request ): \WP_REST_Response {
+	final public function get_courses_student_logs_callback( \WP_REST_Request $request ): \WP_REST_Response { // phpcs:ignore
 		$params = $request->get_query_params();
 		$params = WP::sanitize_text_field_deep( $params, false );
 

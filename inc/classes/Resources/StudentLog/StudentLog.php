@@ -87,7 +87,7 @@ final class StudentLog {
 	/**
 	 * 取得實例
 	 *
-	 * @param int|object{id: int, user_id: int, course_id: int, chapter_id: int, title: string, content: string, log_type: string, user_ip: string, created_at: string} $maybe_id_or_object 紀錄 ID 或 紀錄物件.
+	 * @param int|object{id: string, user_id: string, course_id: string, chapter_id: string, title: string, content: string, log_type: string, user_ip: string, created_at: string} $maybe_id_or_object 紀錄 ID 或 紀錄物件.
 	 * @return StudentLog
 	 */
 	public static function instance( object|int $maybe_id_or_object ): StudentLog {
@@ -95,9 +95,14 @@ final class StudentLog {
 		$schema   = $crud->schema;
 		$object   = \is_numeric( $maybe_id_or_object ) ? $crud->get( (int) $maybe_id_or_object ) : $maybe_id_or_object;
 		$instance = new self();
+		$int_keys = [ 'id', 'user_id', 'course_id', 'chapter_id' ];
 		foreach ( $schema as $key => $value ) {
 			if ( isset( $object->$key ) ) {
-				$instance->$key = $object->$key;
+				if ( \in_array( $key, $int_keys, true ) ) {
+					$instance->$key = (int) $object->$key;
+				} else {
+					$instance->$key = $object->$key;
+				}
 			}
 		}
 

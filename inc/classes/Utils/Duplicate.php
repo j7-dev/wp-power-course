@@ -76,6 +76,7 @@ final class Duplicate {
 
 		$is_course = \get_post_meta( $post_id, '_is_course', true ) === 'yes';
 
+		/** @var \WP_Post $post */
 		return match ($post->post_type) {
 			EmailCPT::POST_TYPE => 'email',
 			ChapterCPT::POST_TYPE => 'chapter',
@@ -101,19 +102,24 @@ final class Duplicate {
 		}
 
 		// 複製文章並設為草稿
+		/** @var \WP_Post $post */
+		// @phpstan-ignore-next-line
 		$post->ID          = null;
 		$post->post_title .= ' (複製)';
 
 		// $post->post_status = 'draft';
 
 		// 插入新文章
+		// @phpstan-ignore-next-line
 		$new_id = \wp_insert_post( (array) $post );
 
+		// @phpstan-ignore-next-line
 		if (!\is_numeric($new_id)) {
 			throw new \Exception(__('複製文章失敗', 'power-course') . ' ' . $new_id->get_error_message());
 		}
 
 		// 複製 meta
+		/** @var array<string, array<int, string>> $metas */
 		$metas = \get_post_meta($post_id);
 		foreach ($metas as $key => $values) {
 			foreach ($values as $value) {
@@ -159,7 +165,7 @@ final class Duplicate {
 		}
 
 		// 使用 WC_Admin_Duplicate_Product 複製產品
-		$duplicate      = new \WC_Admin_Duplicate_Product($product);
+		$duplicate      = new \WC_Admin_Duplicate_Product();
 		$new_product    = $duplicate->product_duplicate($product);
 		$new_product_id = $new_product->get_id();
 
@@ -170,7 +176,7 @@ final class Duplicate {
 
 		if (is_numeric($new_parent)) {
 			// 更新銷售方案的的 link_course_ids
-			$new_product->update_meta_data(Helper::LINK_COURSE_IDS_META_KEY, $new_parent);
+			$new_product->update_meta_data(Helper::LINK_COURSE_IDS_META_KEY, (string) $new_parent);
 			$new_product->save_meta_data();
 		}
 
@@ -194,6 +200,7 @@ final class Duplicate {
 		if (is_numeric($source)) {
 			$source_id = (int) $source;
 			$post      = \get_post($source_id);
+			// @phpstan-ignore-next-line
 			$post_type = $post ? $post->post_type : '';
 		} elseif ($source instanceof \WC_Product) {
 			$source_id = $source->get_id();
@@ -279,6 +286,7 @@ final class Duplicate {
 
 		// 原課程身上的銷售方案
 		$bundle_product_ids = \get_posts(
+			// @phpstan-ignore-next-line
 			[
 				'post_type'   => 'product',
 				'numberposts' => -1,
@@ -288,6 +296,7 @@ final class Duplicate {
 			]
 		);
 
+		// @phpstan-ignore-next-line
 		if (!is_array($bundle_product_ids)) {
 			return;
 		}

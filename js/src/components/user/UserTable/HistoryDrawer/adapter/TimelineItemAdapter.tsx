@@ -5,11 +5,11 @@ import {
 	CheckCircleOutlined,
 	CheckCircleFilled,
 } from '@ant-design/icons'
-import { TimelineSlug, TimelineItemConfig } from '../types'
+import { TimelineLogType, TimelineItemConfig } from '../types'
 import { TimelineItemProps } from 'antd'
 import { TriggerAt } from '@/components/emails/SendCondition/enum'
 
-const timelineItemMapper: Record<TimelineSlug, TimelineItemConfig> = {
+const timelineItemMapper: Record<TimelineLogType, TimelineItemConfig> = {
 	[TriggerAt.ORDER_CREATED]: {
 		color: '#91caff',
 		icon: <PlusCircleOutlined />,
@@ -37,35 +37,35 @@ const timelineItemMapper: Record<TimelineSlug, TimelineItemConfig> = {
 }
 
 export class TimelineItemAdapter {
-	private static readonly mapper: Record<TimelineSlug, TimelineItemConfig> =
+	private static readonly mapper: Record<TimelineLogType, TimelineItemConfig> =
 		timelineItemMapper
 
 	constructor(
-		public readonly slug: TimelineSlug,
-		public readonly label: string,
+		public readonly log_type: TimelineLogType,
+		public readonly title: string,
 	) {
-		this.validateSlug(slug)
+		this.validateLogType(log_type)
 	}
 
 	public get itemProps(): TimelineItemProps {
 		return {
 			color: this.color,
 			dot: this.icon,
-			children: this.label,
+			children: this.title,
 		}
 	}
 
 	get color(): string {
-		return TimelineItemAdapter.mapper[this.slug].color
+		return TimelineItemAdapter.mapper?.[this.log_type]?.color
 	}
 
 	get icon(): React.ReactNode {
-		return TimelineItemAdapter.mapper[this.slug].icon
+		return TimelineItemAdapter.mapper?.[this.log_type]?.icon
 	}
 
-	private validateSlug(slug: TimelineSlug): void {
-		if (!TimelineItemAdapter.mapper[slug]) {
-			throw new Error(`Invalid timeline slug: ${slug}`)
+	private validateLogType(log_type: TimelineLogType): void {
+		if (!TimelineItemAdapter.mapper?.[log_type]) {
+			console.error(`Invalid timeline log_type: ${log_type}`)
 		}
 	}
 }
