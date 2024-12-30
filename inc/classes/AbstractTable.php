@@ -157,7 +157,7 @@ abstract class AbstractTable {
 										id bigint(20) NOT NULL AUTO_INCREMENT,
 										user_id bigint(20) NOT NULL,
 										course_id bigint(20) NOT NULL,
-										chapter_id bigint(20) NOT NULL,
+										chapter_id bigint(20) DEFAULT NULL,
 										log_type varchar(20) DEFAULT NULL,
 										title varchar(255) DEFAULT NULL,
 										content longtext DEFAULT NULL,

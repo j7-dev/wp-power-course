@@ -8,14 +8,14 @@ export type THistoryDrawerProps = {
 }
 
 export const defaultHistoryDrawerProps: THistoryDrawerProps = {
-	user_id: undefined,
-	course_id: undefined,
+	user_id: '1' || undefined,
+	course_id: '1' || undefined,
 	drawerProps: {
 		open: false,
 	},
 }
 
-export type TimelineSlug = Exclude<TTriggerAt, TriggerAt.FIELD_NAME>
+export type TimelineLogType = Exclude<TTriggerAt, TriggerAt.FIELD_NAME>
 
 export interface TimelineItemConfig {
 	color: string

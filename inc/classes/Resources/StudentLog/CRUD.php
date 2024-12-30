@@ -73,7 +73,7 @@ final class CRUD {
 	/**
 	 * 取得學員紀錄列表
 	 *
-	 * @param array<string, mixed> $where 條件.
+	 * @param array<string, array<string>|string> $where 條件.
 	 * @return StudentLog[] 學員紀錄列表.
 	 */
 	public function get_list( array $where ): array {
@@ -90,7 +90,7 @@ final class CRUD {
 	/**
 	 * 從 db 取得學員紀錄列表
 	 *
-	 * @param array<string, mixed> $where 條件.
+	 * @param array<string, array<string>|string> $where 條件.
 	 * @return StudentLog[] 學員紀錄列表.
 	 */
 	private function db_get_list( array $where ): array {
@@ -101,17 +101,7 @@ final class CRUD {
 		$result = $wpdb->get_results(
 		\wp_unslash( // phpcs:ignore
 			$wpdb->prepare(
-				'SELECT
-					CAST(id AS SIGNED) as id,
-					CAST(user_id AS SIGNED) as user_id,
-					CAST(course_id AS SIGNED) as course_id,
-					CAST(chapter_id AS SIGNED) as chapter_id,
-					title,
-					content,
-					log_type,
-					user_ip,
-					created_at
-				 FROM %1$s WHERE %2$s',
+				'SELECT * FROM %1$s %2$s',
 				$this->table_name,
 				$where_string,
 			)
@@ -149,17 +139,7 @@ final class CRUD {
 		global $wpdb;
 		$result = $wpdb->get_row(
 		$wpdb->prepare(
-			'SELECT
-					CAST(id AS SIGNED) as id,
-					CAST(user_id AS SIGNED) as user_id,
-					CAST(course_id AS SIGNED) as course_id,
-					CAST(chapter_id AS SIGNED) as chapter_id,
-					title,
-					content,
-					log_type,
-					user_ip,
-					created_at
-				 FROM %1$s WHERE id = %2$d',
+			'SELECT * FROM %1$s WHERE id = %2$d',
 			$this->table_name,
 			$id,
 		)
@@ -176,7 +156,7 @@ final class CRUD {
 	/**
 	 * 新增學員紀錄
 	 *
-	 * @param array<string, mixed> $args 資料.
+	 * @param array{user_id: numeric-string, course_id: numeric-string, chapter_id?: numeric-string, title: string, content: string, log_type: string} $args 資料.
 	 * @return int|false 新增的Log ID 或 false.
 	 */
 	public function add( array $args ): int|false {

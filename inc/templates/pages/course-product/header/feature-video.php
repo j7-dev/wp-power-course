@@ -32,22 +32,23 @@ if ( ! is_array( $teacher_ids ) ) {
 }
 
 /**
- * @var array{type: string, id: string, meta: ?array} $feature_video
+ * @var array{type: string, id: string, meta: ?array<mixed>} $feature_video
  */
 $feature_video = \get_post_meta( $product_id, 'feature_video', true );
 $image_id      = $product->get_image_id();
 $image_url     = $image_id ? \wp_get_attachment_image_url( (int) $image_id, 'full' ) : Base::DEFAULT_IMAGE;
 
+// @phpstan-ignore-next-line
 $video_type = $feature_video['type'] ?? 'none';
 
 if ( 'none' !== $video_type ) {
 	Plugin::get(
 		'video',
 		[
-			'video_info'    => $feature_video,
-			'class'         => 'md:rounded-2xl',
-			'thumbnail_url' => $image_url,
-			'hide_watermark'  => true,
+			'video_info'     => $feature_video,
+			'class'          => 'md:rounded-2xl',
+			'thumbnail_url'  => $image_url,
+			'hide_watermark' => true,
 		]
 	);
 } else {

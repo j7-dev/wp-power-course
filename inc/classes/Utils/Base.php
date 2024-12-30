@@ -25,7 +25,7 @@ abstract class Base {
 	 * 取得 where 語法
 	 * TODO 加入 wp-utils
 	 *
-	 * @param array<string, mixed> $where 條件.
+	 * @param array<string, array<string>|string> $where 條件.
 	 * @return string
 	 */
 	public static function get_where_sql( array $where ): string {

@@ -294,7 +294,7 @@ final class Chapter extends ApiBase {
 	 */
 	public function post_toggle_finish_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$chapter_id = $request['id'];
+		$chapter_id = (int) $request['id'];
 		// @phpstan-ignore-next-line
 		$body_params = $request->get_body_params() ?? [];
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
@@ -308,7 +308,7 @@ final class Chapter extends ApiBase {
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
 
-		$avl_chapter              = new AVLChapter( (int) $chapter_id, (int) $user_id );
+		$avl_chapter              = new AVLChapter( $chapter_id, (int) $user_id );
 		$is_this_chapter_finished = !!$avl_chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
 		$product                  = \wc_get_product( $course_id );
@@ -322,6 +322,8 @@ final class Chapter extends ApiBase {
 				400
 			);
 		}
+
+		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {
 			$success  = AVLChapterMeta::delete(
@@ -347,7 +349,7 @@ final class Chapter extends ApiBase {
 		}
 
 		$success  = AVLChapterMeta::add(
-			(int) $chapter_id,
+			$chapter_id,
 			$user_id,
 			'finished_at',
 			\wp_date('Y-m-d H:i:s')

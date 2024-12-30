@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $current_user_id = \get_current_user_id();
 
 if ( ! $current_user_id ) {
-	\wp_safe_redirect( \get_permalink( \get_option( 'woocommerce_myaccount_page_id' ) ) );
+	\wp_safe_redirect( \get_permalink( (int) \get_option( 'woocommerce_myaccount_page_id' ) ) ?: \site_url() );
 	exit;
 }
 global $product, $chapter;
@@ -41,7 +41,7 @@ $product->get_name(),
 \get_bloginfo( 'name' )
 );
 
-$is_expired  = CourseUtils::is_expired($product, $current_user_id);
+$is_expired = CourseUtils::is_expired($product, $current_user_id);
 
 \add_filter(
 	'body_class',

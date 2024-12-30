@@ -18,7 +18,8 @@ $args = \wp_parse_args( $args, $default_args );
 
 $course_type = $args['type'] ?? 'all';
 
-$current_user_id  = \get_current_user_id();
+$current_user_id = \get_current_user_id();
+/** @var array<int, \WC_Product> $user_avl_courses */
 $user_avl_courses = CourseUtils::get_avl_courses_by_user();
 
 $filtered_courses = array_filter(
