@@ -21,7 +21,7 @@ final class AtHelper {
 	const ORDER_CREATED      = 'order_created'; // 目前 email 沒有這個 trigger
 	const CHAPTER_UNFINISHED = 'chapter_unfinished'; // 目前 email 沒有這個 trigger
 	const COURSE_REMOVED     = 'course_removed'; // 目前 email 沒有這個 trigger
-
+	const UPDATE_STUDENT     = 'update_student'; // 目前 email 沒有這個 trigger
 	/**
 	 * 允許的時機點
 	 *
@@ -36,6 +36,7 @@ final class AtHelper {
 		self::ORDER_CREATED, // 目前 email 沒有這個 trigger
 		self::CHAPTER_UNFINISHED, // 目前 email 沒有這個 trigger
 		self::COURSE_REMOVED, // 目前 email 沒有這個 trigger
+		self::UPDATE_STUDENT, // 目前 email 沒有這個 trigger
 	];
 
 	/**
@@ -99,6 +100,7 @@ final class AtHelper {
 			self::ORDER_CREATED  => '訂單成立時',
 			self::CHAPTER_UNFINISHED => '單元未完成時',
 			self::COURSE_REMOVED => '管理員手動移除課程權限時',
+			self::UPDATE_STUDENT => '更新學員觀看課程期限時',
 			default => '無效的時機點',
 		};
 	}

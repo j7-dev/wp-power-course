@@ -24,21 +24,18 @@ final class LifeCycle {
 
 	// 開通用戶權限的鉤子
 	const ADD_STUDENT_TO_COURSE_ACTION = 'power_course_add_student_to_course';
-
 	// 開通用戶權限後
 	const AFTER_ADD_STUDENT_TO_COURSE_ACTION = 'power_course_after_add_student_to_course';
-
 	// 課程開課的鉤子
 	const COURSE_LAUNCHED_ACTION = 'power_course_course_launch';
-
 	// 課程更新前
 	const BEFORE_UPDATE_PRODUCT_META_ACTION = 'power_course_before_update_product_meta';
-
 	// 移除學員後
 	const AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION = 'power_course_after_remove_student_from_course';
-
+	// 更新學員觀看後
+	const AFTER_UPDATE_STUDENT_FROM_COURSE_ACTION = 'power_course_after_update_student_from_course';
 	// 課程完成
-	const COURSE_FINISHEDED_ACTION = 'power_course_course_finished';
+	const COURSE_FINISHED_ACTION = 'power_course_course_finished';
 
 	/**
 	 * Constructor
@@ -47,7 +44,6 @@ final class LifeCycle {
 
 		// 購買了有開課權限的商品時
 		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_order_created_log' ], 0, 4 );
-
 		// 開通課程權限
 		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_student_to_course' ], 10, 4 );
 
@@ -67,13 +63,17 @@ final class LifeCycle {
 		\add_action( self::COURSE_LAUNCHED_ACTION, [ __CLASS__, 'add_course_launch_log' ], 20, 2 );
 
 		// 移除學員後，將課程以後權的發信改為 mark_as_sent 改成 0
-		\add_action(self::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'update_email_mark_as_sent' ], 10, 2);
-		\add_action(self::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'add_remove_student_log' ], 10, 2);
+		\add_action(self::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'save_meta_remove_student' ], 10, 2);
+		\add_action(self::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'update_email_mark_as_sent' ], 20, 2);
+
+		// 直接更新學員觀看課程的時間
+		\add_action(self::AFTER_UPDATE_STUDENT_FROM_COURSE_ACTION, [ __CLASS__, 'save_meta_update_student' ], 10, 3);
 
 		// 課程完成
-		\add_action( self::COURSE_FINISHEDED_ACTION, [ __CLASS__, 'save_finished_time' ], 10, 2 );
-		\add_action( self::COURSE_FINISHEDED_ACTION, [ __CLASS__, 'add_course_finish_log' ], 10, 2 );
+		\add_action( self::COURSE_FINISHED_ACTION, [ __CLASS__, 'save_finished_time' ], 10, 2 );
 	}
+
+
 
 	/**
 	 * 購買了有開課權限的商品時，寫入 log
@@ -358,7 +358,42 @@ final class LifeCycle {
 	}
 
 	/**
+	 * 移除學員後，寫入 log
+	 *
+	 * @param int $user_id 用戶 id
+	 * @param int $course_id 課程 id
+	 * @return void
+	 * @throws \Exception 移除學員失敗
+	 */
+	public static function save_meta_remove_student( int $user_id, int $course_id ): void {
+		$all_success = true;
+		$success1    = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
+		// 移除上課權限時，也把 avl_course_meta 相關資料刪除
+		$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id );
+
+		if (false === $success1 || false === $success2) {
+			$all_success = false;
+		}
+
+		$crud = StudentLogCRUD::instance();
+		$crud->add(
+			[
+				'user_id'   => (string) $user_id,
+				'course_id' => (string) $course_id,
+				'title'     => $all_success ? "管理員手動移除課程 #{$course_id} 權限成功" : "管理員手動移除課程 #{$course_id} 權限失敗",
+				'content'   => '',
+				'log_type'  => AtHelper::COURSE_REMOVED,
+			]
+			);
+
+		if (!$all_success) {
+			throw new \Exception('移除學員失敗');
+		}
+	}
+
+	/**
 	 * 更新寄信註記
+	 * 移除學員後，將課程以後權的發信改為 mark_as_sent 改成 0
 	 *
 	 * @param int $user_id 用戶 id
 	 * @param int $course_id 課程 id
@@ -378,23 +413,31 @@ final class LifeCycle {
 	}
 
 	/**
-	 * 移除學員時，寫入 log
+	 * 更新學員觀看課程期限時，寫入 log
 	 *
 	 * @param int $user_id 用戶 id
 	 * @param int $course_id 課程 id
+	 * @param int $timestamp 觀看時間
 	 * @return void
+	 * @throws \Exception 更新學員觀看課程期限失敗
 	 */
-	public static function add_remove_student_log( int $user_id, int $course_id ): void {
-		$crud = StudentLogCRUD::instance();
+	public static function save_meta_update_student( int $user_id, int $course_id, int $timestamp ): void {
+		$success     = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $timestamp );
+		$expire_date = new ExpireDate($timestamp);
+		$crud        = StudentLogCRUD::instance();
 		$crud->add(
 			[
 				'user_id'   => (string) $user_id,
 				'course_id' => (string) $course_id,
-				'title'     => "管理員手動移除課程 #{$course_id} 權限",
+				'title'     => $success ? "管理員手動更新課程 #{$course_id} 時間為 {$expire_date->expire_date_label} 成功" : "管理員手動更新課程 #{$course_id} 時間為 {$expire_date->expire_date_label} 失敗",
 				'content'   => '',
-				'log_type'  => AtHelper::COURSE_REMOVED,
+				'log_type'  => AtHelper::UPDATE_STUDENT,
 			]
 			);
+
+		if (!$success) {
+			throw new \Exception('更新學員觀看課程期限失敗');
+		}
 	}
 
 	/**
@@ -405,23 +448,14 @@ final class LifeCycle {
 	 * @return void
 	 */
 	public static function save_finished_time( int $course_id, int $user_id ): void {
-		AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'finished_at', \wp_date('Y-m-d H:i:s') );
-	}
+		$success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'finished_at', \wp_date('Y-m-d H:i:s') );
 
-	/**
-	 * 課程完成時，寫入 log
-	 *
-	 * @param int $course_id 課程 id
-	 * @param int $user_id 用戶 id
-	 * @return void
-	 */
-	public static function add_course_finish_log( int $course_id, int $user_id ): void {
 		$crud = StudentLogCRUD::instance();
 		$crud->add(
 			[
 				'user_id'   => (string) $user_id,
 				'course_id' => (string) $course_id,
-				'title'     => "課程 #{$course_id} 已完成",
+				'title'     => $success ? "課程 #{$course_id} 已完成" : "課程 #{$course_id} 完成失敗",
 				'content'   => '',
 				'log_type'  => AtHelper::COURSE_FINISHED,
 			]
