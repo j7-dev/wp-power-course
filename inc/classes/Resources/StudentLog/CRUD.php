@@ -60,15 +60,20 @@ final class CRUD {
 	/**
 	 * 取得學員紀錄列表
 	 *
-	 * @param array<string, array<string>|string> $where 條件.
-	 * @return StudentLog[] 學員紀錄列表.
+	 * @param array{
+	 *  paged: int,
+	 *  posts_per_page: int,
+	 *  user_id: int,
+	 *  course_id: int,
+	 * } $where 條件.
+	 * @return object{list: StudentLog[], total: int, total_pages: int, current_page: int, page_size: int} 學員紀錄列表.
 	 */
-	public function get_list( array $where ): array {
-		$where_string = Base::get_where_sql( $where );
-		$logs         = \wp_cache_get( $where_string, $this->cache_key_group );
-		if ( $logs ) {
-			// @phpstan-ignore-next-line
-			return $logs;
+	public function get_list( array $where ): object {
+		$where_string = self::get_where_sql( $where );
+		$list_result  = \wp_cache_get( $where_string, $this->cache_key_group );
+		if ( $list_result ) {
+			/** @var object{list: StudentLog[], total: int, total_pages: int, current_page: int, page_size: int} $list_result */
+			return $list_result;
 		}
 
 		return $this->db_get_list( $where );
@@ -77,12 +82,17 @@ final class CRUD {
 	/**
 	 * 從 db 取得學員紀錄列表
 	 *
-	 * @param array<string, array<string>|string> $where 條件.
-	 * @return StudentLog[] 學員紀錄列表.
+	 * @param array{
+	 *  paged: int,
+	 *  posts_per_page: int,
+	 *  user_id: int,
+	 *  course_id: int,
+	 * } $where 條件.
+	 * @return object{list: StudentLog[], total: int, total_pages: int, current_page: int, page_size: int} 學員紀錄列表.
 	 */
-	private function db_get_list( array $where ): array {
+	private function db_get_list( array $where ): object {
 
-		$where_string = Base::get_where_sql( $where );
+		$where_string = self::get_where_sql( $where );
 
 		global $wpdb;
 		$result = $wpdb->get_results(
@@ -96,8 +106,30 @@ final class CRUD {
 		);
 
 		$logs = array_values(array_map(fn ( $item ) => StudentLog::instance($item), $result)   );
-		\wp_cache_set( $where_string, $logs, $this->cache_key_group );
-		return $logs;
+
+		$total = $wpdb->get_var(
+			\wp_unslash( // phpcs:ignore
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM %1$s %2$s',
+				$this->table_name,
+				self::get_where_sql( $where, false ),
+			)
+			)
+		);
+
+		/** @var object{list: StudentLog[], total: int, total_pages: int, current_page: int, page_size: int} $list_result  */
+		// @phpstan-ignore-next-line
+		$list_result = (object) [
+			'list'         => $logs,
+			'total'        => (int) $total,
+			'total_pages'  => (int) ceil( $total / $where['posts_per_page'] ),
+			'current_page' => (int) $where['paged'],
+			'page_size'    => (int) $where['posts_per_page'],
+		];
+
+		\wp_cache_set( $where_string, $list_result, $this->cache_key_group );
+
+		return $list_result;
 	}
 
 
@@ -232,5 +264,47 @@ final class CRUD {
 		unset( $schema['user_ip'] );
 		unset( $schema['created_at'] );
 		return $schema;
+	}
+
+	/**
+	 * 取得 where 語法
+	 * TODO 加入 wp-utils
+	 *
+	 * @param array{
+	 *  paged: int,
+	 *  posts_per_page: int,
+	 *  ...
+	 * } $where 條件
+	 * @param ?bool  $limit 是否要限制
+	 * @return string
+	 */
+	private static function get_where_sql( array $where, ?bool $limit = true ): string {
+
+		$paged          = isset( $where['paged'] ) ? (int) $where['paged'] : 1; // @phpstan-ignore-line
+		$posts_per_page = isset( $where['posts_per_page'] ) ? (int) $where['posts_per_page'] : 20; // @phpstan-ignore-line
+		$offset         = ( $paged - 1 ) * $posts_per_page;
+		unset( $where['paged'] );
+		unset( $where['posts_per_page'] );
+
+		if ( ! $where ) { // @phpstan-ignore-line
+			return '';
+		}
+		$where_arr = []; // @phpstan-ignore-line
+		foreach ($where as $key => $value) {
+			if (is_array($value)) {
+				$where_arr[] = "{$key} IN (" . implode(',', $value) . ')';
+			} else {
+				$where_arr[] = "{$key} = '{$value}'";
+			}
+		}
+
+		$order_by = ' ORDER BY created_at ASC, id ASC ';
+
+		$limit = " LIMIT {$offset}, {$posts_per_page}";
+		if (!$limit) {
+			$limit = '';
+		}
+
+		return ' WHERE ' . implode(' AND ', $where_arr) . $order_by . $limit;
 	}
 }

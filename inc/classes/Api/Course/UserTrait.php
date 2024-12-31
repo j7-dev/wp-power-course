@@ -23,23 +23,37 @@ trait UserTrait {
 	 * @param \WP_REST_Request<array<string, mixed>> $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @throws \Exception 缺少 user_id 或 course_id
 	 */
 	final public function get_courses_student_logs_callback( \WP_REST_Request $request ): \WP_REST_Response { // phpcs:ignore
-		$params = $request->get_query_params();
-		$params = WP::sanitize_text_field_deep( $params, false );
+		$where = $request->get_query_params();
+		/** @var array{paged: int, posts_per_page: int, user_id: int, course_id: int} $where */
+		$where = WP::sanitize_text_field_deep( $where, false );
 
-		$user_id   = $params['user_id'] ?? 0;
-		$course_id = $params['course_id'] ?? 0;
+		try {
+			if (!@$where['user_id'] || !@$where['course_id']) {
+				throw new \Exception('缺少 user_id 或 course_id');
+			}
 
-		$crud = StudentLogCRUD::instance();
-		$logs = $crud->get_list(
-			[
-				'user_id'   => $user_id,
-				'course_id' => $course_id,
-			]
+			$crud        = StudentLogCRUD::instance();
+			$list_result = $crud->get_list($where);
+
+			$response = new \WP_REST_Response($list_result->list);
+			$response->header( 'X-WP-Total', (string) $list_result->total );
+			$response->header( 'X-WP-TotalPages', (string) $list_result->total_pages );
+			$response->header( 'X-WP-CurrentPage', (string) $list_result->current_page );
+			$response->header( 'X-WP-PageSize', (string) $list_result->page_size );
+
+			return $response;
+		} catch (\Throwable $th) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'get_student_logs_failed',
+					'message' => $th->getMessage(),
+				],
+				400
 			);
-
-		return new \WP_REST_Response($logs);
+		}
 	}
 
 	/**

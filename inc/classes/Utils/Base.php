@@ -20,39 +20,6 @@ abstract class Base {
 	public const DEFAULT_IMAGE = 'https://placehold.co/800x600/1677ff/white?text=%3Cimg%20/%3E';
 	public const PRIMARY_COLOR = '#1677ff';
 
-
-	/**
-	 * 取得 where 語法
-	 * TODO 加入 wp-utils
-	 *
-	 * @param array<string, array<string>|string> $where 條件.
-	 * @return string
-	 */
-	public static function get_where_sql( array $where ): string {
-
-		$paged          = isset( $where['paged'] ) ? (int) $where['paged'] : 1;
-		$posts_per_page = isset( $where['posts_per_page'] ) ? (int) $where['posts_per_page'] : 20;
-		$offset         = ( $paged - 1 ) * $posts_per_page;
-		unset( $where['paged'] );
-		unset( $where['posts_per_page'] );
-
-		if ( ! $where ) {
-			return '';
-		}
-		$where_arr = [];
-		foreach ($where as $key => $value) {
-			if (is_array($value)) {
-				$where_arr[] = "{$key} IN (" . implode(',', $value) . ')';
-			} else {
-				$where_arr[] = "{$key} = '{$value}'";
-			}
-		}
-
-		$limit = " LIMIT {$offset}, {$posts_per_page}";
-
-		return ' WHERE ' . implode(' AND ', $where_arr) . $limit;
-	}
-
 	/**
 	 * 取得商品圖片
 	 *

@@ -6,6 +6,9 @@ export enum TriggerAt {
 	CHAPTER_ENTER = 'chapter_enter',
 	CHAPTER_FINISH = 'chapter_finish',
 	ORDER_CREATED = 'order_created', // 目前 email 沒有這個 trigger
+	CHAPTER_UNFINISHED = 'chapter_unfinished', // 目前 email 沒有這個 trigger
+	COURSE_REMOVED = 'course_removed', // 目前 email 沒有這個 trigger
+	UPDATE_STUDENT = 'update_student', // 目前 email 沒有這個 trigger
 }
 
 export type TTriggerAt = (typeof TriggerAt)[keyof typeof TriggerAt]
