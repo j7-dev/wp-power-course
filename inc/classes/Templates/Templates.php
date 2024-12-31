@@ -69,10 +69,11 @@ final class Templates {
 	 */
 	public function add_rewrite_rules(): void {
 		// get registered rewrite rules.
+		/** @var array<string,string> $rules */
 		$rules = \get_option( 'rewrite_rules', [] );
 
 		// @deprecated 為了兼容0.3以前版本的永久連結
-		$old_course_permalink_structure = \get_option('course_permalink_structure', '');
+		$old_course_permalink_structure = (string) \get_option('course_permalink_structure', '');
 		$old_course_regex               = '^' . $old_course_permalink_structure . '/(.+)/?$';
 		if ($old_course_permalink_structure) {
 			\add_rewrite_rule($old_course_regex, 'index.php?product=$matches[1]', 'top');
@@ -110,7 +111,7 @@ final class Templates {
 	 *
 	 * @param string|null $template Template.
 	 */
-	public function load_custom_template( $template ) {
+	public function load_custom_template( $template ): string|null {
 		// 使用自定義的模板
 		$items = [
 			[
@@ -123,9 +124,9 @@ final class Templates {
 		];
 
 		foreach ( $items as $item ) {
-			$key    = $item['key'];
-			$slug   = $item['slug'];
-			$slug_2 = $item['slug_2'];
+			$key    = $item['key']; // "classroom"
+			$slug   = (string) $item['slug']; // product_slug
+			$slug_2 = (int) $item['slug_2']; // chapter_id
 			$path   = $item['path'];
 
 			if ( $slug ) {
@@ -136,8 +137,14 @@ final class Templates {
 						\wp_safe_redirect( \home_url( '/404' ) );
 						exit;
 					}
+					/** @var \WP_Post $product_post */
+					$product = \wc_get_product( $product_post->ID );
+					if (!$product) {
+						\wp_safe_redirect( \home_url( '/404' ) );
+						exit;
+					}
 
-					$GLOBALS['product'] = \wc_get_product( $product_post->ID );
+					$GLOBALS['product'] = $product;
 
 					// 如果商品不是課程，則不要載入模板
 					$is_course_product = CourseUtils::is_course_product( $GLOBALS['product'] );
@@ -146,12 +153,14 @@ final class Templates {
 						return $template;
 					}
 
-					if ('classroom' === $key) {
+					if ('classroom' === $key) { // @phpstan-ignore-line
 						if ( $slug_2 ) {
 							$GLOBALS['chapter'] = \get_post( $slug_2);
 						} else {
+							/** @var array<int> $sub_chapter_ids */
 							$sub_chapter_ids = CourseUtils::get_sub_chapters( $GLOBALS['product'], true );
 							if (count($sub_chapter_ids) < 1) {
+								// TODO 沒有章節應該顯示空教室!?
 								\wp_safe_redirect( \home_url( '/404' ) );
 								exit;
 							} else {

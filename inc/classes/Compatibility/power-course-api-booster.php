@@ -39,7 +39,7 @@ final class ApiBooster {
 		// 檢查是否為 "/wp-json/{$namespace}" API 請求
 		$some_strpos = false;
 		foreach (self::$namespaces as $namespace) {
-			if (strpos($_SERVER['REQUEST_URI'], '/wp-json/' . $namespace) !== false) { // phpcs:ignore
+			if (strpos((string) $_SERVER['REQUEST_URI'], '/wp-json/' . $namespace) !== false) { // phpcs:ignore
 				$some_strpos = true;
 				break;
 			}

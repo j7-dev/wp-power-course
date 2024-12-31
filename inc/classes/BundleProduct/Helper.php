@@ -125,12 +125,12 @@ final class Helper {
 	 * @return array<string> 被綑綁的 product_ids
 	 */
 	public function get_product_ids(): array {
-		$id = $this->product->get_id();
-		/** @var array<string> $product_ids */
+		$id          = $this->product->get_id();
 		$product_ids = \get_post_meta( $id, self::INCLUDE_PRODUCT_IDS_META_KEY );
 		if (!is_array($product_ids)) {
 			$product_ids = [];
 		}
+		/** @var array<string> $unique_product_ids */
 		$unique_product_ids = array_unique( $product_ids );
 
 		// 確保不會因為重複的 meta_value，使得meta_key 不連續，導致在前端應該顯示為 array 的資料變成 object

@@ -31,6 +31,7 @@ final class General {
 	 */
 	public function __construct() {
 		foreach (self::$shortcodes as $shortcode) {
+			// @phpstan-ignore-next-line
 			\add_shortcode($shortcode, [ __CLASS__, "{$shortcode}_callback" ]);
 		}
 	}
@@ -38,7 +39,7 @@ final class General {
 	/**
 	 * 課程列表短碼 pc_courses callback
 	 *
-	 * @param array $params 短碼參數
+	 * @param array{status:array<string>,paginate:bool,limit:int,page:int,orderby:string,order:string,meta_key:string,meta_value:string,exclude_avl_courses:bool} $params 短碼參數
 	 * @return string
 	 */
 	public static function pc_courses_callback( array $params ): string {
@@ -81,6 +82,7 @@ final class General {
 			$args['exclude']     = $user_avl_course_ids;
 		}
 
+		/** @var object{total:int,max_num_pages:int,products:array<int,\WC_Product>} $results */
 		$results     = \wc_get_products( $args );
 		$total       = $results->total;
 		$total_pages = $results->max_num_pages;
@@ -96,22 +98,22 @@ final class General {
 			false
 			);
 
-		return $html;
+		return (string) $html;
 	}
 
 	/**
 	 * 我的課程短碼 pc_my_courses callback
 	 *
-	 * @param array $params 短碼參數
+	 * @param ?array{} $params 短碼參數
 	 * @return string
 	 */
-	public static function pc_my_courses_callback( array $params ): string {
+	public static function pc_my_courses_callback( ?array $params ): string {
 		$html = Plugin::get(
 			'my-account',
 			null,
 			false
 		);
 
-		return $html;
+		return (string) $html;
 	}
 }
