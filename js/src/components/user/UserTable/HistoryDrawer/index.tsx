@@ -20,11 +20,18 @@ export const defaultHistoryDrawerProps: THistoryDrawerProps = {
 const loadingItems = new Array(8).fill(null).map((_, index) => ({
 	dot: <LoadingOutlined />,
 	children: (
-		<div
-			className={
-				'h-[1.5rem] w-full mr-4 mb-1 bg-gray-100 rounded-[0.25rem] animate-pulse'
-			}
-		/>
+		<>
+			<div
+				className={
+					'h-[1.5rem] w-[20rem] mr-4 mb-1 bg-gray-100 rounded-[0.25rem] animate-pulse'
+				}
+			/>
+			<div
+				className={
+					'h-[1rem] w-28 mr-4 mb-1 bg-gray-100 rounded-[0.25rem] animate-pulse'
+				}
+			/>
+		</>
 	),
 }))
 
@@ -64,8 +71,12 @@ const index = () => {
 	const logs = data?.data || []
 	const total = data?.total || 1
 
-	const items = logs.map(({ log_type, title }) => {
-		return new TimelineItemAdapter(log_type as TimelineLogType, title).itemProps
+	const items = logs.map(({ log_type, title, created_at }) => {
+		return new TimelineItemAdapter(
+			log_type as TimelineLogType,
+			title,
+			created_at,
+		).itemProps
 	})
 
 	return (
@@ -74,7 +85,7 @@ const index = () => {
 			title={
 				<>
 					<p className="mt-0 mb-1">
-						課程紀錄 - {course_name} <sub>#{course_id}</sub>
+						學習紀錄 - {course_name} <sub>#{course_id}</sub>
 					</p>
 					<p className="my-0 text-sm text-gray-500">
 						<UserOutlined className="mr-2" /> {user_name} <sub>#{user_id}</sub>

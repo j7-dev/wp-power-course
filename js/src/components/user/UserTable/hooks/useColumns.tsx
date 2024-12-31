@@ -1,10 +1,11 @@
 import React from 'react'
-import { TableProps, Typography } from 'antd'
+import { TableProps, Typography, Button } from 'antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { UserName } from '@/components/user'
 import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
 import { useSetAtom } from 'jotai'
 import { historyDrawerAtom } from '../atom'
+import { FieldTimeOutlined } from '@ant-design/icons'
 
 type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
@@ -31,7 +32,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 					({ id: course_id, name: course_name, expire_date }) => (
 						<div
 							key={course_id}
-							className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1"
+							className="grid grid-cols-[1fr_6rem_4rem_12rem] gap-1 my-1"
 						>
 							<div>
 								<Text
@@ -59,6 +60,30 @@ const useColumns = (params?: TUseColumnsParams) => {
 									<sub className="text-gray-500">#{course_id}</sub>{' '}
 									{course_name || '未知的課程名稱'}
 								</Text>
+							</div>
+
+							<div className="text-center">
+								<Button
+									className="text-xs"
+									color="primary"
+									size="small"
+									variant="filled"
+									icon={<FieldTimeOutlined />}
+									iconPosition="end"
+									onClick={() => {
+										setHistoryDrawerProps({
+											user_id,
+											user_name: display_name,
+											course_id,
+											course_name,
+											drawerProps: {
+												open: true,
+											},
+										})
+									}}
+								>
+									學習紀錄
+								</Button>
 							</div>
 
 							<div className="text-center">

@@ -8,6 +8,7 @@ import {
 	UserSwitchOutlined,
 	RocketOutlined,
 	CloseCircleOutlined,
+	CalendarOutlined,
 } from '@ant-design/icons'
 import { TimelineLogType, TimelineItemConfig } from '../types'
 import { TimelineItemProps } from 'antd'
@@ -59,6 +60,7 @@ export class TimelineItemAdapter {
 	constructor(
 		public readonly log_type: TimelineLogType,
 		public readonly title: string,
+		public readonly created_at: string,
 	) {
 		this.validateLogType(log_type)
 	}
@@ -67,7 +69,12 @@ export class TimelineItemAdapter {
 		return {
 			color: this.color,
 			dot: this.icon,
-			children: this.title,
+			children: (
+				<>
+					<p className="mt-0 mb-1">{this.title}</p>
+					<p className="my-0 text-xs text-gray-500">{this.created_at}</p>
+				</>
+			),
 		}
 	}
 
