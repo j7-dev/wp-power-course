@@ -27,6 +27,7 @@ final class ApiOptimize {
 	 * 負責將 power-course-api-booster.php 移動到 mu-plugins 目錄
 	 *
 	 * @return void
+	 * @throws \Exception 如果檔案操作失敗
 	 */
 	public static function move_file(): void {
 		// 取得 mu-plugins 目錄路徑
@@ -50,16 +51,16 @@ final class ApiOptimize {
 				return;
 			}
 
-			// 複製文件（如果目標文件已存在會覆蓋）
+			// 如果目標檔案存在，先嘗試刪除
+			if (file_exists($target_file)) {
+				if (!unlink($target_file)) {
+					throw new \Exception('無法刪除現有檔案');
+				}
+			}
+
+			// 複製新檔案
 			if (!copy($source_file, $target_file)) {
-				\J7\WpUtils\Classes\ErrorLog::info(
-					[
-						'source' => $source_file,
-						'target' => $target_file,
-					],
-					'文件複製失敗'
-					);
-				return;
+				throw new \Exception('檔案複製失敗');
 			}
 		} catch (\Exception $e) {
 			\J7\WpUtils\Classes\ErrorLog::info(
@@ -68,8 +69,8 @@ final class ApiOptimize {
 					'source'  => $source_file,
 					'target'  => $target_file,
 				],
-				'複製文件時發生錯誤',
-				);
+				'檔案操作失敗'
+			);
 			return;
 		}
 	}
