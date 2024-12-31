@@ -49,7 +49,11 @@ const WatchStatusTagComponent = ({
 	const color = getColor(expireDate)
 	const label = getLabel(expireDate)
 
-	return <Tag color={color}>{label}</Tag>
+	return (
+		<Tag color={color} bordered={false}>
+			{label}
+		</Tag>
+	)
 }
 
 export const WatchStatusTag = memo(WatchStatusTagComponent)
