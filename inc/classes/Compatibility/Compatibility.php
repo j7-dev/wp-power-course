@@ -12,6 +12,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\AbstractTable;
 
+
 /**
  * Class Compatibility
  */
@@ -65,6 +66,9 @@ final class Compatibility {
 
 		// 判斷是否已經有 wp_pc_email_records 這張 table，沒有就建立
 		AbstractTable::create_email_records_table();
+
+		// 判斷是否已經有 wp_pc_student_logs 這張 table，沒有就建立
+		AbstractTable::create_student_logs_table();
 
 		// 將 table course_id 重新命名為 post_id
 		self::alter_course_table_column();
@@ -127,13 +131,18 @@ final class Compatibility {
 	private static function alter_course_table_column(): void {
 		global $wpdb;
 
-		// 取得表格名稱前綴
 		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
 
-		// 取得欄位的資料類型
-		$column_info = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'course_id'"); //phpcs:ignore
+		// 先檢查 post_id 欄位是否已存在
+		$post_id_exists = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'post_id'"); //phpcs:ignore
+		if ($post_id_exists) {
+			// 如果 post_id 已存在，則不需要進行轉換
+			return;
+		}
+
+		// 檢查 course_id 欄位是否存在
+		$column_info = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'course_id'");//phpcs:ignore
 		if (!$column_info) {
-			// 檢查如果 course_id 欄位不存在，則不執行
 			return;
 		}
 
@@ -147,8 +156,6 @@ final class Compatibility {
 
 		if ($result === false) {
 			error_log('無法重新命名欄位: ' . $wpdb->last_error);
-		} else {
-			error_log('欄位重新命名成功');
 		}
 	}
 

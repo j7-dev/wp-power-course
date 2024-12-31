@@ -93,7 +93,7 @@ final class Bootstrap {
 			$is_course_product = CourseUtils::is_course_product( $product_id );
 
 			// 是否為銷售方案
-			$is_bundle_product = ( Helper::instance( $product_id ) )->is_bundle_product;
+			$is_bundle_product = ( Helper::instance( $product_id ) )?->is_bundle_product;
 
 			// 是否有綁開課權限
 			$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true );

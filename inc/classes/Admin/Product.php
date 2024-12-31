@@ -36,9 +36,9 @@ final class Product {
 	/**
 	 * Add product type options
 	 *
-	 * @param array $product_type_options - Product type options
+	 * @param array{string:array{id:string,wrapper_class:string,label:string,description:string,default:string}} $product_type_options - Product type options
 	 *
-	 * @return array
+	 * @return array{string:array{id:string,wrapper_class:string,label:string,description:string,default:string}}
 	 */
 	public static function add_product_type_options( $product_type_options ): array {
 
@@ -75,10 +75,10 @@ final class Product {
 	/**
 	 * Custom display post states
 	 *
-	 * @param array    $post_states - Post states
-	 * @param \WP_Post $post - Post object
+	 * @param array{string:string} $post_states - Post states
+	 * @param \WP_Post             $post - Post object
 	 *
-	 * @return array
+	 * @return array{string:string}
 	 */
 	public static function custom_display_post_states( array $post_states, $post ): array {
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
@@ -94,10 +94,10 @@ final class Product {
 	/**
 	 * Modify list row actions
 	 *
-	 * @param array    $actions - Actions
-	 * @param \WP_Post $post - Post object
+	 * @param array{'inline hide-if-no-js':string,trash:string, edit:string} $actions - Actions
+	 * @param \WP_Post                                                       $post - Post object
 	 *
-	 * @return array
+	 * @return array{edit:string}
 	 */
 	public static function modify_list_row_actions( array $actions, \WP_Post $post ): array {
 
@@ -110,28 +110,6 @@ final class Product {
 			\admin_url("admin.php?page=power-course#/courses/edit/{$post->ID}")
 			);
 		}
-
-		// 因為已經把 BundleProduct 排除後台 wp-admin 顯示了 所以不需要這個了，參考 J7\PowerCourse\Admin\Product\Query::exclude_bundle_product
-		// if (BundleProduct::is_bundle_product( $post->ID ) ) {
-		// $course_posts = get_posts(
-		// [
-		// 'post_type'   => 'product',
-		// 'numberposts' => -1,
-		// 'meta_key'    => 'bundle_ids',
-		// 'meta_value'  => $post->ID,
-		// ]
-		// );
-
-		// if ($course_posts) {
-		// $course_post     = reset($course_posts);
-		// $actions['view'] = sprintf(
-		// *html*/'<a href="%s" rel="bookmark" target="_blank" aria-label="檢視〈商品〉">檢視</a>',
-		// \get_the_permalink($course_post)
-		// );
-		// } else {
-		// unset($actions['view']);
-		// }
-		// }
 
 		return $actions;
 	}

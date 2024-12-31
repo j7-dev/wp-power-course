@@ -8,19 +8,9 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\Api\Course;
 
-use J7\WpUtils\Classes\ApiBase;
-use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
-use J7\PowerCourse\Utils\Base;
-use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
-use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
-use J7\PowerCourse\Resources\Course\Limit;
-use J7\PowerCourse\BundleProduct\Helper;
+use J7\PowerCourse\Resources\StudentLog\CRUD as StudentLogCRUD;
 
 /**
  * Trait UserTrait
@@ -30,24 +20,40 @@ trait UserTrait {
 	/**
 	 * 取得學員課程紀錄
 	 *
-	 * @param \WP_REST_Request
+	 * @param \WP_REST_Request<array<string, mixed>> $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @throws \Exception 缺少 user_id 或 course_id
 	 */
-	final public function get_courses_student_history_callback( \WP_REST_Request $request ): \WP_REST_Response {
-		$params = $request->get_query_params();
-		$params = WP::sanitize_text_field_deep( $params, false );
+	final public function get_courses_student_logs_callback( \WP_REST_Request $request ): \WP_REST_Response { // phpcs:ignore
+		$where = $request->get_query_params();
+		/** @var array{paged: int, posts_per_page: int, user_id: int, course_id: int} $where */
+		$where = WP::sanitize_text_field_deep( $where, false );
 
-		$user_id   = $params['user_id'] ?? 0;
-		$course_id = $params['course_id'] ?? 0;
+		try {
+			if (!@$where['user_id'] || !@$where['course_id']) {
+				throw new \Exception('缺少 user_id 或 course_id');
+			}
 
-		return new \WP_REST_Response(
-			[
-				'code'    => 'get_student_history_success',
-				'message' => '取得學員課程紀錄成功',
-			],
-			200
-		);
+			$crud        = StudentLogCRUD::instance();
+			$list_result = $crud->get_list($where);
+
+			$response = new \WP_REST_Response($list_result->list);
+			$response->header( 'X-WP-Total', (string) $list_result->total );
+			$response->header( 'X-WP-TotalPages', (string) $list_result->total_pages );
+			$response->header( 'X-WP-CurrentPage', (string) $list_result->current_page );
+			$response->header( 'X-WP-PageSize', (string) $list_result->page_size );
+
+			return $response;
+		} catch (\Throwable $th) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'get_student_logs_failed',
+					'message' => $th->getMessage(),
+				],
+				400
+			);
+		}
 	}
 
 	/**
@@ -56,6 +62,7 @@ trait UserTrait {
 	 * @param \WP_REST_Request<array{'id': string}> $request Request.
 	 *
 	 * @return \WP_REST_Response
+	 * @throws \Exception 缺少 user_ids 或 course_ids
 	 */
 	public function post_courses_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
@@ -65,33 +72,41 @@ trait UserTrait {
 		$course_ids  = $body_params['course_ids'] ?? [];
 		$expire_date = $body_params['expire_date'] ?? 0;
 
-		if (empty($user_ids) || empty($course_ids)) {
+		try {
+			if (empty($user_ids) || empty($course_ids)) {
+				throw new \Exception('新增學員失敗，缺少 user_ids 或 course_ids');
+			}
+
+			foreach ($course_ids as $course_id) {
+				foreach ($user_ids as  $user_id) {
+					\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date, null );
+				}
+			}
+
+			return new \WP_REST_Response(
+				[
+					'code'    => 'add_students_success',
+					'message' => '新增學員成功',
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+					],
+				],
+				200
+			);
+		} catch (\Throwable $th) {
 			return new \WP_REST_Response(
 				[
 					'code'    => 'add_students_failed',
-					'message' => '新增學員失敗，缺少 user_ids 或 course_ids',
+					'message' => $th->getMessage(),
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+					],
 				],
 				400
 			);
 		}
-
-		foreach ($course_ids as $course_id) {
-			foreach ($user_ids as  $user_id) {
-				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date );
-			}
-		}
-
-		return new \WP_REST_Response(
-			[
-				'code'    => 'add_students_success',
-				'message' => '新增學員成功',
-				'data'    => [
-					'user_ids'   => \implode(',', $user_ids),
-					'course_ids' => \implode(',', $course_ids),
-				],
-			],
-			200
-		);
 	}
 
 	/**
@@ -105,31 +120,42 @@ trait UserTrait {
 		$body_params = $request->get_body_params();
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 		$user_ids    = $body_params['user_ids'] ?? [];
-		$timestamp   = $body_params['timestamp'] ?? 0; // 一般為 10 位數字，如果是0就是無期限
+		$timestamp   = (int) ( $body_params['timestamp'] ?? 0 ); // 一般為 10 位數字，如果是0就是無期限 //TODO 可能會跟隨訂閱!?
 		$course_ids  = $body_params['course_ids'] ?? [];
 
-		$success = true;
-		foreach ($course_ids as $course_id) {
-			foreach ($user_ids as  $user_id) {
-				$success = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $timestamp );
-				if (false === $success ) {
-					break;
+		try {
+			foreach ($course_ids as $course_id) {
+				foreach ($user_ids as  $user_id) {
+					\do_action(LifeCycle::AFTER_UPDATE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id, $timestamp);
 				}
 			}
-		}
 
-		return new \WP_REST_Response(
-			[
-				'code'    => $success ? 'update_students_success' : 'update_students_failed',
-				'message' => $success ? '批量調整觀看期限成功' : '批量調整觀看期限失敗',
-				'data'    => [
-					'user_ids'   => \implode(',', $user_ids),
-					'course_ids' => \implode(',', $course_ids),
-					'timestamp'  => $timestamp,
+			return new \WP_REST_Response(
+				[
+					'code'    => 'update_students_success',
+					'message' => '批量調整觀看期限成功',
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+						'timestamp'  => $timestamp,
+					],
 				],
-			],
-			$success ? 200 : 400
-		);
+				200
+			);
+		} catch (\Throwable $th) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'update_students_failed',
+					'message' => $th->getMessage(),
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+						'timestamp'  => $timestamp,
+					],
+				],
+				400
+			);
+		}
 	}
 
 
@@ -146,30 +172,36 @@ trait UserTrait {
 		$user_ids    = $body_params['user_ids'] ?? [];
 		$course_ids  = $body_params['course_ids'] ?? [];
 
-		$success = true;
-		foreach ($course_ids as $course_id) {
-			foreach ($user_ids as $user_id) {
-				$success1 = \delete_user_meta( $user_id, 'avl_course_ids', $course_id );
-				// 移除上課權限時，也把 avl_course_meta 相關資料刪除
-				$success2 = AVLCourseMeta::delete( (int) $course_id, (int) $user_id );
-				\do_action(LifeCycle::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id);
-
-				if (false === $success1 || false === $success2) {
-					$success = false;
-					break;
+		try {
+			foreach ($course_ids as $course_id) {
+				foreach ($user_ids as $user_id) {
+					\do_action(LifeCycle::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id);
 				}
 			}
-		}
-		return new \WP_REST_Response(
-			[
-				'code'    => $success ? 'remove_students_success' : 'remove_students_failed',
-				'message' => $success ? '移除學員成功' : '移���學員失敗',
-				'data'    => [
-					'user_ids'   => \implode(',', $user_ids),
-					'course_ids' => \implode(',', $course_ids),
+
+			return new \WP_REST_Response(
+				[
+					'code'    => 'remove_students_success',
+					'message' => '移除學員成功',
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+					],
 				],
-			],
-			$success ? 200 : 400
-		);
+				200
+			);
+		} catch (\Throwable $th) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'remove_students_failed',
+					'message' => $th->getMessage(),
+					'data'    => [
+						'user_ids'   => \implode(',', $user_ids),
+						'course_ids' => \implode(',', $course_ids),
+					],
+				],
+				400
+			);
+		}
 	}
 }

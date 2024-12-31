@@ -25,6 +25,7 @@ final class Ajax {
 	/**
 	 * Ajax Actions
 	 *
+	 * @deprecated 2024-12-30
 	 * @var string[]
 	 */
 	public $actions = [ 'finish_chapter' ];
@@ -112,6 +113,7 @@ final class Ajax {
 	/**
 	 * Finish Chapter Callback
 	 *
+	 * @deprecated 2024-12-30
 	 * @return void
 	 */
 	public function finish_chapter_callback(): void {

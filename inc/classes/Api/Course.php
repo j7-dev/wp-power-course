@@ -79,10 +79,10 @@ final class Course extends ApiBase {
 			'method'   => 'get',
 		],
 		// ▼ User 相關，放在 UserTrait
-		// [
-		// 'endpoint' => 'courses/student-history',
-		// 'method'   => 'get',
-		// ],
+		[
+			'endpoint' => 'courses/student-logs',
+			'method'   => 'get',
+		],
 		[
 			'endpoint' => 'courses/add-students',
 			'method'   => 'post',

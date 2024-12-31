@@ -21,41 +21,10 @@ final class At {
 
 	const AS_GROUP = 'power_email';
 
-	const SEND_USERS_HOOK            = 'power_email_send_users'; // 寄給用戶的 AS hook
-	const SEND_COURSE_GRANTED_HOOK   = 'power_email_send_course_granted'; // 開通課程權限後寄送的 AS hook
-	const SEND_COURSE_LAUNCH_HOOK    = 'power_email_send_course_launch'; // 課程開課時寄送的 AS hook
-	const SEND_CHAPTER_ENTER_HOOK    = 'power_email_send_chapter_enter'; // 進入單元時寄送的 AS hook
-	const SEND_CHAPTER_FINISHED_HOOK = 'power_email_send_chapter_finish'; // 完成單元時寄送的 AS hook
+	const SEND_USERS_HOOK = 'power_email_send_users'; // 直接寄給用戶的 AS hook
 
-	/**
-	 * 觸發發信時機點
-	 *
-	 * @var array<string, array<string, string>>
-	 * {slug}_at 為達成條件的時間點
-	 * {slug}_sent_at 為發信時間點，如果沒有代表沒發過
-	 */
-	public $trigger_at = [
-		'course_granted' => [
-			'label' => '開通課程權限後',
-			'slug'  => 'course_granted',
-			'hook'  => self::SEND_COURSE_GRANTED_HOOK,
-		],
-		'course_launch' => [
-			'label' => '課程開課時',
-			'slug'  => 'course_launch',
-			'hook'  => self::SEND_COURSE_LAUNCH_HOOK,
-		],
-		'chapter_enter' => [
-			'label' => '進入單元時',
-			'slug'  => 'chapter_enter',
-			'hook'  => self::SEND_CHAPTER_ENTER_HOOK,
-		],
-		'chapter_finish' => [
-			'label' => '完成單元時',
-			'slug'  => 'chapter_finish',
-			'hook'  => self::SEND_CHAPTER_FINISHED_HOOK,
-		],
-	];
+
+
 
 	/**
 	 * Constructor
@@ -64,22 +33,22 @@ final class At {
 
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
-		\add_action( self::SEND_COURSE_GRANTED_HOOK, [ $this, 'send_course_email' ], 10 );
+		\add_action( ( new AtHelper(AtHelper::COURSE_GRANTED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 開通課程權限後 ----//
 
 		// ---- 課程開課時 ----//
-		\add_action( CourseLifeCycle::COURSE_LAUNCH_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
-		\add_action(self::SEND_COURSE_LAUNCH_HOOK, [ $this, 'send_course_email' ], 10 );
+		\add_action( CourseLifeCycle::COURSE_LAUNCHED_ACTION, [ $this, 'course_launch_email' ], 20, 2 );
+		\add_action( ( new AtHelper(AtHelper::COURSE_LAUNCHED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 課程開課時 ----//
 
 		// ---- 進入單元時 ----//
-		\add_action( ChapterLifeCycle::CHAPTER_ENTER_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
-		\add_action( self::SEND_CHAPTER_ENTER_HOOK, [ $this, 'send_course_email' ], 10 );
+		\add_action( ChapterLifeCycle::CHAPTER_ENTERED_ACTION, [ $this, 'chapter_enter_email' ], 10, 2 );
+		\add_action( ( new AtHelper(AtHelper::CHAPTER_ENTERED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 進入單元時 ----//
 
 		// ---- 完成單元時 ----//
 		\add_action( ChapterLifeCycle::CHAPTER_FINISHED_ACTION, [ $this, 'chapter_finish_email' ], 10, 3 );
-		\add_action( self::SEND_CHAPTER_FINISHED_HOOK, [ $this, 'send_course_email' ], 10 );
+		\add_action( ( new AtHelper(AtHelper::CHAPTER_FINISHED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 完成單元時 ----//
 
 		\add_filter( 'power_email_can_send', [ $this, 'trigger_condition' ], 20, 5 );
@@ -139,7 +108,15 @@ final class At {
 		$post_id = $chapter_id ? $chapter_id : $course_id;
 		$is_sent = $email->is_sent($post_id, $user_id, (int) $email->id);
 
-		return $is_sent ? false : $email->condition->can_trigger($user_id, $course_id, $chapter_id);
+		if ( $is_sent ) {
+			return false;
+		}
+
+		if ($email->condition instanceof Condition) {
+			return $email->condition->can_trigger($user_id, $course_id, $chapter_id);
+		}
+
+		return true;
 	}
 
 
@@ -147,8 +124,8 @@ final class At {
 	 * Send users callback
 	 * 指定用戶的發信
 	 *
-	 * @param array $email_ids 電子郵件 ID 陣列
-	 * @param array $user_ids 使用者 ID 陣列
+	 * @param array<numeric-string|int> $email_ids 電子郵件 ID 陣列
+	 * @param array<numeric-string|int> $user_ids 使用者 ID 陣列
 	 */
 	public function send_users_callback( array $email_ids, array $user_ids ): void {
 		foreach ( $email_ids as $email_id ) {
@@ -226,14 +203,14 @@ final class At {
 		$email->send_course_email(  $args['user_id'], $args['course_id'], $args['chapter_id'] ?? 0 );
 	}
 
-
 	/**
 	 * 找出觸發時機的 Email，排程
 	 *
-	 * @param string $context 觸發條件
-	 * @param array  $args 參數
+	 * @param string                                                 $context 觸發條件
+	 * @param array{user_id: int, course_id: int, chapter_id?: ?int} $args 參數
 	 */
-	private function schedule_email( string $context, ?array $args ): void {
+	private function schedule_email( string $context, array $args ): void {
+		$at_helper = new AtHelper($context);
 		$email_ids = \get_posts(
 			[
 				'post_type'      => Email\CPT::POST_TYPE,
@@ -241,11 +218,11 @@ final class At {
 				'post_status'    => 'publish',
 				'fields'         => 'ids',
 				'meta_key'       => 'trigger_at',
-				'meta_value'     => $this->trigger_at[ $context ]['slug'],
+				'meta_value'     => $at_helper->slug,
 			]
 			);
 
-		$hook = $this->trigger_at[ $context ]['hook'];
+		$hook = $at_helper->hook;
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
@@ -268,7 +245,7 @@ final class At {
 				'context'  => $context,
 			];
 
-			$args = \wp_parse_args($args, $default_args   );
+			$args = \wp_parse_args($args, $default_args );
 
 			if (0 === $timestamp) { // 立即寄送
 				\as_enqueue_async_action( $hook, [ $args ], self::AS_GROUP);

@@ -92,7 +92,6 @@ abstract class AbstractTable {
 		}
 	}
 
-
 	/**
 	 * 創建 email records table
 	 *
@@ -125,6 +124,49 @@ abstract class AbstractTable {
 										KEY post_id (post_id),
 										KEY user_id (user_id),
 										KEY email_id (email_id)
+								) $charset_collate;";
+
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+			$result = \dbDelta($sql);
+		} catch (\Throwable $th) {
+			throw new \Exception($th->getMessage());
+		}
+	}
+
+
+	/**
+	 * 創建學員課程紀錄 table
+	 *
+	 * @return void
+	 * @throws \Exception Exception.
+	 */
+	public static function create_student_logs_table(): void {
+		try {
+			global $wpdb;
+			$table_name      = $wpdb->prefix . Plugin::STUDENT_LOGS_TABLE_NAME;
+			$is_table_exists = WP::is_table_exists( $table_name );
+			if ( $is_table_exists ) {
+				return;
+			}
+
+			$wpdb->student_logs = $table_name;
+
+			$charset_collate = $wpdb->get_charset_collate();
+
+			$sql = "CREATE TABLE $table_name (
+										id bigint(20) NOT NULL AUTO_INCREMENT,
+										user_id bigint(20) NOT NULL,
+										course_id bigint(20) NOT NULL,
+										chapter_id bigint(20) DEFAULT NULL,
+										log_type varchar(20) DEFAULT NULL,
+										title varchar(255) DEFAULT NULL,
+										content longtext DEFAULT NULL,
+										user_ip varchar(100) DEFAULT NULL,
+										created_at datetime DEFAULT NULL,
+										PRIMARY KEY  (id),
+										KEY user_id (user_id),
+										KEY course_id (course_id),
+										KEY chapter_id (chapter_id)
 								) $charset_collate;";
 
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';

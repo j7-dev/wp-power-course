@@ -1,26 +1,30 @@
 import {
 	PlusCircleOutlined,
-	InfoCircleOutlined,
+	UserAddOutlined,
 	PlayCircleOutlined,
 	CheckCircleOutlined,
 	CheckCircleFilled,
+	UserDeleteOutlined,
+	UserSwitchOutlined,
+	RocketOutlined,
+	CloseCircleOutlined,
 } from '@ant-design/icons'
-import { TimelineSlug, TimelineItemConfig } from '../types'
+import { TimelineLogType, TimelineItemConfig } from '../types'
 import { TimelineItemProps } from 'antd'
 import { TriggerAt } from '@/components/emails/SendCondition/enum'
 
-const timelineItemMapper: Record<TimelineSlug, TimelineItemConfig> = {
-	[TriggerAt.ORDER_CREATED]: {
-		color: '#91caff',
-		icon: <PlusCircleOutlined />,
-	},
+const timelineItemMapper: Record<TimelineLogType, TimelineItemConfig> = {
 	[TriggerAt.COURSE_GRANTED]: {
 		color: '#91caff',
-		icon: <InfoCircleOutlined />,
+		icon: <UserAddOutlined />,
+	},
+	[TriggerAt.COURSE_FINISH]: {
+		color: '#0958d9',
+		icon: <CheckCircleFilled />,
 	},
 	[TriggerAt.COURSE_LAUNCH]: {
-		color: '#0958d9', // TODO
-		icon: <CheckCircleFilled />, // TODO
+		color: '#f759ab',
+		icon: <RocketOutlined />,
 	},
 	[TriggerAt.CHAPTER_ENTER]: {
 		color: '#4096ff',
@@ -30,42 +34,54 @@ const timelineItemMapper: Record<TimelineSlug, TimelineItemConfig> = {
 		color: '#0958d9',
 		icon: <CheckCircleOutlined />,
 	},
-	[TriggerAt.COURSE_FINISH]: {
-		color: '#0958d9',
-		icon: <CheckCircleFilled />,
+	[TriggerAt.ORDER_CREATED]: {
+		color: '#91caff',
+		icon: <PlusCircleOutlined />,
+	},
+	[TriggerAt.CHAPTER_UNFINISHED]: {
+		color: '#ffa940',
+		icon: <CloseCircleOutlined />,
+	},
+	[TriggerAt.COURSE_REMOVED]: {
+		color: '#ff4d4f',
+		icon: <UserDeleteOutlined />,
+	},
+	[TriggerAt.UPDATE_STUDENT]: {
+		color: '#9254de',
+		icon: <UserSwitchOutlined />,
 	},
 }
 
 export class TimelineItemAdapter {
-	private static readonly mapper: Record<TimelineSlug, TimelineItemConfig> =
+	private static readonly mapper: Record<TimelineLogType, TimelineItemConfig> =
 		timelineItemMapper
 
 	constructor(
-		public readonly slug: TimelineSlug,
-		public readonly label: string,
+		public readonly log_type: TimelineLogType,
+		public readonly title: string,
 	) {
-		this.validateSlug(slug)
+		this.validateLogType(log_type)
 	}
 
 	public get itemProps(): TimelineItemProps {
 		return {
 			color: this.color,
 			dot: this.icon,
-			children: this.label,
+			children: this.title,
 		}
 	}
 
 	get color(): string {
-		return TimelineItemAdapter.mapper[this.slug].color
+		return TimelineItemAdapter.mapper?.[this.log_type]?.color
 	}
 
 	get icon(): React.ReactNode {
-		return TimelineItemAdapter.mapper[this.slug].icon
+		return TimelineItemAdapter.mapper?.[this.log_type]?.icon
 	}
 
-	private validateSlug(slug: TimelineSlug): void {
-		if (!TimelineItemAdapter.mapper[slug]) {
-			throw new Error(`Invalid timeline slug: ${slug}`)
+	private validateLogType(log_type: TimelineLogType): void {
+		if (!TimelineItemAdapter.mapper?.[log_type]) {
+			console.error(`Invalid timeline log_type: ${log_type}`)
 		}
 	}
 }

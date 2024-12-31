@@ -57,10 +57,11 @@ abstract class Comment {
 			}
 
 			// 檢查用戶是否評論過此商品
-			$has_reviewed = get_comments(
+			/** @var array<int, \WP_Comment> $has_reviewed */
+			$has_reviewed = \get_comments(
 				[
 					'post_id' => $product_id,
-					'user_id' => get_current_user_id(),
+					'user_id' => \get_current_user_id(),
 					'type'    => 'review',
 				]
 			);
@@ -68,11 +69,6 @@ abstract class Comment {
 			if ($has_reviewed) {
 				return '您已評價過此課程，無法再次評價';
 			}
-
-			$has_reviewed    = count( $has_reviewed ) > 0;
-			$reviews_allowed = $reviews_allowed && $is_avl && !$has_reviewed;
-
-			return $reviews_allowed;
 		}
 
 		return true;

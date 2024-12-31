@@ -11,7 +11,6 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 
 
@@ -83,6 +82,7 @@ abstract class Course {
 		$chapters = \get_children( $args );
 
 		$sub_chapters = [];
+		/** @var \WP_Post $chapter */
 		foreach ( $chapters as $chapter ) :
 			$chapter_id = $return_ids ? $chapter : $chapter->ID;
 			$sub_args   = [
@@ -101,6 +101,7 @@ abstract class Course {
 			$sub_chapters = array_merge( $sub_chapters, [ $chapter_id ], \get_children( $sub_args ) );
 		endforeach;
 
+		/** @var array<int|\WP_Post> $sub_chapters */
 		return $sub_chapters;
 	}
 
@@ -204,11 +205,20 @@ abstract class Course {
 			return 0;
 		}
 
+		$cache_key = "pid_{$product_id}_uid_{$user_id}";
+		$progress  = \wp_cache_get( $cache_key, 'pc_course_progress' );
+		if (false !== $progress) {
+			return (float) $progress;
+		}
+
 		$sub_chapters_count          = count(self::get_sub_chapters($product, true));
 		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, return_ids: true));
 
 		$progress = $sub_chapters_count ? round(( $finished_sub_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
 		$progress = min( 100, $progress );
+
+		\wp_cache_set( $cache_key, $progress, 'pc_course_progress' );
+
 		return $progress;
 	}
 
@@ -216,13 +226,14 @@ abstract class Course {
 	 * 取得用戶已經上完的課程 ids
 	 *
 	 * @param int $user_id 用戶 id
-	 * @return array<int|string> 課程 ids
+	 * @return array<int|numeric-string> 課程 ids
 	 */
 	public static function get_finished_course_ids( int $user_id ): array {
-		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids') ?: [];
+		$avl_course_ids = \get_user_meta($user_id, 'avl_course_ids');
+		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
 
 		$avl_course_ids = array_filter($avl_course_ids, fn( $course_id ) => self::get_course_progress( (int) $course_id, $user_id) === (float) 100 );
-
+		/** @var array<int|numeric-string> $avl_course_ids */
 		return $avl_course_ids;
 	}
 
