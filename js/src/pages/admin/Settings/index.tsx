@@ -2,10 +2,10 @@ import { memo } from 'react'
 import { Form, Button, Tabs, TabsProps } from 'antd'
 import useOptions from './hooks/useOptions'
 import useSave from './hooks/useSave'
-
 import Bunny from './Bunny'
 import General from './General'
 import Appearance from './Appearance'
+import Lab from './Lab'
 
 const items: TabsProps['items'] = [
 	{
@@ -22,6 +22,18 @@ const items: TabsProps['items'] = [
 		key: 'bunny',
 		label: 'Bunny 整合',
 		children: <Bunny />,
+	},
+	{
+		key: 'lab',
+		label: (
+			<div className="flex items-end">
+				實驗性功能
+				<div className="bg-orange-400 text-white rounded-xl px-2 py-0 inline-block ml-2 text-[0.625rem]">
+					beta
+				</div>
+			</div>
+		),
+		children: <Lab />,
 	},
 ]
 
