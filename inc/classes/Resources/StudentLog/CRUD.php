@@ -275,10 +275,10 @@ final class CRUD {
 	 *  posts_per_page: int,
 	 *  ...
 	 * } $where 條件
-	 * @param ?bool  $limit 是否要限制
+	 * @param ?bool  $need_limit 是否要限制
 	 * @return string
 	 */
-	private static function get_where_sql( array $where, ?bool $limit = true ): string {
+	private static function get_where_sql( array $where, ?bool $need_limit = true ): string {
 
 		$paged          = isset( $where['paged'] ) ? (int) $where['paged'] : 1; // @phpstan-ignore-line
 		$posts_per_page = isset( $where['posts_per_page'] ) ? (int) $where['posts_per_page'] : 20; // @phpstan-ignore-line
@@ -301,7 +301,7 @@ final class CRUD {
 		$order_by = ' ORDER BY created_at ASC, id ASC ';
 
 		$limit = " LIMIT {$offset}, {$posts_per_page}";
-		if (!$limit) {
+		if (!$need_limit) {
 			$limit = '';
 		}
 

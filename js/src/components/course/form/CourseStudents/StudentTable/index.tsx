@@ -20,6 +20,7 @@ import {
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
 import AddOtherCourse from '../AddOtherCourse'
+import HistoryDrawer from '@/components/user/UserTable/HistoryDrawer'
 
 const StudentTable = () => {
 	const apiUrl = useApiUrl()
@@ -189,6 +190,7 @@ const StudentTable = () => {
 					...getDefaultPaginationProps({ label: '學員' }),
 				}}
 			/>
+			<HistoryDrawer />
 		</>
 	)
 }

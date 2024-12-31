@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import { Drawer, Timeline, Empty, Pagination, PaginationProps } from 'antd'
 import { useAtom } from 'jotai'
 import { historyDrawerAtom } from '../atom'
@@ -38,7 +38,7 @@ const index = () => {
 		pageSize: 20,
 	})
 
-	const { data, isLoading, isFetching } = useList<TStudentLog>({
+	const { data, isFetching } = useList<TStudentLog>({
 		resource: 'courses/student-logs',
 		filters: [
 			{
@@ -73,10 +73,10 @@ const index = () => {
 			width={560}
 			title={
 				<>
-					<p>
+					<p className="mt-0 mb-1">
 						課程紀錄 - {course_name} <sub>#{course_id}</sub>
 					</p>
-					<p className="text-sm text-gray-500">
+					<p className="my-0 text-sm text-gray-500">
 						<UserOutlined className="mr-2" /> {user_name} <sub>#{user_id}</sub>
 					</p>
 				</>
@@ -105,6 +105,7 @@ const index = () => {
 						align="center"
 						showSizeChanger
 						showTitle
+						hideOnSinglePage
 						onChange={(page, pageSize) => {
 							setPagination({
 								current: page,
@@ -118,4 +119,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default memo(index)
