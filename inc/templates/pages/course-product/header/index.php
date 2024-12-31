@@ -47,7 +47,7 @@ if ( ! is_array( $teacher_ids ) ) {
 		<div class="mb-2 flex gap-x-4 gap-y-2 flex-wrap">
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
-				$teacher = \get_user_by( 'id', $teacher_id );
+				$teacher = \get_user_by( 'id', (int) $teacher_id );
 				Plugin::get(
 					'user',
 					[

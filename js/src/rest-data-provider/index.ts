@@ -44,11 +44,16 @@ export const dataProvider = (
 			},
 		)
 
-		const total = headers?.['x-wp-total'] || data.length
+		// 取得 response header 上的 X-WP-TotalPages
+		const totalPages = Number(headers?.['x-wp-totalpages']) || 1
+		const total = Number(headers?.['x-wp-total']) || 1
+		const currentPage = Number(headers?.['x-wp-currentpage']) || 1
 
 		return {
 			data,
 			total,
+			totalPages,
+			currentPage,
 		}
 	},
 

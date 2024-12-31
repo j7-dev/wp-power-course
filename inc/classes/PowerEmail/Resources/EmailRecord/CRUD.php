@@ -24,7 +24,7 @@ abstract class CRUD {
 	/**
 	 * 取得紀錄
 	 *
-	 * @param array{id:string, post_id:string, user_id:string, email_id:string, email_subject:string, trigger_at:string, mark_as_sent:string, email_date:string} $where 要查詢的條件
+	 * @param array{id?:string, post_id?:string, user_id?:string, email_id?:string, email_subject?:string, trigger_at?:string, mark_as_sent?:string, email_date?:string} $where 要查詢的條件
 	 * @return array<int, object{id: int, post_id: int, user_id: int, email_id: int, email_subject: string, trigger_at: string, mark_as_sent: int, email_date: string}>
 	 */
 	public static function get( array $where ) {
@@ -72,6 +72,7 @@ abstract class CRUD {
 		if ($unique) {
 			// 檢查紀錄是否存在
 			$record = self::get(
+				// @phpstan-ignore-next-line
 				[
 					'post_id'    => $post_id,
 					'user_id'    => $user_id,

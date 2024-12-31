@@ -209,7 +209,7 @@ final class Order {
 
 			$expire_date = $bind_course_data->calc_expire_date($order);
 
-			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $bind_course_data->course_id, $expire_date );
+			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $bind_course_data->course_id, $expire_date, $order );
 		}
 	}
 
@@ -230,6 +230,6 @@ final class Order {
 		$product_id  = (int) $item->get_product_id();
 		$expire_date = Limit::instance($product_id)->calc_expire_date($order);
 
-		\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $product_id, $expire_date );
+		\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $product_id, $expire_date, $order );
 	}
 }

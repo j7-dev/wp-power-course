@@ -20,7 +20,6 @@ abstract class Base {
 	public const DEFAULT_IMAGE = 'https://placehold.co/800x600/1677ff/white?text=%3Cimg%20/%3E';
 	public const PRIMARY_COLOR = '#1677ff';
 
-
 	/**
 	 * 取得商品圖片
 	 *

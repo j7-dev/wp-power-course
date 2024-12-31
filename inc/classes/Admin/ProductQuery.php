@@ -87,8 +87,11 @@ final class ProductQuery {
 
 		$meta_query = $query->get('meta_query');
 
+		if (!is_array($meta_query)) {
+			$meta_query = [];
+		}
+
 		if (!$meta_query) {
-			$meta_query             = [];
 			$meta_query['relation'] = 'AND';
 		}
 
@@ -133,8 +136,11 @@ final class ProductQuery {
 
 		$meta_query = $query->get('meta_query');
 
+		if (!is_array($meta_query)) {
+			$meta_query = [];
+		}
+
 		if (!$meta_query) {
-			$meta_query             = [];
 			$meta_query['relation'] = 'AND';
 		}
 

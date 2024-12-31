@@ -105,7 +105,7 @@ final class Chapter extends ApiBase {
 		);
 
 		$chapters = \get_posts($args);
-		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
+		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters )); // @phpstan-ignore-line
 
 		$response = new \WP_REST_Response( $chapters );
 
@@ -120,7 +120,7 @@ final class Chapter extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
 	 * @throws \Exception 當找不到商品時拋出異常。.
-	 * @return array{product:\WC_Product, data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
+	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
 	 * @phpstan-ignore-next-line
 	 */
 	private function separator( $request ): array {
@@ -129,24 +129,23 @@ final class Chapter extends ApiBase {
 
 		$body_params = ChapterUtils::converter( $body_params );
 
-		$skip_keys   = [
+		$skip_keys = [
 			'chapter_video',
 			'post_content',
 		];
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []
 		$body_params = General::format_empty_array( $body_params );
 
-		[
-			'data'      => $data,
-			'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'post', files: $file_params['files'] ?? [] );
+		$separated_data = WP::separator( args: $body_params, obj: 'post', files: $file_params['files'] ?? [] );
 
-		return [
-			'data'      => $data,
-			'meta_data' => $meta_data,
-		];
+		if (\is_wp_error($separated_data)) {
+			throw new \Exception($separated_data->get_error_message());
+		}
+
+		return $separated_data;
 	}
 
 	/**
@@ -167,8 +166,9 @@ final class Chapter extends ApiBase {
 		$qty = (int) ( $meta_data['qty'] ?? 1 );
 		unset($meta_data['qty']);
 
-		$post_parents = ( $meta_data['post_parents'] ?? [] );
+		$post_parents = $meta_data['post_parents'];
 		unset($meta_data['post_parents']);
+		$post_parents = is_array( $post_parents ) ? $post_parents : [];
 
 		// 不需要紀錄 depth，深度是由 post_parent 決定的
 		unset($meta_data['depth']);
@@ -246,7 +246,7 @@ final class Chapter extends ApiBase {
 
 		$update_result = \wp_update_post($data);
 
-		if ( \is_wp_error( $update_result ) ) {
+		if ( !is_numeric( $update_result ) ) { // @phpstan-ignore-line
 			return $update_result;
 		}
 
@@ -294,11 +294,12 @@ final class Chapter extends ApiBase {
 	 */
 	public function post_toggle_finish_chapters_with_id_callback( $request ): \WP_REST_Response|\WP_Error {
 
-		$chapter_id = $request['id'];
+		$chapter_id = (int) $request['id'];
 		// @phpstan-ignore-next-line
 		$body_params = $request->get_body_params() ?? [];
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
+		/** @var array<string, mixed> $body_params */
 		$include_required_params = WP::include_required_params( $body_params, [ 'course_id' ] );
 		if ( $include_required_params !== true ) {
 			return $include_required_params;
@@ -307,18 +308,33 @@ final class Chapter extends ApiBase {
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
 
-		$avl_chapter              = new AVLChapter( (int) $chapter_id, (int) $user_id );
+		$avl_chapter              = new AVLChapter( $chapter_id, (int) $user_id );
 		$is_this_chapter_finished = !!$avl_chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
 		$product                  = \wc_get_product( $course_id );
 
+		if (!$product) {
+			return new \WP_REST_Response(
+				[
+					'code'    => '400',
+					'message' => '找不到課程',
+				],
+				400
+			);
+		}
+
+		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
+
 		if ($is_this_chapter_finished) {
-			$success  = AVLChapterMeta::delete(
+			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
 				$user_id,
 				'finished_at'
 			);
+
 			$progress = CourseUtils::get_course_progress( $product );
+
+			\do_action(ChapterLifeCycle::CHAPTER_UNFINISHEDED_ACTION, $chapter_id, $course_id, $user_id);
 
 			return new \WP_REST_Response(
 				[
@@ -336,7 +352,7 @@ final class Chapter extends ApiBase {
 		}
 
 		$success  = AVLChapterMeta::add(
-			(int) $chapter_id,
+			$chapter_id,
 			$user_id,
 			'finished_at',
 			\wp_date('Y-m-d H:i:s')
@@ -372,12 +388,14 @@ final class Chapter extends ApiBase {
 
 		$body_params = $request->get_json_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
+		/** @var array<string> $ids */
 		$ids = (array) $body_params['ids'];
 
 		foreach ($ids as $id) {
-			$result = \wp_trash_post( $id );
+			$result = \wp_trash_post( (int) $id );
 			if (!$result) {
 				throw new \Exception(__('刪除章節資料失敗', 'power-course') . " #{$id}");
 			}

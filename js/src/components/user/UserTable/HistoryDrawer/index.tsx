@@ -1,45 +1,86 @@
-import React from 'react'
-import { Drawer, Timeline } from 'antd'
+import React, { useState, memo } from 'react'
+import { Drawer, Timeline, Empty, Pagination, PaginationProps } from 'antd'
 import { useAtom } from 'jotai'
 import { historyDrawerAtom } from '../atom'
 import { TimelineItemAdapter } from './adapter'
-import { TimelineSlug } from './types'
-import { TriggerAt } from '@/components/emails/SendCondition/enum'
+import { TimelineLogType, THistoryDrawerProps, TStudentLog } from './types'
+import { useList } from '@refinedev/core'
+import { LoadingOutlined, UserOutlined } from '@ant-design/icons'
+
+export const defaultHistoryDrawerProps: THistoryDrawerProps = {
+	user_id: undefined,
+	user_name: 'test' || undefined,
+	course_id: undefined,
+	course_name: '123' || undefined,
+	drawerProps: {
+		open: false,
+	},
+}
+
+const loadingItems = new Array(8).fill(null).map((_, index) => ({
+	dot: <LoadingOutlined />,
+	children: (
+		<div
+			className={
+				'h-[1.5rem] w-full mr-4 mb-1 bg-gray-100 rounded-[0.25rem] animate-pulse'
+			}
+		/>
+	),
+}))
 
 const index = () => {
 	const [historyDrawerProps, setHistoryDrawerProps] = useAtom(historyDrawerAtom)
-	const { user_id, course_id, drawerProps } = historyDrawerProps
+	const { user_id, course_id, drawerProps, user_name, course_name } =
+		historyDrawerProps
 
-	const rawItems = [
-		{
-			slug: TriggerAt.ORDER_CREATED,
-			label: '2024-12-01 10:53 購買課程 #1234',
-		},
-		{
-			slug: TriggerAt.COURSE_GRANTED,
-			label: '2024-12-04 16:28 獲得課程權限 AAAAAA',
-		},
-		{
-			slug: TriggerAt.CHAPTER_ENTER,
-			label: '2024-12-04 16:28 進入章節 OOOOOO',
-		},
-		{
-			slug: TriggerAt.CHAPTER_FINISH,
-			label: '2024-12-04 16:28 完成章節 AAAAAA',
-		},
-		{
-			slug: TriggerAt.COURSE_FINISH,
-			label: '2024-12-04 16:28 完成課程 AAAAAA',
-		},
-	]
+	const [pagination, setPagination] = useState<PaginationProps>({
+		current: 1,
+		pageSize: 20,
+	})
 
-	const items = rawItems.map(({ slug, label }) => {
-		return new TimelineItemAdapter(slug as TimelineSlug, label).itemProps
+	const { data, isFetching } = useList<TStudentLog>({
+		resource: 'courses/student-logs',
+		filters: [
+			{
+				field: 'user_id',
+				operator: 'eq',
+				value: user_id,
+			},
+			{
+				field: 'course_id',
+				operator: 'eq',
+				value: course_id,
+			},
+		],
+		pagination: {
+			pageSize: pagination.pageSize,
+			current: pagination.current,
+		},
+		queryOptions: {
+			enabled: !!user_id && !!course_id,
+		},
+	})
+
+	const logs = data?.data || []
+	const total = data?.total || 1
+
+	const items = logs.map(({ log_type, title }) => {
+		return new TimelineItemAdapter(log_type as TimelineLogType, title).itemProps
 	})
 
 	return (
 		<Drawer
-			title="課程紀錄"
+			width={560}
+			title={
+				<>
+					<p className="mt-0 mb-1">
+						課程紀錄 - {course_name} <sub>#{course_id}</sub>
+					</p>
+					<p className="my-0 text-sm text-gray-500">
+						<UserOutlined className="mr-2" /> {user_name} <sub>#{user_id}</sub>
+					</p>
+				</>
+			}
 			onClose={() =>
 				setHistoryDrawerProps((prev) => ({
 					...prev,
@@ -51,9 +92,31 @@ const index = () => {
 			}
 			{...drawerProps}
 		>
-			<Timeline items={items} />
+			{isFetching && <Timeline items={loadingItems} />}
+			{!isFetching && items.length === 0 && (
+				<Empty className="mt-[10rem]" description="目前沒有紀錄" />
+			)}
+			{!isFetching && items.length !== 0 && (
+				<>
+					<Timeline items={items} />
+					<Pagination
+						{...pagination}
+						total={total}
+						align="center"
+						showSizeChanger
+						showTitle
+						hideOnSinglePage
+						onChange={(page, pageSize) => {
+							setPagination({
+								current: page,
+								pageSize,
+							})
+						}}
+					/>
+				</>
+			)}
 		</Drawer>
 	)
 }
 
-export default index
+export default memo(index)
