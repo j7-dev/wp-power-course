@@ -26,47 +26,51 @@ const useColumns = (params?: TUseColumnsParams) => {
 			title: '已開通課程',
 			dataIndex: 'avl_courses',
 			width: 240,
-			render: (avl_courses: TAVLCourse[], { id: user_id }) => {
-				return avl_courses.map(({ id: course_id, name, expire_date }) => (
-					<div
-						key={course_id}
-						className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1"
-					>
-						<div>
-							<Text
-								className="cursor-pointer"
-								ellipsis={{
-									tooltip: (
-										<>
-											<sub className="text-gray-500">#{course_id}</sub>{' '}
-											{name || '未知的課程名稱'}
-										</>
-									),
-								}}
-								onClick={() => {
-									setHistoryDrawerProps({
-										user_id,
-										course_id,
-										drawerProps: {
-											open: true,
-										},
-									})
-								}}
-							>
-								<sub className="text-gray-500">#{course_id}</sub>{' '}
-								{name || '未知的課程名稱'}
-							</Text>
-						</div>
+			render: (avl_courses: TAVLCourse[], { id: user_id, display_name }) => {
+				return avl_courses.map(
+					({ id: course_id, name: course_name, expire_date }) => (
+						<div
+							key={course_id}
+							className="grid grid-cols-[12rem_4rem_1fr] gap-1 my-1"
+						>
+							<div>
+								<Text
+									className="cursor-pointer"
+									ellipsis={{
+										tooltip: (
+											<>
+												<sub className="text-gray-500">#{course_id}</sub>{' '}
+												{course_name || '未知的課程名稱'}
+											</>
+										),
+									}}
+									onClick={() => {
+										setHistoryDrawerProps({
+											user_id,
+											user_name: display_name,
+											course_id,
+											course_name,
+											drawerProps: {
+												open: true,
+											},
+										})
+									}}
+								>
+									<sub className="text-gray-500">#{course_id}</sub>{' '}
+									{course_name || '未知的課程名稱'}
+								</Text>
+							</div>
 
-						<div className="text-center">
-							<WatchStatusTag expireDate={expire_date} />
-						</div>
+							<div className="text-center">
+								<WatchStatusTag expireDate={expire_date} />
+							</div>
 
-						<div className="text-left">
-							{getWatchStatusTagTooltip(expire_date)}
+							<div className="text-left">
+								{getWatchStatusTagTooltip(expire_date)}
+							</div>
 						</div>
-					</div>
-				))
+					),
+				)
 			},
 		},
 		{

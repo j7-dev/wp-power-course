@@ -1,26 +1,30 @@
 import {
 	PlusCircleOutlined,
-	InfoCircleOutlined,
+	UserAddOutlined,
 	PlayCircleOutlined,
 	CheckCircleOutlined,
 	CheckCircleFilled,
+	UserDeleteOutlined,
+	UserSwitchOutlined,
+	RocketOutlined,
+	CloseCircleOutlined,
 } from '@ant-design/icons'
 import { TimelineLogType, TimelineItemConfig } from '../types'
 import { TimelineItemProps } from 'antd'
 import { TriggerAt } from '@/components/emails/SendCondition/enum'
 
 const timelineItemMapper: Record<TimelineLogType, TimelineItemConfig> = {
-	[TriggerAt.ORDER_CREATED]: {
-		color: '#91caff',
-		icon: <PlusCircleOutlined />,
-	},
 	[TriggerAt.COURSE_GRANTED]: {
 		color: '#91caff',
-		icon: <InfoCircleOutlined />,
+		icon: <UserAddOutlined />,
+	},
+	[TriggerAt.COURSE_FINISH]: {
+		color: '#0958d9',
+		icon: <CheckCircleFilled />,
 	},
 	[TriggerAt.COURSE_LAUNCH]: {
-		color: '#0958d9', // TODO
-		icon: <CheckCircleFilled />, // TODO
+		color: '#f759ab',
+		icon: <RocketOutlined />,
 	},
 	[TriggerAt.CHAPTER_ENTER]: {
 		color: '#4096ff',
@@ -30,9 +34,21 @@ const timelineItemMapper: Record<TimelineLogType, TimelineItemConfig> = {
 		color: '#0958d9',
 		icon: <CheckCircleOutlined />,
 	},
-	[TriggerAt.COURSE_FINISH]: {
-		color: '#0958d9',
-		icon: <CheckCircleFilled />,
+	[TriggerAt.ORDER_CREATED]: {
+		color: '#91caff',
+		icon: <PlusCircleOutlined />,
+	},
+	[TriggerAt.CHAPTER_UNFINISHED]: {
+		color: '#ffa940',
+		icon: <CloseCircleOutlined />,
+	},
+	[TriggerAt.COURSE_REMOVED]: {
+		color: '#ff4d4f',
+		icon: <UserDeleteOutlined />,
+	},
+	[TriggerAt.UPDATE_STUDENT]: {
+		color: '#9254de',
+		icon: <UserSwitchOutlined />,
 	},
 }
 

@@ -1,8 +1,6 @@
 import { atom } from 'jotai'
-import {
-	THistoryDrawerProps,
-	defaultHistoryDrawerProps,
-} from './HistoryDrawer/types'
+import { THistoryDrawerProps } from './HistoryDrawer/types'
+import { defaultHistoryDrawerProps } from './HistoryDrawer'
 
 export const selectedUserIdsAtom = atom<string[]>([])
 
