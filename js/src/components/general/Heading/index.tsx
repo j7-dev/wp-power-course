@@ -1,14 +1,30 @@
-import React, { FC } from 'react'
+import React, { FC, memo } from 'react'
 import { Divider, Typography, TypographyProps, DividerProps } from 'antd'
+import { SendOutlined } from '@ant-design/icons'
 
 const { Title } = Typography
 
-export const Heading: FC<
+const HeadingComponent: FC<
 	{
 		children: React.ReactNode
 		titleProps?: TypographyProps['Title']
+		size?: 'sm' | 'md'
 	} & DividerProps
-> = ({ children, titleProps, ...rest }) => {
+> = ({ children, titleProps, size = 'md', ...rest }) => {
+	if (size === 'sm') {
+		return (
+			<Divider
+				orientation="left"
+				className="text-sm text-gray-500 my-8"
+				plain
+				orientationMargin="0"
+				{...rest}
+			>
+				<SendOutlined className="mr-2" /> {children}
+			</Divider>
+		)
+	}
+
 	return (
 		<Divider orientation="left" orientationMargin={0} plain {...rest}>
 			<Title
@@ -25,3 +41,5 @@ export const Heading: FC<
 		</Divider>
 	)
 }
+
+export const Heading = memo(HeadingComponent)

@@ -58,23 +58,26 @@ $the_content = ob_get_clean();
 
 $course_tabs = [
 	'description' => [
-		'label'   => '簡介',
-		'content' => sprintf(
+		'label'    => '介紹',
+		'content'  => sprintf(
 			/*html*/'<div class="bn-container">%s</div>',
 			$the_content
 		),
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_description_tab' ) ?: 'yes'),
 	],
 	'chapter' => [
-		'label'   => '章節',
-		'content' => $accordion,
+		'label'    => '章節',
+		'content'  => $accordion,
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_chapter_tab' ) ?: 'yes'),
 	],
 	'qa' => [
-		'label'   => '問答',
-		'content' => $qa,
+		'label'    => '問答',
+		'content'  => $qa,
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_qa_tab' ) ?: 'yes'),
 	],
 	'comment' => [
-		'label'   => '留言',
-		'content' => sprintf(
+		'label'    => '留言',
+		'content'  => sprintf(
 		/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
 		$product->get_id(),
 		'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
@@ -82,10 +85,11 @@ $course_tabs = [
 		\get_current_user_id(),
 		\current_user_can('manage_options') ? 'admin' : 'user',
 		),
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'enable_comment' ) ?: 'yes'),
 	],
 	'review' => [
-		'label'   => '評價',
-		'content' => sprintf(
+		'label'    => '評價',
+		'content'  => sprintf(
 			/*html*/'<div id="review-app" data-comment_type="review" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
 			$product->get_id(),
 			$product->get_meta( 'show_review_list' ) === 'yes' ? 'yes' : 'no',
@@ -93,6 +97,7 @@ $course_tabs = [
 			\get_current_user_id(),
 			\current_user_can('manage_options') ? 'admin' : 'user',
 			),
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_review_tab' ) ?: 'yes'),
 	],
 	// 'announcement' => [
 	// 'label'   => '公告',
@@ -100,32 +105,22 @@ $course_tabs = [
 	// ],
 ];
 
+$course_tabs = array_filter($course_tabs, fn( $tab ) => !( $tab['disabled'] ));
 
-
-
-
-
-$show_review_tab = 'yes' === $product->get_meta( 'show_review_tab' );
-
-
-if (!$show_review_tab) {
-	unset($course_tabs['review']);
-}
-
-echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
-Plugin::get(
+if ($course_tabs) {
+	echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
+	Plugin::get(
 	'tabs/nav',
 	[
-		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'description',
+		'course_tabs' => $course_tabs,
 	]
-);
-echo '</div>';
+	);
+	echo '</div>';
 
-Plugin::get(
+	Plugin::get(
 	'tabs/content',
 	[
-		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'description',
+		'course_tabs' => $course_tabs,
 	]
-);
+	);
+}

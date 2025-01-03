@@ -25,6 +25,5 @@ Plugin::get(
 	'tabs',
 	[
 		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'all',
 	]
 );
