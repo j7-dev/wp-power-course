@@ -31,6 +31,7 @@ $chapter_id = $chapter->ID;
 /**
  * @var array{type: string, id: string, meta: ?array} $video_info
  */
+// @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
 $course_tabs = [
@@ -93,8 +94,7 @@ echo '<div class="pc-classroom-body__tabs-nav z-[15] lg:relative">';
 Plugin::get(
 	'tabs/nav',
 	[
-		'course_tabs'        => $course_tabs,
-		'default_active_key' => 'discuss',
+		'course_tabs' => $course_tabs,
 	]
 	);
 echo '</div>';
@@ -104,8 +104,7 @@ echo '<div class="px-4 lg:px-12">';
 Plugin::get(
 'tabs/content',
 [
-	'course_tabs'        => $course_tabs,
-	'default_active_key' => 'discuss',
+	'course_tabs' => $course_tabs,
 ]
 );
 echo '</div>';

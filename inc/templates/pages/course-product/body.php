@@ -45,17 +45,12 @@ if ( $is_avl ) {
 	);
 }
 
-Plugin::get(
-'typography/title',
-[
-	'value' => '課程資訊',
-]
-);
+
 
 $course_schedule_in_timestamp = $product->get_meta( 'course_schedule' );
 $course_schedule              = $course_schedule_in_timestamp ? \wp_date(
 			'Y/m/d H:i',
-			$course_schedule_in_timestamp
+			(int) $course_schedule_in_timestamp
 		) : '未設定';
 $course_hour                  = (int) $product->get_meta( 'course_hour' );
 $course_minute                = (int) $product->get_meta( 'course_minute' );
@@ -66,44 +61,55 @@ $count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true
 $total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
 $limit_labels  = Limit::instance($product)->get_limit_label();
 
-$show_total_student = $product->get_meta( 'show_total_student' ) ?: 'yes';
-
 $items = [
 	[
-		'icon'  => 'calendar',
-		'label' => '開課時間',
-		'value' => $course_schedule,
+		'icon'     => 'calendar',
+		'label'    => '開課時間',
+		'value'    => $course_schedule,
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_schedule' ) ?: 'yes'),
 	],
 	[
-		'icon'  => 'clock',
-		'label' => '預計時長',
-		'value' => "{$course_hour} 小時 {$course_minute} 分",
+		'icon'     => 'clock',
+		'label'    => '預計時長',
+		'value'    => "{$course_hour} 小時 {$course_minute} 分",
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_time' ) ?: 'yes'),
 	],
 	[
-		'icon'  => 'list',
-		'label' => '預計單元',
-		'value' => "{$count_all_chapters} 個",
+		'icon'     => 'list',
+		'label'    => '預計單元',
+		'value'    => "{$count_all_chapters} 個",
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_chapters' ) ?: 'yes'),
 	],
 	[
-		'icon'  => 'eye',
-		'label' => '觀看時間',
-		'value' =>"{$limit_labels->type} {$limit_labels->value}",
+		'icon'     => 'eye',
+		'label'    => '觀看時間',
+		'value'    =>"{$limit_labels->type} {$limit_labels->value}",
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_limit' ) ?: 'yes'),
+	],
+	[
+		'icon'     => 'team',
+		'label'    => '課程學員',
+		'value'    => "{$total_student} 人",
+		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes'),
 	],
 ];
 
-if ( $show_total_student === 'yes' ) {
-	$items[] = [
-		'icon'  => 'team',
-		'label' => '課程學員',
-		'value' => "{$total_student} 人",
-	];
-}
+$items = array_filter($items, fn( $item ) => !( $item['disabled'] ));
 
-Plugin::get(
+if ($items) {
+	Plugin::get(
+	'typography/title',
+	[
+		'value' => '課程資訊',
+	]
+	);
+
+	Plugin::get(
 			'course-product/info',
 			$items
 		);
 
+}
 // echo '<div class="mt-8 flex items-end gap-4">';
 // Plugin::get(
 // 'countdown',

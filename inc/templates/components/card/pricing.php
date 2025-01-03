@@ -32,12 +32,13 @@ $chapter_ids = CourseUtils::get_sub_chapters($product_id, return_ids :true);
 $name              = $product->get_name();
 $product_image_url = Base::get_image_url_by_product( $product, 'full' );
 $teacher_ids       = \get_post_meta( $product_id, 'teacher_ids', false );
+$teacher_ids       = is_array($teacher_ids) ? $teacher_ids : [];
 $teacher_name      = 'by ';
 foreach ( $teacher_ids as $key => $teacher_id ) {
 	$is_last       = $key === count( $teacher_ids ) - 1;
 	$connect       = $is_last ? '' : ' & ';
-	$teacher       = \get_user_by( 'id', $teacher_id );
-	$teacher_name .= $teacher->display_name . $connect;
+	$teacher       = \get_user_by( 'id', (int) $teacher_id );
+	$teacher_name .= $teacher ? $teacher->display_name . $connect : '';
 }
 $teacher_name = count($teacher_ids) > 0 ? $teacher_name : '&nbsp;';
 
@@ -69,7 +70,7 @@ $course_length_html = Plugin::get('icon/clock', null, false) . $course_length;
 
 // 學員人數
 $total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-$show_total_student = $product->get_meta( 'show_total_student' ) == 'yes';
+$show_total_student = \wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes');
 $total_student      = $show_total_student ? $total_student : '-';
 $total_student_html = Plugin::get('icon/team', null, false) . $total_student;
 
