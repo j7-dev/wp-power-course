@@ -88,7 +88,7 @@ div .pc-rating input[checked] ~ input {
 	// price 銷售頁
 	.pc-price-html {
 		> .woocommerce-Price-amount {
-			@apply text-gray-600 text-2xl font-semibold;
+			@apply text-gray-600 text-base md:text-2xl font-semibold;
 		}
 		> .sale-price {
 			display: flex;
@@ -96,11 +96,11 @@ div .pc-rating input[checked] ~ input {
 			align-items: start;
 			del {
 				order: 0;
-				@apply text-gray-500 text-base;
+				@apply text-gray-500 text-xs md:text-base;
 			}
 			ins {
 				order: 1;
-				@apply text-red-400 text-2xl font-semibold;
+				@apply text-red-400 text-base md:text-2xl font-semibold;
 			}
 		}
 	}
@@ -153,12 +153,7 @@ div .pc-rating input[checked] ~ input {
 	}
 
 	&__name {
-		margin: 0rem 0rem 0.5rem 0rem !important;
-		height: 3rem !important;
-		font-weight: 600 !important;
-		font-size: 1.125rem !important;
-		line-height: 1.5rem !important;
-		@apply line-clamp-2;
+		@apply line-clamp-2 text-base md:text-lg leading-5 md:leading-6 font-semibold h-10 md:h-12 mt-0 mx-0 !mb-1 md:!mb-2;
 	}
 
 	&__teachers {
@@ -169,20 +164,17 @@ div .pc-rating input[checked] ~ input {
 
 	&__price {
 		> .woocommerce-Price-amount {
-			@apply text-blue-500 text-2xl font-semibold;
+			@apply text-blue-500 text-base md:text-2xl font-semibold;
 		}
 		> .sale-price {
-			display: flex;
-			gap: 0.5rem;
-			align-items: end;
-			justify-content: start;
+			@apply items-start md:items-end flex flex-col md:flex-row gap-x-2 justify-start;
 			ins {
 				order: 1;
-				@apply text-red-400 text-2xl font-semibold;
+				@apply text-red-400 text-base md:text-2xl font-semibold;
 			}
 			del {
 				order: 2;
-				@apply text-gray-500 text-sm font-normal;
+				@apply text-gray-500 text-xs md:text-base font-normal;
 			}
 		}
 	}
