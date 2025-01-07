@@ -1,6 +1,6 @@
-<span class="bg-red-100 [&_svg]:fill-red-500 text-red-500 text-xs flex items-center px-2 py-1 rounded-md w-fit h-fit">
+<span class="bg-red-100 [&_svg]:fill-red-500 text-red-500 text-[0.625rem] sm:text-xs flex items-center px-1 sm:px-2 py-0.5 sm:py-1 rounded sm:rounded-md w-fit h-fit text-nowrap">
 	<svg
-		class="w-4 h-4 mr-1"
+		class="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1"
 		viewBox="0 0 24 24"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
