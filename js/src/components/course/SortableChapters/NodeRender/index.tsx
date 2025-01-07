@@ -50,7 +50,7 @@ const NodeRender: FC<{
 		<div
 			className={`grid grid-cols-[1fr_3rem_7rem_4rem] gap-4 justify-start items-center ${isSelectedChapter ? 'bg-[#e6f4ff]' : ''}`}
 		>
-			<div className="flex items-center">
+			<div className="flex items-center overflow-hidden">
 				{showPlaceholder && <div className="w-[28px] h-[28px]"></div>}
 				<Checkbox className="mr-2" onChange={handleCheck} checked={isChecked} />
 				<ChapterName record={record} setSelectedChapter={setSelectedChapter} />

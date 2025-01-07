@@ -21,6 +21,10 @@
 		}
 	}
 }
+.ant-editor-sortable-tree-node
+	.ant-editor-icon:not([aria-roledescription="sortable"]) {
+	min-width: 28px;
+}
 
 .sticky-card-actions {
 	.ant-card {
