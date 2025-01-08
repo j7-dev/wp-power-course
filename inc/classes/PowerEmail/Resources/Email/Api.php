@@ -301,8 +301,8 @@ final class Api extends ApiBase {
 		$data['meta_input'] = $meta_data;
 		$data['ID']         = $request['id'];
 
-		// 使用 wp_json_encode 再次編碼
-		$data['post_excerpt'] = \wp_json_encode(json_decode($data['post_excerpt']));
+		// 使用 wp_slash 防止 JSON 跳脫字元在儲存時被過濾掉 再次編碼
+		$data['post_excerpt'] = \wp_slash($data['post_excerpt']);
 
 		/** @var array{ID?: int, post_author?: int, post_date?: string, post_date_gmt?: string, post_content?: string, post_content_filtered?: string, post_title?: string, post_excerpt?: string} $data */
 		$update_result = \wp_update_post($data);
