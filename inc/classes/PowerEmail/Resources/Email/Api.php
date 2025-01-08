@@ -269,7 +269,7 @@ final class Api extends ApiBase {
 			]
 			);
 
-		if (\is_wp_error($post_id)) {
+		if (\is_wp_error($post_id)) { // @phpstan-ignore-line
 			return $post_id;
 		}
 
@@ -301,9 +301,13 @@ final class Api extends ApiBase {
 		$data['meta_input'] = $meta_data;
 		$data['ID']         = $request['id'];
 
+		// 使用 wp_json_encode 再次編碼
+		$data['post_excerpt'] = \wp_json_encode(json_decode($data['post_excerpt']));
+
+		/** @var array{ID?: int, post_author?: int, post_date?: string, post_date_gmt?: string, post_content?: string, post_content_filtered?: string, post_title?: string, post_excerpt?: string} $data */
 		$update_result = \wp_update_post($data);
 
-		if ( \is_wp_error( $update_result ) ) {
+		if ( \is_wp_error( $update_result ) ) { // @phpstan-ignore-line
 			return $update_result;
 		}
 
