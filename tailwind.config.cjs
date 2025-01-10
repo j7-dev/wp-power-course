@@ -4,6 +4,7 @@ module.exports = {
 	important: '.tailwind',
 	corePlugins: {
 		preflight: false,
+		container: false,
 	},
 	content: [
 		'./js/src/**/*.{js,ts,jsx,tsx}',
@@ -11,10 +12,10 @@ module.exports = {
 		'./inc/assets/src/**/*.ts',
 	],
 	theme: {
-		animation: {
-			pulse: 'tw-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-		},
 		extend: {
+			animation: {
+				pulse: 'tw-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+			},
 			screens: {
 				sm: '576px', // iphone SE
 				md: '810px', // ipad Portrait
