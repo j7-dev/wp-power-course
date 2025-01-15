@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { MediaLibrary } from '@/bunny'
-import { TVideo } from '@/bunny/MediaLibrary/types'
+import { TBunnyVideo } from '@/bunny/types'
 
 const MediaLibraryPage = () => {
-	const [selectedVideos, setSelectedVideos] = useState<TVideo[]>([])
+	const [selectedVideos, setSelectedVideos] = useState<TBunnyVideo[]>([])
 	return (
 		<MediaLibrary
 			selectedVideos={selectedVideos}

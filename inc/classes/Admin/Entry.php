@@ -9,14 +9,13 @@ namespace J7\PowerCourse\Admin;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Bootstrap;
+use J7\PowerCourse\Utils\Base;
 
 
 /**
  * Class Entry
  */
 final class Entry {
-
-
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -57,7 +56,7 @@ final class Entry {
 		// Output header HTML.
 		Bootstrap::enqueue_script();
 		$blog_name = \get_bloginfo('name');
-
+		$id        = substr(Base::APP1_SELECTOR, 1);
 		?>
 		<!doctype html>
 		<html lang="zh_tw">
@@ -68,10 +67,8 @@ final class Entry {
 			<title>課程後台 | <?php echo $blog_name; ?></title>
 		</head>
 
-		<body  class="tailwind">
-			<main id="power_course">
-
-			</main>
+		<body class="tailwind">
+			<main id="<?php echo $id; ?>"></main>
 		<?php
 		/**
 		 * Prints any scripts and data queued for the footer.
