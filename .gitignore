@@ -36,5 +36,3 @@ release/*
 
 /vendor/
 
-composer.lock
-yarn.lock

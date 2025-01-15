@@ -4,7 +4,6 @@ module.exports = {
 	important: '.tailwind',
 	corePlugins: {
 		preflight: false,
-		container: false,
 	},
 	content: [
 		'./js/src/**/*.{js,ts,jsx,tsx}',
