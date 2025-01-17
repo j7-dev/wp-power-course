@@ -5,7 +5,7 @@ import { List } from '@refinedev/antd'
 
 const CourseList = () => {
 	return (
-		<List>
+		<List title="">
 			<Table />
 		</List>
 	)

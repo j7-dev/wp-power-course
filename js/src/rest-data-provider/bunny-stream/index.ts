@@ -1,6 +1,7 @@
 /**
  * TODO Bunny 用
  * 還沒有調整過
+ * 目前應該只有 getList / getOne / deleteOne 能用
  *
  */
 
