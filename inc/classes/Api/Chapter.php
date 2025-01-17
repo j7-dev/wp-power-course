@@ -394,19 +394,30 @@ final class Chapter extends ApiBase {
 		/** @var array<string> $ids */
 		$ids = (array) $body_params['ids'];
 
-		foreach ($ids as $id) {
-			$result = \wp_trash_post( (int) $id );
-			if (!$result) {
-				throw new \Exception(__('刪除章節資料失敗', 'power-course') . " #{$id}");
+		try {
+			foreach ($ids as $id) {
+				$result = \wp_trash_post( (int) $id );
+				if (!$result) {
+					throw new \Exception(__('刪除章節資料失敗', 'power-course') . " #{$id}");
+				}
 			}
-		}
 
-		return new \WP_REST_Response(
-			[
-				'code'    => 'delete_success',
-				'message' => '刪除成功',
-				'data'    => $ids,
-			]
-		);
+			return new \WP_REST_Response(
+				[
+					'code'    => 'delete_success',
+					'message' => '刪除成功',
+					'data'    => $ids,
+				]
+			);
+		} catch (\Exception $e) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'delete_failed',
+					'message' => $e->getMessage(),
+					'data'    => $ids,
+				],
+				400
+			);
+		}
 	}
 }
