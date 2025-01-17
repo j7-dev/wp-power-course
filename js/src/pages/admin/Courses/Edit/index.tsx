@@ -19,9 +19,9 @@ import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import {
 	siteUrl,
 	course_permalink_structure,
-	toFormData,
 	formatDateRangeData,
 } from '@/utils'
+import { toFormData } from 'antd-toolkit'
 
 export const CoursesEdit = () => {
 	// 初始化資料

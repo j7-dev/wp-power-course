@@ -3,7 +3,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { Tooltip, Button } from 'antd'
 import { useUpdate } from '@refinedev/core'
-import { toFormData } from '@/utils'
+import { toFormData } from 'antd-toolkit'
 
 const ToggleVisibility: FC<{
 	record: TCourseBaseRecord
