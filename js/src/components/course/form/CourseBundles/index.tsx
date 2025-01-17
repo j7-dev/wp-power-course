@@ -13,7 +13,7 @@ import {
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import ListItem from './ListItem'
-import { toFormData } from '@/utils'
+import { toFormData } from 'antd-toolkit'
 import { EditBundle } from './Edit'
 
 export type TRenderItemOptions = Parameters<RenderItem<TBundleProductRecord>>[1]

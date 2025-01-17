@@ -7,7 +7,7 @@ import {
 } from '@/components/formItem'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
-import { toFormData } from '@/utils'
+import { toFormData } from 'antd-toolkit'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 
 const { Item } = Form
