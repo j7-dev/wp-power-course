@@ -1,17 +1,20 @@
 import $ from 'jquery'
-import { site_url } from '../utils'
+import { plugin_url, pdf_watermark } from '../utils'
 
 // PDF 浮水印下載
 export const watermarkPDF = () => {
-	const watermark = 'PCClassroom 測試測試\n 段行測試'
-
 	// 1. 確保是在 classroom 的 body 內
 	const $container = $('#pc-classroom-body')
 	if (!$container.length) {
 		return
 	}
 
-	// 2. 找到所有 PDF 下載連結
+	// 2. 確保浮水印數量 > 0
+	if (pdf_watermark.qty <= 0) {
+		return
+	}
+
+	// 3. 找到所有 PDF 下載連結
 	const $pdfDownloadLinks = $('#pc-classroom-body a[href*=".pdf"]')
 	$pdfDownloadLinks.each(async function (index, el) {
 		const $link = $(el)
@@ -50,7 +53,7 @@ export const watermarkPDF = () => {
 
 			// 載入中文字型
 			const fontResponse = await fetch(
-				`${site_url}/wp-content/plugins/power-course/inc/assets/src/assets/fonts/NotoSansTC-Regular.ttf`,
+				`${plugin_url}/inc/assets/src/assets/fonts/NotoSansTC-Regular.ttf`,
 			)
 			if (!fontResponse.ok) {
 				throw new Error('無法載入字型檔案')
@@ -62,9 +65,10 @@ export const watermarkPDF = () => {
 			const pages = pdfDoc.getPages()
 
 			// 設定浮水印樣式
-			const fontSize = 18
-			const opacity = 0.3
-			const qty = 1 // 每頁幾個浮水印
+			const { color, qty, text } = pdf_watermark
+
+			const fontSize = 16
+			const [r, g, b, opacity] = parseRgbaColor(color)
 
 			// 處理每一頁
 			for (const page of pages) {
@@ -80,12 +84,12 @@ export const watermarkPDF = () => {
 					// const rotation = -15 + Math.random() * 30
 					const rotation = 15
 
-					page.drawText(watermark, {
+					page.drawText(text, {
 						x,
 						y,
 						size: fontSize,
 						font,
-						color: rgb(1, 0, 0),
+						color: rgb(r, g, b),
 						opacity,
 						rotate: degrees(rotation),
 					})
@@ -128,7 +132,41 @@ export const watermarkPDF = () => {
 			// 檢查此 PDF 是否已經處理完了
 			e.stopPropagation()
 			e.preventDefault()
-			alert('此 PDF 還在處理中，請稍後幾秒鐘後再試')
+			alert(
+				'此 PDF 還在處理中，請稍後幾秒鐘後再試，如果還是無法下載，請聯繫管理員',
+			)
 		}
 	})
+}
+
+/**
+ * 解析浮水印顏色
+ * 傳入 "rgba(255, 255, 255, 0.5)" 等格式
+ * 回傳 [255, 255, 255, 0.5]
+ * @param {string} color
+ * @return {number[]}
+ */
+function parseRgbaColor(color: string) {
+	// 檢查是否符合 rgba 格式
+	const rgbaPattern = /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[0-9.]+\s*\)$/
+	if (!rgbaPattern.test(color)) {
+		console.error('浮水印顏色格式錯誤，應該要是 rgba(r, g, b, a) 格式:', color)
+
+		// 不符合格式時回傳預設值 [0, 0, 0, 0.5]
+		return [0, 0, 0, 0.5]
+	}
+
+	// 移除 rgba() 括號並分割數字
+	const numbers = color
+		.replace('rgba(', '')
+		.replace(')', '')
+		.split(',')
+		.map((num) => parseFloat(num.trim()))
+
+	return [
+		numbers[0] / 255,
+		numbers[1] / 255,
+		numbers[2] / 255,
+		numbers[3],
+	]
 }

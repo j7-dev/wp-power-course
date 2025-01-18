@@ -52,7 +52,7 @@ final class Option extends ApiBase {
 	/**
 	 * Fields
 	 *
-	 * @var array<string, string> $fields 允許獲取 & 預設值
+	 * @var array<string, string|int> $fields 允許獲取 & 預設值
 	 */
 	private $fields = [
 		'bunny_library_id'           => '',
@@ -68,6 +68,9 @@ final class Option extends ApiBase {
 		'pc_watermark_interval'      => 10, // 浮水印間隔
 		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
 		'pc_enable_api_booster'      => 'no',
+		'pc_pdf_watermark_qty'       => 0, // PDF 浮水印數量
+		'pc_pdf_watermark_color'     => 'rgba(255, 255, 255, 0.5)', // PDF 浮水印顏色
+		'pc_pdf_watermark_text'      => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}', // PDF 浮水印文字
 	];
 
 	/**
@@ -105,6 +108,7 @@ final class Option extends ApiBase {
 	public function post_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_json_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
 
 		$allowed_fields = array_keys( $this->fields );

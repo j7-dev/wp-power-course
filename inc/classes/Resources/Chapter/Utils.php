@@ -9,6 +9,7 @@ namespace J7\PowerCourse\Resources\Chapter;
 
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\WpUtils\Classes\General;
 
 /**
  * Class Utils
@@ -322,5 +323,33 @@ abstract class Utils {
 		}
 
 		return true; // 可能可以 apply filters
+	}
+
+
+	/**
+	 * 取得格式化後的水印文字
+	 *
+	 * @param string|null $type 類型.
+	 * @return string
+	 */
+	public static function get_formatted_watermark_text( ?string $type = 'video' ): string {
+		/** @var string $watermark_text */
+		$watermark_text = match ($type) {
+			'pdf'   => \get_option( 'pc_pdf_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}' ),
+			default => \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}' ),
+		};
+
+		$wp_current_user = \wp_get_current_user();
+		$email           = $wp_current_user->user_email ?: '';
+		$display_name    = $wp_current_user->display_name ?: '';
+		$username        = $wp_current_user->user_login ?: '';
+		$ip              = General::get_client_ip() ?? '';
+
+		global $chapter;
+		$post_title = $chapter ? $chapter->post_title : '';
+
+		$formatted_watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}', '{post_title}' ], [ $email, $ip, $display_name, $username, $post_title ], $watermark_text );
+
+		return $formatted_watermark_text;
 	}
 }
