@@ -8,14 +8,14 @@ const showChapterInMobile = (_isMobile = true) => {
 		return
 	}
 
+	$('#pc-classroom-body div[id^="tab-"]').removeClass('active')
 	if (_isMobile) {
-		$('#pc-classroom-body div[id^="tab-"]').removeClass('active')
 		$(
 			'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-content-chapter',
 		).addClass('active')
 	} else {
 		$(
-			'#pc-classroom-body #tab-nav-chapter, #pc-classroom-body #tab-nav-discuss',
+			'#pc-classroom-body #tab-nav-discuss, #pc-classroom-body #tab-content-discuss',
 		).addClass('active')
 	}
 }
