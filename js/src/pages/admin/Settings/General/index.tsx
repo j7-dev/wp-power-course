@@ -50,11 +50,67 @@ const index = () => {
 					name={['pc_watermark_text']}
 					label="浮水印文字"
 					tooltip="可用變數 {display_name} {email} {ip} {username} {post_title}，也支援 <br /> 換行"
+					help="換行使用 <br />"
 				>
-					<Input allowClear placeholder="{display_name}正在觀看 用戶IP:{ip}" />
+					<Input.TextArea
+						allowClear
+						placeholder="學員:{display_name} 用戶IP:{ip} <br /> 用戶Email:{email}"
+						rows={3}
+					/>
 				</Item>
 				<Item
 					name={['pc_watermark_color']}
+					label="浮水印顏色"
+					normalize={(value) => value.toRgbString()}
+				>
+					<ColorPicker
+						defaultFormat="rgb"
+						presets={[
+							{
+								label: '預設',
+								colors: [
+									'rgba(255, 255, 255, 0.5)',
+									'rgba(200, 200, 200, 0.5)',
+								],
+							},
+						]}
+					/>
+				</Item>
+
+				<Heading className="mt-8">課件講義 PDF 浮水印設定</Heading>
+				<Alert
+					className="mb-4"
+					message="防止自己努力錄製的心血被盜錄"
+					description={
+						<ol className="pl-4">
+							<li>浮水印顯示當前用戶的 Email</li>
+							<li>教室內上傳的 PDF 才會顯示浮水印</li>
+						</ol>
+					}
+					type="info"
+					showIcon
+				/>
+				<Item
+					name={['pc_pdf_watermark_qty']}
+					label="浮水印數量"
+					tooltip="填 0 就不顯示浮水印，建議數量 3~10，太多會影響觀影體驗"
+				>
+					<InputNumber min={0} max={30} className="w-full" />
+				</Item>
+				<Item
+					name={['pc_pdf_watermark_text']}
+					label="浮水印文字"
+					tooltip="可用變數 {display_name} {email} {ip} {username} {post_title}，也支援 \n 換行"
+					help="換行使用 \n ，不是 <br />"
+				>
+					<Input.TextArea
+						allowClear
+						placeholder="學員:{display_name} 用戶IP:{ip} \n 用戶Email:{email}"
+						rows={3}
+					/>
+				</Item>
+				<Item
+					name={['pc_pdf_watermark_color']}
 					label="浮水印顏色"
 					normalize={(value) => value.toRgbString()}
 				>

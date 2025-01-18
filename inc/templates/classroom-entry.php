@@ -16,7 +16,7 @@
  */
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
+use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
 
 
@@ -123,10 +123,20 @@ do_action('power_course_before_classroom_render');
 			<script>
 				window.pc_data = {
 					"nonce": "%1$s",
+					"plugin_url": "%2$s",
+					"pdf_watermark": {
+						"qty": "%3$d",
+						"color": "%4$s",
+						"text": "%5$s"
+					}
 				}
 			</script>
 			',
-			\wp_create_nonce( 'wp_rest' )
+			\wp_create_nonce( 'wp_rest' ),
+			Plugin::$url,
+			(int) \get_option('pc_pdf_watermark_qty', 0),
+			(string) \get_option('pc_pdf_watermark_color', 'rgba(255, 255, 255, 0.5)'),
+			ChapterUtils::get_formatted_watermark_text('pdf')
 			);
 			\wp_footer();
 			 ?>

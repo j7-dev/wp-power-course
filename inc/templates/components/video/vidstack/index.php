@@ -8,6 +8,7 @@
 
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\General;
+use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 
 $default_args = [
 	'class'          => 'rounded-xl',
@@ -27,7 +28,7 @@ $default_args = [
 $args = wp_parse_args( $args, $default_args );
 
 /**
- * @var array{type: string, id: string, meta: ?array} $video_info
+ * @var array{type: string, id: string, meta: ?array<string, mixed>} $video_info
  */
 [
 	'class'      => $class,
@@ -40,7 +41,7 @@ $args = wp_parse_args( $args, $default_args );
 	'id'   => $video_id,
 ] = $video_info;
 
-$bunny_cdn_hostname = \get_option( 'bunny_cdn_hostname', '' );
+$bunny_cdn_hostname = (string) \get_option( 'bunny_cdn_hostname', '' );
 
 $src = match ($video_info['type']) {
 	'youtube' => "youtube/{$video_id}",
@@ -60,22 +61,13 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 	return;
 }
 
-
-
-$wp_current_user = \wp_get_current_user();
-$email           = $wp_current_user ? $wp_current_user->user_email : '';
-$display_name    = $wp_current_user ? $wp_current_user->display_name : '';
-$username        = $wp_current_user ? $wp_current_user->user_login : '';
-$ip              = General::get_client_ip() ?? '';
-global $chapter;
-$post_title = $chapter ? $chapter?->post_title : '';
-
-$watermark_qty      = $hide_watermark ? '0' : \get_option( 'pc_watermark_qty', '0' );
-$watermark_color    = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)' );
+/** @var string $watermark_qty */
+$watermark_qty = $hide_watermark ? '0' : \get_option( 'pc_watermark_qty', '0' );
+/** @var string $watermark_color */
+$watermark_color = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)' );
+/** @var string $watermark_interval */
 $watermark_interval = \get_option( 'pc_watermark_interval', '10' );
-$watermark_text     = \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}' );
-
-$watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}', '{post_title}' ], [ $email, $ip, $display_name, $username, $post_title ], $watermark_text );
+$watermark_text     = ChapterUtils::get_formatted_watermark_text();
 
 
 printf(
