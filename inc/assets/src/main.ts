@@ -12,6 +12,7 @@ import {
 	CommentApp,
 	cart,
 	HlsSupport,
+	watermarkPDF,
 } from './events'
 ;(function ($) {
 	// 訂閱放前面
@@ -29,6 +30,9 @@ import {
 	toggleContent()
 	countdown()
 	HlsSupport()
+
+	// PDF 浮水印下載
+	watermarkPDF()
 
 	new CommentApp('#review-app', {
 		queryParams: {
