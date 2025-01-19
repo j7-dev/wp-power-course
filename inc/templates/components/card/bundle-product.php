@@ -27,7 +27,7 @@ if ( ! $helper?->is_bundle_product ) {
 }
 
 
-$pbp_product_ids = $helper?->get_product_ids() ?? [];
+$pbp_product_ids = $helper?->get_product_ids() ?? []; // @phpstan-ignore-line
 
 $product_name = $product->get_name();
 
