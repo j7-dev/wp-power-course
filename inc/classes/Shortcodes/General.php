@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Shortcodes;
 
+use J7\PowerCourse\BundleProduct\Helper;
+
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
@@ -24,6 +26,8 @@ final class General {
 	public static array $shortcodes = [
 		'pc_courses',
 		'pc_my_courses',
+		'pc_simple_card',
+		'pc_bundle_card',
 	];
 
 	/**
@@ -115,5 +119,76 @@ final class General {
 		);
 
 		return (string) $html;
+	}
+
+	/**
+	 * 簡單課程卡片短碼 pc_simple_card_callback
+	 *
+	 * @param array{product_id:int|string} $params 短碼參數
+	 * @return string
+	 */
+	public static function pc_simple_card_callback( array $params ): string {
+		$default_args = [
+			'product_id' => 0,
+		];
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		$product = \wc_get_product( $args['product_id'] );
+
+		if ( ! ( $product instanceof \WC_Product ) ) {
+			return '《找不到商品》';
+		}
+
+		if (in_array($product->get_type(), [ 'simple','subscription' ], true)) {
+			return (string) Plugin::safe_get(
+			'card/single-product',
+			[
+				'product' => $product,
+			],
+				false
+				);
+		}
+
+		return '《商品不是簡單商品》';
+	}
+
+	/**
+	 * 銷售方案卡片短碼 pc_bundle_card_callback
+	 *
+	 * @param array{product_id:int|string} $params 短碼參數
+	 * @return string
+	 */
+	public static function pc_bundle_card_callback( array $params ): string {
+		$default_args = [
+			'product_id' => 0,
+		];
+
+		$args = \wp_parse_args(
+			$params,
+			$default_args,
+		);
+
+		$product = \wc_get_product( $args['product_id'] );
+
+		if ( ! ( $product instanceof \WC_Product ) ) {
+			return '《找不到商品》';
+		}
+
+		$helper = Helper::instance( $product );
+		if ( $helper?->is_bundle_product ) {
+			return (string) Plugin::safe_get(
+				'card/bundle-product',
+				[
+					'product' => $product,
+				],
+				false
+				);
+		}
+
+		return '《商品不是銷售方案》';
 	}
 }
