@@ -1,7 +1,7 @@
 <?php
 /**
  * Api Optimize
- * 將 power-course-api-booster.php 檔案移動到 mu-plugins 目錄下
+ * 將 self::FILE_NAME 檔案移動到 mu-plugins 目錄下
  * 加快 API 回應速度
  */
 
@@ -15,6 +15,8 @@ namespace J7\PowerCourse\Compatibility;
 final class ApiOptimize {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
+	const FILE_NAME = 'power-course-api-booster.php';
+
 	/**
 	 * Constructor
 	 */
@@ -24,7 +26,7 @@ final class ApiOptimize {
 
 	/**
 	 * Move File
-	 * 負責將 power-course-api-booster.php 移動到 mu-plugins 目錄
+	 * 負責將 self::FILE_NAME 移動到 mu-plugins 目錄
 	 *
 	 * @return void
 	 * @throws \Exception 如果檔案操作失敗
@@ -35,19 +37,31 @@ final class ApiOptimize {
 
 		// 檢查 mu-plugins 目錄是否存在
 		if (!is_dir($mu_plugins_dir)) {
-			\J7\WpUtils\Classes\ErrorLog::info('mu-plugins 目錄不存在', $mu_plugins_dir);
-			return;
+			\J7\WpUtils\Classes\WC::log($mu_plugins_dir, 'mu-plugins 目錄不存在，嘗試創建 mu-plugins');
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			// 創建 mu-plugins 目錄
+			global $wp_filesystem;
+			if (!WP_Filesystem()) {
+				\J7\WpUtils\Classes\WC::log($mu_plugins_dir, '無法初始化 WP_Filesystem');
+				return;
+			}
+			if (!$wp_filesystem->mkdir($mu_plugins_dir, 0755)) {
+				\J7\WpUtils\Classes\WC::log($mu_plugins_dir, '無法創建 mu-plugins 目錄');
+				return;
+			} else {
+				\J7\WpUtils\Classes\WC::log($mu_plugins_dir, '成功創建 mu-plugins 目錄');
+			}
 		}
 
 		// 源文件路徑
-		$source_file = __DIR__ . '/power-course-api-booster.php';
+		$source_file = __DIR__ . '/' . self::FILE_NAME;
 		// 目標文件路徑
-		$target_file = $mu_plugins_dir . '/power-course-api-booster.php';
+		$target_file = $mu_plugins_dir . '/' . self::FILE_NAME;
 
 		try {
 			// 檢查源文件是否存在
 			if (!file_exists($source_file)) {
-				\J7\WpUtils\Classes\ErrorLog::info('源文件不存在', $source_file);
+				\J7\WpUtils\Classes\WC::log($source_file, '源文件不存在');
 				return;
 			}
 
@@ -63,15 +77,14 @@ final class ApiOptimize {
 				throw new \Exception('檔案複製失敗');
 			}
 		} catch (\Exception $e) {
-			\J7\WpUtils\Classes\ErrorLog::info(
+			\J7\WpUtils\Classes\WC::log(
 				[
 					'message' => $e->getMessage(),
 					'source'  => $source_file,
 					'target'  => $target_file,
 				],
 				'檔案操作失敗'
-			);
-			return;
+				);
 		}
 	}
 }
