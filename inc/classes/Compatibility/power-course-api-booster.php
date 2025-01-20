@@ -4,7 +4,7 @@
  * 在特定的 API 路徑下，只載入必要的插件
  */
 
-namespace J7\PowerCourse\Compatibility\ApiOptimize;
+namespace J7\PowerCourse\MU;
 
 /**
  * ApiBooster
