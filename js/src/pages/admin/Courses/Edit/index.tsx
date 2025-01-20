@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Modal, Button, Space } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Modal, Button } from 'antd'
 import {
 	CourseDescription,
 	CourseQA,
