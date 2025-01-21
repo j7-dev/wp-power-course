@@ -24,7 +24,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-echo '<div class="w-full md:w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
+echo '<div class="w-full md:!w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
 
 Plugin::get( 'card/single-product' );
 
