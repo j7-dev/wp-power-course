@@ -27,7 +27,7 @@ export const watermarkPDF = () => {
 			.attr('data-href', href)
 			.attr('data-completed', 'false')
 
-		// 押浮水印
+		// 取得檔名
 		const pdfName = href.split('/').pop() || 'watermarked.pdf'
 
 		try {
@@ -112,11 +112,6 @@ export const watermarkPDF = () => {
 
 			// 標示為處理完成
 			$link.attr('data-completed', 'true')
-
-			// 清理 URL
-			setTimeout(() => {
-				URL.revokeObjectURL(url)
-			}, 100)
 		} catch (error) {
 			console.error('處理 PDF 時發生錯誤:', error)
 
