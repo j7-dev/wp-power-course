@@ -28,10 +28,13 @@ const useSave = ({ form }: { form: FormInstance }) => {
 							key: 'save',
 						})
 
+						// 刷新頁面
+						window.location.reload()
+
 						// 使所有的query cache失效
-						invalidate({
-							invalidates: ['all'],
-						})
+						// invalidate({
+						// 	invalidates: ['all'],
+						// })
 					},
 				},
 			)
