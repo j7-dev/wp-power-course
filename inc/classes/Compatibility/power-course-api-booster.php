@@ -19,6 +19,7 @@ final class ApiBooster {
 	protected static $namespaces = [
 		'/wp-json/power-course',
 		'/wp-json/power-email',
+		'powerhouse',
 	];
 
 	/**
@@ -40,7 +41,7 @@ final class ApiBooster {
 	 * @return void
 	 */
 	public static function only_load_required_plugins(): void {
-		// 檢查是否為 "/wp-json/{$namespace}" API 請求
+		// 檢查 API 請求是否包含 "/{$namespace}" 字串
 		$some_strpos = false;
 		foreach (self::$namespaces as $namespace) {
 			if (strpos((string) $_SERVER['REQUEST_URI'],  $namespace) !== false) { // phpcs:ignore
