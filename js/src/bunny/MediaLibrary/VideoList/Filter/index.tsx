@@ -13,14 +13,7 @@ import { bunny_library_id } from '@/utils'
 
 const { Search } = Input
 
-const Filter = ({
-	selectedVideos,
-	setSelectedVideos,
-	setSearch,
-	loading,
-	selectButtonProps,
-	...inputProps
-}: {
+type TFilterProps = {
 	selectedVideos: TBunnyVideo[]
 	setSelectedVideos:
 		| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
@@ -32,7 +25,16 @@ const Filter = ({
 	setSearch: React.Dispatch<React.SetStateAction<string>>
 	loading?: boolean
 	selectButtonProps?: ButtonProps
-} & InputProps) => {
+} & InputProps
+
+const Filter = ({
+	selectedVideos,
+	setSelectedVideos,
+	setSearch,
+	loading,
+	selectButtonProps,
+	...inputProps
+}: TFilterProps) => {
 	const [value, setValue] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 	const { mutate: deleteVideo } = useDelete()
@@ -45,8 +47,7 @@ const Filter = ({
 				{
 					dataProviderName: 'bunny-stream',
 					resource: `${bunny_library_id}/videos`,
-					id: video.guid,
-					mutationMode: 'undoable',
+					id: video?.guid,
 				},
 				{
 					onSuccess: () => {
