@@ -70,6 +70,11 @@ final class Api extends ApiBase {
 	public function __construct() {
 		parent::__construct();
 
+		// 檢查 API 請求是否包含 "/wp-json/power-course" 字串
+		if (strpos( (string) $_SERVER['REQUEST_URI'], '/wp-json/power-course') === false) { // phpcs:ignore
+			return;
+		}
+
 		global $wpdb;
 		$this->extra_report_columns = [
 			// 取得退款訂單數量
