@@ -26,6 +26,9 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
+	const watchShowDescriptionTab =
+		Form.useWatch(['show_description_tab'], form) === 'yes'
+
 	const { blockNoteViewProps, html, setHTML } = useBlockNote({
 		apiConfig: {
 			apiEndpoint: `${apiUrl}/upload`,
@@ -63,6 +66,8 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 		}
 	}, [watchId, open])
 
+	const canElementor = watchId && watchShowDescriptionTab
+
 	return (
 		<div>
 			<p className="mb-2">
@@ -76,19 +81,27 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 						items: [
 							{
 								key: 'elementor',
-								label: watchId ? (
-									<a
-										href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
-										target="_blank"
-										rel="noreferrer"
+								label: (
+									<Tooltip
+										title={getTooltipTitle(
+											canElementor,
+											watchShowDescriptionTab,
+										)}
 									>
-										或 使用 Elementor 編輯器
-									</a>
-								) : (
-									<Tooltip title="先儲存後就可以使用 Elementor 編輯了">
-										或 使用 Elementor 編輯器 🚫
+										{canElementor ? (
+											<a
+												href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
+												target="_blank"
+												rel="noreferrer"
+											>
+												或 使用 Elementor 編輯器
+											</a>
+										) : (
+											'或 使用 Elementor 編輯器'
+										)}
 									</Tooltip>
 								),
+								disabled: !canElementor,
 							},
 						],
 					}}
@@ -155,6 +168,18 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 			</Drawer>
 		</div>
 	)
+}
+
+function getTooltipTitle(
+	canElementor: boolean,
+	watchShowDescriptionTab: boolean,
+) {
+	if (canElementor) {
+		return ''
+	}
+	return watchShowDescriptionTab
+		? '先儲存後就可以使用 Elementor 編輯了'
+		: '您必須「其他設定 》 顯示介紹」才可以使用 Elementor 編輯'
 }
 
 export const DescriptionDrawer = memo(DescriptionDrawerComponent)
