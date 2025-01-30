@@ -4,8 +4,9 @@
  */
 
 $default_args = [
-	'type'    => 'default', // error, success, warning, info
+	'type'    => 'info', // error, success, warning, info
 	'message' => '您還沒購買此課程，無法上課，前往購買',
+	'buttons' => '',
 ];
 
 /**
@@ -17,30 +18,32 @@ $args = wp_parse_args( $args, $default_args );
 [
 	'type'    => $alert_type,
 	'message' => $message,
+	'buttons' => $buttons,
 ] = $args;
 
-$color_class = match ( $alert_type ) {
-	'error'   => 'text-red-800 bg-red-50',
-	'success' => 'text-green-800 bg-green-50',
-	'warning' => 'text-orange-800 bg-orange-50',
-	'info'    => 'text-blue-800 bg-blue-50',
-	default   => 'text-gray-800 bg-gray-50',
-};
+$component_class = "pc-alert-{$alert_type}";
 
 printf(
 	/*html*/'
-	<div
-		class="flex items-center p-4 mb-4 rounded-lg %1$s"
-		role="alert">
-		<svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-		     viewBox="0 0 20 20">
-			<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+	<div role="alert" class="mb-4 pc-alert %1$s">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			class="stroke-info h-6 w-6 shrink-0">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
 		</svg>
-		<div class="ms-3 text-base font-medium">
-			%2$s
+		<span>%2$s</span>
+		<div>
+			%3$s
 		</div>
 	</div>
 	',
-	$color_class,
-	$message
+	$component_class,
+	$message,
+	$buttons
 );
