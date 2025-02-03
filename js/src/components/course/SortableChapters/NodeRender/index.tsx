@@ -8,7 +8,8 @@ import {
 	DuplicateButton,
 	PopconfirmDelete,
 } from '@/components/general'
-import { Checkbox, CheckboxProps, Tooltip } from 'antd'
+import { Checkbox, CheckboxProps } from 'antd'
+import { flatMapDeep } from 'lodash-es'
 
 const NodeRender: FC<{
 	node: FlattenNode<TChapterRecord>
@@ -35,11 +36,25 @@ const NodeRender: FC<{
 		removeNode(node.id)
 	}
 
+	const getFlattenChildrenIds = (
+		_node: FlattenNode<TChapterRecord>,
+	): string[] => {
+		return flatMapDeep([_node], (__node: FlattenNode<TChapterRecord>) => [
+			__node?.id as string,
+			...__node?.children?.map((child) =>
+				getFlattenChildrenIds(child as FlattenNode<TChapterRecord>),
+			),
+		])
+	}
+
 	const handleCheck: CheckboxProps['onChange'] = (e) => {
+		const flattenChildrenIds = getFlattenChildrenIds(node)
 		if (e.target.checked) {
-			setSelectedIds((prev) => [...prev, node.id as string])
+			setSelectedIds((prev) => [...prev, ...flattenChildrenIds])
 		} else {
-			setSelectedIds((prev) => prev.filter((id) => id !== node.id))
+			setSelectedIds((prev) =>
+				prev.filter((id) => !flattenChildrenIds.includes(id)),
+			)
 		}
 	}
 	const isChecked = selectedIds.includes(node.id as string)
