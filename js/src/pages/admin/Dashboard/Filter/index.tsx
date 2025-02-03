@@ -208,7 +208,8 @@ const index = ({
 							)
 							return (
 								<span>
-									<sub className="text-gray-500">#{value}</sub> {label}{' '}
+									<span className="text-gray-400 text-xs">#{value}</span>{' '}
+									{label}{' '}
 									<Tag color={productType?.color}>{productType?.label}</Tag>
 									{option?.is_course && <Tag color="gold">課程</Tag>}
 								</span>
@@ -273,13 +274,13 @@ const index = ({
 				<div className="flex items-center gap-x-2">
 					<Tooltip title="分開顯示">
 						<LineChartOutlined
-							className={`text-xl ${EViewType.DEFAULT === viewType ? 'text-primary' : 'text-gray-500'}`}
+							className={`text-xl ${EViewType.DEFAULT === viewType ? 'text-primary' : 'text-gray-400'}`}
 							onClick={() => setViewType(EViewType.DEFAULT)}
 						/>
 					</Tooltip>
 					<Tooltip title="堆疊比較">
 						<AreaChartOutlined
-							className={`text-xl ${EViewType.AREA === viewType ? 'text-primary' : 'text-gray-500'}`}
+							className={`text-xl ${EViewType.AREA === viewType ? 'text-primary' : 'text-gray-400'}`}
 							onClick={() => setViewType(EViewType.AREA)}
 						/>
 					</Tooltip>

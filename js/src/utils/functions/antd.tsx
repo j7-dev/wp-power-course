@@ -7,7 +7,7 @@ export const defaultSelectProps: SelectProps = {
 	optionRender: ({ value, label }) => {
 		return (
 			<span>
-				<sub className="text-gray-500">#{value}</sub> {label}
+				<span className="text-gray-400 text-xs">#{value}</span> {label}
 			</span>
 		)
 	},

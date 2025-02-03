@@ -72,7 +72,7 @@ export class TimelineItemAdapter {
 			children: (
 				<>
 					<p className="mt-0 mb-1">{this.title}</p>
-					<p className="my-0 text-xs text-gray-500">{this.created_at}</p>
+					<p className="my-0 text-xs text-gray-400">{this.created_at}</p>
 				</>
 			),
 		}

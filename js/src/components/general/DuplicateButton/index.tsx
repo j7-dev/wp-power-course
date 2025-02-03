@@ -40,7 +40,7 @@ const DuplicateButtonComponent: FC<{
 			<Tooltip title="複製" {...tooltipProps}>
 				<Button
 					type="text"
-					className="text-gray-500"
+					className="text-gray-400"
 					icon={<CopyOutlined />}
 					onClick={handleDuplicate}
 					loading={isLoading}

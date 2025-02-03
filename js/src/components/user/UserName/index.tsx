@@ -13,7 +13,8 @@ export const UserName: FC<{
 			<div>
 				<p className="mb-1 cursor-pointer" onClick={onClick(record)}>
 					{is_teacher ? <Tag color="magenta">講師</Tag> : ''}
-					{display_name} <sub className="ml-1 text-gray-400">#{id}</sub>
+					{display_name}{' '}
+					<span className="ml-1 text-gray-400 text-xs">#{id}</span>
 				</p>
 				<p className="text-xs text-gray-400">{user_email}</p>
 			</div>

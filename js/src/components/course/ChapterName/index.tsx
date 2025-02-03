@@ -22,7 +22,7 @@ export const ChapterName: FC<{
 			>
 				{renderHTML(name)}
 			</p>
-			<div className="flex ml-2 text-[0.675rem] text-gray-500">
+			<div className="flex ml-2 text-[0.675rem] text-gray-400">
 				<span className="pr-3">{`ID: ${id}`}</span>
 			</div>
 		</>

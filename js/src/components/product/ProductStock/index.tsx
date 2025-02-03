@@ -37,7 +37,7 @@ export const ProductStock: FC<TProductStockProps> = ({
 	}
 
 	return (
-		<p className="m-0 text-gray-500 text-xs">
+		<p className="m-0 text-gray-400 text-xs">
 			<Icon className={`mr-2 ${color}`} />
 			{label}
 			{Number.isInteger(stock_quantity) && <> ({stock_quantity})</>}
@@ -85,7 +85,7 @@ function getTagProps(
 		default:
 			return {
 				label: '庫存狀態未知',
-				color: 'text-gray-500',
+				color: 'text-gray-400',
 				Icon: ({ ...props }) => <QuestionCircleOutlined {...props} />,
 			}
 	}

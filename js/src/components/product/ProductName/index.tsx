@@ -51,7 +51,7 @@ export const ProductName = <T extends TBaseRecord>({
 					>
 						{renderHTML(label ? label : name)}
 					</p>
-					<div className="flex text-[0.675rem] text-gray-500">
+					<div className="flex text-[0.675rem] text-gray-400">
 						<span className="pr-3">{`ID: ${id}`}</span>
 						{sku && <span className="pr-3">{`SKU: ${sku}`}</span>}
 					</div>

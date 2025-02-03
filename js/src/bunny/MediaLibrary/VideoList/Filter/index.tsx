@@ -89,7 +89,7 @@ const Filter = ({
 			/>
 
 			<div className="flex items-center gap-2">
-				<p className="text-sm m-0 text-gray-500">
+				<p className="text-sm m-0 text-gray-400">
 					已經選取 {selectedVideos?.length ?? 0} 個影片
 				</p>
 				<Popconfirm

@@ -112,7 +112,7 @@ const VideoItem = ({
 						? 'outline outline-4 outline-yellow-300 outline-offset-1'
 						: ''
 				}`}
-				loadingClassName="text-sm text-gray-500 font-bold"
+				loadingClassName="text-sm text-gray-400 font-bold"
 				src={`https://${bunny_cdn_hostname}/${video.guid}/${filename}`}
 			>
 				{children}

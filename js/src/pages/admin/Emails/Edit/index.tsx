@@ -58,7 +58,7 @@ const EmailsEdit = () => {
 				headerButtons={() => null}
 				title={
 					<>
-						《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
+						《編輯》 {name} <span className="text-gray-400 text-xs">#{id}</span>
 					</>
 				}
 				saveButtonProps={{

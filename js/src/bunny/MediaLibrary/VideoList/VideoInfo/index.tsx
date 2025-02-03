@@ -15,7 +15,7 @@ const VideoInfo = ({ video }: { video: TBunnyVideo }) => {
 		<>
 			<SimpleImage
 				className="w-full rounded-md overflow-hidden"
-				loadingClassName="text-sm text-gray-500 font-bold"
+				loadingClassName="text-sm text-gray-400 font-bold"
 				src={`https://${bunny_cdn_hostname}/${guid}/preview.webp`}
 			/>
 			<div className="flex gap-4 my-4">

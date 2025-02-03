@@ -83,13 +83,13 @@ export const ProductVariationsSelector: FC<
 			)}
 
 			{!hasSelectedAllAttributes && (
-				<p className="m-0 text-gray-500 text-xs">
+				<p className="m-0 text-gray-400 text-xs">
 					<CloseCircleFilled className="mr-2 text-red-500" />
 					未選擇商品屬性
 				</p>
 			)}
 			{hasSelectedAllAttributes && !!selectedVariation && (
-				<p className="m-0 text-gray-500 text-xs">
+				<p className="m-0 text-gray-400 text-xs">
 					<CheckCircleFilled className="mr-2 text-green-500" />
 					已選擇商品屬性
 				</p>
