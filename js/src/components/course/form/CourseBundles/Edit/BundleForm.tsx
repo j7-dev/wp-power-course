@@ -293,7 +293,7 @@ const BundleForm = () => {
 											className="h-9 w-16 rounded object-cover"
 										/>
 										<div className="w-full">
-											<sub>#{id}</sub>
+											<span className="text-gray-400 text-xs">#{id}</span>
 											{name}
 											<br />
 											{renderHTML(price_html)}

@@ -89,7 +89,7 @@ const Default = ({
 								</>
 							}
 							extra={
-								<span className="text-sm text-gray-500">
+								<span className="text-sm text-gray-400">
 									{isLastYear && (
 										<Tooltip
 											title={`${lastYear}年共 ${lastYearTotal.toLocaleString()} ${card.unit}`}

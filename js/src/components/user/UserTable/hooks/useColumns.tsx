@@ -40,7 +40,9 @@ const useColumns = (params?: TUseColumnsParams) => {
 									ellipsis={{
 										tooltip: (
 											<>
-												<sub className="text-gray-500">#{course_id}</sub>{' '}
+												<span className="text-gray-400 text-xs">
+													#{course_id}
+												</span>{' '}
 												{course_name || '未知的課程名稱'}
 											</>
 										),
@@ -57,7 +59,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 										})
 									}}
 								>
-									<sub className="text-gray-500">#{course_id}</sub>{' '}
+									<span className="text-gray-400 text-xs">#{course_id}</span>{' '}
 									{course_name || '未知的課程名稱'}
 								</Text>
 							</div>
@@ -105,7 +107,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 			render: (user_registered, record) => (
 				<>
 					<p className="m-0">已註冊 {record?.user_registered_human}</p>
-					<p className="m-0 text-gray-500 text-xs">{user_registered}</p>
+					<p className="m-0 text-gray-400 text-xs">{user_registered}</p>
 				</>
 			),
 		},

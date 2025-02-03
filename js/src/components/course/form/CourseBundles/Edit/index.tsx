@@ -93,7 +93,7 @@ const EditBundleComponent = ({
 			headerButtons={() => null}
 			title={
 				<div className="pl-4">
-					《編輯》 {name} <sub className="text-gray-500">#{id}</sub>
+					《編輯》 {name} <span className="text-gray-400 text-xs">#{id}</span>
 				</div>
 			}
 			saveButtonProps={{

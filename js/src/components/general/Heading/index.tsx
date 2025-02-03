@@ -15,7 +15,7 @@ const HeadingComponent: FC<
 		return (
 			<Divider
 				orientation="left"
-				className="text-sm text-gray-500 my-8"
+				className="text-sm text-gray-400 my-8"
 				plain
 				orientationMargin="0"
 				{...rest}

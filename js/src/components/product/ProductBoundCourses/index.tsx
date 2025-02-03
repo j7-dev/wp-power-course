@@ -46,7 +46,7 @@ const ProductBoundCoursesComponent: FC<{
 					<div>
 						{hideName && (
 							<Tooltip title={name || '未知的課程名稱'}>
-								<sub className="text-gray-500">#{id}</sub>
+								<span className="text-gray-400 text-xs">#{id}</span>
 							</Tooltip>
 						)}
 						{!hideName && (
@@ -55,7 +55,7 @@ const ProductBoundCoursesComponent: FC<{
 									tooltip: name || '未知的課程名稱',
 								}}
 							>
-								<sub className="text-gray-500">#{id}</sub>{' '}
+								<span className="text-gray-400 text-xs">#{id}</span>{' '}
 								{name || '未知的課程名稱'}
 							</Text>
 						)}

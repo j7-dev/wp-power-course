@@ -96,7 +96,7 @@ div .pc-rating input[checked] ~ input {
 			align-items: start;
 			del {
 				order: 0;
-				@apply text-gray-500 text-xs md:text-base;
+				@apply text-gray-400 text-xs md:text-base;
 			}
 			ins {
 				order: 1;
@@ -174,7 +174,7 @@ div .pc-rating input[checked] ~ input {
 			}
 			del {
 				order: 2;
-				@apply text-gray-500 text-xs md:text-base font-normal;
+				@apply text-gray-400 text-xs md:text-base font-normal;
 			}
 		}
 	}
@@ -182,7 +182,9 @@ div .pc-rating input[checked] ~ input {
 
 // My Account 我的學習 icon
 
-.woocommerce-MyAccount-navigation ul li.woocommerce-MyAccount-navigation-link--courses {
+.woocommerce-MyAccount-navigation
+	ul
+	li.woocommerce-MyAccount-navigation-link--courses {
 	a {
 		i {
 			display: none;

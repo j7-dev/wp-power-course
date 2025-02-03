@@ -14,7 +14,7 @@ export const SimpleImage: FC<SimpleImageProps> = ({
 	className = 'w-full',
 	ratio = 'aspect-video',
 	src = defaultImage,
-	loadingClassName = 'text-xl text-gray-500 font-bold',
+	loadingClassName = 'text-xl text-gray-400 font-bold',
 	...rest
 }) => {
 	return (

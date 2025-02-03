@@ -21,7 +21,7 @@ export const ProductAction: FC<{
 				<Button
 					type="text"
 					icon={
-						<SiGoogleclassroom className="relative top-0.5 text-gray-500" />
+						<SiGoogleclassroom className="relative top-0.5 text-gray-400" />
 					}
 					href={`${siteUrl}/classroom/${record?.slug}`}
 					target="_blank"
@@ -34,7 +34,7 @@ export const ProductAction: FC<{
 					href={`${siteUrl}/${course_permalink_structure}/${record?.slug}`}
 					target="_blank"
 					rel="noreferrer"
-					icon={<ExportOutlined className="text-gray-500" />}
+					icon={<ExportOutlined className="text-gray-400" />}
 				/>
 			</Tooltip>
 			<ToggleVisibility record={record} />

@@ -93,7 +93,8 @@ export const ListSelect = <T extends BaseRecord>({
 								/>
 							</div>
 							<div className="flex-1">
-								{name} <sub className="text-gray-400 ml-1">#{key}</sub>
+								{name}{' '}
+								<span className="text-gray-400 text-xs ml-1">#{key}</span>
 							</div>
 							<div className="w-8 text-right">
 								<PopconfirmDelete

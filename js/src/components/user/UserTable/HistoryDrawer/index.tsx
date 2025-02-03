@@ -85,10 +85,12 @@ const index = () => {
 			title={
 				<>
 					<p className="mt-0 mb-1">
-						學習紀錄 - {course_name} <sub>#{course_id}</sub>
+						學習紀錄 - {course_name}{' '}
+						<span className="text-gray-400 text-xs">#{course_id}</span>
 					</p>
-					<p className="my-0 text-sm text-gray-500">
-						<UserOutlined className="mr-2" /> {user_name} <sub>#{user_id}</sub>
+					<p className="my-0 text-sm text-gray-400">
+						<UserOutlined className="mr-2" /> {user_name}{' '}
+						<span className="text-gray-400 text-xs">#{user_id}</span>
 					</p>
 				</>
 			}

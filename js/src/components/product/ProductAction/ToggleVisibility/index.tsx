@@ -35,7 +35,7 @@ const ToggleVisibility: FC<{
 				<Button
 					loading={isLoading}
 					type="text"
-					icon={<EyeOutlined className="text-gray-500" />}
+					icon={<EyeOutlined className="text-gray-400" />}
 					onClick={handleToggle}
 				/>
 			) : (
