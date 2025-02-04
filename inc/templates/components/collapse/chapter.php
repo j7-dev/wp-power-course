@@ -53,7 +53,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	foreach ( $sub_chapters as $sub_chapter ) :
 		$classroom_link      = \site_url("classroom/{$product->get_slug()}/{$sub_chapter->ID}");
 		$classroom_link_html = sprintf(
-		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-primary">%2$s %3$s</a>',
+		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-secondary">%2$s %3$s</a>',
 		$classroom_link,
 		$sub_chapter->post_title,
 		Plugin::get(
@@ -67,7 +67,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 
 		$children_html .= sprintf(
 			/*html*/'
-			<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex pl-8 pr-4">
+			<div class="text-sm border-t-0 border-x-0 border-b border-base-content border-solid py-3 flex pl-8 pr-4">
 					<div class="w-8 flex justify-center items-start">•</div>
 					<div class="flex-1">%1$s</div>
 			</div>
@@ -80,11 +80,11 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		/*html*/'
     <div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
 			<input type="checkbox" checked="checked"/>
-			<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
+			<div class="pc-collapse-title text-sm font-semibold bg-base-300 py-3 flex items-center justify-between">
 				<span>%1$s</span>
-				<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+				<span class="text-xs text-base-content">共 %2$s 個單元</span>
 			</div>
-			<div class="pc-collapse-content bg-gray-50 p-0">
+			<div class="pc-collapse-content bg-base-200 p-0">
 				%3$s
 			</div>
 		</div>

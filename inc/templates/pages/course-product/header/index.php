@@ -58,7 +58,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			?>
 		</div>
 
-		<h1 class="mb-[10px] text-xl md:text-4xl md:leading-[3rem] font-semibold">
+		<h1 class="mb-[10px] text-xl md:text-4xl md:leading-[3rem] font-semibold text-base-content">
 			<?php echo $product->get_name(); ?>
 		</h1>
 

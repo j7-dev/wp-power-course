@@ -27,7 +27,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $message = CourseUtils::get_expired_label($product, get_current_user_id());
 
 
-echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
+echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
 Plugin::get(
 	'alert',
 	[

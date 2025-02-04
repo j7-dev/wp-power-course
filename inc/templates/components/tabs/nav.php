@@ -17,7 +17,7 @@ $course_tabs        = is_array($course_tabs) ? $course_tabs : []; // @phpstan-ig
 $default_active_key = $args['default_active_key'] ?? array_key_first($course_tabs);
 
 
-echo '<div class="bg-gray-50 flex gap-0 text-gray-400 justify-between [&_.active]:!border-gray-600 [&_.active]:text-gray-600 [&_div:hover]:!border-gray-600 [&_div:hover]:text-gray-600" style="border-bottom: 3px solid #eee;">';
+echo '<div class="bg-base-100 flex gap-0 text-base-content justify-between [&_.active]:!border-gray-600 [&_.active]:text-gray-600 [&_div:hover]:!border-gray-600 [&_div:hover]:text-gray-600 border-base-content/20" style="border-bottom: 3px solid;">';
 
 foreach ( $course_tabs as $key => $course_tab ) {
 	printf(

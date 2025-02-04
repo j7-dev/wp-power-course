@@ -49,6 +49,7 @@ if ( 'none' !== $video_type ) {
 	'typography/title',
 	[
 		'value' => '課程試看',
+		'class' => 'mb-8 text-xl font-normal text-base-content',
 	],
 	false
 	),
@@ -68,6 +69,7 @@ if ( ! ! $teacher_ids ) {
 		'typography/title',
 		[
 			'value' => '關於講師',
+			'class' => 'mb-8 text-xl font-normal text-base-content',
 		]
 	);
 }

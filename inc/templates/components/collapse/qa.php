@@ -37,10 +37,10 @@ foreach ( $qa_list as $qa ) {
 		/*html*/'
 	<div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
 		<input type="checkbox" checked="checked" />
-		<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
+		<div class="pc-collapse-title text-sm font-semibold bg-base-300 py-3 flex items-center justify-between">
 			<span>%1$s</span>
 		</div>
-		<div class="pc-collapse-content bg-gray-50 p-0">
+		<div class="pc-collapse-content bg-base-200 p-0">
 			<div class="text-xs border-t-0 border-x-0 border-b border-gray-200 border-solid py-6 flex flex-col px-8 leading-7">
 				%2$s
 			</div>

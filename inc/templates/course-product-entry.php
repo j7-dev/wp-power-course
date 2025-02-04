@@ -15,7 +15,7 @@ $GLOBALS['product'] = $product;
 \add_filter(
 'body_class',
 function ( $classes ) {
-	$classes[] = 'bg-gray-50 courses-product'; // 添加背景色
+	$classes[] = 'courses-product'; // 添加背景色
 	return $classes;
 }
 );
@@ -51,7 +51,7 @@ if ('draft' === $product_status) {
 	</div>';
 }
 
-echo '<div class="leading-7 text-gray-800 w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
+echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
 
 // Header
 Plugin::get( 'course-product/header', null, true, true );

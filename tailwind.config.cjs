@@ -67,7 +67,7 @@ module.exports = {
 		'columns-2',
 		'fixed',
 		'block',
-		'inline'
+		'inline',
 	],
 	daisyui: {
 		themes: [
@@ -89,6 +89,11 @@ module.exports = {
 					'--btn-focus-scale': '1',
 				},
 			},
+			'cupcake',
+			'dark',
+			'cmyk',
+			'light',
+			'lemonade',
 		],
 		prefix: 'pc-', // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
 	},

@@ -37,10 +37,12 @@ if ( $is_avl ) {
 		'alert',
 	[
 		'type'    => 'info',
-		'message' => sprintf(
-		/*html*/'您已經購買課程，<a href="%1$s" class="text-primary underline hover:opacity-70" target="_blank">前往教室</a>',
-			site_url( "classroom/{$product->get_slug()}" ),
-			),
+		'message' => '您已經購買課程',
+		'buttons' => sprintf(
+			/*html*/'<a  href="%1$s" target="_blank" class="pc-btn pc-btn-sm pc-btn-primary text-white">%2$s</a>',
+				site_url( "classroom/{$product->get_slug()}" ),
+				'前往教室',
+				),
 		] // phpcs:ignore
 	);
 }
@@ -101,6 +103,7 @@ if ($items) {
 	'typography/title',
 	[
 		'value' => '課程資訊',
+		'class' => 'mb-8 text-xl font-normal text-base-content',
 	]
 	);
 

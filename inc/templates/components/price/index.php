@@ -42,7 +42,7 @@ if ($is_on_sale) {
 		/*html*/'
 		<div class="flex flex-col">
 			<del aria-hidden="true" class="text-gray-600">%1$s</del>
-			<ins class="text-red-400 text-2xl font-semibold">%2$s</ins>
+			<ins class="text-error text-2xl font-semibold">%2$s</ins>
 		</div>
 		',
 		( is_numeric( $regular_price ) ? \wc_price( (float) $regular_price ) : $regular_price ),
