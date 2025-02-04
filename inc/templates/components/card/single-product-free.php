@@ -34,8 +34,8 @@ $url           = \add_query_arg(
 
 printf(
 /*html*/'
-<div class="w-full bg-white shadow-lg rounded p-6">
-	<h6 class="text-base font-semibold text-center">免費課程</h6>
+<div class="w-full bg-base-100 shadow-lg rounded p-6">
+	<h6 class="text-base text-base-content font-semibold text-center">免費課程</h6>
 	%1$s
 	<div class="mt-2">%2$s</div>
 	<div class="mt-8 mb-6 text-sm">%3$s</div>

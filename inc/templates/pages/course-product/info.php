@@ -21,7 +21,7 @@ foreach ( $items as $index => $item ) :
 	printf(
 		/*html*/'
         <div class="flex items-center gap-3">
-					<div class="bg-blue-500 rounded-xl h-8 w-8 flex items-center justify-center">
+					<div class="pc-badge pc-badge-primary h-8 w-8 flex items-center justify-center">
 		        %1$s
           </div>
 					<div>

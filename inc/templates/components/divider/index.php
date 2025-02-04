@@ -1,1 +1,1 @@
-<hr class="border-none h-[1px] w-full bg-gray-200 my-4" />
+<hr class="border-none h-[1px] w-full bg-base-content my-4" />

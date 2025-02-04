@@ -52,7 +52,7 @@ printf(
 
 <div class="hidden">
 	<a target="_blank" href="%4$s"
-		class="flex hover:opacity-75 whitespace-nowrap items-center text-sm text-gray-800 hover:text-gray-800 transition duration-300 ease-in-out">
+		class="flex hover:opacity-75 whitespace-nowrap items-center text-sm text-base-content hover:text-base-content transition duration-300 ease-in-out">
 		<span style="border-bottom: 1px solid #333">前往講師個人頁</span>
 		<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 			<path d="M10 7L15 12L10 17" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

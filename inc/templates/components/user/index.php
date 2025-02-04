@@ -38,7 +38,7 @@ $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url(
 $user_link = \get_author_posts_url( $user_id );
 
 printf(
-	'<span href="%1$s" target="_blank" class="text-sm flex gap-2 items-center text-gray-800 hover:text-gray-800/70">
+	'<span href="%1$s" target="_blank" class="text-sm flex gap-2 items-center text-base-content hover:text-base-content/75">
 	<img class="rounded-full w-6 h-6" src="%2$s" loading="lazy" alt="%3$s"/>%3$s</span>',
 	'#', // TODO 先隱藏 $user_link,
 	$user_avatar_url,

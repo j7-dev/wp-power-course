@@ -12,7 +12,7 @@ use J7\PowerCourse\Utils\Base;
 $default_args = [
 	'children'   => '',
 	'height'     => 160,
-	'wrap_class' => 'bg-gradient-to-t from-gray-50',
+	'wrap_class' => 'bg-gradient-to-t from-base-100',
 ];
 
 $args = wp_parse_args( $args, $default_args );
@@ -25,7 +25,7 @@ $args = wp_parse_args( $args, $default_args );
 
 printf(
 	/*html*/'
-	<div data-init-height="%1$s" data-init-bg="%2$s" class="pc-toggle-content text-gray-400 overflow-hidden relative" style="height:%1$spx;">
+	<div data-init-height="%1$s" data-init-bg="%2$s" class="pc-toggle-content text-base-content/75 overflow-hidden relative" style="height:%1$spx;">
 			<div class="pc-toggle-content__main">
 				%3$s
 			</div>

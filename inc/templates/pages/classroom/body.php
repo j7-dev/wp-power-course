@@ -54,7 +54,7 @@ $course_tabs = [
 
 $content = \do_shortcode( $chapter->post_content );
 
-echo '<div id="pc-classroom-body" class="w-full bg-white pt-[52px] lg:pt-16">';
+echo '<div id="pc-classroom-body" class="w-full bg-base-100 pt-[52px] lg:pt-16">';
 
 Plugin::get(
 	'classroom/header',

@@ -38,11 +38,11 @@ $bundle_type_label = $product->get_meta( 'bundle_type_label' );
 $is_on_sale      = $product->is_on_sale();
 $date_on_sale_to = $product->get_date_on_sale_to()?->date('Y/m/d H:i');
 
-echo '<div class="w-full bg-white shadow-lg rounded p-6">';
+echo '<div class="w-full bg-base-100 shadow-lg rounded p-6">';
 printf(
 /*html*/'
-  <p class="text-xs text-center mb-1 text-red-400">%1$s</p>
-	<h6 class="text-base font-semibold text-center">%2$s</h6>
+  <p class="text-xs text-center mb-1 text-error">%1$s</p>
+	<h6 class="text-base text-base-content font-semibold text-center">%2$s</h6>
 ',
 	$bundle_type_label,
 	$product_name

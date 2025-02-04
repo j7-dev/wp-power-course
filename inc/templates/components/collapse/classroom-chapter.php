@@ -82,9 +82,9 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		$children_html .= sprintf(
 			/*html*/'
 				<a data-chapter_id="%1$s" href="%2$s">
-					<div class="text-sm border-t-0 border-x-0 border-b border-gray-100 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %3$s">
+					<div class="text-sm border-t-0 border-x-0 border-b border-base-content border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %3$s">
 						<div class="%4$s w-8 flex justify-center items-start">%5$s</div>
-						<div class="flex-1 text-gray-800 hover:text-gray-600">
+						<div class="flex-1 text-base-content hover:text-gray-600">
 							<p class="my-1 font-medium">%6$s</p>
 							<p class="text-gray-400 text-xs m-0 font-light">%7$s</p>
 						</div>
@@ -106,11 +106,11 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		/*html*/'
     <div class="pc-collapse pc-collapse-arrow rounded-none mb-1">
 			<input type="checkbox" checked="checked"/>
-			<div class="pc-collapse-title text-sm font-semibold bg-gray-100 py-3 flex items-center justify-between">
+			<div class="pc-collapse-title text-sm font-semibold bg-base-300 py-3 flex items-center justify-between">
 				<span>%1$s</span>
-				<span class="text-xs text-gray-400">共 %2$s 個單元</span>
+				<span class="text-xs text-base-content">共 %2$s 個單元</span>
 			</div>
-			<div class="pc-collapse-content bg-gray-50 p-0">
+			<div class="pc-collapse-content bg-base-200 p-0">
 						%3$s
 			</div>
 		</div>

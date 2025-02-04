@@ -7,7 +7,7 @@ use J7\PowerCourse\Plugin;
 
 $commenter    = wp_get_current_commenter();
 $comment_form = [
-	'title_reply'         => sprintf(/*html*/'<p class="text-gray-800 text-base font-bold mb-0">%s</p>', __( 'Add a review', 'woocommerce' )),
+	'title_reply'         => sprintf(/*html*/'<p class="text-base-content text-base font-bold mb-0">%s</p>', __( 'Add a review', 'woocommerce' )),
 	'comment_notes_after' => '',
 	'label_submit'        => esc_html__( 'Submit', 'woocommerce' ),
 	'logged_in_as'        => '',
@@ -31,7 +31,7 @@ $comment_form = [
 $comment_form['comment_field'] = sprintf(
 /*html*/'
 <div class="mb-2">%1$s</div>
-<textarea class="mb-2 rounded h-24 bg-white" id="comment" name="comment" rows="4"></textarea>
+<textarea class="mb-2 rounded h-24 bg-base-100" id="comment" name="comment" rows="4"></textarea>
 ',
 Plugin::get(
 	'rate',

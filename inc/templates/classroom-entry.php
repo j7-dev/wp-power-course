@@ -99,7 +99,7 @@ do_action('power_course_before_classroom_render');
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0 min-h-screen bg-gray-50 tailwind classroom">
+		<body class="!m-0 min-h-screen bg-base-100 tailwind classroom">
 			<?php
 			$GLOBALS['product'] = $keep_product;
 			$GLOBALS['chapter'] = $keep_chapter;
