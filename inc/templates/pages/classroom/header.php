@@ -68,9 +68,11 @@ $finish_chapter_button_html = sprintf(
 
 
 // next chapter button html
-$chapter_ids     = CourseUtils::get_sub_chapters($product_id, true);
-$index           = array_search($current_chapter_id, $chapter_ids, true);
-$next_chapter_id = $chapter_ids[ $index + 1 ] ?? false;
+/** @var int[] $chapter_ids */
+$chapter_ids = CourseUtils::get_sub_chapters($product_id, true);
+$index       = array_search($current_chapter_id, $chapter_ids, true);
+/** @var int|false $index */
+$next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
 
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
@@ -103,12 +105,12 @@ if (count($chapter_ids) > 0) {
 // render
 printf(
 	/*html*/'
-<div id="pc-classroom-header" class="w-full bg-white py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-30" style="position:fixed;">
-  <div class="flex flex-nowrap gap-4 items-end">
+<div id="pc-classroom-header" class="w-full bg-base-100 py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-30 gap-x-2" style="position:fixed;">
+  <div class="flex flex-1 flex-nowrap gap-4 items-end">
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1 pl-6 lg:pl-0">%1$s</h2>
 		%2$s
 	</div>
-	<div class="tw-fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-2 lg:grid-flow-row rtl w-full lg:w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-white shadow-2xl lg:shadow-none">
+	<div class="tw-fixed bottom-0 lg:bottom-[unset] left-0 lg:left-[unset] lg:relative grid gap-3 sm:gap-4 grid-cols-2 lg:grid-flow-row rtl w-full lg:!w-fit justify-between lg:justify-normal items-center mt-0 p-3 sm:p-4 lg:p-0 bg-base-100 shadow-2xl lg:shadow-none">
 		%3$s
 		%4$s
 	</div>
