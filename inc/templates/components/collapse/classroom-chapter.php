@@ -5,7 +5,6 @@
 
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
@@ -42,8 +41,9 @@ $args2 = [
 	'post_status'    => 'publish',
 	'post_type'      => ChapterCPT::POST_TYPE,
 ];
-
+/** @var \WP_Post[] $chapters */
 $chapters = get_children( $args2 );
+
 
 foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$args3 = [
@@ -55,9 +55,11 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		'post_type'      => ChapterCPT::POST_TYPE,
 	];
 
+	/** @var \WP_Post[] $sub_chapters */
 	$sub_chapters  = get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
+
 		$avl_chapter    = new AVLChapter( (int) $sub_chapter->ID );
 		$first_visit_at = $avl_chapter->first_visit_at;
 		$finished_at    = $avl_chapter->finished_at;
@@ -74,7 +76,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
 		$icon_html_with_tooltip = sprintf(
-			/*html*/'<div class="pc-tooltip pc-tooltip-right" data-tip="%1$s">%2$s</div>',
+			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
 			$tooltip,
 			$icon_html
 		);
