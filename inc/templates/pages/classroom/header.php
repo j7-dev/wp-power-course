@@ -61,7 +61,7 @@ $finish_chapter_button_html = sprintf(
 		',
 		$product_id,
 		$current_chapter_id,
-		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : '',
+		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : 'text-white',
 		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成'
 	);
 

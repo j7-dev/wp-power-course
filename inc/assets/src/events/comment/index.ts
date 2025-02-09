@@ -12,10 +12,10 @@ export type TCommentAppProps = {
 	queryParams: { [key: string]: any } | undefined
 	navElement: string
 	ratingProps?:
-		| {
-				name: string
-		  }
-		| undefined
+	| {
+		name: string
+	}
+	| undefined
 }
 
 export class CommentApp {
@@ -25,8 +25,8 @@ export class CommentApp {
 	_pagination: TPaginationProps | undefined
 	ratingProps:
 		| {
-				name: string
-		  }
+			name: string
+		}
 		| undefined
 	commentForm: CommentForm
 	showForm: boolean
@@ -199,10 +199,11 @@ export class CommentApp {
 		this._isLoading = value
 		if (value) {
 			const loadingHtml = /*html*/ `
-						<div class="h-[8.5rem] mt-2 rounded bg-gray-100 animate-pulse"></div>
-						<div class="h-[8.5rem] mt-2 rounded bg-gray-100 animate-pulse"></div>
-						<div class="h-[8.5rem] mt-2 rounded bg-gray-100 animate-pulse"></div>
+						<div class="h-[8.5rem] mt-2 rounded bg-base-200 animate-pulse"></div>
+						<div class="h-[8.5rem] mt-2 rounded bg-base-200 animate-pulse"></div>
+						<div class="h-[8.5rem] mt-2 rounded bg-base-200 animate-pulse"></div>
 						`
+
 			this.$element.find('.pc-comment-list').html(loadingHtml)
 		}
 	}

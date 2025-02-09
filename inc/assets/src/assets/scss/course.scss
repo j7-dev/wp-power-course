@@ -11,7 +11,8 @@ div .pc-rating input[checked] ~ input {
 	--tw-bg-opacity: 0.2 !important;
 }
 
-body.courses-product {
+body.courses-product,
+body.classroom {
 	background-color: var(--fallback-b1, oklch(var(--b1) / var(--tw-bg-opacity)));
 
 	h1,

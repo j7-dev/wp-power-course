@@ -86,7 +86,7 @@ if ($content) {
 	);
 }
 
-echo '<div class="bg-gray-100 px-4 lg:px-12 py-4">';
+echo '<div class="bg-base-200 px-4 lg:px-12 py-4">';
 Plugin::get( 'progress' );
 echo '</div>';
 
