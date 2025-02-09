@@ -138,7 +138,10 @@ do_action('power_course_before_classroom_render');
 			ChapterUtils::get_formatted_watermark_text('pdf')
 			);
 			\wp_footer();
+
+			Plugin::get( 'theme', null, true, true );
 			 ?>
+
 </body>
 </html>
 <?php // phpcs:enabled

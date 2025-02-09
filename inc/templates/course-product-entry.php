@@ -94,3 +94,5 @@ printf(
 );
 
 get_footer();
+
+Plugin::get( 'theme', null, true, true );
