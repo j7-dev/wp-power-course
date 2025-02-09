@@ -18,7 +18,7 @@ abstract class Base {
 	public const APP2_SELECTOR = '.pc-vidstack';
 	public const API_TIMEOUT   = '30000';
 	public const DEFAULT_IMAGE = 'https://placehold.co/800x600/1677ff/white?text=%3Cimg%20/%3E';
-	public const PRIMARY_COLOR = '#1677ff';
+	public const PRIMARY_COLOR = 'var(--fallback-p,oklch(var(--p)/1))';
 
 	/**
 	 * 取得商品圖片
