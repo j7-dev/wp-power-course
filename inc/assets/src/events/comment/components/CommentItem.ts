@@ -76,8 +76,8 @@ export class CommentItem {
 					} else {
 						CommentItemContentNode.find('.pc-comment-item__reply-form')
 							.text(message)
-							.removeClass('text-green-500')
-							.addClass('text-red-500')
+							.removeClass('text-success')
+							.addClass('text-error')
 					}
 				},
 				error: (error) => {
@@ -85,8 +85,8 @@ export class CommentItem {
 					const message = error?.responseJSON?.message || '發生錯誤'
 					CommentItemContentNode.find('.pc-comment-item__reply-form')
 						.text(message)
-						.removeClass('text-green-500')
-						.addClass('text-red-500')
+						.removeClass('text-success')
+						.addClass('text-error')
 				},
 				complete: (xhr) => {
 					this.isLoading = false
@@ -126,8 +126,8 @@ export class CommentItem {
 					} else {
 						CommentItemContentNode.find('.pc-comment-item__reply-form')
 							.text(message)
-							.removeClass('text-green-500')
-							.addClass('text-red-500')
+							.removeClass('text-success')
+							.addClass('text-error')
 					}
 				},
 				error: (error) => {
@@ -135,8 +135,8 @@ export class CommentItem {
 					const message = error?.responseJSON?.message || '發生錯誤'
 					CommentItemContentNode.find('.pc-comment-item__reply-form')
 						.text(message)
-						.removeClass('text-green-500')
-						.addClass('text-red-500')
+						.removeClass('text-success')
+						.addClass('text-error')
 				},
 				complete: (xhr) => {
 					this.isLoading = false
@@ -161,7 +161,7 @@ export class CommentItem {
 					`<div data-comment_id="${childId}" class="pc-comment-item"></div>`,
 			)
 			.join('')
-		const bgColor = depth % 2 === 0 ? 'bg-gray-100' : 'bg-gray-50'
+		const bgColor = depth % 2 === 0 ? 'bg-base-200' : 'bg-base-100'
 
 		const comment_approved = this._props.comment_approved === '1'
 		const is_trash = this._props.comment_approved === 'trash'
@@ -170,31 +170,31 @@ export class CommentItem {
 		const can_reply = !(comment_type === 'review' && user_role === 'user')
 
 		this.$element.html(/*html*/ `
-			<div class="relative p-6 mt-2 rounded ${bgColor} ${this._props.comment_approved === '0' ? 'border-2 border-dashed border-gray-400' : ''} ${is_trash ? 'border-2 border-dashed border-red-400' : ''}">
+			<div class="relative p-6 mt-2 rounded ${bgColor} ${this._props.comment_approved === '0' ? 'border-2 border-dashed border-base-300' : ''} ${is_trash ? 'border-2 border-dashed border-error' : ''}">
 				<div class="flex gap-4">
 					<div class="w-10 h-10 rounded-full overflow-hidden relative">
 						<img src="${user.avatar_url}" loading="lazy" class="w-full h-full object-cover relative z-20">
-						<div class="absolute top-0 left-0 w-full h-full bg-gray-400 animate-pulse z-10"></div>
+						<div class="absolute top-0 left-0 w-full h-full bg-base-300 animate-pulse z-10"></div>
 					</div>
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">
 							<div class="pc-tooltip" data-tip="${user_role === 'admin' ? `email: ${user.email}` : ''}">${user.name}</div>
 							<div class="pc-comment-item__rating"></div>
 						</div>
-						<p class="text-gray-400 text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
+						<p class="text-base-300 text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
 						<div class="pc-comment-item__content text-sm [&_p]:mb-0">
 							${comment_content}
 							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
 								${can_reply ? '<span class="pc-comment-item__reply-button">回覆</span>' : ''}
 								${user_role === 'admin' ? `<span class="pc-comment-item__hide-button">${comment_approved ? '隱藏' : '顯示'}</span>` : ''}
-								${user_role === 'admin' && !is_trash ? '<span class="pc-comment-item__trash-button text-red-500">移動到垃圾桶</span>' : ''}
+								${user_role === 'admin' && !is_trash ? '<span class="pc-comment-item__trash-button text-error">移動到垃圾桶</span>' : ''}
 							</div>
 							<div class="pc-comment-item__reply-form"></div>
 						</div>
 						${childrenHTML}
 					</div>
 				</div>
-				<span class="absolute top-2 right-2 text-xs text-gray-400">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
+				<span class="absolute top-2 right-2 text-xs text-base-300">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
 			</div>
 		`)
 

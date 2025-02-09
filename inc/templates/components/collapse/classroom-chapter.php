@@ -84,7 +84,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		$children_html .= sprintf(
 			/*html*/'
 				<a data-chapter_id="%1$s" href="%2$s">
-					<div class="text-sm border-t-0 border-x-0 border-b border-base-content border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %3$s">
+					<div class="text-sm border-t-0 border-x-0 border-b border-base-300 border-solid py-3 flex items-center gap-2 pl-8 pr-4 cursor-pointer hover:bg-primary/10 %3$s">
 						<div class="%4$s w-8 flex justify-center items-start">%5$s</div>
 						<div class="flex-1 text-base-content hover:text-gray-600">
 							<p class="my-1 font-medium">%6$s</p>

@@ -34,11 +34,13 @@ $args2 = [
 	'post_type'      => ChapterCPT::POST_TYPE,
 ];
 
+/** @var \WP_Post[] $chapters */
 $chapters = \get_children( $args2 );
 
 $is_avl = CourseUtils::is_avl( $product->get_id() );
 
 foreach ( $chapters as $chapter_id => $chapter ) :
+
 	$args3 = [
 		'posts_per_page' => - 1,
 		'order'          => 'ASC',
@@ -48,6 +50,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		'post_type'      => ChapterCPT::POST_TYPE,
 	];
 
+	/** @var \WP_Post[] $sub_chapters */
 	$sub_chapters  = \get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
@@ -67,7 +70,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 
 		$children_html .= sprintf(
 			/*html*/'
-			<div class="text-sm border-t-0 border-x-0 border-b border-base-content border-solid py-3 flex pl-8 pr-4">
+			<div class="text-sm border-t-0 border-x-0 border-b border-base-300 border-solid py-3 flex pl-8 pr-4">
 					<div class="w-8 flex justify-center items-start">•</div>
 					<div class="flex-1">%1$s</div>
 			</div>

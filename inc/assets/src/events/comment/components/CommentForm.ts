@@ -79,8 +79,8 @@ export class CommentForm {
 			this.$element
 				.find('.pc-comment-form__message')
 				.text('請輸入您的電子郵件')
-				.removeClass('text-green-500')
-				.addClass('text-red-500')
+				.removeClass('text-success')
+				.addClass('text-error')
 			return false
 		}
 
@@ -89,8 +89,8 @@ export class CommentForm {
 			this.$element
 				.find('.pc-comment-form__message')
 				.text('請輸入有效的電子郵件')
-				.removeClass('text-green-500')
-				.addClass('text-red-500')
+				.removeClass('text-success')
+				.addClass('text-error')
 			return false
 		}
 
@@ -141,8 +141,8 @@ export class CommentForm {
 					this.$element
 						.find('.pc-comment-form__message')
 						.text(message)
-						.removeClass('text-red-500')
-						.addClass('text-green-500')
+						.removeClass('text-error')
+						.addClass('text-success')
 
 					this.$element.find('textarea').val('')
 
@@ -151,8 +151,8 @@ export class CommentForm {
 					this.$element
 						.find('.pc-comment-form__message')
 						.text(message)
-						.removeClass('text-green-500')
-						.addClass('text-red-500')
+						.removeClass('text-success')
+						.addClass('text-error')
 				}
 			},
 			error: (error) => {
@@ -161,8 +161,8 @@ export class CommentForm {
 				this.$element
 					.find('.pc-comment-form__message')
 					.text(message)
-					.removeClass('text-green-500')
-					.addClass('text-red-500')
+					.removeClass('text-success')
+					.addClass('text-error')
 			},
 			complete: (xhr) => {
 				this.setLoading(false)
@@ -209,11 +209,11 @@ export class CommentForm {
 		}
 
 		this.$element.html(/*html*/ `
-			<div class="mb-2 rounded ${reply_comment_type ? 'py-4' : 'p-6 bg-gray-100'}">
-				<p class="text-gray-800 text-base font-bold mb-0">新增${label}</p>
+			<div class="mb-2 rounded ${reply_comment_type ? 'py-4' : 'p-6 bg-base-200'}">
+				<p class="text-base-content text-base font-bold mb-0">新增${label}</p>
 				<div class="pc-comment-item__rating mb-2"></div>
 				${email_field}
-				<textarea placeholder="請輸入您的想法" class="mb-2 rounded h-24 bg-white w-full p-3 border border-solid border-gray-400 focus:border-primary" name="comment_content" rows="4"></textarea>
+				<textarea placeholder="請輸入您的想法" class="mb-2 rounded h-24 bg-white w-full p-3 border border-solid border-base-300 focus:border-primary" name="comment_content" rows="4"></textarea>
 				<div class="flex justify-end gap-4 items-center">
 					<p class="pc-comment-form__message text-sm m-0"></p>
 					<button type="button" class="pc-comment-form__submit pc-btn px-4 pc-btn-primary text-white pc-btn-sm"><span class="pc-loading pc-loading-spinner h-4 w-4 tw-hidden"></span>送出</button>
