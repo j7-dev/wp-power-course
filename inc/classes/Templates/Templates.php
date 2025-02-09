@@ -191,7 +191,7 @@ final class Templates {
 	 */
 	public function add_html_attr( string $output, string $doctype ): string {
 		// ["light", "dark", "cupcake"]
-		return "{$output} data-theme=\"lemonade\"";
+		return "{$output} data-theme=\"dark\"";
 	}
 
 	/**

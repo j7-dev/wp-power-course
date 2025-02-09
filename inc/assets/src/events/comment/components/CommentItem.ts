@@ -181,7 +181,7 @@ export class CommentItem {
 							<div class="pc-tooltip" data-tip="${user_role === 'admin' ? `email: ${user.email}` : ''}">${user.name}</div>
 							<div class="pc-comment-item__rating"></div>
 						</div>
-						<p class="text-base-300 text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
+						<p class="text-gray-400 text-content text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
 						<div class="pc-comment-item__content text-sm [&_p]:mb-0">
 							${comment_content}
 							<div class="mt-2 flex gap-x-2 text-xs text-primary [&_span]:cursor-pointer">
@@ -194,7 +194,7 @@ export class CommentItem {
 						${childrenHTML}
 					</div>
 				</div>
-				<span class="absolute top-2 right-2 text-xs text-base-300">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
+				<span class="absolute top-2 right-2 text-xs text-gray-400">${user_role === 'admin' ? `IP: ${comment_author_IP}  #${id}` : ''}</span>
 			</div>
 		`)
 
