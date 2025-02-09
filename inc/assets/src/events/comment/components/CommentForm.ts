@@ -213,7 +213,7 @@ export class CommentForm {
 				<p class="text-base-content text-base font-bold mb-0">新增${label}</p>
 				<div class="pc-comment-item__rating mb-2"></div>
 				${email_field}
-				<textarea placeholder="請輸入您的想法" class="mb-2 rounded h-24 bg-white w-full p-3 border border-solid border-base-300 focus:border-primary" name="comment_content" rows="4"></textarea>
+				<textarea placeholder="請輸入您的想法" class="mb-2 rounded h-24 w-full p-3 border border-solid border-base-300 focus:border-primary bg-base-100" name="comment_content" rows="4"></textarea>
 				<div class="flex justify-end gap-4 items-center">
 					<p class="pc-comment-form__message text-sm m-0"></p>
 					<button type="button" class="pc-comment-form__submit pc-btn px-4 pc-btn-primary text-white pc-btn-sm"><span class="pc-loading pc-loading-spinner h-4 w-4 tw-hidden"></span>送出</button>

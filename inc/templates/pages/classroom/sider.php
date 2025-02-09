@@ -28,8 +28,8 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 printf(
 	/*html*/'
-<div id="pc-classroom-sider" class="tw-hidden lg:tw-block w-[25rem] bg-base-100 z-20 left-0 top-0 h-screen expended"
-	style="border-right: 1px solid #eee;position:fixed;left:0px">
+<div id="pc-classroom-sider" class="tw-hidden lg:tw-block w-[25rem] bg-base-100 border-base-300 z-20 left-0 top-0 h-screen expended"
+	style="border-right: 1px solid;position:fixed;left:0px">
 	<div id="pc-classroom-sider__main" class="h-full flex flex-col [&_.pc-sider-chapters]:flex-1 [&_.pc-sider-chapters]:pb-12">
 		%1$s
 		<div class="py-4 pl-9 absolute bottom-0 w-full bg-base-100">
@@ -38,7 +38,7 @@ printf(
 				class="hover:opacity-75 transition duration-300 flex gap-4 items-center"
 			>
 				<img class="w-6 h-6" src="%3$s" />
-				<span class="text-gray-600 font-light">
+				<span class="text-gray-400 font-light">
 						回《我的學習》
 				</span>
 			</a>
