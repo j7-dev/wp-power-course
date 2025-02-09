@@ -8,8 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $post, $product;
-$product_id         = $post->ID;
-$product            = wc_get_product( $product_id );
+$product_id = $post->ID;
+$product    = wc_get_product( $product_id );
+
+if (!$product) {
+	\wp_safe_redirect( home_url('/404') );
+	exit;
+}
+
 $GLOBALS['product'] = $product;
 
 \add_filter(
