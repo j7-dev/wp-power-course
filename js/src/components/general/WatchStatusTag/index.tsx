@@ -1,5 +1,5 @@
 import React, { memo } from 'react'
-import { Tag, Tooltip } from 'antd'
+import { Tag } from 'antd'
 import { TExpireDate } from '@/pages/admin/Courses/List/types/user'
 import dayjs from 'dayjs'
 

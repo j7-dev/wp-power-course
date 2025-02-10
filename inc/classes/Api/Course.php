@@ -13,7 +13,6 @@ use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
