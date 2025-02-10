@@ -8,8 +8,7 @@ import {
 	DefaultInlineContentSchema,
 	DefaultStyleSchema,
 } from '@blocknote/core'
-import { TbSwitchHorizontal } from 'react-icons/tb'
-import { bunny_cdn_hostname, bunny_library_id } from '@/utils'
+import { bunny_cdn_hostname } from '@/utils'
 
 export type TMediaLibraryButton = ReactCustomBlockRenderProps<
 	CustomBlockConfig,
