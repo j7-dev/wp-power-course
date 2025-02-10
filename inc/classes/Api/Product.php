@@ -100,19 +100,15 @@ final class Product {
 			function ( $query, $query_vars ) {
 				if ( isset($query_vars['is_course']) ) {
 					$query['meta_query'][] = [
-						[
-							'key'   => '_is_course',
-							'value' => $query_vars['is_course'] ? 'yes' : 'no',
-						],
+						'key'   => '_is_course',
+						'value' => $query_vars['is_course'] ? 'yes' : 'no',
 					];
 				}
 
 				if ( isset($query_vars[ Helper::LINK_COURSE_IDS_META_KEY ]) ) {
 					$query['meta_query'][] = [
-						[
-							'key'   => Helper::LINK_COURSE_IDS_META_KEY,
-							'value' => $query_vars[ Helper::LINK_COURSE_IDS_META_KEY ],
-						],
+						'key'   => Helper::LINK_COURSE_IDS_META_KEY,
+						'value' => $query_vars[ Helper::LINK_COURSE_IDS_META_KEY ],
 					];
 				}
 				return $query;
@@ -536,8 +532,8 @@ final class Product {
 			'type'                               => $product->get_type(),
 			'name'                               => $product->get_name(),
 			'slug'                               => $product->get_slug(),
-			'date_created'                       => $date_created->date( 'Y-m-d H:i:s' ),
-			'date_modified'                      => $date_modified->date( 'Y-m-d H:i:s' ),
+			'date_created'                       => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'                      => $date_modified?->date( 'Y-m-d H:i:s' ),
 			'status'                             => $product->get_status(),
 			'featured'                           => $product->get_featured(),
 			'catalog_visibility'                 => $product->get_catalog_visibility(),
