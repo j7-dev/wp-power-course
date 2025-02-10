@@ -77,7 +77,7 @@ class Limit {
 		// 所有條件都判斷完了，剩下的就是 follow_subscription
 		// 'follow_subscription' === $limit_type
 		if (!class_exists('WC_Subscription')) {
-			\J7\WpUtils\Classes\ErrorLog::info("訂單 {$order->get_id()} 的 expire_date 計算失敗，因為 WC_Subscription 不存在", 'CourseUtils::calc_expire_date');
+			\J7\WpUtils\Classes\WC::log("訂單 {$order->get_id()} 的 expire_date 計算失敗，因為 WC_Subscription 不存在", 'CourseUtils::calc_expire_date');
 			return $expire_date;
 		}
 
@@ -175,7 +175,7 @@ class Limit {
 	 */
 	private function set_limit_type( string $limit_type ): void {
 		if (!in_array($limit_type, [ 'unlimited', 'fixed', 'assigned', 'follow_subscription' ], true)) {
-			\J7\WpUtils\Classes\ErrorLog::info($limit_type, 'set_limit_type Invalid limit type');
+			\J7\WpUtils\Classes\WC::log($limit_type, 'set_limit_type Invalid limit type');
 		}
 		$this->limit_type = $limit_type;
 	}
@@ -205,7 +205,7 @@ class Limit {
 			return;
 		}
 		if (!in_array($limit_unit, [ 'timestamp', 'day', 'month', 'year' ], true)) {
-			\J7\WpUtils\Classes\ErrorLog::info($limit_unit, 'set_limit_unit Invalid limit unit');
+			\J7\WpUtils\Classes\WC::log($limit_unit, 'set_limit_unit Invalid limit unit');
 		}
 		$this->limit_unit = $limit_unit;
 	}
