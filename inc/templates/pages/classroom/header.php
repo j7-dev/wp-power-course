@@ -5,7 +5,6 @@
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Templates\Templates;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 use J7\PowerCourse\Resources\Chapter\AVLChapter;

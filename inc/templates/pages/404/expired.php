@@ -4,7 +4,6 @@
  */
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
