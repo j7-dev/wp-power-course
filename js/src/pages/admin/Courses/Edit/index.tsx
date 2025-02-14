@@ -76,7 +76,7 @@ export const CoursesEdit = () => {
 		},
 		{
 			key: 'CourseStudents',
-			forceRender: true,
+			forceRender: false,
 			label: '學員管理',
 			children: <CourseStudents />,
 		},
