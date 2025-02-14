@@ -36,12 +36,12 @@ abstract class AbstractTable {
 
 			$sql = "CREATE TABLE $table_name (
 										meta_id bigint(20) NOT NULL AUTO_INCREMENT,
-										course_id bigint(20) NOT NULL,
+										post_id bigint(20) NOT NULL,
 										user_id bigint(20) NOT NULL,
 										meta_key varchar(255) DEFAULT NULL,
 										meta_value longtext,
 										PRIMARY KEY  (meta_id),
-										KEY course_id (course_id),
+										KEY post_id (post_id),
 										KEY user_id (user_id),
 										KEY meta_key (meta_key(191))
 								) $charset_collate;";
