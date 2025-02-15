@@ -64,9 +64,9 @@ final class Comment {
 	 */
 	public function register_api_products(): void {
 		$this->register_apis(
-		apis: $this->get_apis(),
-		namespace: Plugin::$kebab,
-		default_permission_callback: fn() => \current_user_can( 'manage_options' ),
+		$this->get_apis(),
+		Plugin::$kebab,
+		fn() => \current_user_can( 'manage_options' ),
 		);
 	}
 

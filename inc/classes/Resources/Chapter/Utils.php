@@ -191,7 +191,7 @@ abstract class Utils {
 		foreach ($to_tree as $node) {
 			$id             = $node['id'];
 			$is_new_chapter = strpos($id, 'new-') === 0;
-			$args           = self::converter($node, keep_id: !$is_new_chapter);
+			$args           = self::converter($node, !$is_new_chapter);
 
 			if ($is_new_chapter) {
 				$insert_result = self::create_chapter($args);
