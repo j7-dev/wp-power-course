@@ -516,7 +516,7 @@ final class Course extends ApiBase {
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+		] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
 
 		if (!( $meta_data['files'] ?? '' )) {
 			unset($meta_data['files']);

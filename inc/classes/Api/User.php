@@ -87,9 +87,9 @@ final class User {
 	 */
 	public function register_api_products(): void {
 		$this->register_apis(
-		apis: $this->apis,
-		namespace: Plugin::$kebab,
-		default_permission_callback: fn() => \current_user_can( 'manage_options' ),
+		$this->apis,
+		Plugin::$kebab,
+		fn() => \current_user_can( 'manage_options' ),
 		);
 	}
 
@@ -338,7 +338,7 @@ final class User {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'user' );
+		] = WP::separator( $body_params, 'user' );
 
 		$user_id = \wp_insert_user( $data );
 
@@ -443,7 +443,7 @@ final class User {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'user', files: $file_params['files'] ?? [] );
+		] = WP::separator( $body_params, 'user', $file_params['files'] ?? [] );
 
 		$data['ID'] = $user_id;
 		unset($meta_data['id']);

@@ -139,7 +139,7 @@ final class Chapter extends ApiBase {
 		// 將 '[]' 轉為 []
 		$body_params = General::format_empty_array( $body_params );
 
-		$separated_data = WP::separator( args: $body_params, obj: 'post', files: $file_params['files'] ?? [] );
+		$separated_data = WP::separator( $body_params, 'post', $file_params['files'] ?? [] );
 
 		if (\is_wp_error($separated_data)) {
 			throw new \Exception($separated_data->get_error_message());

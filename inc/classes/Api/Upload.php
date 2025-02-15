@@ -333,8 +333,8 @@ final class Upload extends ApiBase {
 				} else {
 					// 將檔案上傳到媒體庫
 					$attachment_id = \media_handle_upload(
-						file_id: $key,
-						post_id: 0
+						$key,
+						0
 					);
 
 					if ( \is_wp_error( $attachment_id ) ) {

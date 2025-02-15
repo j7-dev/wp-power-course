@@ -212,7 +212,7 @@ abstract class Course {
 		}
 
 		$sub_chapters_count          = count(self::get_sub_chapters($product, true));
-		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, return_ids: true));
+		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, true));
 
 		$progress = $sub_chapters_count ? round(( $finished_sub_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
 		$progress = min( 100, $progress );
@@ -476,7 +476,7 @@ abstract class Course {
 			$product_id = $product->get_id();
 		}
 
-		$avl_course_ids = self::get_avl_courses_by_user($user_id, return_ids: true);
+		$avl_course_ids = self::get_avl_courses_by_user($user_id, true);
 
 		return in_array( (string) $product_id, $avl_course_ids, true);
 	}

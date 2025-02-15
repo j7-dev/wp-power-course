@@ -238,7 +238,7 @@ final class Api extends ApiBase {
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( args: $body_params, obj: 'post', files: $file_params['files'] ?? [] );
+		] = WP::separator( $body_params, 'post', $file_params['files'] ?? [] );
 
 		return [
 			'data'      => $data,

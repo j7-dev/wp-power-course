@@ -125,9 +125,9 @@ final class Product {
 	 */
 	public function register_api_products(): void {
 		$this->register_apis(
-			apis: $this->apis,
-			namespace: Plugin::$kebab,
-			default_permission_callback: fn() => \current_user_can( 'manage_options' ),
+			$this->apis,
+			Plugin::$kebab,
+			fn() => \current_user_can( 'manage_options' ),
 		);
 	}
 
@@ -267,7 +267,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+			] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
 
 		$std_response = match ($action) {
 			'update' => WcProduct::multi_update( $ids, $data, $meta_data ),
@@ -678,7 +678,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+			] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
 
 		$product = new \WC_Product_Simple();
 
@@ -792,7 +792,7 @@ final class Product {
 		[
 			'data' => $data,
 			'meta_data' => $meta_data,
-			] = WP::separator( args: $body_params, obj: 'product', files: $file_params['files'] ?? [] );
+			] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
 
 		// type 會被儲存為商品的類型，不需要再額外存進 meta data
 		$is_subscription = 'subscription' === $meta_data['type'];
