@@ -28,6 +28,7 @@ final class Order {
 	 */
 	public function __construct() {
 		\add_action( 'woocommerce_new_order', [ $this, 'add_course_item_meta' ], 10, 2 );
+		\add_action( 'woocommerce_subscription_payment_complete', [ $this, 'add_course_item_meta_by_subscription' ], 10, 1 );
 
 		\add_action( 'woocommerce_order_status_completed', [ $this, 'add_meta_to_avl_course' ], 10, 1 );
 
@@ -45,6 +46,56 @@ final class Order {
 	 * @return void
 	 */
 	public function add_course_item_meta( int $order_id, \WC_Order $order ): void {
+		if (class_exists('WC_Subscription')) {
+			$is_subscription = \wcs_order_contains_subscription($order, [ 'parent', 'resubscribe', 'switch', 'renewal' ]);
+			// 如果此筆訂單是訂閱相關訂單，就不處理，改用 woocommerce_subscription_payment_complete hook 來處理
+			if ($is_subscription) {
+				return;
+			}
+		}
+
+		$this->_handle_add_course_item_meta_by_order( $order );
+	}
+
+
+	/**
+	 * 訂閱的上層訂單成立時，新增課程資訊到訂單
+	 *
+	 * @param \WC_Subscription $subscription subscription
+	 * @return void
+	 */
+	public function add_course_item_meta_by_subscription( \WC_Subscription $subscription ): void {
+		$parent_order = $subscription->get_parent();
+
+		if ( ! ( $parent_order instanceof \WC_Order ) ) {
+			return;
+		}
+
+		$parent_order_id = $parent_order->get_id();
+
+		$related_order_ids = $subscription->get_related_orders();
+
+		// 確保只有一筆訂單 (parent order) 才會觸發，續訂不觸發
+		if ( count( $related_order_ids ) !== 1 ) {
+			return;
+		}
+		// 唯一一筆關聯訂單必須要 = parent order id
+		if ( ( (int) reset( $related_order_ids ) ) !== ( (int) $parent_order_id )) {
+			return;
+		}
+
+		$this->_handle_add_course_item_meta_by_order( $parent_order );
+	}
+
+
+	/**
+	 * 處理新增課程資訊到訂單
+	 *
+	 * @param \WC_Order $order    訂單
+	 *
+	 * @return void
+	 */
+	private function _handle_add_course_item_meta_by_order( \WC_Order $order ): void {
 		$items = $order->get_items();
 
 		// 檢查訂單是否有銷售方案商品，如果有將課程限制條件存入為 order item
@@ -132,6 +183,7 @@ final class Order {
 
 		/** @var array<int, array{id: int, name: string, limit_type: string, limit_value: int|null, limit_unit: string|null}> $bind_courses_data */
 		$bind_courses_data = \get_post_meta( $product_id, 'bind_courses_data', true ) ?: [];
+
 		if ( $bind_courses_data ) {
 			$item->update_meta_data( '_bind_courses_data', $bind_courses_data );
 		}
