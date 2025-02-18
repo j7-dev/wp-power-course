@@ -2,6 +2,8 @@
 /**
  * ApiBooster
  * 在特定的 API 路徑下，只載入必要的插件
+ *
+ * @deprecated v0.7
  */
 
 namespace J7\PowerCourse\MU;
@@ -19,7 +21,7 @@ final class ApiBooster {
 	protected static $namespaces = [
 		'/wp-json/power-course',
 		'/wp-json/power-email',
-		'powerhouse',
+		'/wp-json/v2/powerhouse',
 	];
 
 	/**
