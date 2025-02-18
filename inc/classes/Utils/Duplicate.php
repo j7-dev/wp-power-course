@@ -32,8 +32,8 @@ final class Duplicate {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 4 );
-		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_bundle_product' ], 10, 4 );
+		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 5 );
+		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_bundle_product' ], 10, 5 );
 	}
 
 
@@ -43,20 +43,20 @@ final class Duplicate {
 	 * @param int      $post_id 要複製的文章 ID
 	 * @param bool     $copy_terms 是否複製分類
 	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
-	 *
+	 * @param int      $depth 遞迴深度
 	 * @return int 複製後的文章 ID
 	 * @throws \Exception Exception
 	 */
-	public function process( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+	public function process( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false, int $depth = 0 ): int {
 
 		$object_type = self::get_object_type( $post_id );
 
 		$new_id = match ( $object_type ) {
-			'product' => self::duplicate_product( $post_id, $copy_terms, $new_parent ),
-			default => self::duplicate_post( $post_id, $copy_terms, $new_parent ),
+			'product' => self::duplicate_product( $post_id, $copy_terms, $new_parent, $depth ),
+			default => self::duplicate_post( $post_id, $copy_terms, $new_parent, $depth ),
 		};
 
-		\do_action( 'power_course_after_duplicate_post', $this, $post_id, $new_id, $new_parent );
+		\do_action( 'power_course_after_duplicate_post', $this, $post_id, $new_id, $new_parent, $depth );
 
 		return $new_id;
 	}
@@ -91,11 +91,12 @@ final class Duplicate {
 	 * @param int      $post_id 要複製的文章 ID
 	 * @param bool     $copy_terms 是否複製分類
 	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 * @param int      $depth 遞迴深度
 	 *
 	 * @return int 複製後的文章 ID
 	 * @throws \Exception Exception
 	 */
-	public static function duplicate_post( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+	public static function duplicate_post( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false, int $depth = 0 ): int {
 		$post = \get_post($post_id);
 		if (!$post) {
 			throw new \Exception(__('文章不存在', 'power-course'));
@@ -104,8 +105,10 @@ final class Duplicate {
 		// 複製文章並設為草稿
 		/** @var \WP_Post $post */
 		// @phpstan-ignore-next-line
-		$post->ID          = null;
-		$post->post_title .= ' (複製)';
+		$post->ID = null;
+		if (0 === $depth) {
+			$post->post_title .= ' (複製)';
+		}
 
 		// $post->post_status = 'draft';
 
@@ -127,7 +130,7 @@ final class Duplicate {
 					continue;
 				}
 
-				\add_post_meta($new_id, $key, \maybe_unserialize($value));
+				\add_post_meta($new_id, $key, \wp_slash(\maybe_unserialize($value)));
 			}
 		}
 
@@ -154,11 +157,12 @@ final class Duplicate {
 	 * @param int      $post_id 要複製的文章 ID
 	 * @param bool     $copy_terms 是否複製分類
 	 * @param int|bool $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 * @param int      $depth 遞迴深度
 	 *
 	 * @return int 複製後的商品 ID
 	 * @throws \Exception Exception
 	 */
-	public static function duplicate_product( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false ): int {
+	public static function duplicate_product( int $post_id, ?bool $copy_terms = true, int|bool $new_parent = false, int $depth = 0 ): int {
 		$product = \wc_get_product($post_id);
 		if (!$product) {
 			throw new \Exception(__('產品不存在', 'power-course'));
@@ -238,10 +242,11 @@ final class Duplicate {
 	 * @param int  $post_id 文章 ID
 	 * @param int  $new_id 複製後的文章 ID
 	 * @param int  $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 * @param int  $depth 遞迴深度
 	 *
 	 * @return void
 	 */
-	public static function duplicate_children_post( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0 ): void {
+	public static function duplicate_children_post( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0, int $depth = 0 ): void {
 		if (!$new_parent) {
 			return;
 		}
@@ -264,7 +269,7 @@ final class Duplicate {
 			);
 
 		foreach ($children_ids as $child_id) {
-			$duplicate->process($child_id, true, $new_id);
+			$duplicate->process($child_id, true, $new_id, $depth + 1);
 		}
 	}
 
@@ -276,10 +281,11 @@ final class Duplicate {
 	 * @param int  $post_id 文章 ID
 	 * @param int  $new_id 複製後的文章 ID
 	 * @param int  $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 * @param int  $depth 遞迴深度
 	 *
 	 * @return void
 	 */
-	public static function duplicate_bundle_product( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0 ): void {
+	public static function duplicate_bundle_product( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0, int $depth = 0 ): void {
 		if (!$new_parent) {
 			return;
 		}
@@ -302,7 +308,7 @@ final class Duplicate {
 		}
 
 		foreach ($bundle_product_ids as $bundle_product_id) {
-			$duplicate->process($bundle_product_id, true, $new_id);
+			$duplicate->process($bundle_product_id, true, $new_id, $depth + 1);
 		}
 	}
 }
