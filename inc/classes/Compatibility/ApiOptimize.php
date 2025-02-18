@@ -3,6 +3,8 @@
  * Api Optimize
  * 將 self::FILE_NAME 檔案移動到 mu-plugins 目錄下
  * 加快 API 回應速度
+ *
+ * @deprecated v0.7
  */
 
 declare(strict_types=1);
