@@ -135,6 +135,7 @@ abstract class Course {
 
 		$sub_chapters = [];
 		foreach ( $chapters as $chapter ) :
+			/** @var \WP_Post $chapter */
 			$chapter_id = $return_ids ? $chapter : $chapter->ID;
 			$sub_args   = [
 				'posts_per_page' => - 1,
