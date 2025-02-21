@@ -30,6 +30,10 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 	 * Class Plugin
 	 */
 	final class Plugin {
+
+		/** @var bool  */
+		public static $is_local = false;
+
 		use \J7\WpUtils\Traits\PluginTrait;
 		use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -42,6 +46,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 * Constructor
 		 */
 		public function __construct() {
+			self::$is_local            = \wp_get_environment_type() === 'local';
 			self::$template_page_names = [ 'course-product', 'classroom', 'my-account', '404' ];
 
 			$this->required_plugins = [

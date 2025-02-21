@@ -7,6 +7,8 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\Resources\Chapter;
 
+use J7\PowerCourse\Plugin;
+
 /**
  * Class CPT
  */
@@ -77,16 +79,16 @@ final class CPT {
 			'public'                => false,
 			'hierarchical'          => true,
 			'exclude_from_search'   => true,
-			'publicly_queryable'    => WP_DEBUG,
-			'show_ui'               => WP_DEBUG,
-			'show_in_nav_menus'     => WP_DEBUG,
-			'show_in_admin_bar'     => WP_DEBUG,
+			'publicly_queryable'    => Plugin::$is_local,
+			'show_ui'               => Plugin::$is_local,
+			'show_in_nav_menus'     => Plugin::$is_local,
+			'show_in_admin_bar'     => Plugin::$is_local,
 			'show_in_rest'          => true,
 			'can_export'            => true,
 			'delete_with_user'      => false,
 			'has_archive'           => false,
 			'rest_base'             => '',
-			'show_in_menu'          => WP_DEBUG,
+			'show_in_menu'          => Plugin::$is_local,
 			'menu_position'         => 6,
 			'menu_icon'             => 'dashicons-list-view',
 			'capability_type'       => 'post',
