@@ -59,7 +59,7 @@ final class Entry {
 		$id        = substr(Base::APP1_SELECTOR, 1);
 		?>
 		<!doctype html>
-		<html lang="zh_tw">
+		<html lang="zh_tw" id="tw">
 
 		<head>
 			<meta charset="UTF-8" />
@@ -67,7 +67,7 @@ final class Entry {
 			<title>課程後台 | <?php echo $blog_name; ?></title>
 		</head>
 
-		<body class="tailwind">
+		<body>
 			<main id="<?php echo $id; ?>"></main>
 		<?php
 		/**
