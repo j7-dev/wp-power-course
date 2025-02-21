@@ -8,6 +8,7 @@ declare( strict_types=1 );
 namespace J7\PowerCourse\PowerEmail\Resources\Email;
 
 use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
+use J7\PowerCourse\Plugin;
 /**
  * Class CPT
  */
@@ -28,18 +29,10 @@ final class CPT {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'init' ] );
+		\add_action( 'init', [ __CLASS__, 'register_cpt' ] );
 		\add_action( 'power_email_after_send_email', [ $this, 'record_user_id_after_send_email' ], 10, 4 );
 	}
 
-
-
-	/**
-	 * Initialize
-	 */
-	public function init(): void {
-		$this->register_cpt();
-	}
 
 	/**
 	 * Register power-email custom post type
@@ -86,16 +79,16 @@ final class CPT {
 			'public'                => false,
 			'hierarchical'          => true,
 			'exclude_from_search'   => true,
-			'publicly_queryable'    => WP_DEBUG,
-			'show_ui'               => WP_DEBUG,
-			'show_in_nav_menus'     => WP_DEBUG,
-			'show_in_admin_bar'     => WP_DEBUG,
+			'publicly_queryable'    => Plugin::$is_local,
+			'show_ui'               => Plugin::$is_local,
+			'show_in_nav_menus'     => Plugin::$is_local,
+			'show_in_admin_bar'     => Plugin::$is_local,
 			'show_in_rest'          => true,
 			'can_export'            => true,
 			'delete_with_user'      => false,
 			'has_archive'           => false,
 			'rest_base'             => '',
-			'show_in_menu'          => WP_DEBUG,
+			'show_in_menu'          => Plugin::$is_local,
 			'menu_position'         => 6,
 			'menu_icon'             => 'dashicons-email-alt',
 			'capability_type'       => 'post',
