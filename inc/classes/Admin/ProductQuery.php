@@ -21,7 +21,6 @@ final class ProductQuery {
 	 */
 	public function __construct() {
 		\add_action( 'init', [ __CLASS__, 'add_post_meta_to_course_product' ] );
-
 		\add_action( 'pre_get_posts', [ __CLASS__, 'exclude_course_product' ], 10 );
 		\add_action( 'pre_get_posts', [ __CLASS__, 'exclude_bundle_product' ], 20);
 	}
