@@ -1,7 +1,4 @@
 <?php
-/**
- * Custom Post Type: chapter
- */
 
 declare( strict_types=1 );
 
@@ -21,17 +18,8 @@ final class CPT {
 	 * Constructor
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'init' ] );
+		\add_action( 'init', [ __CLASS__, 'register_cpt' ] );
 		\add_filter('option_elementor_cpt_support', [ $this, 'add_elementor_cpt_support' ]);
-	}
-
-
-
-	/**
-	 * Initialize
-	 */
-	public function init(): void {
-		$this->register_cpt();
 	}
 
 	/**
@@ -76,10 +64,10 @@ final class CPT {
 			'label'                 => \esc_html__( 'chapter', 'power-course' ),
 			'labels'                => $labels,
 			'description'           => '',
-			'public'                => false,
+			'public'                => true,
 			'hierarchical'          => true,
-			'exclude_from_search'   => true,
-			'publicly_queryable'    => Plugin::$is_local,
+			'exclude_from_search'   => false,
+			'publicly_queryable'    => true,
 			'show_ui'               => Plugin::$is_local,
 			'show_in_nav_menus'     => Plugin::$is_local,
 			'show_in_admin_bar'     => Plugin::$is_local,
@@ -95,9 +83,9 @@ final class CPT {
 			'supports'              => [ 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'page-attributes' ],
 			'taxonomies'            => [],
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
-			'rewrite'               => [
-				'with_front' => true,
-			],
+			// 'rewrite'               => [
+			// 'with_front' => true,
+			// ],
 		];
 
 		\register_post_type( self::POST_TYPE, $args );
