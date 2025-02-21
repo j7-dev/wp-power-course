@@ -55,7 +55,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'name'     => 'Powerhouse',
 					'slug'     => 'powerhouse',
 					'source'   => 'https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip',
-					'version'  => '2.0.14',
+					'version'  => '3.0.3',
 					'required' => true,
 				],
 			];
@@ -65,7 +65,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'app_name'    => 'Power Course',
 					'github_repo' => 'https://github.com/j7-dev/wp-power-course',
 					'callback'    => [ Bootstrap::class, 'instance' ],
-					'lc' => false
+					'lc'          => false,
 				]
 			);
 		}

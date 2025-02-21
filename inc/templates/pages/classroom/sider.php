@@ -37,7 +37,7 @@ printf(
 				href="%2$s"
 				class="hover:opacity-75 transition duration-300 flex gap-4 items-center"
 			>
-				<img class="w-6 h-6" src="%3$s" />
+				<img class="size-6" src="%3$s" />
 				<span class="text-gray-400 font-light">
 						回《我的學習》
 				</span>

@@ -97,7 +97,7 @@ const Iframe: FC<{
 							borderRadius: '8px',
 						}}
 					>
-						<div className="w-full h-full rounded-xl overflow-hidden">
+						<div className="size-full rounded-xl overflow-hidden">
 							<div
 								className={`rounded-xl bg-gray-200 ${watchField ? 'tw-block' : 'tw-hidden'}`}
 								style={{
@@ -106,7 +106,7 @@ const Iframe: FC<{
 								}}
 							>
 								<iframe
-									className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
+									className="border-0 absolute top-0 left-0 size-full rounded-xl"
 									src={embedVideoUrl}
 									loading="lazy"
 									frameBorder="0"
@@ -117,7 +117,7 @@ const Iframe: FC<{
 								></iframe>
 								<div
 									onClick={handleDelete}
-									className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+									className="group absolute top-4 right-4 rounded-md size-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
 								>
 									<DeleteOutlined className="text-red-500 group-hover:text-white" />
 								</div>

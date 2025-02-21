@@ -21,7 +21,7 @@ foreach ( $items as $index => $item ) :
 	printf(
 		/*html*/'
         <div class="flex items-center gap-3">
-					<div class="pc-badge pc-badge-primary h-8 w-8 flex items-center justify-center">
+					<div class="pc-badge pc-badge-primary size-8 flex items-center justify-center">
 		        %1$s
           </div>
 					<div>
@@ -35,7 +35,7 @@ foreach ( $items as $index => $item ) :
 		Plugin::safe_get(
 			'icon/' . $item['icon'],
 			[
-				'class' => 'h-4 w-4',
+				'class' => 'size-4',
 				'color' => '#ffffff',
 			],
 			false,

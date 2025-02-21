@@ -59,7 +59,7 @@ const index = ({
 				<DefaultVideoLayout icons={defaultLayoutIcons} colorScheme="dark" />
 
 				<div
-					className={`absolute h-full w-full top-0 left-0 ${showWatermark ? 'tw-block' : 'tw-hidden'}`}
+					className={`absolute size-full top-0 left-0 ${showWatermark ? 'tw-block' : 'tw-hidden'}`}
 				>
 					<WaterMark
 						interval={Number(watermark_interval)}

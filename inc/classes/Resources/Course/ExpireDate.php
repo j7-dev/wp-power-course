@@ -15,6 +15,8 @@ use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
  */
 class ExpireDate {
 
+
+
 	/**
 	 * 是否為"跟隨訂閱"
 	 *
@@ -27,7 +29,7 @@ class ExpireDate {
 	 *
 	 * @var bool $is_expired 是否過期
 	 */
-	public bool $is_expired;
+	public bool $is_expired = true;
 
 	/**
 	 * 訂閱ID
@@ -49,10 +51,6 @@ class ExpireDate {
 	 * @param int|string $expire_date 到期日 timestamp | subscription_{訂閱id}
 	 */
 	public function __construct( public int|string $expire_date ) {
-		if (\is_numeric($expire_date)) {
-			$this->expire_date = (int) $expire_date;
-		}
-
 		if (class_exists('WC_Subscription')) {
 			$this->set_subscription();
 		}
@@ -107,10 +105,22 @@ class ExpireDate {
 	 * @return void
 	 */
 	public function set_is_expired(): void {
+		// 先判斷非訂閱情況
 		if (!$this->is_subscription) {
-			$expire_date = (int) $this->expire_date;
-			// 0 = 無期限，不會過期
-			$this->is_expired = $expire_date && $expire_date < time();
+			if (\is_numeric($this->expire_date)) {
+				$this->expire_date = (int) $this->expire_date;
+				// 0 = 無期限，不會過期
+				if (0 === $this->expire_date) {
+					$this->is_expired = false;
+					return;
+				}
+				// 到期日小於現在時間，就會過期
+				$this->is_expired = $this->expire_date < time();
+				return;
+			}
+
+			// 其他非數字都會過期
+			$this->is_expired = true;
 			return;
 		}
 

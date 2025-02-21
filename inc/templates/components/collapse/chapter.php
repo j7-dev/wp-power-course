@@ -62,7 +62,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		Plugin::get(
 			'icon/external-link',
 			[
-				'class' => 'w-4 h-4 relative top-0.5 ml-2',
+				'class' => 'size-4 relative top-0.5 ml-2',
 			],
 			false
 			),

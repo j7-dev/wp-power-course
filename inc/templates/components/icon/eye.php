@@ -7,7 +7,7 @@ use J7\PowerCourse\Utils\Base;
 
 $default_args = [
 	'type'  => '',
-	'class' => 'w-6 h-6', // 可以用 tailwind 子選擇器覆寫路徑顏色 跟 透明度
+	'class' => 'size-6', // 可以用 tailwind 子選擇器覆寫路徑顏色 跟 透明度
 	'color' => Base::PRIMARY_COLOR,
 ];
 

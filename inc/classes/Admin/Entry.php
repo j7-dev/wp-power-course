@@ -10,6 +10,8 @@ namespace J7\PowerCourse\Admin;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Bootstrap;
 use J7\PowerCourse\Utils\Base;
+use J7\Powerhouse\Utils\Base as PowerhouseBase;
+
 
 
 /**
@@ -57,30 +59,11 @@ final class Entry {
 		Bootstrap::enqueue_script();
 		$blog_name = \get_bloginfo('name');
 		$id        = substr(Base::APP1_SELECTOR, 1);
-		?>
-		<!doctype html>
-		<html lang="zh_tw" id="tw">
-
-		<head>
-			<meta charset="UTF-8" />
-			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-			<title>課程後台 | <?php echo $blog_name; ?></title>
-		</head>
-
-		<body>
-			<main id="<?php echo $id; ?>"></main>
-		<?php
-		/**
-		 * Prints any scripts and data queued for the footer.
-		 *
-		 * @since 2.8.0
-		 */
-		\do_action('admin_print_footer_scripts');
-
-		?>
-		</body>
-
-		</html>
-		<?php
+		PowerhouseBase::render_admin_layout(
+			[
+				'title' => "課程後台 | {$blog_name}",
+				'id'    => $id,
+			]
+			);
 	}
 }

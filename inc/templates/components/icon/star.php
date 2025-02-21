@@ -5,7 +5,7 @@
 
 $default_args = [
 	'type'  => 'fill', // // 'fill', 'half', 'outline'
-	'class' => 'w-6 h-6', // 可以用 tailwind 子選擇器覆寫路徑顏色 跟 透明度
+	'class' => 'size-6', // 可以用 tailwind 子選擇器覆寫路徑顏色 跟 透明度
 	'color' => 'rgb(251 146 60 / var(--tw-bg-opacity))',
 ];
 

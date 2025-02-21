@@ -34,7 +34,6 @@ final class Ajax {
 	 */
 	public function __construct() {
 		\add_action( 'wp_enqueue_scripts', [ __CLASS__, 'wp_enqueue_scripts' ], -10 );
-		\add_action( 'admin_enqueue_scripts', [ __CLASS__, 'admin_enqueue_scripts' ] );
 
 		$actions = $this->actions;
 		foreach ( $actions as $action ) {
@@ -74,39 +73,7 @@ final class Ajax {
 			]
 			);
 
-		\wp_enqueue_style(
-			Plugin::$kebab . '-template',
-			Plugin::$url . '/inc/assets/dist/css/index.css',
-			[],
-			Plugin::$version
-		);
-
-		// \wp_enqueue_style(
-		// 'blocknote-mantine',
-		// Plugin::$url . '/inc/assets/dist/css/BlockNote-mantine.css',
-		// [],
-		// Plugin::$version
-		// );
-	}
-
-	/**
-	 * Enqueue assets
-	 *
-	 * @return void
-	 */
-	public static function admin_enqueue_scripts(): void {
-		$screen = \get_current_screen();
-
-		if ('shop_order' !== $screen?->id) {
-			return;
-		}
-
-		\wp_enqueue_style(
-			Plugin::$kebab . '-template',
-			Plugin::$url . '/inc/assets/dist/css/index.css',
-			[],
-			Plugin::$version
-		);
+		\wp_enqueue_style('blocknote');
 	}
 
 	/**

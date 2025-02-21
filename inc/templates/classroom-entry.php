@@ -18,6 +18,8 @@
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
+use J7\Powerhouse\Plugin as PowerhousePlugin;
+use J7\Powerhouse\Theme\FrontEnd as Theme;
 
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -82,7 +84,7 @@ do_action('power_course_before_classroom_render');
 // phpcs:disable
 ?>
 <!doctype html>
-		<html lang="zh_tw" data-theme="dark">
+		<html lang="zh_tw" id="tw" data-theme="dark">
 		<head>
 			<meta charset="UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -94,11 +96,12 @@ do_action('power_course_before_classroom_render');
 			// 	\wp_head();
 			// }
 			?>
-			<link rel="stylesheet" id="wp-power-course-css" href="<?php echo Plugin::$url . '/inc/assets/dist/css/index.css?ver=' . Plugin::$version; ?>"  media='all' />
+			<link rel="stylesheet" href="<?php echo PowerhousePlugin::$url; ?>/js/dist/css/front.min.css?ver=<?php echo PowerhousePlugin::$version; ?>" media='all' /><?php //phpcs:ignore ?>
+			<link rel="stylesheet" href="<?php echo PowerhousePlugin::$url; ?>/js/dist/css/blocknote.min.css?ver=<?php echo PowerhousePlugin::$version; ?>" media='all' />
 			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
 		</head>
 
-		<body class="!m-0 min-h-screen bg-base-100 tailwind classroom">
+		<body class="!m-0 min-h-screen bg-base-100 classroom">
 			<?php
 			$GLOBALS['product'] = $keep_product;
 			$GLOBALS['chapter'] = $keep_chapter;
@@ -137,9 +140,8 @@ do_action('power_course_before_classroom_render');
 			(string) \get_option('pc_pdf_watermark_color', 'rgba(255, 255, 255, 0.5)'),
 			ChapterUtils::get_formatted_watermark_text('pdf')
 			);
+			Theme::render_button();
 			\wp_footer();
-
-			Plugin::get( 'theme', null, true, true );
 			 ?>
 
 </body>

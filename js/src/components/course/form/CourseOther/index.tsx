@@ -32,9 +32,9 @@ const CourseOtherComponent = () => {
 						label: (
 							<div className="flex gap-x-2">
 								顯示{' '}
-								<span className="bg-red-100 [&_svg]:fill-red-500 text-red-500 text-xs flex items-center px-2 py-1 rounded-md w-fit h-fit mb-1">
+								<span className="bg-red-100 [&_svg]:fill-red-500 text-red-500 text-xs flex items-center px-2 py-1 rounded-md size-fit mb-1">
 									<svg
-										className="w-4 h-4 mr-1"
+										className="size-4 mr-1"
 										viewBox="0 0 24 24"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"
@@ -58,9 +58,9 @@ const CourseOtherComponent = () => {
 						label: (
 							<div className="flex gap-x-2">
 								顯示
-								<span className="bg-amber-100 [&_svg_path]:fill-amber-500 text-amber-500 text-xs flex items-center px-2 py-1 rounded-md w-fit h-fit mb-1">
+								<span className="bg-amber-100 [&_svg_path]:fill-amber-500 text-amber-500 text-xs flex items-center px-2 py-1 rounded-md size-fit mb-1">
 									<svg
-										className="w-4 h-4 mr-1"
+										className="size-4 mr-1"
 										viewBox="0 0 24 24"
 										fill="none"
 										xmlns="http://www.w3.org/2000/svg"

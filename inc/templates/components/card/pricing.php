@@ -89,8 +89,8 @@ printf(
 	<p class="pc-course-card__teachers !mb-1 md:!mb-4">%5$s</p>
 	<div class="pc-course-card__price h-[2.5rem] md:h-8">%6$s</div>
 	<div class="flex gap-2 items-center justify-between border-y border-x-0 border-solid border-gray-300 py-2 mt-2">
-		<div class="text-base-content text-xs font-semibold flex items-center gap-1 [&_svg]:w-3.5 [&_svg]:h-3.5 [&_svg_path]:stroke-gray-400">%7$s</div>
-		<div class="text-base-content text-xs font-semibold flex items-center gap-1 [&_svg]:w-3.5 [&_svg]:h-3.5 [&_svg]:fill-gray-400">%8$s</div>
+		<div class="text-base-content text-xs font-semibold flex items-center gap-1 [&_svg]:size-3.5 [&_svg_path]:stroke-gray-400">%7$s</div>
+		<div class="text-base-content text-xs font-semibold flex items-center gap-1 [&_svg]:size-3.5 [&_svg]:fill-gray-400">%8$s</div>
 	</div>
 </div>
 ',
