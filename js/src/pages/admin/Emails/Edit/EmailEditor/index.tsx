@@ -94,7 +94,7 @@ const CustomEmailEditor = (
 	return (
 		<Suspense
 			fallback={
-				<div className="h-full w-full flex justify-center items-center">
+				<div className="size-full flex justify-center items-center">
 					Loading...
 				</div>
 			}

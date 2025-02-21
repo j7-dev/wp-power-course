@@ -1,6 +1,4 @@
 /* eslint-disable quote-props */
-
-import '@/assets/scss/index.scss'
 import { Refine } from '@refinedev/core'
 
 import {

@@ -40,7 +40,7 @@
 		"@uidotdev/usehooks": "^2.4.1",
 		"@vidstack/react": "^1.12.12",
 		"antd-style": "3.7.1",
-		"antd-toolkit": "^1.2.13",
+		"antd-toolkit": "1.2.13",
 		"axios": "1.7.7",
 		"canvas-confetti": "^1.9.3",
 		"clsx": "^2.1.1",

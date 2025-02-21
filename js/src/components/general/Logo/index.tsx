@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 
 export const Logo: FC<{ className?: string; color?: string }> = ({
-	className = 'w-6 h-6',
+	className = 'size-6',
 	color = '#21759B',
 }) => (
 	<svg

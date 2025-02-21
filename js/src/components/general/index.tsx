@@ -1,6 +1,5 @@
 export * from './Gallery'
 export * from './ToggleContent'
-export * from './QuantityInput'
 export * from './Upload'
 export * from './PopconfirmDelete'
 export * from './SaleRange'

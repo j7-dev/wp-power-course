@@ -19,7 +19,7 @@ export const customHTMLMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 	},
 	aliases: ['html'],
 	group: 'Advanced',
-	icon: <ImEmbed2 className="w-[1.125rem] h-[1.125rem]" />,
+	icon: <ImEmbed2 className="size-[1.125rem]" />,
 })
 
 const customHTMLBlockConfig: CustomBlockConfig = {

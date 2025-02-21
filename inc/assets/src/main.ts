@@ -1,6 +1,5 @@
 /* eslint-disable lines-around-comment */
 import jQuery from 'jquery'
-import '@/assets/scss/index.scss'
 import {
 	finishChapter,
 	dynamicWidth,
@@ -14,41 +13,41 @@ import {
 	HlsSupport,
 	watermarkPDF,
 } from './events'
-;(function ($) {
-	// 訂閱放前面
-	responsive()
+	; (function ($) {
+		// 訂閱放前面
+		responsive()
 
-	// classroom 頁面，完成章節
-	finishChapter()
+		// classroom 頁面，完成章節
+		finishChapter()
 
-	// 改變大小時設定 state
-	dynamicWidth()
+		// 改變大小時設定 state
+		dynamicWidth()
 
-	// 添加 tabs 組件事件
-	tabs()
-	coursesProduct()
-	toggleContent()
-	countdown()
-	HlsSupport()
+		// 添加 tabs 組件事件
+		tabs()
+		coursesProduct()
+		toggleContent()
+		countdown()
+		HlsSupport()
 
-	// PDF 浮水印下載
-	watermarkPDF()
+		// PDF 浮水印下載
+		watermarkPDF()
 
-	new CommentApp('#review-app', {
-		queryParams: {
-			type: 'review',
-		},
-		ratingProps: {
-			name: 'course-review',
-		},
-	})
+		new CommentApp('#review-app', {
+			queryParams: {
+				type: 'review',
+			},
+			ratingProps: {
+				name: 'course-review',
+			},
+		})
 
-	new CommentApp('#comment-app', {
-		queryParams: {
-			type: 'comment',
-		},
-	})
+		new CommentApp('#comment-app', {
+			queryParams: {
+				type: 'comment',
+			},
+		})
 
-	// 加入購物車樣式調整
-	cart()
-})(jQuery)
+		// 加入購物車樣式調整
+		cart()
+	})(jQuery)

@@ -87,15 +87,15 @@ export const FileUpload = () => {
 					<p className="ant-upload-text">點擊或拖曳文件到這裡上傳</p>
 					<p className="ant-upload-hint">僅支持 image/* 類型 文件</p>
 					{fileList.length > 0 && fileList?.[0]?.url && (
-						<div className="w-full h-full absolute top-0 left-0 p-2">
-							<div className="w-full h-full rounded-lg overflow-hidden">
+						<div className="size-full absolute top-0 left-0 p-2">
+							<div className="size-full rounded-lg overflow-hidden">
 								<img
 									src={fileList?.[0]?.url}
-									className="w-full h-full object-cover"
+									className="size-full object-cover"
 								/>
 								<div
 									onClick={handleDelete}
-									className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+									className="group absolute top-4 right-4 rounded-md size-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
 								>
 									<DeleteOutlined className="text-red-500 group-hover:text-white" />
 								</div>

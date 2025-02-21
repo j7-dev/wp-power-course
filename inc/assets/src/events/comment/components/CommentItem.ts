@@ -172,9 +172,9 @@ export class CommentItem {
 		this.$element.html(/*html*/ `
 			<div class="relative p-6 mt-2 rounded ${bgColor} ${this._props.comment_approved === '0' ? 'border-2 border-dashed border-base-300' : ''} ${is_trash ? 'border-2 border-dashed border-error' : ''}">
 				<div class="flex gap-4">
-					<div class="w-10 h-10 rounded-full overflow-hidden relative">
-						<img src="${user.avatar_url}" loading="lazy" class="w-full h-full object-cover relative z-20">
-						<div class="absolute top-0 left-0 w-full h-full bg-base-300 animate-pulse z-10"></div>
+					<div class="size-10 rounded-full overflow-hidden relative">
+						<img src="${user.avatar_url}" loading="lazy" class="size-full object-cover relative z-20">
+						<div class="absolute top-0 left-0 size-full bg-base-300 animate-pulse z-10"></div>
 					</div>
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">

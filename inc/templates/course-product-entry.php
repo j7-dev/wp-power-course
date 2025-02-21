@@ -3,6 +3,8 @@
  * 課程銷售頁
  */
 
+use J7\Powerhouse\Theme\FrontEnd as Theme;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -46,7 +48,7 @@ if ('draft' === $product_status) {
 		xmlns="http://www.w3.org/2000/svg"
 		fill="none"
 		viewBox="0 0 24 24"
-		class="h-4 w-4 shrink-0 stroke-current mr-2">
+		class="size-4 shrink-0 stroke-current mr-2">
 		<path
 			stroke-linecap="round"
 			stroke-linejoin="round"
@@ -93,6 +95,6 @@ printf(
 '還是要購買嗎?'
 );
 
-get_footer();
+Theme::render_button();
 
-Plugin::get( 'theme', null, true, true );
+get_footer();

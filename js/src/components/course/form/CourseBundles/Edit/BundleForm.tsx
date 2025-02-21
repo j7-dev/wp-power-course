@@ -327,7 +327,7 @@ const BundleForm = () => {
 								<div className="rounded aspect-video w-16 overflow-hidden">
 									<img
 										src={images?.[0]?.url || defaultImage}
-										className="w-full h-full rounded object-cover"
+										className="size-full rounded object-cover"
 									/>
 								</div>
 								<div className="flex-1">
@@ -365,7 +365,7 @@ const BundleForm = () => {
 							<div className="bg-slate-300 h-9 w-16 rounded object-cover" />
 							<div>
 								<div className="bg-slate-300 h-3 w-20 mb-1" />
-								<div className="bg-slate-300 h-3 w-32" />
+								<div className="bg-slate-300 size-32" />
 							</div>
 						</div>
 					))}

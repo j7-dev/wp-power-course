@@ -2,7 +2,6 @@ import { FC } from 'react'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { renderHTML } from 'antd-toolkit'
-import './style.scss'
 
 export const ProductPrice: FC<{
 	record: TProductRecord | TCourseBaseRecord

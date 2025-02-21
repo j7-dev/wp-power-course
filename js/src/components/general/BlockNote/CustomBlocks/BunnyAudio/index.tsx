@@ -16,7 +16,7 @@ export const bunnyAudioMenuItem = (editor: typeof schema.BlockNoteEditor) => ({
 	},
 	aliases: ['bunny'],
 	group: 'Bunny',
-	icon: <MdOutlineAudioFile className="w-[1.125rem] h-[1.125rem]" />,
+	icon: <MdOutlineAudioFile className="size-[1.125rem]" />,
 })
 
 const bunnyAudioBlockConfig: CustomBlockConfig = {

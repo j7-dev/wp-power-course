@@ -9,7 +9,7 @@ export const UserName: FC<{
 	const { display_name, user_email, id, user_avatar_url, is_teacher } = record
 	return (
 		<div className="grid grid-cols-[2rem_1fr] gap-4 items-center">
-			<img src={user_avatar_url} className="w-8 h-8 rounded-full" />
+			<img src={user_avatar_url} className="size-8 rounded-full" />
 			<div>
 				<p className="mb-1 cursor-pointer" onClick={onClick(record)}>
 					{is_teacher ? <Tag color="magenta">講師</Tag> : ''}

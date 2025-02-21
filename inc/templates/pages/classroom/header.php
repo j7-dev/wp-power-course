@@ -39,7 +39,7 @@ $back_to_my_course_html = sprintf(
 			href="%1$s"
 			class="hover:opacity-75 transition duration-300 contents lg:tw-hidden"
 		>
-			<img class="w-6 h-6 absolute left-2 top-4" src="%2$s" />
+			<img class="size-6 absolute left-2 top-4" src="%2$s" />
 		</a>
 ',
 	\wc_get_account_endpoint_url( MyAccount::COURSES_ENDPOINT ),
@@ -50,7 +50,7 @@ $back_to_my_course_html = sprintf(
 $user_id                    = \get_current_user_id();
 $avl_chapter                = new AVLChapter( (int) $current_chapter_id, (int) $user_id );
 $finished_at                = $avl_chapter->finished_at;
-$is_this_chapter_finished   = !!$finished_at;
+$is_this_chapter_finished   = (bool) $finished_at;
 $finish_chapter_button_html = '';
 $finish_chapter_button_html = sprintf(
 		/*html*/'
@@ -82,7 +82,7 @@ if (count($chapter_ids) > 0) {
 			/*html*/'
 		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
 					前往下一單元
-					<svg class="w-3 sm:w-4 h-3 sm:h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
 						<g id="SVGRepo_iconCarrier">

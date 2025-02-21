@@ -80,8 +80,8 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
 			{recordId && !isEmpty && (
 				<div className="relative aspect-video rounded-lg border border-dashed border-gray-300">
-					<div className="absolute w-full h-full top-0 left-0 p-2">
-						<div className="w-full h-full rounded-xl overflow-hidden">
+					<div className="absolute size-full top-0 left-0 p-2">
+						<div className="size-full rounded-xl overflow-hidden">
 							<div
 								className={`rounded-xl bg-gray-200 ${!isEmpty ? 'tw-block' : 'tw-hidden'}`}
 								style={{
@@ -90,7 +90,7 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 								}}
 							>
 								<iframe
-									className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
+									className="border-0 absolute top-0 left-0 size-full rounded-xl"
 									src={videoUrl}
 									loading="lazy"
 									allow="encrypted-media;picture-in-picture;"
@@ -99,7 +99,7 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 
 								<div
 									onClick={handleDelete}
-									className="group absolute top-4 right-4 rounded-md w-12 h-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+									className="group absolute top-4 right-4 rounded-md size-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
 								>
 									<DeleteOutlined className="text-red-500 group-hover:text-white" />
 								</div>
