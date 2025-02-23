@@ -84,7 +84,7 @@ do_action('power_course_before_classroom_render');
 // phpcs:disable
 ?>
 <!doctype html>
-		<html lang="zh_tw" id="tw" data-theme="dark">
+		<html <?php language_attributes(); ?>>
 		<head>
 			<meta charset="UTF-8" />
 			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
