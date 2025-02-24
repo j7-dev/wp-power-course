@@ -43,5 +43,5 @@ printf(
 	$product->get_title(),
 	$count_all_chapters,
 	$course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : '',
-	Plugin::get( 'collapse/classroom-chapter', null, false ),
+	Plugin::load_template( 'collapse/classroom-chapter', null, false ),
 );

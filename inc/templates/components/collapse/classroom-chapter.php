@@ -65,14 +65,14 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 		$finished_at    = $avl_chapter->finished_at;
 
 
-		$icon_html = Plugin::get( 'icon/video', null, false );
+		$icon_html = Plugin::load_template( 'icon/video', null, false );
 		$tooltip   = '點擊觀看';
 		if ( $first_visit_at ) {
-			$icon_html = Plugin::get( 'icon/check', [ 'type' => 'outline' ], false );
+			$icon_html = Plugin::load_template( 'icon/check', [ 'type' => 'outline' ], false );
 			$tooltip   = "已於 {$first_visit_at} 開始觀看";
 		}
 		if ( $finished_at ) {
-			$icon_html = Plugin::get( 'icon/check', null, false );
+			$icon_html = Plugin::load_template( 'icon/check', null, false );
 			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
 		$icon_html_with_tooltip = sprintf(

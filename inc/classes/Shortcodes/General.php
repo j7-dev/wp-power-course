@@ -91,7 +91,7 @@ final class General {
 
 		$products = $results->products;
 
-		$html = Plugin::get(
+		$html = Plugin::load_template(
 			'list/pricing',
 			[
 				'products' => $products,
@@ -110,7 +110,7 @@ final class General {
 	 * @return string
 	 */
 	public static function pc_my_courses_callback( ?array $params ): string {
-		$html = Plugin::get(
+		$html = Plugin::load_template(
 			'my-account',
 			null,
 			false

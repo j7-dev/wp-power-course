@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 echo '<div class="w-full md:!w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
 
-Plugin::get( 'card/single-product' );
+Plugin::load_template( 'card/single-product' );
 
 $linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 foreach ( $linked_products as $linked_product ) {
@@ -35,7 +35,7 @@ foreach ( $linked_products as $linked_product ) {
 		continue;
 	}
 
-	Plugin::get(
+	Plugin::load_template(
 		'card/bundle-product',
 		[
 			'product' => $linked_product,

@@ -35,7 +35,7 @@ $args = wp_parse_args( $args, $default_args );
 
 
 if ( ! $video_code ) {
-	Plugin::get(
+	Plugin::load_template(
 		'video/404',
 		[
 			'message' => '缺少 video 內容 ，請聯絡老師',

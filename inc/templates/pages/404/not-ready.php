@@ -32,14 +32,14 @@ $message = sprintf(
 
 
 echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
-Plugin::get(
+Plugin::load_template(
 	'alert',
 	[
 		'type'    => 'error',
 		'message' => $message,
 	]
 );
-Plugin::get(
+Plugin::load_template(
 	'course-product/header',
 	[
 		'show_link' => true,

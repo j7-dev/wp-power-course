@@ -34,7 +34,7 @@ $args = wp_parse_args( $args, $default_args );
 $video_id = $video_info['id'];
 
 if ( ! $library_id || ! $video_id ) {
-	Plugin::get(
+	Plugin::load_template(
 		'video/404',
 		[
 			'message' => '缺少 ' . ( ! $library_id ? 'library_id' : 'video_id' ) . ' ，請聯絡老師',

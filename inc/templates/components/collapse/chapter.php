@@ -59,7 +59,7 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-secondary">%2$s %3$s</a>',
 		$classroom_link,
 		$sub_chapter->post_title,
-		Plugin::get(
+		Plugin::load_template(
 			'icon/external-link',
 			[
 				'class' => 'size-4 relative top-0.5 ml-2',

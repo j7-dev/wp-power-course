@@ -48,7 +48,7 @@ $args['attr']  .= sprintf(
 
 unset($args['product'], $args['wrapper_class'], $args['qty']);
 
-$button_html = Plugin::get(
+$button_html = Plugin::load_template(
 	'button',
 	$args,
 	false

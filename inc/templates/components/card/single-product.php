@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $is_free = 'yes' === $product->get_meta( 'is_free' );
 
 if ( $is_free ) {
-	Plugin::get(
+	Plugin::load_template(
 		'card/single-product-free',
 		[
 			'product' => $product,
@@ -35,7 +35,7 @@ if ( $is_free ) {
 	return;
 }
 
-Plugin::get(
+Plugin::load_template(
 	'card/single-product-sale',
 	[
 		'product' => $product,

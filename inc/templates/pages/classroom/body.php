@@ -37,7 +37,7 @@ $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 $course_tabs = [
 	'chapter' => [
 		'label'   => '章節',
-		'content' => Plugin::get( 'classroom/chapters', null, false ),
+		'content' => Plugin::load_template( 'classroom/chapters', null, false ),
 	],
 	'discuss' => [
 		'label'   => '討論',
@@ -56,7 +56,7 @@ $content = \do_shortcode( $chapter->post_content );
 
 echo '<div id="pc-classroom-body" class="w-full bg-base-100 pt-[52px] lg:pt-16">';
 
-Plugin::get(
+Plugin::load_template(
 	'classroom/header',
 	[
 		'product' => $product,
@@ -70,7 +70,7 @@ if (current_user_can('manage_options') && !$is_avl) {
 }
 
 echo '<div class="pc-classroom-body__video z-[15] sticky top-[52px] lg:relative lg:top-[unset]">';
-Plugin::get(
+Plugin::load_template(
 	'video',
 	[
 		'video_info' => $video_info,
@@ -87,11 +87,11 @@ if ($content) {
 }
 
 echo '<div class="bg-base-200 px-4 lg:px-12 py-4">';
-Plugin::get( 'progress' );
+Plugin::load_template( 'progress' );
 echo '</div>';
 
 echo '<div class="pc-classroom-body__tabs-nav z-[15] lg:relative">';
-Plugin::get(
+Plugin::load_template(
 	'tabs/nav',
 	[
 		'course_tabs' => $course_tabs,
@@ -101,7 +101,7 @@ echo '</div>';
 
 
 echo '<div class="px-4 lg:px-12">';
-Plugin::get(
+Plugin::load_template(
 'tabs/content',
 [
 	'course_tabs' => $course_tabs,

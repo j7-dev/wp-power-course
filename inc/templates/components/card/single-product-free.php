@@ -42,8 +42,8 @@ printf(
 	<div class="flex gap-3">%4$s %5$s</div>
 </div>
 ',
-Plugin::get( 'divider', null, false ),
-Plugin::get(
+Plugin::load_template( 'divider', null, false ),
+Plugin::load_template(
 	'countdown/sales',
 	[
 		'product' => $product,
@@ -51,7 +51,7 @@ Plugin::get(
 	false
 	),
 $purchase_note,
-Plugin::get(
+Plugin::load_template(
 	'button',
 	[
 		'type'     => 'primary',
@@ -61,7 +61,7 @@ Plugin::get(
 	],
 	false
 ),
-Plugin::get(
+Plugin::load_template(
 	'button/add-to-cart',
 	[
 		'product'       => $product,

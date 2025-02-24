@@ -42,7 +42,7 @@ printf(
 	$product_name
 );
 
-Plugin::get( 'divider' );
+Plugin::load_template( 'divider' );
 
 printf(
 /*html*/'<div class="mb-6 text-sm">%s</div>',
@@ -52,7 +52,7 @@ printf(
 
 echo '<div class="flex gap-3 justify-between items-end">';
 
-Plugin::get(
+Plugin::load_template(
 	'price',
 	[
 		'product' => $product,
@@ -60,7 +60,7 @@ Plugin::get(
 	]
 );
 
-Plugin::get(
+Plugin::load_template(
 	'button/add-to-cart',
 	[
 		'product'       => $product,

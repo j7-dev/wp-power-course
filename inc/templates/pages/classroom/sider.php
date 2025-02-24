@@ -46,7 +46,7 @@ printf(
 	</div>
 </div>
 ',
-	Plugin::get(
+	Plugin::load_template(
 		'classroom/chapters',
 		[
 			'product' => $product,

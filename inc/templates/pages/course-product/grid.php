@@ -40,7 +40,7 @@ $filtered_courses = array_filter(
 );
 
 if ( empty( $filtered_courses ) ) {
-	Plugin::get(
+	Plugin::load_template(
 		'alert',
 		[
 			'type'    => 'info',
@@ -53,7 +53,7 @@ if ( empty( $filtered_courses ) ) {
 
 echo '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
 foreach ( $filtered_courses as $course ) {
-	Plugin::get(
+	Plugin::load_template(
 		'card/available',
 		[
 			'product' => $course,

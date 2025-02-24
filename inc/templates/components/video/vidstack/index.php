@@ -51,7 +51,7 @@ $src = match ($video_info['type']) {
 
 if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $video_info['type'] ) ) {
 
-	Plugin::get(
+	Plugin::load_template(
 		'video/404',
 		[
 			'message' => '缺少 video_id | src ，請聯絡老師',
