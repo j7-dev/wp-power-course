@@ -26,36 +26,26 @@ if ( ! $current_user_id ) {
 
 global $post;
 
-$chapter_post = $post;
-$chapter      = new Chapter( (int) $chapter_post->ID );
-$product      = $chapter->get_course_product();
+$chapter_post       = $post;
+$chapter            = new Chapter( (int) $chapter_post->ID );
+$course_product     = $chapter->get_course_product();
+$GLOBALS['product'] = $course_product;
+$GLOBALS['chapter'] = $chapter_post;
 
-$is_expired = CourseUtils::is_expired($product, $current_user_id);
+$is_expired = CourseUtils::is_expired($course_product, $current_user_id);
 
 $is_avl = CourseUtils::is_avl();
 if (!current_user_can('manage_options')) {
+	get_header();
 	if ( ! $is_avl ) {
-		get_header();
-		$GLOBALS['product'] = $product;
-		$GLOBALS['chapter'] = $chapter_post;
 		Plugin::load_template( '404/buy', null );
-		get_footer();
-		exit;
 	} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
-		get_header();
-		$GLOBALS['product'] = $product;
-		$GLOBALS['chapter'] = $chapter_post;
 		Plugin::load_template( '404/not-ready', null );
-		get_footer();
-		exit;
 	} elseif ( $is_expired ) {
-		get_header();
-		$GLOBALS['product'] = $product;
-		$GLOBALS['chapter'] = $chapter_post;
 		Plugin::load_template( '404/expired', null );
-		get_footer();
-		exit;
 	}
+	get_footer();
+	exit;
 }
 
 do_action('power_course_before_classroom_render');
@@ -65,18 +55,10 @@ do_action('power_course_before_classroom_render');
 <!doctype html>
 		<html <?php language_attributes(); ?>>
 		<head>
-			<meta charset="UTF-8" />
-			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-			<?php
-			\wp_head();
-			// 如果有短代碼就載入 wp_head
-			// if ( Base::has_shortcode( \get_the_content(null, false, $chapter_post) ) ) {
-			// 	\wp_head();
-			// }
-			?>
-			<link rel="stylesheet" href="<?php echo PowerhousePlugin::$url; ?>/js/dist/css/front.min.css?ver=<?php echo PowerhousePlugin::$version; ?>" media='all' /><?php //phpcs:ignore ?>
-			<link rel="stylesheet" href="<?php echo PowerhousePlugin::$url; ?>/js/dist/css/blocknote.min.css?ver=<?php echo PowerhousePlugin::$version; ?>" media='all' />
-			<script src="<?php echo site_url(); ?>/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+			<meta charset="<?php bloginfo( 'charset' ); ?>">
+			<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover">
+			<link rel="profile" href="https://gmpg.org/xfn/11">
+			<?php wp_head(); ?>
 		</head>
 
 		<body class="!m-0 min-h-screen bg-base-100 classroom">
@@ -89,14 +71,6 @@ do_action('power_course_before_classroom_render');
 			Plugin::load_template( 'classroom/body', null, true, true );
 			echo '</div>';
 
-
-
-			// TODO 需要測試會不會重複載入 script
-			// if ( Base::has_shortcode( \get_the_content(null, false, $chapter_post) ) ) {
-			// 	\wp_footer();
-			// }
-
-			// \do_action( 'pc_classroom_footer' );
 
 			printf(
 			/*html*/'
