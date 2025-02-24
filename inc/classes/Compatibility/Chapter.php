@@ -4,13 +4,13 @@ declare (strict_types = 1);
 
 namespace J7\PowerCourse\Compatibility;
 
-use J7\PowerCourse\Resources\Chapter\CPT;
+use J7\PowerCourse\Resources\Chapter\Core\CPT;
 
 
 /**
  * 修改 Chapter 與 Course 的關聯，將舊版資料結構轉移到新版
  * OLD 舊版: chapter 的 post_parent 是 course_id
- * NEW 新版: chapter 的 post_meta _parent_course_id 是 course_id
+ * NEW 新版: chapter 的 post_meta parent_course_id 是 course_id
  *
  * @since v0.8.0
  */
@@ -63,7 +63,7 @@ final class Chapter {
 	}
 
 	/**
-	 * 遷移 chapter 的 post_parent 到 post_meta _parent_course_id
+	 * 遷移 chapter 的 post_parent 到 post_meta parent_course_id
 	 *
 	 * @throws \Exception 遷移出錯
 	 */
@@ -84,7 +84,7 @@ final class Chapter {
 					'ID'          => $chapter_id,
 					'post_parent' => 0,
 					'meta_input'  => [
-						'_parent_course_id' => $post_parent,
+						'parent_course_id' => $post_parent,
 					],
 				]
 					);

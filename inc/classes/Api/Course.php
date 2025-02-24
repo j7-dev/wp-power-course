@@ -9,8 +9,8 @@ namespace J7\PowerCourse\Api;
 
 use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\WC;
@@ -410,7 +410,7 @@ final class Course extends ApiBase {
 		// @phpstan-ignore-next-line
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
 
-		$children = ! ! $chapters ? [
+		$children = (bool) $chapters ? [
 			'chapters' => $chapters,
 		] : [];
 
@@ -510,7 +510,7 @@ final class Course extends ApiBase {
 		/** @var array<string, mixed|string> $body_params */
 		$body_params = is_array($body_params) ? General::format_empty_array($body_params) : [];
 
-		$product = !!$id ? \wc_get_product( $id ) : new \WC_Product_Simple();
+		$product = (bool) $id ? \wc_get_product( $id ) : new \WC_Product_Simple();
 
 		// @phpstan-ignore-next-line
 		[

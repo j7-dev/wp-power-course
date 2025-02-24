@@ -9,7 +9,7 @@ declare ( strict_types=1 );
 namespace J7\PowerCourse\Utils;
 
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\BundleProduct\Helper;
 
 

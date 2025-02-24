@@ -9,9 +9,9 @@ declare ( strict_types=1 );
 namespace J7\PowerCourse\Utils;
 
 use J7\PowerCourse\Admin\Product as AdminProduct;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\Resources\Chapter\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
 
 
 /**
@@ -257,7 +257,7 @@ abstract class Course {
 			$all_sub_chapter_ids,
 			function ( $chapter_id ) use ( $user_id ) {
 				$avl_chapter = new AVLChapter( (int) $chapter_id, (int) $user_id);
-				return !!$avl_chapter->finished_at;
+				return (bool) $avl_chapter->finished_at;
 			}
 			);
 
@@ -298,7 +298,7 @@ abstract class Course {
 		$avl_courses = [];
 		foreach ($avl_course_ids as $avl_course_id) {
 			$course = \wc_get_product($avl_course_id);
-			if (!!$course) {
+			if ( (bool) $course) {
 				$avl_courses[] = $course;
 			}
 		}
@@ -687,7 +687,7 @@ abstract class Course {
 
 		// phpcs:enable
 
-		return ! ! $results;
+		return (bool) $results;
 	}
 
 	/**
