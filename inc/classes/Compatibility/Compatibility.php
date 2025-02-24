@@ -21,9 +21,7 @@ final class Compatibility {
 
 	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
 		if ($scheduled_version === Plugin::$version) {

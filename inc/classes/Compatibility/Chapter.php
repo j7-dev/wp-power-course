@@ -18,9 +18,7 @@ final class Chapter {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 	}
 

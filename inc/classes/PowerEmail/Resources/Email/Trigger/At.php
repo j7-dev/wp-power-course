@@ -26,9 +26,7 @@ final class At {
 
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 
 		// ---- 開通課程權限後 ----//

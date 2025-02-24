@@ -23,9 +23,7 @@ final class Bootstrap {
 	const SCHEDULE_ACTION          = 'power_course_schedule_action';
 	const SCHEDULE_ACTION_INTERVAL = 10 * MINUTE_IN_SECONDS;
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		Compatibility\Compatibility::instance();
 

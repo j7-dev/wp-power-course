@@ -18,9 +18,7 @@ final class MyAccount {
 
 	public const COURSES_ENDPOINT = 'courses';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		$hide_myaccount_courses = \get_option( 'hide_myaccount_courses', 'no' );
 

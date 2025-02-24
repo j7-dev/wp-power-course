@@ -64,9 +64,7 @@ final class Api extends ApiBase {
 		'non_refunded_orders_count' => 'intval',
 	];
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		parent::__construct();
 

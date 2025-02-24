@@ -21,9 +21,7 @@ final class Templates {
 	public const CLASSROOM_SLUG = 'classroom_slug';
 	public const CHAPTER_ID     = 'chapter_id';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_filter('template_include', [ $this, 'course_product_template' ], 9999);
 		\add_action('init', [ $this, 'add_rewrite_rules' ]);

@@ -30,9 +30,7 @@ final class General {
 		'pc_bundle_card',
 	];
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		foreach (self::$shortcodes as $shortcode) {
 			// @phpstan-ignore-next-line

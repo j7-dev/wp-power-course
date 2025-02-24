@@ -25,9 +25,7 @@ final class CPT {
 	 */
 	public static $email_headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( 'init', [ __CLASS__, 'register_cpt' ] );
 		\add_action( 'power_email_after_send_email', [ $this, 'record_user_id_after_send_email' ], 10, 4 );

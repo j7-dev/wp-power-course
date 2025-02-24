@@ -37,9 +37,7 @@ final class LifeCycle {
 	// 課程完成
 	const COURSE_FINISHED_ACTION = 'power_course_course_finished';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 
 		// 購買了有開課權限的商品時

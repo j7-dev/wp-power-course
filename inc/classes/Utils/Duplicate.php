@@ -28,9 +28,7 @@ final class Duplicate {
 		'_edit_last',
 	];
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 5 );
 		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_bundle_product' ], 10, 5 );

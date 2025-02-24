@@ -14,9 +14,7 @@ final class Comment {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action('wp_insert_comment', [ __CLASS__, 'send_comment_notification' ], 10, 2);
 	}

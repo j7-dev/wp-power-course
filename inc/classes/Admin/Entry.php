@@ -20,9 +20,7 @@ use J7\Powerhouse\Utils\Base as PowerhouseBase;
 final class Entry {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		// Add the admin page for full-screen.
 		\add_action('current_screen', [ __CLASS__, 'maybe_output_admin_page' ], 10);

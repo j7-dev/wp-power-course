@@ -19,9 +19,7 @@ final class Product {
 	const PRODUCT_OPTION_NAME = 'is_course';
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_filter( 'product_type_options', [ __CLASS__, 'add_product_type_options' ] );
 		// \add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );

@@ -98,9 +98,7 @@ final class Api extends ApiBase {
 	 */
 	protected static $time_periods = [];
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		parent::__construct();
 		self::$time_periods = [
