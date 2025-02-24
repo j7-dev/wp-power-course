@@ -27,11 +27,10 @@ final class Bootstrap {
 	public function __construct() {
 		Compatibility\Compatibility::instance();
 
-		Resources\Chapter\CPT::instance();
+		Resources\Chapter\Core\Loader::instance();
 		Resources\Order::instance();
 		Resources\Comment::instance();
 		Resources\Course\LifeCycle::instance();
-		Resources\Chapter\LifeCycle::instance();
 
 		Admin\Entry::instance();
 		Admin\Product::instance();

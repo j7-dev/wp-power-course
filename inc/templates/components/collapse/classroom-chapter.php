@@ -3,9 +3,9 @@
  * Classroom > Sider > Chapters
  */
 
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'] ?? null,

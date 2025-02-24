@@ -9,7 +9,7 @@ declare (strict_types = 1);
 namespace J7\PowerCourse\Compatibility;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\AbstractTable;
 
 

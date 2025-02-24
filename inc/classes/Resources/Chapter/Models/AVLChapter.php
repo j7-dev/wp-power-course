@@ -6,13 +6,13 @@
 
 declare( strict_types=1 );
 
-namespace J7\PowerCourse\Resources\Chapter;
+namespace J7\PowerCourse\Resources\Chapter\Models;
 
 use J7\PowerCourse\Utils\Base;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD;
 
-/**
- * Class AVLChapter
- */
+/** Class AVLChapter */
 final class AVLChapter {
 
 	/**

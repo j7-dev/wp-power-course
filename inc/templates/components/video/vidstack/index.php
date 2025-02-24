@@ -7,8 +7,7 @@
  */
 
 use J7\PowerCourse\Plugin;
-use J7\WpUtils\Classes\General;
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 $default_args = [
 	'class'          => 'rounded-xl',

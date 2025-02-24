@@ -10,7 +10,7 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 use J7\PowerCourse\PowerEmail\Resources\Email;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
-use J7\PowerCourse\Resources\Chapter\LifeCycle as ChapterLifeCycle;
+use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 
 
 /**

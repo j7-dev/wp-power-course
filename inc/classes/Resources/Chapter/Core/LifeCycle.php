@@ -5,14 +5,15 @@
 
 declare( strict_types=1 );
 
-namespace J7\PowerCourse\Resources\Chapter;
+namespace J7\PowerCourse\Resources\Chapter\Core;
 
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Resources\StudentLog\CRUD as StudentLogCRUD;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\AtHelper;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD;
 
 /**
  * Class LifeCycle

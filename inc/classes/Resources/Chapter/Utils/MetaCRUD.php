@@ -6,7 +6,7 @@
 
 declare ( strict_types=1 );
 
-namespace J7\PowerCourse\Resources\Chapter;
+namespace J7\PowerCourse\Resources\Chapter\Utils;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\MetaCRUD as AbstractMetaCRUD;

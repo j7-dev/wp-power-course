@@ -9,7 +9,7 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
-use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 

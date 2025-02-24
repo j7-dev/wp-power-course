@@ -2,13 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace J7\PowerCourse\Resources\Chapter;
+namespace J7\PowerCourse\Resources\Chapter\Core;
 
 use J7\PowerCourse\Plugin;
 
-/**
- * Class CPT
- */
+/** Class CPT */
 final class CPT {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -16,22 +14,6 @@ final class CPT {
 
 	/** Constructor */
 	public function __construct() {
-		// TEST 測試特定 hook 記得刪除
-		\add_action(
-		'init',
-		function () {
-			// $ids = Utils::get_top_level_chapter_ids();
-			// // TEST 印出 WC Logger 記得移除 ---- //
-			// \J7\WpUtils\Classes\WC::log(
-			// [
-			// 'ids' => $ids,
-			// ],
-			// 'get_top_level_chapter_ids'
-			// );
-			// // ---------- END TEST ---------- //
-		}
-		);
-
 		\add_action( 'init', [ __CLASS__, 'register_cpt' ] );
 		\add_filter('option_elementor_cpt_support', [ $this, 'add_elementor_cpt_support' ]);
 	}

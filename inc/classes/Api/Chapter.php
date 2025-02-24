@@ -7,15 +7,15 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Api;
 
-use J7\PowerCourse\Resources\Chapter\Utils as ChapterUtils;
-use J7\PowerCourse\Resources\Chapter\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Chapter\AVLChapter;
-use J7\PowerCourse\Resources\Chapter\MetaCRUD as AVLChapterMeta;
-use J7\PowerCourse\Resources\Chapter\LifeCycle as ChapterLifeCycle;
+use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
+use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 
 
 
@@ -309,7 +309,7 @@ final class Chapter extends ApiBase {
 		$user_id   = \get_current_user_id();
 
 		$avl_chapter              = new AVLChapter( $chapter_id, (int) $user_id );
-		$is_this_chapter_finished = !!$avl_chapter->finished_at;
+		$is_this_chapter_finished = (bool) $avl_chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
 		$product                  = \wc_get_product( $course_id );
 
