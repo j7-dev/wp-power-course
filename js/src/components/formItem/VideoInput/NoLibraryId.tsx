@@ -53,8 +53,8 @@ const NoLibraryId = ({
 		({
 			video:
 				'aspect-video shadow rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center',
-			default: 'flex flex-col items-start justify-center size-full',
-		})[value] ?? 'flex flex-col items-start justify-center size-full')(type)
+			default: 'flex flex-col items-start justify-center w-full h-full',
+		})[value] ?? 'flex flex-col items-start justify-center w-full h-full')(type)
 
 	return (
 		<div className={className}>

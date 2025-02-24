@@ -57,7 +57,7 @@ $iframe_url = add_query_arg(
 	$base_url
 );
 
-echo '<div class="relative [&>*]:absolute [&>*]:top-0 [&>*]:left-0 [&>*]:size-full" style="padding-top:56.25%;">';
+echo '<div class="relative [&>*]:absolute [&>*]:top-0 [&>*]:left-0 [&>*]:w-full [&>*]:h-full" style="padding-top:56.25%;">';
 printf(
 	/*html*/'
 	<iframe class="z-20 border-0 %2$s" src="%1$s" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>

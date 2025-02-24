@@ -63,7 +63,7 @@ export const ListSelect = <T extends BaseRecord>({
 									<div className="rounded-full aspect-square w-8 overflow-hidden">
 										<img
 											src={url as string}
-											className="size-full rounded object-cover"
+											className="w-full h-full rounded object-cover"
 										/>
 									</div>
 									<div className="w-full">
@@ -89,7 +89,7 @@ export const ListSelect = <T extends BaseRecord>({
 							<div className="rounded-full aspect-square w-8 overflow-hidden">
 								<img
 									src={url || defaultImage}
-									className="size-full rounded object-cover"
+									className="w-full h-full rounded object-cover"
 								/>
 							</div>
 							<div className="flex-1">
