@@ -11,7 +11,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 
 
 /**
@@ -79,12 +79,12 @@ abstract class Course {
 			$args['fields'] = 'ids';
 		}
 
-		$chapters = \get_children( $args );
+		$chapter_posts = \get_children( $args );
 
-		$sub_chapters = [];
-		/** @var \WP_Post $chapter */
-		foreach ( $chapters as $chapter ) :
-			$chapter_id = $return_ids ? $chapter : $chapter->ID;
+		$sub_chapter_posts = [];
+		/** @var \WP_Post $chapter_post */
+		foreach ( $chapter_posts as $chapter_post ) :
+			$chapter_id = $return_ids ? $chapter_post : $chapter_post->ID;
 			$sub_args   = [
 				'posts_per_page' => - 1,
 				'order'          => 'ASC',
@@ -98,11 +98,11 @@ abstract class Course {
 				$sub_args['fields'] = 'ids';
 			}
 
-			$sub_chapters = array_merge( $sub_chapters, [ $chapter_id ], \get_children( $sub_args ) );
+			$sub_chapter_posts = array_merge( $sub_chapter_posts, [ $chapter_id ], \get_children( $sub_args ) );
 		endforeach;
 
-		/** @var array<int|\WP_Post> $sub_chapters */
-		return $sub_chapters;
+		/** @var array<int|\WP_Post> $sub_chapter_posts */
+		return $sub_chapter_posts;
 	}
 
 	/**
@@ -131,12 +131,12 @@ abstract class Course {
 			$args['fields'] = 'ids';
 		}
 
-		$chapters = \get_children( $args );
+		$chapter_posts = \get_children( $args );
 
-		$sub_chapters = [];
-		foreach ( $chapters as $chapter ) :
-			/** @var \WP_Post $chapter */
-			$chapter_id = $return_ids ? $chapter : $chapter->ID;
+		$sub_chapter_posts = [];
+		foreach ( $chapter_posts as $chapter_post ) :
+			/** @var \WP_Post $chapter_post */
+			$chapter_id = $return_ids ? $chapter_post : $chapter_post->ID;
 			$sub_args   = [
 				'posts_per_page' => - 1,
 				'order'          => 'ASC',
@@ -150,10 +150,10 @@ abstract class Course {
 				$sub_args['fields'] = 'ids';
 			}
 
-			$sub_chapters = array_merge( $sub_chapters, \get_children( $sub_args ) );
+			$sub_chapter_posts = array_merge( $sub_chapter_posts, \get_children( $sub_args ) );
 		endforeach;
 
-		return $sub_chapters;
+		return $sub_chapter_posts;
 	}
 
 	/**
@@ -256,8 +256,8 @@ abstract class Course {
 		$finished_sub_chapter_ids = array_filter(
 			$all_sub_chapter_ids,
 			function ( $chapter_id ) use ( $user_id ) {
-				$avl_chapter = new AVLChapter( (int) $chapter_id, (int) $user_id);
-				return (bool) $avl_chapter->finished_at;
+				$chapter = new Chapter( (int) $chapter_id, (int) $user_id);
+				return (bool) $chapter->finished_at;
 			}
 			);
 
@@ -265,12 +265,12 @@ abstract class Course {
 			return $finished_sub_chapter_ids;
 		}
 
-		$chapters = [];
+		$chapter_posts = [];
 		foreach ($finished_sub_chapter_ids as $chapter_id) {
-			$chapters[] = \get_post($chapter_id);
+			$chapter_posts[] = \get_post($chapter_id);
 		}
 
-		return $chapters;
+		return $chapter_posts;
 	}
 
 

@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-namespace J7\PowerCourse\Api;
+namespace J7\PowerCourse\Resources\Chapter\Core;
 
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
@@ -13,16 +13,14 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
 use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 
 
 
-/**
- * Class Chapter
- */
-final class Chapter extends ApiBase {
+/** Class Api */
+final class Api extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 	/**
@@ -140,10 +138,6 @@ final class Chapter extends ApiBase {
 		$body_params = General::format_empty_array( $body_params );
 
 		$separated_data = WP::separator( $body_params, 'post', $file_params['files'] ?? [] );
-
-		if (\is_wp_error($separated_data)) {
-			throw new \Exception($separated_data->get_error_message());
-		}
 
 		return $separated_data;
 	}
@@ -308,8 +302,8 @@ final class Chapter extends ApiBase {
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
 
-		$avl_chapter              = new AVLChapter( $chapter_id, (int) $user_id );
-		$is_this_chapter_finished = (bool) $avl_chapter->finished_at;
+		$chapter                  = new Chapter( $chapter_id, (int) $user_id );
+		$is_this_chapter_finished = (bool) $chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
 		$product                  = \wc_get_product( $course_id );
 

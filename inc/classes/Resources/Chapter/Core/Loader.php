@@ -11,6 +11,7 @@ final class Loader {
 	/** Constructor */
 	public function __construct() {
 		CPT::instance();
+		Api::instance();
 		LifeCycle::instance();
 		Templates::instance();
 	}

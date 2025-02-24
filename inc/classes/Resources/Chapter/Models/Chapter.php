@@ -1,6 +1,6 @@
 <?php
 /**
- * AVLChapter
+ * Chapter
  * 用戶可以上的章節
  */
 
@@ -12,42 +12,22 @@ use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD;
 
-/** Class AVLChapter */
-final class AVLChapter {
+/** Class Chapter */
+final class Chapter {
 
-	/**
-	 * Chapter ID
-	 *
-	 * @var int
-	 */
+	/** @var int Chapter ID */
 	public int $id;
 
-	/**
-	 * User ID
-	 *
-	 * @var int
-	 */
+	/** @var int User ID */
 	public int $user_id;
 
-	/**
-	 * Course ID
-	 *
-	 * @var int|null
-	 */
+	/** @var int|null Course ID */
 	public int|null $course_id;
 
-	/**
-	 * 第一次進入章節時間
-	 *
-	 * @var string|null
-	 */
+	/** @var string|null 第一次進入章節時間 */
 	public string|null $first_visit_at;
 
-	/**
-	 * 完成章節時間
-	 *
-	 * @var string|null
-	 */
+	/** @var string|null 完成章節時間 */
 	public string|null $finished_at;
 
 	/**
@@ -76,5 +56,17 @@ final class AVLChapter {
 			return Base::get_video_length_by_seconds( $length );
 		}
 		return $length;
+	}
+
+	/**
+	 * 取得課程商品
+	 *
+	 * @return \WC_Product|null
+	 */
+	public function get_course_product(): \WC_Product|null {
+		if ( ! $this->course_id ) {
+			return null;
+		}
+		return \wc_get_product( $this->course_id );
 	}
 }

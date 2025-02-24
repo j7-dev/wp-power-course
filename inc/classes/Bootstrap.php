@@ -41,7 +41,6 @@ final class Bootstrap {
 		Api\User::instance();
 		Api\Product::instance();
 		Api\Course::instance();
-		Api\Chapter::instance();
 		Api\Upload::instance();
 		Api\Option::instance();
 		Api\Shortcode::instance();
