@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { Button, Alert } from 'antd'
+import { Button, Alert, Tag } from 'antd'
 import { FileUpload } from '@/components/general'
 import { useApiUrl } from '@refinedev/core'
 import { siteUrl } from '@/utils'
@@ -24,6 +24,47 @@ const index = () => {
 								>
 									下載範例 csv 檔案
 								</Button>
+							</li>
+							<li>
+								欄位 <Tag>expire_date</Tag> 可以輸入的值如下
+								<table className="my-2 table table-xs table-border-y text-xs [&_td]:text-left">
+									<thead>
+										<tr>
+											<th className="w-2/5">值</th>
+											<th className="w-3/5">說明</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>0</td>
+											<td>無期限</td>
+										</tr>
+										<tr>
+											<td>subscription_123</td>
+											<td>綁定指定訂閱 id 123</td>
+										</tr>
+										<tr>
+											<td>1735732800</td>
+											<td>指定到期日 2025-01-01 20:00:00</td>
+										</tr>
+										<tr>
+											<td>2025-01-01</td>
+											<td>指定到期日 2024-05-01 00:00:00</td>
+										</tr>
+										<tr>
+											<td>2025-01-01 20:00</td>
+											<td>指定到期日 2025-01-01 20:00:00</td>
+										</tr>
+										<tr>
+											<td>2025-01-01 20:00:00</td>
+											<td>指定到期日 2025-01-01 20:00:00</td>
+										</tr>
+										<tr>
+											<td>錯誤的時間格式，例如 test</td>
+											<td>會以無期限開通課程</td>
+										</tr>
+									</tbody>
+								</table>
 							</li>
 							<li>
 								實測可上傳 5000
