@@ -79,22 +79,22 @@ const CustomEmailEditor = (
 
 	const initialValues: IEmailTemplate = query?.isSuccess
 		? {
-				subject: form.getFieldValue(['subject']),
-				subTitle: '',
-				content: getInitContent(form, initBlock),
-			}
+			subject: form.getFieldValue(['subject']),
+			subTitle: '',
+			content: getInitContent(form, initBlock),
+		}
 		: {
-				subject: '',
-				subTitle: '',
-				content: initBlock,
-			}
+			subject: '',
+			subTitle: '',
+			content: initBlock,
+		}
 
 	const apiUrl = useApiUrl()
 
 	return (
 		<Suspense
 			fallback={
-				<div className="size-full flex justify-center items-center">
+				<div className="w-full h-full flex justify-center items-center">
 					Loading...
 				</div>
 			}

@@ -141,9 +141,9 @@ const BundleForm = () => {
 		const productIds = watchExcludeMainCourse
 			? selectedProducts.map(({ id }) => id)
 			: [
-					courseId,
-					...selectedProducts.map(({ id }) => id),
-				]
+				courseId,
+				...selectedProducts.map(({ id }) => id),
+			]
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
 			productIds,
@@ -327,7 +327,7 @@ const BundleForm = () => {
 								<div className="rounded aspect-video w-16 overflow-hidden">
 									<img
 										src={images?.[0]?.url || defaultImage}
-										className="size-full rounded object-cover"
+										className="w-full h-full rounded object-cover"
 									/>
 								</div>
 								<div className="flex-1">
