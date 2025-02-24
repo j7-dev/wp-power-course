@@ -83,7 +83,7 @@ class Limit {
 
 		$subscriptions = \wcs_get_subscriptions_for_order( $order, [ 'order_type' => 'parent' ] );
 
-		if (!!$subscriptions && count($subscriptions) === 1) {
+		if ( (bool) $subscriptions && count($subscriptions) === 1) {
 			$subscription    = reset($subscriptions);
 			$subscription_id = $subscription->get_id();
 			return "subscription_{$subscription_id}";

@@ -225,6 +225,7 @@ const UserTableComponent = ({
 					centered
 					title="CSV 批次上傳學員權限"
 					footer={null}
+					width={800}
 				>
 					<CsvUpload />
 				</Modal>
