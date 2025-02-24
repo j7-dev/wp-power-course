@@ -14,10 +14,24 @@ final class CPT {
 
 	public const POST_TYPE = 'pc_chapter';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
+		// TEST 測試特定 hook 記得刪除
+		\add_action(
+		'init',
+		function () {
+			// $ids = Utils::get_top_level_chapter_ids();
+			// // TEST 印出 WC Logger 記得移除 ---- //
+			// \J7\WpUtils\Classes\WC::log(
+			// [
+			// 'ids' => $ids,
+			// ],
+			// 'get_top_level_chapter_ids'
+			// );
+			// // ---------- END TEST ---------- //
+		}
+		);
+
 		\add_action( 'init', [ __CLASS__, 'register_cpt' ] );
 		\add_filter('option_elementor_cpt_support', [ $this, 'add_elementor_cpt_support' ]);
 	}
@@ -83,9 +97,9 @@ final class CPT {
 			'supports'              => [ 'title', 'editor', 'thumbnail', 'custom-fields', 'author', 'page-attributes' ],
 			'taxonomies'            => [],
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
-			// 'rewrite'               => [
-			// 'with_front' => true,
-			// ],
+			'rewrite'               => [
+				'slug' => 'classroom_test',
+			],
 		];
 
 		\register_post_type( self::POST_TYPE, $args );

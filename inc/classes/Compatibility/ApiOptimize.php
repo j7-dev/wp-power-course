@@ -19,9 +19,7 @@ final class ApiOptimize {
 
 	const FILE_NAME = 'power-course-api-booster.php';
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( Compatibility::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'delete_file' ]);
 	}

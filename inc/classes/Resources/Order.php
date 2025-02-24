@@ -23,9 +23,7 @@ final class Order {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( 'woocommerce_new_order', [ $this, 'add_course_item_meta' ], 10, 2 );
 		\add_action( 'woocommerce_subscription_payment_complete', [ $this, 'add_course_item_meta_by_subscription' ], 10, 1 );

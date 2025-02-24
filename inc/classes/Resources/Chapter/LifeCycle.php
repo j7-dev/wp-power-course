@@ -26,9 +26,7 @@ final class LifeCycle {
 	const CHAPTER_UNFINISHEDED_ACTION = 'power_course_chapter_unfinished';
 
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 
 		\add_action( 'power_course_before_classroom_render', [ __CLASS__, 'register_visit_chapter' ] );

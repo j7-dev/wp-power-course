@@ -16,9 +16,7 @@ use J7\PowerCourse\BundleProduct\Helper;
 final class ProductQuery {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	/**
-	 * Constructor
-	 */
+	/** Constructor */
 	public function __construct() {
 		\add_action( 'init', [ __CLASS__, 'add_post_meta_to_course_product' ] );
 		\add_action( 'pre_get_posts', [ __CLASS__, 'exclude_course_product' ], 10 );
