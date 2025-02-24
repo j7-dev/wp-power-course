@@ -17,5 +17,5 @@ $course_tabs        = $args['course_tabs'];
 $default_active_key = $args['default_active_key'];
 
 
-Plugin::get('tabs/nav', $args);
-Plugin::get('tabs/content', $args);
+Plugin::load_template('tabs/nav', $args);
+Plugin::load_template('tabs/content', $args);

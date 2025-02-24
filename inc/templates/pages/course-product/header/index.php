@@ -40,7 +40,7 @@ if ( ! is_array( $teacher_ids ) ) {
 ?>
 <div class="flex gap-6 flex-col md:flex-row mb-20">
 	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0 z-40">
-		<?php Plugin::get( 'course-product/header/feature-video' ); ?>
+		<?php Plugin::load_template( 'course-product/header/feature-video' ); ?>
 	</div>
 
 	<div class="w-full md:w-[45%] px-4 md:px-0">
@@ -48,7 +48,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
 				$teacher = \get_user_by( 'id', (int) $teacher_id );
-				Plugin::get(
+				Plugin::load_template(
 					'user',
 					[
 						'user' => $teacher,
@@ -65,15 +65,15 @@ if ( ! is_array( $teacher_ids ) ) {
 		<?php
 		echo '<div class="flex gap-2 items-center mb-[10px]">';
 		if ($is_popular) {
-			Plugin::get('badge/popular');
+			Plugin::load_template('badge/popular');
 		}
 		if ($is_featured) {
-			Plugin::get('badge/feature');
+			Plugin::load_template('badge/feature');
 		}
 		echo '</div>';
 
 
-		Plugin::get(
+		Plugin::load_template(
 			'typography/paragraph/expandable',
 			[
 				'children' => \do_shortcode(  \wpautop($product->get_short_description())  ),
@@ -84,7 +84,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			$rating             = (float) $product->get_meta( 'custom_rating' );
 			$review_count       = $product->get_review_count();
 			$extra_review_count = (int) $product->get_meta( 'extra_review_count' );
-			Plugin::get(
+			Plugin::load_template(
 			'rate',
 			[
 				'show_before' => true,
@@ -97,7 +97,7 @@ if ( ! is_array( $teacher_ids ) ) {
 		$course_permalink_structure = CourseUtils::get_course_permalink_structure();
 		if ( $show_link ) {
 			echo '<div class="mt-6">';
-			Plugin::get(
+			Plugin::load_template(
 				'button',
 				[
 					'href'     => site_url( "{$course_permalink_structure}/{$product->get_slug()}" ),

@@ -64,7 +64,7 @@ final class MyAccount {
 	 */
 	public function render_courses(): void {
 		echo '<div class="tailwind">';
-		Plugin::get( 'my-account' );
+		Plugin::load_template( 'my-account' );
 		echo '</div>';
 	}
 }

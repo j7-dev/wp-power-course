@@ -25,14 +25,14 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $description = $product->get_description();
-$accordion   = Plugin::get(
+$accordion   = Plugin::load_template(
 	'collapse/chapter',
 	[
 		'product' => $product,
 	],
 	false
 	);
-$qa          = Plugin::get(
+$qa          = Plugin::load_template(
 	'collapse/qa',
 	[
 		'product' => $product,
@@ -40,7 +40,7 @@ $qa          = Plugin::get(
 	false
 	);
 
-$review = Plugin::get(
+$review = Plugin::load_template(
 		'review',
 		[
 			'product' => $product,
@@ -109,7 +109,7 @@ $course_tabs = array_filter($course_tabs, fn( $tab ) => !( $tab['disabled'] ));
 
 if ($course_tabs) {
 	echo '<div id="courses-product__tabs-nav" class="z-30 w-full">';
-	Plugin::get(
+	Plugin::load_template(
 	'tabs/nav',
 	[
 		'course_tabs' => $course_tabs,
@@ -117,7 +117,7 @@ if ($course_tabs) {
 	);
 	echo '</div>';
 
-	Plugin::get(
+	Plugin::load_template(
 	'tabs/content',
 	[
 		'course_tabs' => $course_tabs,

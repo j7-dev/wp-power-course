@@ -47,7 +47,7 @@ $current_user_id = get_current_user_id();
 $expire_date_label = CourseUtils::get_expired_label($product, $current_user_id);
 $avl_status        = CourseUtils::get_avl_status($product, $current_user_id);
 
-$badge_html = Plugin::get(
+$badge_html = Plugin::load_template(
 	'badge',
 	[
 		'type'     => $avl_status['badge_color'],
@@ -91,7 +91,7 @@ $badge_html,
 	$product_image_url,
 	$name,
 	$teacher_name,
-	Plugin::get(
+	Plugin::load_template(
 		'progress/vertical',
 		[
 			'product' => $product,

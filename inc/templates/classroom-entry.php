@@ -47,21 +47,21 @@ if (!current_user_can('manage_options')) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Plugin::get( '404/buy', null );
+		Plugin::load_template( '404/buy', null );
 		get_footer();
 		exit;
 	} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Plugin::get( '404/not-ready', null );
+		Plugin::load_template( '404/not-ready', null );
 		get_footer();
 		exit;
 	} elseif ( $is_expired ) {
 		get_header();
 		$GLOBALS['product'] = $keep_product;
 		$GLOBALS['chapter'] = $keep_chapter;
-		Plugin::get( '404/expired', null );
+		Plugin::load_template( '404/expired', null );
 		get_footer();
 		exit;
 	}
@@ -95,8 +95,8 @@ do_action('power_course_before_classroom_render');
 			$GLOBALS['chapter'] = $keep_chapter;
 
 			echo '<div id="pc-classroom-main">';
-			Plugin::get( 'classroom/sider', null, true, false );
-			Plugin::get( 'classroom/body', null, true, true );
+			Plugin::load_template( 'classroom/sider', null, true, false );
+			Plugin::load_template( 'classroom/body', null, true, true );
 			echo '</div>';
 
 

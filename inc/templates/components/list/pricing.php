@@ -32,7 +32,7 @@ $grid_class = match ( (string) $columns) {
 echo "<div class='grid grid-cols-2 gap-x-5 gap-y-14 {$grid_class}'>";
 
 foreach ($products as $product) {
-	Plugin::get(
+	Plugin::load_template(
 	'card/pricing',
 	[
 		'product' => $product,

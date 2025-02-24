@@ -9,21 +9,21 @@ use J7\PowerCourse\Plugin;
 $course_tabs = [
 	'all' => [
 		'label'   => '所有課程',
-		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'all' ], false ),
+		'content' => Plugin::load_template( 'course-product/grid', [ 'type' => 'all' ], false ),
 	],
 	'ready' => [
 		'label'   => '已開課',
-		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'ready' ], false ),
+		'content' => Plugin::load_template( 'course-product/grid', [ 'type' => 'ready' ], false ),
 	],
 	'not-ready' => [
 		'label'   => '尚未開課',
-		'content' => Plugin::get( 'course-product/grid', [ 'type' => 'not-ready' ], false ),
+		'content' => Plugin::load_template( 'course-product/grid', [ 'type' => 'not-ready' ], false ),
 	],
 ];
 
-Plugin::get(
+Plugin::load_template(
 	'tabs',
 	[
-		'course_tabs'        => $course_tabs,
+		'course_tabs' => $course_tabs,
 	]
 );

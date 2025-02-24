@@ -47,7 +47,7 @@ if ($from <= time() && time() < $to ) { // 折扣進行期間
 		剩餘
 		%1$s
 	',
-	Plugin::get(
+	Plugin::load_template(
 		'countdown',
 		[
 			'type'      => 'sm',

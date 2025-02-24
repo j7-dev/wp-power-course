@@ -14,7 +14,7 @@ $comment_form = [
 	'comment_field'       => '',
 	'submit_field'        => sprintf(
 		/*html*/'<div class="text-right">%s</div>',
-		Plugin::get(
+		Plugin::load_template(
 			'button',
 			[
 				'size'     => 'sm',
@@ -33,7 +33,7 @@ $comment_form['comment_field'] = sprintf(
 <div class="mb-2">%1$s</div>
 <textarea class="mb-2 rounded h-24 bg-base-100" id="comment" name="comment" rows="4"></textarea>
 ',
-Plugin::get(
+Plugin::load_template(
 	'rate',
 	[
 		'name'     => 'rating',

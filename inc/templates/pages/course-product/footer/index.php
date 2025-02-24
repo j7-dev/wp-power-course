@@ -45,7 +45,7 @@ if ( 'none' !== $video_type ) {
 	</div>
 </div>
 ',
-	Plugin::get(
+	Plugin::load_template(
 	'typography/title',
 	[
 		'value' => '課程試看',
@@ -53,7 +53,7 @@ if ( 'none' !== $video_type ) {
 	],
 	false
 	),
-	Plugin::get(
+	Plugin::load_template(
 	'video',
 	[
 		'video_info'     => $trial_video,
@@ -64,8 +64,8 @@ if ( 'none' !== $video_type ) {
 	);
 }
 
-if ( ! ! $teacher_ids ) {
-	Plugin::get(
+if ( (bool) $teacher_ids ) {
+	Plugin::load_template(
 		'typography/title',
 		[
 			'value' => '關於講師',
@@ -77,7 +77,7 @@ if ( ! ! $teacher_ids ) {
 foreach ( $teacher_ids as $teacher_id ) {
 	$teacher = \get_user_by( 'id', $teacher_id );
 	echo '<div class="mb-12">';
-	Plugin::get(
+	Plugin::load_template(
 		'user/about',
 		[
 			'user' => $teacher,

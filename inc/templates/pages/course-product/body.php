@@ -33,7 +33,7 @@ echo '<div class="mb-12">';
 
 $is_avl = CourseUtils::is_avl( $product->get_id() );
 if ( $is_avl ) {
-	Plugin::get(
+	Plugin::load_template(
 		'alert',
 	[
 		'type'    => 'info',
@@ -99,7 +99,7 @@ $items = [
 $items = array_filter($items, fn( $item ) => !( $item['disabled'] ));
 
 if ($items) {
-	Plugin::get(
+	Plugin::load_template(
 	'typography/title',
 	[
 		'value' => '課程資訊',
@@ -107,14 +107,14 @@ if ($items) {
 	]
 	);
 
-	Plugin::get(
+	Plugin::load_template(
 			'course-product/info',
 			$items
 		);
 
 }
 // echo '<div class="mt-8 flex items-end gap-4">';
-// Plugin::get(
+// Plugin::load_template(
 // 'countdown',
 // [
 // 'type'       => 'lg',
@@ -126,7 +126,7 @@ if ($items) {
 
 echo '</div>';
 // Tabs
-Plugin::get( 'course-product/tabs', null, true, true );
+Plugin::load_template( 'course-product/tabs', null, true, true );
 // Footer
-Plugin::get( 'course-product/footer', null, true, true );
+Plugin::load_template( 'course-product/footer', null, true, true );
 echo '</div>';

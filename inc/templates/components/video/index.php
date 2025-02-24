@@ -39,7 +39,7 @@ if ('none' === $video_type) {
 }
 
 if ('code' === $video_type) {
-	Plugin::get(
+	Plugin::load_template(
 		'video/code',
 		[
 			'video_info' => $video_info,
@@ -49,7 +49,7 @@ if ('code' === $video_type) {
 	return;
 }
 
-Plugin::get(
+Plugin::load_template(
 	'video/vidstack',
 	[
 		'video_info'     => $video_info,

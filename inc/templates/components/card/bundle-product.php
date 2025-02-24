@@ -48,7 +48,7 @@ printf(
 	$product_name
 );
 
-Plugin::get( 'divider' );
+Plugin::load_template( 'divider' );
 
 printf(
 /*html*/'<div class="mb-6 text-sm">%s</div>',
@@ -61,19 +61,19 @@ foreach ( $pbp_product_ids as $pbp_product_id ) :
 	}
 	$pbp_product = \wc_get_product( $pbp_product_id );
 	echo '<div>';
-	Plugin::get(
+	Plugin::load_template(
 		'course-product/list',
 		[
 			'product' => $pbp_product,
 		]
 		);
 	echo '</div>';
-	Plugin::get( 'divider' );
+	Plugin::load_template( 'divider' );
 endforeach;
 
 echo '<div class="flex gap-3 justify-between items-end">';
 
-Plugin::get(
+Plugin::load_template(
 	'price',
 	[
 		'product' => $product,
@@ -81,7 +81,7 @@ Plugin::get(
 	]
 );
 
-Plugin::get(
+Plugin::load_template(
 	'button/add-to-cart',
 	[
 		'product'       => $product,

@@ -62,15 +62,15 @@ if ('draft' === $product_status) {
 echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
 
 // Header
-Plugin::get( 'course-product/header', null, true, true );
+Plugin::load_template( 'course-product/header', null, true, true );
 
 echo '<div class="flex flex-col md:flex-row gap-8">';
 
 // Body
-Plugin::get( 'course-product/body', null, true, true );
+Plugin::load_template( 'course-product/body', null, true, true );
 
 // Sider
-Plugin::get( 'course-product/sider', null, true, true );
+Plugin::load_template( 'course-product/sider', null, true, true );
 
 echo '</div>';
 echo '</div>';

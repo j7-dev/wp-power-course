@@ -42,7 +42,7 @@ $image_url     = $image_id ? \wp_get_attachment_image_url( (int) $image_id, 'ful
 $video_type = $feature_video['type'] ?? 'none';
 
 if ( 'none' !== $video_type ) {
-	Plugin::get(
+	Plugin::load_template(
 		'video',
 		[
 			'video_info'     => $feature_video,

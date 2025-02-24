@@ -36,7 +36,7 @@ $comment_content = wpautop( $product_comment->comment_content );
 $children      = $product_comment->get_children();
 $children_html = '';
 foreach ($children as $child) {
-	$children_html .= Plugin::get(
+	$children_html .= Plugin::load_template(
 		'review/item',
 		[
 			'comment' => $child,
@@ -72,7 +72,7 @@ printf(
 	$user_avatar_url,
 	$user_name,
 	$user_name,
-	$rating ? Plugin::get(
+	$rating ? Plugin::load_template(
 		'rate',
 		[
 			'value' => $rating,

@@ -60,7 +60,7 @@ if ($reviews_allowed && $has_bought && !$has_reviewed) {
 $show_review_list = $product->get_meta( 'show_review_list' ) === 'yes';
 if ( $show_review_list && count( $product_comments ) ) {
 	foreach ( $product_comments as $product_comment ) {
-		Plugin::get(
+		Plugin::load_template(
 			'review/item',
 			[
 				'comment' => $product_comment,

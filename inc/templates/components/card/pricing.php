@@ -48,14 +48,14 @@ $is_featured = \get_post_meta( $product_id, 'is_featured', true ) === 'yes';
 
 $tags_html = '<div class="flex gap-2 items-center my-2 h-6">';
 if ($is_popular) {
-	$tags_html .= Plugin::get('badge/popular', null, false);
+	$tags_html .= Plugin::load_template('badge/popular', null, false);
 }
 if ($is_featured) {
-	$tags_html .= Plugin::get('badge/feature', null, false);
+	$tags_html .= Plugin::load_template('badge/feature', null, false);
 }
 
 if (!$is_popular && !$is_featured) {
-	$tags_html .= Plugin::get('badge/join', null, false);
+	$tags_html .= Plugin::load_template('badge/join', null, false);
 }
 
 $tags_html .= '</div>';
@@ -66,13 +66,13 @@ $course_minute = (int) $product->get_meta( 'course_minute' );
 
 $course_length      = "{$course_hour} 小時 {$course_minute} 分";
 $course_length      = $course_hour + $course_minute > 0 ? $course_length : '-';
-$course_length_html = Plugin::get('icon/clock', null, false) . $course_length;
+$course_length_html = Plugin::load_template('icon/clock', null, false) . $course_length;
 
 // 學員人數
 $total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
 $show_total_student = \wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes');
 $total_student      = $show_total_student ? $total_student : '-';
-$total_student_html = Plugin::get('icon/team', null, false) . $total_student;
+$total_student_html = Plugin::load_template('icon/team', null, false) . $total_student;
 
 printf(
 	/*html*/'
