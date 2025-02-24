@@ -90,12 +90,7 @@ class ExpireDate {
 	public static function instance( int $course_id, int $user_id ): self {
 		$expire_date = AVLCourseMeta::get( $course_id, $user_id, 'expire_date', true);
 
-		// $expire_date = "" 如果用戶沒有觀看此課程權限
-		if ('' === $expire_date) {
-			new self(404); // 秒數 404 課程會顯示已到期
-			// throw new \Exception('User does not have permission to view this course');
-		}
-
+		// expire_date = "" 也會過期
 		return new self( (string) $expire_date);
 	}
 
