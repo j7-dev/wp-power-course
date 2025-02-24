@@ -5,7 +5,7 @@
 
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 $default_args = [
 	'product' => $GLOBALS['product'] ?? null,
 	'chapter' => $GLOBALS['chapter'] ?? null,
@@ -60,7 +60,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
 
-		$avl_chapter    = new AVLChapter( (int) $sub_chapter->ID );
+		$avl_chapter    = new Chapter( (int) $sub_chapter->ID );
 		$first_visit_at = $avl_chapter->first_visit_at;
 		$finished_at    = $avl_chapter->finished_at;
 

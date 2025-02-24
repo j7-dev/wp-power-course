@@ -7,7 +7,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
-use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 
 
 $default_args = [
@@ -48,7 +48,7 @@ $back_to_my_course_html = sprintf(
 
 // finish button html
 $user_id                    = \get_current_user_id();
-$avl_chapter                = new AVLChapter( (int) $current_chapter_id, (int) $user_id );
+$avl_chapter                = new Chapter( (int) $current_chapter_id, (int) $user_id );
 $finished_at                = $avl_chapter->finished_at;
 $is_this_chapter_finished   = (bool) $finished_at;
 $finish_chapter_button_html = '';

@@ -12,7 +12,7 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Chapter\Models\AVLChapter;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 
@@ -398,11 +398,11 @@ final class User {
 			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
 
 			foreach ($all_chapter_ids as $j => $chapter_id) {
-				$avl_chapter                                 = new AVLChapter( (int) $chapter_id, (int) $user_id );
+				$chapter                                     = new Chapter( (int) $chapter_id, (int) $user_id );
 				$avl_courses[ $i ]['chapters'][ $j ]['id']   = (string) $chapter_id;
 				$avl_courses[ $i ]['chapters'][ $j ]['name'] = \get_the_title($chapter_id);
 				$avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = (bool) $avl_chapter->finished_at;
+				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = (bool) $chapter->finished_at;
 			}
 		}
 
