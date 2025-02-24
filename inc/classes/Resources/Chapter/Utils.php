@@ -101,7 +101,7 @@ abstract class Utils {
 			)
 		);
 
-		$children = !!$chapters ? [
+		$children = $chapters ? [
 			'chapters' => $chapters,
 		] : [];
 
