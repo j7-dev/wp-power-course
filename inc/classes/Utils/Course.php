@@ -171,7 +171,7 @@ abstract class Course {
 		}
 
 		if ('video_length' === $type) {
-			return Base::get_video_length_by_seconds( $length);
+			return Base::get_video_length_by_seconds( $length, '');
 		}
 		return (string) $length;
 	}

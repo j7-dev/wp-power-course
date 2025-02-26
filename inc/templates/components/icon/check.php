@@ -11,6 +11,7 @@ $default_args = [
 	'color' => Base::PRIMARY_COLOR,
 ];
 
+
 /**
  * @var array $args
  * @phpstan-ignore-next-line
