@@ -60,7 +60,7 @@ final class Option extends ApiBase {
 		'bunny_stream_api_key'       => '',
 		'course_permalink_structure' => '',
 		'hide_myaccount_courses'     => 'no', // 是否隱藏我的帳戶中的課程
-		'fix_video_and_tabs_mobile'  => 'yes', // 手機板時，影片以及 tabs 黏性(sticky)置頂
+		'fix_video_and_tabs_mobile'  => 'no', // 手機板時，影片以及 tabs 黏性(sticky)置頂
 		'pc_header_offset'           => '0', // 黏性的偏移距離
 		'hide_courses_in_main_query' => 'no', // 是否在主查詢中隱藏課程
 		'pc_watermark_qty'           => 0, // 浮水印數量

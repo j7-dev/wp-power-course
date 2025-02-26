@@ -16,7 +16,7 @@ export const plugin_url = window.pc_data?.plugin_url
 export const pdf_watermark = window.pc_data?.pdf_watermark
 
 export const fix_video_and_tabs_mobile =
-	(window.pc_data?.fix_video_and_tabs_mobile || 'yes') === 'yes'
+	(window.pc_data?.fix_video_and_tabs_mobile || 'no') === 'yes'
 
 export const isMobile = (size = 'LG') => {
 	return window.innerWidth < SCREEN?.[size]

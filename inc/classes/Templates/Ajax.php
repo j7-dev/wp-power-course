@@ -67,7 +67,7 @@ final class Ajax {
 				'nonce'                     => \wp_create_nonce( 'wp_rest' ),
 				'is_avl'                    => $is_avl,
 				'header_offset'             => \get_option('pc_header_offset', 0),
-				'fix_video_and_tabs_mobile' => \get_option('fix_video_and_tabs_mobile', 'yes'),
+				'fix_video_and_tabs_mobile' => \get_option('fix_video_and_tabs_mobile', 'no'),
 			]
 			);
 
