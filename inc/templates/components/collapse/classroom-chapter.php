@@ -1,6 +1,8 @@
 <?php
 /**
  * Classroom > Sider > Chapters
+ *
+ * @deprecated 0.8.0 後棄用，改用 get_children_posts_html 方法
  */
 
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
