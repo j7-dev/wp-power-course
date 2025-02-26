@@ -1,6 +1,8 @@
 <?php
 /**
  * Sidebar for classroom
+ *
+ * @deprecated 0.8.0 後棄用
  */
 
 use J7\PowerCourse\Plugin;
@@ -24,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-$count_all_chapters       = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
+$count_all_chapters       = count( CourseUtils::get_sub_chapter_ids( $product ) );
 $course_length_in_minutes = CourseUtils::get_course_length( $product, 'minute' );
 
 

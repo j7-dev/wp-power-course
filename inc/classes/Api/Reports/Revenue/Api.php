@@ -370,7 +370,7 @@ final class Api extends ApiBase {
 		$chapter_ids_in_specific_course = [];
 		if (!empty($query_args['product_includes'])) {
 			foreach ($query_args['product_includes'] as $course_id) {
-				$chapter_ids_in_single_course   = CourseUtils::get_sub_chapters( (int) $course_id, true);
+				$chapter_ids_in_single_course   = CourseUtils::get_sub_chapter_ids( (int) $course_id);
 				$chapter_ids_in_specific_course = array_merge($chapter_ids_in_specific_course, $chapter_ids_in_single_course);
 			}
 		}

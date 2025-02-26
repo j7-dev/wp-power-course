@@ -156,7 +156,7 @@ final class Templates {
 							$GLOBALS['chapter'] = \get_post( $slug_2);
 						} else {
 							/** @var array<int> $sub_chapter_ids */
-							$sub_chapter_ids = CourseUtils::get_sub_chapters( $GLOBALS['product'], true );
+							$sub_chapter_ids = CourseUtils::get_sub_chapter_ids( $GLOBALS['product'] );
 							if (count($sub_chapter_ids) < 1) {
 								// TODO 沒有章節應該顯示空教室!?
 								\wp_safe_redirect( \home_url( '/404' ) );

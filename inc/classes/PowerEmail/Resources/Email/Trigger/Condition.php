@@ -156,7 +156,7 @@ final class Condition {
 		if ( !empty( $this->course_ids ) && empty( $this->chapter_ids ) ) {
 			$chapter_ids = [];
 			foreach ( $this->course_ids as $course_id ) {
-				$course_chapter_ids = CourseUtils::get_sub_chapters( (int) $course_id, true);
+				$course_chapter_ids = CourseUtils::get_sub_chapter_ids( (int) $course_id);
 				$chapter_ids        = array_merge( $chapter_ids, $course_chapter_ids );
 			}
 
