@@ -41,12 +41,13 @@ abstract class Base {
 	 * 接收一個整數秒數，轉換為 "時:分:秒" 的格式字符串。
 	 * 如果輸入為0，則返回空字符串。
 	 *
-	 * @param int $seconds 秒數。
+	 * @param int    $seconds 秒數。
+	 * @param string $default 預設值。
 	 * @return string 格式化的時間字符串。
 	 */
-	public static function get_video_length_by_seconds( int $seconds ): string {
+	public static function get_video_length_by_seconds( int $seconds, $default = '-- : -- : --' ): string {
 		if (!$seconds) {
-			return '';
+			return $default;
 		}
 		$video_length_h = sprintf('%02d', floor($seconds / 3600));
 		$video_length_m = sprintf('%02d', floor(( $seconds - $video_length_h * 3600 ) / 60));

@@ -11,6 +11,8 @@ use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Chapter\Core\CPT;
+use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Domains\Post\Utils as PostUtils;
 
 /**
@@ -390,6 +392,7 @@ abstract class Utils {
 
 	/**
 	 * 取得課程章節的 HTML
+	 * TODO classroom__sider-collapse__chapter-{id} 做什麼用的?
 	 *
 	 * @param int                       $post_id 課程 id
 	 * @param array<int, \WP_Post>|null $children_posts 子章節.
@@ -456,15 +459,30 @@ abstract class Utils {
 			]
 			);
 
+			$avl_chapter          = new Chapter( (int) $child_post->ID );
+			$child_children_count = count( $child_children_posts );
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%5$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %6$s" style="padding-left: %4$s;">
-				<a class="py-2 tw-block flex-1" href="%1$s">%2$s</a>
-				%3$s
+			<li data-post-id="%8$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %9$s" style="padding-left: %7$s;">
+				<a class="py-2 flex gap-x-2 items-center flex-1" href="%1$s">
+					%2$s
+					<div class="w-full">
+						%3$s
+						<p class="text-xs text-base-content/50 m-0 flex justify-between">
+							<span>%4$s </span>
+							%5$s
+						</p>
+					</div>
+				</a>
+				%6$s
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
+			self::get_chapter_icon_html($child_post->ID),
 			$child_post->post_title,
+			$avl_chapter->get_chapter_length( true ),
+			$child_children_count ? "<span>{$child_children_count} 個子章節</span>" : '',
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
 				<div class="p-2 icon-arrow flex items-center">
@@ -487,5 +505,36 @@ abstract class Utils {
 		$html .= /* html */'</ul>';
 
 		return $html;
+	}
+
+
+	/**
+	 * 取得章節的 icon html
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @return string
+	 */
+	public static function get_chapter_icon_html( int $chapter_id ): string {
+		$avl_chapter    = new Chapter( (int) $chapter_id );
+		$first_visit_at = $avl_chapter->first_visit_at;
+		$finished_at    = $avl_chapter->finished_at;
+
+		$icon_html = Plugin::load_template( 'icon/video', null, false );
+		$tooltip   = '點擊觀看';
+		if ( $first_visit_at ) {
+			$icon_html = Plugin::load_template( 'icon/check', [ 'type' => 'outline' ], false );
+			$tooltip   = "已於 {$first_visit_at} 開始觀看";
+		}
+		if ( $finished_at ) {
+			$icon_html = Plugin::load_template( 'icon/check', null, false );
+			$tooltip   = "已於 {$finished_at} 完成章節";
+		}
+		$icon_html_with_tooltip = sprintf(
+			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
+			$tooltip,
+			$icon_html
+		);
+
+		return $icon_html_with_tooltip;
 	}
 }
