@@ -14,6 +14,7 @@ use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\AtHelper;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD;
+use J7\Powerhouse\Domains\Post\Utils as PostUtils;
 
 /**
  * Class LifeCycle
@@ -42,6 +43,9 @@ final class LifeCycle {
 
 		// 標示為未完成
 		\add_action( self::CHAPTER_UNFINISHEDED_ACTION, [ __CLASS__, 'add_chapter_unfinished_log' ], 10, 3 );
+
+		// 每次儲存前
+		\add_action('save_post_' . CPT::POST_TYPE, [ __CLASS__, 'delete_transient' ], 10, 3);
 	}
 
 	/**
@@ -173,5 +177,25 @@ final class LifeCycle {
 		if ( $progress == (float) 100 ) {
 			\do_action( CourseLifeCycle::COURSE_FINISHED_ACTION, $course_id, $user_id );
 		}
+	}
+
+	/**
+	 * 處理文章儲存後的動作
+	 *
+	 * @param int     $post_id Post ID
+	 * @param WP_Post $post Post object
+	 * @param bool    $update Whether this is an existing post being updated
+	 */
+	public static function delete_transient( $post_id, $post, $update ): void {
+		// 避免自動儲存
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+			return;
+		}
+
+		// 清除快取
+		$top_parent_id = PostUtils::get_top_post_id( $post_id );
+		$course_id     = (int) \get_post_meta( $top_parent_id, 'parent_course_id', true );
+		$cache_key     = ChapterUtils::get_cache_key( $course_id );
+		\delete_transient( $cache_key );
 	}
 }
