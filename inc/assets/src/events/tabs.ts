@@ -3,6 +3,8 @@ import { isMobile, getDistanceFromViewportTop, header_offset } from '../utils'
 
 // 處理 TAB 組件的切換事件
 export const tabs = () => {
+
+	// 偏移 TAB 置頂
 	$('div[id^="tab-nav-"]').on('click', function () {
 		$(this).addClass('active').siblings().removeClass('active')
 		$('#tab-content-' + $(this).attr('id').split('-')[2])
@@ -15,8 +17,8 @@ export const tabs = () => {
 		const headerH = $('#pc-classroom-header').height() || 0
 		const videoH = _isMobile
 			? $(
-					'.pc-classroom-body__video, #courses-product__feature-video',
-				).height() || 0
+				'.pc-classroom-body__video, #courses-product__feature-video',
+			).height() || 0
 			: 0
 
 		const navH =
@@ -43,6 +45,11 @@ export const tabs = () => {
 		)
 	})
 
+	/**
+	 * 設定最小高度是因為點了 TAB 會有偏移
+	 * TAB 會置頂
+	 * 如果高度不夠  會偏移到中間，才設定此 min height
+	 *
 	$('div[id^="tab-content-"]').each(function () {
 		const _isMobile = isMobile()
 		const videoH = $('.pc-classroom-body__video').height() || 0
@@ -56,4 +63,5 @@ export const tabs = () => {
 			minHeight: `${window.innerHeight - 48 - 43 - offsetTop}px`,
 		})
 	})
+	*/
 }
