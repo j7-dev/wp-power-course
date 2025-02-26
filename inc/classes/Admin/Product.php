@@ -80,11 +80,15 @@ final class Product {
 	 * Custom display post states
 	 *
 	 * @param array{string:string} $post_states - Post states
-	 * @param \WP_Post             $post - Post object
+	 * @param \WP_Post|null        $post - Post object
 	 *
 	 * @return array{string:string}
 	 */
 	public static function custom_display_post_states( array $post_states, $post ): array {
+		if ( !$post?->ID ) {
+			return $post_states;
+		}
+
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
 			$post_states['course'] = '課程商品';
 		}
