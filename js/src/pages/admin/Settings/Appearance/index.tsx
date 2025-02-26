@@ -24,7 +24,7 @@ const index = () => {
 						label: '手機版時，影片以及 tabs 黏性(sticky)置頂',
 						tooltip:
 							'開啟後，手機版時下滑課程銷售頁，影片以及 tabs 會黏性(sticky)置頂，可能會蓋住 fixed 的 header',
-						initialValue: 'yes',
+						initialValue: 'no',
 					}}
 				/>
 
