@@ -1,6 +1,6 @@
 <?php
 /**
- * @deprecated 0.8.0 之後使用 chapter 自己的 template
+ * @deprecated 0.8.0 之後棄用，改用 chapter 自己的 template
  */
 
 use J7\PowerCourse\Utils\Course as CourseUtils;

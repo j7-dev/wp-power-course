@@ -35,10 +35,15 @@ final class Chapter {
 	 *
 	 * @param int      $id Chapter ID.
 	 * @param int|null $user_id User ID.
+	 * @throws \Exception 如果 user_id 為 null.
 	 */
 	public function __construct( int $id, ?int $user_id = null ) {
-		$this->id             = $id;
-		$this->user_id        = $user_id ? $user_id : \get_current_user_id();
+		$this->id      = $id;
+		$this->user_id = $user_id ? $user_id : \get_current_user_id();
+		if ( ! $this->user_id ) {
+			throw new \Exception( 'user_id 不能為 null' );
+		}
+
 		$this->course_id      = Utils::get_course_id( $id );
 		$this->first_visit_at = (string) MetaCRUD::get( $id, $this->user_id, 'first_visit_at', true );
 		$this->finished_at    = (string) MetaCRUD::get( $id, $this->user_id, 'finished_at', true );
