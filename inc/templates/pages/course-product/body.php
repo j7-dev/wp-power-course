@@ -57,7 +57,7 @@ $course_schedule              = $course_schedule_in_timestamp ? \wp_date(
 $course_hour                  = (int) $product->get_meta( 'course_hour' );
 $course_minute                = (int) $product->get_meta( 'course_minute' );
 
-$count_all_chapters = (int) count( CourseUtils::get_sub_chapters( $product, true ) );
+$count_all_chapters = count( CourseUtils::get_sub_chapter_ids( $product ) );
 
 
 $total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );

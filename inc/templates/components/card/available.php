@@ -28,7 +28,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $product_id  = $product->get_id();
-$chapter_ids = CourseUtils::get_sub_chapters($product_id, return_ids :true);
+$chapter_ids = CourseUtils::get_sub_chapter_ids($product_id);
 
 $name              = $product->get_name();
 $product_image_url = Base::get_image_url_by_product( $product, 'full' );

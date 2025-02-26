@@ -395,7 +395,7 @@ final class User {
 			$avl_courses[ $i ]['id']          = (string) $course_id;
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
 			$avl_courses[ $i ]['expire_date'] = ExpireDate::instance($course_id, $user_id)->to_array();
-			$all_chapter_ids                  = CourseUtils::get_sub_chapters($course_id, true);
+			$all_chapter_ids                  = CourseUtils::get_sub_chapter_ids($course_id);
 
 			foreach ($all_chapter_ids as $j => $chapter_id) {
 				$chapter                                     = new Chapter( (int) $chapter_id, (int) $user_id );

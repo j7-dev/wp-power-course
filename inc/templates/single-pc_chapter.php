@@ -26,9 +26,10 @@ if ( ! $current_user_id ) {
 
 global $post;
 
-$chapter_post       = $post;
-$chapter            = new Chapter( (int) $chapter_post->ID );
-$course_product     = $chapter->get_course_product();
+$chapter_post   = $post;
+$chapter        = new Chapter( (int) $chapter_post->ID );
+$course_product = $chapter->get_course_product();
+
 $GLOBALS['product'] = $course_product;
 $GLOBALS['chapter'] = $chapter_post;
 
@@ -63,9 +64,6 @@ do_action('power_course_before_classroom_render');
 
 		<body class="!m-0 min-h-screen bg-base-100 classroom">
 			<?php
-			$GLOBALS['product'] = $product;
-			$GLOBALS['chapter'] = $chapter_post;
-
 			echo '<div id="pc-classroom-main">';
 			Plugin::load_template( 'classroom/sider', null, true, false );
 			Plugin::load_template( 'classroom/body', null, true, true );
