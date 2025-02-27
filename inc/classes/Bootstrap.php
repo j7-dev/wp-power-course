@@ -158,6 +158,9 @@ final class Bootstrap {
 		$post_id   = \get_the_ID();
 		$permalink = $post_id ? \get_permalink( $post_id ) : '';
 
+		/** @var array<string> $active_plugins */
+		$active_plugins = \get_option( 'active_plugins', [] );
+
 		\wp_localize_script(
 			Plugin::$kebab,
 			Plugin::$snake . '_data',
@@ -180,6 +183,7 @@ final class Bootstrap {
 					'bunny_library_id'           => \get_option( 'bunny_library_id', '' ),
 					'bunny_cdn_hostname'         => \get_option( 'bunny_cdn_hostname', '' ),
 					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
+					'ELEMENTOR_ENABLED'          => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
 				],
 			]
 		);

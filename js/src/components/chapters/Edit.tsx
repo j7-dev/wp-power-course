@@ -1,5 +1,5 @@
 import React, { memo, useEffect } from 'react'
-import { Form, Input, Switch } from 'antd'
+import { Form, Input, Switch, Space, Button, Typography } from 'antd'
 import {
 	VideoInput,
 	VideoLength,
@@ -9,11 +9,13 @@ import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
 import { toFormData } from 'antd-toolkit'
 import { ExclamationCircleFilled } from '@ant-design/icons'
+import { CopyText } from 'antd-toolkit'
 
 const { Item } = Form
+const { Text } = Typography
 
 const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
-	const { id, name } = record
+	const { id, name, permalink, slug } = record
 
 	// 初始化資料
 	const { formProps, form, saveButtonProps, mutation, onFinish } = useForm({
@@ -29,10 +31,8 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 		warnWhenUnsavedChanges: true,
 	})
 
-	// 取得課程深度，用來判斷是否為子章節
-	const watchDepth = Form.useWatch(['depth'], form)
-	const label = watchDepth === 0 ? '章節' : '單元'
 	const watchStatus = Form.useWatch(['status'], form)
+	const watchSlug = Form.useWatch(['slug'], form)
 
 	useEffect(() => {
 		form.setFieldsValue(record)
@@ -42,6 +42,9 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 	const handleOnFinish = (values: Partial<TChapterRecord>) => {
 		onFinish(toFormData(values))
 	}
+
+	// 將 permalink 找出 slug 以外的剩餘字串
+	const chapterUrl = permalink?.replace(`${slug}/`, '')
 
 	return (
 		<Edit
@@ -57,7 +60,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			}
 			saveButtonProps={{
 				...saveButtonProps,
-				children: `儲存${label}`,
+				children: `儲存章節`,
 				icon: null,
 				loading: mutation?.isLoading,
 			}}
@@ -65,7 +68,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				<>
 					<div className="text-red-500 font-bold mr-8">
 						<ExclamationCircleFilled />{' '}
-						章節/單元和課程是分開儲存的，編輯完成請記得儲存
+						章節和課程是分開儲存的，編輯完成請記得儲存
 					</div>
 
 					<Switch
@@ -77,7 +80,18 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 							form.setFieldValue(['status'], checked ? 'publish' : 'draft')
 						}}
 					/>
-					{defaultButtons}
+					<Space.Compact>
+						<Button
+							color="default"
+							variant="filled"
+							href={permalink}
+							target="_blank"
+							className="!inline-flex"
+						>
+							預覽
+						</Button>
+						{defaultButtons}
+					</Space.Compact>
 				</>
 			)}
 			wrapperProps={{
@@ -89,31 +103,34 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			}}
 		>
 			<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
-				<Item name={['name']} label={`${label}名稱`}>
-					<Input />
+				<Item name={['name']} label="章節名稱">
+					<Input allowClear />
 				</Item>
-				{/* 如果深度為 0 清除 chapter_video*/}
-				{watchDepth === 0 && (
-					<Item name={['chapter_video']} hidden>
-						<Input allowClear />
-					</Item>
-				)}
-				{/*如果深度為 1 顯示上傳課程內容*/}
-				{watchDepth === 1 && (
-					<>
-						<div className="mb-8">
-							<DescriptionDrawer itemLabel="單元" />
-						</div>
-						<div className="mb-6 max-w-[20rem]">
-							<p className="mb-3">上傳課程內容</p>
-							<VideoInput name={['chapter_video']} />
-						</div>
-						<div className="mb-6 max-w-[20rem]">
-							<p className="mb-3">課程時長</p>
-							<VideoLength name={['chapter_length']} />
-						</div>
-					</>
-				)}
+
+				<Item name={['slug']} label="網址">
+					<Input
+						allowClear
+						addonBefore={
+							<Text className="max-w-[25rem] text-left" ellipsis>
+								{chapterUrl}
+							</Text>
+						}
+						addonAfter={<CopyText text={`${chapterUrl}${watchSlug}`} />}
+					/>
+				</Item>
+
+				<div className="mb-8">
+					<DescriptionDrawer itemLabel="章節" />
+				</div>
+				<div className="mb-6 max-w-[20rem]">
+					<p className="mb-3">上傳課程內容</p>
+					<VideoInput name={['chapter_video']} />
+				</div>
+				<div className="mb-6 max-w-[20rem]">
+					<p className="mb-3">課程時長</p>
+					<VideoLength name={['chapter_length']} />
+				</div>
+
 				<Item name={['status']} hidden />
 				<Item name={['depth']} hidden />
 				<Item name={['id']} hidden />

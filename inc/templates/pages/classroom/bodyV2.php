@@ -35,8 +35,6 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-$content = \do_shortcode( $chapter->post_content );
-
 echo '<div id="pc-classroom-body" class="w-full bg-base-100 pt-[52px] lg:pt-16">';
 
 Plugin::load_template(
@@ -85,17 +83,12 @@ echo /*html*/'</div>';
 Powerhouse::load_template('breadcrumb');
 
 
-if ($content) {
-	// 如果是 elementor 編輯或者 elementor 預覽，就用 the_content
-	if (isset($_GET['elementor-preview']) || !$content) {
-		the_content();
-	} else {
-		printf(
-			/*html*/'<div class="p-4 lg:p-12 bn-container">%s</div>',
-		$content
-		);
-	}
-}
+
+echo '<div class="bn-container">';
+the_content();
+echo '</div>';
+
+
 
 
 // 留言

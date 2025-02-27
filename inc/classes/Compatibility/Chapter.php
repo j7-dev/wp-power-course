@@ -15,12 +15,6 @@ use J7\PowerCourse\Resources\Chapter\Core\CPT;
  * @since v0.8.0
  */
 final class Chapter {
-	use \J7\WpUtils\Traits\SingletonTrait;
-
-
-	/** Constructor */
-	public function __construct() {
-	}
 
 	/**
 	 * 使用 OLD 舊版取法取得最課程底下，最上層的章節 ids

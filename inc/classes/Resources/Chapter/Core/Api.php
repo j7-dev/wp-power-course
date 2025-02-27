@@ -91,8 +91,8 @@ final class Api extends ApiBase {
 			'post_status'    => 'any',
 			'orderby'        => [
 				'menu_order' => 'ASC',
-				'ID'         => 'ASC',
-				'date'       => 'ASC',
+				'ID'         => 'DESC',
+				'date'       => 'DESC',
 			],
 
 		];
@@ -160,28 +160,14 @@ final class Api extends ApiBase {
 		$qty = (int) ( $meta_data['qty'] ?? 1 );
 		unset($meta_data['qty']);
 
-		$post_parents = $meta_data['post_parents'];
-		unset($meta_data['post_parents']);
-		$post_parents = is_array( $post_parents ) ? $post_parents : [];
-
-		// 不需要紀錄 depth，深度是由 post_parent 決定的
-		unset($meta_data['depth']);
-		// action 用來區分是 create 還是 update ，目前只有 create ，所以不用判斷
-		unset($meta_data['action']);
-
 		$data['meta_input'] = $meta_data;
 
 		$success_ids = [];
-		$failed_ids  = [];
-		foreach ($post_parents as $post_parent) {
-			$data['post_parent'] = $post_parent;
-			for ($i = 0; $i < $qty; $i++) {
-				$post_id = ChapterUtils::create_chapter( $data );
-				if (is_numeric($post_id)) {
-					$success_ids[] = $post_id;
-				} else {
-					$failed_ids[] = $post_id;
-				}
+
+		for ($i = 0; $i < $qty; $i++) {
+			$post_id = ChapterUtils::create_chapter( $data );
+			if (is_numeric($post_id)) {
+				$success_ids[] = $post_id;
 			}
 		}
 

@@ -27,7 +27,6 @@ final class Compatibility {
 		if ($scheduled_version === Plugin::$version) {
 			return;
 		}
-
 		ApiOptimize::instance();
 
 		// 排程只執行一次的兼容設定
@@ -76,6 +75,10 @@ final class Compatibility {
 
 		// 將 bundle_type 統一為 'bundle'
 		self::bundle_type();
+
+
+		// 0.8.0 之後使用新的章節結構
+		Chapter::migrate_chapter_to_new_structure();
 
 		/**
 		 * ============== END 相容性代碼 ==============

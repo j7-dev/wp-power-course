@@ -40,7 +40,12 @@ const SortableChaptersComponent = () => {
 		resource: 'chapters',
 		filters: [
 			{
-				field: 'post_parent',
+				field: 'meta_key',
+				operator: 'eq',
+				value: 'parent_course_id',
+			},
+			{
+				field: 'meta_value',
 				operator: 'eq',
 				value: courseId,
 			},

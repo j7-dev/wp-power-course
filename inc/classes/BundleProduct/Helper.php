@@ -50,7 +50,7 @@ final class Helper {
 		$product_id        = $this->product->get_id();
 		$this->bundle_type = (string) \get_post_meta( $product_id, 'bundle_type', true );
 
-		$this->is_bundle_product = !!$this->bundle_type;
+		$this->is_bundle_product = (bool) $this->bundle_type;
 
 		$this->link_course_id = (int) \get_post_meta( $product_id, self::LINK_COURSE_IDS_META_KEY, true );
 	}
@@ -94,7 +94,8 @@ final class Helper {
 			'fields'      => 'ids',
 			'orderby'     => [
 				'menu_order' => 'ASC',
-				'post_date'  => 'DESC',
+				'ID'         => 'DESC',
+				'date'       => 'DESC',
 			],
 		];
 		// @phpstan-ignore-next-line
