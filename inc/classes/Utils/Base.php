@@ -42,12 +42,12 @@ abstract class Base {
 	 * 如果輸入為0，則返回空字符串。
 	 *
 	 * @param int    $seconds 秒數。
-	 * @param string $default 預設值。
+	 * @param string $empty_value 預設值。
 	 * @return string 格式化的時間字符串。
 	 */
-	public static function get_video_length_by_seconds( int $seconds, $default = '-- : -- : --' ): string {
+	public static function get_video_length_by_seconds( int $seconds, $empty_value = '' ): string {
 		if (!$seconds) {
-			return $default;
+			return $empty_value;
 		}
 		$video_length_h = sprintf('%02d', floor($seconds / 3600));
 		$video_length_m = sprintf('%02d', floor(( $seconds - $video_length_h * 3600 ) / 60));
