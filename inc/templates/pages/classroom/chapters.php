@@ -35,8 +35,8 @@ printf(
 	/*html*/'
 		<h2 class="text-lg text-bold tracking-wide my-0 line-clamp-2 h-14 pt-5 pl-0 lg:pl-4">%1$s</h2>
 		<div class="flex justify-between items-center py-4 px-0 lg:px-4">
-			<span class="text-base tracking-wide font-bold">課程單元</span>
-			<span class="text-sm text-gray-400">%2$s 個單元%3$s</span>
+			<span class="text-base tracking-wide font-bold">課程章節</span>
+			<span class="text-sm text-gray-400">%2$s 個章節%3$s</span>
 		</div>
 		<div class="pc-sider-chapters overflow-y-auto -ml-4 lg:ml-0 -mr-4 lg:mr-0">
 			%4$s

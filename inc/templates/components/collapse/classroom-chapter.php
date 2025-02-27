@@ -112,7 +112,7 @@ foreach ( $chapters as $ch_chapter_id => $chapter ) :
 			<input type="checkbox" checked="checked"/>
 			<div class="pc-collapse-title text-sm font-semibold bg-base-300 py-3 flex items-center justify-between">
 				<span>%1$s</span>
-				<span class="text-xs text-base-content">共 %2$s 個單元</span>
+				<span class="text-xs text-base-content">共 %2$s 個章節</span>
 			</div>
 			<div class="pc-collapse-content bg-base-200 p-0">
 						%3$s

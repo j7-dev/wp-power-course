@@ -78,7 +78,7 @@ $items = [
 	],
 	[
 		'icon'     => 'list',
-		'label'    => '預計單元',
+		'label'    => '預計章節',
 		'value'    => "{$count_all_chapters} 個",
 		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_chapters' ) ?: 'yes'),
 	],

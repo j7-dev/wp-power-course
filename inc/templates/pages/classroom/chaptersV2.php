@@ -44,8 +44,8 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 
 <h2 class="text-lg text-bold tracking-wide my-0 line-clamp-2 h-14 pt-5 pl-0 lg:pl-4"><?php echo $product->get_title(); ?></h2>
 <div class="flex justify-between items-center py-4 px-0 lg:px-4">
-	<span class="text-base tracking-wide font-bold">課程單元</span>
-	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個單元<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
+	<span class="text-base tracking-wide font-bold">課程章節</span>
+	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
 </div>
 <div id="power-course-sider" class="pc-sider-chapters overflow-y-auto -ml-4 lg:ml-0 -mr-4 lg:mr-0 px-2">
 	<?php echo $chapters_html; ?>
