@@ -178,19 +178,30 @@ abstract class Utils {
 			$id      = $from_node['id'];
 			$to_node = array_filter($to_tree, fn ( $node ) => $node['id'] === $id);
 			if (empty($to_node)) {
+				// 找出那些在 $to_node 裡面不存在的 id，要刪除這些 post
 				$delete_ids[] = $id;
 			}
 		}
 		foreach ($to_tree as $node) {
-			$id             = $node['id'];
-			$is_new_chapter = strpos($id, 'new-') === 0;
-			$args           = self::converter($node, !$is_new_chapter);
+			$id   = $node['id'];
+			$args = self::converter($node);
 
-			if ($is_new_chapter) {
-				$insert_result = self::create_chapter($args);
+			if (!$node['depth']) {
+				// 如果 depth 是 0，代表是頂層，不使用 post_parent ，而是用 meta_key parent_course_id
+				// post_parent 要清空
+				$args['post_parent'] = 0;
+				$args['meta_input']  = [
+					'parent_course_id' => $node['parent_id'],
+				];
+
 			} else {
-				$insert_result = self::update_chapter($id, $args);
+				// 如果 depth 不是 0，代表是子章節，使用 post_parent 連接母章節
+				// 要刪除 parent_course_id meta_key
+				\delete_post_meta( $id, 'parent_course_id' );
 			}
+
+			$insert_result = self::update_chapter( (string) $id, $args);
+
 			if (\is_wp_error($insert_result)) {
 				return $insert_result;
 			}
@@ -210,13 +221,12 @@ abstract class Utils {
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
 	 * @param array $args    Arguments.
-	 * @param bool  $keep_id Keep id. 是否保留 id 欄位
 	 *
 	 * @return array
 	 */
-	public static function converter( array $args, ?bool $keep_id = false ): array {
+	public static function converter( array $args ): array {
 		$fields_mapper = [
-			'id'                => 'unset',
+			'id'                => 'unset', // 不要把 id 回傳
 			'name'              => 'post_title',
 			'slug'              => 'post_name',
 			'description'       => 'post_content',
@@ -228,13 +238,10 @@ abstract class Utils {
 			'depth'             => 'unset',
 		];
 
-		if ($keep_id) {
-			unset($fields_mapper['id']);
-		}
-
 		$formatted_args = [];
 		foreach ($args as $key => $value) {
 			if (in_array($key, array_keys($fields_mapper), true)) {
+				// 標註為 unset 的，不要回傳
 				if ('unset' === $fields_mapper[ $key ]) {
 					continue;
 				}

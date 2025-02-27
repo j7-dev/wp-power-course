@@ -18,6 +18,9 @@ import { PopconfirmDelete } from '@/components/general'
 
 import AddChapters from './AddChapters'
 
+// 定義最大深度
+export const MAX_DEPTH = 2
+
 const LoadingChapters = () => (
 	<div className="pl-3">
 		{new Array(10).fill(0).map((_, index) => (
@@ -222,8 +225,13 @@ const SortableChaptersComponent = () => {
 						)}
 						indentationWidth={48}
 						sortableRule={({ activeNode, projected }) => {
-							const activeNodeHasChild = !!activeNode.children.length
-							const sortable = projected?.depth <= (activeNodeHasChild ? 0 : 1)
+							const nodeDepth = getMaxDepth([activeNode])
+							const maxDepth = projected?.depth + nodeDepth
+
+							// activeNode - 被拖動的節點
+							// projected - 拖動後的資訊
+
+							const sortable = maxDepth <= MAX_DEPTH
 							if (!sortable) message.error('超過最大深度，無法執行')
 							return sortable
 						}}
@@ -237,3 +245,25 @@ const SortableChaptersComponent = () => {
 }
 
 export const SortableChapters = memo(SortableChaptersComponent)
+
+/**
+ * 取得樹狀結構的最大深度
+ * @param treeData 樹狀結構
+ * @param depth 當前深度
+ * @returns 最大深度
+ */
+function getMaxDepth(treeData: TreeData<TChapterRecord>, depth = 0) {
+	// 如果沒有資料，回傳當前深度
+	if (!treeData?.length) return depth
+
+	// 遞迴取得所有子節點的深度
+	const childrenDepths: number[] = treeData.map((item) => {
+		if (item?.children?.length) {
+			return getMaxDepth(item.children, depth + 1)
+		}
+		return depth
+	})
+
+	// 回傳最大深度
+	return Math.max(...childrenDepths)
+}
