@@ -76,12 +76,12 @@ $next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
-		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多單元</button>';
+		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多章節</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'
 		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
-					前往下一單元
+					前往下一章節
 					<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>

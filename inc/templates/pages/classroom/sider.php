@@ -28,8 +28,8 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 printf(
 	/*html*/'
-<div id="pc-classroom-sider" class="tw-hidden lg:tw-block w-[25rem] bg-base-100 border-base-300 z-20 left-0 top-0 h-screen expended"
-	style="border-right: 1px solid;position:fixed;left:0px">
+<div id="pc-classroom-sider" class="tw-hidden lg:tw-block w-[25rem] bg-base-100 z-20 left-0 top-0 h-screen expended"
+	style="border-right: 1px solid var(--fallback-bc,oklch(var(--bc)/.1));position:fixed;left:0px">
 	<div id="pc-classroom-sider__main" class="h-full flex flex-col [&_.pc-sider-chapters]:flex-1 [&_.pc-sider-chapters]:pb-12">
 		%1$s
 		<div class="py-4 pl-9 absolute bottom-0 w-full bg-base-100">
