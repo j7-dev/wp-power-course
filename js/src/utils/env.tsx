@@ -33,3 +33,6 @@ export const bunny_stream_api_key =
 
 export const course_permalink_structure =
 	window?.[APP_DOMAIN]?.env?.course_permalink_structure || 'courses'
+
+export const ELEMENTOR_ENABLED =
+	window?.[APP_DOMAIN]?.env?.ELEMENTOR_ENABLED || false

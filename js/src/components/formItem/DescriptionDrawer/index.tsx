@@ -1,10 +1,19 @@
-import { FC, useEffect, lazy, Suspense, useMemo, memo } from 'react'
-import { Button, Form, Drawer, Input, Alert, Dropdown, Tooltip } from 'antd'
+import { FC, useEffect, lazy, Suspense, memo } from 'react'
+import {
+	Button,
+	Form,
+	Drawer,
+	Input,
+	Alert,
+	Dropdown,
+	Tooltip,
+	Space,
+} from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
 import { useApiUrl } from '@refinedev/core'
 import { useBlockNote } from '@/components/general'
-import { siteUrl } from '@/utils'
+import { siteUrl, ELEMENTOR_ENABLED } from '@/utils'
 
 const { Item } = Form
 
@@ -66,54 +75,33 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 		}
 	}, [watchId, open])
 
-	const canElementor = watchId && watchShowDescriptionTab
+	const disableElementor =
+		!ELEMENTOR_ENABLED || (itemLabel === '課程' && !watchShowDescriptionTab)
 
 	return (
 		<div>
 			<p className="mb-2">
 				編輯{itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}
 			</p>
-			{itemLabel === '課程' ? (
-				<Dropdown.Button
-					trigger={['click']}
-					placement="bottomLeft"
-					menu={{
-						items: [
-							{
-								key: 'elementor',
-								label: (
-									<Tooltip
-										title={getTooltipTitle(
-											canElementor,
-											watchShowDescriptionTab,
-										)}
-									>
-										{canElementor ? (
-											<a
-												href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
-												target="_blank"
-												rel="noreferrer"
-											>
-												或 使用 Elementor 編輯器
-											</a>
-										) : (
-											'或 使用 Elementor 編輯器'
-										)}
-									</Tooltip>
-								),
-								disabled: !canElementor,
-							},
-						],
-					}}
-					onClick={show}
+			<Space.Compact>
+				<Button onClick={show}>使用 Power 編輯器</Button>
+				<Tooltip
+					title={getTooltipTitle(
+						ELEMENTOR_ENABLED,
+						watchShowDescriptionTab,
+						itemLabel,
+					)}
 				>
-					使用 Power 編輯器
-				</Dropdown.Button>
-			) : (
-				<Button type="default" onClick={show}>
-					使用 Power 編輯器
-				</Button>
-			)}
+					<Button
+						href={`${siteUrl}/wp-admin/post.php?post=${watchId}&action=elementor`}
+						target="_blank"
+						rel="noreferrer"
+						disabled={disableElementor}
+					>
+						使用 Elementor 編輯器
+					</Button>
+				</Tooltip>
+			</Space.Compact>
 
 			<Item name={name} label={`${itemLabel}完整介紹`} hidden>
 				<Input.TextArea rows={8} disabled />
@@ -171,15 +159,21 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 }
 
 function getTooltipTitle(
-	canElementor: boolean,
+	elementorInstalled: boolean,
 	watchShowDescriptionTab: boolean,
+	itemLabel: string,
 ) {
-	if (canElementor) {
-		return ''
+	if (!elementorInstalled) {
+		return '您必須安裝並啟用 Elementor 外掛才可以使用 Elementor 編輯'
 	}
-	return watchShowDescriptionTab
-		? '先儲存後就可以使用 Elementor 編輯了'
-		: '您必須「其他設定 》 顯示介紹」才可以使用 Elementor 編輯'
+
+	// 為課程時，必須要有啟用 ShowDescriptionTab 才可以用
+	if (itemLabel === '課程' && !watchShowDescriptionTab) {
+		return '您必須啟用「其他設定 》 顯示介紹」才可以使用 Elementor 編輯'
+	}
+
+	// 非課程不受限制
+	return
 }
 
 export const DescriptionDrawer = memo(DescriptionDrawerComponent)

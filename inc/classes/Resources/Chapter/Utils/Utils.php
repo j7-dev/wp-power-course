@@ -34,18 +34,7 @@ abstract class Utils {
 	 * @return int|\WP_Error
 	 */
 	public static function create_chapter( array $args = [] ): int|\WP_Error {
-		WP::include_required_params(
-			$args,
-			[
-				'post_parent',
-			],
-		);
-
-		$post_parent        = (int) $args['post_parent'];
-		$parent_post_type   = \get_post_type($post_parent);
-		$default_post_title = $parent_post_type === CPT::POST_TYPE ? '新單元' : '新章節';
-
-		$args['post_title']    = $args['post_title'] ?? $default_post_title;
+		$args['post_title']    = $args['post_title'] ?? '新章節';
 		$args['post_status']   = 'publish';
 		$args['post_author']   = \get_current_user_id();
 		$args['post_type']     = CPT::POST_TYPE;
@@ -90,8 +79,8 @@ abstract class Utils {
 					'post_status' => 'any',
 					'orderby'     => [
 						'menu_order' => 'ASC',
-						'ID'         => 'ASC',
-						'date'       => 'ASC',
+						'ID'         => 'DESC',
+						'date'       => 'DESC',
 					],
 				]
 			)
@@ -414,8 +403,8 @@ abstract class Utils {
 					'posts_per_page' => -1,
 					'orderby'        => [
 						'menu_order' => 'ASC',
-						'ID'         => 'ASC',
-						'date'       => 'ASC',
+						'ID'         => 'DESC',
+						'date'       => 'DESC',
 					],
 				]
 				),
@@ -428,8 +417,8 @@ abstract class Utils {
 					'posts_per_page' => -1,
 					'orderby'        => [
 						'menu_order' => 'ASC',
-						'ID'         => 'ASC',
-						'date'       => 'ASC',
+						'ID'         => 'DESC',
+						'date'       => 'DESC',
 					],
 				]
 				),
@@ -453,8 +442,8 @@ abstract class Utils {
 				'posts_per_page' => -1,
 				'orderby'        => [
 					'menu_order' => 'ASC',
-					'ID'         => 'ASC',
-					'date'       => 'ASC',
+					'ID'         => 'DESC',
+					'date'       => 'DESC',
 				],
 			]
 			);
