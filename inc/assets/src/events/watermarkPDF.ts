@@ -10,7 +10,7 @@ export const watermarkPDF = () => {
 	}
 
 	// 2. 確保浮水印數量 > 0
-	if (pdf_watermark.qty <= 0) {
+	if (Number(pdf_watermark?.qty) <= 0) {
 		return
 	}
 
