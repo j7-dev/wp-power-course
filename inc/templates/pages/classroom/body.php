@@ -4,6 +4,7 @@
  */
 
 use J7\PowerCourse\Plugin;
+use J7\Powerhouse\Plugin as Powerhouse;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
@@ -34,26 +35,6 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-$course_tabs = [
-	'chapter' => [
-		'label'   => '章節',
-		'content' => Plugin::load_template( 'classroom/chapters', null, false ),
-	],
-	'discuss' => [
-		'label'   => '討論',
-		'content' => sprintf(
-			/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
-			$chapter_id,
-			'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
-			'yes',
-			\get_current_user_id(),
-			\current_user_can('manage_options') ? 'admin' : 'user',
-			),
-	],
-];
-
-$content = \do_shortcode( $chapter->post_content );
-
 echo '<div id="pc-classroom-body" class="w-full bg-base-100 pt-[52px] lg:pt-16">';
 
 Plugin::load_template(
@@ -79,36 +60,48 @@ Plugin::load_template(
 );
 echo '</div>';
 
-if ($content) {
-	printf(
-		/*html*/'<div class="p-4 lg:p-12 bn-container">%s</div>',
-	$content
-	);
-}
-
 echo '<div class="bg-base-200 px-4 lg:px-12 py-4">';
 Plugin::load_template( 'progress' );
 echo '</div>';
 
-echo '<div class="pc-classroom-body__tabs-nav z-[15] lg:relative">';
-Plugin::load_template(
-	'tabs/nav',
-	[
-		'course_tabs' => $course_tabs,
-	]
-	);
+
+
+echo '<div class="tw-container mx-auto mt-8">';
+
+Powerhouse::load_template('breadcrumb');
+
+echo '<div class="bn-container">';
+the_content();
 echo '</div>';
 
 
-echo '<div class="px-4 lg:px-12">';
-Plugin::load_template(
-'tabs/content',
-[
-	'course_tabs' => $course_tabs,
-]
+
+
+// 留言
+printf(
+			/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
+			$chapter_id,
+			'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
+			'yes',
+			\get_current_user_id(),
+			\current_user_can('manage_options') ? 'admin' : 'user',
 );
-echo '</div>';
 
+
+echo /*html*/'<div class="pc-divider my-6"></div>';
+
+Powerhouse::load_template('related-posts/children');
+Plugin::load_template('related-posts/prev-next');
+
+echo /*html*/'<div class="pc-divider mt-6"></div>';
+
+printf(
+/*html*/'<p class="text-sm text-base-content/75">最近修改：%1$s</p>
+',
+get_the_modified_time('Y-m-d H:i')
+);
+
+echo '</div>'; // end container
 echo '</div>';
 
 printf(

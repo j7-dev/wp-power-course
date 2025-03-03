@@ -3,12 +3,10 @@
  * Classroom > header
  */
 
-use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Templates\Templates;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
-
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -31,7 +29,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $product_id         = $product->get_id();
-$current_chapter_id = (int) \get_query_var( Templates::CHAPTER_ID );
+$current_chapter_id = $chapter->ID;
 
 $back_to_my_course_html = sprintf(
 	/*html*/'
@@ -68,7 +66,7 @@ $finish_chapter_button_html = sprintf(
 
 // next chapter button html
 /** @var int[] $chapter_ids */
-$chapter_ids = CourseUtils::get_sub_chapter_ids($product_id);
+$chapter_ids = ChapterUtils::get_flatten_post_ids($product_id);
 $index       = array_search($current_chapter_id, $chapter_ids, true);
 /** @var int|false $index */
 $next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
@@ -92,11 +90,7 @@ if (count($chapter_ids) > 0) {
 					</svg>
 		</a>
 ',
-			site_url( 'classroom' ) . sprintf(
-				'/%1$s/%2$s',
-				$product->get_slug(),
-				$next_chapter_id,
-			)
+			\get_permalink($next_chapter_id)
 		);
 	}
 }

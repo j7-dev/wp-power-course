@@ -13,6 +13,7 @@ use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 
@@ -395,7 +396,7 @@ final class User {
 			$avl_courses[ $i ]['id']          = (string) $course_id;
 			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
 			$avl_courses[ $i ]['expire_date'] = ExpireDate::instance($course_id, $user_id)->to_array();
-			$all_chapter_ids                  = CourseUtils::get_sub_chapter_ids($course_id);
+			$all_chapter_ids                  = ChapterUtils::get_flatten_post_ids($course_id);
 
 			foreach ($all_chapter_ids as $j => $chapter_id) {
 				$chapter                                     = new Chapter( (int) $chapter_id, (int) $user_id );

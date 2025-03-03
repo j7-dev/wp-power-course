@@ -6,7 +6,6 @@
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
-use J7\Powerhouse\Plugin as PowerhousePlugin;
 use J7\Powerhouse\Theme\FrontEnd as Theme;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 
@@ -67,7 +66,7 @@ do_action('power_course_before_classroom_render');
 			<?php
 			echo '<div id="pc-classroom-main">';
 			Plugin::load_template( 'classroom/sider', null, true, false );
-			Plugin::load_template( 'classroom/bodyV2', null, true, true );
+			Plugin::load_template( 'classroom/body', null, true, true );
 			echo '</div>';
 
 
