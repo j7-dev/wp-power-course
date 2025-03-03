@@ -14,6 +14,7 @@ export const finishChapterAtom = atom({
 	dialogMessage: '',
 	isFinished: undefined,
 	progress: undefined,
+	icon_html: '',
 })
 
 // RWD 相關
