@@ -21,7 +21,11 @@ export function finishChapter() {
 			dialogMessage,
 			isFinished,
 			progress,
+			icon_html
 		} = store.get(finishChapterAtom)
+
+		const ChapterIcon = $(`li[data-post-id="${chapter_id}"]`).find('.pc-chapter-icon')
+
 		if (isLoading) {
 			FinishButton.find('.pc-loading-spinner').removeClass('tw-hidden')
 		} else {
@@ -29,6 +33,9 @@ export function finishChapter() {
 		}
 
 		if (isSuccess) {
+			if (ChapterIcon?.length > 0) {
+				ChapterIcon.html(icon_html)
+			}
 			Dialog.find('#finish-chapter__dialog__title').text('成功')
 			Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
 
@@ -119,6 +126,7 @@ export function finishChapter() {
 				const is_this_chapter_finished =
 					xhr?.responseJSON?.data?.is_this_chapter_finished
 				const progress = xhr?.responseJSON?.data?.progress
+				const icon_html = xhr?.responseJSON?.data?.icon_html
 
 				store.set(finishChapterAtom, (prev) => ({
 					...prev,
@@ -127,6 +135,7 @@ export function finishChapter() {
 					dialogMessage: message,
 					isFinished: is_this_chapter_finished,
 					progress,
+					icon_html,
 				}))
 			},
 		})

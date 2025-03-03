@@ -325,6 +325,7 @@ final class Api extends ApiBase {
 						'course_id'                => $course_id,
 						'is_this_chapter_finished' => $success ? false : true,
 						'progress'                 => $progress,
+						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
 					],
 				],
 				$success ? 200 : 400
@@ -350,6 +351,7 @@ final class Api extends ApiBase {
 						'course_id'                => $course_id,
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
+						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
 					],
 				],
 				$success ? 200 : 400
