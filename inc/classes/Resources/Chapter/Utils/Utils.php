@@ -463,9 +463,9 @@ abstract class Utils {
 						%3$s
 					</div>
 				</a>
-				<div class="flex items-center justify-end gap-x-0 w-14">
+				<div class="flex items-center justify-end gap-x-0 w-16">
 					%4$s
-					<div class="pc-chapter-icon">%2$s</div>
+					<div class="pc-chapter-icon size-8 p-1">%2$s</div>
 				</div>
 			</li>
 			',
