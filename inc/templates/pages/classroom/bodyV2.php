@@ -105,7 +105,7 @@ printf(
 echo /*html*/'<div class="pc-divider my-6"></div>';
 
 Powerhouse::load_template('related-posts/children');
-Powerhouse::load_template('related-posts/prev-next');
+Plugin::load_template('related-posts/prev-next');
 
 echo /*html*/'<div class="pc-divider mt-6"></div>';
 

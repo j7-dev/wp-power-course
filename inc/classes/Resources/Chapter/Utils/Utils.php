@@ -455,9 +455,6 @@ abstract class Utils {
 			]
 			);
 
-			$avl_chapter          = new Chapter( (int) $child_post->ID );
-			$child_children_count = count( $child_children_posts );
-
 			$html .= sprintf(
 			/*html*/'
 			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
@@ -528,5 +525,44 @@ abstract class Utils {
 		);
 
 		return $icon_html_with_tooltip;
+	}
+
+	/**
+	 * 取得扁平的子孫 post ids，不包含頂層 id
+	 * 階層子孫結構都打平
+	 *
+	 * @param int $course_id 課程 ID.
+	 * @return array<int>
+	 */
+	public static function get_flatten_post_ids( int $course_id ): array {
+		$flatten_post_ids = [];
+
+		/** @var array<int> $top_chapter_ids */
+		$top_chapter_ids = \get_posts(
+				[
+					'post_type'      => CPT::POST_TYPE,
+					'meta_key'       => 'parent_course_id',
+					'meta_value'     => $course_id,
+					'post_status'    => 'publish',
+					'fields'         => 'ids',
+					'posts_per_page' => -1,
+					'orderby'        => [
+						'menu_order' => 'ASC',
+						'ID'         => 'DESC',
+						'date'       => 'DESC',
+					],
+				]
+				);
+
+		foreach ($top_chapter_ids as $top_chapter_id) {
+			$child_chapter_ids = PostUtils::get_flatten_post_ids( $top_chapter_id );
+			$flatten_post_ids  = [
+				...$flatten_post_ids,
+				$top_chapter_id,
+				...$child_chapter_ids,
+			];
+		}
+
+		return $flatten_post_ids;
 	}
 }
