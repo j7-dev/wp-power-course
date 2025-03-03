@@ -1,6 +1,5 @@
 export * from './finishChapter'
 export * from './dynamicWidth'
-export * from './responsive'
 export * from './tabs'
 export * from './coursesProduct'
 export * from './toggleContent'
