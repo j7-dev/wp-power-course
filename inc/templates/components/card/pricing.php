@@ -5,7 +5,7 @@
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
 
 $default_args = [
@@ -27,7 +27,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 }
 
 $product_id  = $product->get_id();
-$chapter_ids = CourseUtils::get_sub_chapter_ids($product_id);
+$chapter_ids = ChapterUtils::get_flatten_post_ids($product_id);
 
 $name              = $product->get_name();
 $product_image_url = Base::get_image_url_by_product( $product, 'full' );

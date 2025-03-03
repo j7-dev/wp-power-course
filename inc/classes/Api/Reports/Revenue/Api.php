@@ -11,7 +11,7 @@ use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\General;
 use Automattic\WooCommerce\Admin\API\Reports\Revenue\Query;
 use Automattic\WooCommerce\Admin\API\Reports\GenericQuery as ProductQuery;
-use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
 
 /**
@@ -370,7 +370,7 @@ final class Api extends ApiBase {
 		$chapter_ids_in_specific_course = [];
 		if (!empty($query_args['product_includes'])) {
 			foreach ($query_args['product_includes'] as $course_id) {
-				$chapter_ids_in_single_course   = CourseUtils::get_sub_chapter_ids( (int) $course_id);
+				$chapter_ids_in_single_course   = ChapterUtils::get_flatten_post_ids( (int) $course_id);
 				$chapter_ids_in_specific_course = array_merge($chapter_ids_in_specific_course, $chapter_ids_in_single_course);
 			}
 		}

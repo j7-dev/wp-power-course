@@ -7,6 +7,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
 use J7\PowerCourse\Resources\Course\Limit;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -57,7 +58,7 @@ $course_schedule              = $course_schedule_in_timestamp ? \wp_date(
 $course_hour                  = (int) $product->get_meta( 'course_hour' );
 $course_minute                = (int) $product->get_meta( 'course_minute' );
 
-$count_all_chapters = count( CourseUtils::get_sub_chapter_ids( $product ) );
+$count_all_chapters = count( ChapterUtils::get_flatten_post_ids( $product->get_id() ) );
 
 
 $total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );

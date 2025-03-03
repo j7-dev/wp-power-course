@@ -13,6 +13,7 @@ use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\Powerhouse\Domains\Post\Utils as PostUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 
 /**
@@ -106,45 +107,6 @@ abstract class Course {
 		return $sub_chapter_posts;
 	}
 
-
-	/**
-	 * 取得課程所有扁平的單元 ids
-	 *
-	 * @param \WC_Product|int $product 商品
-	 *
-	 * @return array<int|\WP_Post>
-	 */
-	public static function get_sub_chapter_ids( \WC_Product|int $product ): array {
-		if (!is_numeric($product)) {
-			$product = $product->get_id();
-		}
-
-		$args = [
-			'fields'         => 'ids',
-			'posts_per_page' => - 1,
-			'order'          => 'ASC',
-			'orderby'        => 'menu_order',
-			'meta_value'     => $product,
-			'meta_key'       => 'parent_course_id',
-			'post_status'    => 'publish',
-			'post_type'      => ChapterCPT::POST_TYPE,
-		];
-
-		/** @var array<int> $top_chapter_ids 課程的頂層章節 */
-		$top_chapter_ids = \get_posts($args);
-
-		$sub_chapter_ids = [];
-		foreach ($top_chapter_ids as $top_chapter_id) {
-			$sub_chapter_ids = [
-				...$sub_chapter_ids,
-				$top_chapter_id,
-				...PostUtils::get_flatten_post_ids( (int) $top_chapter_id),
-			];
-		}
-
-		return $sub_chapter_ids;
-	}
-
 	/**
 	 * 取得課程長度
 	 *
@@ -154,7 +116,7 @@ abstract class Course {
 	 * @return string
 	 */
 	public static function get_course_length( \WC_Product $product, ?string $type = 'second' ): string {
-		$chapter_ids = self::get_sub_chapter_ids( $product );
+		$chapter_ids = ChapterUtils::get_flatten_post_ids( $product->get_id() );
 
 		$length = 0;
 		foreach ( $chapter_ids as $chapter_id ) {
@@ -201,7 +163,7 @@ abstract class Course {
 			return (float) $progress;
 		}
 
-		$sub_chapters_count          = count(self::get_sub_chapter_ids($product));
+		$sub_chapters_count          = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 		$finished_sub_chapters_count = count(self::get_finished_sub_chapters($product_id, $user_id, true));
 
 		$progress = $sub_chapters_count ? round(( $finished_sub_chapters_count / $sub_chapters_count * 100 ), 1) : 0;
@@ -241,7 +203,7 @@ abstract class Course {
 			$user_id = \get_current_user_id();
 		}
 
-		$all_sub_chapter_ids      = self::get_sub_chapter_ids($course_id);
+		$all_sub_chapter_ids      = ChapterUtils::get_flatten_post_ids($course_id);
 		$finished_sub_chapter_ids = array_filter(
 			$all_sub_chapter_ids,
 			function ( $chapter_id ) use ( $user_id ) {

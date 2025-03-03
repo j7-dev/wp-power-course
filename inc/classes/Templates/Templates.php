@@ -9,6 +9,7 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 /**
  * Class FrontEnd
@@ -142,10 +143,10 @@ final class Templates {
 						exit;
 					}
 
-					$GLOBALS['product'] = $product;
+					$GLOBALS['course'] = $product;
 
 					// 如果商品不是課程，則不要載入模板
-					$is_course_product = CourseUtils::is_course_product( $GLOBALS['product'] );
+					$is_course_product = CourseUtils::is_course_product( $GLOBALS['course'] );
 
 					if ( ! $is_course_product ) {
 						return $template;
@@ -156,7 +157,7 @@ final class Templates {
 							$GLOBALS['chapter'] = \get_post( $slug_2);
 						} else {
 							/** @var array<int> $sub_chapter_ids */
-							$sub_chapter_ids = CourseUtils::get_sub_chapter_ids( $GLOBALS['product'] );
+							$sub_chapter_ids = ChapterUtils::get_flatten_post_ids( $product_post->ID);
 							if (count($sub_chapter_ids) < 1) {
 								// TODO 沒有章節應該顯示空教室!?
 								\wp_safe_redirect( \home_url( '/404' ) );

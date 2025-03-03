@@ -9,6 +9,7 @@ namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 
@@ -156,7 +157,7 @@ final class Condition {
 		if ( !empty( $this->course_ids ) && empty( $this->chapter_ids ) ) {
 			$chapter_ids = [];
 			foreach ( $this->course_ids as $course_id ) {
-				$course_chapter_ids = CourseUtils::get_sub_chapter_ids( (int) $course_id);
+				$course_chapter_ids = ChapterUtils::get_flatten_post_ids( (int) $course_id);
 				$chapter_ids        = array_merge( $chapter_ids, $course_chapter_ids );
 			}
 
