@@ -65,7 +65,7 @@ if ( $last_visit_info ) {
 } else {
 	$goto_chapter_id = count($chapter_ids) > 0 ? $chapter_ids[0] : null;
 }
-$goto_classroom_link = $goto_chapter_id ? \site_url( 'classroom' ) . "/{$product->get_slug()}/{$goto_chapter_id}" : site_url( '404' );
+$goto_classroom_link = $goto_chapter_id ? get_permalink($goto_chapter_id) : site_url( '404' );
 
 printf(
 	/*html*/'

@@ -54,10 +54,9 @@ foreach ( $chapters as $chapter_id => $chapter ) :
 	$sub_chapters  = \get_children( $args3 );
 	$children_html = '';
 	foreach ( $sub_chapters as $sub_chapter ) :
-		$classroom_link      = \site_url("classroom/{$product->get_slug()}/{$sub_chapter->ID}");
 		$classroom_link_html = sprintf(
 		/*html*/'<a href="%1$s" target="_blank" title="前往教室 - %2$s" class="text-secondary">%2$s %3$s</a>',
-		$classroom_link,
+		get_permalink($sub_chapter->ID),
 		$sub_chapter->post_title,
 		Plugin::load_template(
 			'icon/external-link',

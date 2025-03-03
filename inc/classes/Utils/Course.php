@@ -12,7 +12,6 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
-use J7\Powerhouse\Domains\Post\Utils as PostUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 
@@ -700,5 +699,41 @@ abstract class Course {
 			)
 		)['product_base'] ?? 'product';
 		return preg_replace('/^\//', '', $course_permalink_structure);
+	}
+
+	/**
+	 * 取得課程的永久連結結構
+	 *
+	 * 如果沒有找到，則返回 false
+	 *
+	 * @param int $course_id 課程 ID
+	 *
+	 * @return string|false
+	 */
+	public static function get_classroom_permalink( int $course_id ): string|false {
+		/** @var array<int> $top_chapter_ids 只拿一個 */
+		$top_chapter_ids = \get_posts(
+			[
+				'post_type'      => ChapterCPT::POST_TYPE,
+				'meta_key'       => 'parent_course_id',
+				'meta_value'     => $course_id,
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'posts_per_page' => 1,
+				'orderby'        => [
+					'menu_order' => 'ASC',
+					'ID'         => 'DESC',
+					'date'       => 'DESC',
+				],
+			]
+			);
+
+		if (empty($top_chapter_ids)) {
+			return false;
+		}
+
+		$top_chapter_id = reset($top_chapter_ids);
+
+		return \get_permalink($top_chapter_id);
 	}
 }

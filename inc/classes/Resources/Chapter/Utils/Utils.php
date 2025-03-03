@@ -345,8 +345,9 @@ abstract class Utils {
 		$username        = $wp_current_user->user_login ?: '';
 		$ip              = General::get_client_ip() ?? '';
 
+		/** @var \WP_Post $chapter */
 		global $chapter;
-		$post_title = $chapter ? $chapter->post_title : '';
+		$post_title = $chapter?->post_title ?? '';
 
 		$formatted_watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}', '{post_title}' ], [ $email, $ip, $display_name, $username, $post_title ], $watermark_text );
 

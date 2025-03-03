@@ -27,7 +27,8 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
-
+$product_id          = $product->get_id();
+$classroom_permalink = CourseUtils::get_classroom_permalink($product_id);
 
 echo '<div class="flex-1 px-4 md:px-0">';
 echo '<div class="mb-12">';
@@ -39,11 +40,11 @@ if ( $is_avl ) {
 	[
 		'type'    => 'info',
 		'message' => '您已經購買課程',
-		'buttons' => sprintf(
+		'buttons' => $classroom_permalink ? sprintf(
 			/*html*/'<a  href="%1$s" target="_blank" class="pc-btn pc-btn-sm pc-btn-primary text-white">%2$s</a>',
-				site_url( "classroom/{$product->get_slug()}" ),
+				$classroom_permalink,
 				'前往教室',
-				),
+				) : '',
 		] // phpcs:ignore
 	);
 }
