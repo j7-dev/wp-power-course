@@ -9,7 +9,7 @@ use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 	'chapter' => $GLOBALS['chapter'] ?? null,
 ];
 

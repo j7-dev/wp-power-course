@@ -7,7 +7,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\Base;
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 	'label'   => '上課進度',
 ];
 

@@ -8,7 +8,7 @@ use J7\PowerCourse\FrontEnd\MyAccount;
 
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 ];
 
 /**
