@@ -15,20 +15,12 @@ use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
  * Class FrontEnd
  */
 final class Templates {
-
 	use \J7\WpUtils\Traits\SingletonTrait;
-
-	// 上課頁面
-	public const CLASSROOM_SLUG = 'classroom_slug';
-	public const CHAPTER_ID     = 'chapter_id';
 
 	/** Constructor */
 	public function __construct() {
 		\add_filter('template_include', [ $this, 'course_product_template' ], 9999);
 		\add_action('init', [ $this, 'add_rewrite_rules' ]);
-		\add_filter( 'query_vars', [ $this, 'add_query_var' ] );
-		\add_filter( 'template_include', [ $this, 'load_custom_template' ], 9999 );
-		\add_filter( 'language_attributes', [ $this, 'add_html_attr' ], 20, 2 );
 		\add_action( 'admin_bar_menu', [ $this, 'admin_bar_item' ], 210 );
 	}
 
@@ -78,119 +70,9 @@ final class Templates {
 			\add_rewrite_rule($old_course_regex, 'index.php?product=$matches[1]', 'top');
 		}
 
-		// 教室頁面
-		$classroom_regex = '^classroom/([^/]+)/?([^/]*)/?'; // '^classroom/?([^/]*)/?';
-		\add_rewrite_rule(
-			$classroom_regex,
-			'index.php?' . self::CLASSROOM_SLUG . '=$matches[1]&' . self::CHAPTER_ID . '=$matches[2]',
-			'top'
-		);
-
-		if ( ! isset( $rules[ $classroom_regex ] ) || ! isset( $rules[ $old_course_regex ] ) ) {
+		if ( ! isset( $rules[ $old_course_regex ] ) ) {
 			\flush_rewrite_rules();
 		}
-	}
-
-	/**
-	 * Add query var
-	 *
-	 * @param array<string> $vars Vars.
-	 *
-	 * @return array<string>
-	 */
-	public function add_query_var( array $vars ): array {
-		$vars[] = self::CLASSROOM_SLUG;
-		$vars[] = self::CHAPTER_ID;
-		return $vars;
-	}
-
-	/**
-	 * Load custom template
-	 * Set {Plugin::$kebab}/{slug}/report  php template
-	 *
-	 * @param string|null $template Template.
-	 */
-	public function load_custom_template( $template ): string|null {
-		// 使用自定義的模板
-		$items = [
-			[
-				// {site_url}/classroom/{slug}/{slug_2}
-				'key'    => 'classroom',
-				'slug'   => \get_query_var( self::CLASSROOM_SLUG ),
-				'slug_2' => \get_query_var( self::CHAPTER_ID ),
-				'path'   => Plugin::$dir . '/inc/templates/classroom-entry.php',
-			],
-		];
-
-		foreach ( $items as $item ) {
-			$key    = $item['key']; // "classroom"
-			$slug   = (string) $item['slug']; // product_slug
-			$slug_2 = (int) $item['slug_2']; // chapter_id
-			$path   = $item['path'];
-
-			if ( $slug ) {
-				if ( file_exists( $path ) ) {
-					// @phpstan-ignore-next-line
-					$product_post = \get_page_by_path( $slug, OBJECT, 'product' );
-					if ( ! $product_post ) {
-						\wp_safe_redirect( \home_url( '/404' ) );
-						exit;
-					}
-					/** @var \WP_Post $product_post */
-					$product = \wc_get_product( $product_post->ID );
-					if (!$product) {
-						\wp_safe_redirect( \home_url( '/404' ) );
-						exit;
-					}
-
-					$GLOBALS['course'] = $product;
-
-					// 如果商品不是課程，則不要載入模板
-					$is_course_product = CourseUtils::is_course_product( $GLOBALS['course'] );
-
-					if ( ! $is_course_product ) {
-						return $template;
-					}
-
-					if ('classroom' === $key) { // @phpstan-ignore-line
-						if ( $slug_2 ) {
-							$GLOBALS['chapter'] = \get_post( $slug_2);
-						} else {
-							/** @var array<int> $sub_chapter_ids */
-							$sub_chapter_ids = ChapterUtils::get_flatten_post_ids( $product_post->ID);
-							if (count($sub_chapter_ids) < 1) {
-								// TODO 沒有章節應該顯示空教室!?
-								\wp_safe_redirect( \home_url( '/404' ) );
-								exit;
-							} else {
-								$first_sub_chapter_id = $sub_chapter_ids[0];
-								\wp_safe_redirect( \site_url( 'classroom' ) . "/{$slug}/{$first_sub_chapter_id}" );
-								exit;
-							}
-						}
-					}
-
-					return $path;
-				}
-			}
-		}
-
-		return $template;
-	}
-
-
-	/**
-	 * Add html attr
-	 * 用來切換 daisyUI 的主題
-	 *
-	 * @param string $output Output.
-	 * @param string $doctype Doctype.
-	 *
-	 * @return string
-	 */
-	public function add_html_attr( string $output, string $doctype ): string {
-		// ["light", "dark", "cupcake"]
-		return "{$output} data-theme=\"dark\"";
 	}
 
 	/**

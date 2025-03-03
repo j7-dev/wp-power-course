@@ -18,7 +18,7 @@ if (!$product) {
 	exit;
 }
 
-$GLOBALS['product'] = $product;
+$GLOBALS['course'] = $product;
 
 \add_filter(
 'body_class',
