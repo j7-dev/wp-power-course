@@ -21,6 +21,7 @@ const index = () => {
 									icon={<SiMicrosoftexcel />}
 									iconPosition="end"
 									href={`${siteUrl}/wp-content/plugins/power-course/sample.csv`}
+									download="sample.csv"
 								>
 									下載範例 csv 檔案
 								</Button>
