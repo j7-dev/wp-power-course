@@ -35,7 +35,7 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-echo '<div id="pc-classroom-body" class="w-full bg-base-100 pt-[52px] lg:pt-16">';
+echo '<div id="pc-classroom-body" class="w-full bg-base-100 lg:pl-[25rem] pt-[52px] lg:pt-16">';
 
 Plugin::load_template(
 	'classroom/header',
@@ -47,7 +47,7 @@ Plugin::load_template(
 
 $is_avl = CourseUtils::is_avl();
 if (current_user_can('manage_options') && !$is_avl) {
-	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full">此為管理員預覽模式</div>';
+	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full sticky top-[52px] lg:top-16 z-30">此為管理員預覽模式</div>';
 }
 
 echo '<div class="pc-classroom-body__video z-[15] sticky top-[52px] lg:relative lg:top-[unset]">';
