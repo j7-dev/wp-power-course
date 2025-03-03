@@ -47,7 +47,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 	<span class="text-base tracking-wide font-bold">課程章節</span>
 	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
 </div>
-<div id="power-course-sider" class="pc-sider-chapters overflow-y-auto -ml-4 lg:ml-0 -mr-4 lg:mr-0 px-2">
+<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0">
 	<?php echo $chapters_html; ?>
 </div>
 
@@ -56,7 +56,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 	(function($) {
 		$(document).ready(function() {
 			// 點擊箭頭展開或收合章節
-			$('#power-course-sider').on('click', 'li .icon-arrow', function() {
+			$('#pc-sider__main-chapters').on('click', 'li .icon-arrow', function() {
 				const $li = $(this).closest('li');
 				const $sub_ul = $li.next('ul'); // 子章節
 
@@ -67,7 +67,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 			})
 
 			// 跳轉頁面前先記錄展開的章節
-			$('#power-course-sider').on('click', 'li a', function(e) {
+			$('#pc-sider__main-chapters').on('click', 'li a', function(e) {
 				// 阻止原本的超連結行為
 				e.preventDefault();
 				e.stopPropagation();
@@ -89,7 +89,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 
 			// 把當前展開的章節 id 先記錄起來
 			function handle_save_expanded_post_ids() {
-				const expanded_post_ids = $('#power-course-sider li.expanded').map(function() {
+				const expanded_post_ids = $('#pc-sider__main-chapters li.expanded').map(function() {
 					return $(this).data('post-id');
 				}).get();
 
@@ -103,7 +103,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 				const expanded_post_ids = expanded_post_ids_string ? JSON.parse(expanded_post_ids_string) : [];
 				if (expanded_post_ids.length > 0) {
 					expanded_post_ids.forEach(function(post_id) {
-						const $li = $(`#power-course-sider li[data-post-id="${post_id}"]`);
+						const $li = $(`#pc-sider__main-chapters li[data-post-id="${post_id}"]`);
 						if ($li.length > 0) {
 							$li.addClass('expanded');
 							$li.next('ul').show();
@@ -111,9 +111,9 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 					});
 				}
 
-				// 恢復完畢，清除 sessionStorage，顯示 #power-course-sider
+				// 恢復完畢，清除 sessionStorage，顯示 #pc-sider__main-chapters
 				sessionStorage.removeItem('expanded_post_ids');
-				$('#power-course-sider').show();
+				$('#pc-sider__main-chapters').show();
 			}
 		})
 	})(jQuery)
