@@ -64,6 +64,7 @@ do_action('power_course_before_classroom_render');
 
 		<body class="!m-0 min-h-screen bg-base-100 classroom">
 			<?php
+
 			Plugin::load_template('classroom/sider');
 			echo '<div id="pc-classroom-main">';
 			Plugin::load_template( 'classroom/body', null, true, true );

@@ -98,7 +98,7 @@ if (count($chapter_ids) > 0) {
 // render
 printf(
 	/*html*/'
-<div id="pc-classroom-header" class="w-full bg-base-100 py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-30 gap-x-2" style="position:fixed;">
+<div id="pc-classroom-header" class="w-full bg-base-100 py-4 px-4 lg:px-6 flex flex-col lg:flex-row justify-between lg:items-center top-0 z-30 gap-x-2 sticky">
   <div class="flex flex-1 flex-nowrap gap-4 items-end">
 		<h2 id="classroom-chapter_title" class="text-sm lg:text-base text-bold lg:tracking-wide my-0 line-clamp-1 pl-6 lg:pl-0">%1$s</h2>
 		%2$s

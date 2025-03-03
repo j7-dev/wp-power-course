@@ -35,7 +35,9 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-echo '<div id="pc-classroom-body" class="w-full bg-base-100 lg:pl-[25rem] pt-[calc(92px+56.25vw)] lg:pt-16">';
+$has_video = isset($video_info['type']) && @$video_info['type'] !== 'none';
+
+echo '<div id="pc-classroom-body" class="w-full bg-base-100 lg:pl-[25rem]">';
 
 Plugin::load_template(
 	'classroom/header',
@@ -45,12 +47,30 @@ Plugin::load_template(
 	]
 	);
 
-$is_avl = CourseUtils::is_avl();
-if (current_user_can('manage_options') && !$is_avl) {
-	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full tw-fixed top-[92px] lg:top-16 z-30">此為管理員預覽模式</div>';
+echo /*html*/'
+<div class="h-10 w-full bg-base-200 flex lg:tw-hidden items-center justify-between px-4 sticky top-[52px] left-0 z-30" style="border-bottom: 1px solid var(--fallback-bc,oklch(var(--bc)/.1))">
+	<label for="pc-classroom-drawer" class="flex items-center gap-x-2 text-sm cursor-pointer">
+		<svg class="size-4 stroke-base-content/30" viewBox="0 0 48 48" fill="none">
+			<path d="M42 9H6" stroke="#78716c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M34 19H6" stroke="#78716c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M42 29H6" stroke="#78716c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+			<path d="M34 39H6" stroke="#78716c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+		</svg>
+		選單
+	</label>
+</div>
+';
+
+$is_avl             = CourseUtils::is_avl();
+$show_admin_preview = current_user_can('manage_options') && !$is_avl;
+if ($show_admin_preview) {
+	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full sticky top-[92px] lg:top-16 z-30">此為管理員預覽模式</div>';
 }
 
-echo '<div class="pc-classroom-body__video z-[15] tw-fixed w-full top-[92px] lg:relative lg:top-[unset]">';
+printf(
+/*html*/'<div class="pc-classroom-body__video z-[15] sticky w-full lg:relative lg:top-[unset] %s">',
+$show_admin_preview ? 'top-[120px]' : 'top-[92px]'
+);
 Plugin::load_template(
 	'video',
 	[
