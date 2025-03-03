@@ -23,18 +23,6 @@ const items: TabsProps['items'] = [
 		label: 'Bunny 整合',
 		children: <Bunny />,
 	},
-	{
-		key: 'lab',
-		label: (
-			<div className="flex items-end">
-				實驗性功能
-				<div className="bg-orange-400 text-white rounded-xl px-2 py-0 inline-block ml-2 text-[0.625rem]">
-					beta
-				</div>
-			</div>
-		),
-		children: <Lab />,
-	},
 ]
 
 const index = () => {
