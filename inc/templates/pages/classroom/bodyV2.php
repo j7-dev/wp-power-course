@@ -8,7 +8,7 @@ use J7\Powerhouse\Plugin as Powerhouse;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
 ];
 

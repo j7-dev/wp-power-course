@@ -7,10 +7,9 @@
 
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
-global $product;
+global $course;
 
-
-$all_children_ids = ChapterUtils::get_flatten_post_ids( $product->get_id());
+$all_children_ids = ChapterUtils::get_flatten_post_ids( $course->get_id());
 
 // find index of current post id
 /** @var int|false $current_post_index */

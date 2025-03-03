@@ -11,7 +11,7 @@ use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 	'chapter' => $GLOBALS['chapter'],
 ];
 

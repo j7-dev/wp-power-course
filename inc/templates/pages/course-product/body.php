@@ -9,7 +9,7 @@ use J7\PowerCourse\Utils\User as UserUtils;
 use J7\PowerCourse\Resources\Course\Limit;
 
 $default_args = [
-	'product' => $GLOBALS['product'] ?? null,
+	'product' => $GLOBALS['course'] ?? null,
 ];
 
 /**

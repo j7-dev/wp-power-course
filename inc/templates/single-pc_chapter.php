@@ -30,7 +30,8 @@ $chapter_post   = $post;
 $chapter        = new Chapter( (int) $chapter_post->ID );
 $course_product = $chapter->get_course_product();
 
-$GLOBALS['product'] = $course_product;
+
+$GLOBALS['course']  = $course_product;
 $GLOBALS['chapter'] = $chapter_post;
 
 $is_expired = CourseUtils::is_expired($course_product, $current_user_id);
