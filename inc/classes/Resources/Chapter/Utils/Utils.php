@@ -388,7 +388,6 @@ abstract class Utils {
 
 	/**
 	 * 取得課程章節的 HTML
-	 * TODO classroom__sider-collapse__chapter-{id} 做什麼用的?
 	 *
 	 * @param int                       $post_id 課程 id
 	 * @param array<int, \WP_Post>|null $children_posts 子章節.
