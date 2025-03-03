@@ -68,21 +68,36 @@ const SortableChaptersComponent = () => {
 	const apiUrl = useApiUrl()
 	const { mutate } = useCustomMutation()
 
+	// 每次更新 List 狀態，會算出當次的展開節點 id
+	const openedNodeIds = getOpenedNodeIds(treeData)
+
 	useEffect(() => {
 		if (!isListFetching) {
 			const chapterTree = chapters?.map(chapterToTreeNode)
+
 			setTreeData((prev) => {
-				// 維持原本的開合狀態
-				const newChapterTree = chapterTree.map((item) => ({
-					...item,
-					collapsed:
-						prev?.find((prevItem) => prevItem.id === item.id)?.collapsed ??
-						true,
-				}))
+				// 恢復原本的 collapsed 狀態
+				const newChapterTree = restoreOriginCollapsedState(
+					chapterTree,
+					openedNodeIds,
+				)
 
 				return newChapterTree
 			})
 			setOriginTree(chapterTree)
+
+			// 每次重新排序後，重新取得章節後，重新 set 選擇的章節
+			const flattenChapters = chapters.reduce((acc, c) => {
+				acc.push(c)
+				if (c?.chapters) {
+					acc.push(...c?.chapters)
+				}
+				return acc
+			}, [] as TChapterRecord[])
+
+			setSelectedChapter(
+				flattenChapters.find((c) => c.id === selectedChapter?.id) || null,
+			)
 		}
 	}, [isListFetching])
 
@@ -134,23 +149,6 @@ const SortableChaptersComponent = () => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批量刪除選中的 ids
 
 	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
-
-	useEffect(() => {
-		// 每次重新排序後，重新取得章節後，重新 set 選擇的章節
-		if (!isListFetching) {
-			const flattenChapters = chapters.reduce((acc, c) => {
-				acc.push(c)
-				if (c?.chapters) {
-					acc.push(...c?.chapters)
-				}
-				return acc
-			}, [] as TChapterRecord[])
-
-			setSelectedChapter(
-				flattenChapters.find((c) => c.id === selectedChapter?.id) || null,
-			)
-		}
-	}, [isListFetching])
 
 	return (
 		<>
@@ -245,6 +243,50 @@ const SortableChaptersComponent = () => {
 }
 
 export const SortableChapters = memo(SortableChaptersComponent)
+
+/**
+ * 取得所有展開的 ids
+ * 遞迴取得所有 collapsed = false 的 id
+ * @param treeData 樹狀結構
+ * @returns 所有 collapsed = false 的 id
+ */
+function getOpenedNodeIds(treeData: TreeData<TChapterRecord>) {
+	// 遞迴取得所有 collapsed = false 的 id
+	const ids = treeData?.reduce((acc, c) => {
+		if (!c.collapsed) acc.push(c.id as string)
+		if (c?.children?.length) acc.push(...getOpenedNodeIds(c.children))
+		return acc
+	}, [] as string[])
+	return ids
+}
+
+/**
+ * 恢復原本的 collapsed 狀態
+ * @param treeData 樹狀結構
+ * @param openedNodeIds 展開的 ids
+ * @returns newTreeData 恢復原本的 collapsed 狀態
+ */
+function restoreOriginCollapsedState(
+	treeData: TreeData<TChapterRecord>,
+	openedNodeIds: string[],
+) {
+	// 遞迴恢復原本的 collapsed 狀態
+	const newTreeData: TreeData<TChapterRecord> = treeData?.map((item) => {
+		let newItem = item
+		if (openedNodeIds.includes(item.id as string)) {
+			newItem.collapsed = false
+		}
+
+		if (item?.children?.length) {
+			newItem.children = restoreOriginCollapsedState(
+				item.children,
+				openedNodeIds,
+			)
+		}
+		return item
+	})
+	return newTreeData
+}
 
 /**
  * 取得樹狀結構的最大深度

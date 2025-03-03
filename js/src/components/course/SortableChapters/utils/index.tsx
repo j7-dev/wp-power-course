@@ -40,35 +40,51 @@ export type TParam = {
 	name?: string
 }
 
+/**
+ * 將 TreeData<TChapterRecord> 轉換成 Create API 傳送的參數
+ * 攤平 array
+ *
+ * @param {TreeData<TDocRecord>} treeData 樹狀結構
+ * @param {string}               parentId 父節點 id
+ * @param {number}               depth    深度
+ * @return {TParam[]}
+ */
 export function treeToParams(
 	treeData: TreeData<TChapterRecord>,
-	topParentId: string,
+	parentId: string,
+	depth: number = 0,
 ): TParam[] {
-	const depth0 = treeData?.map((node, index) => {
-		return {
-			id: node.id as string,
-			depth: 0,
-			menu_order: index,
-			name: node?.content?.name,
-			parent_id: topParentId,
-		}
-
-		// parent_id 不帶就不變更
-	})
-	const depth1 = treeData
-		?.map((parentNode) => {
-			const nodes = parentNode.children?.map((node, index) => {
-				return {
-					id: node.id as string,
-					depth: 1,
-					menu_order: index,
-					parent_id: parentNode.id as string,
-					name: node?.content?.name,
-				}
+	function getFlatArray(
+		_treeData: TreeData<TChapterRecord>,
+		_parentId: string,
+		_depth: number = 0,
+	): TParam[] {
+		const flatArray = _treeData.reduce((acc, node, index) => {
+			acc.push({
+				id: node.id as string,
+				depth: _depth,
+				menu_order: index,
+				name: node?.content?.name,
+				parent_id: _parentId,
 			})
-			return nodes
-		})
-		.flat()
 
-	return [...depth0, ...depth1]
+			const hasChildren = !!node?.children?.length
+
+			if (hasChildren) {
+				const children = node?.children || []
+				const childrenFlatArray = getFlatArray(
+					children,
+					node.id as string,
+					_depth + 1,
+				)
+				acc.push(...childrenFlatArray)
+			}
+
+			return acc
+		}, [] as TParam[])
+
+		return flatArray
+	}
+
+	return getFlatArray(treeData, parentId, depth)
 }
