@@ -67,7 +67,6 @@ final class Option extends ApiBase {
 		'pc_watermark_color'         => 'rgba(255, 255, 255, 0.5)', // 浮水印顏色
 		'pc_watermark_interval'      => 10, // 浮水印間隔
 		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
-		'pc_enable_api_booster'      => 'no',
 		'pc_pdf_watermark_qty'       => 0, // PDF 浮水印數量
 		'pc_pdf_watermark_color'     => 'rgba(255, 255, 255, 0.5)', // PDF 浮水印顏色
 		'pc_pdf_watermark_text'      => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}', // PDF 浮水印文字
