@@ -460,25 +460,21 @@ abstract class Utils {
 
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%8$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %9$s" style="padding-left: %7$s;">
+			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
 				<a class="py-2 flex gap-x-2 items-center flex-1" href="%1$s">
-					%2$s
 					<div class="w-full">
 						%3$s
-						<p class="text-xs text-base-content/50 m-0 flex justify-between">
-							<span>%4$s </span>
-							%5$s
-						</p>
 					</div>
 				</a>
-				%6$s
+				<div class="flex items-center justify-end gap-x-0 w-14">
+					%4$s
+					%2$s
+				</div>
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
 			self::get_chapter_icon_html($child_post->ID),
 			$child_post->post_title,
-			$avl_chapter->get_chapter_length( true ),
-			$child_children_count ? "<span>{$child_children_count} 個子章節</span>" : '',
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
 				<div class="p-2 icon-arrow flex items-center">
@@ -526,7 +522,7 @@ abstract class Utils {
 			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
 		$icon_html_with_tooltip = sprintf(
-			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
+			/*html*/'<div class="pc-tooltip pc-tooltip-left h-6" data-tip="%1$s">%2$s</div>',
 			$tooltip,
 			$icon_html
 		);
