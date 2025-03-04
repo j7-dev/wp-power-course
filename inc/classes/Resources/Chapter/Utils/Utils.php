@@ -458,14 +458,13 @@ abstract class Utils {
 			$html .= sprintf(
 			/*html*/'
 			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+
 				<a class="py-2 flex gap-x-2 items-center flex-1" href="%1$s">
-					<div class="w-full">
+				<div class="pc-chapter-icon size-8 p-1">%2$s</div>
 						%3$s
-					</div>
 				</a>
-				<div class="flex items-center justify-end gap-x-0 w-16">
+				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
-					<div class="pc-chapter-icon size-8 p-1">%2$s</div>
 				</div>
 			</li>
 			',
@@ -478,7 +477,7 @@ abstract class Utils {
 					<svg class="w-4 h-4 fill-base-content" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z"></path> </g></svg>
 				</div>
 			' : '',
-			( $depth + 1 ) . 'rem',
+			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
 			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&>a]:text-primary' : 'font-normal [&>a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
 			);
@@ -519,7 +518,7 @@ abstract class Utils {
 			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
 		$icon_html_with_tooltip = sprintf(
-			/*html*/'<div class="pc-tooltip pc-tooltip-left h-6" data-tip="%1$s">%2$s</div>',
+			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
 			$tooltip,
 			$icon_html
 		);
