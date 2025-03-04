@@ -234,7 +234,7 @@ _proto.initImg = function () {
 			)
 		}
 		if (loadCount >= that.options.maxLoadCount) {
-			that.text.textContent = '加载失败'
+			that.text.textContent = '加載失敗'
 			that.classList.add('text-danger')
 			return
 		}
