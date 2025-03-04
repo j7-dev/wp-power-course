@@ -146,8 +146,8 @@ export class CommentApp {
 			<div class="pc-comment-list"></div>
 			<div class="pc-comment-pagination"></div>
 			<dialog class="pc-comment__captcha-modal pc-modal">
-				<div class="pc-modal-box !w-[326px] !h-[260px]">
-					<div class="pc-comment__captcha-container relative"></div>
+				<div class="pc-modal-box !w-[326px] !h-[260px] overflow-hidden">
+					<div class="captcha-container relative"></div>
 				</div>
 				<form method="dialog" class="pc-modal-backdrop">
 					<button class="opacity-0">close</button>
