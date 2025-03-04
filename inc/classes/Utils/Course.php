@@ -707,17 +707,18 @@ abstract class Course {
 	 * 如果沒有找到，則返回 false
 	 *
 	 * @param int $course_id 課程 ID
+	 * @param string $status 文章狀態
 	 *
 	 * @return string|false
 	 */
-	public static function get_classroom_permalink( int $course_id ): string|false {
+	public static function get_classroom_permalink( int $course_id, string $status = 'publish' ): string|false {
 		/** @var array<int> $top_chapter_ids 只拿一個 */
 		$top_chapter_ids = \get_posts(
 			[
 				'post_type'      => ChapterCPT::POST_TYPE,
 				'meta_key'       => 'parent_course_id',
 				'meta_value'     => $course_id,
-				'post_status'    => 'publish',
+				'post_status'    => $status,
 				'fields'         => 'ids',
 				'posts_per_page' => 1,
 				'orderby'        => [

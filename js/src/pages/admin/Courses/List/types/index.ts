@@ -52,6 +52,7 @@ export type TCourseBaseRecord = {
 	course_hour: number
 	course_minute: number
 	course_length: number
+	classroom_link: string
 }
 
 export type TCoursesLimit = {

@@ -23,7 +23,7 @@ export const ProductAction: FC<{
 					icon={
 						<SiGoogleclassroom className="relative top-0.5 text-gray-400" />
 					}
-					href={`${siteUrl}/classroom/${record?.slug}`}
+					href={record?.classroom_link}
 					target="_blank"
 					rel="noreferrer"
 				/>

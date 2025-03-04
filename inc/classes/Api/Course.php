@@ -376,6 +376,7 @@ final class Course extends ApiBase {
 			'course_minute'      => (int) $product->get_meta( 'course_minute' ),
 			'teacher_ids'        => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
 			'course_length'      => $course_length,
+			'classroom_link'     => (string) CourseUtils::get_classroom_permalink( $product->get_id(), 'any' ),
 		];
 
 		return $base_array;
