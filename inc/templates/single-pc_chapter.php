@@ -40,7 +40,7 @@ if (!current_user_can('manage_options')) {
 	get_header();
 	if ( ! $is_avl ) {
 		Plugin::load_template( '404/buy', null );
-	} elseif ( ! CourseUtils::is_course_ready( $product ) ) {
+	} elseif ( ! CourseUtils::is_course_ready( $course_product ) ) {
 		Plugin::load_template( '404/not-ready', null );
 	} elseif ( $is_expired ) {
 		Plugin::load_template( '404/expired', null );
