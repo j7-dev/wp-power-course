@@ -420,7 +420,8 @@ abstract class Course {
 		}
 
 		if (!$product_id) {
-			global $product;
+			global $product, $course;
+			$product = $course ?? $product;
 			if (!( $product instanceof \WC_Product )) {
 				return false;
 			}
@@ -443,7 +444,8 @@ abstract class Course {
 	 * @return bool 如果課程已過期，返回true；否則返回false。
 	 */
 	public static function is_expired( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
-		global $product;
+		global $product, $course;
+		$product        = $course ?? $product;
 		$the_product    = $the_product ?? $product;
 		$the_product_id = $the_product->get_id();
 		$user_id        = $user_id ?? \get_current_user_id();
@@ -472,7 +474,8 @@ abstract class Course {
 	 * @return string
 	 */
 	public static function get_expired_label( ?\WC_Product $the_product = null, ?int $user_id = null ): string {
-		global $product;
+		global $product, $course;
+		$product = $course ?? $product;
 
 		$the_product = $the_product ?? $product;
 		$user_id     = $user_id ?? \get_current_user_id();
@@ -506,7 +509,9 @@ abstract class Course {
 	 * @return array{label:string,badge_color:string } 包含'label'和'badge_color'的狀態數組。
 	 */
 	public static function get_avl_status( ?\WC_Product $the_product = null, ?int $user_id = null ): array {
-		global $product;
+		global $product, $course;
+		$product = $course ?? $product;
+
 		$the_product = $the_product ?? $product;
 		$user_id     = $user_id ?? \get_current_user_id();
 
@@ -706,7 +711,7 @@ abstract class Course {
 	 *
 	 * 如果沒有找到，則返回 false
 	 *
-	 * @param int $course_id 課程 ID
+	 * @param int    $course_id 課程 ID
 	 * @param string $status 文章狀態
 	 *
 	 * @return string|false

@@ -52,7 +52,8 @@ final class LifeCycle {
 	 * 註冊進入章節的動作
 	 */
 	public static function register_visit_chapter(): void {
-		global $product, $chapter;
+		global $product, $chapter, $course;
+		$product = $course ?? $product;
 		if ( ! $product || ! $chapter ) {
 			return;
 		}

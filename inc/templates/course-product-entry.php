@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-global $post, $product;
+global $post;
 $product_id = $post->ID;
 $product    = wc_get_product( $product_id );
 
