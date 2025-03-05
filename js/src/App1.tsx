@@ -1,6 +1,6 @@
 /* eslint-disable quote-props */
+import { lazy, Suspense } from 'react'
 import { Refine } from '@refinedev/core'
-
 import {
 	ThemedLayoutV2,
 	ThemedSiderV2,
@@ -14,25 +14,25 @@ import routerBindings, {
 } from '@refinedev/react-router-v6'
 import { dataProvider } from './rest-data-provider'
 import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
-
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { apiUrl, kebab, siteUrl } from '@/utils'
 import { resources } from '@/resources'
-import Dashboard from '@/pages/admin/Dashboard'
-import CoursesList from '@/pages/admin/Courses/List'
-import CoursesEdit from '@/pages/admin/Courses/Edit'
-import Teachers from '@/pages/admin/Teachers'
-import Students from '@/pages/admin/Students'
-import Products from '@/pages/admin/Products'
-import Settings from '@/pages/admin/Settings'
-import Shortcodes from '@/pages/admin/Shortcodes'
-import EmailsList from '@/pages/admin/Emails/List'
-import EmailsEdit from '@/pages/admin/Emails/Edit'
-import MediaLibraryPage from '@/pages/admin/MediaLibraryPage'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Logo } from '@/components/general'
+import { Logo, PageLoading } from '@/components/general'
 import { MediaLibraryIndicator } from '@/bunny'
+
+const Dashboard = lazy(() => import('@/pages/admin/Dashboard'))
+const CoursesList = lazy(() => import('@/pages/admin/Courses/List'))
+const CoursesEdit = lazy(() => import('@/pages/admin/Courses/Edit'))
+const Teachers = lazy(() => import('@/pages/admin/Teachers'))
+const Students = lazy(() => import('@/pages/admin/Students'))
+const Products = lazy(() => import('@/pages/admin/Products'))
+const Settings = lazy(() => import('@/pages/admin/Settings'))
+const Shortcodes = lazy(() => import('@/pages/admin/Shortcodes'))
+const EmailsList = lazy(() => import('@/pages/admin/Emails/List'))
+const EmailsEdit = lazy(() => import('@/pages/admin/Emails/Edit'))
+const MediaLibraryPage = lazy(() => import('@/pages/admin/MediaLibraryPage'))
 
 function App() {
 	return (
@@ -107,20 +107,97 @@ function App() {
 					>
 						<Route index element={<NavigateToResource resource="courses" />} />
 						<Route path="courses">
-							<Route index element={<CoursesList />} />
-							<Route path="edit/:id" element={<CoursesEdit />} />
+							<Route
+								index
+								element={
+									<Suspense fallback={<PageLoading />}>
+										<CoursesList />
+									</Suspense>
+								}
+							/>
+							<Route
+								path="edit/:id"
+								element={
+									<Suspense fallback={<PageLoading />}>
+										<CoursesEdit />
+									</Suspense>
+								}
+							/>
 						</Route>
-						<Route path="teachers" element={<Teachers />} />
-						<Route path="students" element={<Students />} />
-						<Route path="products" element={<Products />} />
-						<Route path="shortcodes" element={<Shortcodes />} />
-						<Route path="settings" element={<Settings />} />
-						<Route path="dashboard" element={<Dashboard />} />
+						<Route
+							path="teachers"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Teachers />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="students"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Students />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="products"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Products />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="shortcodes"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Shortcodes />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="settings"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Settings />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="dashboard"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<Dashboard />
+								</Suspense>
+							}
+						/>
 						<Route path="emails">
-							<Route index element={<EmailsList />} />
-							<Route path="edit/:id" element={<EmailsEdit />} />
+							<Route
+								index
+								element={
+									<Suspense fallback={<PageLoading />}>
+										<EmailsList />
+									</Suspense>
+								}
+							/>
+							<Route
+								path="edit/:id"
+								element={
+									<Suspense fallback={<PageLoading />}>
+										<EmailsEdit />
+									</Suspense>
+								}
+							/>
 						</Route>
-						<Route path="media-library" element={<MediaLibraryPage />} />
+						<Route
+							path="media-library"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<MediaLibraryPage />
+								</Suspense>
+							}
+						/>
 
 						<Route path="*" element={<ErrorComponent />} />
 					</Route>

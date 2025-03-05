@@ -1,12 +1,13 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { app1Selector, app2Selector } from '@/utils'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { TPlayerProps } from './App2/Player'
+import { PageLoading } from '@/components/general'
 
-const App1 = React.lazy(() => import('./App1'))
-const App2 = React.lazy(() => import('./App2'))
+const App1 = lazy(() => import('./App1'))
+const App2 = lazy(() => import('./App2'))
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
@@ -31,7 +32,9 @@ mapping.forEach(({ els, App }) => {
 			ReactDOM.createRoot(el).render(
 				<QueryClientProvider client={queryClient}>
 					<StyleProvider hashPriority="low">
-						<App />
+						<Suspense fallback={<PageLoading type="general" />}>
+							<App />
+						</Suspense>
 					</StyleProvider>
 				</QueryClientProvider>,
 			)
@@ -46,7 +49,9 @@ vidstackNodes.forEach((vidstackNode) => {
 
 	ReactDOM.createRoot(vidstackNode).render(
 		<React.StrictMode>
-			<App2 {...dataset} />
+			<Suspense fallback={<PageLoading type="general" />}>
+				<App2 {...dataset} />
+			</Suspense>
 		</React.StrictMode>,
 	)
 })
