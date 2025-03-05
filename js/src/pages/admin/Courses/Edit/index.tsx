@@ -1,6 +1,6 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Modal, Button } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Modal, Button, Tooltip } from 'antd'
 import {
 	CourseDescription,
 	CourseQA,
@@ -172,24 +172,34 @@ export const CoursesEdit = () => {
 						items={items}
 						tabBarExtraContent={
 							<>
-								<a
-									href={record?.classroom_link}
-									target="_blank"
-									rel="noreferrer"
+								<Tooltip
+									title={
+										record?.classroom_link
+											? undefined
+											: '此課程還沒有章節，無法前往教室'
+									}
 								>
-									<Button className="ml-4" type="default">
+									<Button
+										href={record?.classroom_link}
+										target="_blank"
+										rel="noreferrer"
+										className="ml-4"
+										type="default"
+										disabled={!record?.classroom_link}
+									>
 										前往教室
 									</Button>
-								</a>
-								<a
+								</Tooltip>
+
+								<Button
 									href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
 									target="_blank"
 									rel="noreferrer"
+									className="ml-4"
+									type="default"
 								>
-									<Button className="ml-4" type="default">
-										前往銷售頁
-									</Button>
-								</a>
+									前往銷售頁
+								</Button>
 							</>
 						}
 					/>

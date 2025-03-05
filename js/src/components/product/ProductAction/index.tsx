@@ -17,7 +17,13 @@ export const ProductAction: FC<{
 				invalidateProps={{ resource: 'courses' }}
 				tooltipProps={{ title: '複製課程' }}
 			/>
-			<Tooltip title="開啟課程教室">
+			<Tooltip
+				title={
+					record?.classroom_link
+						? '開啟課程教室'
+						: '此課程還沒有章節，無法前往教室'
+				}
+			>
 				<Button
 					type="text"
 					icon={
@@ -26,6 +32,7 @@ export const ProductAction: FC<{
 					href={record?.classroom_link}
 					target="_blank"
 					rel="noreferrer"
+					disabled={!record?.classroom_link}
 				/>
 			</Tooltip>
 			<Tooltip title="開啟課程銷售頁">
