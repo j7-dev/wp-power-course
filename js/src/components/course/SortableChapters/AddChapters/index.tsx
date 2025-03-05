@@ -31,12 +31,8 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 					<InputNumber className="w-40" addonAfter="個" />
 				</Item>
 			</Space.Compact>
-			<Item
-				name={['parent_course_id']}
-				className="flex-1"
-				initialValue={id}
-				hidden
-			/>
+			<Item name={['parent_course_id']} initialValue={id} hidden />
+			<Item name={['chapter_video', 'type']} initialValue="none" hidden />
 		</Form>
 	)
 }
