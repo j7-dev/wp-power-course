@@ -6,11 +6,9 @@ import {
 	CanAccess,
 	type ITreeMenu,
 	useIsExistAuthentication,
-	useRouterContext,
 	useMenu,
 	useRefineContext,
 	useLink,
-	useRouterType,
 	useActiveAuthProvider,
 	pickNotDeprecated,
 	useWarnAboutChange,
@@ -24,9 +22,19 @@ import {
 	LeftOutlined,
 	RightOutlined,
 } from '@ant-design/icons'
-import { Layout, Menu, Grid, Drawer, Button, theme, ConfigProvider } from 'antd'
+import {
+	Layout,
+	Menu,
+	Grid,
+	Drawer,
+	Button,
+	theme,
+	ConfigProvider,
+	Divider,
+} from 'antd'
 import type { RefineThemedLayoutV2SiderProps } from '@refinedev/antd'
 import type { CSSProperties } from 'react'
+import { FaBook } from 'react-icons/fa'
 
 const drawerButtonStyles: CSSProperties = {
 	borderStartStartRadius: 0,
@@ -53,11 +61,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 
 	const isExistAuthentication = useIsExistAuthentication()
 	const direction = useContext(ConfigProvider.ConfigContext)?.direction
-	const routerType = useRouterType()
-	const NewLink = useLink()
+	const Link = useLink()
 	const { warnWhen, setWarnWhen } = useWarnAboutChange()
-	const { Link: LegacyLink } = useRouterContext()
-	const Link = routerType === 'legacy' ? LegacyLink : NewLink
 	const TitleFromContext = useTitle()
 	const translate = useTranslate()
 	const { menuItems, selectedKey, defaultOpenKeys } = useMenu({ meta })
@@ -159,6 +164,14 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 		}
 	}
 
+	const docs = (
+		<Menu.Item key="document_links" icon={<FaBook />}>
+			<Link to="https://powerhouse.cloud/doc/power-course" target="_blank">
+				教學文件
+			</Link>
+		</Menu.Item>
+	)
+
 	const logout = isExistAuthentication && (
 		<Menu.Item
 			key="logout"
@@ -193,6 +206,12 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 			<>
 				{dashboard}
 				{items}
+				<Divider plain>
+					{siderCollapsed ? undefined : (
+						<span className="text-xs text-gray-400">LINKS</span>
+					)}
+				</Divider>
+				{docs}
 				{logout}
 			</>
 		)
