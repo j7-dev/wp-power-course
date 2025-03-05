@@ -76,7 +76,6 @@ final class Compatibility {
 		// 將 bundle_type 統一為 'bundle'
 		self::bundle_type();
 
-
 		// 0.8.0 之後使用新的章節結構
 		Chapter::migrate_chapter_to_new_structure();
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import Filter from './Filter'
 import useRevenue from './hooks/useRevenue'
 import DefaultView from './ViewType/DefaultView'
