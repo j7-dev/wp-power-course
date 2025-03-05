@@ -30,6 +30,8 @@ export const CoursesEdit = () => {
 			redirect: false,
 		})
 
+	const record = query?.data?.data
+
 	// TAB items
 	const items: TabsProps['items'] = [
 		{
@@ -171,7 +173,7 @@ export const CoursesEdit = () => {
 						tabBarExtraContent={
 							<>
 								<a
-									href={`${siteUrl}/classroom/${watchSlug}`}
+									href={record?.classroom_link}
 									target="_blank"
 									rel="noreferrer"
 								>

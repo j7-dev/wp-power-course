@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { FC } from 'react'
 import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import ToggleVisibility from './ToggleVisibility'
 import { ExportOutlined } from '@ant-design/icons'
