@@ -27,6 +27,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	throw new \Exception( 'product 不是 WC_Product' );
 }
 
+/** @var \WP_Post $chapter */
 $chapter_id = $chapter->ID;
 
 /**
@@ -98,14 +99,17 @@ echo '</div>';
 
 
 // 留言
-printf(
+$enable_comment = \wc_string_to_bool( \get_post_meta( $chapter_id, 'enable_comment', true ) ?: 'no');
+if ($enable_comment) {
+	printf(
 			/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
 			$chapter_id,
 			'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
 			'yes',
 			\get_current_user_id(),
 			\current_user_can('manage_options') ? 'admin' : 'user',
-);
+	);
+}
 
 
 echo /*html*/'<div class="pc-divider my-6"></div>';

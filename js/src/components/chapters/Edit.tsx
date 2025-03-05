@@ -1,9 +1,10 @@
-import React, { memo, useEffect } from 'react'
+import { memo, useEffect } from 'react'
 import { Form, Input, Switch, Space, Button, Typography } from 'antd'
 import {
 	VideoInput,
 	VideoLength,
 	DescriptionDrawer,
+	FiSwitch,
 } from '@/components/formItem'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
@@ -129,6 +130,15 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				<div className="mb-6 max-w-[20rem]">
 					<p className="mb-3">課程時長</p>
 					<VideoLength name={['chapter_length']} />
+				</div>
+
+				<div className="mb-6 max-w-[20rem]">
+					<FiSwitch
+						formItemProps={{
+							name: ['enable_comment'],
+							label: '顯示留言',
+						}}
+					/>
 				</div>
 
 				<Item name={['status']} hidden />
