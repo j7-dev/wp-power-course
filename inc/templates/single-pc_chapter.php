@@ -36,19 +36,25 @@ $GLOBALS['chapter'] = $chapter_post;
 $is_expired = CourseUtils::is_expired($course_product, $current_user_id);
 
 $is_avl = CourseUtils::is_avl($course_product?->get_id());
-if (!current_user_can('manage_options')) {
-	get_header();
-	if ( ! $is_avl ) {
-		Plugin::load_template( '404/buy', null );
-	} elseif ( ! CourseUtils::is_course_ready( $course_product ) ) {
-		Plugin::load_template( '404/not-ready', null );
-	} elseif ( $is_expired ) {
-		Plugin::load_template( '404/expired', null );
-	}
-	get_footer();
-	exit;
-}
 
+if (!current_user_can('manage_options')) {
+	if ( ! $is_avl ) {
+		get_header();
+		Plugin::load_template( '404/buy', null );
+		get_footer();
+		exit;
+	} elseif ( ! CourseUtils::is_course_ready( $course_product ) ) {
+		get_header();
+		Plugin::load_template( '404/not-ready', null );
+		get_footer();
+		exit;
+	} elseif ( $is_expired ) {
+		get_header();
+		Plugin::load_template( '404/expired', null );
+		get_footer();
+		exit;
+	}
+}
 do_action('power_course_before_classroom_render');
 
 // phpcs:disable
