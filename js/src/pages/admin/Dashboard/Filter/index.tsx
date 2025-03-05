@@ -22,7 +22,7 @@ import { EViewType } from '../types'
 const { RangePicker } = DatePicker
 const { Item } = Form
 
-const rangePresets: TimeRangePickerProps['presets'] = [
+const RANGE_PRESETS: TimeRangePickerProps['presets'] = [
 	{
 		label: '最近 7 天',
 		value: [dayjs().add(-7, 'd').startOf('day'), dayjs().endOf('day')],
@@ -40,14 +40,22 @@ const rangePresets: TimeRangePickerProps['presets'] = [
 		value: [dayjs().add(-90, 'd').startOf('day'), dayjs().endOf('day')],
 	},
 	{
+		label: '最近 180 天',
+		value: [dayjs().add(-180, 'd').startOf('day'), dayjs().endOf('day')],
+	},
+	{
+		label: '最近 365 天',
+		value: [dayjs().add(-365, 'd').startOf('day'), dayjs().endOf('day')],
+	},
+	{
 		label: '月初至今',
 		value: [dayjs().startOf('month'), dayjs().endOf('day')],
 	},
 	{ label: '年初至今', value: [dayjs().startOf('year'), dayjs().endOf('day')] },
 ]
 
-// Disabled 366 days from the selected date
-const disabled366DaysDate: DatePickerProps['disabledDate'] = (
+// Disabled 732 days from the selected date
+const maxDateRange: DatePickerProps['disabledDate'] = (
 	current,
 	{ from, type },
 ) => {
@@ -174,6 +182,7 @@ const index = ({
 				<Item
 					label="日期範圍"
 					name={['date_range']}
+					tooltip="最大選取範圍為 1 年"
 					initialValue={[
 						dayjs().add(-7, 'd').startOf('day'),
 						dayjs().endOf('day'),
@@ -186,8 +195,8 @@ const index = ({
 					]}
 				>
 					<RangePicker
-						presets={rangePresets}
-						disabledDate={disabled366DaysDate}
+						presets={RANGE_PRESETS}
+						disabledDate={maxDateRange}
 						placeholder={['開始日期', '結束日期']}
 						allowClear={false}
 						className="w-[16rem]"
