@@ -94,6 +94,7 @@ export type TProductRecord = {
 	pbp_product_ids: string[]
 	sale_date_range: [number, number]
 	is_free: 'yes' | 'no' | ''
+	is_course: 'yes' | 'no' | ''
 	qa_list: {
 		key: string
 		question: string
