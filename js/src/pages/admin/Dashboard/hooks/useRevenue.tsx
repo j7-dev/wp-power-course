@@ -64,7 +64,9 @@ const useRevenue = () => {
 	const formattedLastYearResult = getFormattedResult(lastYearResult, true)
 
 	// 取得 response header 上的 X-WP-TotalPages
+	// @ts-ignore
 	const totalPages = Number(result?.data?.headers?.['x-wp-totalpages']) || 1
+	// @ts-ignore
 	const total = Number(result?.data?.headers?.['x-wp-total']) || 1
 
 	const [form] = Form.useForm()

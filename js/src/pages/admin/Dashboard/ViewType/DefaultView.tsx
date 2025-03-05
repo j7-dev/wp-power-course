@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import { memo } from 'react'
 import { Card, Form, Tooltip } from 'antd'
 import { Line, LineConfig } from '@ant-design/plots'
 import dayjs from 'dayjs'
