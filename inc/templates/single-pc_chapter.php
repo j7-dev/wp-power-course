@@ -35,7 +35,7 @@ $GLOBALS['chapter'] = $chapter_post;
 
 $is_expired = CourseUtils::is_expired($course_product, $current_user_id);
 
-$is_avl = CourseUtils::is_avl();
+$is_avl = CourseUtils::is_avl($course_product?->get_id());
 if (!current_user_can('manage_options')) {
 	get_header();
 	if ( ! $is_avl ) {

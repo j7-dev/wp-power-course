@@ -62,7 +62,7 @@ echo /*html*/'
 </div>
 ';
 
-$is_avl             = CourseUtils::is_avl();
+$is_avl             = CourseUtils::is_avl($product->get_id());
 $show_admin_preview = current_user_can('manage_options') && !$is_avl;
 if ($show_admin_preview) {
 	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full sticky top-[92px] lg:top-16 z-30">此為管理員預覽模式</div>';
