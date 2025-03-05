@@ -1,12 +1,7 @@
 /* eslint-disable quote-props */
 import { lazy, Suspense } from 'react'
 import { Refine } from '@refinedev/core'
-import {
-	ThemedLayoutV2,
-	ThemedSiderV2,
-	ErrorComponent,
-	useNotificationProvider,
-} from '@refinedev/antd'
+import { ErrorComponent, useNotificationProvider } from '@refinedev/antd'
 import '@refinedev/antd/dist/reset.css'
 import routerBindings, {
 	UnsavedChangesNotifier,
@@ -15,11 +10,13 @@ import routerBindings, {
 import { dataProvider } from './rest-data-provider'
 import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
-import { apiUrl, kebab, siteUrl } from '@/utils'
+import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
 import { ConfigProvider } from 'antd'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { Logo, PageLoading } from '@/components/general'
+import { PageLoading } from '@/components/general'
+import { ThemedLayoutV2, ThemedSiderV2 } from '@/components/layout'
+
 import { MediaLibraryIndicator } from '@/bunny'
 
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'))
@@ -83,21 +80,7 @@ function App() {
 							>
 								<ThemedLayoutV2
 									Sider={(props) => <ThemedSiderV2 {...props} fixed />}
-									Title={({ collapsed }) => (
-										<a
-											href={`${siteUrl}/wp-admin/`}
-											className="hover:opacity-75 transition duration-300"
-										>
-											<div className="flex gap-4 items-center">
-												<Logo />
-												{!collapsed && (
-													<span className="text-gray-600 font-light">
-														回網站後台
-													</span>
-												)}
-											</div>
-										</a>
-									)}
+									Title={({ collapsed }) => <></>}
 								>
 									<Outlet />
 									<MediaLibraryIndicator />
