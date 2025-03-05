@@ -67,7 +67,7 @@ export const VideoLength: FC<FormItemProps> = (formItemProps) => {
 				如果長度為 0 ，在前端不會顯示時長
 			</p>
 
-			<Item {...formItemProps} />
+			<Item hidden {...formItemProps} />
 		</>
 	)
 }

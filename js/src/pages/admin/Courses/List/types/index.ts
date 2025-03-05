@@ -113,4 +113,5 @@ export type TChapterRecord = {
 	chapters?: TChapterRecord[]
 	parent_id?: string
 	chapter_video?: TVideo
+	enable_comment: 'yes' | 'no'
 }

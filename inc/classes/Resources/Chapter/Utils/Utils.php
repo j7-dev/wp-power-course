@@ -153,6 +153,7 @@ abstract class Utils {
 
 			'parent_id'          => (string) $post->post_parent,
 			'chapter_video'      => \get_post_meta($post->ID, 'chapter_video', true),
+			'enable_comment'     => \get_post_meta($post->ID, 'enable_comment', true) ?: 'no',
 		] + $children;
 
 		return array_merge(
