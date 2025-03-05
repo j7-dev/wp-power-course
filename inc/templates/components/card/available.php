@@ -63,7 +63,7 @@ $last_visit_info = AVLCourseMeta::get( $product_id, $current_user_id, 'last_visi
 if ( $last_visit_info ) {
 	$goto_chapter_id = $last_visit_info['chapter_id'] ?? null;
 } else {
-	$goto_chapter_id = count($chapter_ids) > 0 ? $chapter_ids[0] : null;
+	$goto_chapter_id = count($chapter_ids) > 0 ? reset($chapter_ids) : null;
 }
 $goto_classroom_link = $goto_chapter_id ? get_permalink($goto_chapter_id) : site_url( '404' );
 

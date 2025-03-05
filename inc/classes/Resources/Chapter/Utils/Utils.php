@@ -563,6 +563,6 @@ abstract class Utils {
 			];
 		}
 
-		return $flatten_post_ids;
+		return \array_values($flatten_post_ids);
 	}
 }
