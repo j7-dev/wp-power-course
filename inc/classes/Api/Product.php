@@ -526,7 +526,10 @@ final class Product {
 		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
 
 		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
-		$base_array      = [
+
+		$helper     = Helper::instance( $product );
+		$permalink  = $helper->link_course_id ? \get_permalink( $helper->link_course_id ) : \get_permalink( $product_id );
+		$base_array = [
 			// Get Product General Info
 			'id'                                 => (string) $product_id,
 			'type'                               => $product->get_type(),
@@ -541,7 +544,7 @@ final class Product {
 			// 'menu_order'         => $product?->get_menu_order(),
 			'virtual'                            => $product->get_virtual(),
 			'downloadable'                       => $product->get_downloadable(),
-			'permalink'                          => \get_permalink( $product_id ),
+			'permalink'                          => $permalink,
 
 			// Get Product Prices
 			'price_html'                         => $price_html,

@@ -22,16 +22,9 @@ const useColumns = () => {
 			render: (_, record) => (
 				<ProductName<TProductRecord>
 					record={record}
-					onClick={
-						'variation' === record?.type
-							? undefined
-							: () => {
-									window.open(
-										`${siteUrl}/${course_permalink_structure}/${record?.slug}`,
-										'_blank',
-									)
-								}
-					}
+					onClick={() => {
+						window.open(record?.permalink, '_blank')
+					}}
 				/>
 			),
 		},
