@@ -74,13 +74,13 @@ $items = [
 	],
 	[
 		'icon'     => 'clock',
-		'label'    => '預計時長',
+		'label'    => '課程時長',
 		'value'    => "{$course_hour} 小時 {$course_minute} 分",
 		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_time' ) ?: 'yes'),
 	],
 	[
 		'icon'     => 'list',
-		'label'    => '預計章節',
+		'label'    => '章節數量',
 		'value'    => "{$count_all_chapters} 個",
 		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_chapters' ) ?: 'yes'),
 	],

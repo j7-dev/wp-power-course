@@ -48,7 +48,7 @@ const DeleteButton = ({
 					onConfirm: handleDelete,
 				}}
 				buttonProps={{
-					children: `批量刪除 Email
+					children: `批次刪除 Email
 						${selectedRowKeys.length ? ` (${selectedRowKeys.length})` : ''}`,
 					disabled: !selectedRowKeys.length,
 					loading: isDeleting,

@@ -122,7 +122,7 @@ const StudentTable = () => {
 			{
 				onSuccess: () => {
 					message.success({
-						content: '批量修改觀看期限成功！',
+						content: '批次修改觀看期限成功！',
 						key: 'update-students',
 					})
 					invalidate({
@@ -134,7 +134,7 @@ const StudentTable = () => {
 				},
 				onError: () => {
 					message.error({
-						content: '批量修改觀看期限失敗！',
+						content: '批次修改觀看期限失敗！',
 						key: 'update-students',
 					})
 				},

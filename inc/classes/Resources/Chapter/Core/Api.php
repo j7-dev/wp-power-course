@@ -359,7 +359,7 @@ final class Api extends ApiBase {
 	}
 
 	/**
-	 * 批量刪除章節資料
+	 * 批次刪除章節資料
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error

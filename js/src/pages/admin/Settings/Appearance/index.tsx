@@ -42,9 +42,9 @@ const index = () => {
 				<FiSwitch
 					formItemProps={{
 						name: ['hide_myaccount_courses'],
-						label: '隱藏 My Account 我的學習選單',
+						label: '隱藏 My Account 我的課程選單',
 						tooltip:
-							'還沒準備好對外公布你的課程網站? 可以隱藏 My Account 我的學習選單',
+							'還沒準備好對外公布你的課程網站? 可以隱藏 My Account 我的課程選單',
 						initialValue: 'no',
 					}}
 				/>

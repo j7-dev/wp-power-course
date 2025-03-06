@@ -135,20 +135,20 @@ const CourseOtherComponent = () => {
 				}}
 			/>
 
-			{/* <Heading size="sm">預計時長</Heading> */}
+			{/* <Heading size="sm">時長</Heading> */}
 			<FiSwitch
 				formItemProps={{
 					name: ['show_course_time'],
-					label: '顯示預計時長',
+					label: '顯示課程時長',
 					initialValue: 'yes',
 				}}
 			/>
 
-			{/* <Heading size="sm">預計單元</Heading> */}
+			{/* <Heading size="sm">單元</Heading> */}
 			<FiSwitch
 				formItemProps={{
 					name: ['show_course_chapters'],
-					label: '顯示預計單元',
+					label: '顯示單元數量',
 					initialValue: 'yes',
 				}}
 			/>

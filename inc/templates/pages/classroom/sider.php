@@ -41,7 +41,7 @@ printf(
 						>
 							<img class="size-6" src="%3$s" />
 							<span class="text-gray-400 font-light">
-									回《我的學習》
+									回《我的課程》
 							</span>
 						</a>
 					</div>
