@@ -5,6 +5,8 @@
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Core\CPT;
+
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -28,6 +30,10 @@ $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->g
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
 $chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
 
+global $chapter;
+$ancestor_ids        = get_ancestors($chapter->ID, CPT::POST_TYPE, 'post_type');
+$ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
+
 ?>
 <style>
 	.icon-arrow svg {
@@ -47,7 +53,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 	<span class="text-base tracking-wide font-bold">課程章節</span>
 	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
 </div>
-<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0">
+<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0" data-ancestor_ids="<?php echo $ancestor_ids_string; ?>">
 	<?php echo $chapters_html; ?>
 </div>
 
@@ -55,8 +61,14 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 <script type="module" async>
 	(function($) {
 		$(document).ready(function() {
+			const $el = $('#pc-sider__main-chapters')
+			if(!$el.length){
+				console.error('#pc-sider__main-chapters 節點不存在')
+				return
+			}
+
 			// 點擊箭頭展開或收合章節
-			$('#pc-sider__main-chapters').on('click', 'li', function() {
+			$el.on('click', 'li', function() {
 				const $li = $(this);
 				const $sub_ul = $li.next('ul'); // 子章節
 
@@ -67,7 +79,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 			})
 
 			// 跳轉頁面前先記錄展開的章節
-			$('#pc-sider__main-chapters').on('click', 'li a', function(e) {
+			$el.on('click', 'li a', function(e) {
 				// 阻止原本的超連結行為
 				e.preventDefault();
 				e.stopPropagation();
@@ -79,7 +91,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 				window.location.href = href;
 			})
 
-			// 離開頁面時，恢復章節的展開狀態
+			// 離開頁面時，記錄展開的章節
 			$(window).on('beforeunload', function(e) {
 				// 避免顯示確認框，不要使用 preventDefault()
 				handle_save_expanded_post_ids()
@@ -89,7 +101,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 
 			// 把當前展開的章節 id 先記錄起來
 			function handle_save_expanded_post_ids() {
-				const expanded_post_ids = $('#pc-sider__main-chapters li.expanded').map(function() {
+				const expanded_post_ids = $el.find('li.expanded').map(function() {
 					return $(this).data('post-id');
 				}).get();
 
@@ -101,9 +113,18 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 			function restore_expanded_post_ids() {
 				const expanded_post_ids_string = sessionStorage.getItem('expanded_post_ids') // 拿不到為 null
 				const expanded_post_ids = expanded_post_ids_string ? JSON.parse(expanded_post_ids_string) : [];
-				if (expanded_post_ids.length > 0) {
-					expanded_post_ids.forEach(function(post_id) {
-						const $li = $(`#pc-sider__main-chapters li[data-post-id="${post_id}"]`);
+
+				// 當前文章的祖先也要展開，所以也必須加入
+				const ancestor_ids = $el.data('ancestor_ids');
+
+				const all_expanded_post_ids = [...new Set([
+					...expanded_post_ids,
+					...ancestor_ids,
+				])];
+
+				if (all_expanded_post_ids.length > 0) {
+					all_expanded_post_ids.forEach(function(post_id) {
+						const $li = $el.find(`li[data-post-id="${post_id}"]`);
 						if ($li.length > 0) {
 							$li.addClass('expanded');
 							$li.next('ul').show();
@@ -113,7 +134,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 
 				// 恢復完畢，清除 sessionStorage，顯示 #pc-sider__main-chapters
 				sessionStorage.removeItem('expanded_post_ids');
-				$('#pc-sider__main-chapters').show();
+				$el.show();
 			}
 		})
 	})(jQuery)
