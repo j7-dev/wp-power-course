@@ -237,7 +237,7 @@ final class Product {
 	}
 
 	/**
-	 * 批量創建或修改商品
+	 * 批次創建或修改商品
 	 * 創建要帶 qty
 	 * 修改要帶 ids
 	 * form-data 方式送出

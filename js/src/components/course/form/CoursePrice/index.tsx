@@ -76,7 +76,7 @@ const CoursePriceComponent = () => {
 						/>
 
 						<div>
-							<p className="mb-2">預計時長</p>
+							<p className="mb-2">課程時長</p>
 							<Space.Compact block>
 								<Item name={['course_hour']} noStyle>
 									<InputNumber className="w-1/2" min={0} addonAfter="時" />

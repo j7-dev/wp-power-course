@@ -47,7 +47,7 @@ const MyCourses = () => {
 
 	return (
 		<>
-			<Heading className="mt-8">我的學習</Heading>
+			<Heading className="mt-8">我的課程</Heading>
 			<div className="grid grid-cols-1 md:grid-cols-[25rem_1fr] gap-8">
 				<div>
 					<Form

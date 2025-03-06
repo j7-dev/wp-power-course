@@ -1,7 +1,7 @@
 <?php
 /**
  * Front-end MyAccount Page
- * 我的學習
+ * 我的課程
  */
 
 declare( strict_types=1 );
@@ -35,7 +35,7 @@ final class MyAccount {
 	}
 
 	/**
-	 * Custom account endpoint 我的學習
+	 * Custom account endpoint 我的課程
 	 */
 	public function custom_account_endpoint(): void {
 		// @phpstan-ignore-next-line
@@ -43,7 +43,7 @@ final class MyAccount {
 	}
 
 	/**
-	 * Add menu item 我的學習
+	 * Add menu item 我的課程
 	 *
 	 * @param array<string> $items Menu items.
 	 *
@@ -53,7 +53,7 @@ final class MyAccount {
 		// 重新排序，排在控制台後
 		return array_slice( $items, 0, 1, true ) + [
 			self::COURSES_ENDPOINT => __(
-				'我的學習',
+				'我的課程',
 				'power-course'
 			),
 		] + array_slice( $items, 1, null, true );

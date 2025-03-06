@@ -151,13 +151,13 @@ const UserTableComponent = ({
 						<div className="mt-4">
 							<GrantCourseAccess
 								user_ids={selectedRowKeys as string[]}
-								label="添加其他課程"
+								label="新增其他課程"
 							/>
 						</div>
 
 						<div className="mt-4 flex gap-x-6 justify-between">
 							<div>
-								<label className="tw-block mb-2">批量操作</label>
+								<label className="tw-block mb-2">批次操作</label>
 								<div className="flex gap-x-4">
 									<ModifyCourseExpireDate
 										user_ids={selectedRowKeys as string[]}

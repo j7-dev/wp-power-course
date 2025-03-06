@@ -27,7 +27,7 @@ const DeleteButton = ({
 				onClick={show}
 				disabled={!selectedRowKeys.length}
 			>
-				批量刪除課程
+				批次刪除課程
 				{selectedRowKeys.length ? ` (${selectedRowKeys.length})` : ''}
 			</Button>
 

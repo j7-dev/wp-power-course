@@ -12,7 +12,7 @@ const AddOtherCourse = ({ user_ids }: { user_ids: string[] }) => {
 					onClick={() => setShow(true)}
 					className="cursor-pointer text-primary m-0"
 				>
-					添加其他課程
+					新增其他課程
 				</span>{' '}
 				或{' '}
 				<a

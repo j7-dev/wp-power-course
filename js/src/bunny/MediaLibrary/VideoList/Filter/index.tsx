@@ -16,12 +16,12 @@ const { Search } = Input
 type TFilterProps = {
 	selectedVideos: TBunnyVideo[]
 	setSelectedVideos:
-		| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
-		| ((
-				_videosOrFunction:
-					| TBunnyVideo[]
-					| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
-		  ) => void)
+	| React.Dispatch<React.SetStateAction<TBunnyVideo[]>>
+	| ((
+		_videosOrFunction:
+			| TBunnyVideo[]
+			| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
+	) => void)
 	setSearch: React.Dispatch<React.SetStateAction<string>>
 	loading?: boolean
 	selectButtonProps?: ButtonProps
@@ -104,7 +104,7 @@ const Filter = ({
 						type="primary"
 						danger
 					>
-						批量刪除{' '}
+						批次刪除{' '}
 						{selectedVideos?.length ? `(${selectedVideos?.length})` : ''}
 					</Button>
 				</Popconfirm>

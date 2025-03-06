@@ -133,7 +133,7 @@ trait UserTrait {
 			return new \WP_REST_Response(
 				[
 					'code'    => 'update_students_success',
-					'message' => '批量調整觀看期限成功',
+					'message' => '批次調整觀看期限成功',
 					'data'    => [
 						'user_ids'   => \implode(',', $user_ids),
 						'course_ids' => \implode(',', $course_ids),

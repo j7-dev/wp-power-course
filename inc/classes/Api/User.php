@@ -471,7 +471,7 @@ final class User {
 	}
 
 	/**
-	 * 處理批量將用戶設定為講師的請求。
+	 * 處理批次將用戶設定為講師的請求。
 	 *
 	 * @param \WP_REST_Request $request REST請求對象，包含需要處理的用戶ID。
 	 * @return \WP_REST_Response 返回REST響應對象，包含操作結果的狀態碼和訊息。
@@ -491,7 +491,7 @@ final class User {
 		return new \WP_REST_Response(
 		[
 			'code'    =>'update_users_to_teachers_success',
-			'message' =>'批量將用戶轉為講師成功',
+			'message' =>'批次將用戶轉為講師成功',
 			'data'    => [
 				'user_ids' => \implode(',', $user_ids),
 			],
@@ -501,7 +501,7 @@ final class User {
 	}
 
 	/**
-	 * 將指定用戶批量移除講師身分
+	 * 將指定用戶批次移除講師身分
 	 *
 	 * @param \WP_REST_Request $request 包含用戶ID的REST請求。
 	 * @return \WP_REST_Response 包含操作結果的響應對象。
@@ -525,7 +525,7 @@ final class User {
 		return new \WP_REST_Response(
 		[
 			'code'    => $update_success ? 'remove_teachers_success' : 'remove_teachers_failed',
-			'message' => $update_success ? '批量移除講師成功' : '批量移除講師失敗',
+			'message' => $update_success ? '批次移除講師成功' : '批次移除講師失敗',
 			'data'    => [
 				'user_ids' => \implode(',', $user_ids),
 			],

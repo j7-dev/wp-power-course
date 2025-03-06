@@ -80,7 +80,7 @@ const GrantCourseAccessComponent = ({
 					disabled={!user_ids.length || !course_ids.length}
 					onClick={handleClick}
 				>
-					添加其他課程
+					新增其他課程
 				</Button>
 			</Space.Compact>
 		</>

@@ -1,6 +1,6 @@
 <?php
 /**
- * My Account 我的學習
+ * My Account 我的課程
  */
 
 use J7\PowerCourse\Plugin;

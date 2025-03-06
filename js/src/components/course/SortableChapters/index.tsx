@@ -146,7 +146,7 @@ const SortableChaptersComponent = () => {
 		null,
 	)
 
-	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批量刪除選中的 ids
+	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批次刪除選中的 ids
 
 	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
 
@@ -184,7 +184,7 @@ const SortableChaptersComponent = () => {
 						className: 'relative top-1',
 						loading: isDeleteManyLoading,
 						disabled: !selectedIds.length,
-						children: `批量刪除 ${selectedIds.length ? `(${selectedIds.length})` : ''}`,
+						children: `批次刪除 ${selectedIds.length ? `(${selectedIds.length})` : ''}`,
 					}}
 				/>
 			</div>
