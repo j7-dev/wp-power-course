@@ -366,14 +366,9 @@ final class LifeCycle {
 
 		$product_id = $product->get_id();
 		$editor     = $meta_data['editor'];
-		if ($editor === 'elementor') {
-			return;
-		}
 
 		if ( $editor === 'power-editor' ) {
-
 			$post_meta = \get_post_meta(    $product_id );
-
 			foreach ( $post_meta as $key => $value ) {
 				if ( strpos( $key, '_elementor_' ) !== false ) {
 					\delete_post_meta(  $product_id, $key );

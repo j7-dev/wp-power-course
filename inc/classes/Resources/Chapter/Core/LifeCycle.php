@@ -215,9 +215,6 @@ final class LifeCycle {
 			return;
 		}
 		$editor = \get_post_meta( $post_id, 'editor', true );
-		if ( $editor === 'elementor' ) {
-			return;
-		}
 
 		if ( $editor === 'power-editor' ) {
 			$post_meta = \get_post_meta( $post_id );
