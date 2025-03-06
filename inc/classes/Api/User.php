@@ -638,7 +638,7 @@ final class User {
 
 	/**
 	 * 經過實測，大約連續創建 32個用戶，系統就會資源不足
-	 * 每批數量建議10人
+	 * 每批數量建議100人
 	 *
 	 * @param int    $attachment_id 附件 ID
 	 * @param int    $batch 批次
