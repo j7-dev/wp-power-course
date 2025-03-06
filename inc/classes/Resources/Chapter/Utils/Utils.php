@@ -459,11 +459,10 @@ abstract class Utils {
 			$html .= sprintf(
 			/*html*/'
 			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
-
-				<a class="py-2 flex gap-x-2 items-center flex-1" href="%1$s">
-				<div class="pc-chapter-icon size-8 p-1">%2$s</div>
-						%3$s
-				</a>
+				<div class="py-2 flex gap-x-2 items-center flex-1">
+					<div class="pc-chapter-icon size-8 p-1">%2$s</div>
+					<a href="%1$s">%3$s</a>
+				</div>
 				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
 				</div>
@@ -480,7 +479,7 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&>a]:text-primary' : 'font-normal [&>a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
 			);
 
 			// 沒有子章節就結束
