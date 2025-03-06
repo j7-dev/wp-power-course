@@ -65,6 +65,7 @@ final class Compatibility {
 		Chapter::migrate_chapter_to_new_structure();
 		// 儲存章節使用的編輯器
 		Chapter::set_editor_meta_to_chapter();
+		Course::set_editor_meta_to_course();
 
 		/**
 		 * ============== END 相容性代碼 ==============
