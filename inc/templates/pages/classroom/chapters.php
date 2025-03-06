@@ -56,8 +56,8 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 	(function($) {
 		$(document).ready(function() {
 			// 點擊箭頭展開或收合章節
-			$('#pc-sider__main-chapters').on('click', 'li .icon-arrow', function() {
-				const $li = $(this).closest('li');
+			$('#pc-sider__main-chapters').on('click', 'li', function() {
+				const $li = $(this);
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
