@@ -108,6 +108,7 @@ final class Chapter {
 			[
 				'post_type'   => CPT::POST_TYPE,
 				'numberposts' => -1,
+				'fields'      => 'ids',
 				'meta_query'  => [
 					'relation'              => 'AND',
 					'elementor_data_clause' => [
@@ -130,6 +131,7 @@ final class Chapter {
 			[
 				'post_type'   => CPT::POST_TYPE,
 				'numberposts' => -1,
+				'fields'      => 'ids',
 				'meta_query'  => [
 					'relation'              => 'AND',
 					'elementor_data_clause' => [
