@@ -370,11 +370,14 @@ final class LifeCycle {
 			return;
 		}
 
-		$post_meta = \get_post_meta(    $product_id );
+		if ( $editor === 'power-editor' ) {
 
-		foreach ( $post_meta as $key => $value ) {
-			if ( strpos( $key, '_elementor_' ) !== false ) {
-				\delete_post_meta(  $product_id, $key );
+			$post_meta = \get_post_meta(    $product_id );
+
+			foreach ( $post_meta as $key => $value ) {
+				if ( strpos( $key, '_elementor_' ) !== false ) {
+					\delete_post_meta(  $product_id, $key );
+				}
 			}
 		}
 	}
