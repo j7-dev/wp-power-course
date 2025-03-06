@@ -475,6 +475,7 @@ final class Course extends ApiBase {
 			'_subscription_sign_up_fee'     => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
 			'_subscription_trial_length'    => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
 			'_subscription_trial_period'    => $subscription_trial_period ?: 'day',
+			'editor'                        => (string) $product->get_meta( 'editor' ) ?: 'power-editor',
 
 		] + $children;
 
