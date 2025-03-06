@@ -26,9 +26,7 @@ if (! ( $product instanceof \WC_Product )) {
 	throw new \Exception('product 不是 WC_Product');
 }
 
-$count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
-$course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id(), null, 0, 'course-product');
+$chapters_html = ChapterUtils::get_children_posts_html_uncached($product->get_id(), null, 0, 'course-product');
 
 global $chapter;
 
@@ -45,10 +43,6 @@ global $chapter;
 	}
 </style>
 
-<div class="flex justify-between items-center py-4 px-0 lg:px-4">
-	<span class="text-base tracking-wide font-bold">課程章節</span>
-	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
-</div>
 <div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0">
 	<?php echo $chapters_html; ?>
 </div>
