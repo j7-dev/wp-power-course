@@ -46,6 +46,7 @@ final class LifeCycle {
 
 		// 每次儲存前
 		\add_action('save_post_' . CPT::POST_TYPE, [ __CLASS__, 'delete_transient' ], 10, 3);
+		\add_action('save_post_' . CPT::POST_TYPE, [ __CLASS__, 'delete_elementor_data' ], 10, 3);
 	}
 
 	/**
@@ -198,5 +199,31 @@ final class LifeCycle {
 		$course_id     = (int) \get_post_meta( $top_parent_id, 'parent_course_id', true );
 		$cache_key     = ChapterUtils::get_cache_key( $course_id );
 		\delete_transient( $cache_key );
+	}
+
+
+	/**
+	 * 如果儲存時，editor 是 power-editor，則要清除 elementor 相關資料
+	 *
+	 * @param int     $post_id Post ID
+	 * @param WP_Post $post Post object
+	 * @param bool    $update Whether this is an existing post being updated
+	 */
+	public static function delete_elementor_data( $post_id, $post, $update ): void {
+		// 避免自動儲存
+		if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+			return;
+		}
+		$editor = \get_post_meta( $post_id, 'editor', true );
+		if ( $editor === 'elementor' ) {
+			return;
+		}
+		$post_meta = \get_post_meta( $post_id );
+
+		foreach ( $post_meta as $key => $value ) {
+			if ( strpos( $key, '_elementor_' ) !== false ) {
+				\delete_post_meta( $post_id, $key );
+			}
+		}
 	}
 }

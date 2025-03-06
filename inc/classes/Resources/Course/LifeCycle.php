@@ -55,6 +55,7 @@ final class LifeCycle {
 
 		// 課程更新時，清除寄信註記
 		\add_action(self::BEFORE_UPDATE_PRODUCT_META_ACTION, [ __CLASS__, 'clear_course_launch_action_done' ], 10, 2);
+		\add_action(self::BEFORE_UPDATE_PRODUCT_META_ACTION, [ __CLASS__, 'delete_elementor_data' ], 10, 2);
 
 		// 註冊課程開課 hook，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );
@@ -352,6 +353,29 @@ final class LifeCycle {
 		if ($old_course_schedule !== $new_course_schedule) {
 			// 要清除註記
 			\delete_post_meta($product_id, 'course_launch_action_done');
+		}
+	}
+
+	/**
+	 * 如果儲存時，editor 是 power-editor，則要清除 elementor 相關資料
+	 *
+	 * @param \WC_Product          $product 課程
+	 * @param array<string, mixed> $meta_data 更新資料
+	 */
+	public static function delete_elementor_data( \WC_Product $product, array $meta_data ): void {
+
+		$product_id = $product->get_id();
+		$editor     = $meta_data['editor'];
+		if ($editor === 'elementor') {
+			return;
+		}
+
+		$post_meta = \get_post_meta(    $product_id );
+
+		foreach ( $post_meta as $key => $value ) {
+			if ( strpos( $key, '_elementor_' ) !== false ) {
+				\delete_post_meta(  $product_id, $key );
+			}
 		}
 	}
 
