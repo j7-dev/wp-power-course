@@ -29,7 +29,8 @@ $args2 = [
 	'posts_per_page' => - 1,
 	'order'          => 'ASC',
 	'orderby'        => 'menu_order',
-	'post_parent'    => $product->get_id(),
+	'meta_key'       => 'parent_course_id',
+	'meta_value'     => $product->get_id(),
 	'post_status'    => 'publish',
 	'post_type'      => ChapterCPT::POST_TYPE,
 ];
