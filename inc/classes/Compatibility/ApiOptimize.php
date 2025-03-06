@@ -21,7 +21,7 @@ final class ApiOptimize {
 
 	/** Constructor */
 	public function __construct() {
-		\add_action( Compatibility::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'delete_file' ]);
+		\add_action( 'upgrader_process_complete', [ __CLASS__, 'delete_file' ]);
 		\delete_option('pc_enable_api_booster');
 	}
 

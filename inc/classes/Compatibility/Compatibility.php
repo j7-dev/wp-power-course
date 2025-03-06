@@ -19,30 +19,15 @@ use J7\PowerCourse\AbstractTable;
 final class Compatibility {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	const AS_COMPATIBILITY_ACTION = 'pc_compatibility_action_scheduler';
-
 	/** Constructor */
 	public function __construct() {
-		$scheduled_version = \get_option('pc_compatibility_action_scheduled');
-		if ($scheduled_version === Plugin::$version) {
-			return;
-		}
+		\delete_option('pc_compatibility_action_scheduled');
+
 		ApiOptimize::instance();
-
-		// 排程只執行一次的兼容設定
-		\add_action( 'init', [ __CLASS__, 'compatibility_action_scheduler' ] );
-		\add_action( self::AS_COMPATIBILITY_ACTION, [ __CLASS__, 'compatibility' ]);
+		// 升級成功後執行
+		\add_action( 'upgrader_process_complete', [ __CLASS__, 'compatibility' ]);
 	}
 
-
-	/**
-	 * 排程只執行一次的兼容設定
-	 *
-	 * @return void
-	 */
-	public static function compatibility_action_scheduler(): void {
-		\as_enqueue_async_action( self::AS_COMPATIBILITY_ACTION, [] );
-	}
 
 	/**
 	 * 執行排程
@@ -78,13 +63,12 @@ final class Compatibility {
 
 		// 0.8.0 之後使用新的章節結構
 		Chapter::migrate_chapter_to_new_structure();
+		// 儲存章節使用的編輯器
+		Chapter::set_editor_meta_to_chapter();
 
 		/**
 		 * ============== END 相容性代碼 ==============
 		 */
-
-		// ❗不要刪除此行，註記已經執行過相容設定
-		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
 	}
 
 	/**
