@@ -218,11 +218,14 @@ final class LifeCycle {
 		if ( $editor === 'elementor' ) {
 			return;
 		}
-		$post_meta = \get_post_meta( $post_id );
 
-		foreach ( $post_meta as $key => $value ) {
-			if ( strpos( $key, '_elementor_' ) !== false ) {
-				\delete_post_meta( $post_id, $key );
+		if ( $editor === 'power-editor' ) {
+			$post_meta = \get_post_meta( $post_id );
+
+			foreach ( $post_meta as $key => $value ) {
+				if ( strpos( $key, '_elementor_' ) !== false ) {
+					\delete_post_meta( $post_id, $key );
+				}
 			}
 		}
 	}
