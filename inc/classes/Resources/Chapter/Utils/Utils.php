@@ -391,12 +391,13 @@ abstract class Utils {
 	/**
 	 * 取得課程章節的 HTML
 	 *
-	 * @param int                       $post_id 課程 id
-	 * @param array<int, \WP_Post>|null $children_posts 子章節.
-	 * @param int                       $depth 深度，預設從 0 (課程) 開始
+	 * @param int                            $post_id 課程 id
+	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
+	 * @param int                            $depth 深度，預設從 0 (課程) 開始
+	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0 ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
 		global $post; // 當前文章
 
 		$html           = '';
@@ -459,9 +460,9 @@ abstract class Utils {
 			$html .= sprintf(
 			/*html*/'
 			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
-				<div class="py-2 flex gap-x-2 items-center flex-1">
-					<div class="pc-chapter-icon size-8 p-1">%2$s</div>
-					<a href="%1$s">%3$s</a>
+				<div class="py-2 flex items-center flex-1">
+					%2$s
+					<a href="%1$s" class="ml-2">%3$s</a>
 				</div>
 				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
@@ -469,7 +470,7 @@ abstract class Utils {
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
-			self::get_chapter_icon_html($child_post->ID),
+			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
 			$child_post->post_title,
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
@@ -488,7 +489,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1);
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
 		}
 		$html .= /* html */'</ul>';
 

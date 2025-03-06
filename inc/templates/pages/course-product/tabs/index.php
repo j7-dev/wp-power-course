@@ -26,7 +26,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 $description = $product->get_description();
 $accordion   = Plugin::load_template(
-	'collapse/chapter',
+	'collapse/chapters',
 	[
 		'product' => $product,
 	],
