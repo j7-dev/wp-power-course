@@ -742,4 +742,40 @@ abstract class Course {
 
 		return \get_permalink($top_chapter_id);
 	}
+
+
+	/**
+	 * 取得用戶最後訪問的課程連結
+	 *
+	 * @param int $course_id 課程 ID
+	 * @param int $current_user_id 用戶 ID
+	 *
+	 * @return string
+	 */
+	public static function get_last_visit_classroom_link( int $course_id, int $current_user_id = null ): string {
+		$current_user_id = $current_user_id ?? \get_current_user_id();
+		$last_visit_info = AVLCourseMeta::get( $course_id, $current_user_id, 'last_visit_info', true );
+
+		if ( $last_visit_info ) {
+			$last_chapter_id = $last_visit_info['chapter_id'] ?? null;
+			$last_chapter    = \get_post( $last_chapter_id );
+			if ('publish' === $last_chapter?->post_status) {
+				$last_classroom_link = \get_permalink($last_chapter_id);
+				return $last_classroom_link;
+			}
+		}
+
+		$chapter_ids = ChapterUtils::get_flatten_post_ids($course_id);
+
+		$first_chapter_id = count($chapter_ids) > 0 ? reset($chapter_ids) : null;
+
+		if ($first_chapter_id) {
+			$first_classroom_link = \get_permalink($first_chapter_id);
+			if ($first_classroom_link) {
+				return $first_classroom_link;
+			}
+		}
+
+		return \site_url( '404' );
+	}
 }
