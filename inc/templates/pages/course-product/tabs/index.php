@@ -60,8 +60,9 @@ $course_tabs = [
 	'description' => [
 		'label'    => '介紹',
 		'content'  => sprintf(
-			/*html*/'<div class="bn-container">%s</div>',
-			$the_content
+			/*html*/'<div class="%2$s">%1$s</div>',
+			$the_content,
+			$product->get_meta('editor') === 'power-editor' ? 'bn-container' : ''
 		),
 		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_description_tab' ) ?: 'yes'),
 	],

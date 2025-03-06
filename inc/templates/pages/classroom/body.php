@@ -91,7 +91,10 @@ echo '<div class="tw-container mx-auto mt-8">';
 
 Powerhouse::load_template('breadcrumb');
 
-echo '<div class="bn-container">';
+printf(
+/*html*/'<div class="%s">',
+$product->get_meta('editor') === 'power-editor' ? 'bn-container' : ''
+);
 the_content();
 echo '</div>';
 
