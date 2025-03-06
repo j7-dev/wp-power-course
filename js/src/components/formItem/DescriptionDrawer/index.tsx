@@ -75,8 +75,7 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 			<Item
 				name={['editor']}
 				label={`編輯${itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}`}
-				tooltip="切換編輯器可能導致資料遺失，請謹慎使用"
-				help={getTooltipTitle(
+				tooltip={getTooltipTitle(
 					ELEMENTOR_ENABLED,
 					watchShowDescriptionTab,
 					itemLabel,
