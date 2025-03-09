@@ -35,7 +35,6 @@ final class Compatibility {
 	 * @return void
 	 */
 	public static function compatibility(): void {
-
 		/**
 		 * ============== START 相容性代碼 ==============
 		 */
@@ -70,6 +69,8 @@ final class Compatibility {
 		/**
 		 * ============== END 相容性代碼 ==============
 		 */
+
+		\J7\WpUtils\Classes\WC::log(Plugin::$version, '已執行兼容性設定');
 	}
 
 	/**
