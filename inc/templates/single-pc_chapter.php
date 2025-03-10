@@ -54,7 +54,14 @@ if (!current_user_can('manage_options')) {
 		get_footer();
 		exit;
 	}
+
+	if ('publish' !== $post->post_status) {
+		\wp_safe_redirect(site_url('404'));
+		exit;
+	}
 }
+
+
 do_action('power_course_before_classroom_render');
 
 // phpcs:disable
