@@ -611,7 +611,7 @@ final class User {
 
 			// --- END 將 email content 寫入到 txt 檔，不然太大傳參會 exception END ---
 
-			$action_id = \as_enqueue_async_action( 'pc_batch_add_students_task', [ $attachment_id, 0, self::BATCH_SIZE, $email_content_file_path ], 'power_course_batch_add_students' );
+			$action_id = \as_enqueue_async_action( 'pc_batch_add_students_task', [ $attachment_id, 0, self::BATCH_SIZE, $email_content_file_content ], 'power_course_batch_add_students' );
 
 			// 寫入 DB
 			return new \WP_REST_Response(
@@ -652,6 +652,7 @@ final class User {
 		$current_batch_rows = File::parse_csv_streaming($file, $batch, $batch_size);
 		$is_last_batch      = $batch === 0 ? count($current_batch_rows) < $batch_size - 1 : count($current_batch_rows) < $batch_size; // -1 是要扣掉標題欄
 		// 去除重複
+
 		$unique_array_instance = new UniqueArray($current_batch_rows);
 		$unique_rows           = $unique_array_instance->get_list();
 
@@ -710,7 +711,8 @@ final class User {
 
 		// 如果還有下一批資料,安排下一次執行
 		if ( !$is_last_batch ) {
-			\as_enqueue_async_action(
+			$schedule_result = \wp_schedule_single_event(
+				time() + 15,
 			'pc_batch_add_students_task',
 			[ $attachment_id, $batch + 1, $batch_size, $email_content ],
 			'power_course_batch_add_students',
@@ -722,6 +724,9 @@ final class User {
 			$admin_email,
 			sprintf('csv 匯入學員結果，共 %1$d 筆，共 %2$d 批次，每批次 %3$d 筆', ( $batch ) * $batch_size + count($current_batch_rows), $batch + 1, $batch_size),
 			$email_content,
+			[
+				'Content-Type: text/html; charset=UTF-8',
+			]
 			);
 		}
 	}
