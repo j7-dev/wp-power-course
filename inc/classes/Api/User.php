@@ -711,12 +711,13 @@ final class User {
 
 		// 如果還有下一批資料,安排下一次執行
 		if ( !$is_last_batch ) {
-			$schedule_result = \wp_schedule_single_event(
-				time() + 15,
-			'pc_batch_add_students_task',
-			[ $attachment_id, $batch + 1, $batch_size, $email_content ],
-			'power_course_batch_add_students',
-			);
+			$this->process_batch_add_students($attachment_id, $batch + 1, $batch_size, $email_content);
+			// $schedule_result = \wp_schedule_single_event(
+			// 	time() + 15,
+			// 'pc_batch_add_students_task',
+			// [ $attachment_id, $batch + 1, $batch_size, $email_content ],
+			// 'power_course_batch_add_students',
+			// );
 		} else {
 			// 如果已經沒有下一批資料, 就發送 EMAIL
 			$admin_email = \get_option('admin_email');
