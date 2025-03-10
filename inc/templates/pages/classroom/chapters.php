@@ -30,6 +30,7 @@ $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->g
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
 $chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
 
+/** @var \WP_Post $chapter */
 global $chapter;
 $ancestor_ids        = get_ancestors($chapter->ID, CPT::POST_TYPE, 'post_type');
 $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
