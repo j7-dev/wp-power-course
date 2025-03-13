@@ -9,9 +9,9 @@ import { LoadingOutlined, UserOutlined } from '@ant-design/icons'
 
 export const defaultHistoryDrawerProps: THistoryDrawerProps = {
 	user_id: undefined,
-	user_name: 'test' || undefined,
+	user_name: '' || undefined,
 	course_id: undefined,
-	course_name: '123' || undefined,
+	course_name: '' || undefined,
 	drawerProps: {
 		open: false,
 	},
