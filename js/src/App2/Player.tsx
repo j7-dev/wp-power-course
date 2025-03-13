@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import styles1 from '@vidstack/react/player/styles/default/theme.css?inline'
-import styles2 from '@vidstack/react/player/styles/default/layouts/video.css?inline'
+import '@vidstack/react/player/styles/default/theme.css'
+import '@vidstack/react/player/styles/default/layouts/video.css'
 import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react'
 
 import {
@@ -30,11 +30,8 @@ const index = ({
 	watermark_interval,
 }: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
-	const styles = `${styles1}${styles2}`
 	return (
 		<>
-			<style type="text/css">{styles}</style>
-
 			<MediaPlayer
 				src={src}
 				viewType="video"
