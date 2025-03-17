@@ -460,10 +460,10 @@ abstract class Utils {
 
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
-					<a href="%1$s" class="ml-2">%3$s</a>
+					<span class="ml-2">%3$s</span>
 				</div>
 				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
