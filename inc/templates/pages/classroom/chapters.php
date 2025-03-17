@@ -69,13 +69,26 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 			}
 
 			// 點擊箭頭展開或收合章節
-			$el.on('click', 'li', function() {
+			$el.on('click', 'li', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+
 				const $li = $(this);
+				const href = $li.data('href');
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
 					$li.toggleClass('expanded'); // 如果有找到子章節
 					$sub_ul.slideToggle('fast'); // 如果有找到子章節
+				}
+
+				// 如果點擊的是箭頭，就只展開/收合，不要跳轉頁面
+				if ($(e.target).closest('.icon-arrow').length > 0) {
+					return;
+				}
+
+				if (href) {
+					window.location.href = href;
 				}
 			})
 
