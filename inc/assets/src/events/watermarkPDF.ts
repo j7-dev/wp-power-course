@@ -46,7 +46,9 @@ export const watermarkPDF = () => {
 			const pdfBuffer = await response.arrayBuffer()
 
 			// 載入 PDF 文件
-			const pdfDoc = await PDFDocument.load(pdfBuffer)
+			const pdfDoc = await PDFDocument.load(pdfBuffer, {
+				ignoreEncryption: true
+			})
 
 			// 註冊 fontkit
 			pdfDoc.registerFontkit(fontkit)
