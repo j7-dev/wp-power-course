@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
 import { Tabs, TabsProps, Form, Switch, Modal, Button, Tooltip } from 'antd'
 import {
@@ -16,6 +16,7 @@ import { useAtom } from 'jotai'
 import { MediaLibrary } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { CourseContext } from '@/pages/admin/Courses/Edit/hooks'
 import {
 	siteUrl,
 	course_permalink_structure,
@@ -26,11 +27,13 @@ import { toFormData } from 'antd-toolkit'
 export const CoursesEdit = () => {
 	// 初始化資料
 	const { formProps, form, saveButtonProps, query, mutation, onFinish } =
-		useForm({
+		useForm<TCourseRecord>({
 			redirect: false,
 		})
 
-	const record = query?.data?.data
+	const record = useMemo(() => {
+		return query?.data?.data
+	}, [query])
 
 	// TAB items
 	const items: TabsProps['items'] = [
@@ -136,75 +139,77 @@ export const CoursesEdit = () => {
 
 	return (
 		<div className="sticky-card-actions sticky-tabs-nav">
-			<Edit
-				resource="courses"
-				title={
-					<>
-						{watchName}{' '}
-						<span className="text-gray-400 text-xs">#{watchId}</span>
-					</>
-				}
-				headerButtons={() => null}
-				saveButtonProps={{
-					...saveButtonProps,
-					children: '儲存',
-					icon: null,
-					loading: mutation?.isLoading,
-				}}
-				footerButtons={({ defaultButtons }) => (
-					<>
-						<Switch
-							className="mr-4"
-							checkedChildren="發佈"
-							unCheckedChildren="草稿"
-							value={watchStatus === 'publish'}
-							onChange={(checked) => {
-								form.setFieldValue(['status'], checked ? 'publish' : 'draft')
-							}}
-						/>
-						{defaultButtons}
-					</>
-				)}
-				isLoading={query?.isLoading}
-			>
-				<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
-					<Tabs
-						items={items}
-						tabBarExtraContent={
-							<>
-								<Tooltip
-									title={
-										record?.classroom_link
-											? undefined
-											: '此課程還沒有章節，無法前往教室'
-									}
-								>
+			<CourseContext.Provider value={record}>
+				<Edit
+					resource="courses"
+					title={
+						<>
+							{watchName}{' '}
+							<span className="text-gray-400 text-xs">#{watchId}</span>
+						</>
+					}
+					headerButtons={() => null}
+					saveButtonProps={{
+						...saveButtonProps,
+						children: '儲存',
+						icon: null,
+						loading: mutation?.isLoading,
+					}}
+					footerButtons={({ defaultButtons }) => (
+						<>
+							<Switch
+								className="mr-4"
+								checkedChildren="發佈"
+								unCheckedChildren="草稿"
+								value={watchStatus === 'publish'}
+								onChange={(checked) => {
+									form.setFieldValue(['status'], checked ? 'publish' : 'draft')
+								}}
+							/>
+							{defaultButtons}
+						</>
+					)}
+					isLoading={query?.isLoading}
+				>
+					<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
+						<Tabs
+							items={items}
+							tabBarExtraContent={
+								<>
+									<Tooltip
+										title={
+											record?.classroom_link
+												? undefined
+												: '此課程還沒有章節，無法前往教室'
+										}
+									>
+										<Button
+											href={record?.classroom_link}
+											target="_blank"
+											rel="noreferrer"
+											className="ml-4"
+											type="default"
+											disabled={!record?.classroom_link}
+										>
+											前往教室
+										</Button>
+									</Tooltip>
+
 									<Button
-										href={record?.classroom_link}
+										href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
 										target="_blank"
 										rel="noreferrer"
 										className="ml-4"
 										type="default"
-										disabled={!record?.classroom_link}
 									>
-										前往教室
+										前往銷售頁
 									</Button>
-								</Tooltip>
-
-								<Button
-									href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
-									target="_blank"
-									rel="noreferrer"
-									className="ml-4"
-									type="default"
-								>
-									前往銷售頁
-								</Button>
-							</>
-						}
-					/>
-				</Form>
-			</Edit>
+								</>
+							}
+						/>
+					</Form>
+				</Edit>
+			</CourseContext.Provider>
 
 			<Modal
 				{...modalProps}

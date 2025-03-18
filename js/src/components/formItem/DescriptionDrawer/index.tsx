@@ -1,8 +1,8 @@
 import { FC, useEffect, lazy, Suspense, memo } from 'react'
-import { Button, Form, Drawer, Input, Alert, Radio } from 'antd'
+import { Button, Form, Drawer, Alert, Radio } from 'antd'
 import { LoadingOutlined, ExportOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
-import { useApiUrl } from '@refinedev/core'
+import { useApiUrl, useUpdate } from '@refinedev/core'
 import { useBlockNote } from '@/components/general'
 import { siteUrl, ELEMENTOR_ENABLED } from '@/utils'
 
@@ -17,12 +17,14 @@ const BlockNote = lazy(() =>
 type TDescriptionDrawerProps = {
 	name?: string | string[]
 	itemLabel?: string
+	initEditor?: 'power-editor' | 'elementor' | ''
 }
 const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 	props,
 ) => {
 	const name = props?.name || ['description']
 	const itemLabel = props?.itemLabel || '課程'
+	const initEditor = props?.initEditor || 'power-editor'
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
@@ -45,9 +47,26 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 		itemLabel,
 	})
 
-	const handleConfirm = () => {
-		form.setFieldValue(name, html)
-		close()
+	const { mutate: update, isLoading } = useUpdate({
+		resource: 'posts',
+		dataProviderName: 'powerhouse',
+	})
+
+	const handleSaveContent = () => {
+		update(
+			{
+				id: watchId,
+				values: {
+					description: html,
+					editor: watchEditor,
+				},
+			},
+			{
+				onSuccess: () => {
+					close()
+				},
+			},
+		)
 	}
 
 	useEffect(() => {
@@ -71,7 +90,7 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 		!ELEMENTOR_ENABLED || (itemLabel === '課程' && !watchShowDescriptionTab)
 
 	return (
-		<div className="max-w-[20rem]">
+		<div style={{ maxWidth: '30rem' }}>
 			<Item
 				name={['editor']}
 				label={`編輯${itemLabel === '課程' ? '課程完整介紹' : `${itemLabel}內容`}`}
@@ -97,11 +116,13 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 					defaultValue="power-editor"
 					optionType="button"
 					buttonStyle="solid"
+					block
 				/>
 			</Item>
 
 			<Button
-				className="w-[20rem]"
+				disabled={watchEditor !== initEditor && watchEditor === 'elementor'}
+				className="w-full"
 				icon={<ExportOutlined />}
 				iconPosition="end"
 				onClick={() => {
@@ -122,10 +143,13 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 			>
 				開始編輯
 			</Button>
+			{watchEditor !== initEditor && watchEditor === 'elementor' && (
+				<p className="text-sm text-red-400">
+					先儲存後就可以用 Elementor 編輯了
+				</p>
+			)}
 
-			<Item name={name} label={`${itemLabel}完整介紹`} hidden>
-				<Input.TextArea rows={8} disabled />
-			</Item>
+			<Item name={name} hidden />
 			<Drawer
 				{...drawerProps}
 				extra={
@@ -140,8 +164,12 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 						>
 							一鍵清空內容
 						</Button>
-						<Button type="primary" onClick={handleConfirm}>
-							確認變更
+						<Button
+							type="primary"
+							onClick={handleSaveContent}
+							loading={isLoading}
+						>
+							儲存
 						</Button>
 					</div>
 				}
@@ -151,10 +179,6 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 					message="注意事項"
 					description={
 						<ol className="pl-4">
-							<li>
-								確認變更只是確認內文有沒有變更，您還是需要儲存才會存進
-								{itemLabel}
-							</li>
 							<li>可以使用 WordPress shortcode</li>
 							<li>圖片在前台顯示皆為 100% ，縮小圖片並不影響前台顯示</li>
 							<li>未來有新功能持續擴充</li>
