@@ -685,6 +685,7 @@ final class Product {
 
 		$product = new \WC_Product_Simple();
 
+		$data['catalog_visibility'] = 'hidden'; // 新增 bundle product 預設為 "不可見"
 		foreach ( $data as $key => $value ) {
 			$method_name = 'set_' . $key;
 			$product->$method_name( $value );
