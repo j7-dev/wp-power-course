@@ -87,6 +87,8 @@ final class Compatibility {
 		Chapter::set_editor_meta_to_chapter();
 		Course::set_editor_meta_to_course();
 
+		BundleProduct::set_catalog_visibility_to_hidden();
+
 		/**
 		 * ============== END 相容性代碼 ==============
 		 */
