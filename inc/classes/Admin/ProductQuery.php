@@ -20,7 +20,6 @@ final class ProductQuery {
 	public function __construct() {
 		\add_action( 'init', [ __CLASS__, 'add_post_meta_to_course_product' ] );
 		\add_action( 'pre_get_posts', [ __CLASS__, 'exclude_course_product' ], 10 );
-		\add_action( 'pre_get_posts', [ __CLASS__, 'exclude_bundle_product' ], 20);
 	}
 
 	/**
@@ -88,7 +87,7 @@ final class ProductQuery {
 			$meta_query = [];
 		}
 
-		if (!$meta_query) {
+		if (!isset($meta_query['relation'])) {
 			$meta_query['relation'] = 'AND';
 		}
 
@@ -96,54 +95,6 @@ final class ProductQuery {
 			'key'     => '_is_course',
 			'value'   => 'no',
 			'compare' => '=',
-		];
-
-		$query->set('meta_query', $meta_query);
-	}
-
-	/**
-	 * Exclude Bundle Product
-	 * [危險] 會影響全站的查詢
-	 * 只有在 power course api 取得時，還有課程銷售頁可見
-	 * 搜尋 - 排除 bundle product
-	 *
-	 * @param \WP_Query $query 查詢
-	 * @return void
-	 */
-	public static function exclude_bundle_product( $query ): void {
-
-		if ('local' === \wp_get_environment_type()) {
-			return;
-		}
-
-		$meta_key = $query->get('meta_key');
-		// 只有在 power course api 取得時，還有課程銷售頁可見
-		if (General::in_url([ '/wp-json/power-course' ]) || Helper::LINK_COURSE_IDS_META_KEY === $meta_key) {
-			return;
-		}
-
-		$post_type = $query->get('post_type');
-		if (is_array($post_type)) {
-			if (!in_array('product', $post_type, true)) {
-				return;
-			}
-		} elseif ('product' !== $post_type) {
-			return;
-		}
-
-		$meta_query = $query->get('meta_query');
-
-		if (!is_array($meta_query)) {
-			$meta_query = [];
-		}
-
-		if (!$meta_query) {
-			$meta_query['relation'] = 'AND';
-		}
-
-		$meta_query[] = [
-			'key'     => 'bundle_type',
-			'compare' => 'NOT EXISTS',
 		];
 
 		$query->set('meta_query', $meta_query);
