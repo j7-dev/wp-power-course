@@ -15,6 +15,7 @@ import { FiSwitch, VideoInput, DescriptionDrawer } from '@/components/formItem'
 import { CopyText } from 'antd-toolkit'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
+import { useCourse } from '@/pages/admin/Courses/Edit/hooks'
 
 const { Item } = Form
 
@@ -23,9 +24,8 @@ const CourseDescriptionComponent = () => {
 	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
 	const productUrl = `${siteUrl}/${course_permalink_structure}/`
-	const slug = Form.useWatch(['slug'], form)
-	const watchId = Form.useWatch(['id'], form)
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
+	const course = useCourse()
 
 	const { listSelectProps } = useListSelect<TUserRecord>({
 		resource: 'users',
@@ -60,13 +60,13 @@ const CourseDescriptionComponent = () => {
 	}, [selectedTeachers.length])
 
 	useEffect(() => {
-		if (watchId) {
+		if (course?.id) {
 			const teacherIds = form.getFieldValue(['teacher_ids'])
 			setInitTeacherIds(teacherIds || [])
 		} else {
 			setInitTeacherIds([])
 		}
-	}, [watchId])
+	}, [course?.id])
 
 	return (
 		<>
@@ -76,7 +76,7 @@ const CourseDescriptionComponent = () => {
 				<Item name={['slug']} label="銷售網址">
 					<Input
 						addonBefore={productUrl}
-						addonAfter={<CopyText text={`${productUrl}${slug}`} />}
+						addonAfter={<CopyText text={`${productUrl}${course?.slug}`} />}
 					/>
 				</Item>
 
@@ -135,7 +135,7 @@ const CourseDescriptionComponent = () => {
 					>
 						<Input.TextArea rows={8} allowClear />
 					</Item>
-					<DescriptionDrawer />
+					<DescriptionDrawer initEditor={course?.editor} />
 
 					<div className="mb-8">
 						<label className="mb-3 tw-block">課程封面圖</label>

@@ -9,13 +9,13 @@ namespace J7\PowerCourse\Resources\Course;
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
+use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 use J7\PowerCourse\PowerEmail\Resources\Email\Trigger\AtHelper;
 use J7\PowerCourse\PowerEmail\Resources\EmailRecord\CRUD as EmailRecord;
 use J7\PowerCourse\Bootstrap;
 use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Resources\StudentLog\CRUD as StudentLogCRUD;
-
 /**
  * Class LifeCycle
  */
@@ -55,7 +55,11 @@ final class LifeCycle {
 
 		// 課程更新時，清除寄信註記
 		\add_action(self::BEFORE_UPDATE_PRODUCT_META_ACTION, [ __CLASS__, 'clear_course_launch_action_done' ], 10, 2);
+
+		// 使用 power-editor 時刪除 elementor 資料 (商品 API觸發)
 		\add_action(self::BEFORE_UPDATE_PRODUCT_META_ACTION, [ __CLASS__, 'delete_elementor_data' ], 10, 2);
+		// 使用 power-editor 時刪除 elementor 資料 (Post API觸發)
+		\add_action('save_post_product', [ ChapterLifeCycle::class, 'delete_elementor_data' ], 10, 3);
 
 		// 註冊課程開課 hook，透過定時任務去看課程開課時機
 		\add_action( Bootstrap::SCHEDULE_ACTION, [ __CLASS__, 'register_course_launch' ], 10, 1 );

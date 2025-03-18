@@ -88,6 +88,7 @@ export type TCourseRecord = TCourseBaseRecord &
 		extra_student_count: number
 		feature_video: TVideo
 		trial_video: TVideo
+		editor: 'power-editor' | 'elementor' | ''
 	}
 
 export type TChapterRecord = {
@@ -114,4 +115,5 @@ export type TChapterRecord = {
 	parent_id?: string
 	chapter_video?: TVideo
 	enable_comment: 'yes' | 'no'
+	editor: 'power-editor' | 'elementor' | ''
 }

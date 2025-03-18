@@ -34,11 +34,13 @@ abstract class Utils {
 	 * @return int|\WP_Error
 	 */
 	public static function create_chapter( array $args = [] ): int|\WP_Error {
-		$args['post_title']    = $args['post_title'] ?? '新章節';
-		$args['post_status']   = 'publish';
-		$args['post_author']   = \get_current_user_id();
-		$args['post_type']     = CPT::POST_TYPE;
-		$args['page_template'] = self::TEMPLATE;
+		$args['post_title']           = $args['post_title'] ?? '新章節';
+		$args['post_status']          = 'publish';
+		$args['post_author']          = \get_current_user_id();
+		$args['post_type']            = CPT::POST_TYPE;
+		$args['page_template']        = self::TEMPLATE;
+		$args['meta_input']           = $args['meta_input'] ?? [];
+		$args['meta_input']['editor'] = $args['meta_input']['editor'] ?? 'power-editor';
 
 		return \wp_insert_post($args);
 	}
