@@ -64,7 +64,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 			}
 			saveButtonProps={{
 				...saveButtonProps,
-				children: `儲存章節`,
+				children: '儲存章節',
 				icon: null,
 				loading: mutation?.isLoading,
 			}}
@@ -124,7 +124,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				</Item>
 
 				<div className="mb-8">
-					<DescriptionDrawer itemLabel="章節" initEditor={initEditor} />
+					<DescriptionDrawer resource="chapters" initEditor={initEditor} />
 				</div>
 				<div className="mb-6 max-w-[20rem]">
 					<p className="mb-3">上傳課程內容</p>
