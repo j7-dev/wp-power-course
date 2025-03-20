@@ -135,7 +135,7 @@ const CourseDescriptionComponent = () => {
 					>
 						<Input.TextArea rows={8} allowClear />
 					</Item>
-					<DescriptionDrawer initEditor={course?.editor} />
+					<DescriptionDrawer resource="courses" initEditor={course?.editor} />
 
 					<div className="mb-8">
 						<label className="mb-3 tw-block">課程封面圖</label>

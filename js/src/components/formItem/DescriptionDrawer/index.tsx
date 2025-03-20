@@ -2,7 +2,7 @@ import { FC, useEffect, lazy, Suspense, memo } from 'react'
 import { Button, Form, Drawer, Alert, Radio } from 'antd'
 import { LoadingOutlined, ExportOutlined } from '@ant-design/icons'
 import { useEditorDrawer } from '@/hooks'
-import { useApiUrl, useUpdate } from '@refinedev/core'
+import { useApiUrl, useUpdate, useInvalidate } from '@refinedev/core'
 import { useBlockNote } from '@/components/general'
 import { siteUrl, ELEMENTOR_ENABLED } from '@/utils'
 
@@ -16,21 +16,23 @@ const BlockNote = lazy(() =>
 
 type TDescriptionDrawerProps = {
 	name?: string | string[]
-	itemLabel?: string
+	resource?: string
 	initEditor?: 'power-editor' | 'elementor' | ''
 }
-const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
-	props,
-) => {
-	const name = props?.name || ['description']
-	const itemLabel = props?.itemLabel || '課程'
-	const initEditor = props?.initEditor || 'power-editor'
+const DescriptionDrawerComponent: FC<TDescriptionDrawerProps> = ({
+	name = ['description'],
+	initEditor = 'power-editor',
+	resource = 'courses',
+}: TDescriptionDrawerProps) => {
+	const itemLabel = resource === 'courses' ? '課程' : '章節'
+
 	const apiUrl = useApiUrl()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
 	const watchShowDescriptionTab =
 		Form.useWatch(['show_description_tab'], form) === 'yes'
 	const watchEditor = Form.useWatch(['editor'], form)
+	const invalidate = useInvalidate()
 
 	const { blockNoteViewProps, html, setHTML } = useBlockNote({
 		apiConfig: {
@@ -63,6 +65,18 @@ const DescriptionDrawerComponent: FC<TDescriptionDrawerProps | undefined> = (
 			},
 			{
 				onSuccess: () => {
+					if (resource === 'courses') {
+						invalidate({
+							resource,
+							invalidates: ['detail'],
+							id: watchId,
+						})
+					} else {
+						invalidate({
+							resource,
+							invalidates: ['list'],
+						})
+					}
 					close()
 				},
 			},
@@ -217,7 +231,6 @@ function getTooltipTitle(
 	}
 
 	// 非課程不受限制
-	return
 }
 
 export const DescriptionDrawer = memo(DescriptionDrawerComponent)
