@@ -93,8 +93,8 @@ final class Api extends ApiBase {
 			'post_status'    => 'any',
 			'orderby'        => [
 				'menu_order' => 'ASC',
-				'ID'         => 'DESC',
-				'date'       => 'DESC',
+				'ID'         => 'ASC',
+				'date'       => 'ASC',
 			],
 
 		];

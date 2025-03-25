@@ -1,23 +1,44 @@
 import React, { memo } from 'react'
 import { Space, InputNumber, Button, Form } from 'antd'
-import { useCreateMany, useParsed } from '@refinedev/core'
+import { useCreate, useParsed, HttpError } from '@refinedev/core'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
+
+type TCreateManyResponse = number[]
+type TCreateManyParams = {
+	qty: number
+	parent_course_id: number
+	chapter_video: {
+		type: 'none'
+	}
+}
 
 const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 	const { id } = useParsed()
 	const [form] = Form.useForm()
 
-	const { mutate, isLoading } = useCreateMany({
+	const { mutate, isLoading } = useCreate<
+		TCreateManyResponse,
+		HttpError,
+		TCreateManyParams
+	>({
 		resource: 'chapters',
 	})
 
 	const handleCreateMany = () => {
-		const values = form.getFieldsValue()
+		const values = form.getFieldsValue() as TCreateManyParams
 		mutate({
 			values,
 			invalidates: ['list'],
+			successNotification: (data) => {
+				const ids = data?.data || []
+				const idsString = ids?.map((id) => `#${id}`).join(', ')
+				return {
+					message: `新增 ${values?.qty} 個章節成功 (${idsString})，可以在底部查看 ⬇️`,
+					type: 'success',
+				}
+			},
 		})
 	}
 

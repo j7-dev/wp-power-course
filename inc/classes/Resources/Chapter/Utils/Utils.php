@@ -41,6 +41,7 @@ abstract class Utils {
 		$args['page_template']        = self::TEMPLATE;
 		$args['meta_input']           = $args['meta_input'] ?? [];
 		$args['meta_input']['editor'] = $args['meta_input']['editor'] ?? 'power-editor';
+		$args['menu_order']           = $args['menu_order'] ?? PHP_INT_MAX; // 預設排在最底下
 
 		return \wp_insert_post($args);
 	}
