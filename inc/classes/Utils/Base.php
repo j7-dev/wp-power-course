@@ -287,8 +287,8 @@ abstract class Base {
 	public static function batch_process( $items, $callback, $options = [] ) {
 		// 默认选项
 		$default_options = [
-			'batch_size'  => 10,  // 每批次處理的項目數量
-			'pause_ms'    => 750, // 每批次之間暫停的毫秒數
+			'batch_size'  => 20,  // 每批次處理的項目數量
+			'pause_ms'    => 500, // 每批次之間暫停的毫秒數
 			'flush_cache' => true, // 每批次後是否清除 WordPress 快取
 		];
 
