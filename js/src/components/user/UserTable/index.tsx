@@ -138,14 +138,14 @@ const UserTableComponent = ({
 
 	return (
 		<>
-			<Card title="篩選" bordered={false} className="mb-4" {...cardProps}>
+			<Card title="篩選" variant="borderless" className="mb-4" {...cardProps}>
 				<Filter formProps={searchFormProps} />
 				<FilterTags
 					form={searchFormProps.form as FormInstance}
 					keyLabelMapper={keyLabelMapper}
 				/>
 			</Card>
-			<Card bordered={false} {...cardProps}>
+			<Card variant="borderless" {...cardProps}>
 				{canGrantCourseAccess && (
 					<>
 						<div className="mt-4">
