@@ -139,14 +139,15 @@ final class Duplicate {
 			$success = self::duplicate_terms($post_id, $new_id);
 		}
 
+		$args = [
+			'ID'         => $new_id,
+			'menu_order' => $post->menu_order + 1,
+		];
 		if (\is_numeric($new_parent)) {
-			$args = [
-				'ID'          => $new_id,
-				'post_parent' => $new_parent,
-			];
-
-			\wp_update_post($args);
+			$args['post_parent'] = $new_parent;
 		}
+
+		\wp_update_post($args);
 
 		return $new_id;
 	}
@@ -317,7 +318,20 @@ final class Duplicate {
 
 		// 把這貼複製後的頂層 chapter meta_key parent_course_id 更新為新的課程 id
 		foreach ($copied_ids as $copied_id) {
-			\update_post_meta($copied_id, 'parent_course_id', $new_id);
+			$post = \get_post($copied_id);
+			if (!$post) {
+				continue;
+			}
+
+			\wp_update_post(
+				[
+					'ID'         => $copied_id,
+					'menu_order' => $post->menu_order + 1,
+					'meta_input' => [
+						'parent_course_id' => $new_id,
+					],
+				]
+				);
 		}
 	}
 

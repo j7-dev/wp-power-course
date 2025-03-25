@@ -93,7 +93,6 @@ export const dataProvider = (
 
 		const formattedVariables = {
 			...variables,
-			action: 'create',
 		}
 
 		const { headers, method } = meta ?? {}
