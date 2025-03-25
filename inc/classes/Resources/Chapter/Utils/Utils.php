@@ -170,7 +170,24 @@ abstract class Utils {
 	 * Sort chapters
 	 * 改變章節順序
 	 *
-	 * @param array $params Parameters.
+	 * @param array{
+	 * from_tree: array{
+	 *  id: string,
+	 *  depth: string,
+	 *  menu_order: string,
+	 *  name: string,
+	 *  slug: string,
+	 *  parent_id: string,
+	 * }[],
+	 * to_tree: array{
+	 *  id: string,
+	 *  depth: string,
+	 *  menu_order: string,
+	 *  name: string,
+	 *  slug: string,
+	 *  parent_id: string,
+	 * }[],
+	 * } $params Parameters.
 	 *
 	 * @return true|\WP_Error
 	 */
@@ -190,7 +207,6 @@ abstract class Utils {
 		foreach ($to_tree as $node) {
 			$id   = $node['id'];
 			$args = self::converter($node);
-
 			if (!$node['depth']) {
 				// 如果 depth 是 0，代表是頂層，不使用 post_parent ，而是用 meta_key parent_course_id
 				// post_parent 要清空
@@ -205,7 +221,9 @@ abstract class Utils {
 				\delete_post_meta( $id, 'parent_course_id' );
 			}
 
-			$insert_result = self::update_chapter( (string) $id, $args);
+			// 為了做更細粒度的排序，但 menu_order WP 強制轉 int，所以需要 * 10
+			$args['menu_order'] = ( (int) $node['menu_order'] ) * 10;
+			$insert_result      = self::update_chapter( (string) $id, $args);
 
 			if (\is_wp_error($insert_result)) {
 				return $insert_result;
