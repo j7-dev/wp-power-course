@@ -23,7 +23,7 @@ $args = wp_parse_args( $args, $default_args );
 
 $helper = Helper::instance( $product );
 if ( ! $helper?->is_bundle_product ) {
-	throw new \Exception( 'product 不是 BundleProduct' );
+	return;
 }
 
 

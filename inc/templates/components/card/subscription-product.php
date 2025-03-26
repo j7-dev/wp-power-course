@@ -20,7 +20,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product_Subscription ) ) {
-	throw new \Exception( 'product 不是 WC_Product_Subscription' );
+	return;
 }
 
 $product_name = $product->get_name();
