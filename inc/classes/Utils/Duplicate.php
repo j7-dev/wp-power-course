@@ -110,7 +110,10 @@ final class Duplicate {
 			$post->post_title .= ' (複製)';
 		}
 
-		// $post->post_status = 'draft';
+		// 在插入前處理 post_content
+		if (isset($post->post_excerpt)) {
+			$post->post_excerpt = \wp_slash($post->post_excerpt);
+		}
 
 		// 插入新文章
 		// @phpstan-ignore-next-line
