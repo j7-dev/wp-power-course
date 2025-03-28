@@ -139,23 +139,16 @@ $linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 $variation_count = count($linked_products);
 
 // 添加固定在底部的mobile元素
-echo '<div class="p-4 md:hidden tw-fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-50">
+printf(
+/*html*/'
+<div class="p-4 md:hidden tw-fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-50">
     <div class="container mx-auto">
-        <button onclick="handleEnrollClick(' . $variation_count . ');"
+        <a href="%1$s"
             class="w-full pc-btn pc-btn-primary text-white cursor-pointer">
             立即報名
-        </button>
+        </a>
     </div>
 </div>
-
-<script>
-function handleEnrollClick(variationCount) {
-	if (variationCount > 1) {
-	      // 如果有多個方案，滾動到方案選擇區
-        document.getElementById("course-pricing").scrollIntoView({ behavior: "smooth" });
-    } else {
-        // 如果只有一個方案，直接跳轉到結帳頁
-        window.location.href = "' . esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url())) . '";
-    }
-}
-</script>';
+',
+$variation_count > 1 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url()))
+);
