@@ -319,6 +319,6 @@ final class Email {
 			]
 			);
 
-		return !!$find_record;
+		return (bool) $find_record;
 	}
 }

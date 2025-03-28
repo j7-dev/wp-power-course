@@ -21,7 +21,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 $course_permalink_structure = CourseUtils::get_course_permalink_structure();
 
