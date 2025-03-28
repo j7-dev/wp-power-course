@@ -3,6 +3,7 @@
  * Course Product > body
  */
 
+use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
@@ -132,3 +133,22 @@ Plugin::load_template( 'course-product/tabs', null, true, true );
 // Footer
 Plugin::load_template( 'course-product/footer', null, true, true );
 echo '</div>';
+
+// 獲取課程方案數量
+$linked_products = Helper::get_bundle_products( (int) $product->get_id() );
+$variation_count = count($linked_products);
+
+// 添加固定在底部的mobile元素
+printf(
+/*html*/'
+<div class="p-4 md:hidden tw-fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-50">
+    <div class="container mx-auto">
+        <a href="%1$s"
+            class="w-full pc-btn pc-btn-primary text-white cursor-pointer">
+            立即報名
+        </a>
+    </div>
+</div>
+',
+$variation_count > 1 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url()))
+);
