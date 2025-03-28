@@ -20,7 +20,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 
 $purchase_note = \wpautop( $product->get_purchase_note() );

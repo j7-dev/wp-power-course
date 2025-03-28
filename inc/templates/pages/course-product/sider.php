@@ -21,7 +21,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 
 echo '<div class="w-full md:!w-[20rem] px-4 md:px-0 flex flex-col gap-6">';

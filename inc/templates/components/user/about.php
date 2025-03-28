@@ -19,7 +19,7 @@ $args = wp_parse_args( $args, $default_args );
 
 
 if ( ! ( $user instanceof \WP_User ) ) {
-	throw new \Exception( 'user 不是 WP_User' );
+	return;
 }
 
 $user_id = $user->ID;

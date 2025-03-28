@@ -11,6 +11,7 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\PowerEmail\Resources\Email\CPT as EmailCPT;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\BundleProduct\Helper;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 
 /**
@@ -31,6 +32,7 @@ final class Duplicate {
 	/** Constructor */
 	public function __construct() {
 		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_post' ], 10, 5 );
+		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_children_chapter' ], 10, 5 );
 		\add_action( 'power_course_after_duplicate_post', [ __CLASS__, 'duplicate_bundle_product' ], 10, 5 );
 	}
 
@@ -108,7 +110,10 @@ final class Duplicate {
 			$post->post_title .= ' (複製)';
 		}
 
-		// $post->post_status = 'draft';
+		// 在插入前處理 post_content
+		if (isset($post->post_excerpt)) {
+			$post->post_excerpt = \wp_slash($post->post_excerpt);
+		}
 
 		// 插入新文章
 		// @phpstan-ignore-next-line
@@ -138,12 +143,12 @@ final class Duplicate {
 		}
 
 		if (\is_numeric($new_parent)) {
-			\wp_update_post(
-				[
-					'ID'          => $new_id,
-					'post_parent' => $new_parent,
-				]
-			);
+			$args = [
+				'ID'          => $new_id,
+				'post_parent' => $new_parent,
+			];
+
+			\wp_update_post($args);
 		}
 
 		return $new_id;
@@ -268,6 +273,54 @@ final class Duplicate {
 
 		foreach ($children_ids as $child_id) {
 			$duplicate->process($child_id, true, $new_id, $depth + 1);
+		}
+	}
+
+	/**
+	 * 複製子章節
+	 *
+	 * @param self $duplicate 複製物件
+	 * @param int  $post_id 文章 ID
+	 * @param int  $new_id 複製後的文章 ID
+	 * @param int  $new_parent 覆寫 post_parent, false 則不複製當前文章的子文章, true 會複製當前文章的子文章但當前文章 post_parent 不變
+	 * @param int  $depth 遞迴深度
+	 *
+	 * @return void
+	 */
+	public static function duplicate_children_chapter( self $duplicate, int $post_id, int $new_id, ?int $new_parent = 0, int $depth = 0 ): void {
+		if (!$new_parent) {
+			return;
+		}
+		// 只有複製課程時，才處理頂層子章節的複製
+		$is_course_product = CourseUtils::is_course_product( $new_id );
+
+		if (!$is_course_product) {
+			return;
+		}
+
+		$allowed_post_types = [
+			ChapterCPT::POST_TYPE,
+		];
+
+		/** @var array<int> $children_ids 原本課程的頂層 id */
+		$children_ids = \get_children(
+			[
+				'post_type'   => $allowed_post_types,
+				'numberposts' => -1,
+				'fields'      => 'ids',
+				'meta_key'    => 'parent_course_id',
+				'meta_value'  => $post_id,
+			]
+			);
+
+		$copied_ids = [];
+		foreach ($children_ids as $child_id) {
+			$copied_ids[] = $duplicate->process($child_id, true, true, $depth + 1);
+		}
+
+		// 把這貼複製後的頂層 chapter meta_key parent_course_id 更新為新的課程 id
+		foreach ($copied_ids as $copied_id) {
+			\update_post_meta($copied_id, 'parent_course_id', $new_id);
 		}
 	}
 

@@ -16,6 +16,8 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
+use J7\PowerCourse\Utils\Base;
+
 
 
 
@@ -377,11 +379,24 @@ final class Api extends ApiBase {
 		$ids = (array) $body_params['ids'];
 
 		try {
-			foreach ($ids as $id) {
-				$result = \wp_trash_post( (int) $id );
-				if (!$result) {
-					throw new \Exception(__('刪除章節資料失敗', 'power-course') . " #{$id}");
+			$results        = Base::batch_process(
+				$ids,
+				function ( int $id ) {
+					// 因為 wp_trash_post 有 hook 會遞規刪除子文章，所以這邊要先檢查狀態
+					// 不然刪除已經為 trash 的文章，會 return false，誤報為刪除失敗
+					$status = \get_post_status( (int) $id );
+					if ( $status === 'trash' ) {
+						return true;
+					}
+					return \wp_trash_post( (int) $id );
 				}
+			);
+			$failed_results = array_filter($results, fn ( $result ) => !$result);
+
+			if ($failed_results) {
+				$failed_result_indexes = array_keys($failed_results);
+				$failed_ids            = array_map(fn ( int $index ) => $ids[ $index ], $failed_result_indexes);
+				throw new \Exception(__('刪除章節資料失敗', 'power-course') . ' ids:' . implode(', ', $failed_ids));
 			}
 
 			return new \WP_REST_Response(
