@@ -23,7 +23,7 @@ $args = wp_parse_args($args, $default_args);
 ] = $args;
 
 if (! ( $product instanceof \WC_Product )) {
-	throw new \Exception('product 不是 WC_Product');
+	return;
 }
 
 $chapters_html = ChapterUtils::get_children_posts_html_uncached($product->get_id(), null, 0, 'course-product');

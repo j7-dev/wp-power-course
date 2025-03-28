@@ -32,7 +32,7 @@ $default_props = [
 $args    = wp_parse_args( $args, $default_props );
 $product = $args['product'];
 if (!( $product instanceof \WC_Product )) {
-	throw new \Exception('product 不是 WC_Product');
+	return;
 }
 
 $wrapper_class  = $args['wrapper_class'];
