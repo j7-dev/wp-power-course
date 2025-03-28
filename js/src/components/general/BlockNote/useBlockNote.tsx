@@ -109,52 +109,53 @@ export const useBlockNote = (params: TUseBlockNoteParams) => {
 			const doc = parser.parseFromString(newHtml, 'text/html')
 
 			// 將圖片的 data-url 轉換成 src
-			doc.body
-				.querySelectorAll('[data-content-type="image"]')
-				.forEach((node) => {
-					const src = node.getAttribute('data-url')
-					const imageNode = node.querySelector('img')
-					if (imageNode) {
-						imageNode.setAttribute('src', src || '')
-					}
-				})
+			doc.body.querySelectorAll('[data-content-type="image"]').forEach((node) => {
+				const src = node.getAttribute('data-url')
+				const imageNode = node.querySelector('img')
+				if (imageNode) {
+					imageNode.setAttribute('src', src || '')
+				}
+			})
+
+			// 移除空的圖片說明
+			doc.body.querySelectorAll('.bn-file-caption').forEach((node) => {
+				if (!node.textContent?.trim()) {
+					node.remove()
+				}
+			})
 
 			// 將檔案的 data-url 轉換成 下載連結
-			doc.body
-				.querySelectorAll('[data-content-type="file"]')
-				.forEach((node) => {
-					const link = node.getAttribute('data-url')
-					const previewNode = node.querySelector(
-						'.bn-file-default-preview',
-					) as HTMLDivElement
+			doc.body.querySelectorAll('[data-content-type="file"]').forEach((node) => {
+				const link = node.getAttribute('data-url')
+				const previewNode = node.querySelector(
+					'.bn-file-default-preview',
+				) as HTMLDivElement
 
-					if (previewNode) {
-						const previewANode = convertDivToATag(previewNode)
-						previewANode.setAttribute('href', link || '')
-						previewANode.setAttribute('target', '_blank')
+				if (previewNode) {
+					const previewANode = convertDivToATag(previewNode)
+					previewANode.setAttribute('href', link || '')
+					previewANode.setAttribute('target', '_blank')
 
-						const iconNode = previewANode.querySelector(
-							'.bn-file-default-preview-icon',
-						)
+					const iconNode = previewANode.querySelector(
+						'.bn-file-default-preview-icon',
+					)
 
-						if (iconNode) {
-							const ext = getFileExtension(link || '')
-							iconNode.innerHTML = getIconHTML(ext)
-						}
+					if (iconNode) {
+						const ext = getFileExtension(link || '')
+						iconNode.innerHTML = getIconHTML(ext)
 					}
-				})
+				}
+			})
 
 			// 將音檔的 data-url 轉換成 下載連結
-			doc.body
-				.querySelectorAll('[data-content-type="audio"]')
-				.forEach((node) => {
-					const src = node.getAttribute('data-url')
-					const audioNode = node.querySelector('.bn-audio')
+			doc.body.querySelectorAll('[data-content-type="audio"]').forEach((node) => {
+				const src = node.getAttribute('data-url')
+				const audioNode = node.querySelector('.bn-audio')
 
-					if (audioNode) {
-						audioNode.setAttribute('src', src || '')
-					}
-				})
+				if (audioNode) {
+					audioNode.setAttribute('src', src || '')
+				}
+			})
 
 			setHTML(doc.body.innerHTML)
 		},
