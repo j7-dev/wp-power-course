@@ -20,7 +20,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 
 $is_free = 'yes' === $product->get_meta( 'is_free' );

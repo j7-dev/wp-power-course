@@ -23,7 +23,7 @@ $args = wp_parse_args($args, $default_args);
 ] = $args;
 
 if (! ( $product instanceof \WC_Product )) {
-	throw new \Exception('product 不是 WC_Product');
+	return;
 }
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));

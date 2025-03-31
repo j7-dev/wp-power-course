@@ -21,7 +21,7 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 
 $message = CourseUtils::get_expired_label($product, get_current_user_id());

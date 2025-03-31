@@ -21,10 +21,10 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
-	throw new \Exception( 'product 不是 WC_Product' );
+	return;
 }
 
-echo '<div class="w-full md:!w-[20rem] px-4 md:px-0 flex flex-col gap-6">';
+echo '<div id="course-pricing" class="w-full md:!w-[20rem] md:h-[calc(100vh-8rem)] overflow-y-auto md:sticky md:top-[8rem] flex flex-col gap-6">';
 
 Plugin::load_template( 'card/single-product' );
 
