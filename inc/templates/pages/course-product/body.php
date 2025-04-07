@@ -134,6 +134,13 @@ Plugin::load_template( 'course-product/tabs', null, true, true );
 Plugin::load_template( 'course-product/footer', null, true, true );
 echo '</div>';
 
+// 是否啟用 enable_mobile_fixed_cta
+$enable_mobile_fixed_cta = $product->get_meta( 'enable_mobile_fixed_cta' ) === 'yes';
+
+if (!$enable_mobile_fixed_cta) {
+	return;
+}
+
 // 獲取課程方案數量
 $linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 $variation_count = count($linked_products);
@@ -150,5 +157,5 @@ printf(
     </div>
 </div>
 ',
-$variation_count > 1 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url()))
+$variation_count > 0 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url()))
 );

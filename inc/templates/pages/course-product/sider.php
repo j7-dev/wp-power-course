@@ -24,7 +24,14 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	return;
 }
 
-echo '<div id="course-pricing" class="w-full md:!w-[20rem] md:h-[calc(100vh-8rem)] overflow-y-auto md:sticky md:top-[8rem] flex flex-col gap-6">';
+// 檢查 enable_bundles_sticky
+$enable_bundles_sticky = $product->get_meta( 'enable_bundles_sticky' ) === 'yes';
+
+printf(
+/*html*/'<div id="course-pricing" class="w-full md:!w-[20rem] flex flex-col gap-6 %s">
+',
+$enable_bundles_sticky ? 'md:h-[calc(100vh-8rem)] overflow-y-auto md:sticky md:top-[8rem] ' : ''
+);
 
 Plugin::load_template( 'card/single-product' );
 
