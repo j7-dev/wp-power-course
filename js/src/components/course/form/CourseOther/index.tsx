@@ -246,6 +246,27 @@ const CourseOtherComponent = () => {
 					</>
 				)}
 			</div>
+
+			<Heading>銷售方案</Heading>
+			<div className="grid 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['enable_bundles_sticky'],
+						label: '桌機板( > 810px )時，銷售方案 Sticky',
+						tooltip:
+							'啟用後，如果你的課程介紹內容過長，旁邊的銷售方案會 sticky 在畫面上',
+					}}
+				/>
+
+				<FiSwitch
+					formItemProps={{
+						name: ['enable_mobile_fixed_cta'],
+						label: '手機板( < 810px )時，fix 行動呼籲在底部',
+						tooltip:
+							'行動呼籲，如果只有單一課程會直接加入1個課程並前往結帳頁，如果有多個銷售組合則會移動到方案區域讓用戶做選擇',
+					}}
+				/>
+			</div>
 		</>
 	)
 }
