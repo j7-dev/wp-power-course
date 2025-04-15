@@ -31,7 +31,7 @@ $message = sprintf(
 );
 
 
-echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]">';
+echo '<div class="leading-7 text-base-content w-full mx-auto px-0 md:px-6 text-base font-normal pt-0 lg:pt-[5rem] pb-[10rem]" style="max-width: 1200px;">';
 Plugin::load_template(
 	'alert',
 	[
