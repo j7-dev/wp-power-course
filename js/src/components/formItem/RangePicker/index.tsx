@@ -6,6 +6,7 @@ const { Item } = Form
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>
 const { RangePicker: AntdRangePicker } = DatePicker
 
+// @deprecated 改用 共用組件
 export const RangePicker: FC<{
 	formItemProps?: FormItemProps
 	rangePickerProps?: RangePickerProps

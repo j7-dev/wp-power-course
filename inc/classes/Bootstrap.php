@@ -8,6 +8,7 @@ use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\BundleProduct\Helper;
+use J7\WpUtils\Classes\General;
 
 
 
@@ -125,6 +126,9 @@ final class Bootstrap {
 	 * @return void
 	 */
 	public function admin_enqueue_script( $hook ): void {
+		if (!General::in_url([ 'power-course' ])) {
+			return;
+		}
 		self::enqueue_script();
 	}
 
