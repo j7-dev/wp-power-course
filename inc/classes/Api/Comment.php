@@ -47,12 +47,12 @@ final class Comment {
 			[
 				'endpoint'            => 'comments/(?P<id>\d+)/toggle-approved',
 				'method'              => 'post',
-				'permission_callback' => fn() => \current_user_can( 'manage_options' ),
+				'permission_callback' => fn() => \current_user_can( 'manage_woocommerce' ),
 			],
 			[
 				'endpoint'            => 'comments/(?P<id>\d+)',
 				'method'              => 'delete',
-				'permission_callback' => fn() => \current_user_can( 'manage_options' ),
+				'permission_callback' => fn() => \current_user_can( 'manage_woocommerce' ),
 			],
 		];
 	}
@@ -66,7 +66,7 @@ final class Comment {
 		$this->register_apis(
 		$this->get_apis(),
 		Plugin::$kebab,
-		fn() => \current_user_can( 'manage_options' ),
+		fn() => \current_user_can( 'manage_woocommerce' ),
 		);
 	}
 
@@ -105,7 +105,7 @@ final class Comment {
 		$default_args,
 		);
 
-		if (\current_user_can('manage_options')) {
+		if (\current_user_can('manage_woocommerce')) {
 			$args['status'] = 'all';
 		}
 
@@ -423,7 +423,7 @@ final class Comment {
 		$comment_id        = $comment->comment_ID;
 		$user_id           = $comment->user_id;
 		$user_avatar_url   = \get_user_meta($user_id, 'user_avatar_url', true);
-		$user_avatar_url   = !!$user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
+		$user_avatar_url   = (bool) $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 		$user              = [
 			'id'         => (string) $user_id,
 			'name'       => \get_the_author_meta('display_name', $user_id) ?: '訪客',

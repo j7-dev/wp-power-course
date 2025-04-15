@@ -90,7 +90,7 @@ final class User {
 		$this->register_apis(
 		$this->apis,
 		Plugin::$kebab,
-		fn() => \current_user_can( 'manage_options' ),
+		fn() => \current_user_can( 'manage_woocommerce' ),
 		);
 	}
 

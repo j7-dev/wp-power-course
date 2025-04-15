@@ -63,7 +63,7 @@ echo /*html*/'
 ';
 
 $is_avl             = CourseUtils::is_avl($product->get_id());
-$show_admin_preview = current_user_can('manage_options') && !$is_avl;
+$show_admin_preview = current_user_can('manage_woocommerce') && !$is_avl;
 if ($show_admin_preview) {
 	echo /*html*/'<div class="text-center text-sm text-white bg-orange-500 py-1 w-full sticky top-[92px] lg:top-16 z-30">此為管理員預覽模式</div>';
 }
@@ -112,7 +112,7 @@ if ($enable_comment) {
 			'yes', // $product->get_meta( 'show_comment_list' ) === 'yes' ? 'yes' : 'no',
 			'yes',
 			\get_current_user_id(),
-			\current_user_can('manage_options') ? 'admin' : 'user',
+			\current_user_can('manage_woocommerce') ? 'admin' : 'user',
 	);
 }
 
