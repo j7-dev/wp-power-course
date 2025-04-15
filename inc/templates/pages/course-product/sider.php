@@ -28,7 +28,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 $enable_bundles_sticky = $product->get_meta( 'enable_bundles_sticky' ) === 'yes';
 
 printf(
-/*html*/'<div id="course-pricing" class="w-full md:!w-[20rem] flex flex-col gap-6 %s">
+/*html*/'<div id="course-pricing" class="w-full md:!w-[20rem] flex flex-col gap-6 px-2 %s">
 ',
 $enable_bundles_sticky ? 'md:h-[calc(100vh-8rem)] overflow-y-auto md:sticky md:top-[8rem] ' : ''
 );

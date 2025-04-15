@@ -64,7 +64,7 @@ echo '<div class="leading-7 text-base-content w-full max-w-[1138px] mx-auto  px-
 // Header
 Plugin::load_template( 'course-product/header', null, true, true );
 
-echo '<div class="flex flex-col md:flex-row gap-8">';
+echo '<div class="flex flex-col md:flex-row gap-6">';
 
 // Body
 Plugin::load_template( 'course-product/body', null, true, true );
