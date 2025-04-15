@@ -37,7 +37,7 @@ $is_expired = CourseUtils::is_expired($course_product, $current_user_id);
 
 $is_avl = CourseUtils::is_avl($course_product?->get_id());
 
-if (!current_user_can('manage_options')) {
+if (!current_user_can('manage_woocommerce')) {
 	if ( ! $is_avl ) {
 		get_header();
 		Plugin::load_template( '404/buy', null );

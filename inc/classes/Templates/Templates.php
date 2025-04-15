@@ -84,7 +84,7 @@ final class Templates {
 	 */
 	public function admin_bar_item( \WP_Admin_Bar $admin_bar ): void {
 
-		if ( ! \current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
