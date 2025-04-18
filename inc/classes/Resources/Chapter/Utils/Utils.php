@@ -577,7 +577,12 @@ abstract class Utils {
 				);
 
 		foreach ($top_chapter_ids as $top_chapter_id) {
-			$child_chapter_ids = PostUtils::get_flatten_post_ids( $top_chapter_id );
+			$child_chapter_ids = PostUtils::get_flatten_post_ids(
+				$top_chapter_id,
+				[
+					'post_status' => 'publish',
+				]
+				);
 			$flatten_post_ids  = [
 				...$flatten_post_ids,
 				$top_chapter_id,
