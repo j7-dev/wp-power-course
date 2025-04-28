@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import '@vidstack/react/player/styles/default/theme.css'
 import '@vidstack/react/player/styles/default/layouts/video.css'
-import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react'
+import {
+	MediaPlayer,
+	MediaProvider,
+	Poster,
+	MediaPlayerInstance,
+	// useStore,
+} from '@vidstack/react'
 
 import {
 	defaultLayoutIcons,
@@ -30,9 +36,23 @@ const index = ({
 	watermark_interval,
 }: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
+	const playerRef = useRef<MediaPlayerInstance>(null)
+	// const { playing } = useStore(MediaPlayerInstance, playerRef)
+
 	return (
 		<>
 			<MediaPlayer
+				ref={playerRef}
+				onTouchEnd={(e) => {
+					if (!playerRef?.current) {
+						return
+					}
+					e.preventDefault()
+					e.stopPropagation()
+
+					const remoteControl = playerRef.current.remoteControl
+					remoteControl.togglePaused()
+				}}
 				src={src}
 				viewType="video"
 				streamType="on-demand"
@@ -52,8 +72,17 @@ const index = ({
 				<MediaProvider>
 					<Poster className="vds-poster" />
 				</MediaProvider>
-				<DefaultAudioLayout icons={defaultLayoutIcons} colorScheme="dark" />
-				<DefaultVideoLayout icons={defaultLayoutIcons} colorScheme="dark" />
+				<DefaultAudioLayout
+					// smallLayoutWhen={false}
+					icons={defaultLayoutIcons}
+					colorScheme="dark"
+				/>
+
+				<DefaultVideoLayout
+					// smallLayoutWhen={false}
+					icons={defaultLayoutIcons}
+					colorScheme="dark"
+				/>
 
 				<div
 					className={`absolute w-full h-full top-0 left-0 ${showWatermark ? 'tw-block' : 'tw-hidden'}`}
