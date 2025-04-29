@@ -25,6 +25,7 @@ final class Duplicate {
 	 * @var array<string>
 	 */
 	protected static array $exclude_meta_keys = [
+		'total_sales',
 		'_edit_lock',
 		'_edit_last',
 	];
