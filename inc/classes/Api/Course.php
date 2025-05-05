@@ -343,12 +343,13 @@ final class Course extends ApiBase {
 			// Get Product Stock
 			'stock'              => $product->get_stock_quantity(),
 			'stock_status'       => $product->get_stock_status(),
-			'manage_stock'       => $product->get_manage_stock(),
+			'manage_stock'       => \wc_bool_to_string( $product->get_manage_stock() ),
 			'stock_quantity'     => $product->get_stock_quantity(),
 			'backorders'         => $product->get_backorders(),
-			'backorders_allowed' => $product->backorders_allowed(),
-			'backordered'        => $product->is_on_backorder(),
+			'backorders_allowed' => \wc_bool_to_string( $product->backorders_allowed() ),
+			'backordered'        => \wc_bool_to_string( $product->is_on_backorder() ),
 			'low_stock_amount'   => $low_stock_amount,
+			'sold_individually'  => \wc_bool_to_string( $product->is_sold_individually() ),
 
 			// Get Product Taxonomies
 			'category_ids'       => $category_ids,
@@ -688,6 +689,11 @@ final class Course extends ApiBase {
 			'data'      => $data,
 			'meta_data' => $meta_data,
 		] = $this->separator($request);
+
+		// TEST 印出 WC Logger 記得移除 ---- //
+		\J7\WpUtils\Classes\WC::log( $data, 'data' );
+		// ---------- END TEST ---------- //
+
 		$this->handle_save_course_data($product, $data );
 		$result = $this->handle_save_course_meta_data($product, $meta_data );
 

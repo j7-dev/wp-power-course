@@ -1,6 +1,7 @@
 import React from 'react'
 import SimplePriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Simple'
 import SubscriptionPriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Subscription'
+import StockFields from '@/components/course/form/CoursePrice/StockFields'
 import { Form } from 'antd'
 import { useParsed } from '@refinedev/core'
 import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '../utils'
@@ -67,6 +68,8 @@ const ProductPriceFields = ({
 					),
 				}}
 			/>
+
+			<StockFields />
 		</>
 	)
 }

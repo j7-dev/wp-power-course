@@ -36,3 +36,6 @@ export const course_permalink_structure =
 
 export const ELEMENTOR_ENABLED =
 	window?.[APP_DOMAIN]?.env?.ELEMENTOR_ENABLED || false
+
+export const notify_low_stock_amount =
+	window?.[APP_DOMAIN]?.env?.notify_low_stock_amount || 10
