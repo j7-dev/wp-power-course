@@ -188,6 +188,7 @@ final class Bootstrap {
 					'bunny_cdn_hostname'         => \get_option( 'bunny_cdn_hostname', '' ),
 					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
 					'ELEMENTOR_ENABLED'          => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
+					'notify_low_stock_amount'    => \get_option( 'woocommerce_notify_low_stock_amount' ),
 				],
 			]
 		);

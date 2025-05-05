@@ -4,6 +4,8 @@ import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
 import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
 import SubscriptionPriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Subscription'
 import SimplePriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Simple'
+import StockFields from '@/components/course/form/CoursePrice/StockFields'
+
 import { Heading } from '@/components/general'
 
 const { Item } = Form
@@ -41,6 +43,8 @@ const CoursePriceComponent = () => {
 					{isSubscription && <SubscriptionPriceFields />}
 
 					<SimplePriceFields />
+
+					<StockFields />
 				</div>
 				<div>
 					<Heading>購買備註</Heading>
