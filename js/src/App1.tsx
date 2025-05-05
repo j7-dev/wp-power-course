@@ -2,7 +2,6 @@
 import { lazy, Suspense } from 'react'
 import { Refine } from '@refinedev/core'
 import { ErrorComponent, useNotificationProvider } from '@refinedev/antd'
-import '@refinedev/antd/dist/reset.css'
 import routerBindings, {
 	UnsavedChangesNotifier,
 	NavigateToResource,
