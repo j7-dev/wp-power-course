@@ -1,7 +1,4 @@
 <?php
-/**
- * User API
- */
 
 declare(strict_types=1);
 
@@ -11,20 +8,17 @@ use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
-use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 
-/**
- * Class Api
- */
+/** Class Api */
 final class User {
 	use \J7\WpUtils\Traits\SingletonTrait;
 	use \J7\WpUtils\Traits\ApiRegisterTrait;
 
-	const BATCH_SIZE = 100;
+	const BATCH_SIZE = 50;
 
 	/**
 	 * APIs
@@ -73,9 +67,7 @@ final class User {
 		],
 	];
 
-	/**
-	 * Constructor.
-	 */
+	/** Constructor*/
 	public function __construct() {
 		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
 		\add_action( 'pc_batch_add_students_task', [ $this, 'process_batch_add_students' ], 10, 4 );
@@ -665,6 +657,9 @@ final class User {
 			}
 
 			$user = \get_user_by('email', $email);
+
+			// ----- ▼ 判斷用戶存不存在，不存在就創建 ----- //
+
 			if (!$user) {
 				// 如果用戶不存在，要創建用戶，並且計送 EMAIL 設置密碼
 
@@ -687,11 +682,7 @@ final class User {
 			} else {
 				// 如果用戶已經存在，要先取得用戶 ID
 				$user_id = (int) $user->ID;
-				$is_avl  = CourseUtils::is_avl( (int) $course_id, (int) $user_id);
-				// 原本用戶已經可以上課，那就不用新增
-				if ($is_avl) {
-					continue;
-				}
+				// 原本用戶已經可以上課，那就一樣覆蓋課程時間
 			}
 
 			// 處理 $expire_date，如果 是 subscription_ 開頭, 0, timestamp，則不需要處理
@@ -711,13 +702,12 @@ final class User {
 
 		// 如果還有下一批資料,安排下一次執行
 		if ( !$is_last_batch ) {
-			$this->process_batch_add_students($attachment_id, $batch + 1, $batch_size, $email_content);
-			// $schedule_result = \wp_schedule_single_event(
-			// 	time() + 15,
-			// 'pc_batch_add_students_task',
-			// [ $attachment_id, $batch + 1, $batch_size, $email_content ],
-			// 'power_course_batch_add_students',
-			// );
+			$action_id = \as_schedule_single_action(
+				time() + 20,
+			'pc_batch_add_students_task',
+			[ $attachment_id, $batch + 1, $batch_size, $email_content ],
+			'power_course_batch_add_students',
+			);
 		} else {
 			// 如果已經沒有下一批資料, 就發送 EMAIL
 			$admin_email = \get_option('admin_email');
