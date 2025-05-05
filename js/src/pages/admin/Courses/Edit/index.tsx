@@ -67,12 +67,12 @@ export const CoursesEdit = () => {
 			label: 'QA設定',
 			children: <CourseQA />,
 		},
-		{
-			key: 'CourseAnnouncement',
-			forceRender: false,
-			label: '課程公告',
-			children: <CourseAnnouncement />,
-		},
+		// {
+		// 	key: 'CourseAnnouncement',
+		// 	forceRender: false,
+		// 	label: '課程公告',
+		// 	children: <CourseAnnouncement />,
+		// },
 		{
 			key: 'CourseOther',
 			forceRender: true,
