@@ -603,7 +603,7 @@ final class User {
 
 			// --- END 將 email content 寫入到 txt 檔，不然太大傳參會 exception END ---
 
-			$action_id = \as_enqueue_async_action( 'pc_batch_add_students_task', [ $attachment_id, 0, self::BATCH_SIZE, $email_content_file_content ], 'power_course_batch_add_students' );
+			$action_id = \as_enqueue_async_action( 'pc_batch_add_students_task', [ $attachment_id, 0, self::BATCH_SIZE, $email_content_file_path ], 'power_course_batch_add_students' );
 
 			// 寫入 DB
 			return new \WP_REST_Response(
@@ -635,10 +635,10 @@ final class User {
 	 * @param int    $attachment_id 附件 ID
 	 * @param int    $batch 批次
 	 * @param int    $batch_size 每批數量
-	 * @param string $email_content 要傳送的 EMAIL 內容 txt 檔路徑
+	 * @param string $email_content_file_path Email content file path
 	 * @return void
 	 */
-	public function process_batch_add_students( int $attachment_id, int $batch, int $batch_size, string $email_content = '' ): void {
+	public function process_batch_add_students( int $attachment_id, int $batch, int $batch_size, string $email_content_file_path = '' ): void {
 		$file = File::get_file_by_id($attachment_id);
 		// 獲取當前批次的資料
 		$current_batch_rows = File::parse_csv_streaming($file, $batch, $batch_size);
@@ -647,7 +647,7 @@ final class User {
 
 		$unique_array_instance = new UniqueArray($current_batch_rows);
 		$unique_rows           = $unique_array_instance->get_list();
-
+		$email_content         = '';
 		foreach ($unique_rows as $csv_row) {
 			$email       = $csv_row[0];
 			$course_id   = $csv_row[1];
@@ -695,26 +695,56 @@ final class User {
 
 			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date, null );
 
-			$email_content .= "用戶 #{$user_id} 獲得課程 #{$course_id} 權限，到期日 {$expire_date} <br>";
+			$email_content .= "用戶 #{$user_id} 獲得課程 #{$course_id} 權限，到期日 {$expire_date} \n\n";
 		}
 
+		// ----- ▼ 寫入 log 以及 email 文字檔 ----- //
 		\J7\WpUtils\Classes\WC::log($is_last_batch ? '已經是最後一批，發信，結束' : '還沒到最後一批，繼續', 'User::process_batch_add_students');
+
+		// 初始化 WP_Filesystem
+		global $wp_filesystem;
+		if (empty($wp_filesystem)) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			\WP_Filesystem();
+		}
+
+		// 讀取原本檔案內容
+		$old_content = $wp_filesystem->get_contents($email_content_file_path);
+
+		// 新內容
+		$new_content = $old_content . $email_content;
+
+		// 寫入文字檔內容
+		$wp_filesystem->put_contents($email_content_file_path, $new_content, FS_CHMOD_FILE);
 
 		// 如果還有下一批資料,安排下一次執行
 		if ( !$is_last_batch ) {
-			$action_id = \as_schedule_single_action(
-				time() + 20,
+			$action_id = \as_enqueue_async_action(
 			'pc_batch_add_students_task',
-			[ $attachment_id, $batch + 1, $batch_size, $email_content ],
+			[ $attachment_id, $batch + 1, $batch_size, $email_content_file_path ],
 			'power_course_batch_add_students',
 			);
+
 		} else {
+
+			$upload_dir = \wp_upload_dir();
+
+			// 標準化路徑
+			$basedir   = \wp_normalize_path($upload_dir['basedir']);
+			$file_path = \wp_normalize_path($email_content_file_path);
+
+			// 取得相對路徑
+			$relative_path = ltrim(str_replace($basedir, '', $file_path), '/');
+
+			// 組合成 URL
+			$file_url = \trailingslashit($upload_dir['baseurl']) . $relative_path;
+
 			// 如果已經沒有下一批資料, 就發送 EMAIL
 			$admin_email = \get_option('admin_email');
 			\wp_mail(
 			$admin_email,
 			sprintf('csv 匯入學員結果，共 %1$d 筆，共 %2$d 批次，每批次 %3$d 筆', ( $batch ) * $batch_size + count($current_batch_rows), $batch + 1, $batch_size),
-			$email_content,
+			'<a href="' . $file_url . '">下載學員課程權限明細</a>',
 			[
 				'Content-Type: text/html; charset=UTF-8',
 			]
