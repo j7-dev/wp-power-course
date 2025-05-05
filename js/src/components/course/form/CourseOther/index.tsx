@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { Form, Switch, Slider, InputNumber, Rate, Tooltip } from 'antd'
 import { Heading } from '@/components/general'
-import { FiSwitch } from '@/components/formItem'
+import { FiSwitch, DatePicker } from '@/components/formItem'
 
 const { Item } = Form
 
@@ -25,7 +25,7 @@ const CourseOtherComponent = () => {
 		<>
 			<Heading>課程介紹區域</Heading>
 			{/* <Heading size="sm">課程標籤</Heading> */}
-			<div className="grid 2xl:grid-cols-3 gap-6">
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch
 					formItemProps={{
 						name: ['is_popular'],
@@ -84,7 +84,7 @@ const CourseOtherComponent = () => {
 			</div>
 
 			{/* <Heading size="sm">課程評價星星</Heading> */}
-			<div className="grid 2xl:grid-cols-3 gap-6">
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch
 					formItemProps={{
 						name: ['show_review'],
@@ -126,44 +126,41 @@ const CourseOtherComponent = () => {
 
 			<Heading>課程資訊</Heading>
 
-			{/* <Heading size="sm">開課時間</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_course_schedule'],
-					label: '顯示開課時間',
-					initialValue: 'yes',
-				}}
-			/>
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				{/* <Heading size="sm">開課時間</Heading> */}
+				<FiSwitch
+					formItemProps={{
+						name: ['show_course_schedule'],
+						label: '顯示開課時間',
+						initialValue: 'yes',
+					}}
+				/>
 
-			{/* <Heading size="sm">時長</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_course_time'],
-					label: '顯示課程時長',
-					initialValue: 'yes',
-				}}
-			/>
+				{/* <Heading size="sm">時長</Heading> */}
+				<FiSwitch
+					formItemProps={{
+						name: ['show_course_time'],
+						label: '顯示課程時長',
+						initialValue: 'yes',
+					}}
+				/>
 
-			{/* <Heading size="sm">單元</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_course_chapters'],
-					label: '顯示單元數量',
-					initialValue: 'yes',
-				}}
-			/>
-			{/* <Heading size="sm">觀看時間</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_course_limit'],
-					label: '顯示觀看時間',
-					initialValue: 'yes',
-				}}
-			/>
-
-			{/* <Heading size="sm">課程學員</Heading> */}
-
-			<div className="grid 2xl:grid-cols-3 gap-6">
+				{/* <Heading size="sm">單元</Heading> */}
+				<FiSwitch
+					formItemProps={{
+						name: ['show_course_chapters'],
+						label: '顯示單元數量',
+						initialValue: 'yes',
+					}}
+				/>
+				{/* <Heading size="sm">觀看時間</Heading> */}
+				<FiSwitch
+					formItemProps={{
+						name: ['show_course_limit'],
+						label: '顯示觀看時間',
+						initialValue: 'yes',
+					}}
+				/>
 				<FiSwitch
 					formItemProps={{
 						name: ['show_total_student'],
@@ -188,39 +185,33 @@ const CourseOtherComponent = () => {
 			</div>
 
 			<Heading>課程詳情</Heading>
-			{/* <Heading size="sm">介紹</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_description_tab'],
-					label: '顯示介紹',
-				}}
-			/>
-			{/* <Heading size="sm">章節</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_chapter_tab'],
-					label: '顯示章節',
-				}}
-			/>
-			{/* <Heading size="sm">問答</Heading> */}
-			<FiSwitch
-				formItemProps={{
-					name: ['show_qa_tab'],
-					label: '顯示問答',
-				}}
-			/>
-			{/* <Heading size="sm">留言</Heading> */}
-			<div className="grid 2xl:grid-cols-3 gap-6">
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['show_description_tab'],
+						label: '顯示介紹',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
+						name: ['show_chapter_tab'],
+						label: '顯示章節',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
+						name: ['show_qa_tab'],
+						label: '顯示問答',
+					}}
+				/>
+
 				<FiSwitch
 					formItemProps={{
 						name: ['enable_comment'],
 						label: '顯示留言',
 					}}
 				/>
-			</div>
 
-			{/* <Heading size="sm">評價</Heading> */}
-			<div className="grid 2xl:grid-cols-3 gap-6">
 				<FiSwitch
 					formItemProps={{
 						name: ['show_review_tab'],
@@ -264,6 +255,19 @@ const CourseOtherComponent = () => {
 						label: '手機板( < 810px )時，fix 行動呼籲在底部',
 						tooltip:
 							'行動呼籲，如果只有單一課程會直接加入1個課程並前往結帳頁，如果有多個銷售組合則會移動到方案區域讓用戶做選擇',
+					}}
+				/>
+			</div>
+
+			<Heading>發佈時間</Heading>
+
+			<div className="grid 2xl:grid-cols-3 gap-6">
+				<DatePicker
+					formItemProps={{
+						name: ['date_created'],
+						label: '發佈時間',
+						className: 'mb-0',
+						tooltip: '你可以透過控制發布時間，搭配短代碼，控制課程的排列順序',
 					}}
 				/>
 			</div>
