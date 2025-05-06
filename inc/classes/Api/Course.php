@@ -690,10 +690,6 @@ final class Course extends ApiBase {
 			'meta_data' => $meta_data,
 		] = $this->separator($request);
 
-		// TEST 印出 WC Logger 記得移除 ---- //
-		\J7\WpUtils\Classes\WC::log( $data, 'data' );
-		// ---------- END TEST ---------- //
-
 		$this->handle_save_course_data($product, $data );
 		$result = $this->handle_save_course_meta_data($product, $meta_data );
 
