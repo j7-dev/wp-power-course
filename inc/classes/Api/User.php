@@ -682,8 +682,7 @@ final class User {
 			if (!$user) {
 				// 如果用戶不存在，要創建用戶，並且計送 EMAIL 設置密碼
 
-				// 把 email @ 的前面作為 username
-				$username = \explode('@', $email)[0];
+				$username = $email;
 				$password = \wp_generate_password(12);
 				$user_id  = \wp_create_user($username, $password, $email);
 				if (\is_wp_error($user_id)) {
