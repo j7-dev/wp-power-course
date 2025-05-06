@@ -48,6 +48,7 @@ final class General {
 
 		$default_args = [
 			'status'              => [ 'publish' ],
+			'visibility'          => 'visible',
 			'paginate'            => true,
 			'limit'               => 12,
 			'page'                => 1,
