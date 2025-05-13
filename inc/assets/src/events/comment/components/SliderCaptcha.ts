@@ -37,7 +37,7 @@ export const SliderCaptcha = function (element, options) {
 }
 
 SliderCaptcha.VERSION = '1.0'
-SliderCaptcha.Author = 'j7.dev.gg@gmail.com'
+SliderCaptcha.Author = ''
 SliderCaptcha.DEFAULTS = {
 	width: 280, // canvas宽度
 	height: 155, // canvas高度
