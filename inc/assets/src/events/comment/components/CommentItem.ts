@@ -178,7 +178,7 @@ export class CommentItem {
 					</div>
 					<div class="flex-1">
 						<div class="flex justify-between text-sm">
-							<div class="pc-tooltip" data-tip="${user_role === 'admin' ? `email: ${user.email}` : ''}">${user.name}</div>
+							<div>${user.name}</div>
 							<div class="pc-comment-item__rating"></div>
 						</div>
 						<p class="text-gray-400 text-content text-xs mb-4">${comment_date}${comment_approved ? '' : '  留言已隱藏'}</p>
