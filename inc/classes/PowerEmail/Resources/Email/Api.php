@@ -231,7 +231,7 @@ final class Api extends ApiBase {
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []
-		$body_params = General::format_empty_array( $body_params );
+		$body_params = General::parse( $body_params );
 
 		[
 			'data'      => $data,
