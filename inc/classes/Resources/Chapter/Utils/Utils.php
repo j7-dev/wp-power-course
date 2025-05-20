@@ -190,6 +190,7 @@ abstract class Utils {
 	 * } $params Parameters.
 	 *
 	 * @return true|\WP_Error
+	 * @throws \Exception 更新錯誤
 	 */
 	public static function sort_chapters( array $params ): bool|\WP_Error {
 		$from_tree = $params['from_tree'] ?? [];
@@ -204,30 +205,215 @@ abstract class Utils {
 				$delete_ids[] = $id;
 			}
 		}
+
+		$new_to_tree = [];
+
+		// 重新整理 to_tree 的資料
 		foreach ($to_tree as $node) {
-			$id   = $node['id'];
-			$args = self::converter($node);
-			if (!$node['depth']) {
+			$new_node = [
+				'id'               => $node['id'],
+				// 為了做更細粒度的排序，但 menu_order WP 強制轉 int，所以需要 * 10
+				'menu_order'       => ( (int) $node['menu_order'] ) * 10,
 				// 如果 depth 是 0，代表是頂層，不使用 post_parent ，而是用 meta_key parent_course_id
 				// post_parent 要清空
-				$args['post_parent'] = 0;
-				$args['meta_input']  = [
-					'parent_course_id' => $node['parent_id'],
-				];
+				'parent_id'        => $node['depth'] ? $node['parent_id'] : 0,
+				'parent_course_id' => $node['depth'] ? 0 : $node['parent_id'],
+			];
 
-			} else {
-				// 如果 depth 不是 0，代表是子章節，使用 post_parent 連接母章節
-				// 要刪除 parent_course_id meta_key
-				\delete_post_meta( $id, 'parent_course_id' );
+			$new_to_tree[] = $new_node;
+		}
+
+		// 使用 wpdb 一次更新
+		global $wpdb;
+
+		// 批量更新的大小
+		$batch_size = 50; // 每次處理50筆資料
+
+		// 分批處理資料
+		$batches = array_chunk($new_to_tree, $batch_size);
+
+		// 開始事務處理
+		$wpdb->query('START TRANSACTION');
+
+		try {
+			// 準備兩個不同的更新集合：一個用於只更新 menu_order，另一個用於同時更新 menu_order 和 post_parent
+			foreach ($batches as $batch) {
+				// 構建 CASE WHEN 語句
+				$ids                    = [];
+				$menu_order_cases       = [];
+				$parent_cases           = [];
+				$parent_course_id_cases = [];
+
+				foreach ($batch as $item) {
+					$id               = intval($item['id']);
+					$ids[]            = $id;
+					$menu_order       = intval($item['menu_order']);
+					$parent_id        = $item['parent_id'];
+					$parent_course_id = $item['parent_course_id'];
+
+					// 為每個ID準備menu_order的CASE語句
+					$menu_order_cases[] = $wpdb->prepare('WHEN ID = %d THEN %d', $id, $menu_order);
+
+					// 則準備post_parent的CASE語句
+					$parent_cases[] = $wpdb->prepare('WHEN ID = %d THEN %d', $id, $parent_id);
+
+					// 如果 parent_course_id 不為 0，則準備 parent_course_id 的 CASE 語句
+					$parent_course_id_cases[] = $wpdb->prepare('WHEN ID = %d THEN %d', $id, $parent_course_id);
+				}
+
+				// 如果沒有要處理的ID，則跳過
+				if (empty($ids)) {
+					continue;
+				}
+
+				// 構建ID列表
+				$id_list = implode(',', $ids);
+
+				// 構建批量更新SQL
+				$sql  = "UPDATE {$wpdb->posts} SET menu_order = CASE ";
+				$sql .= implode(' ', $menu_order_cases);
+				$sql .= ' ELSE menu_order END ';
+
+				// 如果有post_parent需要更新，加入post_parent的更新語句
+				if (!empty($parent_cases)) {
+					$sql .= ', post_parent = CASE ';
+					$sql .= implode(' ', $parent_cases);
+					$sql .= ' ELSE post_parent END ';
+				}
+
+				// 加入WHERE條件，限制只更新需要的記錄
+				$sql .= " WHERE ID IN ($id_list)";
+
+				// 執行批量更新 wp_posts
+				$result = $wpdb->query($sql);  // phpcs:ignore
+
+				if ($result === false) {
+					throw new \Exception('批量更新失敗: ' . $wpdb->last_error);
+				}
+
+				// ----- 處理 parent_course_id ----- //
+				// 1. 先收集需要處理的資料
+				$delete_meta_ids       = []; // 需要刪除的 post_id (parent_course_id = 0)
+				$insert_or_update_data = []; // 需要插入或更新的資料 (parent_course_id != 0)
+
+				foreach ($batch as $item) {
+					$id               = intval($item['id']);
+					$parent_course_id = intval($item['parent_course_id']);
+
+					if ($parent_course_id === 0) {
+						$delete_meta_ids[] = $id;
+					} else {
+						$insert_or_update_data[] = [
+							'post_id' => $id,
+							'value'   => $parent_course_id,
+						];
+					}
+				}
+
+				// 2. 刪除 parent_course_id = 0 的記錄
+				if (!empty($delete_meta_ids)) {
+					$delete_id_placeholders = implode(',', array_fill(0, count($delete_meta_ids), '%d'));
+					// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+					$delete_sql = "DELETE FROM {$wpdb->postmeta} WHERE post_id IN ($delete_id_placeholders) AND meta_key = 'parent_course_id'";
+					$wpdb->query(
+						$wpdb->prepare(
+							$delete_sql, // phpcs:ignore
+							$delete_meta_ids
+						)
+					);
+				}
+
+				// 3. 處理需要插入或更新的數據
+				if (!empty($insert_or_update_data)) {
+					// 先用一個查詢找出哪些記錄已存在
+					$check_ids          = array_column($insert_or_update_data, 'post_id');
+					$check_placeholders = implode(',', array_fill(0, count($check_ids), '%d'));
+					// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+					$check_sql    = "SELECT post_id FROM {$wpdb->postmeta} WHERE post_id IN ($check_placeholders) AND meta_key = 'parent_course_id'";
+					$existing_ids = $wpdb->get_col(
+						$wpdb->prepare(
+							$check_sql, // phpcs:ignore
+							$check_ids
+						)
+					);
+					$existing_ids = array_map('intval', $existing_ids);
+
+					// 構建更新語句
+					$update_data   = [];
+					$update_values = [];
+					foreach ($insert_or_update_data as $data) {
+						if (in_array($data['post_id'], $existing_ids)) {
+							$update_data[]   = $data;
+							$update_values[] = $data['post_id'];
+							$update_values[] = $data['value'];
+						}
+					}
+
+					if (!empty($update_data)) {
+						$update_cases       = [];
+						$update_values_flat = [];
+
+						foreach ($update_data as $data) {
+							$update_cases[]       = 'WHEN post_id = %d THEN %d';
+							$update_values_flat[] = $data['post_id'];
+							$update_values_flat[] = $data['value'];
+						}
+
+						// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$update_sql  = "UPDATE {$wpdb->postmeta} SET meta_value = CASE ";
+						$update_sql .= implode(' ', $update_cases);
+						$update_sql .= ' ELSE meta_value END WHERE post_id IN (';
+						$update_sql .= implode(',', array_fill(0, count($update_data), '%d'));
+						$update_sql .= ") AND meta_key = 'parent_course_id'";
+
+						$wpdb->query(
+							$wpdb->prepare(
+								$update_sql, // phpcs:ignore
+								array_merge($update_values_flat, array_column($update_data, 'post_id'))
+							)
+						);
+					}
+
+					// 構建插入語句 - 插入不存在的記錄
+					$insert_data = [];
+					foreach ($insert_or_update_data as $data) {
+						if (!in_array($data['post_id'], $existing_ids)) {
+							$insert_data[] = $data;
+						}
+					}
+
+					if (!empty($insert_data)) {
+						$insert_values       = [];
+						$insert_placeholders = [];
+
+						foreach ($insert_data as $data) {
+							$insert_placeholders[] = '(%d, %s, %d)';
+							$insert_values[]       = $data['post_id'];
+							$insert_values[]       = 'parent_course_id';
+							$insert_values[]       = $data['value'];
+						}
+
+						// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+						$insert_sql  = "INSERT INTO {$wpdb->postmeta} (post_id, meta_key, meta_value) VALUES ";
+						$insert_sql .= implode(', ', $insert_placeholders);
+
+						$wpdb->query(
+							$wpdb->prepare(
+								$insert_sql, // phpcs:ignore
+								$insert_values
+							)
+						);
+					}
+				}
 			}
 
-			// 為了做更細粒度的排序，但 menu_order WP 強制轉 int，所以需要 * 10
-			$args['menu_order'] = ( (int) $node['menu_order'] ) * 10;
-			$insert_result      = self::update_chapter( (string) $id, $args);
+			// 提交事務
+			$wpdb->query('COMMIT');
 
-			if (\is_wp_error($insert_result)) {
-				return $insert_result;
-			}
+		} catch (\Exception $e) {
+			// 回滾事務
+			$wpdb->query('ROLLBACK');
+			throw new \Exception('排序失敗: ' . $e->getMessage());
 		}
 
 		foreach ($delete_ids as $id) {
@@ -238,8 +424,7 @@ abstract class Utils {
 	}
 
 	/**
-	 * Converter 轉換器
-	 * 把 key 轉換/重新命名，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
+	 * Converter 轉換器     * 把 key 轉換/重新命，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
