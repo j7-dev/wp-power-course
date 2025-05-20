@@ -499,7 +499,8 @@ final class Course extends ApiBase {
 	 * @phpstan-ignore-next-line
 	 */
 	private function separator( $request ): array {
-		$id          = $request['id'] ?? '';
+		$id = $request['id'] ?? '';
+
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
@@ -513,9 +514,12 @@ final class Course extends ApiBase {
 
 		// 將 '[]' 轉為 []，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 		/** @var array<string, mixed|string> $body_params */
-		$body_params = is_array($body_params) ? General::format_empty_array($body_params) : [];
+		$body_params = is_array($body_params) ? General::parse($body_params) : [];
 
-		$product = (bool) $id ? \wc_get_product( $id ) : new \WC_Product_Simple();
+		$product = \wc_get_product( $id );
+		if (!$product) {
+			$product = new \WC_Product_Simple();
+		}
 
 		// @phpstan-ignore-next-line
 		[
@@ -525,10 +529,6 @@ final class Course extends ApiBase {
 
 		if (!( $meta_data['files'] ?? '' )) {
 			unset($meta_data['files']);
-		}
-
-		if ( ! $product ) {
-			throw new \Exception( '找不到商品' );
 		}
 
 		return [
