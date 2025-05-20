@@ -441,13 +441,16 @@ abstract class Course {
 	 *
 	 * @param \WC_Product|null $the_product 產品實例，預設為null。
 	 * @param int|null         $user_id 用戶ID，預設為null。
-	 * @return bool 如果課程已過期，返回true；否則返回false。
+	 * @return bool 如果課程已過期，返回 true；否則返回 false 預設為 true
 	 */
 	public static function is_expired( ?\WC_Product $the_product = null, ?int $user_id = null ): bool {
 		global $product, $course;
 		$product        = $course ?? $product;
 		$the_product    = $the_product ?? $product;
-		$the_product_id = $the_product->get_id();
+		$the_product_id = $the_product?->get_id();
+		if (!$the_product_id) {
+			return true;
+		}
 		$user_id        = $user_id ?? \get_current_user_id();
 		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
 
