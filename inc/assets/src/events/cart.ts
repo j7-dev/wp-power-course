@@ -5,10 +5,8 @@ export const cart = () => {
 	$(document.body).on(
 		'added_to_cart',
 		function (event, fragments, cart_hash, Button) {
-			// 檢查 body 是否有 courses-product 這個 class，檢查是否為課程銷售頁
-			const isCoursesProductPage = document.body.classList.contains('courses-product')
-
-			if (!isCoursesProductPage) {
+			//檢查 Button 這個 jQuery 元素是否包含 .pc-btn class
+			if (!Button.hasClass('pc-btn')) {
 				return
 			}
 
