@@ -5,6 +5,13 @@ export const cart = () => {
 	$(document.body).on(
 		'added_to_cart',
 		function (event, fragments, cart_hash, Button) {
+			// 檢查 body 是否有 courses-product 這個 class，檢查是否為課程銷售頁
+			const isCoursesProductPage = document.body.classList.contains('courses-product')
+
+			if (!isCoursesProductPage) {
+				return
+			}
+
 			const isIcon = Button.hasClass('pc-btn-square')
 			if (isIcon) {
 				const svgClasses = Button.find('svg').attr('class')
