@@ -93,9 +93,10 @@ Powerhouse::load_template('breadcrumb');
 
 $editor = get_post_meta($chapter->ID, 'editor', true) ?: 'power-editor';
 
+/** @deprecated Powerhouse 3.3.0 之後其實是不需要用 class 包裹的，這邊是為了兼容舊版本 */
 printf(
 /*html*/'<div class="%s">',
-$editor === 'power-editor' ? 'bn-container' : ''
+$editor === 'power-editor' ? 'power-editor' : ''
 );
 the_content();
 echo '</div>';

@@ -3,7 +3,7 @@
  * 課程銷售頁
  */
 
-use J7\Powerhouse\Theme\FrontEnd as Theme;
+use J7\Powerhouse\Theme\Core\FrontEnd as Theme;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

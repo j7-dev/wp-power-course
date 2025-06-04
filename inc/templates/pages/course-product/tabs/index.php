@@ -59,10 +59,11 @@ $the_content = ob_get_clean();
 $course_tabs = [
 	'description' => [
 		'label'    => '介紹',
+		/** @deprecated Powerhouse 3.3.0 之後其實是不需要用 class 包裹的，這邊是為了兼容舊版本 */
 		'content'  => sprintf(
 			/*html*/'<div class="%2$s">%1$s</div>',
 			$the_content,
-			$product->get_meta('editor') === 'power-editor' ? 'bn-container' : ''
+			$product->get_meta('editor') === 'power-editor' ? 'power-editor' : ''
 		),
 		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_description_tab' ) ?: 'yes'),
 	],
