@@ -3,7 +3,7 @@ import { Button, Alert, Tag } from 'antd'
 import { FileUpload } from '@/components/general'
 import { useApiUrl } from '@refinedev/core'
 import { siteUrl } from '@/utils'
-import { SiMicrosoftexcel } from 'react-icons/si'
+import { PiMicrosoftExcelLogoFill } from 'react-icons/pi'
 
 const index = () => {
 	const apiUrl = useApiUrl()
@@ -18,7 +18,7 @@ const index = () => {
 								<Button
 									type="link"
 									className="pl-0 ml-0"
-									icon={<SiMicrosoftexcel />}
+									icon={<PiMicrosoftExcelLogoFill />}
 									iconPosition="end"
 									href={`${siteUrl}/wp-content/plugins/power-course/sample.csv`}
 									download="sample.csv"
