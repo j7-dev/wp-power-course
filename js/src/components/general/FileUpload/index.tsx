@@ -1,6 +1,6 @@
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, message, Upload, UploadProps, ButtonProps } from 'antd'
-import { SiMicrosoftexcel } from 'react-icons/si'
+import { PiMicrosoftExcelLogoFill } from 'react-icons/pi'
 
 type TFileUploadProps = {
 	uploadProps: UploadProps
@@ -22,7 +22,7 @@ export const FileUpload = ({ uploadProps, buttonProps }: TFileUploadProps) => {
 		},
 		iconRender: (file) => {
 			if (isCSV(file)) {
-				return <SiMicrosoftexcel className="relative top-0.5" />
+				return <PiMicrosoftExcelLogoFill className="relative top-0.5" />
 			}
 			return <UploadOutlined />
 		},
