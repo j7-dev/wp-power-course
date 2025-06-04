@@ -55,7 +55,14 @@ const index = () => {
 						name: ['hide_courses_in_main_query'],
 						label: '商店頁隱藏課程商品',
 						tooltip:
-							'開啟後商店頁、彙整頁、搜尋頁，不顯示課程商品，如果要顯示課程列表可以使用 Power Course 的短代馬',
+							'開啟後商店頁、彙整頁，不顯示課程商品，如果要顯示課程列表可以使用 Power Course 的短代碼',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
+						name: ['hide_courses_in_search_result'],
+						label: '搜尋結果隱藏課程商品',
+						tooltip: '開啟後搜尋不到課程商品',
 					}}
 				/>
 			</div>

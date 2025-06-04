@@ -456,6 +456,7 @@ final class Course extends ApiBase {
 			'enable_comment'                => (string) $product->get_meta( 'enable_comment' ) ?: 'yes',
 			'hide_single_course'            => (string) $product->get_meta( 'hide_single_course' ) ?: 'no',
 			'hide_courses_in_main_query'    => (string) $product->get_meta( 'hide_courses_in_main_query' ) ?: 'no',
+			'hide_courses_in_search_result' => (string) $product->get_meta( 'hide_courses_in_search_result' ) ?: 'no',
 			'enable_bundles_sticky'         => (string) $product->get_meta( 'enable_bundles_sticky' ) ?: 'no',
 			'enable_mobile_fixed_cta'       => (string) $product->get_meta( 'enable_mobile_fixed_cta' ) ?: 'no',
 			'extra_student_count'           => (int) $product->get_meta( 'extra_student_count' ),

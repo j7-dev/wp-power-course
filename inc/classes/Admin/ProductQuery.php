@@ -60,14 +60,22 @@ final class ProductQuery {
 	 */
 	public static function exclude_course_product( $query ): void {
 
-		$hide_courses_in_main_query = \get_option('hide_courses_in_main_query', 'no') === 'yes';
+		$hide_courses_in_main_query    = \get_option('hide_courses_in_main_query', 'no');
+		$hide_courses_in_search_result = \get_option('hide_courses_in_search_result', 'no');
 
-		if (!$hide_courses_in_main_query) {
+		if (!\wc_string_to_bool($hide_courses_in_main_query)) {
 			return;
 		}
 
 		if ( \is_admin() || !$query->is_main_query() || $query->is_single()) {
 			return;
+		}
+
+		if (!\wc_string_to_bool($hide_courses_in_search_result)) {
+			// 如果是搜尋，也不排除
+			if (isset($_GET['s'])) {
+				return;
+			}
 		}
 
 		// 搜尋時候 $post_type 有時是 "" 有時候是 array
