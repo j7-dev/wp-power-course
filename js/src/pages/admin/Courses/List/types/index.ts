@@ -85,6 +85,7 @@ export type TCourseRecord = TCourseBaseRecord &
 		enable_comment: 'yes' | 'no' | ''
 		hide_single_course: 'yes' | 'no' | ''
 		hide_courses_in_main_query: 'yes' | 'no' | ''
+		hide_courses_in_search_result: 'yes' | 'no' | ''
 		extra_student_count: number
 		feature_video: TVideo
 		trial_video: TVideo

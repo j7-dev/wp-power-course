@@ -55,21 +55,22 @@ final class Option extends ApiBase {
 	 * @var array<string, string|int> $fields 允許獲取 & 預設值
 	 */
 	private $fields = [
-		'bunny_library_id'           => '',
-		'bunny_cdn_hostname'         => '',
-		'bunny_stream_api_key'       => '',
-		'course_permalink_structure' => '',
-		'hide_myaccount_courses'     => 'no', // 是否隱藏我的帳戶中的課程
-		'fix_video_and_tabs_mobile'  => 'no', // 手機板時，影片以及 tabs 黏性(sticky)置頂
-		'pc_header_offset'           => '0', // 黏性的偏移距離
-		'hide_courses_in_main_query' => 'no', // 是否在主查詢中隱藏課程
-		'pc_watermark_qty'           => 0, // 浮水印數量
-		'pc_watermark_color'         => 'rgba(255, 255, 255, 0.5)', // 浮水印顏色
-		'pc_watermark_interval'      => 10, // 浮水印間隔
-		'pc_watermark_text'          => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
-		'pc_pdf_watermark_qty'       => 0, // PDF 浮水印數量
-		'pc_pdf_watermark_color'     => 'rgba(255, 255, 255, 0.5)', // PDF 浮水印顏色
-		'pc_pdf_watermark_text'      => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}', // PDF 浮水印文字
+		'bunny_library_id'              => '',
+		'bunny_cdn_hostname'            => '',
+		'bunny_stream_api_key'          => '',
+		'course_permalink_structure'    => '',
+		'hide_myaccount_courses'        => 'no', // 是否隱藏我的帳戶中的課程
+		'fix_video_and_tabs_mobile'     => 'no', // 手機板時，影片以及 tabs 黏性(sticky)置頂
+		'pc_header_offset'              => '0', // 黏性的偏移距離
+		'hide_courses_in_main_query'    => 'no', // 是否在主查詢中隱藏課程
+		'hide_courses_in_search_result' => 'no', // 是否在搜尋結果中隱藏課程
+		'pc_watermark_qty'              => 0, // 浮水印數量
+		'pc_watermark_color'            => 'rgba(255, 255, 255, 0.5)', // 浮水印顏色
+		'pc_watermark_interval'         => 10, // 浮水印間隔
+		'pc_watermark_text'             => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}', // 浮水印文字
+		'pc_pdf_watermark_qty'          => 0, // PDF 浮水印數量
+		'pc_pdf_watermark_color'        => 'rgba(255, 255, 255, 0.5)', // PDF 浮水印顏色
+		'pc_pdf_watermark_text'         => '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}', // PDF 浮水印文字
 	];
 
 	/**
