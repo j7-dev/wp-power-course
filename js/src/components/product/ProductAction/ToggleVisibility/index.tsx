@@ -19,6 +19,7 @@ const ToggleVisibility: FC<{
 		})
 		update({
 			resource: 'courses',
+			dataProviderName: 'power-course',
 			values: formData,
 			id,
 			meta: {

@@ -1,16 +1,11 @@
 import { memo, useEffect } from 'react'
 import { Form, Input, Switch, Space, Button, Typography } from 'antd'
-import {
-	VideoInput,
-	VideoLength,
-	DescriptionDrawer,
-	FiSwitch,
-} from '@/components/formItem'
+import { VideoInput, VideoLength, FiSwitch } from '@/components/formItem'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
 import { toFormData } from 'antd-toolkit'
 import { ExclamationCircleFilled } from '@ant-design/icons'
-import { CopyText } from 'antd-toolkit'
+import { CopyText, DescriptionDrawer } from 'antd-toolkit'
 
 const { Item } = Form
 const { Text } = Typography
@@ -22,6 +17,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 	const { formProps, form, saveButtonProps, mutation, onFinish } = useForm({
 		action: 'edit',
 		resource: 'chapters',
+		dataProviderName: 'power-course',
 		id,
 		redirect: false,
 		queryOptions: {
@@ -53,6 +49,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 	return (
 		<Edit
 			resource="chapters"
+			dataProviderName="power-course"
 			recordItemId={id}
 			breadcrumb={null}
 			goBack={null}
@@ -124,7 +121,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				</Item>
 
 				<div className="mb-8">
-					<DescriptionDrawer resource="chapters" initEditor={initEditor} />
+					<DescriptionDrawer resource="posts" />
 				</div>
 				<div className="mb-6 max-w-[20rem]">
 					<p className="mb-3">上傳課程內容</p>

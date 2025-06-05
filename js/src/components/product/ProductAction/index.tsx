@@ -3,13 +3,14 @@ import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import ToggleVisibility from './ToggleVisibility'
 import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip, Button } from 'antd'
-import { siteUrl, course_permalink_structure } from '@/utils'
 import { SiGoogleclassroom } from 'react-icons/si'
 import { DuplicateButton } from '@/components/general'
+import { useEnv } from '@/hooks'
 
 export const ProductAction: FC<{
 	record: TCourseBaseRecord
 }> = ({ record }) => {
+	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
 	return (
 		<div className="flex gap-1">
 			<DuplicateButton
@@ -38,7 +39,7 @@ export const ProductAction: FC<{
 			<Tooltip title="開啟課程銷售頁">
 				<Button
 					type="text"
-					href={`${siteUrl}/${course_permalink_structure}/${record?.slug}`}
+					href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${record?.slug}`}
 					target="_blank"
 					rel="noreferrer"
 					icon={<ExportOutlined className="text-gray-400" />}

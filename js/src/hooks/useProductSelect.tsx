@@ -37,6 +37,7 @@ export const useProductSelect = (params?: TUseProductSelectParams) => {
 
 	const { selectProps: refineSelectProps, query } = useSelect<TProductRecord>({
 		resource: 'products',
+		dataProviderName: 'power-course',
 		debounce: 500,
 		pagination: {
 			pageSize: 20,
