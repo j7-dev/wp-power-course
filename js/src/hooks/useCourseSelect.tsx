@@ -31,6 +31,7 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 
 	const { selectProps: refineSelectProps, query } = useSelect<TCourseRecord>({
 		resource: 'courses',
+		dataProviderName: 'power-course',
 		debounce: 500,
 		pagination: {
 			pageSize: 20,

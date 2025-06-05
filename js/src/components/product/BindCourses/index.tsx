@@ -14,7 +14,7 @@ const BindCoursesComponent = ({
 	const { selectProps, courseIds: course_ids } = useCourseSelect()
 
 	const { mutate, isLoading } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const form = Form.useFormInstance()
 
@@ -43,6 +43,7 @@ const BindCoursesComponent = ({
 					})
 					invalidate({
 						resource: 'products',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},

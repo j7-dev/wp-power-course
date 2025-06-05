@@ -27,7 +27,7 @@ const defaultQuery = {
 export type TQuery = typeof defaultQuery
 
 const useRevenue = () => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const [query, setQuery] = useState(defaultQuery)
 	const [viewType, setViewType] = useState(EViewType.DEFAULT)
 	const { compare_last_year } = query

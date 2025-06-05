@@ -3,7 +3,7 @@ import { FormInstance, message } from 'antd'
 import { useCallback } from 'react'
 
 const useSave = ({ form }: { form: FormInstance }) => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const mutation = useCustomMutation()
 	const invalidate = useInvalidate()
 	const { mutate } = mutation

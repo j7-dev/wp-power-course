@@ -5,19 +5,24 @@ declare global {
 	}
 	var appData: {
 		env: {
-			siteUrl: string
-			ajaxUrl: string
-			ajaxNonce: string
-			userId: string
-			postId: string
-			permalink: string
+			SITE_URL: string
+			API_URL:string
+			CURRENT_USER_ID: number|false
+			CURRENT_POST_ID: number
+			PERMALINK: string
 			APP_NAME: string
 			KEBAB: string
 			SNAKE: string
-			BASE_URL: string
+			BUNNY_LIBRARY_ID: string
+			BUNNY_CDN_HOSTNAME: string
+			BUNNY_STREAM_API_KEY: string
+			NONCE:string
 			APP1_SELECTOR: string
 			APP2_SELECTOR: string
-			API_TIMEOUT: string
+			ELEMENTOR_ENABLED: boolean
+			COURSE_PERMALINK_STRUCTURE: string
+				/** @deprecated */
+			NOTIFY_LOW_STOCK_AMOUNT:string
 		}
 	}
 	var wp: {

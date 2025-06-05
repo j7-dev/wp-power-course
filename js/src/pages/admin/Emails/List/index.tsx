@@ -2,14 +2,15 @@ import Table from '@/pages/admin/Emails/List/Table'
 import AsTable from '@/pages/admin/Emails/List/AsTable'
 import { List } from '@refinedev/antd'
 import { Tabs, Button } from 'antd'
-import { siteUrl } from '@/utils'
+import { useEnv } from '@/hooks'
 
 const EmailsList = () => {
+	const { SITE_URL } = useEnv()
 	return (
 		<Tabs
 			tabBarExtraContent={
 				<Button
-					href={`${siteUrl}/wp-admin/admin.php?page=wc-status&tab=action-scheduler&s=power_email_send_`}
+					href={`${SITE_URL}/wp-admin/admin.php?page=wc-status&tab=action-scheduler&s=power_email_send_`}
 					target="_blank"
 				>
 					查看 Woocommerce 排程紀錄

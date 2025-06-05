@@ -47,6 +47,7 @@ const index = () => {
 
 	const { data, isFetching } = useList<TStudentLog>({
 		resource: 'courses/student-logs',
+		dataProviderName: 'power-course',
 		filters: [
 			{
 				field: 'user_id',

@@ -31,6 +31,7 @@ const EditBundleComponent = ({
 		useForm<TBundleProductRecord>({
 			action: 'edit',
 			resource: 'bundle_products',
+			dataProviderName: 'power-course',
 			id,
 			redirect: false,
 			queryOptions: {
@@ -87,6 +88,7 @@ const EditBundleComponent = ({
 	return (
 		<Edit
 			resource="bundle_products"
+			dataProviderName="power-course"
 			recordItemId={id}
 			breadcrumb={null}
 			goBack={null}

@@ -55,6 +55,7 @@ export const useListSelect = <T extends BaseRecord>({
 	}
 
 	const searchItemsResult = useList<T>({
+		dataProviderName: 'power-course',
 		resource,
 		filters: [
 			{

@@ -1,6 +1,9 @@
 import { SelectProps } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
 
+/**
+ * @deprecated
+ */
 export const defaultSelectProps: SelectProps = {
 	className: 'w-full',
 	mode: 'multiple',
@@ -26,7 +29,7 @@ export const defaultSelectProps: SelectProps = {
  * @param values
  * @param fromProperty
  * @param toProperty
- 
+
  * @return
  */
 export const formatDateRangeData = (

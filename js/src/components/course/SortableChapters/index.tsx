@@ -41,6 +41,7 @@ const SortableChaptersComponent = () => {
 		isLoading: isListLoading,
 	} = useList<TChapterRecord, HttpError>({
 		resource: 'chapters',
+		dataProviderName: 'power-course',
 		filters: [
 			{
 				field: 'meta_key',
@@ -65,7 +66,7 @@ const SortableChaptersComponent = () => {
 	const [originTree, setOriginTree] = useState<TreeData<TChapterRecord>>([])
 	const invalidate = useInvalidate()
 
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const { mutate } = useCustomMutation()
 
 	// 每次更新 List 狀態，會算出當次的展開節點 id
@@ -138,6 +139,7 @@ const SortableChaptersComponent = () => {
 				onSettled: () => {
 					invalidate({
 						resource: 'chapters',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},
@@ -171,6 +173,7 @@ const SortableChaptersComponent = () => {
 							deleteMany(
 								{
 									resource: 'chapters',
+									dataProviderName: 'power-course',
 									ids: selectedIds,
 									mutationMode: 'optimistic',
 								},

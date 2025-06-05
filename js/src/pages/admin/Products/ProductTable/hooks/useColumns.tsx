@@ -9,7 +9,7 @@ import {
 	ProductBoundCourses,
 	ProductType,
 } from '@/components/product'
-import { getPostStatus, siteUrl, course_permalink_structure } from '@/utils'
+import { getPostStatus } from '@/utils'
 
 const useColumns = () => {
 	const columns: TableProps<TProductRecord>['columns'] = [

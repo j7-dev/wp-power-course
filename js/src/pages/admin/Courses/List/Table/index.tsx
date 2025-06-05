@@ -1,7 +1,6 @@
 import { memo } from 'react'
 import { useTable } from '@refinedev/antd'
 import { Table, FormInstance, Spin, Button, TableProps, Card } from 'antd'
-import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
@@ -19,6 +18,8 @@ import useValueLabelMapper from '@/pages/admin/Courses/List/hooks/useValueLabelM
 import useColumns from '@/pages/admin/Courses/List/hooks/useColumns'
 import { PlusOutlined } from '@ant-design/icons'
 import DeleteButton from './DeleteButton'
+import { useRowSelection } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
 
 const Main = () => {
 	const { tableProps, searchFormProps } = useTable<
@@ -27,6 +28,7 @@ const Main = () => {
 		TFilterProps
 	>({
 		resource: 'courses',
+		dataProviderName: 'power-course',
 		onSearch,
 		filters: {
 			initial: getInitialFilters(initialFilteredValues),
@@ -50,6 +52,7 @@ const Main = () => {
 
 	const { mutate: create, isLoading: isCreating } = useCreate({
 		resource: 'courses',
+		dataProviderName: 'power-course',
 		invalidates: ['list'],
 		meta: {
 			headers: { 'Content-Type': 'multipart/form-data;' },

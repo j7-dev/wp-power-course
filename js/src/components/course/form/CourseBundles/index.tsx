@@ -33,6 +33,7 @@ const CourseBundlesComponent = () => {
 	// 取得課程 record
 	const { id: courseId } = useParsed()
 	const { data: courseData } = useOne<TCourseRecord>({
+		dataProviderName: 'power-course',
 		resource: 'courses',
 		id: courseId,
 		meta: {
@@ -45,6 +46,7 @@ const CourseBundlesComponent = () => {
 
 	// 取得銷售方案列表
 	const { data, isLoading } = useList<TBundleProductRecord>({
+		dataProviderName: 'power-course',
 		resource: 'bundle_products',
 		filters: [
 			{
@@ -99,6 +101,7 @@ const CourseBundlesComponent = () => {
 		const formData = toFormData(values)
 
 		create({
+			dataProviderName: 'power-course',
 			resource: 'bundle_products',
 			values: formData,
 			invalidates: ['list'],
@@ -111,7 +114,7 @@ const CourseBundlesComponent = () => {
 
 	// 批次變更，排序用
 	const { mutate: sort } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 
 	return (
 		<>

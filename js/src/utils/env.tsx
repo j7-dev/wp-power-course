@@ -1,41 +1,14 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck
+import { simpleDecrypt } from 'antd-toolkit'
 
-import { removeTrailingSlash } from '@/utils'
+// @ts-ignore
+const encryptedEnv = window?.power_course_data?.env
 
-const APP_DOMAIN = 'power_course_data' as string
-export const snake = window?.[APP_DOMAIN]?.env?.SNAKE || 'power_course'
-export const appName = window?.[APP_DOMAIN]?.env?.APP_NAME || 'Power Course'
-export const kebab = window?.[APP_DOMAIN]?.env?.KEBAB || 'power-course'
-export const app1Selector =
-	window?.[APP_DOMAIN]?.env?.APP1_SELECTOR || 'power_course'
-export const app2Selector =
-	window?.[APP_DOMAIN]?.env?.APP2_SELECTOR || 'power_course_metabox'
-export const apiUrl =
-	removeTrailingSlash(window?.wpApiSettings?.root) || '/wp-json'
-export const ajaxUrl =
-	removeTrailingSlash(window?.[APP_DOMAIN]?.env?.ajaxUrl) ||
-	'/wp-admin/admin-ajax.php'
-export const siteUrl =
-	removeTrailingSlash(window?.[APP_DOMAIN]?.env?.siteUrl) || '/'
-export const currentUserId = window?.[APP_DOMAIN]?.env?.userId || '0'
-export const postId = window?.[APP_DOMAIN]?.env?.postId || '0'
-export const permalink =
-	removeTrailingSlash(window?.[APP_DOMAIN]?.env?.permalink) || '/'
-export const apiTimeout = '30000'
-export const ajaxNonce = window?.[APP_DOMAIN]?.env?.nonce || ''
-export const bunny_library_id =
-	window?.[APP_DOMAIN]?.env?.bunny_library_id || ''
-export const bunny_cdn_hostname =
-	window?.[APP_DOMAIN]?.env?.bunny_cdn_hostname || ''
-export const bunny_stream_api_key =
-	window?.[APP_DOMAIN]?.env?.bunny_stream_api_key || ''
+if (!encryptedEnv) {
+	throw new Error('env is not found')
+}
 
-export const course_permalink_structure =
-	window?.[APP_DOMAIN]?.env?.course_permalink_structure || 'courses'
-
-export const ELEMENTOR_ENABLED =
-	window?.[APP_DOMAIN]?.env?.ELEMENTOR_ENABLED || false
-
-export const notify_low_stock_amount =
-	window?.[APP_DOMAIN]?.env?.notify_low_stock_amount || 10
+export const env = simpleDecrypt(encryptedEnv)
+export const API_URL = env?.API_URL || '/wp-json'
+export const APP1_SELECTOR = env?.APP1_SELECTOR || '#power_course'
+export const APP2_SELECTOR = env?.APP2_SELECTOR || '.pc-vidstack'
+export const DEFAULT_IMAGE = 'https://placehold.co/480x480?text=%3CIMG%20/%3E'

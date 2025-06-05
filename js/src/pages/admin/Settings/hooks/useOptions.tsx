@@ -10,7 +10,7 @@ type TOptionResponse = {
 }
 
 const useOptions = ({ form }: { form: FormInstance }) => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const result = useCustom<TOptionResponse>({
 		url: `${apiUrl}/options`,
 		method: 'get',

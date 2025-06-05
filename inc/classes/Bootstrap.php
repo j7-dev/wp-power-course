@@ -4,11 +4,13 @@ declare (strict_types = 1);
 
 namespace J7\PowerCourse;
 
-use J7\PowerCourse\Utils\Base;
 use Kucrut\Vite;
+use J7\WpUtils\Classes\General;
+use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\BundleProduct\Helper;
-use J7\WpUtils\Classes\General;
+use J7\Powerhouse\Settings\Model\Settings;
+use J7\Powerhouse\Utils\Base as PowerhouseUtils;
 
 
 
@@ -165,31 +167,33 @@ final class Bootstrap {
 		/** @var array<string> $active_plugins */
 		$active_plugins = \get_option( 'active_plugins', [] );
 
+		$encrypt_env = PowerhouseUtils::simple_encrypt(
+			[
+				'SITE_URL'                => \untrailingslashit( \site_url() ),
+				'API_URL'                 => \untrailingslashit( \esc_url_raw( rest_url() ) ),
+				'CURRENT_USER_ID'         => \get_current_user_id(),
+				'CURRENT_POST_ID'         => $post_id,
+				'PERMALINK'               => \untrailingslashit( $permalink ),
+				'APP_NAME'                => Plugin::$app_name,
+				'KEBAB'                   => Plugin::$kebab,
+				'SNAKE'                   => Plugin::$snake,
+				'BUNNY_LIBRARY_ID'        => Settings::instance()->bunny_library_id,
+				'BUNNY_CDN_HOSTNAME'      => Settings::instance()->bunny_cdn_hostname,
+				'BUNNY_STREAM_API_KEY'    => Settings::instance()->bunny_stream_api_key,
+				'NONCE'                   => \wp_create_nonce( 'wp_rest' ),
+				'APP1_SELECTOR'           => Base::APP1_SELECTOR,
+				'APP2_SELECTOR'           => Base::APP2_SELECTOR,
+				'ELEMENTOR_ENABLED'       => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
+				/** @deprecated 用 woocommerce API */
+				'NOTIFY_LOW_STOCK_AMOUNT' => \get_option( 'woocommerce_notify_low_stock_amount' ),
+			]
+		);
+
 		\wp_localize_script(
 			Plugin::$kebab,
 			Plugin::$snake . '_data',
 			[
-				'env' => [
-					'siteUrl'                    => \untrailingslashit( \site_url() ),
-					'ajaxUrl'                    => \untrailingslashit( \admin_url( 'admin-ajax.php' ) ),
-					'userId'                     => \wp_get_current_user()->data->ID ?? null,
-					'postId'                     => $post_id,
-					'permalink'                  => \untrailingslashit( $permalink ),
-					'course_permalink_structure' => CourseUtils::get_course_permalink_structure(),
-					'APP_NAME'                   => Plugin::$app_name,
-					'KEBAB'                      => Plugin::$kebab,
-					'SNAKE'                      => Plugin::$snake,
-					'BASE_URL'                   => Base::BASE_URL,
-					'APP1_SELECTOR'              => Base::APP1_SELECTOR,
-					'APP2_SELECTOR'              => Base::APP2_SELECTOR,
-					'API_TIMEOUT'                => Base::API_TIMEOUT,
-					'nonce'                      => \wp_create_nonce( Plugin::$kebab ),
-					'bunny_library_id'           => \get_option( 'bunny_library_id', '' ),
-					'bunny_cdn_hostname'         => \get_option( 'bunny_cdn_hostname', '' ),
-					'bunny_stream_api_key'       => \get_option( 'bunny_stream_api_key', '' ),
-					'ELEMENTOR_ENABLED'          => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
-					'notify_low_stock_amount'    => \get_option( 'woocommerce_notify_low_stock_amount' ),
-				],
+				'env' => $encrypt_env,
 			]
 		);
 

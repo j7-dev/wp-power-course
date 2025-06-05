@@ -71,6 +71,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'github_repo' => 'https://github.com/j7-dev/wp-power-course',
 					'callback'    => [ Bootstrap::class, 'instance' ],
 					'capability'  => 'manage_woocommerce',
+					'lc'          => false,
 				]
 			);
 		}

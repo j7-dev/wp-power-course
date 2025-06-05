@@ -24,7 +24,7 @@ const useOptions: (_params?: TUseOptionsParams) => QueryObserverResult<any> & {
 	options: TOptions
 } = (params) => {
 	const endpoint = params?.endpoint || 'options'
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const result = useCustom<TOptions>({
 		url: `${apiUrl}/${endpoint}`,
 		method: 'get',
