@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Modal, Button, Tooltip } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Button, Tooltip } from 'antd'
 import {
 	CourseDescription,
 	CourseQA,
@@ -11,23 +11,18 @@ import {
 	CourseStudents,
 } from '@/components/course/form'
 import { SortableChapters } from '@/components/course'
-import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
-import { useAtom } from 'jotai'
-import { MediaLibrary } from '@/bunny'
-import { TBunnyVideo } from '@/bunny/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { CourseContext } from '@/pages/admin/Courses/Edit/hooks'
-import {
-	siteUrl,
-	course_permalink_structure,
-	formatDateRangeData,
-} from '@/utils'
+import { formatDateRangeData } from '@/utils'
 import { toFormData } from 'antd-toolkit'
+import { useEnv } from '@/hooks'
 
 export const CoursesEdit = () => {
+	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
 	// 初始化資料
 	const { formProps, form, saveButtonProps, query, mutation, onFinish } =
 		useForm<TCourseRecord>({
+			dataProviderName: 'power-course',
 			redirect: false,
 		})
 
@@ -87,41 +82,6 @@ export const CoursesEdit = () => {
 		},
 	]
 
-	// 處理 media library
-	const [mediaLibrary, setMediaLibrary] = useAtom(mediaLibraryAtom)
-	const {
-		modalProps,
-		mediaLibraryProps,
-		name,
-		form: mediaLibraryForm, // TODO 其實不需要這個 form 了
-	} = mediaLibrary
-	const { limit, selectedVideos } = mediaLibraryProps
-
-	const selectedVideosSetter = (
-		videosOrFunction:
-			| TBunnyVideo[]
-			| ((_videos: TBunnyVideo[]) => TBunnyVideo[]),
-	) => {
-		if (typeof videosOrFunction === 'function') {
-			const newVideos = videosOrFunction(selectedVideos)
-			setMediaLibrary((prev) => ({
-				...prev,
-				mediaLibraryProps: {
-					...prev.mediaLibraryProps,
-					selectedVideos: newVideos,
-				},
-			}))
-		} else {
-			setMediaLibrary((prev) => ({
-				...prev,
-				mediaLibraryProps: {
-					...prev.mediaLibraryProps,
-					selectedVideos: videosOrFunction,
-				},
-			}))
-		}
-	}
-
 	// 顯示
 	const watchName = Form.useWatch(['name'], form)
 	const watchId = Form.useWatch(['id'], form)
@@ -142,6 +102,7 @@ export const CoursesEdit = () => {
 			<CourseContext.Provider value={record}>
 				<Edit
 					resource="courses"
+					dataProviderName="power-course"
 					title={
 						<>
 							{watchName}{' '}
@@ -196,7 +157,7 @@ export const CoursesEdit = () => {
 									</Tooltip>
 
 									<Button
-										href={`${siteUrl}/${course_permalink_structure}/${watchSlug}`}
+										href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${watchSlug}`}
 										target="_blank"
 										rel="noreferrer"
 										className="ml-4"
@@ -210,49 +171,6 @@ export const CoursesEdit = () => {
 					</Form>
 				</Edit>
 			</CourseContext.Provider>
-
-			<Modal
-				{...modalProps}
-				onCancel={() => {
-					setMediaLibrary((prev) => ({
-						...prev,
-						modalProps: {
-							...prev.modalProps,
-							open: false,
-						},
-					}))
-				}}
-			>
-				<div className="max-h-[75vh] overflow-x-hidden overflow-y-auto pr-4">
-					<MediaLibrary
-						limit={limit}
-						selectedVideos={selectedVideos}
-						setSelectedVideos={selectedVideosSetter}
-						selectButtonProps={{
-							onClick: () => {
-								setMediaLibrary((prev) => ({
-									...prev,
-									modalProps: {
-										...prev.modalProps,
-										open: false,
-									},
-								}))
-								setMediaLibrary((prev) => ({
-									...prev,
-									confirmedSelectedVideos: selectedVideos,
-								}))
-								if (mediaLibraryForm && name) {
-									mediaLibraryForm.setFieldValue(name, {
-										type: 'bunny-stream-api',
-										id: selectedVideos?.[0]?.guid || '',
-										meta: {},
-									})
-								}
-							},
-						}}
-					/>
-				</div>
-			</Modal>
 		</div>
 	)
 }

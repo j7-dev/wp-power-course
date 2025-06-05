@@ -1,7 +1,6 @@
 import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
 import { Table, FormInstance, Spin, TableProps, Card, Form } from 'antd'
-import { FilterTags, useRowSelection } from 'antd-toolkit'
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
@@ -30,6 +29,8 @@ import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
 import { productsAtom } from '@/pages/admin/Products/ProductTable'
 import { useGCDItems } from '@/hooks'
 import { WatchLimit } from '@/components/formItem'
+import { useRowSelection } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
 
 const Main = () => {
 	const [form] = Form.useForm()
@@ -41,6 +42,7 @@ const Main = () => {
 		TFilterProps
 	>({
 		resource: 'products',
+		dataProviderName: 'power-course',
 		onSearch,
 		filters: {
 			initial: getInitialFilters(initialFilteredValues),

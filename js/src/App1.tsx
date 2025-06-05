@@ -1,22 +1,25 @@
 /* eslint-disable quote-props */
-import { lazy, Suspense } from 'react'
+import React, { lazy, Suspense } from 'react'
 import { Refine } from '@refinedev/core'
-import { ErrorComponent, useNotificationProvider } from '@refinedev/antd'
+import { ErrorComponent } from '@refinedev/antd'
 import routerBindings, {
 	UnsavedChangesNotifier,
 	NavigateToResource,
 } from '@refinedev/react-router-v6'
-import { dataProvider } from './rest-data-provider'
-import { dataProvider as bunnyStreamDataProvider } from './rest-data-provider/bunny-stream'
 import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
-import { apiUrl, kebab } from '@/utils'
 import { resources } from '@/resources'
 import { ConfigProvider } from 'antd'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 import { PageLoading } from '@/components/general'
 import { ThemedLayoutV2, ThemedSiderV2 } from '@/components/layout'
-
-import { MediaLibraryIndicator } from '@/bunny'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { useEnv } from '@/hooks'
+import {
+	dataProvider,
+	notificationProvider,
+	useBunny,
+	MediaLibraryNotification,
+} from 'antd-toolkit/refine'
 
 const Dashboard = lazy(() => import('@/pages/admin/Dashboard'))
 const CoursesList = lazy(() => import('@/pages/admin/Courses/List'))
@@ -31,22 +34,26 @@ const EmailsEdit = lazy(() => import('@/pages/admin/Emails/Edit'))
 const MediaLibraryPage = lazy(() => import('@/pages/admin/MediaLibraryPage'))
 
 function App() {
+	const { bunny_data_provider_result } = useBunny()
+	const { KEBAB, API_URL, AXIOS_INSTANCE } = useEnv()
+
 	return (
 		<HashRouter>
 			<Refine
 				dataProvider={{
-					default: dataProvider(`${apiUrl}/${kebab}`),
-					'power-email': dataProvider(`${apiUrl}/power-email`),
-					powerhouse: dataProvider(`${apiUrl}/v2/powerhouse`),
-					'wc-analytics': dataProvider(`${apiUrl}/wc-analytics`),
-					'wp-rest': dataProvider(`${apiUrl}/wp/v2`),
-					'wc-rest': dataProvider(`${apiUrl}/wc/v3`),
-					'wc-store': dataProvider(`${apiUrl}/wc/store/v1`),
-					'bunny-stream': bunnyStreamDataProvider(
-						'https://video.bunnycdn.com/library',
+					default: dataProvider(`${API_URL}/v2/powerhouse`, AXIOS_INSTANCE),
+					'power-email': dataProvider(`${API_URL}/power-email`, AXIOS_INSTANCE),
+					'power-course': dataProvider(`${API_URL}/${KEBAB}`, AXIOS_INSTANCE),
+					'wc-analytics': dataProvider(
+						`${API_URL}/wc-analytics`,
+						AXIOS_INSTANCE,
 					),
+					'wp-rest': dataProvider(`${API_URL}/wp/v2`, AXIOS_INSTANCE),
+					'wc-rest': dataProvider(`${API_URL}/wc/v3`, AXIOS_INSTANCE),
+					'wc-store': dataProvider(`${API_URL}/wc/store/v1`, AXIOS_INSTANCE),
+					'bunny-stream': bunny_data_provider_result,
 				}}
-				notificationProvider={useNotificationProvider}
+				notificationProvider={notificationProvider}
 				routerProvider={routerBindings}
 				resources={resources}
 				options={{
@@ -82,8 +89,10 @@ function App() {
 									Sider={(props) => <ThemedSiderV2 {...props} fixed />}
 									Title={({ collapsed }) => <></>}
 								>
-									<Outlet />
-									<MediaLibraryIndicator />
+									<div className="pb-32">
+										<Outlet />
+									</div>
+									<MediaLibraryNotification />
 								</ThemedLayoutV2>
 							</ConfigProvider>
 						}

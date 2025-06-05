@@ -14,7 +14,7 @@ const DuplicateButtonComponent: FC<{
 	invalidateProps: Omit<UseInvalidateProp, 'invalidates'>
 }> = ({ id, invalidateProps, tooltipProps }) => {
 	const { mutate: duplicate, isLoading } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
 	const handleDuplicate = () => {
@@ -27,6 +27,7 @@ const DuplicateButtonComponent: FC<{
 			{
 				onSuccess: (data, variables, context) => {
 					invalidate({
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 						...invalidateProps,
 					})

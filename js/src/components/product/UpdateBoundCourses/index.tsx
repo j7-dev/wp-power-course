@@ -13,7 +13,7 @@ const UpdateBoundCoursesComponent = ({
 	onSettled: () => void
 }) => {
 	const { mutate, isLoading } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const form = Form.useFormInstance()
 
@@ -42,6 +42,7 @@ const UpdateBoundCoursesComponent = ({
 					})
 					invalidate({
 						resource: 'products',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},

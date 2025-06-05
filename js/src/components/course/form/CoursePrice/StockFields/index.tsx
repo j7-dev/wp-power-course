@@ -1,11 +1,12 @@
 import { Form, InputNumber, Select } from 'antd'
-import { notify_low_stock_amount } from '@/utils'
 import { FiSwitch as Switch } from '@/components/formItem'
+import { useEnv } from '@/hooks'
 import { PRODUCT_STOCK_STATUS } from 'antd-toolkit/wp'
 
 const { Item } = Form
 
 const StockFields = () => {
+	const { NOTIFY_LOW_STOCK_AMOUNT } = useEnv()
 	const form = Form.useFormInstance()
 	const manageStockName = ['manage_stock']
 	const watchManageStock = Form.useWatch(manageStockName, form)
@@ -47,7 +48,7 @@ const StockFields = () => {
 					</Item>
 					<Item name={['low_stock_amount']} label="低庫存臨界值">
 						<InputNumber
-							placeholder={`全店門檻(${notify_low_stock_amount})`}
+							placeholder={`全店門檻(${NOTIFY_LOW_STOCK_AMOUNT})`}
 							className="w-full"
 						/>
 					</Item>

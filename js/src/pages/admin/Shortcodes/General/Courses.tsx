@@ -70,7 +70,7 @@ const Courses = () => {
 	}
 
 	const watchPreview = Form.useWatch(['preview'], form) || false
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const { data, isFetching } = useCustom({
 		url: `${apiUrl}/shortcode`,
 		method: 'get',

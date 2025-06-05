@@ -16,7 +16,7 @@ const GrantCourseAccessComponent = ({
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
 
 	const { mutate, isLoading } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
 	const handleClick = () => {
@@ -43,10 +43,12 @@ const GrantCourseAccessComponent = ({
 					})
 					invalidate({
 						resource: 'users',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					invalidate({
 						resource: 'users/students',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},
