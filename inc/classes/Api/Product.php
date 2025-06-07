@@ -612,6 +612,8 @@ final class Product {
 			'_subscription_trial_length'         => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
 			'_subscription_trial_period'         => $subscription_trial_period ?: 'day',
 
+			'purchase_note'                      => $product->get_purchase_note(),
+
 		] + $children;
 
 		return array_merge(
