@@ -53,14 +53,6 @@ export const resources = [
 		},
 	},
 	{
-		name: 'media-library',
-		list: '/media-library',
-		meta: {
-			label: 'Bunny 媒體庫',
-			icon: <FaPhotoVideo />,
-		},
-	},
-	{
 		name: 'shortcodes',
 		list: '/shortcodes',
 		meta: {
@@ -91,6 +83,22 @@ export const resources = [
 		meta: {
 			label: 'Email 模板管理',
 			icon: <MailOutlined />,
+		},
+	},
+	{
+		name: 'media-library',
+		list: '/media-library',
+		meta: {
+			label: '媒體庫',
+			icon: <FaPhotoVideo />,
+		},
+	},
+	{
+		name: 'bunny-media-library',
+		list: '/bunny-media-library',
+		meta: {
+			label: 'Bunny 媒體庫',
+			icon: <FaPhotoVideo />,
 		},
 	},
 ]
