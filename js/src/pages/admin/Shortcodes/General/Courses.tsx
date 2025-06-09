@@ -24,6 +24,7 @@ const { Item } = Form
 const { Text } = Typography
 
 const marks: SliderSingleProps['marks'] = {
+	1: '1',
 	2: '2',
 	3: '3',
 	4: '4',
@@ -120,7 +121,7 @@ const Courses = () => {
 							tooltip="預設 3"
 							initialValue={3}
 						>
-							<Slider marks={marks} min={2} max={4} />
+							<Slider marks={marks} min={1} max={4} />
 						</Item>
 						<Item name={['include']} label="只包含指定課程">
 							<Select {...selectProps} />

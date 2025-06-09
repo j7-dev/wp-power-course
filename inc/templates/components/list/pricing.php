@@ -23,13 +23,14 @@ $args = wp_parse_args( $args, $default_args );
 ] = $args;
 
 $grid_class = match ( (string) $columns) {
-	'2' => '',
-	'3' => 'lg:grid-cols-3',
-	'4' => 'lg:grid-cols-4',
-	default => 'lg:grid-cols-3',
+	'1' => 'grid-cols-1',
+	'2' => 'grid-cols-2',
+	'3' => 'grid-cols-2 lg:grid-cols-3',
+	'4' => 'grid-cols-2 lg:grid-cols-4',
+	default => 'grid-cols-2 lg:grid-cols-3', // Default to 2 columns base, 3 for large screens
 };
 
-echo "<div class='grid grid-cols-2 gap-x-5 gap-y-14 {$grid_class}'>";
+echo "<div class='grid gap-x-5 gap-y-14 {$grid_class}'>";
 
 foreach ($products as $product) {
 	Plugin::load_template(
