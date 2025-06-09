@@ -434,6 +434,16 @@ abstract class Course {
 	}
 
 	/**
+	 * 檢查是否為管理員預覽模式
+	 *
+	 * @param int $product_id 商品 ID
+	 * @return bool 如果為管理員預覽模式，返回 true；否則返回 false
+	 */
+	public static function is_admin_preview( int $product_id ): bool {
+		return \current_user_can('manage_woocommerce') && !self::is_avl($product_id);
+	}
+
+	/**
 	 * 檢查課程是否已過期。
 	 *
 	 * 根據產品ID和用戶ID，從AVLCourseMeta中獲取課程的過期日期，
@@ -451,8 +461,8 @@ abstract class Course {
 		if (!$the_product_id) {
 			return true;
 		}
-		$user_id        = $user_id ?? \get_current_user_id();
-		$expire_date    = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
+		$user_id     = $user_id ?? \get_current_user_id();
+		$expire_date = AVLCourseMeta::get( (int) $the_product_id, $user_id, 'expire_date', true);
 
 		// 如果 $expire_date 不是 subscription_ 開頭，就以 timestamp 判斷
 		if (!str_starts_with( (string) $expire_date, 'subscription_')) {
