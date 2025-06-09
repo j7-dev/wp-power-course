@@ -155,7 +155,9 @@ const SortableChaptersComponent = () => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批次刪除選中的 ids
 
 	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
-	const { mutate: updateMany, isLoading: isUpdateManyLoading } = useUpdateMany()
+	const { mutate: updateMany, isLoading: isUpdateManyLoading } = useUpdateMany({
+		dataProviderName: 'power-course',
+	})
 
 	const handlePublishMany = () => {
 		message.loading({
