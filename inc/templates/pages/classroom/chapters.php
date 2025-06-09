@@ -32,7 +32,7 @@ $chapters_html            = ChapterUtils::get_children_posts_html_uncached($prod
 
 /** @var \WP_Post $chapter */
 global $chapter;
-$ancestor_ids        = get_ancestors($chapter->ID, CPT::POST_TYPE, 'post_type');
+$ancestor_ids        = get_ancestors($chapter->id, CPT::POST_TYPE, 'post_type');
 $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 ?>
