@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
-import { MediaLibrary } from '@/bunny'
-import { TBunnyVideo } from '@/bunny/types'
+import { MediaLibrary, TAttachment, TImage } from 'antd-toolkit/wp'
 
 const MediaLibraryPage = () => {
-	const [selectedVideos, setSelectedVideos] = useState<TBunnyVideo[]>([])
+	const [selectedItems, setSelectedItems] = useState<(TAttachment | TImage)[]>(
+		[],
+	)
 	return (
 		<MediaLibrary
-			selectedVideos={selectedVideos}
-			setSelectedVideos={setSelectedVideos}
+			selectedItems={selectedItems}
+			setSelectedItems={setSelectedItems}
+			limit={undefined}
 		/>
 	)
 }

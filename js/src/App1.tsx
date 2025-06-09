@@ -31,6 +31,9 @@ const Settings = lazy(() => import('@/pages/admin/Settings'))
 const Shortcodes = lazy(() => import('@/pages/admin/Shortcodes'))
 const EmailsList = lazy(() => import('@/pages/admin/Emails/List'))
 const EmailsEdit = lazy(() => import('@/pages/admin/Emails/Edit'))
+const BunnyMediaLibraryPage = lazy(
+	() => import('@/pages/admin/BunnyMediaLibraryPage'),
+)
 const MediaLibraryPage = lazy(() => import('@/pages/admin/MediaLibraryPage'))
 
 function App() {
@@ -187,6 +190,14 @@ function App() {
 							element={
 								<Suspense fallback={<PageLoading />}>
 									<MediaLibraryPage />
+								</Suspense>
+							}
+						/>
+						<Route
+							path="bunny-media-library"
+							element={
+								<Suspense fallback={<PageLoading />}>
+									<BunnyMediaLibraryPage />
 								</Suspense>
 							}
 						/>
