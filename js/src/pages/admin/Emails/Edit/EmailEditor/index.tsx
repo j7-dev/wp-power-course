@@ -6,8 +6,8 @@ import type { UseFormReturnType } from '@refinedev/antd'
 import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 import type { FormInstance } from 'antd'
 import parseJson from 'parse-json'
-import { axiosInstance } from '@/rest-data-provider/utils'
 import { IEmailTemplate } from 'j7-easy-email-editor'
+import { useEnv } from '@/hooks'
 
 const EmailEditor = lazy(() =>
 	Promise.all([
@@ -79,17 +79,19 @@ const CustomEmailEditor = (
 
 	const initialValues: IEmailTemplate = query?.isSuccess
 		? {
-			subject: form.getFieldValue(['subject']),
-			subTitle: '',
-			content: getInitContent(form, initBlock),
-		}
+				subject: form.getFieldValue(['subject']),
+				subTitle: '',
+				content: getInitContent(form, initBlock),
+			}
 		: {
-			subject: '',
-			subTitle: '',
-			content: initBlock,
-		}
+				subject: '',
+				subTitle: '',
+				content: initBlock,
+			}
 
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
+
+	const { AXIOS_INSTANCE } = useEnv()
 
 	return (
 		<Suspense
@@ -103,7 +105,7 @@ const CustomEmailEditor = (
 				data={initialValues}
 				dashed={false}
 				onUploadImage={async (file) => {
-					const res = await axiosInstance.post(
+					const res = await AXIOS_INSTANCE.post(
 						`${apiUrl}/upload`,
 						{
 							files: file,

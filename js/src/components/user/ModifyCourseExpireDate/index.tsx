@@ -14,7 +14,7 @@ const ModifyCourseExpireDateComponent = ({
 }) => {
 	const [time, setTime] = useState<Dayjs | undefined>(undefined)
 	const { mutate, isLoading } = useCustomMutation()
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
 	const handleUpdate = () => () => {
@@ -41,6 +41,7 @@ const ModifyCourseExpireDateComponent = ({
 					})
 					invalidate({
 						resource: 'users',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setTime(undefined)

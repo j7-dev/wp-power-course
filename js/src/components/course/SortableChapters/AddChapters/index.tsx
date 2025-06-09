@@ -24,6 +24,7 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 		TCreateManyParams
 	>({
 		resource: 'chapters',
+		dataProviderName: 'power-course',
 	})
 
 	const handleCreateMany = () => {

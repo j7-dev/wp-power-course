@@ -9,8 +9,8 @@ declare (strict_types = 1);
 namespace J7\PowerCourse\Compatibility;
 
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\AbstractTable;
+use J7\Powerhouse\Settings\Model\Settings as PowerhouseSettings;
 
 
 /**
@@ -60,9 +60,6 @@ final class Compatibility {
 		 * ============== START 相容性代碼 ==============
 		 */
 
-		// 將 course_granted_at 從 timestamp 轉為 Y-m-d H:i:s
-		self::convert_timestamp_to_date();
-
 		// 判斷是否已經有 wp_pc_avl_chaptermeta 這張 table，沒有就建立
 		AbstractTable::create_chapter_table();
 
@@ -72,15 +69,6 @@ final class Compatibility {
 		// 判斷是否已經有 wp_pc_student_logs 這張 table，沒有就建立
 		AbstractTable::create_student_logs_table();
 
-		// 將 table course_id 重新命名為 post_id
-		self::alter_course_table_column();
-
-		// 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
-		self::convert_fields();
-
-		// 將 bundle_type 統一為 'bundle'
-		self::bundle_type();
-
 		// 0.8.0 之後使用新的章節結構
 		Chapter::migrate_chapter_to_new_structure();
 		// 儲存章節使用的編輯器
@@ -88,6 +76,11 @@ final class Compatibility {
 		Course::set_editor_meta_to_course();
 
 		BundleProduct::set_catalog_visibility_to_hidden();
+
+		// 0.9.0 之前版本
+		if (version_compare(Plugin::$version, '0.9.0', '<=')) {
+			self::migration_bunny_settings();
+		}
 
 		/**
 		 * ============== END 相容性代碼 ==============
@@ -99,142 +92,30 @@ final class Compatibility {
 		\J7\WpUtils\Classes\WC::log(Plugin::$version, '已執行兼容性設定');
 	}
 
-	/**
-	 * 將 course_granted_at 從 timestamp 轉為 Y-m-d H:i:s
-	 *
-	 * @deprecated
-	 * @return void
-	 */
-	private static function convert_timestamp_to_date(): void {
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-
-		/** @var array<int, object{meta_id: string, meta_value: string}> */
-		$results = $wpdb->get_results(
-				$wpdb->prepare(
-					'SELECT meta_id, meta_value FROM %1$s WHERE meta_key = "%2$s"',
-					$table_name,
-					'course_granted_at',
-				)
-			);
-
-		foreach ($results as $item) {
-			if (!\is_numeric($item->meta_value)) {
-				continue;
-			}
-			$meta_id           = (int) $item->meta_id;
-			$timestamp_to_date = \wp_date('Y-m-d H:i:s', (int) $item->meta_value);
-			$wpdb->update(
-				$table_name,
-				[ 'meta_value' => $timestamp_to_date ],
-				[ 'meta_id' => $meta_id ]
-			);
-		}
-	}
 
 	/**
-	 * 重新命名 course_id 欄位為 post_id
-	 *
-	 * @deprecated
+	 * 將 bunny_settings 從 option 個別欄位轉移到 option 的 powerhouse_settings array 底下
 	 *
 	 * @return void
 	 */
-	private static function alter_course_table_column(): void {
-		global $wpdb;
+	private static function migration_bunny_settings(): void {
+		$bunny_library_id     = \get_option('bunny_library_id');
+		$bunny_cdn_hostname   = \get_option('bunny_cdn_hostname');
+		$bunny_stream_api_key = \get_option('bunny_stream_api_key');
 
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-
-		// 先檢查 post_id 欄位是否已存在
-		$post_id_exists = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'post_id'"); //phpcs:ignore
-		if ($post_id_exists) {
-			// 如果 post_id 已存在，則不需要進行轉換
+		if (!$bunny_library_id && !$bunny_cdn_hostname && !$bunny_stream_api_key) {
 			return;
 		}
 
-		// 檢查 course_id 欄位是否存在
-		$column_info = $wpdb->get_row("SHOW COLUMNS FROM {$table_name} WHERE Field = 'course_id'");//phpcs:ignore
-		if (!$column_info) {
-			return;
-		}
+		$powerhouse_settings                         = PowerhouseSettings::instance()->to_array();
+		$powerhouse_settings['bunny_library_id']     = $bunny_library_id;
+		$powerhouse_settings['bunny_cdn_hostname']   = $bunny_cdn_hostname;
+		$powerhouse_settings['bunny_stream_api_key'] = $bunny_stream_api_key;
 
-		$column_type = $column_info->Type; //phpcs:ignore
+		\update_option(PowerhouseSettings::SETTINGS_KEY, $powerhouse_settings);
 
-		// SQL 查詢來重新命名欄位
-		$sql = "ALTER TABLE {$table_name} CHANGE COLUMN course_id post_id {$column_type}";
-
-		// 執行查詢
-		$result = $wpdb->query($sql); // phpcs:ignore
-
-		if ($result === false) {
-			error_log('無法重新命名欄位: ' . $wpdb->last_error);
-		}
-	}
-
-
-	/**
-	 * 將 avl_coursemeta 的 finished_chapter_ids 改為 avl_chaptermeta 的 finished_at
-	 *
-	 * @deprecated
-	 *
-	 * @return void
-	 */
-	private static function convert_fields(): void {
-		global $wpdb;
-
-		// 取得表格名稱前綴
-		$table_name = $wpdb->prefix . Plugin::COURSE_TABLE_NAME;
-
-		// 取得所有 meta_key = 'finished_chapter_ids' 的資料
-		$results = $wpdb->get_results(
-			$wpdb->prepare(
-				'SELECT * FROM %1$s WHERE meta_key = "%2$s"',
-				$table_name,
-				'finished_chapter_ids',
-			)
-		);
-
-		foreach ($results as $item) {
-			$user_id    = (int) $item->user_id;
-			$course_id  = (int) $item->post_id;
-			$chapter_id = (int) $item->meta_value;
-
-			AVLChapterMeta::update(
-				$chapter_id,
-				$user_id,
-				'finished_at',
-				\wp_date('Y-m-d H:i:s'),
-			);
-		}
-
-		// 刪除 avl_coursemeta 的 finished_chapter_ids
-		$wpdb->delete(
-			$table_name,
-			[ 'meta_key' => 'finished_chapter_ids' ],
-		);
-	}
-
-	/**
-	 * 將 bundle_type 統一為 'bundle'
-	 *
-	 * @since 2024-12-26
-	 * @return void
-	 */
-	private static function bundle_type(): void {
-
-		global $wpdb;
-
-		try {
-			// 把非 bundle 的 meta_value 改為 bundle
-			$wpdb->get_results(
-			$wpdb->prepare(
-			'UPDATE %1$s SET meta_value = "bundle" WHERE meta_key = "bundle_type" AND meta_value != "bundle"',
-			$wpdb->postmeta,
-			)
-			);
-		} catch (\Throwable $th) {
-			// TEST 印出 ErrorLog 記得移除
-			\J7\WpUtils\Classes\ErrorLog::info( $th, 'bundle_type' );
-		}
+		\delete_option('bunny_library_id');
+		\delete_option('bunny_cdn_hostname');
+		\delete_option('bunny_stream_api_key');
 	}
 }

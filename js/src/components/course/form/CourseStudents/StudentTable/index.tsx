@@ -23,13 +23,14 @@ import AddOtherCourse from '../AddOtherCourse'
 import HistoryDrawer from '@/components/user/UserTable/HistoryDrawer'
 
 const StudentTable = () => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
 	const columns = useColumns()
 	const { tableProps } = useTable<TUserRecord>({
 		resource: 'users/students',
+		dataProviderName: 'power-course',
 		filters: {
 			permanent: [
 				{
@@ -86,6 +87,7 @@ const StudentTable = () => {
 					})
 					invalidate({
 						resource: 'users/students',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setSelectedRowKeys([])
@@ -127,6 +129,7 @@ const StudentTable = () => {
 					})
 					invalidate({
 						resource: 'users/students',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setSelectedRowKeys([])

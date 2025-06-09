@@ -49,6 +49,7 @@ const BundleForm = () => {
 	}
 
 	const searchProductsResult = useList<TBundleProductRecord>({
+		dataProviderName: 'power-course',
 		resource: 'products',
 		filters: [
 			{
@@ -113,6 +114,7 @@ const BundleForm = () => {
 	// 初始狀態
 	const { data: initProductsData, isFetching: initIsFetching } =
 		useList<TBundleProductRecord>({
+			dataProviderName: 'power-course',
 			resource: 'products',
 			filters: [
 				{
@@ -141,9 +143,9 @@ const BundleForm = () => {
 		const productIds = watchExcludeMainCourse
 			? selectedProducts.map(({ id }) => id)
 			: [
-				courseId,
-				...selectedProducts.map(({ id }) => id),
-			]
+					courseId,
+					...selectedProducts.map(({ id }) => id),
+				]
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
 			productIds,

@@ -2,10 +2,8 @@ import { memo } from 'react'
 import { Form, Button, Tabs, TabsProps } from 'antd'
 import useOptions from './hooks/useOptions'
 import useSave from './hooks/useSave'
-import Bunny from './Bunny'
 import General from './General'
 import Appearance from './Appearance'
-import Lab from './Lab'
 
 const items: TabsProps['items'] = [
 	{
@@ -17,11 +15,6 @@ const items: TabsProps['items'] = [
 		key: 'appearance',
 		label: '外觀設定',
 		children: <Appearance />,
-	},
-	{
-		key: 'bunny',
-		label: 'Bunny 整合',
-		children: <Bunny />,
 	},
 ]
 

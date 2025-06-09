@@ -1,7 +1,4 @@
 <?php
-/**
- * 覆寫 WooCommerce 模板
- */
 
 declare( strict_types=1 );
 
@@ -9,10 +6,10 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 /**
  * Class FrontEnd
+ * 覆寫 WooCommerce 模板
  */
 final class Templates {
 	use \J7\WpUtils\Traits\SingletonTrait;
@@ -99,10 +96,10 @@ final class Templates {
 					'id'     => Plugin::$kebab,
 					'parent' => null,
 					'group'  => null,
-					'title'  => '課程列表', // you can use img tag with image link. it will show the image icon Instead of the title.
+					'title'  => '課程系統', // you can use img tag with image link. it will show the image icon Instead of the title.
 					'href'   => \admin_url('admin.php?page=power-course#/courses'),
 					'meta'   => [
-						'title' => \__( '課程列表', 'power_course' ), // This title will show on hover
+						'title' => \__( '課程系統', 'power_course' ), // This title will show on hover
 					],
 				]
 			);

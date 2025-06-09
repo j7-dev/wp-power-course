@@ -3,7 +3,6 @@ import { useTable, useModal } from '@refinedev/antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { Table, TableProps, FormInstance, Button, Modal, CardProps } from 'antd'
 import useColumns from './hooks/useColumns'
-import { useRowSelection, FilterTags } from 'antd-toolkit'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
@@ -23,6 +22,8 @@ import { useAtom } from 'jotai'
 import SelectedUser from './SelectedUser'
 import Card from './Card'
 import HistoryDrawer from './HistoryDrawer'
+import { useRowSelection } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
 
 const UserTableComponent = ({
 	canGrantCourseAccess = false,
@@ -41,6 +42,7 @@ const UserTableComponent = ({
 		TFilterValues
 	>({
 		resource: 'users',
+		dataProviderName: 'power-course',
 		pagination: {
 			pageSize: 20,
 		},

@@ -54,12 +54,14 @@ export function useUserFormDrawer({
 
 	const { mutate: create, isLoading: isLoadingCreate } = useCreate({
 		resource,
+		dataProviderName: 'power-course',
 		meta: {
 			headers: { 'Content-Type': 'multipart/form-data;' },
 		},
 	})
 	const { mutate: update, isLoading: isLoadingUpdate } = useUpdate({
 		resource,
+		dataProviderName: 'power-course',
 		meta: {
 			headers: { 'Content-Type': 'multipart/form-data;' },
 		},

@@ -96,6 +96,7 @@ const index = ({
 	const { selectProps: productSelectProps, query: productQuery } =
 		useSelect<TProductSelectOption>({
 			resource: 'products/select',
+			dataProviderName: 'power-course',
 			optionLabel: 'name',
 			optionValue: 'id',
 			onSearch: (value) => [
@@ -124,6 +125,7 @@ const index = ({
 	const { selectProps: bundleProductSelectProps } =
 		useSelect<TProductSelectOption>({
 			resource: 'products/select',
+			dataProviderName: 'power-course',
 			optionLabel: 'name',
 			optionValue: 'id',
 			filters: [

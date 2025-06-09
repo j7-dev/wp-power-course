@@ -2,11 +2,12 @@ import { memo } from 'react'
 import { Button, Alert, Tag } from 'antd'
 import { FileUpload } from '@/components/general'
 import { useApiUrl } from '@refinedev/core'
-import { siteUrl } from '@/utils'
-import { SiMicrosoftexcel } from 'react-icons/si'
+import { PiMicrosoftExcelLogoFill } from 'react-icons/pi'
+import { useEnv } from '@/hooks'
 
 const index = () => {
-	const apiUrl = useApiUrl()
+	const { SITE_URL } = useEnv()
+	const apiUrl = useApiUrl('power-course')
 	return (
 		<div className="flex flex-col md:flex-row gap-8 py-8">
 			<div className="w-full">
@@ -18,9 +19,9 @@ const index = () => {
 								<Button
 									type="link"
 									className="pl-0 ml-0"
-									icon={<SiMicrosoftexcel />}
+									icon={<PiMicrosoftExcelLogoFill />}
 									iconPosition="end"
-									href={`${siteUrl}/wp-content/plugins/power-course/sample.csv`}
+									href={`${SITE_URL}/wp-content/plugins/power-course/sample.csv`}
 									download="sample.csv"
 								>
 									下載範例 csv 檔案
@@ -76,7 +77,7 @@ const index = () => {
 								<a
 									target="_blank"
 									rel="noopener noreferrer"
-									href={`${siteUrl}/wp-admin/admin.php?page=wc-status&tab=action-scheduler&s=pc_batch_add_students_task`}
+									href={`${SITE_URL}/wp-admin/admin.php?page=wc-status&tab=action-scheduler&s=pc_batch_add_students_task`}
 								>
 									Action Scheduler
 								</a>{' '}

@@ -104,6 +104,8 @@ export type TProductRecord = {
 	exclude_main_course: 'yes' | 'no' | ''
 	enable_bundles_sticky: 'yes' | 'no' | ''
 	enable_mobile_fixed_cta: 'yes' | 'no' | ''
+	show_stock_quantity: 'yes' | 'no' | ''
+	show_customer_amount: 'yes' | 'no' | ''
 	bind_courses_data: TBindCoursesData[]
 	link_course_ids: string
 }

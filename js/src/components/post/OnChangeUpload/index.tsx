@@ -17,7 +17,7 @@ export const OnChangeUpload = () => {
 	const form = Form.useFormInstance()
 	const watchId = Form.useWatch(['id'], form)
 
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 
 	const onChange: UploadProps['onChange'] = ({ file }) => {
 		const { status } = file
