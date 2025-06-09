@@ -15,8 +15,8 @@ import {
 import { isEqual as _isEqual } from 'lodash-es'
 import { ChapterEdit } from '@/components/chapters'
 import { PopconfirmDelete } from '@/components/general'
-
 import AddChapters from './AddChapters'
+import { cn } from 'antd-toolkit'
 
 // 定義最大深度
 export const MAX_DEPTH = 2
@@ -67,7 +67,7 @@ const SortableChaptersComponent = () => {
 	const invalidate = useInvalidate()
 
 	const apiUrl = useApiUrl('power-course')
-	const { mutate } = useCustomMutation()
+	const { mutate, isLoading: isSorting } = useCustomMutation()
 
 	// 每次更新 List 狀態，會算出當次的展開節點 id
 	const openedNodeIds = getOpenedNodeIds(treeData)
@@ -194,7 +194,12 @@ const SortableChaptersComponent = () => {
 					}}
 				/>
 			</div>
-			<div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+			<div
+				className={cn(
+					'grid grid-cols-1 xl:grid-cols-2 gap-6',
+					isSorting || isListFetching ? 'pointer-events-none' : '',
+				)}
+			>
 				{isListLoading && <LoadingChapters />}
 				{!isListLoading && (
 					<SortableTree
