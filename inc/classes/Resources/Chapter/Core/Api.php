@@ -153,29 +153,130 @@ final class Api extends ApiBase {
 	 * @phpstan-ignore-next-line
 	 */
 	public function post_chapters_callback( $request ): \WP_REST_Response|\WP_Error {
+		$json_params = $request->get_json_params();
+		$ids         = $json_params['ids'] ?? null;
+		$values      = $json_params['values'] ?? null;
 
-		[
-			'data'      => $data,
-			'meta_data' => $meta_data,
-		] = $this->separator( $request );
+		if ( ! empty( $ids ) && is_array( $ids ) && ! empty( $values ) && is_array( $values ) && isset( $values['status'] ) ) {
+			// Batch update logic
+			$new_status = $values['status'];
+			// WordPress default post statuses. Can be extended by custom statuses.
+			$allowed_statuses = [ 'publish', 'pending', 'draft', 'auto-draft', 'future', 'private', 'inherit', 'trash' ];
 
-		$qty = (int) ( $meta_data['qty'] ?? 1 );
-		unset($meta_data['qty']);
-
-		$data['meta_input'] = $meta_data;
-
-		$success_ids = [];
-
-		for ($i = 0; $i < $qty; $i++) {
-			$post_id = ChapterUtils::create_chapter( $data );
-			if (is_numeric($post_id)) {
-				$success_ids[] = $post_id;
+			if ( ! in_array( $new_status, $allowed_statuses, true ) ) {
+				return new \WP_Error(
+					'invalid_status',
+					'提供的狀態無效。',
+					[ 'status' => 400 ]
+				);
 			}
-		}
 
-		return new \WP_REST_Response(
-			$success_ids
-		);
+			$success_ids = [];
+			$failed_ids  = [];
+
+			foreach ( $ids as $id ) {
+				$post_id = (int) $id;
+				if ( $post_id > 0 ) {
+					// Check if post exists and is a chapter before updating
+					if ( get_post_type( $post_id ) !== ChapterCPT::POST_TYPE ) {
+						$failed_ids[] = [
+							'id'    => $post_id,
+							'error' => '無效的章節 ID 或類型不符。',
+						];
+						continue;
+					}
+
+					$update_data = [
+						'ID'          => $post_id,
+						'post_status' => $new_status,
+					];
+					$result      = \wp_update_post( $update_data, true ); // true to return WP_Error on failure
+
+					if ( is_wp_error( $result ) ) {
+						$failed_ids[] = [ 'id' => $post_id, 'error' => $result->get_error_message() ];
+					} else {
+						$success_ids[] = $post_id;
+					}
+				} else {
+					$failed_ids[] = [ 'id' => $id, 'error' => '無效的 ID 格式。' ];
+				}
+			}
+
+			if ( ! empty( $failed_ids ) ) {
+				// If all updates failed, return a more general error, otherwise a 207 Multi-Status
+				if ( empty( $success_ids ) ) {
+					return new \WP_REST_Response(
+						[
+							'code'    => 'batch_update_failed',
+							'message' => '所有選定章節狀態更新失敗。',
+							'data'    => [
+								'failed_ids' => $failed_ids,
+							],
+						],
+						400 // Bad Request or appropriate error code
+					);
+				}
+				return new \WP_REST_Response(
+					[
+						'code'    => 'batch_update_partial_success',
+						'message' => '部分章節狀態更新成功，部分失敗。',
+						'data'    => [
+							'success_ids' => $success_ids,
+							'failed_ids'  => $failed_ids,
+						],
+					],
+					207 // Multi-Status
+				);
+			}
+
+			return new \WP_REST_Response(
+				[
+					'code'    => 'batch_update_success',
+					'message' => '所有選定章節狀態更新成功。',
+					'data'    => [
+						'success_ids' => $success_ids,
+					],
+				],
+				200
+			);
+
+		} else {
+			// Existing create chapter logic
+			[
+				'data'      => $data,
+				'meta_data' => $meta_data,
+			] = $this->separator( $request ); // separator uses get_body_params
+
+			$qty = (int) ( $meta_data['qty'] ?? 1 );
+			unset( $meta_data['qty'] );
+
+			$data['meta_input'] = $meta_data;
+
+			$created_ids = []; // Renamed from success_ids to avoid confusion
+
+			for ( $i = 0; $i < $qty; $i++ ) {
+				$post_id = ChapterUtils::create_chapter( $data );
+				if ( is_numeric( $post_id ) && $post_id > 0 ) {
+					$created_ids[] = $post_id;
+				} else {
+					// Optionally handle creation errors if create_chapter can return errors/false
+					// For now, just skipping non-numeric/zero IDs
+				}
+			}
+
+			if (empty($created_ids) && $qty > 0) {
+				return new \WP_Error(
+					'chapter_creation_failed',
+					'無法創建章節。',
+					[ 'status' => 500 ]
+				);
+			}
+
+			return new \WP_REST_Response(
+				$created_ids, // Return only the array of IDs as per original logic for creation
+				201 // HTTP 201 Created
+			);
+		}
 	}
 
 	/**
