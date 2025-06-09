@@ -126,6 +126,9 @@ const Courses = () => {
 						<Item name={['include']} label="只包含指定課程">
 							<Select {...selectProps} />
 						</Item>
+						<Item name={['exclude']} label="排除指定課程">
+							<Select {...selectProps} />
+						</Item>
 						<Item name={['orderby']} label="排序依據">
 							<Select
 								className="w-full"

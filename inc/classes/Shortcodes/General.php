@@ -56,33 +56,46 @@ final class General {
 			'order'               => 'DESC',
 			'meta_key'            => '_is_course',
 			'meta_value'          => 'yes',
-			'exclude_avl_courses' => false, // 是否排除當前用戶已授權的課程
+			'exclude_avl_courses' => false,
 		];
 
 		$args = \wp_parse_args(
-		$params,
-		$default_args,
+			$params,
+			$default_args,
 		);
 
-		$exclude_avl_courses = $args['exclude_avl_courses'] ?? false;
+		$exclude_avl_courses_val = $args['exclude_avl_courses'] ?? false;
 		unset($args['exclude_avl_courses']);
 
-		$columns = $args['columns'] ?? 3;
+		$columns_val = $args['columns'] ?? 3;
 		unset($args['columns']);
 
-		$array_keys = [ 'include', 'exclude', 'tag', 'category' ];
-
-		foreach ($array_keys as $key) {
-			// 因為 wc_get_products 是接受 array 所以在這裡要做轉換
+		$array_keys_to_process = [ 'include', 'exclude', 'tag', 'category' ];
+		foreach ($array_keys_to_process as $key) {
 			if (isset($args[ $key ])) {
-				$args[ $key ] = explode(',', str_replace(' ', '', $args[ $key ]));
+				if (is_string($args[ $key ])) {
+					$args[ $key ] = explode(',', str_replace(' ', '', $args[ $key ]));
+				}
+				if (($key === 'include' || $key === 'exclude') && is_array($args[ $key ])) {
+					$args[ $key ] = array_filter(array_map('intval', $args[ $key ]));
+				}
 			}
 		}
 
-		if ( $exclude_avl_courses ) {
+		$final_excluded_ids = $args['exclude'] ?? [];
+
+		if ( $exclude_avl_courses_val ) {
 			$current_user_id     = \get_current_user_id();
 			$user_avl_course_ids = CourseUtils::get_avl_courses_by_user( $current_user_id, true );
-			$args['exclude']     = $user_avl_course_ids;
+			if (!empty($user_avl_course_ids)) {
+				$final_excluded_ids = array_merge($final_excluded_ids, $user_avl_course_ids);
+			}
+		}
+
+		if (!empty($final_excluded_ids)) {
+			$args['exclude'] = array_unique($final_excluded_ids);
+		} else {
+			unset($args['exclude']);
 		}
 
 		/** @var object{total:int,max_num_pages:int,products:array<int,\WC_Product>} $results */
@@ -96,10 +109,10 @@ final class General {
 			'list/pricing',
 			[
 				'products' => $products,
-				'columns'  => $columns,
+				'columns'  => $columns_val,
 			],
 			false
-			);
+		);
 
 		return (string) $html;
 	}
