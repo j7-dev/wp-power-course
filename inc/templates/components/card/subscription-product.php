@@ -50,7 +50,7 @@ printf(
 );
 
 
-echo '<div class="flex gap-3 justify-between items-end">';
+echo '<div class="flex flex-wrap gap-3 justify-between items-end">';
 
 Plugin::load_template(
 	'price',
