@@ -16,11 +16,12 @@ import { PlusOutlined } from '@ant-design/icons'
 import { UserDrawer } from '@/components/user'
 
 const index = () => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
 	const { tableProps } = useTable<TUserRecord>({
 		resource: 'users',
+		dataProviderName: 'power-course',
 		filters: {
 			permanent: [
 				{
@@ -73,6 +74,7 @@ const index = () => {
 					})
 					invalidate({
 						resource: 'users',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setSelectedRowKeys([])

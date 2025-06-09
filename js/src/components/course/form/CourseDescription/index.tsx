@@ -5,17 +5,14 @@ import {
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
-import {
-	siteUrl,
-	course_permalink_structure,
-	defaultSelectProps,
-} from '@/utils'
+import { defaultSelectProps } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
-import { FiSwitch, VideoInput, DescriptionDrawer } from '@/components/formItem'
-import { CopyText } from 'antd-toolkit'
+import { FiSwitch, VideoInput } from '@/components/formItem'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
 import { useCourse } from '@/pages/admin/Courses/Edit/hooks'
+import { useEnv } from '@/hooks'
+import { CopyText, DescriptionDrawer } from 'antd-toolkit'
 
 const { Item } = Form
 
@@ -23,7 +20,8 @@ const CourseDescriptionComponent = () => {
 	const form = Form.useFormInstance()
 	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
-	const productUrl = `${siteUrl}/${course_permalink_structure}/`
+	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
+	const productUrl = `${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/`
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
 	const course = useCourse()
 
@@ -135,7 +133,10 @@ const CourseDescriptionComponent = () => {
 					>
 						<Input.TextArea rows={8} allowClear />
 					</Item>
-					<DescriptionDrawer resource="courses" initEditor={course?.editor} />
+					<DescriptionDrawer
+						resource="courses"
+						dataProviderName="power-course"
+					/>
 
 					<div className="mb-8">
 						<label className="mb-3 tw-block">課程封面圖</label>

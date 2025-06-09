@@ -31,6 +31,7 @@ if ($sale_price) {
 	$discount = 0;
 }
 
+echo '<div class="mt-1">';
 echo '<div class="flex gap-2 items-center text-sm">';
 if ('' !== $sale_price && $regular_price) { // 沒有折扣價就不顯示 或 沒有一般價就不顯示
 	printf(
@@ -59,4 +60,5 @@ if ($from <= time() && time() < $to ) { // 折扣進行期間
 }
 
 
+echo '</div>';
 echo '</div>';

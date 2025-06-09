@@ -9,7 +9,7 @@ import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { defaultSelectProps } from '@/utils'
 
 const index = () => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const [userIds, setUserIds] = useState<string[]>([])
 	const [keyword, setKeyword] = useState<string>('')
@@ -20,6 +20,7 @@ const index = () => {
 
 	const { selectProps, queryResult } = useSelect<TUserRecord>({
 		resource: 'users/students',
+		dataProviderName: 'power-course',
 		optionLabel: 'display_name',
 		optionValue: 'id',
 		filters: [
@@ -90,6 +91,7 @@ const index = () => {
 					})
 					invalidate({
 						resource: 'users/students',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setUserIds([])

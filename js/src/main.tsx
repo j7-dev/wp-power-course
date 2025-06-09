@@ -1,12 +1,14 @@
-import React, { lazy, Suspense } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { app1Selector, app2Selector } from '@/utils'
+import { APP1_SELECTOR, APP2_SELECTOR, env } from '@/utils'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { TPlayerProps } from './App2/Player'
-import { PageLoading } from '@/components/general'
+import { ConfigProvider } from 'antd'
 import App1 from './App1'
 import App2 from './App2'
+import { EnvProvider } from 'antd-toolkit'
+import { BunnyProvider } from 'antd-toolkit/refine'
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -17,7 +19,7 @@ const queryClient = new QueryClient({
 	},
 })
 
-const app1Nodes = document.querySelectorAll(app1Selector)
+const app1Nodes = document.querySelectorAll(APP1_SELECTOR)
 
 const mapping = [
 	{
@@ -26,6 +28,8 @@ const mapping = [
 	},
 ]
 
+const { BUNNY_LIBRARY_ID, BUNNY_CDN_HOSTNAME, BUNNY_STREAM_API_KEY } = env
+
 document.addEventListener('DOMContentLoaded', () => {
 	mapping.forEach(({ els, App }) => {
 		if (!!els) {
@@ -33,9 +37,30 @@ document.addEventListener('DOMContentLoaded', () => {
 				ReactDOM.createRoot(el).render(
 					<QueryClientProvider client={queryClient}>
 						<StyleProvider hashPriority="low">
-							<Suspense fallback={<PageLoading type="general" />}>
-								<App />
-							</Suspense>
+							<EnvProvider env={env}>
+								<BunnyProvider
+									bunny_library_id={BUNNY_LIBRARY_ID}
+									bunny_cdn_hostname={BUNNY_CDN_HOSTNAME}
+									bunny_stream_api_key={BUNNY_STREAM_API_KEY}
+								>
+									<ConfigProvider
+										theme={{
+											token: {
+												colorPrimary: '#1677ff',
+												borderRadius: 6,
+											},
+											components: {
+												Segmented: {
+													itemSelectedBg: '#1677ff',
+													itemSelectedColor: '#ffffff',
+												},
+											},
+										}}
+									>
+										<App />
+									</ConfigProvider>
+								</BunnyProvider>
+							</EnvProvider>
 						</StyleProvider>
 					</QueryClientProvider>,
 				)
@@ -44,15 +69,13 @@ document.addEventListener('DOMContentLoaded', () => {
 	})
 
 	// 一個畫面可能會有多個 vidstack 元素
-	const vidstackNodes = document.querySelectorAll(app2Selector)
+	const vidstackNodes = document.querySelectorAll(APP2_SELECTOR)
 	vidstackNodes.forEach((vidstackNode) => {
 		const dataset: TPlayerProps = vidstackNode.dataset || {}
 
 		ReactDOM.createRoot(vidstackNode).render(
 			<React.StrictMode>
-				<Suspense fallback={<PageLoading type="general" />}>
-					<App2 {...dataset} />
-				</Suspense>
+				<App2 {...dataset} />
 			</React.StrictMode>,
 		)
 	})

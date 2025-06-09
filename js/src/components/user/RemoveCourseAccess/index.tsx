@@ -12,7 +12,7 @@ const RemoveCourseAccessComponent = ({
 	course_ids: string[]
 	onSettled: () => void
 }) => {
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
 	// remove student mutation
@@ -41,6 +41,7 @@ const RemoveCourseAccessComponent = ({
 					})
 					invalidate({
 						resource: 'users',
+						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},

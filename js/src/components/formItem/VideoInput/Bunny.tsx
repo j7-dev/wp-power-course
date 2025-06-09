@@ -1,62 +1,38 @@
 import { Form, FormItemProps, Button } from 'antd'
 import { FC } from 'react'
-import {
-	bunny_library_id,
-	bunny_stream_api_key,
-	bunny_cdn_hostname,
-} from '@/utils'
 import { DeleteOutlined } from '@ant-design/icons'
-import NoLibraryId from './NoLibraryId'
 import { TVideo } from './types'
-import { mediaLibraryAtom } from '@/pages/admin/Courses/atom'
-import { useSetAtom } from 'jotai'
+import { useEnv } from '@/hooks'
+import { MediaLibraryModal, useMediaLibraryModal } from 'antd-toolkit/refine'
 
 const { Item } = Form
 const Bunny: FC<FormItemProps> = (formItemProps) => {
+	const { BUNNY_LIBRARY_ID } = useEnv()
 	const form = Form.useFormInstance()
-
 	const name = formItemProps?.name
+	if (!name) {
+		throw new Error('name is required')
+	}
+
 	const recordId = Form.useWatch(['id'], form)
 
 	// 取得後端傳來的 saved video
 	const savedVideo: TVideo | undefined = Form.useWatch(name, form)
 
-	const setMediaLibrary = useSetAtom(mediaLibraryAtom)
-
-	const handleOpenMediaLibrary = () => {
-		setMediaLibrary((prev) => ({
-			...prev,
-			modalProps: {
-				...prev.modalProps,
-				open: true,
+	const { show, close, modalProps, setModalProps, ...mediaLibraryProps } =
+		useMediaLibraryModal({
+			onConfirm: (selectedItems) => {
+				form.setFieldValue(name, {
+					type: 'bunny-stream-api',
+					id: selectedItems?.[0]?.guid || '',
+					meta: {},
+				})
 			},
-			mediaLibraryProps: {
-				...prev.mediaLibraryProps,
-				selectedVideos: [],
-			},
-			name,
-			form,
-		}))
-	}
-
-	if (!name) {
-		throw new Error('name is required')
-	}
-
-	if (!bunny_library_id || !bunny_stream_api_key || !bunny_cdn_hostname) {
-		return (
-			<NoLibraryId
-				bunny_library_id={bunny_library_id}
-				bunny_stream_api_key={bunny_stream_api_key}
-				bunny_cdn_hostname={bunny_cdn_hostname}
-				type="video"
-			/>
-		)
-	}
+		})
 
 	const isEmpty = savedVideo?.id === ''
 
-	const videoUrl = `https://iframe.mediadelivery.net/embed/${bunny_library_id}/${savedVideo?.id}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`
+	const videoUrl = `https://iframe.mediadelivery.net/embed/${BUNNY_LIBRARY_ID}/${savedVideo?.id}?autoplay=false&loop=false&muted=false&preload=true&responsive=true`
 
 	const handleDelete = () => {
 		form.setFieldValue(name, {
@@ -72,10 +48,17 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 				size="small"
 				type="link"
 				className="ml-0 mb-2 pl-0"
-				onClick={handleOpenMediaLibrary}
+				onClick={show}
 			>
 				開啟 Bunny 媒體庫
 			</Button>
+			<MediaLibraryModal
+				modalProps={modalProps}
+				mediaLibraryProps={{
+					...mediaLibraryProps,
+					limit: 1,
+				}}
+			/>
 			<Item hidden {...formItemProps} />
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
 			{recordId && !isEmpty && (

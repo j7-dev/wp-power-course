@@ -45,6 +45,7 @@ const DeleteButton = ({
 					deleteMany(
 						{
 							resource: 'courses',
+							dataProviderName: 'power-course',
 							ids: selectedRowKeys as string[],
 							mutationMode: 'optimistic',
 							successNotification: (data, ids, resource) => {
