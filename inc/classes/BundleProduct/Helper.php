@@ -181,4 +181,20 @@ final class Helper {
 		$this->product->delete_meta_data_value( self::INCLUDE_PRODUCT_IDS_META_KEY, $product_id );
 		$this->product->save_meta_data();
 	}
+
+
+	/**
+	 * 取得銷售方案連結的課程商品
+	 * 如果銷售方案沒有連結課程，則回傳 null
+	 *
+	 * @return \WC_Product|null
+	 */
+	public function get_course_product(): \WC_Product|null {
+		$course_product = $this->link_course_id;
+		$course_product = wc_get_product($course_product);
+		if (!$course_product) {
+			return null;
+		}
+		return $course_product;
+	}
 }

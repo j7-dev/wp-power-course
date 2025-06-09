@@ -43,9 +43,11 @@ printf(
 	<h6 class="text-base text-base-content font-semibold text-center">購買單堂課</h6>
 	%1$s
 	<div class="mt-8">%2$s</div>
-	<div class="mt-2">%3$s</div>
-	<div class="mt-8 mb-6 text-sm">%4$s</div>
-	<div class="flex gap-3">%5$s %6$s</div>
+	%3$s
+	%4$s
+	%5$s
+	<div class="mt-8 mb-6 text-sm">%6$s</div>
+	<div class="flex gap-3">%7$s %8$s</div>
 </div>
 ',
 Plugin::load_template( 'divider', null, false ),
@@ -56,6 +58,20 @@ Plugin::load_template(
 	],
 	false
 ),
+Plugin::load_template(
+	'customer_amount',
+	[
+		'product' => $product,
+	],
+	false
+	),
+Plugin::load_template(
+	'stock',
+	[
+		'product' => $product,
+	],
+	false
+	),
 Plugin::load_template(
 	'countdown/sales',
 	[
