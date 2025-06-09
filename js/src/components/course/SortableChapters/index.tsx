@@ -11,6 +11,7 @@ import {
 	useList,
 	HttpError,
 	useDeleteMany,
+	useUpdateMany,
 } from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
 import { ChapterEdit } from '@/components/chapters'
@@ -152,6 +153,79 @@ const SortableChaptersComponent = () => {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批次刪除選中的 ids
 
 	const { mutate: deleteMany, isLoading: isDeleteManyLoading } = useDeleteMany()
+	const { mutate: updateMany, isLoading: isUpdateManyLoading } = useUpdateMany()
+
+	const handlePublishMany = () => {
+		message.loading({
+			content: '更新中...',
+			key: 'chapter-status-update',
+		})
+		updateMany(
+			{
+				resource: 'chapters',
+				ids: selectedIds,
+				values: {
+					status: 'publish',
+				},
+				mutationMode: 'optimistic',
+			},
+			{
+				onSuccess: () => {
+					message.success({
+						content: '已成功設為發佈',
+						key: 'chapter-status-update',
+					})
+					setSelectedIds([])
+					invalidate({
+						resource: 'chapters',
+						invalidates: ['list'],
+					})
+				},
+				onError: (error) => {
+					message.error({
+						content: `更新失敗: ${error?.message || '未知錯誤'}`,
+						key: 'chapter-status-update',
+					})
+				},
+			},
+		)
+	}
+
+	const handleDraftMany = () => {
+		message.loading({
+			content: '更新中...',
+			key: 'chapter-status-update',
+		})
+		updateMany(
+			{
+				resource: 'chapters',
+				ids: selectedIds,
+				values: {
+					status: 'draft',
+				},
+				mutationMode: 'optimistic',
+			},
+			{
+				onSuccess: () => {
+					message.success({
+						content: '已成功設為草稿',
+						key: 'chapter-status-update',
+					})
+					setSelectedIds([])
+					invalidate({
+						resource: 'chapters',
+						invalidates: ['list'],
+					})
+				},
+				onError: (error) => {
+					message.error({
+						content: `更新失敗: ${error?.message || '未知錯誤'}`,
+						key: 'chapter-status-update',
+					})
+				},
+			},
+		)
+	}
 
 	return (
 		<>
@@ -164,6 +238,24 @@ const SortableChaptersComponent = () => {
 					onClick={() => setSelectedIds([])}
 				>
 					清空選取
+				</Button>
+				<Button
+					type="primary"
+					className="relative top-1"
+					disabled={!selectedIds.length}
+					onClick={handlePublishMany}
+					loading={isUpdateManyLoading}
+				>
+					設為發佈
+				</Button>
+				<Button
+					type="default"
+					className="relative top-1"
+					disabled={!selectedIds.length}
+					onClick={handleDraftMany}
+					loading={isUpdateManyLoading}
+				>
+					設為草稿
 				</Button>
 				<PopconfirmDelete
 					popconfirmProps={{
