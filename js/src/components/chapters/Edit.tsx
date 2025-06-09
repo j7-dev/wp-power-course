@@ -121,7 +121,10 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 				</Item>
 
 				<div className="mb-8">
-					<DescriptionDrawer resource="posts" />
+					<DescriptionDrawer
+						resource="chapters"
+						dataProviderName="power-course"
+					/>
 				</div>
 				<div className="mb-6 max-w-[20rem]">
 					<p className="mb-3">上傳課程內容</p>
