@@ -35,6 +35,7 @@ const TermSelector: FC<TTermSelector> = ({
 	const fieldLabel = keyLabelMapper(name)
 	const { selectProps: selectPropsFetched } = useSelect<TTerm>({
 		resource: 'terms',
+		dataProviderName: 'power-course',
 		optionLabel: 'name',
 		optionValue: 'id',
 		sorters: [

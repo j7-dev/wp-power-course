@@ -41,6 +41,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
 		resource: 'courses',
+		dataProviderName: 'power-course',
 		optionLabel: 'name',
 		optionValue: 'id',
 		onSearch: (value) => [

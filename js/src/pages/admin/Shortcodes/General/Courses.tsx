@@ -24,6 +24,7 @@ const { Item } = Form
 const { Text } = Typography
 
 const marks: SliderSingleProps['marks'] = {
+	1: '1',
 	2: '2',
 	3: '3',
 	4: '4',
@@ -70,7 +71,7 @@ const Courses = () => {
 	}
 
 	const watchPreview = Form.useWatch(['preview'], form) || false
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 	const { data, isFetching } = useCustom({
 		url: `${apiUrl}/shortcode`,
 		method: 'get',
@@ -120,9 +121,12 @@ const Courses = () => {
 							tooltip="預設 3"
 							initialValue={3}
 						>
-							<Slider marks={marks} min={2} max={4} />
+							<Slider marks={marks} min={1} max={4} />
 						</Item>
 						<Item name={['include']} label="只包含指定課程">
+							<Select {...selectProps} />
+						</Item>
+						<Item name={['exclude']} label="排除指定課程">
 							<Select {...selectProps} />
 						</Item>
 						<Item name={['orderby']} label="排序依據">

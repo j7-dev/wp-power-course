@@ -37,7 +37,7 @@ printf(
 <div class="w-full bg-base-100 shadow-lg rounded p-6">
 	<h6 class="text-base text-base-content font-semibold text-center">免費課程</h6>
 	%1$s
-	<div class="mt-2">%2$s</div>
+	%2$s
 	<div class="mt-8 mb-6 text-sm">%3$s</div>
 	<div class="flex gap-3">%4$s %5$s</div>
 </div>

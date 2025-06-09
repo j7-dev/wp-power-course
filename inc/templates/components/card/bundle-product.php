@@ -71,7 +71,23 @@ foreach ( $pbp_product_ids as $pbp_product_id ) :
 	Plugin::load_template( 'divider' );
 endforeach;
 
-echo '<div class="flex gap-3 justify-between items-end">';
+Plugin::load_template(
+	'customer_amount',
+	[
+		'product' => $product,
+	]
+);
+
+Plugin::load_template(
+	'stock',
+	[
+		'product' => $product,
+	]
+);
+
+
+
+echo '<div class="flex flex-wrap gap-3 justify-between items-end">';
 
 Plugin::load_template(
 	'price',

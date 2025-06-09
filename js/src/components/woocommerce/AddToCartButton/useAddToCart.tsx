@@ -41,7 +41,7 @@ export const useAddToCart = (props?: TUseAddToCartParams) => {
 
 	const { mutate } = mutation
 
-	const apiUrl = useApiUrl()
+	const apiUrl = useApiUrl('power-course')
 
 	const addToCart = ({ product_id, quantity, variation_id }: TAddToCart) => {
 		mutate(

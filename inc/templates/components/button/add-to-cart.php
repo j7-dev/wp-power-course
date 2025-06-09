@@ -55,7 +55,7 @@ $button_html = Plugin::load_template(
 );
 
 printf(
-/*html*/'<div class="pc-add-to-cart %1$s">%2$s</div>',
+/*html*/'<div class="pc-add-to-cart whitespace-nowrap %1$s">%2$s</div>',
 $wrapper_class,
 $button_html
 );

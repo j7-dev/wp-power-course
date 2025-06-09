@@ -242,6 +242,21 @@ const CourseOtherComponent = () => {
 			<div className="grid 2xl:grid-cols-3 gap-6">
 				<FiSwitch
 					formItemProps={{
+						name: ['show_customer_amount'],
+						label: '顯示「已有 OO 位學員購買此方案」文字',
+					}}
+				/>
+
+				<FiSwitch
+					formItemProps={{
+						name: ['show_stock_quantity'],
+						label: '顯示「剩餘 OO 組」文字',
+						tooltip: '只有當你有設定課程的庫存數量時才會作用',
+					}}
+				/>
+
+				<FiSwitch
+					formItemProps={{
 						name: ['enable_bundles_sticky'],
 						label: '桌機板( > 810px )時，銷售方案 Sticky',
 						tooltip:

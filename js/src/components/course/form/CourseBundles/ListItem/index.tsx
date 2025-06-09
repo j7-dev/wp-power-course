@@ -88,6 +88,7 @@ const ListItem = ({
 						title: '確認刪除這個銷售方案嗎?',
 						onConfirm: () =>
 							deleteProduct({
+								dataProviderName: 'power-course',
 								resource: 'bundle_products',
 								id,
 								mutationMode: 'optimistic',

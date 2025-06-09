@@ -54,6 +54,7 @@ const EmailsEdit = () => {
 		<div className="sticky-card-actions">
 			<Edit
 				resource="emails"
+				dataProviderName="power-email"
 				recordItemId={id}
 				headerButtons={() => null}
 				title={
