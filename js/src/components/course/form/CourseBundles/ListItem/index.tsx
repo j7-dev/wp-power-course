@@ -1,7 +1,6 @@
 import React, { memo } from 'react'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import {
-	ProductName,
 	ProductPrice,
 	ProductTotalSales,
 	ProductBoundCourses,
@@ -10,6 +9,7 @@ import { getPostStatus, productTypes } from '@/utils'
 import { Tag } from 'antd'
 import { DuplicateButton, PopconfirmDelete } from '@/components/general'
 import { useDelete } from '@refinedev/core'
+import { ProductName } from 'antd-toolkit/wp'
 
 const ListItem = ({
 	record,
@@ -40,10 +40,10 @@ const ListItem = ({
 			</div> */}
 
 			<div className="self-center">
-				<ProductName<TBundleProductRecord>
-					record={record}
+				<ProductName
+					record={record as any}
 					onClick={() => setSelectedProduct(record)}
-					hideImage={true}
+					hideImage={false}
 				/>
 			</div>
 

@@ -169,23 +169,24 @@ final class Bootstrap {
 
 		$encrypt_env = PowerhouseUtils::simple_encrypt(
 			[
-				'SITE_URL'                => \untrailingslashit( \site_url() ),
-				'API_URL'                 => \untrailingslashit( \esc_url_raw( rest_url() ) ),
-				'CURRENT_USER_ID'         => \get_current_user_id(),
-				'CURRENT_POST_ID'         => $post_id,
-				'PERMALINK'               => \untrailingslashit( $permalink ),
-				'APP_NAME'                => Plugin::$app_name,
-				'KEBAB'                   => Plugin::$kebab,
-				'SNAKE'                   => Plugin::$snake,
-				'BUNNY_LIBRARY_ID'        => Settings::instance()->bunny_library_id,
-				'BUNNY_CDN_HOSTNAME'      => Settings::instance()->bunny_cdn_hostname,
-				'BUNNY_STREAM_API_KEY'    => Settings::instance()->bunny_stream_api_key,
-				'NONCE'                   => \wp_create_nonce( 'wp_rest' ),
-				'APP1_SELECTOR'           => Base::APP1_SELECTOR,
-				'APP2_SELECTOR'           => Base::APP2_SELECTOR,
-				'ELEMENTOR_ENABLED'       => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
+				'SITE_URL'                   => \untrailingslashit( \site_url() ),
+				'API_URL'                    => \untrailingslashit( \esc_url_raw( rest_url() ) ),
+				'CURRENT_USER_ID'            => \get_current_user_id(),
+				'CURRENT_POST_ID'            => $post_id,
+				'PERMALINK'                  => \untrailingslashit( $permalink ),
+				'APP_NAME'                   => Plugin::$app_name,
+				'KEBAB'                      => Plugin::$kebab,
+				'SNAKE'                      => Plugin::$snake,
+				'BUNNY_LIBRARY_ID'           => Settings::instance()->bunny_library_id,
+				'BUNNY_CDN_HOSTNAME'         => Settings::instance()->bunny_cdn_hostname,
+				'BUNNY_STREAM_API_KEY'       => Settings::instance()->bunny_stream_api_key,
+				'NONCE'                      => \wp_create_nonce( 'wp_rest' ),
+				'APP1_SELECTOR'              => Base::APP1_SELECTOR,
+				'APP2_SELECTOR'              => Base::APP2_SELECTOR,
+				'ELEMENTOR_ENABLED'          => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
 				/** @deprecated 用 woocommerce API */
-				'NOTIFY_LOW_STOCK_AMOUNT' => \get_option( 'woocommerce_notify_low_stock_amount' ),
+				'NOTIFY_LOW_STOCK_AMOUNT'    => \get_option( 'woocommerce_notify_low_stock_amount' ),
+				'COURSE_PERMALINK_STRUCTURE' => CourseUtils::get_course_permalink_structure(),
 			]
 		);
 
