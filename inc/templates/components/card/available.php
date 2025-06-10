@@ -66,7 +66,7 @@ printf(
 	<a href="%1$s">
 		<div class="pc-course-card__image-wrap group">
 			%2$s
-			<img class="pc-course-card__image group-hover:scale-110 transition duration-300 ease-in-out" src="%3$s" alt="%4$s" loading="lazy">
+			<img class="pc-course-card__image group-hover:scale-110 transition duration-300 ease-in-out" src="%3$s" alt="%4$s"  loading="lazy" decoding="async">
 	  </div>
   </a>
 	<a href="%1$s">

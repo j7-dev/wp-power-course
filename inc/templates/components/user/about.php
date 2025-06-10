@@ -43,7 +43,7 @@ printf(
 /*html*/'
 <div class="flex gap-6 items-center mb-6">
 	<div class="group rounded-full size-20 overflow-hidden">
-		<img class="group-hover:scale-110 transition duration-300 ease-in-out" src="%1$s" loading="lazy"/>
+		<img class="group-hover:scale-110 transition duration-300 ease-in-out" src="%1$s" loading="lazy" decoding="async"/>
 	</div>
 	<h4 class="text-xl font-semibold">%2$s</h4>
 </div>

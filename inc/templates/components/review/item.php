@@ -52,7 +52,7 @@ printf(
 	<div class="flex gap-4">
 		<div class="w-10">
 			<div class="size-10 rounded-full overflow-hidden relative">
-				<img src="%2$s" loading="lazy" class="w-full h-full object-cover relative z-20">
+				<img src="%2$s" class="w-full h-full object-cover relative z-20" loading="lazy" decoding="async">
 				<div class="absolute top-0 left-0 w-full h-full bg-gray-400 animate-pulse z-10"></div>
 			</div>
 		</div>

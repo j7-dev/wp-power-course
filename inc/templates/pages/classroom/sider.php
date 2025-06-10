@@ -39,7 +39,7 @@ printf(
 							href="%2$s"
 							class="hover:opacity-75 transition duration-300 flex gap-4 items-center"
 						>
-							<img class="size-6" src="%3$s" />
+							<img class="size-6" src="%3$s" loading="lazy" decoding="async" />
 							<span class="text-gray-400 font-light">
 									回《我的課程》
 							</span>
