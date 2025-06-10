@@ -410,6 +410,12 @@ abstract class Utils {
 			// 提交事務
 			$wpdb->query('COMMIT');
 
+			// 清除文章內容快取
+			\wp_cache_flush_group('posts');
+
+			// 清除文章的中繼資料快取
+			\wp_cache_flush_group('post_meta');
+
 		} catch (\Exception $e) {
 			// 回滾事務
 			$wpdb->query('ROLLBACK');
