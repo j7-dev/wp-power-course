@@ -37,7 +37,7 @@ $back_to_my_course_html = sprintf(
 			href="%1$s"
 			class="hover:opacity-75 transition duration-300 contents lg:tw-hidden"
 		>
-			<img class="size-6 absolute left-2 top-4" src="%2$s" />
+			<img class="size-6 absolute left-2 top-4" src="%2$s" loading="lazy" decoding="async" />
 		</a>
 ',
 	\wc_get_account_endpoint_url( MyAccount::COURSES_ENDPOINT ),

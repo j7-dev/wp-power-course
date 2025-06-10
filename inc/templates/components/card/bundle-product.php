@@ -47,7 +47,7 @@ echo '<div class="w-full bg-base-100 shadow-lg rounded">';
 if ($image_url) {
 	printf(
 	/*html*/'
-	<img src="%1$s" alt="%2$s" class="w-full rounded-t">
+	<img src="%1$s" alt="%2$s" class="w-full rounded-t" loading="lazy" decoding="async">
 	',
 	$image_url,
 	$product_name
