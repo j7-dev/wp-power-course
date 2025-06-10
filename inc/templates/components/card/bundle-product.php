@@ -42,12 +42,12 @@ $date_on_sale_to = $product->get_date_on_sale_to()?->date('Y/m/d H:i');
 $image_id  = $product->get_image_id();
 $image_url = \wp_get_attachment_image_url($image_id, 'full');
 
-echo '<div class="w-full bg-base-100 shadow-lg rounded overflow-hidden">';
+echo '<div class="w-full bg-base-100 shadow-lg rounded">';
 
 if ($image_url) {
 	printf(
 	/*html*/'
-	<img src="%1$s" alt="%2$s" class="w-full">
+	<img src="%1$s" alt="%2$s" class="w-full rounded-t">
 	',
 	$image_url,
 	$product_name
