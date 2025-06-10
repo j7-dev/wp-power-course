@@ -17,6 +17,7 @@ $default_args = [
  */
 $args = wp_parse_args( $args, $default_args );
 
+/** @var array{product: \WC_Product} $args */
 [
 	'product' => $product,
 ] = $args;
@@ -38,7 +39,23 @@ $bundle_type_label = $product->get_meta( 'bundle_type_label' );
 $is_on_sale      = $product->is_on_sale();
 $date_on_sale_to = $product->get_date_on_sale_to()?->date('Y/m/d H:i');
 
-echo '<div class="w-full bg-base-100 shadow-lg rounded p-6">';
+$image_id  = $product->get_image_id();
+$image_url = \wp_get_attachment_image_url($image_id, 'full');
+
+echo '<div class="w-full bg-base-100 shadow-lg rounded overflow-hidden">';
+
+if ($image_url) {
+	printf(
+	/*html*/'
+	<img src="%1$s" alt="%2$s" class="w-full">
+	',
+	$image_url,
+	$product_name
+	);
+}
+
+echo '<div class="p-6">';
+
 printf(
 /*html*/'
   <p class="text-xs text-center mb-1 text-error">%1$s</p>
@@ -131,4 +148,5 @@ if ($is_on_sale && $date_on_sale_to) {
 	);
 }
 
+echo '</div>';
 echo '</div>';

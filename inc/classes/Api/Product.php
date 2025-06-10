@@ -471,7 +471,7 @@ final class Product {
 		$gallery_image_ids = $product->get_gallery_image_ids();
 
 		$image_ids = [ $image_id, ...$gallery_image_ids ];
-		$images    = array_map( [ WP::class, 'get_image_info' ], $image_ids );
+		$images    = array_filter(array_map( [ WP::class, 'get_image_info' ], $image_ids ));
 
 		$description_array = $with_description ? [
 			'description'       => $product->get_description(),
@@ -799,6 +799,24 @@ final class Product {
 			'data' => $data,
 			'meta_data' => $meta_data,
 			] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
+
+		if (isset($meta_data['images'])) {
+			$gallery_image_ids = [];
+			$images            = $meta_data['images'];
+			$images            = is_array($images) ? $images : [];
+			foreach ($images as $index => $image) {
+				$image_id = $image['id'] ?? null;
+				if (!$image_id) {
+					continue;
+				}
+				if ($index === 0) {
+					$product->set_image_id($image_id);
+				}
+				$gallery_image_ids[] = $image_id;
+			}
+			$product->set_gallery_image_ids($gallery_image_ids);
+			unset($meta_data['images']);
+		}
 
 		// type 會被儲存為商品的類型，不需要再額外存進 meta data
 		$is_subscription = 'subscription' === $meta_data['type'];

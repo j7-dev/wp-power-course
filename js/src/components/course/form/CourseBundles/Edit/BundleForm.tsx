@@ -22,6 +22,7 @@ import {
 import { useList } from '@refinedev/core'
 import ProductPriceFields from './ProductPriceFields'
 import { productTypes } from '@/utils'
+import Gallery from './Gallery'
 
 const { Search } = Input
 const { Item } = Form
@@ -183,6 +184,8 @@ const BundleForm = () => {
 
 	return (
 		<>
+			<Item name={['id']} hidden />
+			<Gallery limit={1} />
 			<Item
 				name={['bundle_type']}
 				label="銷售方案種類"
