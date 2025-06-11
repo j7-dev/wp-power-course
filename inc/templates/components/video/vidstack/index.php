@@ -8,6 +8,7 @@
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\Powerhouse\Settings\Model\Settings;
 
 $default_args = [
 	'class'          => 'rounded-xl',
@@ -40,7 +41,7 @@ $args = wp_parse_args( $args, $default_args );
 	'id'   => $video_id,
 ] = $video_info;
 
-$bunny_cdn_hostname = (string) \get_option( 'bunny_cdn_hostname', '' );
+$bunny_cdn_hostname = Settings::instance()->bunny_cdn_hostname;
 
 $src = match ($video_info['type']) {
 	'youtube' => "youtube/{$video_id}",
