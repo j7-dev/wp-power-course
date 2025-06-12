@@ -1,8 +1,4 @@
 <?php
-/**
- * Compatibility 不同版本間的相容性設定
- * from v0.5.0
- */
 
 declare (strict_types = 1);
 
@@ -13,9 +9,7 @@ use J7\PowerCourse\AbstractTable;
 use J7\Powerhouse\Settings\Model\Settings as PowerhouseSettings;
 
 
-/**
- * Class Compatibility
- */
+/** Class Compatibility 不同版本間的相容性設定 */
 final class Compatibility {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -89,7 +83,7 @@ final class Compatibility {
 		// ❗不要刪除此行，註記已經執行過相容設定
 		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
 
-		\J7\WpUtils\Classes\WC::log(Plugin::$version, '已執行兼容性設定');
+		Plugin::logger(Plugin::$version . ' 已執行兼容性設定', 'info');
 	}
 
 
@@ -112,7 +106,7 @@ final class Compatibility {
 		$powerhouse_settings['bunny_cdn_hostname']   = $bunny_cdn_hostname;
 		$powerhouse_settings['bunny_stream_api_key'] = $bunny_stream_api_key;
 
-		\update_option(PowerhouseSettings::SETTINGS_KEY, $powerhouse_settings);
+		PowerhouseSettings::instance()->partial_update($powerhouse_settings);
 
 		\delete_option('bunny_library_id');
 		\delete_option('bunny_cdn_hostname');
