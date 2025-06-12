@@ -60,7 +60,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'name'     => 'Powerhouse',
 					'slug'     => 'powerhouse',
 					'source'   => 'https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip',
-					'version'  => '3.3.5',
+					'version'  => '3.3.7',
 					'required' => true,
 				],
 			];
@@ -111,6 +111,20 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					\update_post_meta($post_id, '_is_course', 'no');
 				}
 			}
+		}
+
+
+		/**
+		 * 記錄日誌
+		 *
+		 * @param string $message 訊息
+		 * @param string $level 日誌等級
+		 * @param array  $context 上下文
+		 * @param int    $trace_limit 堆疊限制
+		 * @return void
+		 */
+		public static function logger( string $message, string $level = 'debug', array $context = [], int $trace_limit = 0 ): void {
+			\J7\WpUtils\Classes\WC::logger($message, $level, $context, 'power-course', $trace_limit);
 		}
 	}
 
