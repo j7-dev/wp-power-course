@@ -1,5 +1,5 @@
 import { Button, Alert } from 'antd'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { DoubleRightOutlined } from '@ant-design/icons'
 
 const NoLibraryId = ({
