@@ -5,8 +5,8 @@ import { ErrorComponent } from '@refinedev/antd'
 import routerBindings, {
 	UnsavedChangesNotifier,
 	NavigateToResource,
-} from '@refinedev/react-router-v6'
-import { HashRouter, Outlet, Route, Routes } from 'react-router-dom'
+} from '@refinedev/react-router'
+import { HashRouter, Outlet, Route, Routes } from 'react-router'
 import { resources } from '@/resources'
 import { ConfigProvider } from 'antd'
 
