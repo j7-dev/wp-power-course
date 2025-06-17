@@ -69,7 +69,7 @@ if ($is_admin_preview) {
 
 printf(
 /*html*/'<div class="pc-classroom-body__video z-[15] sticky w-full lg:relative lg:top-[unset] %s">',
-$show_admin_preview ? 'top-[120px]' : 'top-[92px]'
+$is_admin_preview ? 'top-[120px]' : 'top-[92px]'
 );
 Plugin::load_template(
 	'video',
