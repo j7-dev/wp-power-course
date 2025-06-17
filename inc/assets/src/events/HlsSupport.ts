@@ -9,12 +9,10 @@ export const HlsSupport = () => {
 	if (!audios.length) return
 
 	audios.forEach((audio) => {
-		const source = audio.getAttribute('data-src') || ''
+		const source = audio.getAttribute('src') || ''
 
 		// 對於原生支持 HLS 的瀏覽器（如 Safari）
-		if (audio.canPlayType('application/vnd.apple.mpegurl')) {
-			audio.src = source
-		} else {
+		if (!audio.canPlayType('application/vnd.apple.mpegurl')) {
 			if (!Hls.isSupported()) {
 				$(audio)
 					.closest('.bn-block')
