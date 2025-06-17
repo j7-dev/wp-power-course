@@ -3,7 +3,7 @@ import $ from 'jquery'
 
 export const HlsSupport = () => {
 	const audios = document.querySelectorAll<HTMLMediaElement>(
-		'.bn-container audio',
+		'.power-editor audio',
 	)
 
 	if (!audios.length) return
