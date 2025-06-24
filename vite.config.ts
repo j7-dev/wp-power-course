@@ -2,12 +2,22 @@ import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import alias from '@rollup/plugin-alias'
 import path from 'path'
+import { defineConfig } from 'vite'
 
 // import liveReload from 'vite-plugin-live-reload'
 
 import { v4wp } from '@kucrut/vite-for-wp'
 
-export default {
+export default defineConfig({
+	server: {
+		port: 5174,
+		cors: {
+			origin: '*',
+		},
+		fs: {
+			allow: ['./', '../../packages'],
+		},
+	},
 	plugins: [
 		alias(),
 		react(),
@@ -40,4 +50,4 @@ export default {
 			'@': path.resolve(__dirname, 'js/src'),
 		},
 	},
-}
+})

@@ -2,11 +2,20 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import alias from '@rollup/plugin-alias'
 import path from 'path'
-import liveReload from 'vite-plugin-live-reload'
+// import liveReload from 'vite-plugin-live-reload'
 import optimizer from 'vite-plugin-optimizer'
 import { terser } from 'rollup-plugin-terser'
 
 export default defineConfig({
+	server: {
+		port: 6174,
+		cors: {
+			origin: '*',
+		},
+		fs: {
+			allow: ['./', '../../packages'],
+		},
+	},
 	build: {
 		emptyOutDir: true,
 		minify: true,
@@ -27,9 +36,9 @@ export default defineConfig({
 	plugins: [
 		alias(),
 		tsconfigPaths(),
-		liveReload([
-			__dirname + '/**/*.php',
-		]),
+		// liveReload([
+		// 	__dirname + '/**/*.php',
+		// ]),
 		optimizer({
 			jquery: 'const $ = window.jQuery; export { $ as default }',
 		}),

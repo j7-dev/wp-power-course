@@ -74,7 +74,6 @@ $show_total_student = \wc_string_to_bool( (string) $product->get_meta( 'show_tot
 $total_student      = $show_total_student ? $total_student : '-';
 $total_student_html = Plugin::load_template('icon/team', null, false) . $total_student;
 
-// TODO pc-course-card__price h-[2.5rem] md:h-8 高度可能需要調整
 printf(
 	/*html*/'
 <div class="pc-course-card">

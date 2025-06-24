@@ -262,7 +262,7 @@ abstract class Utils {
 				}
 
 				// 如果沒有要處理的ID，則跳過
-				if (empty($ids)) {
+				if (!$ids) {
 					continue;
 				}
 
@@ -275,7 +275,7 @@ abstract class Utils {
 				$sql .= ' ELSE menu_order END ';
 
 				// 如果有post_parent需要更新，加入post_parent的更新語句
-				if (!empty($parent_cases)) {
+				if ($parent_cases) {
 					$sql .= ', post_parent = CASE ';
 					$sql .= implode(' ', $parent_cases);
 					$sql .= ' ELSE post_parent END ';
