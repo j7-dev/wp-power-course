@@ -1,3 +1,4 @@
+// @ts-ignore
 import $, { JQuery } from 'jquery'
 
 // 處理倒數計時器

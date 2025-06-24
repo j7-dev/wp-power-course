@@ -559,12 +559,13 @@ final class Product {
 			// Get Product Stock
 			'stock'                              => $product->get_stock_quantity(),
 			'stock_status'                       => $product->get_stock_status(),
-			'manage_stock'                       => $product->get_manage_stock(),
+			'manage_stock'                       => \wc_bool_to_string( $product->get_manage_stock() ),
 			'stock_quantity'                     => $product->get_stock_quantity(),
 			'backorders'                         => $product->get_backorders(),
-			'backorders_allowed'                 => $product->backorders_allowed(),
-			'backordered'                        => $product->is_on_backorder(),
+			'backorders_allowed'                 => \wc_bool_to_string( $product->backorders_allowed() ),
+			'backordered'                        => \wc_bool_to_string( $product->is_on_backorder() ),
 			'low_stock_amount'                   => $low_stock_amount,
+			'sold_individually'                  => \wc_bool_to_string( $product->is_sold_individually() ),
 
 			// Get Linked Products
 			'upsell_ids'                         => array_map( 'strval', $product?->get_upsell_ids() ),
