@@ -9,6 +9,7 @@ use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\BundleProduct\Helper;
+
 use J7\Powerhouse\Settings\Model\Settings;
 use J7\Powerhouse\Utils\Base as PowerhouseUtils;
 
@@ -184,8 +185,6 @@ final class Bootstrap {
 				'APP1_SELECTOR'              => Base::APP1_SELECTOR,
 				'APP2_SELECTOR'              => Base::APP2_SELECTOR,
 				'ELEMENTOR_ENABLED'          => \in_array( 'elementor/elementor.php', $active_plugins, true ), // 檢查 elementor 是否啟用
-				/** @deprecated 用 woocommerce API */
-				'NOTIFY_LOW_STOCK_AMOUNT'    => \get_option( 'woocommerce_notify_low_stock_amount' ),
 				'COURSE_PERMALINK_STRUCTURE' => CourseUtils::get_course_permalink_structure(),
 			]
 		);

@@ -21,8 +21,6 @@ declare global {
 			APP2_SELECTOR: string
 			ELEMENTOR_ENABLED: boolean
 			COURSE_PERMALINK_STRUCTURE: string
-				/** @deprecated */
-			NOTIFY_LOW_STOCK_AMOUNT:string
 		}
 	}
 	var wp: {
