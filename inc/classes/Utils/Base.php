@@ -65,6 +65,18 @@ abstract class Base {
 	public static function get_price_html( \WC_Product $product ): string {
 		$product_type = $product->get_type();
 
+		/**
+		 * ▼ 強制刷新價格
+		 * Woocommerce 的折價天數邏輯預設是用天數來判斷
+		 * 即使資料是儲存成 timestamp 但倒數計時到的時候
+		 * 價格並不會刷新回原價
+		 */
+		if (!$product->is_on_sale()) {
+			\update_post_meta($product->get_id(), '_price', $product->get_regular_price());
+			$product->save();
+			$product = \wc_get_product($product->get_id());
+		}
+
 		return match ($product_type) {
 			'subscription' => self::get_subscription_product_price_html($product),
 			'variable-subscription' => '',
