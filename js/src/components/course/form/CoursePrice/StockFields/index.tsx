@@ -1,16 +1,45 @@
-import { Form, InputNumber, Select } from 'antd'
+import { Form, InputNumber, Select, Button, Alert } from 'antd'
+import { ExportOutlined } from '@ant-design/icons'
 import { FiSwitch as Switch } from '@/components/formItem'
-import { useEnv } from '@/hooks'
-import { PRODUCT_STOCK_STATUS } from 'antd-toolkit/wp'
+import { useEnv } from 'antd-toolkit'
+import { PRODUCT_STOCK_STATUS, useWoocommerce } from 'antd-toolkit/wp'
 
 const { Item } = Form
 
 const StockFields = () => {
-	const { NOTIFY_LOW_STOCK_AMOUNT } = useEnv()
+	const { SITE_URL } = useEnv()
+	const { notify_low_stock_amount, manage_stock: canManageStock } =
+		useWoocommerce()
 	const form = Form.useFormInstance()
 	const manageStockName = ['manage_stock']
 	const watchManageStock = Form.useWatch(manageStockName, form)
 	const enableStockManagement = watchManageStock === 'yes'
+
+	if (!canManageStock) {
+		return (
+			<Alert
+				message={
+					<>
+						您的商店未啟用【庫存管理】
+						<Button
+							color="primary"
+							variant="link"
+							href={`${SITE_URL}/wp-admin/admin.php?page=wc-settings&tab=products&section=inventory`}
+							target="_blank"
+							icon={<ExportOutlined />}
+							iconPosition="end"
+						>
+							前往啟用
+						</Button>
+					</>
+				}
+				type="info"
+				showIcon
+				className="mb-4"
+			/>
+		)
+	}
+
 	return (
 		<>
 			<Item name={['backorders']} label="允許無庫存下單">
@@ -48,7 +77,7 @@ const StockFields = () => {
 					</Item>
 					<Item name={['low_stock_amount']} label="低庫存臨界值">
 						<InputNumber
-							placeholder={`全店門檻(${NOTIFY_LOW_STOCK_AMOUNT})`}
+							placeholder={`全店門檻(${notify_low_stock_amount})`}
 							className="w-full"
 						/>
 					</Item>
