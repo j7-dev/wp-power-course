@@ -34,7 +34,7 @@ $item_class .= ' ' . $base_class;
 if ('sm' === $countdown_type) {
 	printf(
 		/*html*/'
-
+		<span class="fixed-day pc-countdown-component__hour font-mono -mr-2"></span>
 		<div data-timestamp="%1$s" class="pc-countdown-component %2$s">
 			<span class="pc-countdown flex items-center gap-x-1" style="line-height:1em !important">
 				<span class="pc-countdown-component__day font-mono" style="--value:0;"></span>
