@@ -1,6 +1,6 @@
 import { FC, HTMLAttributes } from 'react'
 import defaultImage from '@/assets/images/defaultImage.jpg'
-import { cn } from '@/utils'
+import { cn } from 'antd-toolkit'
 
 type SimpleImageProps = {
 	src: string

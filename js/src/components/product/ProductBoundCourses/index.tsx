@@ -2,8 +2,8 @@ import React, { memo, FC } from 'react'
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Typography, Tag, Tooltip } from 'antd'
 import dayjs from 'dayjs'
-import { cn } from '@/utils'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
+import { cn } from 'antd-toolkit'
 
 const { Text } = Typography
 
