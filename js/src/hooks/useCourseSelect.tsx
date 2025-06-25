@@ -46,8 +46,8 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 		],
 	})
 
-	const courses = query.data?.data ?? []
-	const options = courses.map((course) => ({
+	const courses = query?.data?.data ?? []
+	const options = courses?.map((course) => ({
 		label: course.name,
 		value: course.id,
 	}))
