@@ -28,6 +28,9 @@ if ( 'yes' === $hide_single_course ) {
 	return;
 }
 
+// 確認是否可以購買 以及還有沒有庫存
+$in_stock_and_purchasable = $product->is_purchasable() && $product->is_in_stock();
+
 $purchase_note = \wpautop( $product->get_purchase_note() );
 $checkout_url  = \wc_get_checkout_url();
 $url           = \add_query_arg(
@@ -85,8 +88,9 @@ Plugin::load_template(
 	[
 		'type'     => 'primary',
 		'children' => '立即購買',
-		'class'    => 'pc-add-to-cart-link text-white flex-1',
-		'href'     => $url,
+		'disabled' => ! $in_stock_and_purchasable,
+		'class'    => $in_stock_and_purchasable ? 'pc-add-to-cart-link flex-1 text-white' : 'pc-add-to-cart-link flex-1 cursor-not-allowed',
+		'href'     => $in_stock_and_purchasable ? $url : '',
 	],
 	false
 ),
