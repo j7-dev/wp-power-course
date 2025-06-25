@@ -30,15 +30,17 @@ if ($helper?->is_bundle_product ) {
 	$course_product = $product;
 }
 
-$show_stock_quantity = wc_string_to_bool($course_product->get_meta('show_stock_quantity'));
-
-if (!$show_stock_quantity) {
+$managing_stock = $course_product->managing_stock();
+if (!$managing_stock) {
 	return;
 }
 
-$product_low_stock_amount = $product->get_low_stock_amount();
 
-$notify_low_stock_amount = ( $product_low_stock_amount === '' ) ? (int) WCSettings::instance()->notify_low_stock_amount : (int) $product_low_stock_amount;
+$show_stock_quantity = wc_string_to_bool($course_product->get_meta('show_stock_quantity'));
+
+$product_low_stock_amount = $product->get_low_stock_amount(); // 個別商品 override 低庫存通知數量
+
+$notify_low_stock_amount = ( $product_low_stock_amount === '' ) ? (int) WCSettings::instance()->notify_low_stock_amount : (int) $product_low_stock_amount; // 檢查 個別商品是否 override 低庫存通知數量，如果沒有則使用設定值
 
 $stock_quantity = $product->get_stock_quantity();
 
