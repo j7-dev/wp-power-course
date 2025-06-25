@@ -73,7 +73,7 @@ $classes   = $class . ' ' . implode( ' ', $class_arr ) . ( $outline ? ' border-s
 
 $icon_html = '';
 if ($icon) {
-	$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out"></span>' : Plugin::safe_get(
+	$icon_html = $loading ? '<span class="loading loading-spinner text-current group-hover:text-white transition duration-300 ease-in-out"></span>' : Plugin::load_template(
 		"icon/{$icon}",
 		[
 			'class' => $icon_class,
