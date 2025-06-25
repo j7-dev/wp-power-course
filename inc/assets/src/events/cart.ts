@@ -87,7 +87,7 @@ export const cart = () => {
 		},
 	)
 
-	$('.pc-add-to-cart-link').on('click', function (e) {
+	$('.pc-add-to-cart-link:not(.pc-btn-disabled)').on('click', function (e) {
 		e.preventDefault()
 		e.stopPropagation()
 		$('.pc-already-bought-modal .pc-already-bought-modal__confirm').off()
