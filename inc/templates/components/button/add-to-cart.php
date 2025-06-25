@@ -25,10 +25,7 @@ $default_props = [
 	'wrapper_class' => '[&_.added]:tw-hidden', // 🆕
 ];
 
-/**
- * @var array $args
- * @phpstan-ignore-next-line
- */
+/** @var array $args */
 $args    = wp_parse_args( $args, $default_props );
 $product = $args['product'];
 if (!( $product instanceof \WC_Product )) {
@@ -48,14 +45,32 @@ $args['attr']  .= sprintf(
 
 unset($args['product'], $args['wrapper_class'], $args['qty']);
 
+// 確認是否可以購買 以及還有沒有庫存
+$in_stock_and_purchasable = $product->is_purchasable() && $product->is_in_stock();
+if ( ! $in_stock_and_purchasable ) {
+	$args['disabled'] = true;
+	$args['outline']  = false;
+	$args['class']   .= ' !pointer-events-none ';
+	// text-white 替代為 ''
+	$args['class']  = str_replace( 'text-white', '', $args['class'] );
+	$wrapper_class .= ' !pointer-events-none ';
+}
+
 $button_html = Plugin::load_template(
 	'button',
 	$args,
 	false
 );
 
+if (!$in_stock_and_purchasable) {
+	echo '<div class="cursor-not-allowed">';
+}
 printf(
 /*html*/'<div class="pc-add-to-cart whitespace-nowrap %1$s">%2$s</div>',
 $wrapper_class,
 $button_html
 );
+
+if (!$in_stock_and_purchasable) {
+	echo '</div>';
+}
