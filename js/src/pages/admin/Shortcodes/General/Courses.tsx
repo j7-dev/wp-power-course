@@ -16,9 +16,8 @@ import {
 	keyLabelMapper,
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
-import { defaultSelectProps } from '@/utils'
 import { useCustom, useApiUrl } from '@refinedev/core'
-import { renderHTML } from 'antd-toolkit'
+import { renderHTML, defaultSelectProps } from 'antd-toolkit'
 
 const { Item } = Form
 const { Text } = Typography

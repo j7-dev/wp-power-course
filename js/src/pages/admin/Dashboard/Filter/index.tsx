@@ -14,10 +14,11 @@ import {
 import { useSelect } from '@refinedev/antd'
 import dayjs from 'dayjs'
 import { TProductSelectOption } from '@/components/product/ProductTable/types'
-import { defaultSelectProps, productTypes } from '@/utils'
+import { productTypes } from '@/utils'
 import { TQuery } from '../hooks/useRevenue'
 import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons'
 import { EViewType } from '../types'
+import { defaultSelectProps } from 'antd-toolkit'
 
 const { RangePicker } = DatePicker
 const { Item } = Form
