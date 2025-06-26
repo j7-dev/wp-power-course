@@ -197,24 +197,16 @@ final class User {
 	 * @phpstan-ignore-next-line
 	 */
 	public function get_users_students_callback( $request ): \WP_REST_Response {
-
 		$params = $request->get_query_params();
-
 		$params = WP::sanitize_text_field_deep( $params, false );
 
-		$query = new Query($params);
-
-		$user_ids = $query->user_ids;
-
-		$users = array_map( fn( $user_id ) => \get_user_by('id', $user_id), $user_ids );
-		$users = array_filter($users);
-
+		$query      = new Query($params);
+		$users      = $query->get_users();
 		$pagination = $query->get_pagination();
 
 		$formatted_users = array_values(array_map( [ $this, 'format_user_details' ], $users ));
 
 		$response = new \WP_REST_Response( $formatted_users );
-
 		// // set pagination in header
 		$response->header( 'X-WP-Total', (string) $pagination->total );
 		$response->header( 'X-WP-TotalPages', (string) $pagination->total_pages );
@@ -591,7 +583,7 @@ final class User {
 			}
 
 			// 處理 $expire_date，如果 是 subscription_ 開頭, 0, timestamp，則不需要處理
-			if (!str_starts_with($expire_date, 'subscription_') && !\is_numeric($expire_date)) {
+			if (!str_starts_with( (string) $expire_date, 'subscription_') && !\is_numeric($expire_date)) {
 				$expire_date = WP::wp_strtotime($expire_date) ?? 0;
 			}
 			if (is_numeric($expire_date)) {

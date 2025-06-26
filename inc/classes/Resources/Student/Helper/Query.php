@@ -23,13 +23,13 @@ final class Query {
 	public function __construct( private array $args ) {
 		$default_args = [
 			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'posts_per_page' => 10,
+			'posts_per_page' => 20,
 			'order'          => 'DESC',
 			'offset'         => 0,
 			'paged'          => 1,
 			'count_total'    => true,
-			'meta_key'       => 'avl_course_ids', // phpcs:ignore
-			'meta_value'     => '', // phpcs:ignore
+			'meta_key'       => 'avl_course_ids',
+			'meta_value'     => '',
 		];
 
 		$args = \wp_parse_args(
@@ -42,7 +42,7 @@ final class Query {
 		}
 
 		// 如果 $args['meta_value'] 有包含 ! 開頭，就用反查詢
-		if (\str_starts_with($args['meta_value'], '!')) {
+		if (\str_starts_with( (string) $args['meta_value'], '!')) {
 			$reverse   = true;
 			$course_id = substr($args['meta_value'], 1);
 		} else {
@@ -103,20 +103,12 @@ final class Query {
 		}
 
 		$sql .= $where;
-		if (!$reverse) {
-			$sql .= $wpdb->prepare(
-			' ORDER BY um.umeta_id DESC
-			LIMIT %1$d OFFSET %2$d',
-			$args['posts_per_page'],
-			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
+		$sql .= $wpdb->prepare(
+			' ORDER BY %1$s DESC ',
+			$reverse ? 'u.ID' : 'um.umeta_id'
 			);
-		} else {
-			$sql .= $wpdb->prepare(
-			' ORDER BY u.ID DESC
-				LIMIT %1$d OFFSET %2$d',
-			$args['posts_per_page'],
-			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
-			);
+		if ('-1' !== (string) $args['posts_per_page']) {
+			$sql .= $wpdb->prepare('LIMIT %1$d OFFSET %2$d', $args['posts_per_page'], ( ( $args['paged'] - 1 ) * $args['posts_per_page'] ));
 		}
 
 		$user_ids = $wpdb->get_col( $sql); // phpcs:ignore
@@ -148,5 +140,17 @@ final class Query {
 			'total'       => (int) $total,
 			'total_pages' => (int) $total_pages,
 		];
+	}
+
+	/**
+	 * 取得學員資料
+	 *
+	 * @return WP_User[]
+	 * */
+	public function get_users(): array {
+		$users = array_map( fn( $user_id ) => \get_user_by('id', $user_id), $this->user_ids );
+		$users = array_filter($users);
+
+		return $users;
 	}
 }
