@@ -1,15 +1,10 @@
 <?php
-/**
- * Comment 相關
- */
 
 declare( strict_types=1 );
 
 namespace J7\PowerCourse\Resources;
 
-/**
- * Class Order
- */
+/** Class Comment */
 final class Comment {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -28,7 +23,7 @@ final class Comment {
 	 * @return void
 	 */
 	public static function send_comment_notification( $comment_id, $comment ): void {
-		if (!in_array($comment->comment_type, [ 'comment', 'review' ])) {
+		if (!in_array($comment->comment_type, [ 'comment', 'review' ], true)) {
 			return;
 		}
 

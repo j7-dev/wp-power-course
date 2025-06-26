@@ -13,8 +13,6 @@ use J7\PowerCourse\BundleProduct\Helper;
 use J7\Powerhouse\Settings\Model\Settings;
 use J7\Powerhouse\Utils\Base as PowerhouseUtils;
 
-
-
 /** Class Bootstrap */
 final class Bootstrap {
 	use \J7\WpUtils\Traits\SingletonTrait;
