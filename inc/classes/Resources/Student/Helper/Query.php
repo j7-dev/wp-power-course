@@ -145,7 +145,7 @@ final class Query {
 	/**
 	 * 取得學員資料
 	 *
-	 * @return WP_User[]
+	 * @return \WP_User[]
 	 * */
 	public function get_users(): array {
 		$users = array_map( fn( $user_id ) => \get_user_by('id', $user_id), $this->user_ids );

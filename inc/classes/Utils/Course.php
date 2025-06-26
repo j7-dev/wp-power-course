@@ -147,7 +147,7 @@ abstract class Course {
 	 */
 	public static function get_course_progress( \WC_Product|int $product, ?int $user_id = 0 ): float {
 		if (!$user_id) {
-			$user_id = get_current_user_id();
+			$user_id = \get_current_user_id();
 		}
 		$product_id = $product instanceof \WC_Product ? $product->get_id() : $product;
 		$product    = $product instanceof \WC_Product ? $product : \wc_get_product($product_id);
