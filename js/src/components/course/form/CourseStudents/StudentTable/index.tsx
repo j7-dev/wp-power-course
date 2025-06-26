@@ -11,7 +11,6 @@ import {
 	TableProps,
 } from 'antd'
 import useColumns from '@/components/user/UserTable/hooks/useColumns'
-import { useRowSelection } from 'antd-toolkit'
 import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { Dayjs } from 'dayjs'
@@ -21,6 +20,8 @@ import {
 } from '@/components/product/ProductTable/utils'
 import AddOtherCourse from '../AddOtherCourse'
 import HistoryDrawer from '@/components/user/UserTable/HistoryDrawer'
+import { useRowSelection } from 'antd-toolkit'
+import { useEnv } from '@/hooks'
 
 const StudentTable = () => {
 	const apiUrl = useApiUrl('power-course')
@@ -145,6 +146,14 @@ const StudentTable = () => {
 		)
 	}
 
+	const { NONCE } = useEnv()
+	const handleExport = () => {
+		window.open(
+			`${apiUrl}/students/export/${watchId}?_wpnonce=${NONCE}`,
+			'_blank',
+		)
+	}
+
 	return (
 		<>
 			<div className="mb-4 flex justify-between gap-4">
@@ -166,18 +175,28 @@ const StudentTable = () => {
 						修改觀看期限
 					</Button>
 				</Space.Compact>
-				<PopconfirmDelete
-					type="button"
-					popconfirmProps={{
-						title: '確認移除這些學員嗎?',
-						onConfirm: handleRemove,
-					}}
-					buttonProps={{
-						children: '移除課程(移除學員)',
-						disabled: !selectedRowKeys.length,
-						loading: isLoading,
-					}}
-				/>
+				<div>
+					<Button
+						color="primary"
+						variant="filled"
+						className="mr-2"
+						onClick={handleExport}
+					>
+						學員匯出 CSV
+					</Button>
+					<PopconfirmDelete
+						type="button"
+						popconfirmProps={{
+							title: '確認移除這些學員嗎?',
+							onConfirm: handleRemove,
+						}}
+						buttonProps={{
+							children: '移除學員權限',
+							disabled: !selectedRowKeys.length,
+							loading: isLoading,
+						}}
+					/>
+				</div>
 			</div>
 
 			<AddOtherCourse user_ids={selectedRowKeys as string[]} />
