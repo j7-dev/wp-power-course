@@ -5,14 +5,13 @@ import {
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
-import { defaultSelectProps } from '@/utils'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
 import { useCourse } from '@/pages/admin/Courses/Edit/hooks'
 import { useEnv } from '@/hooks'
-import { CopyText, DescriptionDrawer } from 'antd-toolkit'
+import { CopyText, DescriptionDrawer, defaultSelectProps } from 'antd-toolkit'
 
 const { Item } = Form
 

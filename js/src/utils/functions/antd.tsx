@@ -1,23 +1,4 @@
-import { SelectProps } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
-
-/**
- * @deprecated
- */
-export const defaultSelectProps: SelectProps = {
-	className: 'w-full',
-	mode: 'multiple',
-	optionRender: ({ value, label }) => {
-		return (
-			<span>
-				<span className="text-gray-400 text-xs">#{value}</span> {label}
-			</span>
-		)
-	},
-	allowClear: true,
-	showSearch: true,
-	optionFilterProp: 'label',
-}
 
 /**
  * 處理日期欄位 sale_date_range

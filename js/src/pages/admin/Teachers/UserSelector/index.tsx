@@ -6,7 +6,7 @@ import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, message } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
-import { defaultSelectProps } from '@/utils'
+import { defaultSelectProps } from 'antd-toolkit'
 
 const index = () => {
 	const apiUrl = useApiUrl('power-course')

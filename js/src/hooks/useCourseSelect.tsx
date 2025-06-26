@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { SelectProps } from 'antd'
+import { defaultSelectProps } from 'antd-toolkit'
 
 type TUseCourseSelectParams = {
 	selectProps?: SelectProps
@@ -10,24 +11,6 @@ type TUseCourseSelectParams = {
 export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 	const selectProps = params?.selectProps
 	const [courseIds, setCourseIds] = useState<string[]>([])
-
-	const defaultSelectProps: SelectProps = {
-		placeholder: '搜尋課程關鍵字',
-		className: 'w-full',
-		allowClear: true,
-		mode: 'multiple',
-		optionRender: ({ value, label }) => {
-			return (
-				<span>
-					{label} <span className="text-gray-400 text-xs">#{value}</span>
-				</span>
-			)
-		},
-		value: courseIds,
-		onChange: (value: string[]) => {
-			setCourseIds(value)
-		},
-	}
 
 	const { selectProps: refineSelectProps, query } = useSelect<TCourseRecord>({
 		resource: 'courses',
@@ -47,6 +30,7 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 	})
 
 	const courses = query?.data?.data ?? []
+
 	const options = courses?.map((course) => ({
 		label: course.name,
 		value: course.id,
@@ -54,6 +38,11 @@ export const useCourseSelect = (params?: TUseCourseSelectParams) => {
 
 	const mergedSelectProps: SelectProps = {
 		...defaultSelectProps,
+		value: courseIds,
+		onChange: (value: string[]) => {
+			setCourseIds(value)
+		},
+		placeholder: '搜尋課程關鍵字',
 		...selectProps,
 		...refineSelectProps,
 		options,

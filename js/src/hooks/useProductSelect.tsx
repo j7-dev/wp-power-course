@@ -4,6 +4,7 @@ import { UseSelectProps, HttpError } from '@refinedev/core'
 
 import { TProductRecord } from '@/components/product/ProductTable/types'
 import { SelectProps } from 'antd'
+import { defaultSelectProps } from 'antd-toolkit'
 
 type TUseProductSelectParams = {
 	selectProps?: SelectProps
@@ -16,24 +17,6 @@ export const useProductSelect = (params?: TUseProductSelectParams) => {
 	const selectProps = params?.selectProps
 	const useSelectProps = params?.useSelectProps
 	const [productIds, setProductIds] = useState<string[]>([])
-
-	const defaultSelectProps: SelectProps = {
-		placeholder: '搜尋商品關鍵字',
-		className: 'w-full',
-		allowClear: true,
-		mode: 'multiple',
-		optionRender: ({ value, label }) => {
-			return (
-				<span>
-					{label} <span className="text-gray-400 text-xs">#{value}</span>
-				</span>
-			)
-		},
-		value: productIds,
-		onChange: (value: string[]) => {
-			setProductIds(value)
-		},
-	}
 
 	const { selectProps: refineSelectProps, query } = useSelect<TProductRecord>({
 		resource: 'products',
@@ -61,6 +44,11 @@ export const useProductSelect = (params?: TUseProductSelectParams) => {
 
 	const mergedSelectProps: SelectProps = {
 		...defaultSelectProps,
+		placeholder: '搜尋商品關鍵字',
+		value: productIds,
+		onChange: (value: string[]) => {
+			setProductIds(value)
+		},
 		...selectProps,
 		...refineSelectProps,
 		options,

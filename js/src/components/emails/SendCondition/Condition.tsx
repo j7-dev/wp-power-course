@@ -16,8 +16,8 @@ import {
 	TCourseBaseRecord,
 	TChapterRecord,
 } from '@/pages/admin/Courses/List/types'
-import { defaultSelectProps } from '@/utils'
 import dayjs, { Dayjs } from 'dayjs'
+import { defaultSelectProps } from 'antd-toolkit'
 
 const { Item } = Form
 
