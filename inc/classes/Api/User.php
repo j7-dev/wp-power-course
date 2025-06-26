@@ -12,6 +12,7 @@ use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
+use J7\PowerCourse\Resources\Student\Helper\Query;
 
 /** Class Api */
 final class User {
@@ -201,136 +202,22 @@ final class User {
 
 		$params = WP::sanitize_text_field_deep( $params, false );
 
-		$default_args = [
-			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'posts_per_page' => 10,
-			'order'          => 'DESC',
-			'offset'         => 0,
-			'paged'          => 1,
-			'count_total'    => true,
-			'meta_key'       => 'avl_course_ids', // phpcs:ignore
-			'meta_value'     => '', // phpcs:ignore
-		];
+		$query = new Query($params);
 
-		$args = \wp_parse_args(
-		$params,
-		$default_args,
-		);
+		$user_ids = $query->user_ids;
 
-		if ( empty($args['meta_value']) ) {
-			return new \WP_REST_Response(
-			[
-				'code'    => 'empty_meta_value',
-				'message' => 'meta_value 不能為空，找不到 course_id',
-			],
-			400
-			);
-		}
-
-		// 如果 $args['meta_value'] 有包含 ! 開頭，就用反查詢
-		if (\str_starts_with($args['meta_value'], '!')) {
-			$reverse   = true;
-			$course_id = substr($args['meta_value'], 1);
-		} else {
-			$reverse   = false;
-			$course_id = $args['meta_value'];
-		}
-
-		global $wpdb;
-
-		if (!$reverse) {
-			$sql = $wpdb->prepare(
-			'SELECT u.ID
-			FROM %1$s u
-			INNER JOIN %2$s um ON u.ID = um.user_id',
-			$wpdb->users,
-			$wpdb->usermeta,
-			);
-		} else {
-			$sql = $wpdb->prepare(
-			'SELECT u.ID
-			FROM %1$s u ',
-			$wpdb->users,
-			);
-		}
-
-		if (!$reverse) {
-			$where = $wpdb->prepare(
-			" WHERE um.meta_key = '%1\$s'
-			AND um.meta_value = '%2\$s'",
-			$args['meta_key'],
-			$args['meta_value']
-			);
-		} else {
-			$where = $wpdb->prepare(
-			" WHERE u.ID NOT IN (
-    SELECT DISTINCT u.ID
-    FROM %1\$s u
-    LEFT JOIN %2\$s um ON u.ID = um.user_id
-    WHERE um.meta_key = '%3\$s' AND um.meta_value = '%4\$s'
-) ",
-			$wpdb->users,
-			$wpdb->usermeta,
-			$args['meta_key'],
-			$course_id
-			);
-		}
-
-		if (!empty($args['search'])) {
-			$search_value = $args['search'];
-			$where       .= ' AND (';
-			$where       .= match ($args['search_field']) {
-				'email'=> "u.user_email LIKE '%{$search_value}%'",
-				'name'=> "u.user_login LIKE '%{$search_value}%' OR u.user_nicename LIKE '%{$search_value}%' OR u.display_name LIKE '%{$search_value}%'",
-				'id' => \is_numeric($search_value) ? "u.ID = {$search_value}" : '',
-				default => "u.user_login LIKE '%{$search_value}%' OR u.user_nicename LIKE '%{$search_value}%' OR u.display_name LIKE '%{$search_value}%' OR u.user_email LIKE '%{$search_value}%'" . ( \is_numeric($search_value) ? " OR u.ID = {$search_value}" : '' ),
-			};
-			$where .= ')';
-		}
-
-		$sql .= $where;
-		if (!$reverse) {
-			$sql .= $wpdb->prepare(
-			' ORDER BY um.umeta_id DESC
-			LIMIT %1$d OFFSET %2$d',
-			$args['posts_per_page'],
-			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
-			);
-		} else {
-			$sql .= $wpdb->prepare(
-			' ORDER BY u.ID DESC
-				LIMIT %1$d OFFSET %2$d',
-			$args['posts_per_page'],
-			( ( $args['paged'] - 1 ) * $args['posts_per_page'] )
-			);
-		}
-
-		$user_ids = $wpdb->get_col( $sql); // phpcs:ignore
-		$user_ids = \array_unique($user_ids);
-
-		$users = array_map( fn( $user_id ) => get_user_by('id', $user_id), $user_ids );
+		$users = array_map( fn( $user_id ) => \get_user_by('id', $user_id), $user_ids );
 		$users = array_filter($users);
 
-		// 查找總數
-		$count_query = $wpdb->prepare(
-		'SELECT DISTINCT COUNT(DISTINCT u.ID)
-			FROM %1$s u
-			INNER JOIN %2$s um ON u.ID = um.user_id',
-			$wpdb->users,
-			$wpdb->usermeta,
-		) . $where;
-
-		$total = $wpdb->get_var($count_query); // phpcs:ignore
-
-		$total_pages = \floor( ( (int) $total )/ ( (int) $args['posts_per_page'] ) ) + 1;
+		$pagination = $query->get_pagination();
 
 		$formatted_users = array_values(array_map( [ $this, 'format_user_details' ], $users ));
 
 		$response = new \WP_REST_Response( $formatted_users );
 
 		// // set pagination in header
-		$response->header( 'X-WP-Total', (string) $total );
-		$response->header( 'X-WP-TotalPages', (string) $total_pages );
+		$response->header( 'X-WP-Total', (string) $pagination->total );
+		$response->header( 'X-WP-TotalPages', (string) $pagination->total_pages );
 
 		return $response;
 	}
