@@ -38,7 +38,7 @@ final class Product {
 			'id'            => "_{$option}",
 			'wrapper_class' => 'show_if_simple',
 			'label'         => '課程',
-			'description'   => '是否為課程商品',
+			'description'   => '是否為課程商品，課程商品只能用於【簡單商品】以及【簡易訂閱】',
 			'default'       => 'no',
 		];
 
