@@ -1,18 +1,15 @@
 import React, { useState, memo } from 'react'
 import { useTable } from '@refinedev/antd'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
-import {
-	Table,
-	Form,
-	message,
-	DatePicker,
-	Space,
-	Button,
-	TableProps,
-} from 'antd'
+import { Table, message, DatePicker, Space, Button, TableProps } from 'antd'
 import useColumns from '@/components/user/UserTable/hooks/useColumns'
 import { PopconfirmDelete } from '@/components/general'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import {
+	useCustomMutation,
+	useApiUrl,
+	useInvalidate,
+	useParsed,
+} from '@refinedev/core'
 import { Dayjs } from 'dayjs'
 import {
 	getDefaultPaginationProps,
@@ -26,8 +23,7 @@ import { useEnv } from '@/hooks'
 const StudentTable = () => {
 	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
-	const form = Form.useFormInstance()
-	const watchId = Form.useWatch(['id'], form)
+	const { id: courseId } = useParsed()
 	const columns = useColumns()
 	const { tableProps } = useTable<TUserRecord>({
 		resource: 'users/students',
@@ -42,7 +38,7 @@ const StudentTable = () => {
 				{
 					field: 'meta_value',
 					operator: 'eq',
-					value: watchId,
+					value: courseId,
 				},
 			],
 		},
@@ -50,7 +46,7 @@ const StudentTable = () => {
 			pageSize: 20,
 		},
 		queryOptions: {
-			enabled: !!watchId,
+			enabled: !!courseId,
 		},
 	})
 
@@ -72,7 +68,7 @@ const StudentTable = () => {
 				method: 'post',
 				values: {
 					user_ids: selectedRowKeys,
-					course_ids: [watchId],
+					course_ids: [courseId],
 				},
 				config: {
 					headers: {
@@ -113,7 +109,7 @@ const StudentTable = () => {
 				method: 'post',
 				values: {
 					user_ids: selectedRowKeys,
-					course_ids: [watchId],
+					course_ids: [courseId],
 					timestamp: time ? time?.unix() : 0,
 				},
 				config: {
@@ -149,7 +145,7 @@ const StudentTable = () => {
 	const { NONCE } = useEnv()
 	const handleExport = () => {
 		window.open(
-			`${apiUrl}/students/export/${watchId}?_wpnonce=${NONCE}`,
+			`${apiUrl}/students/export/${courseId}?_wpnonce=${NONCE}`,
 			'_blank',
 		)
 	}

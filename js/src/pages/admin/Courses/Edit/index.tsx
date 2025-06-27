@@ -42,7 +42,6 @@ export const CoursesEdit = () => {
 
 	// 顯示
 	const watchName = Form.useWatch(['name'], form)
-	const watchSlug = Form.useWatch(['slug'], form)
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (values: Partial<TCourseRecord>) => {
@@ -133,7 +132,7 @@ export const CoursesEdit = () => {
 					dataProviderName="power-course"
 					title={
 						<>
-							{watchName}{' '}
+							{record?.name}{' '}
 							<span className="text-gray-400 text-xs">#{record?.id}</span>
 						</>
 					}
@@ -200,7 +199,7 @@ export const CoursesEdit = () => {
 								</Tooltip>
 
 								<Button
-									href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${watchSlug}`}
+									href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${record?.slug}`}
 									target="_blank"
 									rel="noreferrer"
 									className="ml-4"

@@ -5,7 +5,12 @@ import { useState, memo } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { Select, Space, Button, Form, message } from 'antd'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import {
+	useCustomMutation,
+	useApiUrl,
+	useInvalidate,
+	useParsed,
+} from '@refinedev/core'
 import { defaultSelectProps } from 'antd-toolkit'
 
 const index = () => {
@@ -16,7 +21,7 @@ const index = () => {
 	const [searchField, setSearchField] = useState<string>('all')
 
 	const form = Form.useFormInstance()
-	const watchId = Form.useWatch(['id'], form)
+	const { id: courseId } = useParsed()
 
 	const { selectProps, queryResult } = useSelect<TUserRecord>({
 		resource: 'users/students',
@@ -47,7 +52,7 @@ const index = () => {
 			{
 				field: 'meta_value',
 				operator: 'ne',
-				value: watchId,
+				value: courseId,
 			},
 		],
 		onSearch: (value) => {
@@ -61,7 +66,7 @@ const index = () => {
 			]
 		},
 		queryOptions: {
-			enabled: !!watchId,
+			enabled: !!courseId,
 		},
 	})
 
@@ -75,7 +80,7 @@ const index = () => {
 				method: 'post',
 				values: {
 					user_ids: userIds,
-					course_ids: [watchId],
+					course_ids: [courseId],
 				},
 				config: {
 					headers: {
