@@ -69,8 +69,8 @@ export const resources = [
 		},
 	},
 	{
-		name: 'dashboard',
-		list: '/dashboard',
+		name: 'analytics',
+		list: '/analytics',
 		meta: {
 			label: '分析',
 			icon: <LineChartOutlined />,

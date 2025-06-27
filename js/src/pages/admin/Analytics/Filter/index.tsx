@@ -1,94 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import {
-	DatePicker,
-	TimeRangePickerProps,
-	Button,
-	Select,
-	Form,
-	Checkbox,
-	Tooltip,
-	FormInstance,
-	DatePickerProps,
-	Tag,
-} from 'antd'
-import { useSelect } from '@refinedev/antd'
+import { DatePicker, Button, Select, Form, Checkbox, Tooltip, Tag } from 'antd'
 import dayjs from 'dayjs'
+import { useSelect } from '@refinedev/antd'
 import { TProductSelectOption } from '@/components/product/ProductTable/types'
-import { productTypes } from '@/utils'
-import { TQuery } from '../hooks/useRevenue'
+import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
 import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons'
-import { EViewType } from '../types'
+import { EViewType } from '@/pages/admin/Analytics/types'
+import { RANGE_PRESETS, maxDateRange } from '@/pages/admin/Analytics/utils'
+import { productTypes } from '@/utils'
 import { defaultSelectProps } from 'antd-toolkit'
+import { objToCrudFilters } from 'antd-toolkit/refine'
 
 const { RangePicker } = DatePicker
 const { Item } = Form
 
-const RANGE_PRESETS: TimeRangePickerProps['presets'] = [
-	{
-		label: '最近 7 天',
-		value: [dayjs().add(-7, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '最近 14 天',
-		value: [dayjs().add(-14, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '最近 30 天',
-		value: [dayjs().add(-30, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '最近 90 天',
-		value: [dayjs().add(-90, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '最近 180 天',
-		value: [dayjs().add(-180, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '最近 365 天',
-		value: [dayjs().add(-365, 'd').startOf('day'), dayjs().endOf('day')],
-	},
-	{
-		label: '月初至今',
-		value: [dayjs().startOf('month'), dayjs().endOf('day')],
-	},
-	{ label: '年初至今', value: [dayjs().startOf('year'), dayjs().endOf('day')] },
-]
+const index = () => {
+	const { viewType, setViewType, form, query, setQuery, context, isFetching } =
+		useRevenueContext()
 
-// Disabled 732 days from the selected date
-const maxDateRange: DatePickerProps['disabledDate'] = (
-	current,
-	{ from, type },
-) => {
-	if (current && current > dayjs().endOf('day')) {
-		return true
-	}
-	if (from) {
-		return Math.abs(current.diff(from, 'days')) >= 366
-	}
-
-	return false
-}
-
-export type TFilterProps = {
-	isFetching: boolean
-	isLoading: boolean
-	setQuery: React.Dispatch<React.SetStateAction<TQuery>>
-	query: TQuery
-	totalPages: number
-	total: number
-	form: FormInstance
-	viewType: EViewType
-	setViewType: React.Dispatch<React.SetStateAction<EViewType>>
-}
-
-const index = ({
-	setQuery,
-	isFetching,
-	form,
-	viewType,
-	setViewType,
-}: TFilterProps) => {
 	// 需要這個 state 是因為，需要知道用戶選了哪些課程/商品(需要挑出 is_course 為 true 的)，才能在查詢時帶入
 	const [selectedCourseProducts, setSelectedCourseProducts] = useState<
 		TProductSelectOption[]
@@ -107,18 +36,10 @@ const index = ({
 					value,
 				},
 			],
-			filters: [
-				{
-					field: 'meta_key',
-					operator: 'eq',
-					value: 'link_course_ids',
-				},
-				{
-					field: 'meta_compare',
-					operator: 'eq',
-					value: 'NOT EXISTS', // 排除銷售方案
-				},
-			],
+			filters: objToCrudFilters({
+				meta_key: 'link_course_ids',
+				meta_compare: 'NOT EXISTS',
+			}),
 		})
 
 	const productSelectOptions = productQuery?.data?.data || []
@@ -129,25 +50,16 @@ const index = ({
 			dataProviderName: 'power-course',
 			optionLabel: 'name',
 			optionValue: 'id',
-			filters: [
-				{
-					field: 'meta_key',
-					operator: 'eq',
-					value: 'link_course_ids',
-				},
-				{
-					field: 'meta_value',
-					operator: 'in',
-					value: selectedCourseProducts.map((product) => product.id),
-				},
-				{
-					field: 'meta_compare',
-					operator: 'eq',
-					value: 'IN',
-				},
-			],
+			filters: objToCrudFilters({
+				meta_key: 'link_course_ids',
+				meta_compare: 'IN',
+				meta_value: query?.product_includes?.length
+					? query?.product_includes
+					: selectedCourseProducts.map((product) => product.id),
+			}),
 			queryOptions: {
-				enabled: !!selectedCourseProducts?.length,
+				enabled:
+					!!selectedCourseProducts?.length || !!query?.product_includes?.length,
 			},
 		})
 
@@ -206,7 +118,12 @@ const index = ({
 					/>
 				</Item>
 
-				<Item name={['products']} className="w-full" label="查看特定課程/商品">
+				<Item
+					name={['products']}
+					className="w-full"
+					label="查看特定課程/商品"
+					hidden={context === 'detail'}
+				>
 					<Select
 						{...defaultSelectProps}
 						{...productSelectProps}

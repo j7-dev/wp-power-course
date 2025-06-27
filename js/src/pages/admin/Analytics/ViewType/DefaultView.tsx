@@ -2,20 +2,16 @@ import { memo } from 'react'
 import { Card, Form, Tooltip } from 'antd'
 import { Line, LineConfig } from '@ant-design/plots'
 import dayjs from 'dayjs'
-import { TTotals, TViewTypeProps } from '../types'
-import { cards, tickFilter } from '../index'
-import { round } from 'lodash-es'
-import {
-	CaretUpOutlined,
-	CaretDownOutlined,
-	QuestionCircleOutlined,
-} from '@ant-design/icons'
+import { TTotals } from '@/pages/admin/Analytics/types'
+import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
+import { cards, tickFilter } from '@/pages/admin/Analytics/utils'
+import { QuestionCircleOutlined } from '@ant-design/icons'
+import { nanoid } from 'nanoid'
+import { TrendIndicator } from 'antd-toolkit'
 
-const Default = ({
-	revenueData,
-	lastYearRevenueData,
-	form,
-}: TViewTypeProps) => {
+const Default = () => {
+	const { viewTypeProps, form, isFetching } = useRevenueContext()
+	const { revenueData, lastYearRevenueData } = viewTypeProps
 	const isLastYear = form.getFieldValue(['compare_last_year'])
 
 	const intervals = revenueData?.intervals || []
@@ -51,6 +47,47 @@ const Default = ({
 		},
 	}
 
+	if (isFetching) {
+		return (
+			<>
+				<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+					{cards.map((card) => {
+						// 隨機產生 10 個 2~15 的 array
+						const randomArray = Array.from(
+							{ length: 12 },
+							() => Math.floor(Math.random() * 8) + 2,
+						)
+
+						return (
+							<Card
+								key={card.slug}
+								title={card?.title}
+								extra={
+									<span className="text-sm text-gray-400 flex items-center">
+										共
+										<span className="bg-gray-200 inline-block w-10 h-4 rounded-md mx-2 animate-pulse"></span>
+										{card.unit}
+									</span>
+								}
+								variant="borderless"
+							>
+								<div className="aspect-video grid grid-cols-12 gap-x-4 items-end animate-pulse">
+									{randomArray.map((n) => (
+										<div
+											key={nanoid(4)}
+											className="w-full bg-gray-200"
+											style={{ height: `${n * 10}%` }}
+										></div>
+									))}
+								</div>
+							</Card>
+						)
+					})}
+				</div>
+			</>
+		)
+	}
+
 	return (
 		<>
 			<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
@@ -67,11 +104,6 @@ const Default = ({
 								card.slug as keyof TTotals
 							] as number) || 0
 						: 0
-
-					const isGreater = total > lastYearTotal
-					const percentage = lastYearTotal
-						? round(((total - lastYearTotal) / lastYearTotal) * 100, 2)
-						: '∞'
 
 					const thisYear = revenueData?.intervals?.[0]?.interval?.slice(0, 4)
 					const lastYear = Number(thisYear) - 1
@@ -91,20 +123,13 @@ const Default = ({
 							extra={
 								<span className="text-sm text-gray-400">
 									{isLastYear && (
-										<Tooltip
-											title={`${lastYear}年共 ${lastYearTotal.toLocaleString()} ${card.unit}`}
-										>
-											<span
-												className={`inline-flex items-center mr-2 gap-x-1 ${isGreater ? 'text-red-500' : 'text-green-500'}`}
-											>
-												{isGreater ? (
-													<CaretUpOutlined />
-												) : (
-													<CaretDownOutlined />
-												)}
-												{percentage}%
-											</span>
-										</Tooltip>
+										<TrendIndicator
+											tooltipProps={{
+												title: `${lastYear}年共 ${lastYearTotal.toLocaleString()} ${card.unit}`,
+											}}
+											value={total}
+											compareValue={lastYearTotal}
+										/>
 									)}
 									共
 									<Tooltip
@@ -117,7 +142,7 @@ const Default = ({
 									{card.unit}
 								</span>
 							}
-							bordered={false}
+							variant="borderless"
 						>
 							<Line
 								{...config}
