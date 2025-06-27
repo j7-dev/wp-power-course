@@ -139,6 +139,8 @@ abstract class Course {
 
 	/**
 	 * 取得課程進度
+	 * ENHANCE 可以把能上的課程抽離成一個類
+	 * 取得上課進度、完成的章節等資訊
 	 *
 	 * @param \WC_Product|int $product 課程商品
 	 * @param int|null        $user_id 用户 ID
