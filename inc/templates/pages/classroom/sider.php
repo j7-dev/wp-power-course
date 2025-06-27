@@ -59,5 +59,5 @@ printf(
 		false
 		),
 	\wc_get_account_endpoint_url( MyAccount::COURSES_ENDPOINT ),
-	Plugin::$url . '/inc/assets/src/assets/svg/back.svg',
+	Plugin::$url . '/inc/assets/images/back.svg',
 );
