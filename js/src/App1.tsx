@@ -21,7 +21,7 @@ import {
 	MediaLibraryNotification,
 } from 'antd-toolkit/refine'
 
-const Dashboard = lazy(() => import('@/pages/admin/Dashboard'))
+const Analytics = lazy(() => import('@/pages/admin/Analytics'))
 const CoursesList = lazy(() => import('@/pages/admin/Courses/List'))
 const CoursesEdit = lazy(() => import('@/pages/admin/Courses/Edit'))
 const Teachers = lazy(() => import('@/pages/admin/Teachers'))
@@ -160,10 +160,10 @@ function App() {
 							}
 						/>
 						<Route
-							path="dashboard"
+							path="analytics"
 							element={
 								<Suspense fallback={<PageLoading />}>
-									<Dashboard />
+									<Analytics />
 								</Suspense>
 							}
 						/>

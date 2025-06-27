@@ -1,9 +1,11 @@
 import React, { memo } from 'react'
 import { Card, Form } from 'antd'
 import dayjs from 'dayjs'
-import { TTotals, TViewTypeProps, TIntervalBase } from '../types'
-import { cards, tickFilter } from '../index'
+import { TTotals, TIntervalBase } from '@/pages/admin/Analytics/types'
+import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
+import { cards, tickFilter } from '@/pages/admin/Analytics/utils'
 import { Area, AreaConfig } from '@ant-design/plots'
+import { nanoid } from 'nanoid'
 
 type TData = {
 	interval: string
@@ -44,7 +46,9 @@ function formatStackedAreaData(
 	return data
 }
 
-const AreaView = ({ revenueData, form }: TViewTypeProps) => {
+const AreaView = () => {
+	const { viewTypeProps, form, isFetching } = useRevenueContext()
+	const { revenueData } = viewTypeProps
 	const intervals = revenueData?.intervals || []
 	const data = formatStackedAreaData(intervals)
 	const watchInterval = Form.useWatch(['interval'], form)
@@ -76,9 +80,29 @@ const AreaView = ({ revenueData, form }: TViewTypeProps) => {
 		},
 	}
 
+	if (isFetching) {
+		const randomArray = Array.from(
+			{ length: 12 },
+			() => Math.floor(Math.random() * 8) + 2,
+		)
+		return (
+			<Card variant="borderless">
+				<div className="aspect-video grid grid-cols-12 gap-x-4 items-end animate-pulse">
+					{randomArray.map((n) => (
+						<div
+							key={nanoid(4)}
+							className="w-full bg-gray-200"
+							style={{ height: `${n * 10}%` }}
+						></div>
+					))}
+				</div>
+			</Card>
+		)
+	}
+
 	return (
 		<>
-			<Card bordered={false}>
+			<Card variant="borderless">
 				<Area
 					{...config}
 					height={720}

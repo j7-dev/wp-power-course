@@ -1,42 +1,44 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
 	useCustom,
 	useApiUrl,
 	CustomResponse,
 	HttpError,
 	UseLoadingOvertimeReturnType,
-	CrudFilter,
 } from '@refinedev/core'
 import { QueryObserverResult } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { TRevenue, TFormattedRevenue, EViewType } from '../types'
+import {
+	TRevenue,
+	TFormattedRevenue,
+	TFilterProps,
+	TViewTypeProps,
+	TQuery,
+	defaultQuery,
+} from '@/pages/admin/Analytics/types'
 import { Form } from 'antd'
 import { round } from 'lodash-es'
+import { objToCrudFilters } from 'antd-toolkit/refine'
 
-const defaultQuery = {
-	order: 'asc',
-	interval: 'day',
-	per_page: 10000,
-	after: dayjs().add(-7, 'd').startOf('day').format('YYYY-MM-DDTHH:mm:ss'),
-	before: dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
-	_locale: 'user',
-	page: 1,
-	compare_last_year: false,
+export type TUseRevenueParams = {
+	initialQuery?: Partial<TQuery>
+	context?: 'detail'
 }
 
-export type TQuery = typeof defaultQuery
-
-const useRevenue = () => {
+const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 	const apiUrl = useApiUrl('power-course')
-	const [query, setQuery] = useState(defaultQuery)
-	const [viewType, setViewType] = useState(EViewType.DEFAULT)
+	const DEFAULT_QUERY = {
+		...defaultQuery,
+		...initialQuery,
+	}
+	const [query, setQuery] = useState(DEFAULT_QUERY)
 	const { compare_last_year } = query
 
 	const result = useCustom<TRevenue>({
 		url: `${apiUrl}/reports/revenue/stats`,
 		method: 'get',
 		config: {
-			filters: getFormattedFilter(query),
+			filters: objToCrudFilters(query),
 		},
 	})
 
@@ -52,7 +54,7 @@ const useRevenue = () => {
 		url: `${apiUrl}/reports/revenue/stats`,
 		method: 'get',
 		config: {
-			filters: getFormattedFilter(lastYearQuery),
+			filters: objToCrudFilters(lastYearQuery),
 		},
 		queryOptions: {
 			enabled: compare_last_year,
@@ -71,25 +73,32 @@ const useRevenue = () => {
 
 	const [form] = Form.useForm()
 
+	useEffect(() => {
+		form.setFieldsValue(DEFAULT_QUERY)
+	}, [JSON.stringify(DEFAULT_QUERY)])
+
 	return {
 		result: formattedResult,
 		lastYearResult: formattedLastYearResult,
+		isLoading: compare_last_year
+			? result.isLoading || lastYearResult.isLoading
+			: result.isLoading,
+		isFetching: compare_last_year
+			? result.isFetching || lastYearResult.isFetching
+			: result.isFetching,
+		form,
+		query,
+		setQuery,
 		filterProps: {
 			isFetching: result.isFetching,
 			isLoading: result.isLoading,
-			setQuery,
-			query,
 			totalPages,
 			total,
-			form,
-			viewType,
-			setViewType,
-		},
+		} as TFilterProps,
 		viewTypeProps: {
 			revenueData: formattedResult?.data?.data,
 			lastYearRevenueData: formattedLastYearResult?.data?.data,
-			form,
-		},
+		} as TViewTypeProps,
 	}
 }
 
@@ -148,15 +157,6 @@ function getFormattedResult(
 		UseLoadingOvertimeReturnType
 
 	return formatResult
-}
-
-function getFormattedFilter(query: TQuery) {
-	const filters = Object.keys(query).map((key) => ({
-		field: key,
-		operator: 'eq',
-		value: query[key as keyof typeof query],
-	})) as CrudFilter[]
-	return filters
 }
 
 export default useRevenue
