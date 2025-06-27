@@ -38,12 +38,12 @@ if ( ! is_array( $teacher_ids ) ) {
 }
 
 ?>
-<div class="flex gap-6 flex-col md:flex-row mb-20">
+<div class="flex gap-12 flex-col md:flex-row mb-20">
 	<div id="courses-product__feature-video" class="w-full md:w-[55%] px-0 z-40">
 		<?php Plugin::load_template( 'course-product/header/feature-video' ); ?>
 	</div>
 
-	<div class="w-full md:w-[45%] px-4 md:px-0">
+	<div id="courses-product__feature-content" class="w-full md:w-[45%] px-4 md:px-0 flex flex-col justify-center" style="opacity: 0;">
 		<div class="mb-2 flex gap-x-4 gap-y-2 flex-wrap">
 			<?php
 			foreach ( $teacher_ids as $teacher_id ) {
@@ -58,7 +58,7 @@ if ( ! is_array( $teacher_ids ) ) {
 			?>
 		</div>
 
-		<h1 class="mb-[10px] text-xl md:text-4xl md:leading-[3rem] font-semibold text-base-content">
+		<h1 class="mb-6 text-xl md:text-[1.65rem] md:leading-[2.5rem] font-semibold text-base-content">
 			<?php echo $product->get_name(); ?>
 		</h1>
 

@@ -9,6 +9,9 @@ export const toggleContent = () => {
 		if (mainH <= initH) {
 			ToggleContent.height('auto').next('.pc-toggle-content__wrap').remove()
 		}
+
+		// 初始化，調整完高度後，才顯示內容
+		$('#courses-product__feature-content').css('opacity', 1)
 	})
 
 	const expand = (Wrap, initBG) => () => {
