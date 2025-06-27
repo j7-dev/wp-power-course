@@ -3,14 +3,13 @@ import { Form, Switch, Alert, message } from 'antd'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { Edit, useForm } from '@refinedev/antd'
-import { formatDateRangeData } from '@/utils'
-import { toFormData } from 'antd-toolkit'
 import { ExclamationCircleFilled } from '@ant-design/icons'
 import BundleForm from './BundleForm'
 import { Dayjs } from 'dayjs'
 import { useAtom, useSetAtom, useAtomValue } from 'jotai'
 import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
 import { useLink } from '@refinedev/core'
+import { toFormData, formatDateRangeData } from 'antd-toolkit'
 
 const EditBundleComponent = ({
 	record,
