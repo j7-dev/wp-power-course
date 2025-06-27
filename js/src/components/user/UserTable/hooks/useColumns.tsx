@@ -1,11 +1,12 @@
-import React from 'react'
-import { TableProps, Typography, Button } from 'antd'
+import React, { useState } from 'react'
+import { TableProps, Typography, Button, Progress, Switch, Tooltip } from 'antd'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 import { UserName } from '@/components/user'
 import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
 import { useSetAtom } from 'jotai'
 import { historyDrawerAtom } from '../atom'
 import { FieldTimeOutlined } from '@ant-design/icons'
+import { useParsed } from '@refinedev/core'
 
 type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
@@ -16,23 +17,52 @@ const { Text } = Typography
 const useColumns = (params?: TUseColumnsParams) => {
 	const setHistoryDrawerProps = useSetAtom(historyDrawerAtom)
 	const handleClick = params?.onClick
+	const [showAllCourses, setShowAllCourses] = useState(false)
+	const { id: currentCourseId } = useParsed()
 	const columns: TableProps<TUserRecord>['columns'] = [
 		{
-			title: '會員',
+			title: '學員',
 			dataIndex: 'id',
 			width: 180,
 			render: (_, record) => <UserName record={record} onClick={handleClick} />,
 		},
 		{
-			title: '已開通課程',
+			title: (
+				<>
+					已開通課程{' '}
+					{currentCourseId && (
+						<Tooltip title="顯示用戶身上所有已開通的課程">
+							<Switch
+								checked={showAllCourses}
+								onChange={(checked) => setShowAllCourses(checked)}
+								size="small"
+							/>
+						</Tooltip>
+					)}
+				</>
+			),
 			dataIndex: 'avl_courses',
 			width: 240,
 			render: (avl_courses: TAVLCourse[], { id: user_id, display_name }) => {
-				return avl_courses.map(
-					({ id: course_id, name: course_name, expire_date }) => (
+				const filtered_avl_courses =
+					showAllCourses || !currentCourseId
+						? avl_courses
+						: avl_courses.filter(
+								(course) => String(course.id) === String(currentCourseId),
+							)
+
+				return filtered_avl_courses.map(
+					({
+						id: course_id,
+						name: course_name,
+						expire_date,
+						progress,
+						total_chapters_count,
+						finished_chapters_count,
+					}) => (
 						<div
 							key={course_id}
-							className="grid grid-cols-[1fr_6rem_4rem_12rem] gap-1 my-1"
+							className="grid grid-cols-[1fr_6rem_4rem_12rem_6rem_10rem] gap-1 my-1"
 						>
 							<div>
 								<Text
@@ -94,6 +124,16 @@ const useColumns = (params?: TUseColumnsParams) => {
 
 							<div className="text-left">
 								{getWatchStatusTagTooltip(expire_date)}
+							</div>
+							<div>
+								<Progress percent={progress} size="small" showInfo={false} />
+							</div>
+
+							<div className="text-xs flex items-center justify-between">
+								<span>{progress}%</span>
+								<span>
+									{finished_chapters_count} 完成 / {total_chapters_count} 個單元
+								</span>
 							</div>
 						</div>
 					),

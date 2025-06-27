@@ -15,6 +15,9 @@ export type TExpireDate = {
 export type TAVLCourse = {
 	id: string
 	name: string
+	progress: number
+	total_chapters_count: number
+	finished_chapters_count: number
 	expire_date: TExpireDate
 	chapters?: TChapter[]
 }

@@ -12,6 +12,7 @@ use J7\PowerCourse\Resources\Chapter\Models\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Student\Helper\Query;
 
 /** Class Api */
@@ -282,11 +283,17 @@ final class User {
 		// BUG: 有用戶因為章節太多，會 500 Error
 		$avl_courses = [];
 		foreach ($avl_course_ids as $i => $course_id) {
-			$course_id                        = (int) $course_id;
-			$avl_courses[ $i ]['id']          = (string) $course_id;
-			$avl_courses[ $i ]['name']        = \get_the_title($course_id);
-			$avl_courses[ $i ]['expire_date'] = ExpireDate::instance($course_id, $user_id)->to_array();
-			$all_chapter_ids                  = ChapterUtils::get_flatten_post_ids($course_id);
+			$course_id               = (int) $course_id;
+			$total_chapters_count    = count(ChapterUtils::get_flatten_post_ids($course_id));
+			$finished_chapters_count = count(CourseUtils::get_finished_sub_chapters($course_id, $user_id, true));
+
+			$avl_courses[ $i ]['id']                      = (string) $course_id;
+			$avl_courses[ $i ]['name']                    = \get_the_title($course_id);
+			$avl_courses[ $i ]['progress']                = CourseUtils::get_course_progress( $course_id, $user->ID );
+			$avl_courses[ $i ]['finished_chapters_count'] = $finished_chapters_count;
+			$avl_courses[ $i ]['total_chapters_count']    = $total_chapters_count;
+			$avl_courses[ $i ]['expire_date']             = ExpireDate::instance($course_id, $user_id)->to_array();
+			$all_chapter_ids                              = ChapterUtils::get_flatten_post_ids($course_id);
 
 			foreach ($all_chapter_ids as $j => $chapter_id) {
 				$chapter                                     = new Chapter( (int) $chapter_id, (int) $user_id );
