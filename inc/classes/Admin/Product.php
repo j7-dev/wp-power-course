@@ -1,7 +1,4 @@
 <?php
-/**
- * Product related features
- */
 
 declare(strict_types=1);
 
@@ -10,9 +7,7 @@ namespace J7\PowerCourse\Admin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\BundleProduct\Helper;
 
-/**
- * Class Product
- */
+/** Class Product */
 final class Product {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
@@ -22,15 +17,8 @@ final class Product {
 	/** Constructor */
 	public function __construct() {
 		\add_filter( 'product_type_options', [ __CLASS__, 'add_product_type_options' ] );
-		// \add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
+		\add_action( 'save_post_product', [ __CLASS__, 'save_product_type_options' ], 10, 3 );
 		\add_filter( 'display_post_states', [ __CLASS__, 'custom_display_post_states' ], 10, 2 );
-
-		if (class_exists('\J7\PowerPartnerServer\Bootstrap')) {
-			return;
-		}
-		\add_filter( 'post_row_actions', [ __CLASS__, 'modify_list_row_actions' ], 10, 2 );
-		\add_filter( 'get_edit_post_link', [ __CLASS__, 'modify_edit_post_link' ], 10, 3);
-		\add_filter( 'woocommerce_admin_html_order_item_class', [ __CLASS__, 'add_order_item_class' ], 10, 3);
 	}
 
 
@@ -97,46 +85,6 @@ final class Product {
 		return $post_states;
 	}
 
-	/**
-	 * Modify list row actions
-	 *
-	 * @param array{'inline hide-if-no-js':string,trash:string, edit:string} $actions - Actions
-	 * @param \WP_Post                                                       $post - Post object
-	 *
-	 * @return array{edit:string}
-	 */
-	public static function modify_list_row_actions( array $actions, \WP_Post $post ): array {
-
-		$helper = Helper::instance( $post->ID );
-		if ( CourseUtils::is_course_product( $post->ID ) || $helper?->is_bundle_product ) {
-			unset( $actions['inline hide-if-no-js'] );
-			unset( $actions['trash'] );
-			$actions['edit'] = sprintf(
-			/*html*/'<a href="%s" aria-label="編輯〈課程〉" target="_blank">編輯</a>',
-			\admin_url("admin.php?page=power-course#/courses/edit/{$post->ID}")
-			);
-		}
-
-		return $actions;
-	}
-
-	/**
-	 * Modify edit post link
-	 *
-	 * @param string $link - Link
-	 * @param int    $post_id - Post ID
-	 * @param string $context - Context
-	 *
-	 * @return string
-	 */
-	public static function modify_edit_post_link( string $link, int $post_id, $context ): string {
-		$helper = Helper::instance( $post_id );
-		if ( CourseUtils::is_course_product( $post_id ) || $helper?->is_bundle_product ) {
-			$link = \admin_url("admin.php?page=power-course#/courses/edit/{$post_id}");
-		}
-
-		return $link;
-	}
 
 	/**
 	 * 針對課程商品 || 銷售方案商品在訂單 detail 添加額外的 class
