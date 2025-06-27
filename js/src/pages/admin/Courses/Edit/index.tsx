@@ -1,9 +1,9 @@
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
-import { Tabs, TabsProps, Form, Switch, Button, Tooltip } from 'antd'
+import { Tabs, TabsProps, Form, Switch, Button, Tooltip, FormProps } from 'antd'
 import { SortableChapters } from '@/components/course'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { CourseContext } from '@/pages/admin/Courses/Edit/hooks'
+import { RecordContext } from '@/pages/admin/Courses/Edit/hooks'
 import {
 	CourseDescription,
 	CourseQA,
@@ -18,18 +18,47 @@ import { formatDateRangeData } from '@/utils'
 import { useEnv } from '@/hooks'
 import { toFormData } from 'antd-toolkit'
 
+const { Item } = Form
+
 export const CoursesEdit = () => {
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
+	const [activeKey, setActiveKey] = useState('CourseDescription')
 	// 初始化資料
-	const { formProps, form, saveButtonProps, query, mutation, onFinish } =
-		useForm<TCourseRecord>({
-			dataProviderName: 'power-course',
-			redirect: false,
-		})
+	const {
+		formProps: _formProps,
+		form,
+		saveButtonProps,
+		query,
+		mutation,
+		onFinish,
+	} = useForm<TCourseRecord>({
+		dataProviderName: 'power-course',
+		redirect: false,
+	})
 
 	const record = useMemo(() => {
 		return query?.data?.data
 	}, [query])
+
+	// 顯示
+	const watchName = Form.useWatch(['name'], form)
+	const watchSlug = Form.useWatch(['slug'], form)
+
+	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
+	const handleOnFinish = (values: Partial<TCourseRecord>) => {
+		const formattedValues = formatDateRangeData(values, 'sale_date_range', [
+			'date_on_sale_from',
+			'date_on_sale_to',
+		])
+		onFinish(toFormData(formattedValues))
+	}
+
+	// 重組 formProps
+	const formProps: FormProps = {
+		..._formProps,
+		layout: 'vertical',
+		onFinish: handleOnFinish,
+	}
 
 	// TAB items
 	const items: TabsProps['items'] = [
@@ -37,13 +66,13 @@ export const CoursesEdit = () => {
 			key: 'CourseDescription',
 			forceRender: true,
 			label: '課程描述',
-			children: <CourseDescription />,
+			children: <CourseDescription formProps={formProps} />,
 		},
 		{
 			key: 'CoursePrice',
 			forceRender: true,
 			label: '課程訂價',
-			children: <CoursePrice />,
+			children: <CoursePrice formProps={formProps} />,
 		},
 		{
 			key: 'CourseBundle',
@@ -61,7 +90,7 @@ export const CoursesEdit = () => {
 			key: 'CourseQA',
 			forceRender: true,
 			label: 'QA設定',
-			children: <CourseQA />,
+			children: <CourseQA formProps={formProps} />,
 		},
 		// {
 		// 	key: 'CourseAnnouncement',
@@ -73,7 +102,7 @@ export const CoursesEdit = () => {
 			key: 'CourseOther',
 			forceRender: true,
 			label: '其他設定',
-			children: <CourseOther />,
+			children: <CourseOther formProps={formProps} />,
 		},
 		{
 			key: 'CourseStudents',
@@ -89,31 +118,23 @@ export const CoursesEdit = () => {
 		},
 	]
 
-	// 顯示
-	const watchName = Form.useWatch(['name'], form)
-	const watchId = Form.useWatch(['id'], form)
-	const watchStatus = Form.useWatch(['status'], form)
-	const watchSlug = Form.useWatch(['slug'], form)
-
-	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
-	const handleOnFinish = (values: Partial<TCourseRecord>) => {
-		const formattedValues = formatDateRangeData(values, 'sale_date_range', [
-			'date_on_sale_from',
-			'date_on_sale_to',
-		])
-		onFinish(toFormData(formattedValues))
-	}
+	const disableSaveButton = [
+		'CourseBundle',
+		'Chapters',
+		'CourseStudents',
+		'CourseAnalysis',
+	].includes(activeKey)
 
 	return (
 		<div className="sticky-card-actions sticky-tabs-nav">
-			<CourseContext.Provider value={record}>
+			<RecordContext.Provider value={record}>
 				<Edit
 					resource="courses"
 					dataProviderName="power-course"
 					title={
 						<>
 							{watchName}{' '}
-							<span className="text-gray-400 text-xs">#{watchId}</span>
+							<span className="text-gray-400 text-xs">#{record?.id}</span>
 						</>
 					}
 					headerButtons={() => null}
@@ -123,61 +144,75 @@ export const CoursesEdit = () => {
 						icon: null,
 						loading: mutation?.isLoading,
 					}}
-					footerButtons={({ defaultButtons }) => (
-						<>
-							<Switch
-								className="mr-4"
-								checkedChildren="發佈"
-								unCheckedChildren="草稿"
-								value={watchStatus === 'publish'}
-								onChange={(checked) => {
-									form.setFieldValue(['status'], checked ? 'publish' : 'draft')
-								}}
-							/>
-							{defaultButtons}
-						</>
-					)}
+					footerButtons={({ defaultButtons }) =>
+						disableSaveButton ? null : (
+							<>
+								<Form {...formProps}>
+									<Item
+										noStyle
+										name={['status']}
+										getValueProps={(value) => {
+											return {
+												value: value === 'publish',
+											}
+										}}
+										normalize={(value) => {
+											return value ? 'publish' : 'draft'
+										}}
+									>
+										<Switch
+											className="mr-4"
+											checkedChildren="發佈"
+											unCheckedChildren="草稿"
+											disabled={disableSaveButton}
+										/>
+									</Item>
+								</Form>
+								{defaultButtons}
+							</>
+						)
+					}
 					isLoading={query?.isLoading}
 				>
-					<Form {...formProps} onFinish={handleOnFinish} layout="vertical">
-						<Tabs
-							items={items}
-							tabBarExtraContent={
-								<>
-									<Tooltip
-										title={
-											record?.classroom_link
-												? undefined
-												: '此課程還沒有章節，無法前往教室'
-										}
-									>
-										<Button
-											href={record?.classroom_link}
-											target="_blank"
-											rel="noreferrer"
-											className="ml-4"
-											type="default"
-											disabled={!record?.classroom_link}
-										>
-											前往教室
-										</Button>
-									</Tooltip>
-
+					<Tabs
+						activeKey={activeKey}
+						onChange={(key) => setActiveKey(key)}
+						items={items}
+						tabBarExtraContent={
+							<>
+								<Tooltip
+									title={
+										record?.classroom_link
+											? undefined
+											: '此課程還沒有章節，無法前往教室'
+									}
+								>
 									<Button
-										href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${watchSlug}`}
+										href={record?.classroom_link}
 										target="_blank"
 										rel="noreferrer"
 										className="ml-4"
 										type="default"
+										disabled={!record?.classroom_link}
 									>
-										前往銷售頁
+										前往教室
 									</Button>
-								</>
-							}
-						/>
-					</Form>
+								</Tooltip>
+
+								<Button
+									href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${watchSlug}`}
+									target="_blank"
+									rel="noreferrer"
+									className="ml-4"
+									type="default"
+								>
+									前往銷售頁
+								</Button>
+							</>
+						}
+					/>
 				</Edit>
-			</CourseContext.Provider>
+			</RecordContext.Provider>
 		</div>
 	)
 }

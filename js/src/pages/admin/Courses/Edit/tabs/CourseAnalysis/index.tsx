@@ -1,8 +1,8 @@
 import AnalyticsPage from '@/pages/admin/Analytics'
-import { useCourse } from '@/pages/admin/Courses/Edit/hooks'
+import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
 
 export const CourseAnalysis = () => {
-	const course = useCourse()
+	const course = useRecord()
 
 	if (!course) return null
 
