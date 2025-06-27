@@ -50,6 +50,8 @@ final class Compatibility {
 	 * @return void
 	 */
 	public static function compatibility(): void {
+
+		self::add_post_meta_to_course_product();
 		/**
 		 * ============== START 相容性代碼 ==============
 		 */
@@ -111,5 +113,32 @@ final class Compatibility {
 		\delete_option('bunny_library_id');
 		\delete_option('bunny_cdn_hostname');
 		\delete_option('bunny_stream_api_key');
+	}
+
+
+	/**
+	 * Add Post Meta To Course Product
+	 * 把每個商品都標示，是否為課程商品
+	 *
+	 * @return void
+	 */
+	public static function add_post_meta_to_course_product(): void {
+		$args = [
+			'post_type'      => 'product',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'     => '_is_course',
+					'compare' => 'NOT EXISTS',
+				],
+			],
+		];
+
+		$ids = \get_posts($args);
+
+		foreach ($ids as $id) {
+			\add_post_meta($id, '_is_course', 'no');
+		}
 	}
 }
