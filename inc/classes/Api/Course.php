@@ -463,12 +463,12 @@ final class Course extends ApiBase {
 			'show_customer_amount'          => (string) $product->get_meta( 'show_customer_amount' ) ?: 'no',
 			'extra_student_count'           => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'                 => $product->get_meta( 'feature_video' ) ?: [
-				'type' => 'youtube',
+				'type' => 'none',
 				'id'   => '',
 				'meta' => [],
 			],
 			'trial_video'                   => $product->get_meta( 'trial_video' ) ?: [
-				'type' => 'youtube',
+				'type' => 'none',
 				'id'   => '',
 				'meta' => [],
 			],
