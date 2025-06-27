@@ -11,7 +11,12 @@ import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
 import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
 import { useEnv } from '@/hooks'
-import { CopyText, DescriptionDrawer, defaultSelectProps } from 'antd-toolkit'
+import {
+	CopyText,
+	DescriptionDrawer,
+	defaultSelectProps,
+	BlockNoteDrawer,
+} from 'antd-toolkit'
 
 const { Item } = Form
 
@@ -128,17 +133,21 @@ const CourseDescriptionComponent = ({
 					</Item>
 				</div>
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-					<Item
-						name={['short_description']}
-						label="課程簡介"
-						className="col-span-2"
-					>
-						<Input.TextArea rows={8} allowClear />
-					</Item>
-					<DescriptionDrawer
-						resource="courses"
-						dataProviderName="power-course"
-					/>
+					<div>
+						<label className="text-sm pb-2 inline-block">簡短說明</label>
+						<div>
+							<BlockNoteDrawer
+								resource="courses"
+								dataProviderName="power-course"
+							/>
+						</div>
+					</div>
+					<div className="col-span-2">
+						<DescriptionDrawer
+							resource="courses"
+							dataProviderName="power-course"
+						/>
+					</div>
 
 					<div className="mb-8">
 						<label className="mb-3 tw-block">課程封面圖</label>

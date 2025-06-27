@@ -511,6 +511,7 @@ final class Course extends ApiBase {
 			'feature_video',
 			'trial_video',
 			'description',
+			'short_description',
 			'slug',
 		];
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
