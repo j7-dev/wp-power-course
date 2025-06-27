@@ -49,7 +49,7 @@ for ( $i = 1; $i <= $count; $i++ ) {
 
 	if ( $half ) {
 		$icons_html .= sprintf(
-			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-1 %3$s" %4$s %5$s />',
+			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="pc-mask pc-mask-star-2 pc-mask-half-1 %3$s" %4$s %5$s />',
 		$i - 0.5,
 		$name,
 		$cursor,
@@ -57,7 +57,7 @@ for ( $i = 1; $i <= $count; $i++ ) {
 		$disabled
 		);
 		$icons_html .= sprintf(
-		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star-2 pc-mask-half-2 %3$s" %4$s %5$s />',
+		/*html*/'<input type="radio" value="%1$s" name="%2$s" class="pc-mask pc-mask-star-2 pc-mask-half-2 %3$s" %4$s %5$s />',
 		$i,
 		$name,
 		$cursor,
@@ -66,7 +66,7 @@ for ( $i = 1; $i <= $count; $i++ ) {
 		);
 	} else {
 		$icons_html .= sprintf(
-			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="bg-yellow-400 pc-mask pc-mask-star %3$s" %4$s %5$s />',
+			/*html*/'<input type="radio" value="%1$s" name="%2$s" class="pc-mask pc-mask-star %3$s" %4$s %5$s />',
 			$i,
 			$name,
 			$cursor,
