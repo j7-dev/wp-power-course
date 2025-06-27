@@ -20,9 +20,8 @@ import CsvUpload from './CsvUpload'
 import { selectedUserIdsAtom } from './atom'
 import { useAtom } from 'jotai'
 import SelectedUser from './SelectedUser'
-import Card from './Card'
 import HistoryDrawer from './HistoryDrawer'
-import { useRowSelection } from 'antd-toolkit'
+import { useRowSelection, Card } from 'antd-toolkit'
 import { FilterTags } from 'antd-toolkit/refine'
 
 const UserTableComponent = ({
