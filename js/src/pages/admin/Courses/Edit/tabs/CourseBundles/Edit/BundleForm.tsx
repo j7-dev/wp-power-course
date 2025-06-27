@@ -379,7 +379,7 @@ const BundleForm = () => {
 			<ProductPriceFields bundlePrices={bundlePrices} />
 
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-				<Item name={['virtual']} label="虛擬商品" initialValue={true}>
+				<Item name={['virtual']} label="虛擬商品">
 					<Switch />
 				</Item>
 				<Item name={['status']} hidden />

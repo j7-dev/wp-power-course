@@ -1,12 +1,21 @@
 import React, { memo } from 'react'
-import { Form, Switch, Slider, InputNumber, Rate, Tooltip } from 'antd'
+import {
+	Form,
+	Switch,
+	Slider,
+	InputNumber,
+	Rate,
+	Tooltip,
+	FormProps,
+	FormInstance,
+} from 'antd'
 import { Heading } from '@/components/general'
 import { FiSwitch, DatePicker } from '@/components/formItem'
 
 const { Item } = Form
 
-const CourseOtherComponent = () => {
-	const form = Form.useFormInstance()
+const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
+	const form = formProps.form as FormInstance
 	const watchShowTotalStudent: boolean =
 		Form.useWatch(['show_total_student'], form) === 'yes'
 
@@ -22,7 +31,7 @@ const CourseOtherComponent = () => {
 		Form.useWatch(['show_review_tab'], form) === 'yes'
 
 	return (
-		<>
+		<Form {...formProps}>
 			<Heading>課程介紹區域</Heading>
 			{/* <Heading size="sm">課程標籤</Heading> */}
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
@@ -286,7 +295,7 @@ const CourseOtherComponent = () => {
 					}}
 				/>
 			</div>
-		</>
+		</Form>
 	)
 }
 

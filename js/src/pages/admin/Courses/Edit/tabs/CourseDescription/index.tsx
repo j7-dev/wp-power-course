@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from 'react'
-import { Form, Input, Select } from 'antd'
+import { Form, Input, Select, FormProps, FormInstance } from 'antd'
 import {
 	keyLabelMapper,
 	termToOptions,
@@ -9,20 +9,24 @@ import { Heading, ListSelect, useListSelect } from '@/components/general'
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
-import { useCourse } from '@/pages/admin/Courses/Edit/hooks'
+import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
 import { useEnv } from '@/hooks'
 import { CopyText, DescriptionDrawer, defaultSelectProps } from 'antd-toolkit'
 
 const { Item } = Form
 
-const CourseDescriptionComponent = () => {
-	const form = Form.useFormInstance()
+const CourseDescriptionComponent = ({
+	formProps,
+}: {
+	formProps: FormProps
+}) => {
+	const form = formProps.form as FormInstance
 	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
 	const productUrl = `${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/`
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
-	const course = useCourse()
+	const course = useRecord()
 
 	const { listSelectProps } = useListSelect<TUserRecord>({
 		resource: 'users',
@@ -66,7 +70,7 @@ const CourseDescriptionComponent = () => {
 	}, [course?.id])
 
 	return (
-		<>
+		<Form {...formProps}>
 			<div className="mb-12">
 				<Heading>課程發佈</Heading>
 
@@ -81,7 +85,6 @@ const CourseDescriptionComponent = () => {
 					formItemProps={{
 						name: ['status'],
 						label: '發佈',
-						initialValue: 'publish',
 						getValueProps: (value) => ({ value: value === 'publish' }),
 						normalize: (value) => (value ? 'publish' : 'draft'),
 						hidden: true,
@@ -166,7 +169,7 @@ const CourseDescriptionComponent = () => {
 				/>
 				<Item name={['teacher_ids']} hidden initialValue={[]} />
 			</div>
-		</>
+		</Form>
 	)
 }
 

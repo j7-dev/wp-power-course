@@ -1,5 +1,13 @@
 import React, { useEffect, memo } from 'react'
-import { Form, Input, Select, InputNumber, Space } from 'antd'
+import {
+	Form,
+	Input,
+	Select,
+	InputNumber,
+	Space,
+	FormProps,
+	FormInstance,
+} from 'antd'
 import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
 import { PRODUCT_TYPE_OPTIONS } from '@/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils'
 import SubscriptionPriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Subscription'
@@ -10,8 +18,8 @@ import { Heading } from '@/components/general'
 
 const { Item } = Form
 
-const CoursePriceComponent = () => {
-	const form = Form.useFormInstance()
+const CoursePriceComponent = ({ formProps }: { formProps: FormProps }) => {
+	const form = formProps.form as FormInstance
 	const watchIsFree = Form.useWatch(['is_free'], form) === 'yes'
 
 	useEffect(() => {
@@ -28,7 +36,7 @@ const CoursePriceComponent = () => {
 	const isSubscription = watchProductType === 'subscription'
 
 	return (
-		<>
+		<Form {...formProps}>
 			<div className="grid grid-cols-3 gap-6">
 				<div>
 					<Heading>課程訂價</Heading>
@@ -95,7 +103,7 @@ const CoursePriceComponent = () => {
 					</div>
 				</div>
 			</div>
-		</>
+		</Form>
 	)
 }
 

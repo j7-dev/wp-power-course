@@ -1,6 +1,15 @@
 /* eslint-disable lines-around-comment */
 import React, { useRef, useEffect, memo } from 'react'
-import { Input, Button, Collapse, CollapseProps, Form, Empty } from 'antd'
+import {
+	Input,
+	Button,
+	Collapse,
+	CollapseProps,
+	Form,
+	Empty,
+	FormProps,
+	FormInstance,
+} from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
 import { nanoid } from 'nanoid'
@@ -14,9 +23,9 @@ type TListItem = {
 
 const { Item } = Form
 
-const CourseQAComponent = () => {
+const CourseQAComponent = ({ formProps }: { formProps: FormProps }) => {
 	const ref = useRef<SortableListRef>(null)
-	const form = Form.useFormInstance()
+	const form = formProps.form as FormInstance
 
 	const watchQAList = (Form.useWatch(['qa_list'], form) || []) as TListItem[]
 
@@ -27,7 +36,7 @@ const CourseQAComponent = () => {
 	}, [watchQAList?.length])
 
 	return (
-		<>
+		<Form {...formProps}>
 			<div className="gap-6 p-6">
 				<Button
 					onClick={() => {
@@ -114,7 +123,7 @@ const CourseQAComponent = () => {
 			<Item hidden name={['qa_list']} initialValue={[]}>
 				<Input />
 			</Item>
-		</>
+		</Form>
 	)
 }
 
