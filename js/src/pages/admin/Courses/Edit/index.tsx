@@ -1,6 +1,9 @@
 import { memo, useMemo } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
 import { Tabs, TabsProps, Form, Switch, Button, Tooltip } from 'antd'
+import { SortableChapters } from '@/components/course'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { CourseContext } from '@/pages/admin/Courses/Edit/hooks'
 import {
 	CourseDescription,
 	CourseQA,
@@ -9,13 +12,11 @@ import {
 	CourseBundles,
 	CourseOther,
 	CourseStudents,
-} from '@/components/course/form'
-import { SortableChapters } from '@/components/course'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { CourseContext } from '@/pages/admin/Courses/Edit/hooks'
+	CourseAnalysis,
+} from '@/pages/admin/Courses/Edit/tabs'
 import { formatDateRangeData } from '@/utils'
-import { toFormData } from 'antd-toolkit'
 import { useEnv } from '@/hooks'
+import { toFormData } from 'antd-toolkit'
 
 export const CoursesEdit = () => {
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
@@ -79,6 +80,12 @@ export const CoursesEdit = () => {
 			forceRender: false,
 			label: '學員管理',
 			children: <CourseStudents />,
+		},
+		{
+			key: 'CourseAnalysis',
+			forceRender: false,
+			label: '分析',
+			children: <CourseAnalysis />,
 		},
 	]
 

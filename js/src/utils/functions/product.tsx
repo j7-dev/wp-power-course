@@ -1,7 +1,7 @@
 import { TProduct as TProductStoreApi } from '@/types/wcStoreApi'
 import { TProduct as TProductRestApi } from '@/types/wcRestApi'
 import defaultImage from '@/assets/images/defaultImage.jpg'
-import { BUNDLE_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
+import { BUNDLE_TYPE_OPTIONS } from '@/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils'
 
 export const getProductImageSrc = (
 	product: TProductStoreApi | TProductRestApi,

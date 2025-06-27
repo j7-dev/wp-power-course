@@ -1,10 +1,10 @@
 import React, { useEffect, memo } from 'react'
 import { Form, Input, Select, InputNumber, Space } from 'antd'
 import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
-import { PRODUCT_TYPE_OPTIONS } from '@/components/course/form/CourseBundles/Edit/utils'
-import SubscriptionPriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Subscription'
-import SimplePriceFields from '@/components/course/form/CoursePrice/ProductPriceFields/Simple'
-import StockFields from '@/components/course/form/CoursePrice/StockFields'
+import { PRODUCT_TYPE_OPTIONS } from '@/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils'
+import SubscriptionPriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Subscription'
+import SimplePriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Simple'
+import StockFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/StockFields'
 
 import { Heading } from '@/components/general'
 
