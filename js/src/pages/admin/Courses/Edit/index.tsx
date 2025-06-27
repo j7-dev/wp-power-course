@@ -14,9 +14,8 @@ import {
 	CourseStudents,
 	CourseAnalysis,
 } from '@/pages/admin/Courses/Edit/tabs'
-import { formatDateRangeData } from '@/utils'
 import { useEnv } from '@/hooks'
-import { toFormData } from 'antd-toolkit'
+import { toFormData, formatDateRangeData } from 'antd-toolkit'
 
 const { Item } = Form
 
@@ -26,7 +25,6 @@ export const CoursesEdit = () => {
 	// 初始化資料
 	const {
 		formProps: _formProps,
-		form,
 		saveButtonProps,
 		query,
 		mutation,
@@ -40,16 +38,14 @@ export const CoursesEdit = () => {
 		return query?.data?.data
 	}, [query])
 
-	// 顯示
-	const watchName = Form.useWatch(['name'], form)
-
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (values: Partial<TCourseRecord>) => {
 		const formattedValues = formatDateRangeData(values, 'sale_date_range', [
 			'date_on_sale_from',
 			'date_on_sale_to',
 		])
-		onFinish(toFormData(formattedValues))
+		const { description, short_description, ...rest } = formattedValues
+		onFinish(toFormData(rest))
 	}
 
 	// 重組 formProps
