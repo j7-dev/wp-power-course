@@ -19,6 +19,7 @@ $default_args = [
 		'id'   => '',
 		'meta' => [],
 	],
+	'next_post_url'  => '',
 ];
 
 /**
@@ -35,6 +36,7 @@ $args = wp_parse_args( $args, $default_args );
 	'thumbnail_url' => $thumbnail_url,
 	'hide_watermark'  => $hide_watermark,
 	'video_info'   => $video_info,
+	'next_post_url'  => $next_post_url,
 ] = $args;
 
 [
@@ -79,6 +81,7 @@ printf(
 	data-watermark_qty="%5$s"
 	data-watermark_color="%6$s"
 	data-watermark_interval="%7$s"
+	data-next_post_url="%8$s"
 >
 	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
 </div>
@@ -89,5 +92,6 @@ printf(
 	$watermark_text,
 	$watermark_qty,
 	$watermark_color,
-	$watermark_interval
+	$watermark_interval,
+	$next_post_url
 );
