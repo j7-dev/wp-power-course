@@ -6,6 +6,7 @@
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Plugin as Powerhouse;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -36,7 +37,9 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-$has_video = isset($video_info['type']) && @$video_info['type'] !== 'none';
+
+$next_post_id  = ChapterUtils::get_next_post_id( $chapter_id );
+$next_post_url = $next_post_id ? ( \get_permalink( $next_post_id ) ?: '' ) : '';
 
 echo '<div id="pc-classroom-body" class="w-full bg-base-100 lg:pl-[25rem]">';
 
@@ -74,8 +77,9 @@ $is_admin_preview ? 'top-[120px]' : 'top-[92px]'
 Plugin::load_template(
 	'video',
 	[
-		'video_info' => $video_info,
-		'class'      => 'rounded-none',
+		'video_info'    => $video_info,
+		'class'         => sprintf('rounded-none %s', $next_post_url ? 'has-next-post' : ''),
+		'next_post_url' => $next_post_url,
 	]
 );
 echo '</div>';
