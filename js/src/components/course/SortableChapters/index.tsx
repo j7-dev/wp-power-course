@@ -11,6 +11,7 @@ import {
 	useList,
 	HttpError,
 	useDeleteMany,
+	useParsed,
 } from '@refinedev/core'
 import { isEqual as _isEqual } from 'lodash-es'
 import { ChapterEdit } from '@/components/chapters'
@@ -34,7 +35,7 @@ const LoadingChapters = () => (
 
 const SortableChaptersComponent = () => {
 	const form = Form.useFormInstance()
-	const courseId = form?.getFieldValue('id')
+	const { id: courseId } = useParsed()
 	const {
 		data: chaptersData,
 		isFetching: isListFetching,
