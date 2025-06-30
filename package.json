@@ -37,7 +37,8 @@
 		"j7-easy-email-extensions": "4.17.1",
 		"mjml-browser": "^4.15.3",
 		"pdf-lib": "^1.17.1",
-		"parse-json": "^8.3.0"
+		"parse-json": "^8.3.0",
+		"media-icons": "^1.1.5"
 	},
 	"devDependencies": {
 		"@power/eslint-config": "workspace:*",
