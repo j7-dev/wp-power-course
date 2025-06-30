@@ -6,10 +6,14 @@ import Iframe from './Iframe'
 const Vimeo: FC<FormItemProps> = (formItemProps) => {
 	const getVideoUrl = (videoId: string | null) =>
 		videoId ? `https://vimeo.com/${videoId}` : ''
-	const getEmbedVideoUrl = (videoId: string | null) =>
-		videoId
-			? `https://player.vimeo.com/video/${videoId}?h=f741860ba7&color=a6a8a8&title=0&byline=0&portrait=0`
-			: ''
+	const getEmbedVideoUrl = (videoId: string | null) => {
+		if (!videoId) return ''
+
+		// videoId 以 / 拆開
+		const [vId, hash] = videoId.split('/')
+
+		return `https://player.vimeo.com/video/${vId}?h=${hash}&color=a6a8a8&title=0&byline=0&portrait=0`
+	}
 
 	return (
 		<Iframe
