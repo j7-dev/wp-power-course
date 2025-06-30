@@ -199,6 +199,7 @@ final class LifeCycle {
 		$course_id     = (int) \get_post_meta( $top_parent_id, 'parent_course_id', true );
 		$cache_key     = ChapterUtils::get_cache_key( $course_id );
 		\delete_transient( $cache_key );
+		\wp_cache_flush_group('prev_next');
 	}
 
 
