@@ -142,13 +142,14 @@ export const getYoutubeVideoId = (url: string | null): string | null => {
 /**
  * 從 vimeo 的 URL 中取得影片 ID
  *
- * @param {string} url // ex: https://vimeo.com/900151069
- * @return {string | null} 影片 ID
+ * @param {string} url // ex: https://vimeo.com/900151069 或 https://vimeo.com/900151069/abc123def
+ * @return {string | null} 影片 ID (可能包含 HASH)
  */
 export const getVimeoVideoId = (url: string | null): string | null => {
 	if (!url) return ''
 	try {
-		const regex = /(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+)/
+		const regex =
+			/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(\d+(?:\/[a-zA-Z0-9]+)?)/
 		const match = url.match(regex)
 		return match ? match[1] : null
 	} catch (error) {
