@@ -11,7 +11,10 @@ export const tabs = () => {
 			.addClass('active')
 			.siblings()
 			.removeClass('active')
+	})
 
+
+	function scrollToTab() {
 		// 切換 TAB 時滾到目標節點的位置
 		const _isMobile = isMobile()
 		const videoH = _isMobile
@@ -40,5 +43,5 @@ export const tabs = () => {
 			},
 			500,
 		)
-	})
+	}
 }
