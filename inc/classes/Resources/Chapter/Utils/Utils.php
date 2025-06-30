@@ -748,6 +748,12 @@ abstract class Utils {
 	 * @return array<int>
 	 */
 	public static function get_flatten_post_ids( int $course_id ): array {
+
+		$flatten_post_ids = \wp_cache_get( 'flatten_post_ids_' . $course_id, 'prev_next' );
+		if (false !== $flatten_post_ids) {
+			return $flatten_post_ids;
+		}
+
 		$flatten_post_ids = [];
 
 		/** @var array<int> $top_chapter_ids */
@@ -781,6 +787,73 @@ abstract class Utils {
 			];
 		}
 
+		\wp_cache_set( 'flatten_post_ids_' . $course_id, $flatten_post_ids, 'prev_next' );
+
 		return \array_values($flatten_post_ids);
+	}
+
+	/**
+	 * 取得上一個章節的 id
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @return int|null
+	 */
+	public static function get_prev_post_id( int $chapter_id ): int|null {
+		$prev_post_id = \wp_cache_get( 'prev_post_id_' . $chapter_id, 'prev_next' );
+
+		if (false !== $prev_post_id) {
+			return $prev_post_id;
+		}
+
+		$course_id        = self::get_course_id( $chapter_id );
+		$all_children_ids = self::get_flatten_post_ids( $course_id);
+
+		// find index of current post id
+		/** @var int|false $current_post_index */
+		$current_post_index = array_search($chapter_id, $all_children_ids, true);
+
+		if (false === $current_post_index) {
+			// 此文章 id 不在列表中
+			return null;
+		}
+
+		$prev_post_id = $all_children_ids[ $current_post_index - 1 ] ?? null;
+
+		\wp_cache_set( 'prev_post_id_' . $chapter_id, $prev_post_id, 'prev_next' );
+
+		return $prev_post_id;
+	}
+
+
+	/**
+	 * 取得下一個章節的 id
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @return int|null
+	 */
+	public static function get_next_post_id( int $chapter_id ): int|null {
+		$next_post_id = \wp_cache_get( 'next_post_id_' . $chapter_id, 'prev_next' );
+
+		if (false !== $next_post_id) {
+			return $next_post_id;
+		}
+
+		$course_id        = self::get_course_id( $chapter_id );
+		$all_children_ids = self::get_flatten_post_ids( $course_id);
+
+		// find index of current post id
+		/** @var int|false $current_post_index */
+		$current_post_index = array_search($chapter_id, $all_children_ids, true);
+
+		if (false === $current_post_index) {
+			// 此文章 id 不在列表中
+			return null;
+		}
+
+		$next_post_id = $all_children_ids[ $current_post_index + 1 ] ?? null;
+
+		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
+
+		return $next_post_id;
 	}
 }
