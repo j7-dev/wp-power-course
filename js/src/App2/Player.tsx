@@ -16,6 +16,7 @@ import {
 } from '@vidstack/react/player/layouts/default'
 import { WaterMark } from '@/components/general'
 import Ended from './Ended'
+import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
 
@@ -27,6 +28,7 @@ export type TPlayerProps = {
 	watermark_color: string
 	watermark_interval: string
 	next_post_url: string
+	autoplay: 'yes' | 'no'
 }
 
 const index = ({
@@ -37,6 +39,7 @@ const index = ({
 	watermark_color,
 	watermark_interval,
 	next_post_url,
+	autoplay,
 }: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
@@ -73,6 +76,7 @@ const index = ({
 					setIsPlaying(false)
 				}}
 				onEnded={() => setIsEnded(true)}
+				autoPlay={stringToBool(autoplay)}
 			>
 				<MediaProvider>
 					<Poster className="vds-poster" />

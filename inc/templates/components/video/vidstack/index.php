@@ -71,6 +71,16 @@ $watermark_color = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)'
 $watermark_interval = \get_option( 'pc_watermark_interval', '10' );
 $watermark_text     = ChapterUtils::get_formatted_watermark_text();
 
+$autoplay = 'no';
+if ( isset($_GET['autoplay']) ) {
+	if ( 'yes' === $_GET['autoplay'] ) {
+		$autoplay = 'yes';
+	}
+}
+
+if ($next_post_url) {
+	$next_post_url = \add_query_arg( 'autoplay', 'yes', $next_post_url );
+}
 
 printf(
 /*html*/'
@@ -82,6 +92,7 @@ printf(
 	data-watermark_color="%6$s"
 	data-watermark_interval="%7$s"
 	data-next_post_url="%8$s"
+	data-autoplay="%9$s"
 >
 	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
 </div>
@@ -93,5 +104,6 @@ printf(
 	$watermark_qty,
 	$watermark_color,
 	$watermark_interval,
-	$next_post_url
+	$next_post_url,
+	$autoplay,
 );
