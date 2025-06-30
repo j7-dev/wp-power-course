@@ -9,21 +9,10 @@ use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 global $course;
 
-$all_children_ids = ChapterUtils::get_flatten_post_ids( $course->get_id());
-
-// find index of current post id
-/** @var int|false $current_post_index */
-$current_post_index = array_search($post->ID, $all_children_ids, true);
-
-if (false === $current_post_index) {
-	// 此文章 id 不在列表中
-	return;
-}
-
-$prev_post_id = $all_children_ids[ $current_post_index - 1 ] ?? null;
+$prev_post_id = ChapterUtils::get_prev_post_id( $post->ID );
 /** @var WP_Post|null $prev_post */
 $prev_post    = $prev_post_id ? get_post($prev_post_id) : null;
-$next_post_id = $all_children_ids[ $current_post_index + 1 ] ?? null;
+$next_post_id = ChapterUtils::get_next_post_id( $post->ID );
 /** @var WP_Post|null $next_post */
 $next_post = $next_post_id ? get_post($next_post_id) : null;
 
