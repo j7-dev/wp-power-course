@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Api;
 
-use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
+use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
 use J7\PowerCourse\Resources\Chapter\Models\Chapter;
@@ -15,11 +15,13 @@ use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /** Class Api */
-final class User {
+final class User extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
-	use \J7\WpUtils\Traits\ApiRegisterTrait;
 
 	const BATCH_SIZE = 50;
+
+	/** @var string Namespace */
+	protected $namespace = 'power-course';
 
 	/**
 	 * APIs
@@ -30,12 +32,6 @@ final class User {
 	 * - permission_callback : callable
 	 */
 	protected $apis = [
-
-		[
-			'endpoint'            => 'users',
-			'method'              => 'get',
-			'permission_callback' => null,
-		],
 		[
 			'endpoint'            => 'users',
 			'method'              => 'post',
@@ -65,117 +61,25 @@ final class User {
 
 	/** Constructor*/
 	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_api_products' ] );
+		parent::__construct();
 		\add_action( 'pc_batch_add_students_task', [ $this, 'process_batch_add_students' ], 10, 4 );
 	}
 
 	/**
 	 * Log 到 WC Logger 的指定檔名
 	 *
-	 * @param string $message 訊息
-	 * @param string $level 等級
+	 * @param string               $message 訊息
+	 * @param string               $level 等級
+	 * @param array<string, mixed> $args 參數
 	 * @return void
 	 */
-	protected static function log( string $message, $level = 'info' ): void {
+	protected static function log( string $message, $level = 'info', array $args = [] ): void {
 		\J7\WpUtils\Classes\WC::logger(
 			$message,
 			$level,
-			[],
+			$args,
 			'power_course_csv_upload_students'
 			);
-	}
-
-	/**
-	 * Register products API
-	 *
-	 * @return void
-	 */
-	public function register_api_products(): void {
-		$this->register_apis(
-		$this->apis,
-		Plugin::$kebab,
-		fn() => \current_user_can( 'manage_woocommerce' ),
-		);
-	}
-
-
-	/**
-	 * Get users callback
-	 *
-	 * @deprecated 改用 Powerhouse User API
-	 * 通用的用戶查詢
-	 * TODO 再改成 SQL 查詢，以支持更複雜的查詢，例如買過OO商品的用戶
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 * $params
-	 *  - meta_key avl_course_ids 如果要找用戶可以上的課程
-	 *  - meta_value
-	 * - count_total 是否要計算總數
-	 *
-	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
-	 */
-	public function get_users_callback( $request ): \WP_REST_Response {
-
-		$params = $request->get_query_params();
-
-		$params = WP::sanitize_text_field_deep( $params, false );
-
-		// 轉換 posts_per_page 為 number
-		$params['number'] = $params['posts_per_page'] ?? 10;
-		unset($params['posts_per_page']);
-
-		$default_args = [
-			'search_columns' => [ 'ID', 'user_login', 'user_email', 'user_nicename', 'display_name' ],
-			'number'         => 10,
-			'orderby'        => 'ID',
-			'order'          => 'DESC',
-			'offset'         => 0,
-			'paged'          => 1,
-			'count_total'    => true,
-		];
-
-		$args = \wp_parse_args(
-		$params,
-		$default_args,
-		);
-
-		if (!empty($args['search'])) {
-			$args['search'] = '*' . $args['search'] . '*'; // 模糊搜尋
-		}
-
-		if (!empty($args['avl_course_ids'])) {
-			$args['meta_query']             = [];
-			$args['meta_query']['relation'] = 'AND';
-			foreach ($args['avl_course_ids'] as $course_id) {
-				$args['meta_query'][] = [
-					'key'     => 'avl_course_ids',
-					'value'   => $course_id,
-					'compare' => '=',
-				];
-			}
-		}
-
-		// Create the WP_User_Query object
-		$wp_user_query = new \WP_User_Query($args);
-
-		/**
-		 * @var \WP_User[] $users
-		 */
-		$users = $wp_user_query->get_results();
-
-		$total       = $wp_user_query->get_total();
-		$total_pages = \floor( $total / $args['number'] ) + 1;
-
-		$formatted_users = array_values(array_map( [ $this, 'format_user_details' ], $users ));
-
-		$response = new \WP_REST_Response( $formatted_users );
-
-		// // set pagination in header
-		$response->header( 'X-WP-Total', (string) $total );
-		$response->header( 'X-WP-TotalPages', (string) $total_pages );
-
-		return $response;
 	}
 
 	/**
