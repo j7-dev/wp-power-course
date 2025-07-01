@@ -60,7 +60,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 					'name'     => 'Powerhouse',
 					'slug'     => 'powerhouse',
 					'source'   => 'https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip',
-					'version'  => '3.3.11',
+					'version'  => '3.3.12',
 					'required' => true,
 				],
 			];
