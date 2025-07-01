@@ -47,6 +47,7 @@ final class Api extends ApiBase {
 	/** Constructor */
 	public function __construct() {
 		parent::__construct();
+		ExtendQuery::instance();
 		\add_filter('powerhouse/user/get_meta_keys_array', [ $this, 'extend_meta_keys' ], 10, 2);
 	}
 
