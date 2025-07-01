@@ -54,7 +54,7 @@ export function useUserFormDrawer({
 
 	const { mutate: create, isLoading: isLoadingCreate } = useCreate({
 		resource,
-		dataProviderName: 'power-course',
+		dataProviderName: resource !== 'users' ? 'power-course' : undefined,
 		meta: {
 			headers: { 'Content-Type': 'multipart/form-data;' },
 		},

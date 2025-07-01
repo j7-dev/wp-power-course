@@ -15,7 +15,6 @@ const index = () => {
 
 	const { selectProps } = useSelect<TUserRecord>({
 		resource: 'users',
-		dataProviderName: 'power-course',
 		optionLabel: 'display_name',
 		optionValue: 'id',
 		filters: [
@@ -25,39 +24,9 @@ const index = () => {
 				value: '',
 			},
 			{
-				field: 'number',
-				operator: 'eq',
-				value: '20',
-			},
-			{
-				field: 'meta_query[relation]',
-				operator: 'eq',
-				value: 'OR',
-			},
-			{
-				field: 'meta_query[0][key]',
-				operator: 'eq',
-				value: 'is_teacher',
-			},
-			{
-				field: 'meta_query[0][value]',
-				operator: 'eq',
+				field: 'is_teacher',
+				operator: 'ne',
 				value: 'yes',
-			},
-			{
-				field: 'meta_query[0][compare]',
-				operator: 'eq',
-				value: '!=',
-			},
-			{
-				field: 'meta_query[1][key]',
-				operator: 'eq',
-				value: 'is_teacher',
-			},
-			{
-				field: 'meta_query[1][compare]',
-				operator: 'eq',
-				value: 'NOT EXISTS',
 			},
 		],
 		onSearch: (value) => {
@@ -69,10 +38,6 @@ const index = () => {
 				},
 			]
 		},
-
-		// queryOptions: {
-		//   enabled: !!keyword,
-		// },
 	})
 
 	// add student mutation
@@ -100,7 +65,6 @@ const index = () => {
 					})
 					invalidate({
 						resource: 'users',
-						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setUserIds([])

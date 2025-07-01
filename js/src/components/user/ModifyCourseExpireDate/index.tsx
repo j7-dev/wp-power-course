@@ -41,7 +41,6 @@ const ModifyCourseExpireDateComponent = ({
 					})
 					invalidate({
 						resource: 'users',
-						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setTime(undefined)
