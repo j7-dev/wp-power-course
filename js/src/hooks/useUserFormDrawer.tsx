@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { DrawerProps, Button, FormInstance, Popconfirm, Form } from 'antd'
-import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
+import { useCreate, useUpdate } from '@refinedev/core'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { toFormData } from 'antd-toolkit'
 import { isEqual } from 'lodash-es'
@@ -19,8 +19,6 @@ export function useUserFormDrawer({
 	const isUpdate = !!Form.useWatch(['id'], form) // 如果沒有傳入 record 就走新增課程，否則走更新課程
 	const closeRef = useRef<HTMLDivElement>(null)
 	const [unsavedChangesCheck, setUnsavedChangesCheck] = useState(true) // 是否檢查有未儲存的變更
-
-	const invalidate = useInvalidate()
 
 	const show = (theRecord?: TUserRecord) => () => {
 		setRecord({ ...theRecord } as TUserRecord)
