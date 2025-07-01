@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace J7\PowerCourse\Resources\Student\Helper;
+namespace J7\PowerCourse\Resources\Student\Services;
 
 use J7\Powerhouse\Utils\ExportCSV as ExportCSVBase;
 use J7\PowerCourse\Utils\Course as CourseUtils;
