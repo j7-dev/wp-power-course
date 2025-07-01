@@ -13,7 +13,6 @@ use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Student\Helper\Query;
 
 /** Class Api */
 final class User {
@@ -31,6 +30,7 @@ final class User {
 	 * - permission_callback : callable
 	 */
 	protected $apis = [
+
 		[
 			'endpoint'            => 'users',
 			'method'              => 'get',
@@ -46,12 +46,6 @@ final class User {
 			'method'              => 'post',
 			'permission_callback' => null,
 		],
-		[
-			'endpoint'            => 'users/students',
-			'method'              => 'get',
-			'permission_callback' => null,
-		],
-
 		[
 			'endpoint'            => 'users/add-teachers', // 設定為講師
 			'method'              => 'post',
@@ -107,6 +101,8 @@ final class User {
 
 	/**
 	 * Get users callback
+	 *
+	 * @deprecated 改用 Powerhouse User API
 	 * 通用的用戶查詢
 	 * TODO 再改成 SQL 查詢，以支持更複雜的查詢，例如買過OO商品的用戶
 	 *
@@ -183,36 +179,6 @@ final class User {
 	}
 
 	/**
-	 * Get student callback
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 * $params
-	 *  - meta_key avl_course_ids 如果要找用戶可以上的課程
-	 *  - meta_value
-	 * - count_total 是否要計算總數
-	 *
-	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
-	 */
-	public function get_users_students_callback( $request ): \WP_REST_Response {
-		$params = $request->get_query_params();
-		$params = WP::sanitize_text_field_deep( $params, false );
-
-		$query      = new Query($params);
-		$users      = $query->get_users();
-		$pagination = $query->get_pagination();
-
-		$formatted_users = array_values(array_map( [ $this, 'format_user_details' ], $users ));
-
-		$response = new \WP_REST_Response( $formatted_users );
-		// // set pagination in header
-		$response->header( 'X-WP-Total', (string) $pagination->total );
-		$response->header( 'X-WP-TotalPages', (string) $pagination->total_pages );
-
-		return $response;
-	}
-
-	/**
 	 * 新增用戶
 	 *
 	 * @param \WP_REST_Request $request 包含新增用戶所需資料的REST請求對象。
@@ -260,6 +226,8 @@ final class User {
 
 	/**
 	 * Format user details
+	 *
+	 * @deprecated 改用 Powerhouse User::instance()->to_array('list', $meta_keys)
 	 *
 	 * @param \WP_User $user  User.
 	 * @return array{id: string,user_login: string,user_email: string,display_name: string,user_registered: string,user_registered_human: string,user_avatar: string,avl_courses: array<string, mixed>}[]
@@ -309,8 +277,8 @@ final class User {
 			'user_registered'       => $user_registered,
 			'user_registered_human' => \human_time_diff( \strtotime( $user_registered ) ),
 			'user_avatar_url'       => $user_avatar_url,
-			'avl_courses'           => $avl_courses,
 			'description'           => $user->description,
+			'avl_courses'           => $avl_courses,
 			'is_teacher'            => \get_user_meta($user_id, 'is_teacher', true) === 'yes',
 		];
 
