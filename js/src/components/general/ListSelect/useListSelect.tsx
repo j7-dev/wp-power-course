@@ -55,7 +55,7 @@ export const useListSelect = <T extends BaseRecord>({
 	}
 
 	const searchItemsResult = useList<T>({
-		dataProviderName: 'power-course',
+		dataProviderName: resource !== 'users' ? 'power-course' : undefined,
 		resource,
 		filters: [
 			{
