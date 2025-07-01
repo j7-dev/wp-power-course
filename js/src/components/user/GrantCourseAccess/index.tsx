@@ -47,7 +47,7 @@ const GrantCourseAccessComponent = ({
 						invalidates: ['list'],
 					})
 					invalidate({
-						resource: 'users/students',
+						resource: 'students',
 						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})

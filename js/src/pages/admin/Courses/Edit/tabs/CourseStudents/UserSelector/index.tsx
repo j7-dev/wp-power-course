@@ -24,7 +24,7 @@ const index = () => {
 	const { id: courseId } = useParsed()
 
 	const { selectProps, queryResult } = useSelect<TUserRecord>({
-		resource: 'users/students',
+		resource: 'students',
 		dataProviderName: 'power-course',
 		optionLabel: 'display_name',
 		optionValue: 'id',
@@ -95,7 +95,7 @@ const index = () => {
 						key: 'add-students',
 					})
 					invalidate({
-						resource: 'users/students',
+						resource: 'students',
 						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})

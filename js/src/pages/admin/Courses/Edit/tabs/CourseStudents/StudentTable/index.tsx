@@ -26,7 +26,7 @@ const StudentTable = () => {
 	const { id: courseId } = useParsed()
 	const columns = useColumns()
 	const { tableProps } = useTable<TUserRecord>({
-		resource: 'users/students',
+		resource: 'students',
 		dataProviderName: 'power-course',
 		filters: {
 			permanent: [
@@ -39,6 +39,11 @@ const StudentTable = () => {
 					field: 'meta_value',
 					operator: 'eq',
 					value: courseId,
+				},
+				{
+					field: 'meta_keys',
+					operator: 'eq',
+					value: ['is_teacher', 'avl_courses'],
 				},
 			],
 		},
@@ -83,7 +88,7 @@ const StudentTable = () => {
 						key: 'remove-students',
 					})
 					invalidate({
-						resource: 'users/students',
+						resource: 'students',
 						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
@@ -125,7 +130,7 @@ const StudentTable = () => {
 						key: 'update-students',
 					})
 					invalidate({
-						resource: 'users/students',
+						resource: 'students',
 						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})

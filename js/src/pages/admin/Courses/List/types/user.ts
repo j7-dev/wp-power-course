@@ -19,7 +19,6 @@ export type TAVLCourse = {
 	total_chapters_count: number
 	finished_chapters_count: number
 	expire_date: TExpireDate
-	chapters?: TChapter[]
 }
 
 export type TUserRecord = {
