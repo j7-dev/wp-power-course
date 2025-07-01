@@ -41,7 +41,6 @@ const RemoveCourseAccessComponent = ({
 					})
 					invalidate({
 						resource: 'users',
-						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 				},

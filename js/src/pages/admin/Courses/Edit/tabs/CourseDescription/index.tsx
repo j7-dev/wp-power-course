@@ -38,19 +38,9 @@ const CourseDescriptionComponent = ({
 		searchField: 'search',
 		filters: [
 			{
-				field: 'meta_key',
-				operator: 'eq',
-				value: 'is_teacher',
-			},
-			{
-				field: 'meta_value',
+				field: 'is_teacher',
 				operator: 'eq',
 				value: 'yes',
-			},
-			{
-				field: 'posts_per_page',
-				operator: 'eq',
-				value: 20,
 			},
 		],
 		initKeys: initTeacherIds,

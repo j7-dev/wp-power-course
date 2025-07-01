@@ -21,16 +21,10 @@ const index = () => {
 
 	const { tableProps } = useTable<TUserRecord>({
 		resource: 'users',
-		dataProviderName: 'power-course',
 		filters: {
 			permanent: [
 				{
-					field: 'meta_key',
-					operator: 'eq',
-					value: 'is_teacher',
-				},
-				{
-					field: 'meta_value',
+					field: 'is_teacher',
 					operator: 'eq',
 					value: 'yes',
 				},
@@ -74,7 +68,6 @@ const index = () => {
 					})
 					invalidate({
 						resource: 'users',
-						dataProviderName: 'power-course',
 						invalidates: ['list'],
 					})
 					setSelectedRowKeys([])

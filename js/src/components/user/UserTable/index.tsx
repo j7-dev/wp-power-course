@@ -41,9 +41,17 @@ const UserTableComponent = ({
 		TFilterValues
 	>({
 		resource: 'users',
-		dataProviderName: 'power-course',
 		pagination: {
 			pageSize: 20,
+		},
+		filters: {
+			permanent: [
+				{
+					field: 'meta_keys',
+					operator: 'eq',
+					value: ['is_teacher', 'avl_courses'],
+				},
+			],
 		},
 		onSearch: (values) => {
 			return Object.keys(values).map((key) => {
