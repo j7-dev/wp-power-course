@@ -2,7 +2,7 @@
 
 declare (strict_types = 1);
 
-namespace J7\PowerCourse\Resources\Student\Helper;
+namespace J7\PowerCourse\Resources\Student\Services;
 
 /**
  * Query 查詢學員
