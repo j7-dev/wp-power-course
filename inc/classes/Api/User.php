@@ -78,19 +78,16 @@ final class User {
 	/**
 	 * Log 到 WC Logger 的指定檔名
 	 *
-	 * @param mixed  $message 訊息
-	 * @param string $title 標題
+	 * @param string $message 訊息
 	 * @param string $level 等級
 	 * @return void
 	 */
-	protected static function log( $message, string $title = '', $level = 'info' ): void {
-		\J7\WpUtils\Classes\WC::log(
+	protected static function log( string $message, $level = 'info' ): void {
+		\J7\WpUtils\Classes\WC::logger(
 			$message,
-			$title,
 			$level,
-			[
-				'source' => 'power_course_csv_upload_students',
-			]
+			[],
+			'power_course_csv_upload_students'
 			);
 	}
 
@@ -572,7 +569,7 @@ final class User {
 				$password = \wp_generate_password(12);
 				$user_id  = \wp_create_user($username, $password, $email);
 				if (\is_wp_error($user_id)) {
-					self::log('創建用戶失敗: ' . $user_id->get_error_message() . ' 用戶名稱: ' . $username . ' 用戶信箱: ' . $email, 'User::process_batch_add_students');
+					self::log("創建用戶失敗: {$user_id->get_error_message()}，用戶名稱: {$username}，用戶信箱: {$email}", 'error');
 					continue;
 				}
 
@@ -580,7 +577,7 @@ final class User {
 				$result = \retrieve_password($username);
 
 				if (true !== $result) {
-					self::log('發送重新設置密碼的信失敗: ' . $result->get_error_message() . ' 用戶名稱: ' . $username . ' 用戶信箱: ' . $email, 'User::process_batch_add_students');
+					self::log("發送重新設置密碼的信失敗: {$result->get_error_message()}，用戶名稱: {$username}，用戶信箱: {$email}", 'error');
 					continue;
 				}
 			} else {
@@ -604,7 +601,7 @@ final class User {
 
 		// ----- ▼ 寫入 log 以及 email 文字檔 ----- //
 		$attachment_url = \wp_get_attachment_url($attachment_id);
-		self::log($is_last_batch ? "附件 #{$attachment_id} {$attachment_url} csv 匯入 已經是最後一批，發信，結束" : "附件 #{$attachment_id} {$attachment_url} csv 匯入 還沒到最後一批，繼續", 'User::process_batch_add_students');
+		self::log($is_last_batch ? "附件 #{$attachment_id} {$attachment_url} csv 匯入 已經是最後一批，發信，結束" : "附件 #{$attachment_id} {$attachment_url} csv 匯入 還沒到最後一批，繼續", 'info');
 
 		// 初始化 WP_Filesystem
 		global $wp_filesystem;
@@ -629,7 +626,7 @@ final class User {
 			[ $attachment_id, $batch + 1, $batch_size, $email_content_file_path ],
 			'power_course_batch_add_students',
 			);
-			self::log("附件 #{$attachment_id} {$attachment_url} csv 匯入 下次排程 {$action_id}", 'User::process_batch_add_students');
+			self::log("附件 #{$attachment_id} {$attachment_url} csv 匯入 下次排程 {$action_id}", 'info');
 		} else {
 
 			$upload_dir = \wp_upload_dir();
