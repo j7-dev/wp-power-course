@@ -24,10 +24,8 @@
 	},
 	"dependencies": {
 		"antd-toolkit": "workspace:*",
-		"jotai": "^2.12.5",
 		"@ant-design/charts": "^2.3.0",
 		"@ant-design/pro-components": "^2.8.7",
-		"@ant-design/pro-editor": "1.3.0",
 		"@arco-themes/react-easy-email-theme": "^0.0.3",
 		"@pdf-lib/fontkit": "^1.1.1",
 		"@vidstack/react": "^1.12.13",
@@ -46,7 +44,6 @@
 		"@power/typescript-config": "workspace:*",
 		"@types/mjml-browser": "^4.15.0",
 		"vite-plugin-optimizer": "^1.4.3",
-		"vite-plugin-live-reload": "^3.0.3",
 		"rollup-plugin-terser": "^7.0.2"
 	}
 }
