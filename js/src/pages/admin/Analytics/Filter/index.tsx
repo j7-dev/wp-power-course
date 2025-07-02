@@ -8,6 +8,8 @@ import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons'
 import { EViewType } from '@/pages/admin/Analytics/types'
 import { RANGE_PRESETS, maxDateRange } from '@/pages/admin/Analytics/utils'
 import { productTypes } from '@/utils'
+import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
+import Tags from '@/pages/admin/Analytics/Filter/Tags'
 import { defaultSelectProps } from 'antd-toolkit'
 import { objToCrudFilters } from 'antd-toolkit/refine'
 
@@ -15,13 +17,23 @@ const { RangePicker } = DatePicker
 const { Item } = Form
 
 const index = () => {
-	const { viewType, setViewType, form, query, setQuery, context, isFetching } =
-		useRevenueContext()
+	const {
+		viewType,
+		setViewType,
+		form,
+		context,
+		isFetching,
+		setEnabled,
+		initialQuery,
+	} = useRevenueContext()
+	const course = useRecord()
 
 	// 需要這個 state 是因為，需要知道用戶選了哪些課程/商品(需要挑出 is_course 為 true 的)，才能在查詢時帶入
 	const [selectedCourseProducts, setSelectedCourseProducts] = useState<
 		TProductSelectOption[]
 	>([])
+
+	const watchProducts = Form.useWatch(['products'], form) || []
 
 	const { selectProps: productSelectProps, query: productQuery } =
 		useSelect<TProductSelectOption>({
@@ -36,53 +48,36 @@ const index = () => {
 					value,
 				},
 			],
-			filters: objToCrudFilters({
-				meta_key: 'link_course_ids',
-				meta_compare: 'NOT EXISTS',
-			}),
-			queryOptions: {
-				enabled: context !== 'detail',
-			},
+			filters:
+				context === 'detail'
+					? objToCrudFilters({
+							p: watchProducts,
+						})
+					: [],
 		})
 
 	const productSelectOptions = productQuery?.data?.data || []
 
-	const { selectProps: bundleProductSelectProps } =
-		useSelect<TProductSelectOption>({
-			resource: 'products/select',
-			dataProviderName: 'power-course',
-			optionLabel: 'name',
-			optionValue: 'id',
-			filters: objToCrudFilters({
-				meta_key: 'link_course_ids',
-				meta_compare: 'IN',
-				meta_value: query?.product_includes?.length
-					? query?.product_includes
+	const { query: bundleProductQuery } = useSelect<TProductSelectOption>({
+		resource: 'products/select',
+		dataProviderName: 'power-course',
+		optionLabel: 'name',
+		optionValue: 'id',
+		filters: objToCrudFilters({
+			meta_key: 'link_course_ids',
+			meta_compare: 'IN',
+			meta_value:
+				context === 'detail'
+					? [course?.id]
 					: selectedCourseProducts.map((product) => product.id),
-			}),
-			queryOptions: {
-				enabled:
-					!!selectedCourseProducts?.length || !!query?.product_includes?.length,
-			},
-		})
+		}),
+		queryOptions: {
+			enabled: !!selectedCourseProducts?.length || context === 'detail',
+		},
+	})
 
 	const handleSubmit = () => {
-		const {
-			date_range,
-			products = [],
-			bundle_products = [],
-			...rest
-		} = form.getFieldsValue()
-		const query = {
-			...rest,
-			after: date_range?.[0]?.format('YYYY-MM-DDTHH:mm:ss'),
-			before: date_range?.[1]?.format('YYYY-MM-DDTHH:mm:ss'),
-			per_page: 10000,
-			order: 'asc',
-			_locale: 'user',
-			product_includes: [...products, ...bundle_products],
-		}
-		setQuery(query)
+		setEnabled(true)
 	}
 
 	const watchProductIds = Form.useWatch(['products'], form) || []
@@ -92,25 +87,56 @@ const index = () => {
 			(option) => watchProductIds?.includes(option?.id) && option?.is_course,
 		) || []) as TProductSelectOption[]
 		setSelectedCourseProducts(selectedCourseProductOptions)
-	}, [watchProductIds?.length])
+	}, [watchProductIds?.length, productSelectOptions?.length])
+
+	useEffect(() => {
+		setEnabled(true)
+	}, [])
 
 	return (
-		<Form form={form} onFinish={handleSubmit} layout="vertical">
-			<div className="flex items-center gap-x-4 mb-4">
+		<Form form={form} layout="vertical">
+			<div className="flex items-center gap-x-4">
 				<Item
 					label="日期範圍"
 					name={['date_range']}
 					tooltip="最大選取範圍為 1 年"
-					initialValue={[
-						dayjs().add(-7, 'd').startOf('day'),
-						dayjs().endOf('day'),
-					]}
+					initialValue={
+						initialQuery?.after && initialQuery?.before
+							? [dayjs(initialQuery.after), dayjs(initialQuery.before)]
+							: [
+									dayjs()
+										.add(-7, 'd')
+										.startOf('day')
+										.format('YYYY-MM-DDTHH:mm:ss'),
+									dayjs().endOf('day').format('YYYY-MM-DDTHH:mm:ss'),
+								]
+					}
 					rules={[
 						{
 							required: true,
 							message: '請選擇日期範圍',
 						},
 					]}
+					normalize={(value) => {
+						if (Array.isArray(value)) {
+							if (value.every((v) => dayjs.isDayjs(v))) {
+								return value.map((v) => v.format('YYYY-MM-DDTHH:mm:ss'))
+							}
+						}
+						return value
+					}}
+					getValueProps={(value) => {
+						if (Array.isArray(value)) {
+							if (value.every((v) => typeof v === 'string')) {
+								return {
+									value: value.map((v) => dayjs(v)),
+								}
+							}
+						}
+						return {
+							value,
+						}
+					}}
 				>
 					<RangePicker
 						presets={RANGE_PRESETS}
@@ -125,6 +151,7 @@ const index = () => {
 					name={['products']}
 					className="w-full"
 					label="查看特定課程/商品"
+					initialValue={initialQuery?.product_includes}
 					hidden={context === 'detail'}
 				>
 					<Select
@@ -154,14 +181,8 @@ const index = () => {
 					name={['bundle_products']}
 					className="w-full"
 					label="查看銷售方案"
-				>
-					<Select
-						{...defaultSelectProps}
-						{...bundleProductSelectProps}
-						placeholder="可多選"
-						disabled={!bundleProductSelectProps?.options?.length}
-					/>
-				</Item>
+					hidden
+				/>
 				<Item name={['interval']} initialValue={'day'} label="時間間格">
 					<Select
 						className="w-24"
@@ -186,11 +207,18 @@ const index = () => {
 					/>
 				</Item>
 				<Item label=" ">
-					<Button type="primary" htmlType="submit" loading={isFetching}>
+					<Button type="primary" onClick={handleSubmit} loading={isFetching}>
 						查詢
 					</Button>
 				</Item>
 			</div>
+
+			{context === 'detail' && (
+				<Tags
+					products={bundleProductQuery?.data?.data || []}
+					isLoading={bundleProductQuery?.isLoading}
+				/>
+			)}
 
 			<div className="flex justify-between">
 				<div className="flex items-center gap-x-4">

@@ -18,6 +18,7 @@ import {
 export const RevenueContext = createContext<
 	| {
 			context?: 'detail'
+			initialQuery?: Partial<TQuery>
 			viewType: EViewType
 			setViewType: React.Dispatch<React.SetStateAction<EViewType>>
 			result: QueryObserverResult<
@@ -33,8 +34,8 @@ export const RevenueContext = createContext<
 			isFetching: boolean
 			isLoading: boolean
 			form: FormInstance
-			query: TQuery
-			setQuery: React.Dispatch<React.SetStateAction<TQuery>>
+			enabled: boolean
+			setEnabled: React.Dispatch<React.SetStateAction<boolean>>
 			filterProps: TFilterProps
 			viewTypeProps: TViewTypeProps
 	  }
