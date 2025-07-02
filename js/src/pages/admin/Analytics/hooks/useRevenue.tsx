@@ -74,7 +74,11 @@ const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 	const [form] = Form.useForm()
 
 	useEffect(() => {
-		form.setFieldsValue(DEFAULT_QUERY)
+		form.setFieldsValue({
+			...DEFAULT_QUERY,
+			products: DEFAULT_QUERY?.product_includes,
+			product_includes: undefined,
+		})
 	}, [JSON.stringify(DEFAULT_QUERY)])
 
 	return {
