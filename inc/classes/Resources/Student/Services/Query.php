@@ -54,16 +54,13 @@ final class Query {
 
 		if (!$reverse) {
 			$sql = $wpdb->prepare(
-			'SELECT u.ID
-			FROM %1$s u
-			INNER JOIN %2$s um ON u.ID = um.user_id',
+			'SELECT u.ID FROM %1$s u INNER JOIN %2$s um ON u.ID = um.user_id',
 			$wpdb->users,
 			$wpdb->usermeta,
 			);
 		} else {
 			$sql = $wpdb->prepare(
-			'SELECT u.ID
-			FROM %1$s u ',
+			'SELECT u.ID FROM %1$s u ',
 			$wpdb->users,
 			);
 		}
@@ -77,11 +74,7 @@ final class Query {
 			);
 		} else {
 			$where = $wpdb->prepare(
-			" WHERE u.ID NOT IN (
-			SELECT DISTINCT u.ID
-			FROM %1\$s u
-			LEFT JOIN %2\$s um ON u.ID = um.user_id
-			WHERE um.meta_key = '%3\$s' AND um.meta_value = '%4\$s'
+			" WHERE u.ID NOT IN ( SELECT DISTINCT u.ID FROM %1\$s u LEFT JOIN %2\$s um ON u.ID = um.user_id WHERE um.meta_key = '%3\$s' AND um.meta_value = '%4\$s'
 			) ",
 				$wpdb->users,
 				$wpdb->usermeta,
@@ -125,9 +118,7 @@ final class Query {
 		global $wpdb;
 		// 查找總數
 		$count_query = $wpdb->prepare(
-					'SELECT DISTINCT COUNT(DISTINCT u.ID)
-						FROM %1$s u
-						INNER JOIN %2$s um ON u.ID = um.user_id',
+					'SELECT DISTINCT COUNT(DISTINCT u.ID) FROM %1$s u INNER JOIN %2$s um ON u.ID = um.user_id',
 						$wpdb->users,
 						$wpdb->usermeta,
 					) . $this->where;

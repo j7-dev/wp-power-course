@@ -31,11 +31,7 @@ abstract class User {
 		// 查找總數
 		$total = $wpdb->get_var(
 			$wpdb->prepare(
-			'SELECT DISTINCT COUNT(DISTINCT u.ID)
-			FROM %1$s u
-			INNER JOIN %2$s um ON u.ID = um.user_id
-			WHERE um.meta_key = "avl_course_ids"
-			AND um.meta_value = "%3$s"',
+			'SELECT DISTINCT COUNT(DISTINCT u.ID) FROM %1$s u INNER JOIN %2$s um ON u.ID = um.user_id WHERE um.meta_key = "avl_course_ids" AND um.meta_value = "%3$s"',
 			$wpdb->users,
 			$wpdb->usermeta,
 			(string) $course_id

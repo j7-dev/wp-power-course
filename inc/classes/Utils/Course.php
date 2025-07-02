@@ -672,15 +672,7 @@ abstract class Course {
 		// 执行查询
 		$top_selling_products = $wpdb->get_results(
 			$wpdb->prepare(
-				"
-    SELECT pm.post_id, CAST(pm.meta_value AS UNSIGNED) AS total_sales
-		FROM  %1\$s pm
-    JOIN  %1\$s pm2 ON pm.post_id = pm2.post_id
-    WHERE pm.meta_key = 'total_sales'
-		AND pm2.meta_key = '_is_course' AND pm2.meta_value = 'yes'
-    ORDER BY total_sales DESC
-    LIMIT %2\$d
-",
+				"SELECT pm.post_id, CAST(pm.meta_value AS UNSIGNED) AS total_sales FROM  %1\$s pm JOIN  %1\$s pm2 ON pm.post_id = pm2.post_id WHERE pm.meta_key = 'total_sales' AND pm2.meta_key = '_is_course' AND pm2.meta_value = 'yes' ORDER BY total_sales DESC LIMIT %2\$d ",
 		$wpdb->postmeta,
 				$limit
 			)
