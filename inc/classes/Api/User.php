@@ -128,66 +128,6 @@ final class User extends ApiBase {
 			);
 	}
 
-	/**
-	 * Format user details
-	 *
-	 * @deprecated 改用 Powerhouse User::instance()->to_array('list', $meta_keys)
-	 *
-	 * @param \WP_User $user  User.
-	 * @return array{id: string,user_login: string,user_email: string,display_name: string,user_registered: string,user_registered_human: string,user_avatar: string,avl_courses: array<string, mixed>}[]
-	 */
-	public function format_user_details( \WP_User $user ): array {
-
-		if ( ! ( $user instanceof \WP_User ) ) {
-			return [];
-		}
-		$user_id         = (int) $user->get( 'ID' );
-		$user_registered = $user->get( 'user_registered' );
-		$user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
-		$user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id );
-
-		$avl_course_ids =\get_user_meta($user_id, 'avl_course_ids');
-		$avl_course_ids = \is_array($avl_course_ids) ? $avl_course_ids : [];
-
-		// BUG: 有用戶因為章節太多，會 500 Error
-		$avl_courses = [];
-		foreach ($avl_course_ids as $i => $course_id) {
-			$course_id               = (int) $course_id;
-			$total_chapters_count    = count(ChapterUtils::get_flatten_post_ids($course_id));
-			$finished_chapters_count = count(CourseUtils::get_finished_sub_chapters($course_id, $user_id, true));
-
-			$avl_courses[ $i ]['id']                      = (string) $course_id;
-			$avl_courses[ $i ]['name']                    = \get_the_title($course_id);
-			$avl_courses[ $i ]['progress']                = CourseUtils::get_course_progress( $course_id, $user->ID );
-			$avl_courses[ $i ]['finished_chapters_count'] = $finished_chapters_count;
-			$avl_courses[ $i ]['total_chapters_count']    = $total_chapters_count;
-			$avl_courses[ $i ]['expire_date']             = ExpireDate::instance($course_id, $user_id)->to_array();
-			$all_chapter_ids                              = ChapterUtils::get_flatten_post_ids($course_id);
-
-			foreach ($all_chapter_ids as $j => $chapter_id) {
-				$chapter                                     = new Chapter( (int) $chapter_id, (int) $user_id );
-				$avl_courses[ $i ]['chapters'][ $j ]['id']   = (string) $chapter_id;
-				$avl_courses[ $i ]['chapters'][ $j ]['name'] = \get_the_title($chapter_id);
-				$avl_courses[ $i ]['chapters'][ $j ]['chapter_video'] = \get_post_meta($chapter_id, 'chapter_video', true);
-				$avl_courses[ $i ]['chapters'][ $j ]['is_finished']   = (bool) $chapter->finished_at;
-			}
-		}
-
-		$base_array = [
-			'id'                    => (string) $user_id,
-			'user_login'            => $user->user_login,
-			'user_email'            => $user->user_email,
-			'display_name'          => $user->display_name,
-			'user_registered'       => $user_registered,
-			'user_registered_human' => \human_time_diff( \strtotime( $user_registered ) ),
-			'user_avatar_url'       => $user_avatar_url,
-			'description'           => $user->description,
-			'avl_courses'           => $avl_courses,
-			'is_teacher'            => \get_user_meta($user_id, 'is_teacher', true) === 'yes',
-		];
-
-		return $base_array;
-	}
 
 
 
