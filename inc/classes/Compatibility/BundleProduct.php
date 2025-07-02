@@ -18,11 +18,7 @@ final class BundleProduct {
 
 		$bundle_ids = $wpdb->get_col(
 		$wpdb->prepare(
-			"SELECT DISTINCT p.ID
-				FROM {$wpdb->posts} p
-				JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-				WHERE p.post_type = 'product'
-				AND pm.meta_key = 'bundle_type'"
+			"SELECT DISTINCT p.ID FROM {$wpdb->posts} p JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id WHERE p.post_type = 'product' AND pm.meta_key = 'bundle_type'"
 		)
 		);
 

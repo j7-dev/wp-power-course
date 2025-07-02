@@ -287,10 +287,10 @@ final class Api extends ApiBase {
 	 */
 	public function extend_finished_chapters_count_stats( $data, $query_args ) {
 		global $wpdb;
-		$sql = $this->get_chapter_sql( $query_args );
 
+		$sql = $this->get_chapter_sql( $query_args );
 		/** @var array<int, array{time_interval: string, record_value: string}> $results */
-		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
+			$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
 		$total_finished_chapters_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
 
 		$data->totals->finished_chapters_count = $total_finished_chapters_count;
@@ -331,19 +331,14 @@ final class Api extends ApiBase {
 			$where_clause = 'AND post_id IN (' . implode(',', $query_args['product_includes']) . ')';
 		}
 
-		return "SELECT
-					{$date_format} as time_interval,
-					COUNT(DISTINCT user_id) as record_value
-			FROM
-					{$table_name}
-			WHERE
-					meta_key = 'course_granted_at'
-					{$where_clause}
-					AND meta_value BETWEEN '{$after}' AND '{$before}'
-			GROUP BY
-					time_interval
-			ORDER BY
-					time_interval ASC;";
+		return $wpdb->prepare(
+			"SELECT %1\$s as time_interval, COUNT(DISTINCT user_id) as record_value FROM %2\$s WHERE meta_key = 'course_granted_at' %3\$s AND meta_value BETWEEN '%4\$s' AND '%5\$s' GROUP BY time_interval ORDER BY time_interval ASC;",
+			$date_format,
+			$table_name,
+			$where_clause,
+			$after,
+			$before
+		);
 	}
 
 
@@ -380,19 +375,14 @@ final class Api extends ApiBase {
 			$where_clause = 'AND post_id IN (' . implode(',', $chapter_ids_in_specific_course) . ')';
 		}
 
-		return "SELECT
-					{$date_format} as time_interval,
-					COUNT(meta_value) as record_value
-			FROM
-					{$table_name}
-			WHERE
-					meta_key = 'finished_at'
-					{$where_clause}
-					AND meta_value BETWEEN '{$after}' AND '{$before}'
-			GROUP BY
-					time_interval
-			ORDER BY
-					time_interval ASC;";
+		return $wpdb->prepare(
+			"SELECT %1\$s as time_interval, COUNT(meta_value) as record_value FROM %2\$s WHERE meta_key = 'finished_at' %3\$s AND meta_value BETWEEN '%4\$s' AND '%5\$s' GROUP BY time_interval ORDER BY time_interval ASC;",
+			$date_format,
+			$table_name,
+			$where_clause,
+			$after,
+			$before
+		);
 	}
 
 	/**

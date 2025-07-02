@@ -309,15 +309,7 @@ final class LifeCycle {
 
 		$course_ids = $wpdb->get_col(
 		$wpdb->prepare(
-		"SELECT p.ID
-        FROM {$wpdb->posts} p
-        LEFT JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'course_launch_action_done'
-        JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'course_schedule'
-        WHERE p.post_type = 'product'
-        AND p.post_status = 'publish'
-        AND (pm1.meta_value IS NULL OR pm1.meta_value != 'yes')
-        AND pm2.meta_value < %d
-				AND pm2.meta_value > 0",
+		"SELECT p.ID FROM {$wpdb->posts} p LEFT JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'course_launch_action_done' JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'course_schedule' WHERE p.post_type = 'product' AND p.post_status = 'publish' AND (pm1.meta_value IS NULL OR pm1.meta_value != 'yes') AND pm2.meta_value < %d AND pm2.meta_value > 0",
 		time()
 		)
 		);

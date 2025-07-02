@@ -27,11 +27,7 @@ final class Chapter {
 		$course_ids = $wpdb->get_col(
 			\wp_unslash( // phpcs:ignore
 			$wpdb->prepare(
-				"SELECT p.ID FROM {$wpdb->posts} p
-				LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
-				WHERE p.post_type = 'product'
-				AND pm.meta_key = '_is_course'
-				AND pm.meta_value = 'yes'"
+				"SELECT p.ID FROM {$wpdb->posts} p LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id WHERE p.post_type = 'product' AND pm.meta_key = '_is_course' AND pm.meta_value = 'yes'"
 			)
 				)
 		);
