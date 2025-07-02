@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tag, Form, FormItemProps } from 'antd'
+import { Tag, Form } from 'antd'
 import { uniq } from 'lodash-es'
 import { TProductSelectOption } from '@/components/product/ProductTable/types'
 import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
@@ -32,6 +32,17 @@ const Tags = ({
 	}
 
 	const course = useRecord()
+
+	if (isLoading) {
+		return new Array(5)
+			.fill(0)
+			.map((_, index) => (
+				<div
+					key={index}
+					className="w-16 h-6 bg-gray-200 rounded-md animate-pulse mr-2 inline-block"
+				/>
+			))
+	}
 
 	return (
 		<div className="mb-4">
