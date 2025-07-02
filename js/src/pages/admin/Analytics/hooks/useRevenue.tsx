@@ -17,7 +17,7 @@ import {
 	defaultQuery,
 } from '@/pages/admin/Analytics/types'
 import { Form } from 'antd'
-import { round } from 'lodash-es'
+import { round, uniq } from 'lodash-es'
 import { objToCrudFilters } from 'antd-toolkit/refine'
 
 export type TUseRevenueParams = {
@@ -27,18 +27,37 @@ export type TUseRevenueParams = {
 
 const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 	const apiUrl = useApiUrl('power-course')
+	const [form] = Form.useForm()
+
 	const DEFAULT_QUERY = {
 		...defaultQuery,
 		...initialQuery,
 	}
-	const [query, setQuery] = useState(DEFAULT_QUERY)
-	const { compare_last_year } = query
+
+	const [enabled, setEnabled] = useState(false)
+	const compare_last_year = Form.useWatch(['compare_last_year'], form)
+	const date_range = Form.useWatch(['date_range'], form)
+	const product_ids = Form.useWatch(['products'], form) || []
+	const bundle_product_ids = Form.useWatch(['bundle_products'], form) || []
+	const interval = Form.useWatch(['interval'], form)
+
+	const query = {
+		...DEFAULT_QUERY,
+		compare_last_year,
+		after: date_range?.[0],
+		before: date_range?.[1],
+		product_includes: uniq([...product_ids, ...bundle_product_ids]),
+		interval,
+	}
 
 	const result = useCustom<TRevenue>({
 		url: `${apiUrl}/reports/revenue/stats`,
 		method: 'get',
 		config: {
 			filters: objToCrudFilters(query),
+		},
+		queryOptions: {
+			enabled,
 		},
 	})
 
@@ -57,7 +76,7 @@ const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 			filters: objToCrudFilters(lastYearQuery),
 		},
 		queryOptions: {
-			enabled: compare_last_year,
+			enabled: !!compare_last_year && enabled,
 		},
 	})
 
@@ -71,15 +90,11 @@ const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 	// @ts-ignore
 	const total = Number(result?.data?.headers?.['x-wp-total']) || 1
 
-	const [form] = Form.useForm()
-
 	useEffect(() => {
-		form.setFieldsValue({
-			...DEFAULT_QUERY,
-			products: DEFAULT_QUERY?.product_includes,
-			product_includes: undefined,
-		})
-	}, [JSON.stringify(DEFAULT_QUERY)])
+		if (result.isSuccess || result.isError) {
+			setEnabled(false)
+		}
+	}, [result])
 
 	return {
 		result: formattedResult,
@@ -91,8 +106,8 @@ const useRevenue = ({ initialQuery, context }: TUseRevenueParams) => {
 			? result.isFetching || lastYearResult.isFetching
 			: result.isFetching,
 		form,
-		query,
-		setQuery,
+		enabled,
+		setEnabled,
 		filterProps: {
 			isFetching: result.isFetching,
 			isLoading: result.isLoading,

@@ -1,5 +1,5 @@
 import { memo, useState, useEffect } from 'react'
-import { Skeleton } from 'antd'
+import { Skeleton, Form } from 'antd'
 import Filter from '@/pages/admin/Analytics/Filter'
 import useRevenue, {
 	TUseRevenueParams,
@@ -26,7 +26,7 @@ const AnalyticsComponent = (props: TUseRevenueParams) => {
 	return (
 		<RevenueContext.Provider
 			value={{
-				context: props?.context,
+				...props,
 				viewType,
 				setViewType,
 				...revenueData,
