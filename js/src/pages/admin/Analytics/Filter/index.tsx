@@ -40,6 +40,9 @@ const index = () => {
 				meta_key: 'link_course_ids',
 				meta_compare: 'NOT EXISTS',
 			}),
+			queryOptions: {
+				enabled: context !== 'detail',
+			},
 		})
 
 	const productSelectOptions = productQuery?.data?.data || []
