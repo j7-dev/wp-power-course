@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { Card, Form, Tooltip } from 'antd'
 import { Line, LineConfig } from '@ant-design/plots'
 import dayjs from 'dayjs'
@@ -7,6 +7,7 @@ import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
 import { cards, tickFilter } from '@/pages/admin/Analytics/utils'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import { nanoid } from 'nanoid'
+import LoadingCard from '@/pages/admin/Analytics/ViewType/LoadingCard'
 import { TrendIndicator } from 'antd-toolkit'
 
 const Default = () => {
@@ -51,38 +52,9 @@ const Default = () => {
 		return (
 			<>
 				<div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
-					{cards.map((card) => {
-						// 隨機產生 10 個 2~15 的 array
-						const randomArray = Array.from(
-							{ length: 12 },
-							() => Math.floor(Math.random() * 8) + 2,
-						)
-
-						return (
-							<Card
-								key={card.slug}
-								title={card?.title}
-								extra={
-									<span className="text-sm text-gray-400 flex items-center">
-										共
-										<span className="bg-gray-200 inline-block w-10 h-4 rounded-md mx-2 animate-pulse"></span>
-										{card.unit}
-									</span>
-								}
-								variant="borderless"
-							>
-								<div className="aspect-video grid grid-cols-12 gap-x-4 items-end animate-pulse">
-									{randomArray.map((n) => (
-										<div
-											key={nanoid(4)}
-											className="w-full bg-gray-200"
-											style={{ height: `${n * 10}%` }}
-										></div>
-									))}
-								</div>
-							</Card>
-						)
-					})}
+					{cards.map((card) => (
+						<LoadingCard key={card.slug} card={card} />
+					))}
 				</div>
 			</>
 		)
