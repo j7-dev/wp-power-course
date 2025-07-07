@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { Form, Button, Tabs, TabsProps } from 'antd'
-import useOptions from './hooks/useOptions'
+import useSettings from './hooks/useSettings'
 import useSave from './hooks/useSave'
 import General from './General'
 import Appearance from './Appearance'
@@ -22,7 +22,7 @@ const index = () => {
 	const [form] = Form.useForm()
 	const { handleSave, mutation } = useSave({ form })
 	const { isLoading: isSaveLoading } = mutation
-	const { isLoading: isGetLoading } = useOptions({ form })
+	const { isLoading: isGetLoading } = useSettings({ form })
 
 	return (
 		<Form layout="vertical" form={form} onFinish={handleSave}>

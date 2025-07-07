@@ -5,7 +5,7 @@
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
-use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 $default_args = [

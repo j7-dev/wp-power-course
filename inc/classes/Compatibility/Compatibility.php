@@ -6,7 +6,9 @@ namespace J7\PowerCourse\Compatibility;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\AbstractTable;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 use J7\Powerhouse\Settings\Model\Settings as PowerhouseSettings;
+use J7\WpUtils\Classes\General;
 
 
 /** Class Compatibility 不同版本間的相容性設定 */
@@ -78,6 +80,11 @@ final class Compatibility {
 			self::migration_bunny_settings();
 		}
 
+		// 0.10.0 之後使用新的設定
+		if (version_compare(Plugin::$version, '0.10.0', '<=')) {
+			self::migration_settings();
+		}
+
 		/**
 		 * ============== END 相容性代碼 ==============
 		 */
@@ -139,6 +146,26 @@ final class Compatibility {
 
 		foreach ($ids as $id) {
 			\add_post_meta($id, '_is_course', 'no');
+		}
+	}
+
+
+	/**
+	 * 將設定從 option 轉移到 power_course_settings 這個 option_name 底下
+	 *
+	 * @return void
+	 */
+	private static function migration_settings(): void {
+		$settings = Settings::instance();
+		// 取得 $settings 的 public 屬性
+		$properties = get_object_vars($settings);
+		foreach ($properties as $property => $default_value) {
+			$original_value      = \get_option($property, $default_value);
+			$settings->$property = General::to_same_type( $settings->$property, $original_value );
+		}
+		$settings->save();
+		foreach ($properties as $property => $default_value) {
+			\delete_option($property);
 		}
 	}
 }

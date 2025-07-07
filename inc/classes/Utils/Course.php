@@ -1,8 +1,4 @@
 <?php
-/**
- * Course
- * TODO 移動到 Resources 底下
- */
 
 declare ( strict_types=1 );
 
@@ -11,12 +7,13 @@ namespace J7\PowerCourse\Utils;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
-use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 
 /**
  * Class Course
+ * TODO 移動到 Resources 底下
  */
 abstract class Course {
 

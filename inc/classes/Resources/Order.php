@@ -1,8 +1,4 @@
 <?php
-/**
- * Order
- * 處理訂單相關業務
- */
 
 declare( strict_types=1 );
 
@@ -15,9 +11,11 @@ use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Course\BindCoursesData;
 use J7\PowerCourse\Resources\Course\BindCourseData;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /**
  * Class Order
+ * 處理訂單相關業務
  */
 final class Order {
 	use \J7\WpUtils\Traits\SingletonTrait;
@@ -28,7 +26,8 @@ final class Order {
 		\add_action( 'woocommerce_new_order', [ $this, 'add_course_item_meta' ], 10, 2 );
 		\add_action( 'woocommerce_subscription_payment_complete', [ $this, 'add_course_item_meta_by_subscription' ], 10, 1 );
 
-		\add_action( 'woocommerce_order_status_completed', [ $this, 'add_meta_to_avl_course' ], 10, 1 );
+		$settings = Settings::instance();
+		\add_action( "woocommerce_order_status_{$settings->course_access_trigger}", [ $this, 'add_meta_to_avl_course' ], 10, 1 );
 
 		// \add_action( 'woocommerce_subscription_pre_update_status', [ $this, 'subscription_failed' ], 10, 3 );
 

@@ -7,7 +7,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Theme\Core\FrontEnd as Theme;
-use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 
 
 
