@@ -55,6 +55,7 @@ final class Option extends ApiBase {
 	 * @var array<string, string|int> $fields 允許獲取 & 預設值
 	 */
 	private $fields = [
+		'course_access_trigger'         => 'completed', // 當訂單處於什麼狀態時，會觸發課程開通
 		'course_permalink_structure'    => '',
 		'hide_myaccount_courses'        => 'no', // 是否隱藏我的帳戶中的課程
 		'fix_video_and_tabs_mobile'     => 'no', // 手機板時，影片以及 tabs 黏性(sticky)置頂
