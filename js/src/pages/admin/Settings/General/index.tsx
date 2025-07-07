@@ -1,23 +1,40 @@
 import { memo } from 'react'
-import { Form, Input, InputNumber, ColorPicker, Alert } from 'antd'
+import { Form, Input, InputNumber, ColorPicker, Alert, Select } from 'antd'
 import { Heading, SimpleImage } from '@/components/general'
+import { useWoocommerce } from 'antd-toolkit/wp'
 import cantPlayVideo from '@/assets/images/cant_play.jpg'
 
 const { Item } = Form
 
+const DEFAULT_ORDER_STATUS_OPTIONS = [
+	{ label: '完成付款', value: 'completed' },
+	{ label: '處理中', value: 'completed' },
+]
+
 const index = () => {
+	const { order_statuses = DEFAULT_ORDER_STATUS_OPTIONS } = useWoocommerce()
+	const paid_statuses = order_statuses?.filter(
+		(status) =>
+			![
+				'pending',
+				'on-hold',
+				'cancelled',
+				'refunded',
+				'failed',
+				'checkout-draft',
+			]?.includes(status?.value),
+	)
+
 	return (
 		<div className="flex flex-col md:flex-row gap-8">
 			<div className="w-full max-w-[400px]">
-				<Heading className="mt-8">擴展課程銷售頁永久連結設定</Heading>
+				<Heading className="mt-8">課程開通時機</Heading>
 				<Item
-					name={['course_permalink_structure']}
-					label="擴充課程銷售頁的永久連結結構"
-					tooltip="例如: courses/{slug} 當用戶前往 courses/{slug} 時，也能看到課程銷售頁"
+					name={['course_access_trigger']}
+					label="當訂單處於什麼狀態時，會觸發課程開通"
 				>
-					<Input allowClear />
+					<Select options={paid_statuses} />
 				</Item>
-
 				<Heading className="mt-8">教室影片浮水印設定</Heading>
 				<Alert
 					className="mb-4"
@@ -126,6 +143,15 @@ const index = () => {
 							},
 						]}
 					/>
+				</Item>
+
+				<Heading className="mt-8">擴展課程銷售頁永久連結設定</Heading>
+				<Item
+					name={['course_permalink_structure']}
+					label="擴充課程銷售頁的永久連結結構"
+					tooltip="如果輸入 'courses' ，當用戶前往 courses/{slug} 時，也能看到課程銷售頁"
+				>
+					<Input placeholder="例如: courses" allowClear />
 				</Item>
 			</div>
 			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto">
