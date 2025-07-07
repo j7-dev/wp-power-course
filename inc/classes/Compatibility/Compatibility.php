@@ -75,13 +75,14 @@ final class Compatibility {
 
 		BundleProduct::set_catalog_visibility_to_hidden();
 
+		$previous_version = \get_option('pc_compatibility_action_scheduled', '0.0.0');
 		// 0.9.0 之前版本
-		if (version_compare(Plugin::$version, '0.9.0', '<=')) {
+		if (version_compare($previous_version, '0.9.0', '<=')) {
 			self::migration_bunny_settings();
 		}
 
 		// 0.10.0 之後使用新的設定
-		if (version_compare(Plugin::$version, '0.10.0', '<=')) {
+		if (version_compare($previous_version, '0.10.0', '<=')) {
 			self::migration_settings();
 		}
 
