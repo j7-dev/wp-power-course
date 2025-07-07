@@ -8,11 +8,7 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
-use J7\PowerCourse\Resources\Chapter\Models\Chapter;
-use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
-use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Resources\Course\LifeCycle;
-use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /** Class Api */
 final class User extends ApiBase {

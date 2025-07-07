@@ -17,7 +17,7 @@ const useSave = ({ form }: { form: FormInstance }) => {
 		form.validateFields().then((values) => {
 			mutate(
 				{
-					url: `${apiUrl}/options`,
+					url: `${apiUrl}/settings`,
 					method: 'post',
 					values,
 				},
@@ -35,6 +35,12 @@ const useSave = ({ form }: { form: FormInstance }) => {
 						// invalidate({
 						// 	invalidates: ['all'],
 						// })
+					},
+					onError: () => {
+						message.error({
+							content: '儲存失敗',
+							key: 'save',
+						})
 					},
 				},
 			)

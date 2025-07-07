@@ -11,7 +11,7 @@ use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Chapter\Core\CPT;
-use J7\PowerCourse\Resources\Chapter\Models\Chapter;
+use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Domains\Post\Utils as PostUtils;
 

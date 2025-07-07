@@ -1,3 +1,3 @@
-export type TOptions = {
+export type TSettings = {
 	[key: string]: any
 }

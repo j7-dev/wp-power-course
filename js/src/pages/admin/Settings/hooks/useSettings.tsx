@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react'
 import { useCustom, useApiUrl } from '@refinedev/core'
 import { FormInstance } from 'antd'
-import { TOptions } from '../types'
+import { TSettings } from '../types'
 
-type TOptionResponse = {
+type TSettingsResponse = {
 	code: string
-	data: TOptions
+	data: TSettings
 	message: string
 }
 
-const useOptions = ({ form }: { form: FormInstance }) => {
+const useSettings = ({ form }: { form: FormInstance }) => {
 	const apiUrl = useApiUrl('power-course')
-	const result = useCustom<TOptionResponse>({
-		url: `${apiUrl}/options`,
+	const result = useCustom<TSettingsResponse>({
+		url: `${apiUrl}/settings`,
 		method: 'get',
 	})
 
@@ -27,4 +27,4 @@ const useOptions = ({ form }: { form: FormInstance }) => {
 	return result
 }
 
-export default useOptions
+export default useSettings

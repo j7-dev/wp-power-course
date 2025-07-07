@@ -1,18 +1,14 @@
 <?php
-/**
- * Chapter
- * 用戶可以上的章節
- */
 
 declare( strict_types=1 );
 
-namespace J7\PowerCourse\Resources\Chapter\Models;
+namespace J7\PowerCourse\Resources\Chapter\Model;
 
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD;
 
-/** Class Chapter */
+/** Class Chapter 用戶可以上的章節 */
 final class Chapter {
 
 	/** @var int Chapter ID */

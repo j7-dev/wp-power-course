@@ -16,5 +16,6 @@ final class Loader {
 		Comment::instance();
 		Course\LifeCycle::instance();
 		Teacher\Core\ExtendQuery::instance();
+		Settings\Core\Api::instance();
 	}
 }
