@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Resources\Student\Core;
 
-use J7\PowerCourse\Resources\Student\Services\ExportCSV;
-use J7\PowerCourse\Resources\Student\Services\Query;
+use J7\PowerCourse\Resources\Student\Service\ExportCSV;
+use J7\PowerCourse\Resources\Student\Service\Query;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Course\ExpireDate;
 use J7\PowerCourse\Utils\Course as CourseUtils;
