@@ -84,7 +84,7 @@ final class Compatibility {
 
 		// ❗不要刪除此行，註記已經執行過相容設定
 		\update_option('pc_compatibility_action_scheduled', Plugin::$version);
-
+		\wp_cache_flush();
 		Plugin::logger(Plugin::$version . ' 已執行兼容性設定', 'info');
 	}
 
