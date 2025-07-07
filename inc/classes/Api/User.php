@@ -8,7 +8,7 @@ use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\ApiBase;
 use J7\WpUtils\Classes\File;
 use J7\WpUtils\Classes\UniqueArray;
-use J7\PowerCourse\Resources\Course\LifeCycle;
+use J7\PowerCourse\Resources\Course\Service\AddStudent;
 
 /** Class Api */
 final class User extends ApiBase {
@@ -358,6 +358,7 @@ final class User extends ApiBase {
 		$unique_array_instance = new UniqueArray($current_batch_rows);
 		$unique_rows           = $unique_array_instance->get_list();
 		$email_content         = '';
+		$add_student           = new AddStudent();
 		foreach ($unique_rows as $csv_row) {
 			$email       = $csv_row[0];
 			$course_id   = $csv_row[1];
@@ -402,10 +403,12 @@ final class User extends ApiBase {
 				$expire_date = (int) $expire_date;
 			}
 
-			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date, null );
+			$add_student->add_item( (int) $user_id, (int) $course_id, $expire_date, null );
 
 			$email_content .= "用戶 #{$user_id} 獲得課程 #{$course_id} 權限，到期日 {$expire_date} \n\n";
 		}
+
+		$add_student->do_action();
 
 		// ----- ▼ 寫入 log 以及 email 文字檔 ----- //
 		$attachment_url = \wp_get_attachment_url($attachment_id);
