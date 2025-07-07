@@ -7,11 +7,11 @@ namespace J7\PowerCourse\Resources;
 use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Utils\Course as CourseUtils;
-use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Course\BindCoursesData;
 use J7\PowerCourse\Resources\Course\BindCourseData;
 use J7\PowerCourse\Resources\Settings\Model\Settings;
+use J7\PowerCourse\Resources\Course\Service\AddStudent;
 
 /**
  * Class Order
@@ -205,6 +205,9 @@ final class Order {
 			return;
 		}
 
+		// 使用 AddStudent 來處理課程授權
+		$add_student = new AddStudent();
+
 		$items = $order->get_items();
 		foreach ( $items as $item ) {
 			/**
@@ -222,14 +225,16 @@ final class Order {
 
 			// 如果是單一課程，就處理單一課程
 			if ($is_course) {
-				$this->handle_single_course( $order, $item );
+				$this->handle_single_course( $order, $item, $add_student );
 			}
 
 			// 如果有綁定課程，就處理綁定課程
 			if ($bind_courses_data) {
-				$this->handle_bind_courses( $order, $item );
+				$this->handle_bind_courses( $order, $item, $add_student );
 			}
 		}
+
+		$add_student->do_action();
 	}
 
 	/**
@@ -237,9 +242,10 @@ final class Order {
 	 *
 	 * @param \WC_Order              $order 訂單
 	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
+	 * @param AddStudent             $add_student 新增學員到課程
 	 * @return void
 	 */
-	public function handle_bind_courses( $order, $item ): void {
+	public function handle_bind_courses( $order, $item, $add_student ): void {
 		$customer_id = $order->get_customer_id();
 		if (!$customer_id) {
 			return;
@@ -258,7 +264,7 @@ final class Order {
 
 			$expire_date = $bind_course_data->calc_expire_date($order);
 
-			\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $bind_course_data->course_id, $expire_date, $order );
+			$add_student->add_item( $customer_id, $bind_course_data->course_id, $expire_date, $order );
 		}
 	}
 
@@ -268,9 +274,10 @@ final class Order {
 	 *
 	 * @param \WC_Order              $order 訂單
 	 * @param \WC_Order_Item_Product $item 訂單項目，需為 WooCommerce 的產品項目實例。
+	 * @param AddStudent             $add_student 新增學員到課程
 	 * @return void
 	 */
-	public function handle_single_course( $order, $item ): void {
+	public function handle_single_course( $order, $item, $add_student ): void {
 		$customer_id = $order->get_customer_id();
 		if (!$customer_id) {
 			return;
@@ -278,7 +285,6 @@ final class Order {
 
 		$product_id  = (int) $item->get_product_id();
 		$expire_date = Limit::instance($product_id)->calc_expire_date($order);
-
-		\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $customer_id, $product_id, $expire_date, $order );
+		$add_student->add_item( $customer_id, $product_id, $expire_date, $order );
 	}
 }

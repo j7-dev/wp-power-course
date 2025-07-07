@@ -11,6 +11,7 @@ namespace J7\PowerCourse\Api\Course;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\StudentLog\CRUD as StudentLogCRUD;
+use J7\PowerCourse\Resources\Course\Service\AddStudent;
 
 /**
  * Trait UserTrait
@@ -77,11 +78,14 @@ trait UserTrait {
 				throw new \Exception('新增學員失敗，缺少 user_ids 或 course_ids');
 			}
 
+			$add_student = new AddStudent();
 			foreach ($course_ids as $course_id) {
 				foreach ($user_ids as  $user_id) {
-					\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, (int) $user_id, (int) $course_id, $expire_date, null );
+					$add_student->add_item( (int) $user_id, (int) $course_id, $expire_date, null );
 				}
 			}
+
+			$add_student->do_action();
 
 			return new \WP_REST_Response(
 				[
