@@ -5,7 +5,7 @@
 
 use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Plugin;
-use J7\PowerCourse\Utils\Base;
+use J7\Powerhouse\Domains\Product\Utils\Subscription;
 
 $default_args = [
 	'product' => null, // BundleProduct
@@ -128,7 +128,7 @@ echo '</div>';
 
 
 if ('subscription' === $product->get_type()) {
-	$product_meta_data = Base::get_subscription_product_meta_data_label( $product );
+	$product_meta_data = Subscription::get_meta_data_label( $product );
 	echo '<div class="grid grid-cols-2 gap-y-1.5 mt-2">';
 	foreach ($product_meta_data as $key => $meta_data) {
 		printf(

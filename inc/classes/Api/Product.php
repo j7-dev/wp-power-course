@@ -1,7 +1,4 @@
 <?php
-/**
- * Product API
- */
 
 declare(strict_types=1);
 
@@ -12,16 +9,12 @@ use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\WC;
 use J7\PowerCourse\BundleProduct\Helper;
-use J7\PowerCourse\Utils\Base;
 use J7\WpUtils\Classes\WC\Product as WcProduct;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Course\BindCoursesData;
+use J7\Powerhouse\Domains\Product\Utils\CRUD;
 
-
-
-/**
- * Class Product
- */
+/** Product API */
 final class Product {
 	use \J7\WpUtils\Traits\SingletonTrait;
 	use \J7\WpUtils\Traits\ApiRegisterTrait;
@@ -510,7 +503,7 @@ final class Product {
 			}
 		}
 
-		$price_html = Base::get_price_html( $product );
+		$price_html = CRUD::get_price_html( $product );
 
 		$product_id = $product->get_id();
 

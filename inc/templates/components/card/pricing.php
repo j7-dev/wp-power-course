@@ -7,6 +7,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
+use J7\Powerhouse\Domains\Product\Utils\CRUD;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -99,7 +100,7 @@ $product->get_permalink(),
 	$name,
 	$tags_html,
 	$teacher_name,
-	Base::get_price_html($product),
+	CRUD::get_price_html($product),
 	$course_length_html,
 	$total_student_html,
 );

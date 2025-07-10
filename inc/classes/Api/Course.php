@@ -1,7 +1,4 @@
 <?php
-/**
- * Course API
- */
 
 declare( strict_types=1 );
 
@@ -11,7 +8,6 @@ use J7\WpUtils\Classes\ApiBase;
 use J7\PowerCourse\Admin\Product as AdminProduct;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
-use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\WC;
 use J7\WpUtils\Classes\WP;
@@ -19,11 +15,9 @@ use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Course\LifeCycle;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\BundleProduct\Helper;
+use J7\Powerhouse\Domains\Product\Utils\CRUD;
 
-
-/**
- * Class Course
- */
+/** Course API */
 final class Course extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
 	use Course\UserTrait;
@@ -292,7 +286,7 @@ final class Course extends ApiBase {
 
 		$regular_price = $product->get_regular_price();
 		$sale_price    = $product->get_sale_price();
-		$price_html    = Base::get_price_html( $product );
+		$price_html    = CRUD::get_price_html($product);
 		$product_id    = $product->get_id();
 		$categories    = Product::format_terms(
 			[
