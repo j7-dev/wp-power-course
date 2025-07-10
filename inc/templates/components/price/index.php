@@ -3,7 +3,7 @@
  * Price component
  */
 
-use J7\PowerCourse\Utils\Base;
+use J7\Powerhouse\Domains\Product\Utils\CRUD;
 
 $default_args = [
 	'product' => null,
@@ -25,7 +25,7 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	return;
 }
 
-$price_html = Base::get_price_html( $product );
+$price_html = CRUD::get_price_html( $product );
 echo '<div class="pc-price-html">';
 echo $price_html;
 echo '</div>';
