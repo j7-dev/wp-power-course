@@ -1,7 +1,4 @@
 <?php
-/**
- * Chapter API
- */
 
 declare(strict_types=1);
 
@@ -16,30 +13,18 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
-use J7\PowerCourse\Utils\Base;
+use J7\Powerhouse\Utils\Base as PowerhouseBase;
 
 
 
-
-/** Class Api */
+/** Chapter Api */
 final class Api extends ApiBase {
 	use \J7\WpUtils\Traits\SingletonTrait;
 
-	/**
-	 * Namespace
-	 *
-	 * @var string
-	 */
+	/** @var string Namespace */
 	protected $namespace = 'power-course';
 
-	/**
-	 * APIs
-	 *
-	 * @var array{endpoint:string,method:string,permission_callback: callable|null }[]
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
-	 */
+	/** @var array{endpoint:string,method:string,permission_callback: callable|null }[] APIs */
 	protected $apis = [
 		[
 			'endpoint'            => 'chapters',
@@ -379,7 +364,7 @@ final class Api extends ApiBase {
 		$ids = (array) $body_params['ids'];
 
 		try {
-			$results        = Base::batch_process(
+			$results        = PowerhouseBase::batch_process(
 				$ids,
 				function ( int $id ) {
 					// 因為 wp_trash_post 有 hook 會遞規刪除子文章，所以這邊要先檢查狀態
