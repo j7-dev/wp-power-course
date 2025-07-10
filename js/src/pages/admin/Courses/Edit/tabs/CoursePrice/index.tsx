@@ -50,7 +50,11 @@ const CoursePriceComponent = ({ formProps }: { formProps: FormProps }) => {
 
 					{isSubscription && <SubscriptionPriceFields />}
 
-					<SimplePriceFields />
+					<SimplePriceFields
+						regularPriceItemProps={{
+							hidden: isSubscription,
+						}}
+					/>
 
 					<StockFields />
 				</div>
