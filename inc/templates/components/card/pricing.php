@@ -72,8 +72,8 @@ $course_length_html = Plugin::load_template('icon/clock', null, false) . $course
 // 學員人數
 $total_student      = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
 $show_total_student = \wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes');
-$total_student      = $show_total_student ? $total_student : '-';
-$total_student_html = Plugin::load_template('icon/team', null, false) . $total_student;
+$total_student      = $total_student;
+$total_student_html = $show_total_student ? Plugin::load_template('icon/team', null, false) . $total_student : '';
 
 printf(
 	/*html*/'
