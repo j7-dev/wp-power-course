@@ -30,19 +30,25 @@ final class AddStudent {
 	 * @return void
 	 */
 	public function add_item( int $customer_id, int $course_id, int|string $expire_date, \WC_Order|null $order ): void {
+		// 檢查原本的 $items 跟要添加的 課程 ID 與 學員 ID 是否相同
+		// 如果相同，則不添加
+		// 如果不同，則添加
 		$filtered_items = [];
 		foreach ($this->items as $item) {
-			if ($item->course_id !== $course_id && $item->customer_id !== $customer_id) {
-				$filtered_items[] = $item;
+			if ($item->course_id === $course_id && $item->customer_id === $customer_id) {
+				continue;
 			}
+			$filtered_items[] = $item;
 		}
+		// 如果沒有相同，則添加
 		$filtered_items[] = (object) [
 			'customer_id' => $customer_id,
 			'course_id'   => $course_id,
 			'expire_date' => $expire_date,
 			'order'       => $order,
 		];
-		$this->items      = $filtered_items;
+
+		$this->items = $filtered_items;
 	}
 
 	/** @return void 執行新增學員到課程 */
