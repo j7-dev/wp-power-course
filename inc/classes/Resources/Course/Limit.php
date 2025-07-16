@@ -171,13 +171,9 @@ class Limit {
 	 * 設定限制類型
 	 *
 	 * @param string $limit_type 限制類型 'unlimited' | 'fixed' | 'assigned' | 'follow_subscription'
-	 * @throws \Exception 如果限制類型無效
 	 */
 	private function set_limit_type( string $limit_type ): void {
-		if (!in_array($limit_type, [ 'unlimited', 'fixed', 'assigned', 'follow_subscription' ], true)) {
-			\J7\WpUtils\Classes\WC::log($limit_type, 'set_limit_type Invalid limit type');
-		}
-		$this->limit_type = $limit_type;
+		$this->limit_type = in_array($limit_type, [ 'unlimited', 'fixed', 'assigned', 'follow_subscription' ], true) ? $limit_type : 'unlimited';
 	}
 
 	/**
