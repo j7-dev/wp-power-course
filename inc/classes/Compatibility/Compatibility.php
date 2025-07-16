@@ -211,7 +211,7 @@ final class Compatibility {
 
 			// 新增欄位 - 表格名稱已經過驗證，使用反引號包圍確保安全
 			// 這是相容性更新，表格名稱來自常數，已經過驗證
-			$result = $wpdb->query("ALTER TABLE `{$table_name}` ADD COLUMN `identifier` varchar(100) DEFAULT NULL"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$result = $wpdb->query("ALTER TABLE `{$table_name}` ADD COLUMN `identifier` varchar(255) DEFAULT NULL"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 			if ($result === false) {
 				Plugin::logger(
