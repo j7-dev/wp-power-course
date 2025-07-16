@@ -116,6 +116,8 @@ final class CPT {
 			(int) $email->id,
 			$email->formatted_subject,
 			$email->trigger_at,
+			$email->get_identifier([ $course_id, $chapter_id ], $user_id ),
+			true,
 		);
 	}
 }
