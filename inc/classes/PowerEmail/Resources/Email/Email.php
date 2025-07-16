@@ -59,6 +59,7 @@ final class Email {
 	 * @param \WP_Post|int $post Post object or post ID.
 	 * @param bool         $show_description 是否顯示 Email 內容
 	 * @param bool         $api_format 是否為 API 格式，true 直接回傳 array 不是的話會 new Condition
+	 * // ENHANCE 之後改用 DTO 就可以巢狀 to_array 了 不需要用 $api_format 判斷
 	 */
 	public function __construct( $post, $show_description = true, $api_format = false ) {
 		$post         = $post instanceof \WP_Post ? $post : \get_post( $post );
@@ -136,40 +137,6 @@ final class Email {
 		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
 	}
 
-
-	/**
-	 * 是否在範圍內
-	 *
-	 * @deprecated
-	 *
-	 * @return bool
-	 */
-	public function is_in_range(): bool {
-		$condition = $this->condition;
-		if (!$condition) {
-			return false;
-		}
-
-		if ('day' !== $condition->sending_unit) {
-			return false;
-		}
-
-		if (empty($condition->sending_range)) {
-			return false;
-		}
-
-		// 取得 WordPress 時區
-		$wp_timezone = \wp_timezone();
-
-		// 建立今天 18:15 的 DateTime 物件
-		$start = new \DateTime("today {$condition->sending_range[0]}:00", $wp_timezone);
-		$end   = new \DateTime("today {$condition->sending_range[1]}:00", $wp_timezone);
-
-		$current_timestamp = time();
-		return $current_timestamp >= $start->getTimestamp() && $current_timestamp < $end->getTimestamp();
-	}
-
-
 	/**
 	 * 寄送課程 Email
 	 *
@@ -198,6 +165,45 @@ final class Email {
 			\do_action('power_email_after_send_email', $this, $user_id, $course_id, $chapter_id);
 		}
 		return $sent;
+	}
+
+	/**
+	 * 取得信件唯一標識符，用來判斷是否已寄送過
+	 *
+	 * @param array<int> $post_ids 文章/課程/章節 ID
+	 * @param int        $user_id 使用者 ID
+	 * @return string
+	 */
+	public function get_identifier( array $post_ids, int $user_id ): string {
+		$post_ids   = array_filter($post_ids);
+		$condition  = $this->condition;
+		$identifier = '';
+		$data       = [
+			'email_id' => $this->id,
+			'user_id'  => $user_id,
+			'ids'      => implode(',', $post_ids),
+		];
+
+		if ($condition instanceof Trigger\Condition) {
+
+			$qty          = null === $condition->qty ? 'null' : $condition->qty;
+			$required_ids = implode(',', $condition->required_ids);
+
+			// 如果條件是 全部達成時 | 達成指定數量時 就只用 required_ids 就好
+			// 因為 全部達成時 | 達成指定數量時 只需要寄一封信
+			if ('each' !== $condition->trigger_condition) {
+				$data['ids'] = $required_ids;
+			}
+
+			$data['trigger_at']        = $condition->trigger_at;
+			$data['trigger_condition'] = $condition->trigger_condition;
+			$data['qty']               = $qty;
+		}
+
+		foreach ($data as $key => $value) {
+			$identifier .= "{$key}:{$value}|";
+		}
+		return $identifier;
 	}
 
 	/**
@@ -279,16 +285,12 @@ final class Email {
 	 *
 	 * @param int $post_id 文章/課程/章節 ID
 	 * @param int $user_id 使用者 ID
-	 * @param int $email_id 信件 ID
 	 * @return bool
 	 */
-	public function is_sent( int $post_id, int $user_id, int $email_id ): bool {
+	public function is_sent( int $post_id, int $user_id ): bool {
 		$find_record = EmailRecord::get(
 			[
-				'post_id'      => $post_id,
-				'user_id'      => $user_id,
-				'email_id'     => $email_id,
-				'trigger_at'   => $this->trigger_at,
+				'identifier'   => $this->get_identifier([ $post_id ], $user_id),
 				'mark_as_sent' => 1,
 			]
 			);
