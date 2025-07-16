@@ -8,7 +8,8 @@
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
-use J7\Powerhouse\Settings\Model\Settings;
+use J7\Powerhouse\Settings\Model\Settings as PowerhouseSettings;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 $default_args = [
 	'class'          => 'rounded-xl',
@@ -43,7 +44,7 @@ $args = wp_parse_args( $args, $default_args );
 	'id'   => $video_id,
 ] = $video_info;
 
-$bunny_cdn_hostname = Settings::instance()->bunny_cdn_hostname;
+$bunny_cdn_hostname = PowerhouseSettings::instance()->bunny_cdn_hostname;
 
 $src = match ($video_info['type']) {
 	'youtube' => "youtube/{$video_id}",
@@ -63,12 +64,13 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 	return;
 }
 
+$settings = Settings::instance();
 /** @var string $watermark_qty */
-$watermark_qty = $hide_watermark ? '0' : \get_option( 'pc_watermark_qty', '0' );
+$watermark_qty = $hide_watermark ? '0' : (string) $settings->pc_watermark_qty;
 /** @var string $watermark_color */
-$watermark_color = \get_option( 'pc_watermark_color', 'rgba(205, 205, 205, 0.5)' );
+$watermark_color = $settings->pc_watermark_color;
 /** @var string $watermark_interval */
-$watermark_interval = \get_option( 'pc_watermark_interval', '10' );
+$watermark_interval = $settings->pc_watermark_interval;
 $watermark_text     = ChapterUtils::get_formatted_watermark_text();
 
 $autoplay = 'no';

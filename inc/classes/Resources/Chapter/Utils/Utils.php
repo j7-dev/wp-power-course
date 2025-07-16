@@ -1,7 +1,4 @@
 <?php
-/**
- * Chapter Utils
- */
 
 declare(strict_types=1);
 
@@ -14,9 +11,10 @@ use J7\PowerCourse\Resources\Chapter\Core\CPT;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Domains\Post\Utils as PostUtils;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /**
- * Class Utils
+ * Chapter Utils
  */
 abstract class Utils {
 
@@ -547,10 +545,11 @@ abstract class Utils {
 	 * @return string
 	 */
 	public static function get_formatted_watermark_text( ?string $type = 'video' ): string {
+		$settings = Settings::instance();
 		/** @var string $watermark_text */
 		$watermark_text = match ($type) {
-			'pdf'   => \get_option( 'pc_pdf_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}' ),
-			default => \get_option( 'pc_watermark_text', '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}' ),
+			'pdf'   => $settings->pc_pdf_watermark_text,
+			default => $settings->pc_watermark_text,
 		};
 
 		$wp_current_user = \wp_get_current_user();

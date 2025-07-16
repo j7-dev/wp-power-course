@@ -1,17 +1,15 @@
 <?php
-/**
- * Front-end MyAccount Page
- * 我的課程
- */
 
 declare( strict_types=1 );
 
 namespace J7\PowerCourse\FrontEnd;
 
 use J7\PowerCourse\Plugin;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /**
- * Class FrontEnd
+ * Front-end MyAccount Page
+ * 我的課程
  */
 final class MyAccount {
 	use \J7\WpUtils\Traits\SingletonTrait;
@@ -20,9 +18,8 @@ final class MyAccount {
 
 	/** Constructor */
 	public function __construct() {
-		$hide_myaccount_courses = \get_option( 'hide_myaccount_courses', 'no' );
-
-		if ( 'yes' === $hide_myaccount_courses ) {
+		$settings = Settings::instance();
+		if ( 'yes' === $settings->hide_myaccount_courses ) {
 			return;
 		}
 
