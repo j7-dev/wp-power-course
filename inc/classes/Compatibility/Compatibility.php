@@ -75,7 +75,7 @@ final class Compatibility {
 
 		BundleProduct::set_catalog_visibility_to_hidden();
 
-		$previous_version = \get_option('pc_compatibility_action_scheduled', '0.0.0');
+		$previous_version = \get_option('pc_compatibility_action_scheduled', '0.0.1');
 		// 0.9.0 之前版本
 		if (version_compare($previous_version, '0.9.0', '<=')) {
 			self::migration_bunny_settings();
@@ -84,6 +84,11 @@ final class Compatibility {
 		// 0.10.0 之後使用新的設定
 		if (version_compare($previous_version, '0.10.0', '<=')) {
 			self::migration_settings();
+		}
+
+		// 0.11.0 之後要對  {$prefix}_pc_email_records table 新增 identifier 欄位
+		if (version_compare($previous_version, '0.11.0', '<=')) {
+			self::extend_email_records_table_identifier_column();
 		}
 
 		/**
@@ -167,6 +172,75 @@ final class Compatibility {
 		$settings->save();
 		foreach ($properties as $property => $default_value) {
 			\delete_option($property);
+		}
+	}
+
+
+	/**
+	 * 對  {$prefix}_pc_email_records table 新增 identifier 欄位
+	 *
+	 * @return void
+	 */
+	private static function extend_email_records_table_identifier_column(): void {
+		global $wpdb;
+
+		$table_name = $wpdb->prefix . Plugin::EMAIL_RECORDS_TABLE_NAME;
+		try {
+			// 檢查表格是否存在
+			if (!$wpdb->get_var($wpdb->prepare('SHOW TABLES LIKE %s', $table_name))) {
+				Plugin::logger("表格 {$table_name} 不存在，無法新增 identifier 欄位", 'critical');
+				return;
+			}
+
+			// 檢查 identifier 欄位是否已存在
+			$column_exists = $wpdb->get_var(
+				$wpdb->prepare(
+				"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+				WHERE TABLE_SCHEMA = %s
+				AND TABLE_NAME = %s
+				AND COLUMN_NAME = 'identifier'",
+				DB_NAME,
+				$table_name
+			)
+				);
+
+			if ($column_exists > 0) {
+				// identifier 欄位已存在於表格 table 中，跳過新增
+				return;
+			}
+
+			// 新增欄位 - 表格名稱已經過驗證，使用反引號包圍確保安全
+			// 這是相容性更新，表格名稱來自常數，已經過驗證
+			$result = $wpdb->query("ALTER TABLE `{$table_name}` ADD COLUMN `identifier` varchar(100) DEFAULT NULL"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+			if ($result === false) {
+				Plugin::logger(
+					'新增 identifier 欄位失敗',
+					'critical',
+					[
+						'table_name' => $table_name,
+						'error'      => $wpdb->last_error,
+						'last_query' => $wpdb->last_query,
+					]
+				);
+				return;
+			}
+
+			Plugin::logger(
+				"成功新增 identifier 欄位到表格 {$table_name}",
+				'info',
+				[ 'table_name' => $table_name ]
+			);
+
+		} catch (\Throwable $th) {
+			Plugin::logger(
+				'新增 identifier 欄位時發生異常',
+				'critical',
+				[
+					'table_name' => $table_name,
+					'error'      => $th->getMessage(),
+				]
+			);
 		}
 	}
 }
