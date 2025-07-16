@@ -41,9 +41,9 @@ final class LifeCycle {
 	public function __construct() {
 
 		// 購買了有開課權限的商品時
-		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_order_created_log' ], 0, 4 );
+		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_order_created_log' ], 10, 4 );
 		// 開通課程權限
-		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_student_to_course' ], 10, 4 );
+		\add_action( self::ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_student_to_course' ], 20, 4 );
 
 		// 開通課程權限後
 		\add_action(self::AFTER_ADD_STUDENT_TO_COURSE_ACTION, [ __CLASS__, 'add_course_granted_log' ], 10, 4);
