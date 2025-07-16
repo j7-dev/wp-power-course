@@ -1,7 +1,4 @@
 <?php
-/**
- * Email Trigger Condition
- */
 
 declare( strict_types=1 );
 
@@ -14,7 +11,7 @@ use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Course\MetaCRUD as AVLCourseMeta;
 
 /**
- * Class Condition 觸發發信時機點
+ * Email Trigger Condition 觸發發信時機點
  */
 final class Condition {
 
@@ -274,9 +271,7 @@ final class Condition {
 			default => [],
 		};
 
-		if ( !is_array( $current_ids ) ) {
-			$current_ids = [];
-		}
+		$current_ids = \is_array($current_ids) ? $current_ids : [];
 
 		/** @var array<int, int> */
 		// @phpstan-ignore-next-line
