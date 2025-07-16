@@ -155,7 +155,8 @@ const index = () => {
 				</Item>
 			</div>
 			<div className="flex-1 h-auto md:h-[calc(100%-5.375rem)] md:overflow-y-auto">
-				<Heading className="mt-8">使用 Bunny 影片無法撥放嗎?</Heading>
+				<Heading className="mt-8">如果浮水印功能沒有顯示出來</Heading>
+				<p>請到Bunny關閉DRM功能，浮水印才會正常顯示喔</p>
 				<SimpleImage src={cantPlayVideo} ratio="aspect-[2.1]" />
 			</div>
 		</div>
