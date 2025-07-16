@@ -1,7 +1,4 @@
 <?php
-/**
- * Table trait
- */
 
 namespace J7\PowerCourse;
 
@@ -13,6 +10,11 @@ if ( class_exists( 'AbstractTable' ) ) {
 
 /**
  * 抽象類別，用來創建 table
+ * 功能
+ * 1. 創建 course table
+ * 2. 創建 chapter table
+ * 3. 創建 email records table
+ * 4. 創建 student logs table
  */
 abstract class AbstractTable {
 	/**
@@ -119,6 +121,7 @@ abstract class AbstractTable {
 										email_subject varchar(255) DEFAULT NULL,
 										trigger_at varchar(30) DEFAULT NULL,
 										mark_as_sent tinyint(1) DEFAULT 0,
+										identifier varchar(100) DEFAULT NULL,
 										email_date datetime DEFAULT NULL,
 										PRIMARY KEY  (id),
 										KEY post_id (post_id),
