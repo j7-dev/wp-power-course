@@ -20,12 +20,8 @@ final class At {
 
 	const SEND_USERS_HOOK = 'power_email_send_users'; // 直接寄給用戶的 AS hook
 
-
-
-
 	/** Constructor */
 	public function __construct() {
-
 		// ---- 開通課程權限後 ----//
 		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
 		\add_action( ( new AtHelper(AtHelper::COURSE_GRANTED) )->hook, [ $this, 'send_course_email' ], 10 );
@@ -72,7 +68,7 @@ final class At {
 		}
 
 		$this->schedule_email(
-			'course_granted',
+			AtHelper::COURSE_GRANTED,
 			[
 				'user_id'   => $user_id,
 				'course_id' => $course_id,
@@ -205,6 +201,7 @@ final class At {
 	 */
 	private function schedule_email( string $context, array $args ): void {
 		$at_helper = new AtHelper($context);
+		$hook      = $at_helper->hook;
 		$email_ids = \get_posts(
 			[
 				'post_type'      => Email\CPT::POST_TYPE,
@@ -215,8 +212,6 @@ final class At {
 				'meta_value'     => $at_helper->slug,
 			]
 			);
-
-		$hook = $at_helper->hook;
 
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
