@@ -221,13 +221,6 @@ final class At {
 		foreach ( $email_ids as $email_id ) {
 			$email = new EmailResource( (int) $email_id );
 
-			// 如果不該發信，就不該排程
-			$can_send = $email->can_send( (int) $args['user_id'], (int) $args['course_id'], (int) ( $args['chapter_id'] ?? 0 ));
-
-			if (!$can_send) {
-				continue;
-			}
-
 			$timestamp = $email->get_sending_timestamp();
 
 			if ( null === $timestamp ) {

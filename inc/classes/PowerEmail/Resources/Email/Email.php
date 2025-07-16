@@ -179,6 +179,10 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_course_email( int $user_id, int $course_id, int $chapter_id = 0 ): bool {
+		// 檢查是否該發信
+		if (!$this->can_send( $user_id, $course_id, $chapter_id )) {
+			return false;
+		}
 
 		$user = \get_user_by( 'ID', $user_id );
 		if (!$user) {
