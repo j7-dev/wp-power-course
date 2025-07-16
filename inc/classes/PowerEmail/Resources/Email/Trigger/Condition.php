@@ -31,18 +31,18 @@ final class Condition {
 	/**
 	 * @var array<string|int> 課程 ID 陣列
 	 */
-	public array $course_ids = [];
+	private array $course_ids = [];
 
 	/**
-	 * @var array<string|int> 章節/單元 ID 陣列
+	 * @var array<string|int> 章節 ID 陣列
 	 */
-	public array|null $chapter_ids = null;
+	private array|null $chapter_ids = null;
 
 
 	/**
-	 * @var array<string|int> 課程/章節/單元 ID 陣列
+	 * @var array<string|int> 課程/章節 ID 陣列
 	 */
-	private array $required_ids = [];
+	public array $required_ids = [];
 
 	/**
 	 * @var string 觸發條件
