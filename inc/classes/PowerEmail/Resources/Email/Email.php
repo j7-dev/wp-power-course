@@ -1,7 +1,4 @@
 <?php
-/**
- * Email
- */
 
 declare( strict_types=1 );
 
@@ -17,67 +14,41 @@ use J7\WpUtils\Classes\WP;
  */
 final class Email {
 
-	/**
-	 * @var string Email ID
-	 */
+	/** @var string Email ID */
 	public string $id;
 
-	/**
-	 * @var string Email 狀態
-	 */
-	public string $status;
+	/** @var string|null Email 狀態 */
+	public string|null $status;
 
-	/**
-	 * @var string Email 名稱
-	 */
+	/** @var string Email 名稱 */
 	public string $name;
 
-	/**
-	 * @var string Email 內容，存放 email html
-	 * @see https://mjml.io/
-	 */
+	/** @var string Email 內容，存放 email html @see https://mjml.io/ */
 	public string $description = '';
 
-	/**
-	 * @var string Email 內容，存放 json 格式
-	 * @see https://github.com/zalify/easy-email-editor
-	 */
+	/** @var string Email 內容，存放 json 格式 @see https://github.com/zalify/easy-email-editor */
 	public string $short_description;
 
-	/**
-	 * @var string Email 主旨
-	 */
+	/** @var string Email 主旨 */
 	public string $subject = '';
 
-	/**
-	 * @var string Email 主旨
-	 */
+	/** @var string Email 主旨 */
 	public string $formatted_subject = '';
 
-	/**
-	 * @var string Email 寄送條件
-	 */
+	/** @var string Email 寄送條件 */
 	public string $trigger_at = '';
 
-	/**
-	 * @var Trigger\Condition|array|null Email 寄送條件
-	 */
+	/** @var Trigger\Condition|array|null Email 寄送條件 */
 	public Trigger\Condition|array|null $condition = null;
 
 
-	/**
-	 * @var string Email 建立時間
-	 */
+	/** @var string Email 建立時間 */
 	public string $date_created;
 
-	/**
-	 * @var string Email 修改時間
-	 */
+	/** @var string Email 修改時間 */
 	public string $date_modified;
 
-	/**
-	 * @var array Email post meta 欄位
-	 */
+	/** @var array Email post meta 欄位 */
 	public static array $meta_keys = [
 		'subject',
 	];
@@ -156,9 +127,8 @@ final class Email {
 	 * @return bool
 	 */
 	public function can_send( int $user_id, ?int $course_id = 0, ?int $chapter_id = 0 ): bool {
-		$can_send  = true;
-		$condition = $this->condition;
-		if (!$condition) {
+		$can_send = true;
+		if (!$this->condition) {
 			return false; // 沒有條件就不用判斷了，就是不能寄信
 		}
 
@@ -189,7 +159,7 @@ final class Email {
 		}
 
 		// 取得 WordPress 時區
-		$wp_timezone = wp_timezone();
+		$wp_timezone = \wp_timezone();
 
 		// 建立今天 18:15 的 DateTime 物件
 		$start = new \DateTime("today {$condition->sending_range[0]}:00", $wp_timezone);

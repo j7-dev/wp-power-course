@@ -1,7 +1,4 @@
 <?php
-/**
- * Email Trigger At
- */
 
 declare( strict_types=1 );
 
@@ -14,7 +11,7 @@ use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 
 
 /**
- * Class At 觸發發信時機點
+ * Email Trigger At 觸發發信時機點
  */
 final class At {
 	use \J7\WpUtils\Traits\SingletonTrait;
@@ -66,9 +63,8 @@ final class At {
 	 */
 	public function schedule_course_granted_email( int $user_id, int $course_id, int|string $expire_date ): void {
 		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
-		if (!\is_array($current_avl_course_ids)) {
-			$current_avl_course_ids = [];
-		}
+		$current_avl_course_ids = \is_array($current_avl_course_ids) ? $current_avl_course_ids : [];
+
 		// 因為直接更新用戶課程權限時，會帶全部的課程 id，所以需要檢查課程 id 是否已經在原本客戶的權限裡面
 		// 我們只需要對新增的課程權限部分寄送課程開通信件
 		if (!\in_array($course_id, $current_avl_course_ids)) {
