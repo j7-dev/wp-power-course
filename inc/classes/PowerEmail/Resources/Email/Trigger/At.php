@@ -23,7 +23,7 @@ final class At {
 	/** Constructor */
 	public function __construct() {
 		// ---- 開通課程權限後 ----//
-		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 10, 3 );
+		\add_action( CourseLifeCycle::ADD_STUDENT_TO_COURSE_ACTION, [ $this, 'schedule_course_granted_email' ], 30, 3 );
 		\add_action( ( new AtHelper(AtHelper::COURSE_GRANTED) )->hook, [ $this, 'send_course_email' ], 10 );
 		// ---- END 開通課程權限後 ----//
 
