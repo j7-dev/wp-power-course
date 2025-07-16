@@ -7,8 +7,7 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Admin;
 
-use J7\WpUtils\Classes\General;
-use J7\PowerCourse\BundleProduct\Helper;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /**
  * Class ProductQuery
@@ -32,9 +31,9 @@ final class ProductQuery {
 	 * @return void
 	 */
 	public static function exclude_course_product( $query ): void {
-
-		$hide_courses_in_main_query    = \get_option('hide_courses_in_main_query', 'no');
-		$hide_courses_in_search_result = \get_option('hide_courses_in_search_result', 'no');
+		$settings                      = Settings::instance();
+		$hide_courses_in_main_query    = $settings->hide_courses_in_main_query;
+		$hide_courses_in_search_result = $settings->hide_courses_in_search_result;
 
 		if (!\wc_string_to_bool($hide_courses_in_main_query)) {
 			return;

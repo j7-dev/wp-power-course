@@ -8,6 +8,8 @@ use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Theme\Core\FrontEnd as Theme;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
+
 
 
 
@@ -64,6 +66,8 @@ if (!current_user_can('manage_woocommerce')) {
 
 do_action('power_course_before_classroom_render');
 
+$settings = Settings::instance();
+
 // phpcs:disable
 ?>
 <!doctype html>
@@ -100,8 +104,8 @@ do_action('power_course_before_classroom_render');
 			',
 			\wp_create_nonce( 'wp_rest' ),
 			Plugin::$url,
-			(int) \get_option('pc_pdf_watermark_qty', 0),
-			(string) \get_option('pc_pdf_watermark_color', 'rgba(255, 255, 255, 0.5)'),
+			$settings->pc_pdf_watermark_qty,
+			$settings->pc_pdf_watermark_color,
 			ChapterUtils::get_formatted_watermark_text('pdf')
 			);
 			Theme::render_button();

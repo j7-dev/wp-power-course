@@ -6,6 +6,7 @@ namespace J7\PowerCourse\Templates;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /**
  * Class FrontEnd
@@ -61,7 +62,8 @@ final class Templates {
 		$rules = \get_option( 'rewrite_rules', [] );
 
 		// @deprecated 為了兼容0.3以前版本的永久連結
-		$old_course_permalink_structure = (string) \get_option('course_permalink_structure', '');
+		$settings                       = Settings::instance();
+		$old_course_permalink_structure = $settings->course_permalink_structure;
 		$old_course_regex               = '^' . $old_course_permalink_structure . '/(.+)/?$';
 		if ($old_course_permalink_structure) {
 			\add_rewrite_rule($old_course_regex, 'index.php?product=$matches[1]', 'top');

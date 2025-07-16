@@ -1,7 +1,4 @@
 <?php
-/**
- * Template for AJAX
- */
 
 declare( strict_types=1 );
 
@@ -11,12 +8,14 @@ use J7\PowerCourse\Plugin;
 use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
+
 
 
 
 
 /**
- * Class Ajax
+ *  Template for AJAX
  */
 final class Ajax {
 	use \J7\WpUtils\Traits\SingletonTrait;
@@ -59,6 +58,7 @@ final class Ajax {
 
 		$is_avl = CourseUtils::is_avl();
 
+		$settings = Settings::instance();
 		\wp_localize_script(
 			Plugin::$kebab . '-template',
 			'pc_data',
@@ -66,8 +66,8 @@ final class Ajax {
 				'ajax_url'                  => \admin_url('admin-ajax.php'),
 				'nonce'                     => \wp_create_nonce( 'wp_rest' ),
 				'is_avl'                    => $is_avl,
-				'header_offset'             => \get_option('pc_header_offset', 0),
-				'fix_video_and_tabs_mobile' => \get_option('fix_video_and_tabs_mobile', 'no'),
+				'header_offset'             => $settings->pc_header_offset,
+				'fix_video_and_tabs_mobile' => $settings->fix_video_and_tabs_mobile,
 			]
 			);
 
