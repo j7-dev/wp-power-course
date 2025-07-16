@@ -4,6 +4,7 @@ declare( strict_types=1 );
 
 namespace J7\PowerCourse\PowerEmail\Resources\Email\Trigger;
 
+use J7\PowerCourse\Plugin;
 use J7\PowerCourse\PowerEmail\Resources\Email;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
@@ -87,7 +88,7 @@ final class At {
 		}
 
 		$post_id = $chapter_id ? $chapter_id : $course_id;
-		$is_sent = $email->is_sent($post_id, $user_id, (int) $email->id);
+		$is_sent = $email->is_sent($post_id, $user_id);
 
 		if ( $is_sent ) {
 			return false;
@@ -213,19 +214,36 @@ final class At {
 				continue;
 			}
 
-			$default_args = [
-				'email_id' => $email_id,
-				'context'  => $context,
-			];
+			$args['email_id'] = $email_id;
+			$args['context']  = $context;
+			$user_id          = $args['user_id'] ?? 0;
+			$course_id        = $args['course_id'] ?? 0;
+			$chapter_id       = $args['chapter_id'] ?? 0;
+			$group            = $email->get_identifier([ $course_id, $chapter_id ], $user_id);
 
-			$args = \wp_parse_args($args, $default_args );
+			// $group 就類似唯一的 key 確認是否已經寄信過
+			$scheduled_actions = \as_get_scheduled_actions(
+			[
+				'hook'  => $hook,
+				'group' => $group,
+			],
+			'ids'
+			);
+			$is_scheduled      = (bool) $scheduled_actions;
 
-			if (0 === $timestamp) { // 立即寄送
-				\as_enqueue_async_action( $hook, [ $args ], self::AS_GROUP);
+			if ($is_scheduled) {
+				$args['scheduled_actions'] = $scheduled_actions;
+				$args['group']             = $group;
+				Plugin::logger( "{$context} 已經排程或已寄信過，不重複排程", 'warning', $args );
 				continue;
 			}
 
-			\as_schedule_single_action( $timestamp, $hook, [ $args ], self::AS_GROUP );
+			if (0 === $timestamp) { // 立即寄送
+				\as_enqueue_async_action( $hook, [ $args ], $group);
+				continue;
+			}
+
+			\as_schedule_single_action( $timestamp, $hook, [ $args ], $group );
 		}
 	}
 }
