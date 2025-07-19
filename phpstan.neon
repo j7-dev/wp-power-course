@@ -18,4 +18,4 @@ parameters:
 		- vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
 		- ../powerhouse/plugin.php
 		- ../powerhouse/vendor/autoload.php
-		- ../woocommerce-subscriptions/woocommerce-subscriptions.php
+

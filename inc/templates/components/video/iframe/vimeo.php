@@ -21,7 +21,7 @@ $default_args = [
 $args = wp_parse_args( $args, $default_args );
 
 /**
- * @var array{type: string, id: string, meta: ?array} $video_info
+ * @var array{type: string, id: string, meta: ?array<mixed>} $video_info
  */
 [
 	'class'      => $class,

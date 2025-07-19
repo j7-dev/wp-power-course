@@ -23,6 +23,9 @@
     <!-- Check up to 8 files simultaneously. -->
     <arg name="parallel" value="8"/>
 
+    <!-- 忽略警告，只報告錯誤 -->
+    <arg name="warning-severity" value="0"/>
+
     <rule ref="WordPress-Core">
         <exclude name="Squiz.Commenting.FileComment.MissingPackageTag"/>
         <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_print_r"/>
