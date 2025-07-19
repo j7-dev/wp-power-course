@@ -69,7 +69,9 @@ trait UserTrait {
 		$body_params = $request->get_body_params();
 		$body_params =WP::sanitize_text_field_deep($body_params, false );
 
+		/** @var array<numeric-string|int> $user_ids */
 		$user_ids    = $body_params['user_ids'] ?? [];
+		/** @var array<numeric-string|int> $course_ids */
 		$course_ids  = $body_params['course_ids'] ?? [];
 		$expire_date = $body_params['expire_date'] ?? 0;
 
@@ -123,8 +125,10 @@ trait UserTrait {
 	public function post_courses_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+		/** @var array<numeric-string|int> $user_ids */
 		$user_ids    = $body_params['user_ids'] ?? [];
 		$timestamp   = (int) ( $body_params['timestamp'] ?? 0 ); // 一般為 10 位數字，如果是0就是無期限 //TODO 可能會跟隨訂閱!?
+		/** @var array<numeric-string|int> $course_ids */
 		$course_ids  = $body_params['course_ids'] ?? [];
 
 		try {
@@ -173,7 +177,9 @@ trait UserTrait {
 	public function post_courses_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
+		/** @var array<numeric-string|int> $user_ids */
 		$user_ids    = $body_params['user_ids'] ?? [];
+		/** @var array<numeric-string|int> $course_ids */
 		$course_ids  = $body_params['course_ids'] ?? [];
 
 		try {

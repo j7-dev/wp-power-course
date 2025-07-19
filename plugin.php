@@ -119,7 +119,7 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		 *
 		 * @param string $message 訊息
 		 * @param string $level 日誌等級
-		 * @param array  $context 上下文
+		 * @param array<string, mixed>  $context 上下文
 		 * @param int    $trace_limit 堆疊限制
 		 * @return void
 		 */

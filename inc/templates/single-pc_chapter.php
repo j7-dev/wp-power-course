@@ -45,7 +45,7 @@ if (!current_user_can('manage_woocommerce')) {
 		Plugin::load_template( '404/buy', null );
 		get_footer();
 		exit;
-	} elseif ( ! CourseUtils::is_course_ready( $course_product ) ) {
+	} elseif ( ! CourseUtils::is_course_ready( $course_product ?: 0 ) ) {
 		get_header();
 		Plugin::load_template( '404/not-ready', null );
 		get_footer();

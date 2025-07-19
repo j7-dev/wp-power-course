@@ -25,15 +25,16 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 
 $product_id  = $product->get_id();
 $teacher_ids = \get_post_meta( $product_id, 'teacher_ids', false );
-if ( ! is_array( $teacher_ids ) ) {
-	$teacher_ids = [];
-}
+/** @var array<numeric-string|int> $teacher_ids */
+$teacher_ids = is_array( $teacher_ids ) ? $teacher_ids : [];
 
-/**
- * @var array{type: string, id: string, meta: ?array} $trial_video
- */
-$trial_video = \get_post_meta( $product_id, 'trial_video', true );
-$video_type  = $trial_video['type'] ?? 'none';
+/** @var array{type: string, id: string, meta: array<string,mixed>} $trial_video */
+$trial_video = \get_post_meta( $product_id, 'trial_video', true ) ?: [
+	'type' => 'none',
+	'id' => '',
+	'meta' => [],
+];
+$video_type  = $trial_video['type'];
 
 if ( 'none' !== $video_type ) {
 	printf(

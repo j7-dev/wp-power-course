@@ -108,7 +108,7 @@ echo '</div>';
 
 
 // 留言
-$enable_comment = \wc_string_to_bool( \get_post_meta( $chapter_id, 'enable_comment', true ) ?: 'no');
+$enable_comment = \wc_string_to_bool( (string) (\get_post_meta( $chapter_id, 'enable_comment', true ) ?: 'no'));
 if ($enable_comment) {
 	printf(
 			/*html*/'<div id="comment-app" data-comment_type="comment" data-post_id="%1$s" data-show_list="%2$s" data-show_form="%3$s" data-user_id="%4$s" data-user_role="%5$s"></div>',
