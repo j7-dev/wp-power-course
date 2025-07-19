@@ -9,6 +9,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Utils\User as UserUtils;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\Powerhouse\Domains\Product\Utils\CRUD;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -146,16 +147,21 @@ $linked_products = Helper::get_bundle_products( (int) $product->get_id() );
 $variation_count = count($linked_products);
 
 // 添加固定在底部的mobile元素
+$price_html = CRUD::get_price_html( $product );
 printf(
 /*html*/'
 <div class="p-4 md:hidden tw-fixed bottom-0 left-0 right-0 w-full bg-white border-t border-gray-200 z-50">
-    <div class="container mx-auto">
+    <div class="container mx-auto flex items-center justify-between gap-4">
+        <div class="flex-shrink-0">
+            %2$s
+        </div>
         <a href="%1$s"
-            class="w-full pc-btn pc-btn-primary text-white cursor-pointer">
+            class="flex-1 pc-btn pc-btn-primary text-white cursor-pointer text-center">
             立即報名
         </a>
     </div>
 </div>
 ',
-$variation_count > 0 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url()))
+$variation_count > 0 ? '#course-pricing' : esc_url(add_query_arg('add-to-cart', $product->get_id(), wc_get_checkout_url())),
+$price_html
 );
