@@ -6,7 +6,7 @@
 - 所有 php 檔案都必須宣告 declare(strict_types=1); 強制嚴格型別檢查
 - 函數都必須要有繁體中文註解，一句話講清楚用途，並且函數的輸入、輸出變數要都有 phpstan 的型別註釋以及強型別定義
 - 如果有定時任務優先使用 ActionScheduler 來實作，而非 wp-cron
-- 提交前必須通過 `pnpm run lint` 檢查
+- 提交前必須通過 `pnpm run lint:php` 檢查，有錯誤請自動修正
 - PHP 8.0+ 語法，使用 PSR-4 autoloading
 - 所有 API 端點需繼承適當的基礎類別
 - 資料庫操作使用抽象表格類別，避免直接 SQL
@@ -29,6 +29,7 @@ public string $name;
 - API 呼叫統一使用 custom hooks，位於 `hooks/` 目錄
 - TypeScript 嚴格模式，所有 API 回應需定義類型
 - Power Course 沒有自己的 CSS，所有 CSS (scss & tailwind) 都寫在 Powerhouse 內
+- 提交前必須通過 `pnpm run lint:ts` 檢查，有錯誤請自動修正
 
 ### 錯誤處理與測試標準
 - 目前專案沒有任何的測試，都是手動測試，所以暫時不要求測試，等到有自動化測試再補充

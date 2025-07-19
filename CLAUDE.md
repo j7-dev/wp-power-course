@@ -21,8 +21,8 @@ pnpm run build:wp     # 使用 WordPress 專用配置建置
 
 ### 代碼品質檢查
 ```bash
-pnpm run lint         # 執行 ESLint + PHP CodeSniffer
-pnpm run lint:fix     # 自動修復 linting 問題
+pnpm run lint:php     # 後端 php 代碼品質檢查執行 phpcbf & phpcs & phpstan
+pnpm run lint:ts      # 前端 typescript eslint 代碼品質檢查
 pnpm run format       # 格式化 TypeScript/React 代碼
 composer run phpstan # 執行 PHP 靜態分析
 ```
