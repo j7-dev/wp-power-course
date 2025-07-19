@@ -76,7 +76,7 @@ final class General {
 				if (is_string($args[ $key ])) {
 					$args[ $key ] = explode(',', str_replace(' ', '', $args[ $key ]));
 				}
-				if (($key === 'include' || $key === 'exclude') && is_array($args[ $key ])) {
+				if (( $key === 'include' || $key === 'exclude' ) && is_array($args[ $key ])) {
 					$args[ $key ] = array_filter(array_map('intval', $args[ $key ]));
 				}
 			}
