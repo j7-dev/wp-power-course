@@ -116,23 +116,37 @@ final class LifeCycle {
 	 * @throws \Exception 新增學員失敗
 	 */
 	public static function add_student_to_course( int $user_id, int $course_id, int|string $expire_date, $order ): void {
-		$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
-		if (!\is_array($current_avl_course_ids)) {
-			$current_avl_course_ids = [];
-		}
-		// 先檢查用戶有沒有買過，沒買過才新增 user_meta
-		if (!\in_array($course_id, $current_avl_course_ids)) {
-			\add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
-		}
+		global $wpdb;
+		// 開始事務
+		$wpdb->query( 'START TRANSACTION' );
 
-		$update_success1 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
-		$at_helper       = new AtHelper(AtHelper::COURSE_GRANTED);
-		$update_success2 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, $at_helper->meta_key_at, \wp_date('Y-m-d H:i:s') ); // 紀錄 local time
+		try {
+			$current_avl_course_ids = \get_user_meta( $user_id, 'avl_course_ids' );
+			if (!\is_array($current_avl_course_ids)) {
+				$current_avl_course_ids = [];
+			}
+			// 先檢查用戶有沒有買過，沒買過才新增 user_meta
+			if (!\in_array($course_id, $current_avl_course_ids)) {
+				\add_user_meta( $user_id, 'avl_course_ids', $course_id, false );
+			}
 
-		\do_action(self::AFTER_ADD_STUDENT_TO_COURSE_ACTION, $user_id, $course_id, $expire_date, $order);
+			$update_success1 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, 'expire_date', $expire_date );
+			if (false === $update_success1) {
+				throw new \Exception("更新課程到期日失敗 course_id: {$course_id} user_id: {$user_id} expire_date: {$expire_date}");
+			}
+			$at_helper       = new AtHelper(AtHelper::COURSE_GRANTED);
+			$update_success2 = AVLCourseMeta::update( (int) $course_id, (int) $user_id, $at_helper->meta_key_at, \wp_date('Y-m-d H:i:s') ); // 紀錄 local time
+			if (false === $update_success2) {
+				throw new \Exception("更新用戶獲得權限的時間失敗 course_id: {$course_id} user_id: {$user_id} meta_key: {$at_helper->meta_key_at}");
+			}
 
-		if ( false === $update_success1 || false === $update_success2) {
-			throw new \Exception('新增學員失敗');
+			\do_action(self::AFTER_ADD_STUDENT_TO_COURSE_ACTION, $user_id, $course_id, $expire_date, $order);
+
+			// 提交事務
+			$wpdb->query( 'COMMIT' );
+		} catch (\Throwable $th) {
+			$wpdb->query( 'ROLLBACK' );
+			throw new \Exception("新增學員失敗: {$th->getMessage()}");
 		}
 	}
 
