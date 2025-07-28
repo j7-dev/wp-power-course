@@ -42,8 +42,6 @@
 		"@power/eslint-config": "workspace:*",
 		"@power/tailwind-config": "workspace:*",
 		"@power/typescript-config": "workspace:*",
-		"@types/mjml-browser": "^4.15.0",
-		"vite-plugin-optimizer": "^1.4.3",
-		"rollup-plugin-terser": "^7.0.2"
+		"@types/mjml-browser": "^4.15.0"
 	}
 }
