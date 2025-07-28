@@ -1,8 +1,4 @@
 <?php
-/**
- * Duplicate
- * 複製文章功能的抽象類
- */
 
 declare ( strict_types=1 );
 
@@ -13,17 +9,13 @@ use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\PowerCourse\BundleProduct\Helper;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 
-
 /**
  * Class Duplicate
+ * 複製文章功能的類
  */
 final class Duplicate {
 
-	/**
-	 * 要排除的 meta key
-	 *
-	 * @var array<string>
-	 */
+	/** @var array<string> 要排除的 meta key */
 	protected static array $exclude_meta_keys = [
 		'total_sales',
 		'_edit_lock',
@@ -67,7 +59,7 @@ final class Duplicate {
 	 *
 	 * @param int $post_id 文章 ID
 	 *
-	 * @return string 物件類型 email, chapter, course 或 post_type
+	 * @return string 物件類型 email, chapter 或 post_type
 	 */
 	private static function get_object_type( int $post_id ): string {
 		$post = \get_post( $post_id );
@@ -75,13 +67,10 @@ final class Duplicate {
 			return '';
 		}
 
-		$is_course = \get_post_meta( $post_id, '_is_course', true ) === 'yes';
-
 		/** @var \WP_Post $post */
 		return match ($post->post_type) {
 			EmailCPT::POST_TYPE => 'email',
 			ChapterCPT::POST_TYPE => 'chapter',
-			'product' => $is_course ? 'course' : 'product',
 			default => $post->post_type,
 		};
 	}
@@ -188,6 +177,11 @@ final class Duplicate {
 			$new_product->update_meta_data(Helper::LINK_COURSE_IDS_META_KEY, (string) $new_parent);
 			$new_product->save_meta_data();
 		}
+
+		// 手動複製課程的 _is_course 值
+		$is_course = \get_post_meta( $post_id, '_is_course', true ) === 'yes';
+		\delete_post_meta( $new_product_id, '_is_course' );
+		\update_post_meta( $new_product_id, '_is_course', $is_course ? 'yes' : 'no' );
 
 		return $new_product_id;
 	}
