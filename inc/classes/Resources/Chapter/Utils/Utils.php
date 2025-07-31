@@ -834,7 +834,7 @@ abstract class Utils {
 		$next_post_id = \wp_cache_get( 'next_post_id_' . $chapter_id, 'prev_next' );
 
 		if (false !== $next_post_id) {
-			return $next_post_id;
+			return $next_post_id === null ? null : (int) $next_post_id;
 		}
 
 		$course_id        = self::get_course_id( $chapter_id );
@@ -853,6 +853,6 @@ abstract class Utils {
 
 		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
 
-		return $next_post_id;
+		return $next_post_id === null ? null : (int) $next_post_id;
 	}
 }
