@@ -26,7 +26,6 @@ final class Compatibility {
 
 		\delete_option('pc_compatibility_action_scheduled');
 
-		ApiOptimize::instance();
 		// 升級成功後執行
 		\add_action( 'upgrader_process_complete', [ __CLASS__, 'compatibility' ]);
 
