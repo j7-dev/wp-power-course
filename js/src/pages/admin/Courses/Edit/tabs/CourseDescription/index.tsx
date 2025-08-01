@@ -136,6 +136,7 @@ const CourseDescriptionComponent = ({
 						<DescriptionDrawer
 							resource="courses"
 							dataProviderName="power-course"
+							initialEditor={course?.editor as 'power-editor' | 'elementor'}
 						/>
 					</div>
 

@@ -124,6 +124,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 					<DescriptionDrawer
 						resource="chapters"
 						dataProviderName="power-course"
+						initialEditor={initEditor as 'power-editor' | 'elementor'}
 					/>
 				</div>
 				<div className="mb-6 max-w-[20rem]">
