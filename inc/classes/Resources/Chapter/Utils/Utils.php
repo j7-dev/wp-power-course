@@ -428,7 +428,8 @@ abstract class Utils {
 	}
 
 	/**
-	 * Converter 轉換器     * 把 key 轉換/重新命，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
+	 * Converter 轉換器
+	 * 把 key 轉換/重新命名，將 前端傳過來的欄位轉換成 wp_update_post 能吃的參數
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
