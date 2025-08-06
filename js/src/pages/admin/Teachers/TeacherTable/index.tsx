@@ -35,6 +35,8 @@ const index = () => {
 		},
 	})
 
+	const users = tableProps?.dataSource || []
+
 	// 多選
 	const { rowSelection, setSelectedRowKeys, selectedRowKeys } =
 		useRowSelection<TUserRecord>({
@@ -83,7 +85,11 @@ const index = () => {
 	}
 
 	const [form] = Form.useForm()
-	const { show, drawerProps } = useUserFormDrawer({ form, resource: 'users' })
+	const { show, drawerProps } = useUserFormDrawer({
+		form,
+		resource: 'users',
+		users,
+	})
 	const columns = useColumns({
 		onClick: show,
 	})
