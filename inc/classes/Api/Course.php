@@ -226,158 +226,6 @@ final class Course extends ApiBase {
 	}
 
 	/**
-	 * Format course base records
-	 *
-	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
-	 *
-	 * @param \WC_Product $product Product.
-	 *
-	 * @return array
-	 * @phpstan-ignore-next-line
-	 */
-	public function format_course_base_records( $product ) { // phpcs:ignore
-
-		// @phpstan-ignore-next-line
-		if ( ! ( $product instanceof \WC_Product ) ) {
-			return [];
-		}
-
-		$date_created  = $product->get_date_created();
-		$date_modified = $product->get_date_modified();
-
-		$image_id          = $product->get_image_id();
-		$gallery_image_ids = $product->get_gallery_image_ids();
-
-		$image_ids = $image_id ? [ $image_id, ...$gallery_image_ids ] : [];
-		$images    = $image_ids ? array_map( [ WP::class, 'get_image_info' ], $image_ids ) : [];
-
-		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
-
-		$chapters = array_values(
-			\get_children(
-				[
-					'post_parent' => $product->get_id(),
-					'post_type'   => ChapterCPT::POST_TYPE,
-					'numberposts' => - 1,
-					'post_status' => 'any',
-					'orderby'     => 'menu_order',
-					'order'       => 'ASC',
-				]
-			)
-		);
-		// @phpstan-ignore-next-line
-		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
-		// 把子章節的時間加總
-		$course_length = array_reduce(
-			$chapters,
-			function ( $acc, $chapter ) {
-				$sub_chapters       = $chapter['chapters'] ?? [];
-				$sub_chapter_length = array_reduce(
-					$sub_chapters,
-					function ( $acc, $sub_chapter ) {
-						return $acc + $sub_chapter['chapter_length'];
-					},
-					0
-					);
-				return $acc + $sub_chapter_length;
-			},
-			0
-			);
-
-		$regular_price = $product->get_regular_price();
-		$sale_price    = $product->get_sale_price();
-		$price_html    = CRUD::get_price_html($product);
-		$product_id    = $product->get_id();
-		$categories    = Product::format_terms(
-			[
-				'taxonomy'   => 'product_cat',
-				'object_ids' => $product_id,
-			]
-			);
-		$category_ids  = array_column( $categories, 'id' );
-		$tags          = Product::format_terms(
-			[
-				'taxonomy'   => 'product_tag',
-				'object_ids' => $product_id,
-			]
-			);
-		$tag_ids       = array_column( $tags, 'id' );
-
-		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
-
-		$base_array = [
-			// Get Product General Info
-			'id'                 => (string) $product_id,
-			'type'               => $product->get_type(),
-			'name'               => $product->get_name(),
-			'slug'               => $product->get_slug(),
-			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
-			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
-			'status'             => $product->get_status(),
-			'featured'           => $product->get_featured(),
-			'catalog_visibility' => $product->get_catalog_visibility(),
-			'sku'                => $product->get_sku(),
-			'menu_order'         => (int) $product->get_menu_order(),
-			'virtual'            => $product->get_virtual(),
-			'downloadable'       => $product->get_downloadable(),
-			'permalink'          => \get_permalink( $product->get_id() ),
-			'custom_rating'      => (float) $product->get_meta('custom_rating') ?: 2.5,
-			'extra_review_count' => (int) $product->get_meta('extra_review_count'),
-
-			// Get Product Prices
-			'price_html'         => $price_html,
-			'regular_price'      => $regular_price,
-			'sale_price'         => $sale_price,
-			'on_sale'            => $product->is_on_sale(),
-			'sale_date_range'    => $sale_date_range,
-			'date_on_sale_from'  => $sale_date_range[0],
-			'date_on_sale_to'    => $sale_date_range[1],
-			'total_sales'        => $product->get_total_sales(),
-
-			// Get Product Stock
-			'stock'              => $product->get_stock_quantity(),
-			'stock_status'       => $product->get_stock_status(),
-			'manage_stock'       => \wc_bool_to_string( $product->get_manage_stock() ),
-			'stock_quantity'     => $product->get_stock_quantity(),
-			'backorders'         => $product->get_backorders(),
-			'backorders_allowed' => \wc_bool_to_string( $product->backorders_allowed() ),
-			'backordered'        => \wc_bool_to_string( $product->is_on_backorder() ),
-			'low_stock_amount'   => $low_stock_amount,
-			'sold_individually'  => \wc_bool_to_string( $product->is_sold_individually() ),
-
-			// Get Product Taxonomies
-			'category_ids'       => $category_ids,
-
-			'categories'         => Product::format_terms(
-				[
-					'taxonomy'   => 'product_cat',
-					'object_ids' => $product_id,
-				]
-				),
-			'tags'               => Product::format_terms(
-				[
-					'taxonomy'   => 'product_tag',
-					'object_ids' => $product_id,
-				]
-				),
-			'tag_ids'            => $tag_ids,
-			// Get Product Images
-			'images'             => $images,
-			'is_course'          => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
-			'is_free'            => (string) $product->get_meta( 'is_free' ),
-			'qa_list'            => (array) $product->get_meta( 'qa_list' ),
-			'course_schedule'    => (int) $product->get_meta( 'course_schedule' ),
-			'course_hour'        => (int) $product->get_meta( 'course_hour' ),
-			'course_minute'      => (int) $product->get_meta( 'course_minute' ),
-			'teacher_ids'        => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
-			'course_length'      => $course_length,
-			'classroom_link'     => (string) CourseUtils::get_classroom_permalink( $product->get_id(), 'any' ),
-		];
-
-		return $base_array;
-	}
-
-	/**
 	 * Format course records
 	 *
 	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
@@ -480,6 +328,195 @@ final class Course extends ApiBase {
 		return array_merge(
 			$base_array,
 			$extra_array,
+		);
+	}
+
+	/**
+	 * Format course base records
+	 *
+	 * @see https://www.businessbloomer.com/woocommerce-easily-get-product-info-title-sku-desc-product-object/
+	 *
+	 * @param \WC_Product $product Product.
+	 *
+	 * @return array
+	 * @phpstan-ignore-next-line
+	 */
+	public function format_course_base_records( $product ) { // phpcs:ignore
+
+		// @phpstan-ignore-next-line
+		if ( ! ( $product instanceof \WC_Product ) ) {
+			return [];
+		}
+
+		$date_created  = $product->get_date_created();
+		$date_modified = $product->get_date_modified();
+
+		$image_id          = $product->get_image_id();
+		$gallery_image_ids = $product->get_gallery_image_ids();
+
+		$image_ids = $image_id ? [ $image_id, ...$gallery_image_ids ] : [];
+		$images    = $image_ids ? array_map( [ WP::class, 'get_image_info' ], $image_ids ) : [];
+
+		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
+
+		$chapters = array_values(
+			\get_children(
+				[
+					'post_parent' => $product->get_id(),
+					'post_type'   => ChapterCPT::POST_TYPE,
+					'numberposts' => - 1,
+					'post_status' => 'any',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
+				]
+			)
+		);
+		// @phpstan-ignore-next-line
+		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
+		// 把子章節的時間加總
+		$course_length = array_reduce(
+			$chapters,
+			function ( $acc, $chapter ) {
+				$sub_chapters       = $chapter['chapters'] ?? [];
+				$sub_chapter_length = array_reduce(
+					$sub_chapters,
+					function ( $acc, $sub_chapter ) {
+						return $acc + $sub_chapter['chapter_length'];
+					},
+					0
+					);
+				return $acc + $sub_chapter_length;
+			},
+			0
+			);
+
+		$regular_price = $product->get_regular_price();
+		$sale_price    = $product->get_sale_price();
+		$price_html    = CRUD::get_price_html($product);
+		$product_id    = $product->get_id();
+		$categories    = Product::format_terms(
+			[
+				'taxonomy'   => 'product_cat',
+				'object_ids' => $product_id,
+			]
+			);
+		$category_ids  = array_column( $categories, 'id' );
+		$tags          = Product::format_terms(
+			[
+				'taxonomy'   => 'product_tag',
+				'object_ids' => $product_id,
+			]
+			);
+		$tag_ids       = array_column( $tags, 'id' );
+
+		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
+
+		$base_array = [
+			// Get Product General Info
+			'id'                 => (string) $product_id,
+			'type'               => $product->get_type(),
+			'name'               => $product->get_name(),
+			'slug'               => $product->get_slug(),
+			'date_created'       => $date_created?->date( 'Y-m-d H:i:s' ),
+			'date_modified'      => $date_modified?->date( 'Y-m-d H:i:s' ),
+			'status'             => $product->get_status(),
+			'featured'           => $product->get_featured(),
+			'catalog_visibility' => $product->get_catalog_visibility(),
+			'sku'                => $product->get_sku(),
+			'menu_order'         => (int) $product->get_menu_order(),
+			'virtual'            => $product->get_virtual(),
+			'downloadable'       => $product->get_downloadable(),
+			'permalink'          => \get_permalink( $product->get_id() ),
+			'edit_url'           => \get_edit_post_link( $product->get_id(), 'raw' ) ?? '',
+			'custom_rating'      => (float) $product->get_meta('custom_rating') ?: 2.5,
+			'extra_review_count' => (int) $product->get_meta('extra_review_count'),
+
+			// Get Product Prices
+			'price_html'         => $price_html,
+			'regular_price'      => $regular_price,
+			'sale_price'         => $sale_price,
+			'on_sale'            => $product->is_on_sale(),
+			'sale_date_range'    => $sale_date_range,
+			'date_on_sale_from'  => $sale_date_range[0],
+			'date_on_sale_to'    => $sale_date_range[1],
+			'total_sales'        => $product->get_total_sales(),
+
+			// Get Product Stock
+			'stock'              => $product->get_stock_quantity(),
+			'stock_status'       => $product->get_stock_status(),
+			'manage_stock'       => \wc_bool_to_string( $product->get_manage_stock() ),
+			'stock_quantity'     => $product->get_stock_quantity(),
+			'backorders'         => $product->get_backorders(),
+			'backorders_allowed' => \wc_bool_to_string( $product->backorders_allowed() ),
+			'backordered'        => \wc_bool_to_string( $product->is_on_backorder() ),
+			'low_stock_amount'   => $low_stock_amount,
+			'sold_individually'  => \wc_bool_to_string( $product->is_sold_individually() ),
+
+			// Get Product Taxonomies
+			'category_ids'       => $category_ids,
+
+			'categories'         => Product::format_terms(
+				[
+					'taxonomy'   => 'product_cat',
+					'object_ids' => $product_id,
+				]
+				),
+			'tags'               => Product::format_terms(
+				[
+					'taxonomy'   => 'product_tag',
+					'object_ids' => $product_id,
+				]
+				),
+			'tag_ids'            => $tag_ids,
+			// Get Product Images
+			'images'             => $images,
+			'is_course'          => (string) $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME ),
+			'is_free'            => (string) $product->get_meta( 'is_free' ),
+			'qa_list'            => (array) $product->get_meta( 'qa_list' ),
+			'course_schedule'    => (int) $product->get_meta( 'course_schedule' ),
+			'course_hour'        => (int) $product->get_meta( 'course_hour' ),
+			'course_minute'      => (int) $product->get_meta( 'course_minute' ),
+			'teacher_ids'        => (array) \get_post_meta( $product->get_id(), 'teacher_ids', false ),
+			'course_length'      => $course_length,
+			'classroom_link'     => (string) CourseUtils::get_classroom_permalink( $product->get_id(), 'any' ),
+		];
+
+		return $base_array;
+	}
+
+	/**
+	 * Post courses callback
+	 *
+	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 *
+	 * @return \WP_REST_Response|\WP_Error
+	 * @phpstan-ignore-next-line
+	 */
+	public function post_courses_callback( $request ): \WP_REST_Response|\WP_Error {
+		/** @var array<string, array<mixed>|string> $meta_data */
+		[
+			'product' => $product,
+			'data'      => $data,
+			'meta_data' => $meta_data,
+		] = $this->separator($request);
+
+		$this->handle_save_course_data($product, $data );
+		$result = $this->handle_save_course_meta_data($product, $meta_data );
+
+		if (true !== $result ) {
+			return $result;
+		}
+
+		return new \WP_REST_Response(
+			[
+				'code'    => 'create_success',
+				'message' => '新增成功',
+				'data'    => [
+					'id' => (string) $product->get_id(),
+				],
+			]
 		);
 	}
 
@@ -632,43 +669,6 @@ final class Course extends ApiBase {
 
 		return true;
 	}
-
-	/**
-	 * Post courses callback
-	 *
-	 * @see https://rudrastyh.com/woocommerce/create-product-programmatically.html
-	 *
-	 * @param \WP_REST_Request $request Request.
-	 *
-	 * @return \WP_REST_Response|\WP_Error
-	 * @phpstan-ignore-next-line
-	 */
-	public function post_courses_callback( $request ): \WP_REST_Response|\WP_Error {
-		/** @var array<string, array<mixed>|string> $meta_data */
-		[
-			'product' => $product,
-			'data'      => $data,
-			'meta_data' => $meta_data,
-		] = $this->separator($request);
-
-		$this->handle_save_course_data($product, $data );
-		$result = $this->handle_save_course_meta_data($product, $meta_data );
-
-		if (true !== $result ) {
-			return $result;
-		}
-
-		return new \WP_REST_Response(
-			[
-				'code'    => 'create_success',
-				'message' => '新增成功',
-				'data'    => [
-					'id' => (string) $product->get_id(),
-				],
-			]
-		);
-	}
-
 
 	/**
 	 * Post courses with id callback
