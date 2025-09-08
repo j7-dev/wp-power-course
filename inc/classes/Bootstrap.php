@@ -4,6 +4,7 @@ declare (strict_types = 1);
 
 namespace J7\PowerCourse;
 
+use J7\PowerCourse\Domain\Product\Events\Edit;
 use Kucrut\Vite;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Utils\Base;
@@ -47,6 +48,8 @@ final class Bootstrap {
 		Shortcodes\General::instance();
 
 		PowerEmail\Bootstrap::instance();
+
+		new Edit();
 
 		\add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_script' ], 99 );
 		\add_action( 'wp_enqueue_scripts', [ $this, 'frontend_enqueue_script' ], 99 );
@@ -111,7 +114,20 @@ final class Bootstrap {
 		}
 	}
 
+	/**
+	 * 註冊每5分鐘執行一次的 action scheduler
+	 *
+	 * @return void
+	 */
+	public static function register_power_course_cron(): void {
+		if ( !\function_exists( 'as_schedule_recurring_action' ) ) {
+			return;
+		}
 
+		if ( !\as_next_scheduled_action( self::SCHEDULE_ACTION ) ) {
+			\as_schedule_recurring_action( time(), self::SCHEDULE_ACTION_INTERVAL, self::SCHEDULE_ACTION );
+		}
+	}
 
 	/**
 	 * Admin Enqueue script
@@ -125,17 +141,6 @@ final class Bootstrap {
 		if (!General::in_url([ 'power-course' ])) {
 			return;
 		}
-		self::enqueue_script();
-	}
-
-
-	/**
-	 * Front-end Enqueue script
-	 * You can load the script on demand
-	 *
-	 * @return void
-	 */
-	public function frontend_enqueue_script(): void {
 		self::enqueue_script();
 	}
 
@@ -201,17 +206,12 @@ final class Bootstrap {
 	}
 
 	/**
-	 * 註冊每5分鐘執行一次的 action scheduler
+	 * Front-end Enqueue script
+	 * You can load the script on demand
 	 *
 	 * @return void
 	 */
-	public static function register_power_course_cron(): void {
-		if ( !\function_exists( 'as_schedule_recurring_action' ) ) {
-			return;
-		}
-
-		if ( !\as_next_scheduled_action( self::SCHEDULE_ACTION ) ) {
-			\as_schedule_recurring_action( time(), self::SCHEDULE_ACTION_INTERVAL, self::SCHEDULE_ACTION );
-		}
+	public function frontend_enqueue_script(): void {
+		self::enqueue_script();
 	}
 }
