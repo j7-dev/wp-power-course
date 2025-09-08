@@ -59,7 +59,18 @@ final class Product {
 	public static function save_product_type_options( $post_id, $product_post, $update ): void {
 		$option = self::PRODUCT_OPTION_NAME;
 		$option = "_{$option}";
-		\update_post_meta( $post_id, $option, isset( $_POST[ $option ] ) ? 'yes' : 'no' ); // phpcs:ignore
+
+		if (!isset( $_REQUEST[ $option ] )) { // phpcs:ignore
+			return;
+		}
+
+		if (empty($_REQUEST[ $option ])) { // phpcs:ignore
+			return;
+		}
+
+		$is_course = \wc_string_to_bool( $_REQUEST[ $option ] ); // phpcs:ignore
+
+		\update_post_meta( $post_id, $option, \wc_bool_to_string( $is_course) ); // phpcs:ignore
 	}
 
 	/**
