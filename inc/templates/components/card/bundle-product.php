@@ -42,6 +42,16 @@ $date_on_sale_to = $product->get_date_on_sale_to()?->date('Y/m/d H:i');
 $image_id  = $product->get_image_id();
 $image_url = \wp_get_attachment_image_url($image_id, 'full');
 
+// 確認是否可以購買 以及還有沒有庫存
+$in_stock_and_purchasable = $product->is_purchasable() && $product->is_in_stock();
+$checkout_url             = \wc_get_checkout_url();
+$url                      = \add_query_arg(
+	[
+		'add-to-cart' => $product->get_id(),
+	],
+	$checkout_url
+);
+
 echo '<div class="w-full bg-base-100 shadow-lg rounded">';
 
 if ($image_url) {
@@ -115,14 +125,30 @@ Plugin::load_template(
 );
 
 Plugin::load_template(
-	'button/add-to-cart',
-	[
-		'product'       => $product,
-		'type'          => 'primary',
-		'class'         => 'px-6 text-white ',
-		'wrapper_class' => '[&_a.wc-forward]:tw-hidden',
-	]
+'button',
+[
+	'type'     => 'primary',
+	'children' => '立即報名',
+	'disabled' => ! $in_stock_and_purchasable,
+	'class'    => $in_stock_and_purchasable ? 'pc-add-to-cart-link flex-1 text-white px-0' : 'pc-add-to-cart-link flex-1 cursor-not-allowed',
+	'href'     => $in_stock_and_purchasable ? $url : '',
+],
 );
+
+Plugin::load_template(
+'button/add-to-cart',
+[
+	'product'       => $product,
+	'children'      => '',
+	'type'          => 'primary',
+	'outline'       => true,
+	'icon'          => 'shopping-bag',
+	'shape'         => 'square',
+	'wrapper_class' => '[&_a.wc-forward]:tw-hidden',
+	'class'         => '',
+],
+);
+
 
 echo '</div>';
 

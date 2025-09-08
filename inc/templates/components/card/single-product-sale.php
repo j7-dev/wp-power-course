@@ -87,7 +87,7 @@ Plugin::load_template(
 	'button',
 	[
 		'type'     => 'primary',
-		'children' => '立即購買',
+		'children' => '立即報名',
 		'disabled' => ! $in_stock_and_purchasable,
 		'class'    => $in_stock_and_purchasable ? 'pc-add-to-cart-link flex-1 text-white' : 'pc-add-to-cart-link flex-1 cursor-not-allowed',
 		'href'     => $in_stock_and_purchasable ? $url : '',
