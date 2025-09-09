@@ -26,9 +26,25 @@ final class Product {
 	/**
 	 * Add product type options
 	 *
-	 * @param array{string:array{id:string,wrapper_class:string,label:string,description:string,default:string}} $product_type_options - Product type options
+	 * @param array{
+	 *     string:array{
+	 *      id:string,
+	 *      wrapper_class:string,
+	 *      label:string,
+	 *      description:string,
+	 *      default:string
+	 *     }
+	 * } $product_type_options - Product type options
 	 *
-	 * @return array{string:array{id:string,wrapper_class:string,label:string,description:string,default:string}}
+	 * @return array{
+	 *     string:array{
+	 *      id:string,
+	 *      wrapper_class:string,
+	 *      label:string,
+	 *      description:string,
+	 *      default:string
+	 *     }
+	 * }
 	 */
 	public static function add_product_type_options( $product_type_options ): array {
 
@@ -68,7 +84,7 @@ final class Product {
 			return;
 		}
 
-		$is_course = \wc_string_to_bool( $_REQUEST[ $option ] ); // phpcs:ignore
+		$is_course = \wc_string_to_bool( $_REQUEST[ $option ] ) || 'on' === $_REQUEST[ $option ]; // phpcs:ignore
 
 		\update_post_meta( $post_id, $option, \wc_bool_to_string( $is_course) ); // phpcs:ignore
 	}
