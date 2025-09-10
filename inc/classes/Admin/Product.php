@@ -77,6 +77,7 @@ final class Product {
 		$option = "_{$option}";
 
 		if (!isset( $_REQUEST[ $option ] )) { // phpcs:ignore
+			\update_post_meta( $post_id, $option, 'no' );
 			return;
 		}
 
