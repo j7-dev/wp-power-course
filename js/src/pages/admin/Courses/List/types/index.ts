@@ -83,6 +83,7 @@ export type TCourseRecord = TCourseBaseRecord &
     show_review_tab: 'yes' | 'no' | ''
     show_review_list: 'yes' | 'no' | ''
     show_total_student: 'yes' | 'no' | ''
+    teacher_ids: string[],
     enable_comment: 'yes' | 'no' | ''
     hide_single_course: 'yes' | 'no' | ''
     extra_student_count: number

@@ -26,7 +26,7 @@ const CourseDescriptionComponent = ({
 	formProps: FormProps
 }) => {
 	const form = formProps.form as FormInstance
-	const { options, isLoading } = useOptions({ endpoint: 'courses/options' })
+	const { options } = useOptions({ endpoint: 'courses/options' })
 	const { product_cats = [], product_tags = [] } = options
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
 	const productUrl = `${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/`
@@ -56,13 +56,12 @@ const CourseDescriptionComponent = ({
 	}, [selectedTeachers.length])
 
 	useEffect(() => {
-		if (course?.id) {
-			const teacherIds = form.getFieldValue(['teacher_ids'])
-			setInitTeacherIds(teacherIds || [])
+		if (course?.id && course?.teacher_ids?.length) {
+			setInitTeacherIds(course?.teacher_ids || [])
 		} else {
 			setInitTeacherIds([])
 		}
-	}, [course?.id])
+	}, [course])
 
 	return (
 		<Form {...formProps}>
