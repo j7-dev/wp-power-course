@@ -77,7 +77,11 @@ final class Product {
 		$option = "_{$option}";
 
 		if (!isset( $_REQUEST[ $option ] )) { // phpcs:ignore
-			\update_post_meta( $post_id, $option, 'no' );
+			// 只有在傳統的 WordPress 商品編輯才會預設儲存為 no
+			$is_admin = \is_admin() && ( isset($_POST['publish']) || isset($_POST['save']) );
+			if ($is_admin) {
+				\update_post_meta( $post_id, $option, 'no' );
+			}
 			return;
 		}
 
