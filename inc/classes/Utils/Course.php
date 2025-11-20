@@ -34,7 +34,7 @@ abstract class Course {
 
 		$option_value = $product->get_meta( '_' . AdminProduct::PRODUCT_OPTION_NAME );
 
-		return \in_array( $option_value, [ 'yes', 'on', true ]);
+		return \in_array( $option_value, [ 'yes', 'on' ], true);
 	}
 
 	/**
