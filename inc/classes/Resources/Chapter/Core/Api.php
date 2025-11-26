@@ -366,7 +366,7 @@ final class Api extends ApiBase {
 		try {
 			$results        = PowerhouseBase::batch_process(
 				$ids,
-				function ( int $id ) {
+				static function ( int $id ) {
 					// 因為 wp_trash_post 有 hook 會遞規刪除子文章，所以這邊要先檢查狀態
 					// 不然刪除已經為 trash 的文章，會 return false，誤報為刪除失敗
 					$status = \get_post_status( (int) $id );
