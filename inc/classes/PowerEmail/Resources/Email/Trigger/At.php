@@ -9,6 +9,7 @@ use J7\PowerCourse\PowerEmail\Resources\Email;
 use J7\PowerCourse\PowerEmail\Resources\Email\Email as EmailResource;
 use J7\PowerCourse\Resources\Course\LifeCycle as CourseLifeCycle;
 use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
+use J7\Powerhouse\Utils\Base as PowerhouseUtils;
 
 
 /**
@@ -110,12 +111,25 @@ final class At {
 	 * @param array<numeric-string|int> $user_ids 使用者 ID 陣列
 	 */
 	public function send_users_callback( array $email_ids, array $user_ids ): void {
-		foreach ( $email_ids as $email_id ) {
-			$email = new EmailResource( (int) $email_id );
-			foreach ( $user_ids as $user_id ) {
-				$email->send_email( (int) $user_id );
-			}
-		}
+
+		$batch_options = [
+			'batch_size'  => 20,  // 每批次處理的項目數量
+			'pause_ms'    => 750, // 每批次之間暫停的毫秒數
+			'flush_cache' => false, // 每批次後是否清除 WordPress 快取
+		];
+
+		PowerhouseUtils::batch_process(
+			$email_ids,
+			static function ( $email_id ) use ( $user_ids, $batch_options ) {
+				$email = new EmailResource( (int) $email_id );
+				PowerhouseUtils::batch_process(
+				$user_ids,
+				static fn( $user_id ) => $email->send_email( (int) $user_id ),
+					$batch_options
+					);
+			},
+			$batch_options
+			);
 	}
 
 
