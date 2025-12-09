@@ -37,9 +37,6 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 
 	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
 	const handleOnFinish = (values: Partial<TChapterRecord>) => {
-		// 刪除 description 屬性
-		// 因為 description 內文為獨立儲存
-		delete values.description
 		onFinish(toFormData(values))
 	}
 
@@ -125,6 +122,7 @@ const ChapterEditComponent = ({ record }: { record: TChapterRecord }) => {
 						resource="chapters"
 						dataProviderName="power-course"
 						initialEditor={initEditor as 'power-editor' | 'elementor'}
+						parseData={toFormData}
 					/>
 				</div>
 				<div className="mb-6 max-w-[20rem]">
