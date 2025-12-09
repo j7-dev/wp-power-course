@@ -55,6 +55,7 @@ final class Ajax {
 				'strategy' => 'defer',
 			]
 		);
+		Plugin::instance()->add_module_handle(Plugin::$kebab . '-template', 'defer');
 
 		$is_avl = CourseUtils::is_avl();
 
