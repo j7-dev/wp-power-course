@@ -9,7 +9,7 @@ import { Heading, ListSelect, useListSelect } from '@/components/general'
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { FileUpload } from '@/components/post'
-import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
+import { useParseData, useRecord } from '@/pages/admin/Courses/Edit/hooks'
 import { useEnv } from '@/hooks'
 import {
 	CopyText,
@@ -32,6 +32,7 @@ const CourseDescriptionComponent = ({
 	const productUrl = `${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/`
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
 	const course = useRecord()
+	const parseData = useParseData()
 
 	const { listSelectProps } = useListSelect<TUserRecord>({
 		resource: 'users',
@@ -128,6 +129,7 @@ const CourseDescriptionComponent = ({
 							<BlockNoteDrawer
 								resource="courses"
 								dataProviderName="power-course"
+								parseData={parseData}
 							/>
 						</div>
 					</div>
@@ -136,6 +138,7 @@ const CourseDescriptionComponent = ({
 							resource="courses"
 							dataProviderName="power-course"
 							initialEditor={course?.editor as 'power-editor' | 'elementor'}
+							parseData={parseData}
 						/>
 					</div>
 
