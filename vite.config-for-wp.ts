@@ -7,6 +7,7 @@ import optimizer from 'vite-plugin-optimizer'
 import { terser } from 'rollup-plugin-terser'
 
 export default defineConfig({
+	base: '/wp-content/plugins/power-course/inc/assets/dist/', // ★ 設定正確的公開路徑
 	server: {
 		port: 6174,
 		cors: {
