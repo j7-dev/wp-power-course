@@ -152,9 +152,9 @@ final class Api extends ApiBase {
 	 */
 	public function get_emails_callback( $request ) { // phpcs:ignore
 
-		// 未來有做篩選器材需要開啟
-		// $params = $request->get_query_params();
-		// $params = WP::sanitize_text_field_deep( $params, false );
+		// 未來有做篩選器才需要開啟
+		$params = $request->get_query_params();
+		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
 			'post_type'      => EmailCPT::POST_TYPE,
@@ -168,14 +168,14 @@ final class Api extends ApiBase {
 		];
 
 		// 未來有做篩選器材需要開啟
-		// $args = \wp_parse_args(
-		// $params,
-		// $default_args,
-		// );
+		$args = \wp_parse_args(
+		$params,
+		$default_args,
+		);
 
-		$results = new \WP_Query( $default_args );
+		$results = new \WP_Query( $args );
 
-		$total       = $results->total;
+		$total       = $results->found_posts;
 		$total_pages = $results->max_num_pages;
 
 		$post_ids = $results->posts;
