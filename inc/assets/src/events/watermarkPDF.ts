@@ -14,6 +14,21 @@ export const watermarkPDF = () => {
 		return
 	}
 
+
+    $('#pc-classroom-body').on('click', 'a[data-href*=".pdf"]', function (e) {
+
+        const $link = $(this)
+        const completed = $link.attr('data-completed') === 'true'
+        if (!completed) {
+            // 檢查此 PDF 是否已經處理完了
+            e.stopPropagation()
+            e.preventDefault()
+            alert(
+                    '此 PDF 還在處理中，請稍後幾秒鐘後再試，如果還是無法下載，請聯繫管理員',
+            )
+        }
+    })
+
 	// 3. 找到所有 PDF 下載連結
 	const $pdfDownloadLinks = $('#pc-classroom-body a[href*=".pdf"]')
 	$pdfDownloadLinks.each(async function (index, el) {
@@ -47,7 +62,7 @@ export const watermarkPDF = () => {
 
 			// 載入 PDF 文件
 			const pdfDoc = await PDFDocument.load(pdfBuffer, {
-				ignoreEncryption: true
+				ignoreEncryption: true,
 			})
 
 			// 註冊 fontkit
@@ -122,18 +137,6 @@ export const watermarkPDF = () => {
 		}
 	})
 
-	$pdfDownloadLinks.on('click', function (e) {
-		const $link = $(this)
-		const completed = $link.data('completed')
-		if (!completed) {
-			// 檢查此 PDF 是否已經處理完了
-			e.stopPropagation()
-			e.preventDefault()
-			alert(
-				'此 PDF 還在處理中，請稍後幾秒鐘後再試，如果還是無法下載，請聯繫管理員',
-			)
-		}
-	})
 }
 
 /**
