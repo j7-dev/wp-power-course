@@ -283,6 +283,7 @@ final class Course extends ApiBase {
 			'limit_unit'                    => $limit->limit_unit,
 			'is_popular'                    => (string) $product->get_meta( 'is_popular' ),
 			'is_featured'                   => (string) $product->get_meta( 'is_featured' ),
+			'show_join'                   => (string) $product->get_meta( 'show_join' ),
 			'show_review'                   => (string) $product->get_meta( 'show_review' ),
 			'reviews_allowed'               => (bool) $product->get_reviews_allowed(),
 			'show_description_tab'          => (string) $product->get_meta( 'show_description_tab' ) ?: 'yes',
