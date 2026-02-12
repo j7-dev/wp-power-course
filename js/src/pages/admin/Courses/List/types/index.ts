@@ -78,6 +78,7 @@ export type TCourseRecord = TCourseBaseRecord &
     }[]
     is_popular: 'yes' | 'no' | ''
     is_featured: 'yes' | 'no' | ''
+    show_join: 'yes' | 'no' | ''
     show_review: 'yes' | 'no' | ''
     reviews_allowed: boolean
     show_review_tab: 'yes' | 'no' | ''
