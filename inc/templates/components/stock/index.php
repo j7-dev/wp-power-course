@@ -20,23 +20,14 @@ $args = wp_parse_args( $args, $default_args );
 	'product' => $product,
 ] = $args;
 
-$helper = Helper::instance( $product );
-if ($helper?->is_bundle_product ) {
-	$course_product = $helper->get_course_product();
-	if (!$course_product) {
-		$course_product = $product;
-	}
-} else {
-	$course_product = $product;
-}
+$managing_stock = $product->managing_stock();
 
-$managing_stock = $course_product->managing_stock();
 if (!$managing_stock) {
 	return;
 }
 
 
-$show_stock_quantity = wc_string_to_bool($course_product->get_meta('show_stock_quantity'));
+$show_stock_quantity = wc_string_to_bool($product->get_meta('show_stock_quantity'));
 
 $product_low_stock_amount = $product->get_low_stock_amount(); // 個別商品 override 低庫存通知數量
 
@@ -53,12 +44,8 @@ if ($stock_quantity <= 0) {
 	$color_class = 'bg-gray-100 text-gray-500';
 }
 
-printf(
-/*html*/'
-<div class="mt-1 flex">
-	<span class="px-2 py-1 %1$s text-xs rounded-md font-bold">剩餘 %2$d 組</span>
-</div>
-',
-$color_class,
-$stock_quantity
-);
+echo <<<HTML
+    <div class="mt-1 flex">
+        <span class="px-2 py-1 {$color_class} text-xs rounded-md font-bold">剩餘 {$stock_quantity} 組</span>
+    </div>
+HTML;
