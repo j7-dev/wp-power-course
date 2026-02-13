@@ -93,13 +93,12 @@ final class Order {
 	 * @return void
 	 */
 	private function _handle_add_course_item_meta_by_order( \WC_Order $order ): void {
+		/** @var \WC_Order_Item_Product[] $items */
 		$items = $order->get_items();
 
 		// 檢查訂單是否有銷售方案商品，如果有將課程限制條件存入為 order item
 		foreach ( $items as $item ) {
-			/**
-			 * @var \WC_Order_Item_Product $item
-			 */
+
 			$product_id = $item->get_product_id();
 			$product    = \wc_get_product( $product_id );
 
@@ -119,9 +118,12 @@ final class Order {
 						continue;
 					}
 
+					// ex: 買了 3 份銷售方案，應該要扣除3份庫存
+					$qty = $item->get_quantity() ?: 1;
+
 					$order->add_product(
 						$included_product,
-						1, // TODO: 應該也要記錄數量
+						$qty, // TODO: 應該也要記錄數量
 						[
 							'name'     => $product->get_name() . ' - ' . $included_product->get_name(),
 							'subtotal' => 0,
