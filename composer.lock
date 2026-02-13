@@ -2793,18 +2793,18 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "squizlabs/php_codesniffer": 0,
+        "wp-coding-standards/wpcs": 0,
         "dealerdirect/phpcodesniffer-composer-installer": 0,
+        "phpcompatibility/php-compatibility": 0,
+        "phpstan/phpstan": 0,
         "php-stubs/woocommerce-stubs": 0,
         "php-stubs/wordpress-stubs": 0,
-        "phpcompatibility/php-compatibility": 0,
-        "phpstan/extension-installer": 0,
-        "phpstan/phpstan": 0,
-        "squizlabs/php_codesniffer": 0,
-        "wp-coding-standards/wpcs": 0
+        "phpstan/extension-installer": 0
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
