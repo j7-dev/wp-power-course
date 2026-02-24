@@ -63,6 +63,9 @@ final class Email {
 	 */
 	public function __construct( $post, $show_description = true, $api_format = false ) {
 		$post         = $post instanceof \WP_Post ? $post : \get_post( $post );
+		if (! $post instanceof \WP_Post) {
+			return;
+		}
 		$this->id     = (string) $post->ID;
 		$this->status = $post->post_status;
 		$this->name   = $post->post_title;
