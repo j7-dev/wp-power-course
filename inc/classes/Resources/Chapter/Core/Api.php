@@ -376,11 +376,11 @@ final class Api extends ApiBase {
 					return \wp_trash_post( (int) $id );
 				}
 			);
-			$failed_results = array_filter($results, fn ( $result ) => !$result);
+			$failed_results = array_filter($results, static fn ( $result ) => !$result);
 
 			if ($failed_results) {
 				$failed_result_indexes = array_keys($failed_results);
-				$failed_ids            = array_map(fn ( int $index ) => $ids[ $index ], $failed_result_indexes);
+				$failed_ids            = array_map(static fn ( $index ) => $ids[ $index ], $failed_result_indexes);
 				throw new \Exception(__('刪除章節資料失敗', 'power-course') . ' ids:' . implode(', ', $failed_ids));
 			}
 
