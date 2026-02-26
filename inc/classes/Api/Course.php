@@ -302,6 +302,7 @@ final class Course extends ApiBase {
 			'enable_mobile_fixed_cta'       => (string) $product->get_meta( 'enable_mobile_fixed_cta' ) ?: 'no',
 			'show_stock_quantity'           => (string) $product->get_meta( 'show_stock_quantity' ) ?: 'no',
 			'show_customer_amount'          => (string) $product->get_meta( 'show_customer_amount' ) ?: 'no',
+			'show_total_sales'              => (string) $product->get_meta( 'show_total_sales' ) ?: 'no',
 			'extra_student_count'           => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'                 => $product->get_meta( 'feature_video' ) ?: [
 				'type' => 'none',

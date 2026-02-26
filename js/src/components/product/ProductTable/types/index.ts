@@ -106,6 +106,7 @@ export type TProductRecord = {
 	enable_mobile_fixed_cta: 'yes' | 'no' | ''
 	show_stock_quantity: 'yes' | 'no' | ''
 	show_customer_amount: 'yes' | 'no' | ''
+	show_total_sales: 'yes' | 'no' | ''
 	bind_courses_data: TBindCoursesData[]
 	link_course_ids: string
 }
