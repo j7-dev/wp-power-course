@@ -3,11 +3,11 @@
  * 顯示庫存組件
  */
 
-use J7\PowerCourse\BundleProduct\Helper;
 use J7\Powerhouse\Domains\Woocommerce\Model\Settings as WCSettings;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
+	'class'   => 'mt-1',
 ];
 
 /**
@@ -18,6 +18,7 @@ $args = wp_parse_args( $args, $default_args );
 
 [
 	'product' => $product,
+	'class'   => $class,
 ] = $args;
 
 $managing_stock = $product->managing_stock();
@@ -45,7 +46,7 @@ if ($stock_quantity <= 0) {
 }
 
 echo <<<HTML
-    <div class="mt-1 flex">
+    <div class="{$class}">
         <span class="px-2 py-1 {$color_class} text-xs rounded-md font-bold">剩餘 {$stock_quantity} 組</span>
     </div>
 HTML;
