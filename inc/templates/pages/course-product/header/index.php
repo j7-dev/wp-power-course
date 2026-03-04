@@ -5,6 +5,7 @@
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Utils\Course as CourseUtils;
+use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 $default_args = [
 	'product'   => $GLOBALS['course'] ?? null,
@@ -66,7 +67,7 @@ if ( !is_array( $teacher_ids ) ) {
 
 		<?php
 		echo '<div class="flex gap-2 items-center mb-[10px] flex-wrap">';
-		$settings = \J7\PowerCourse\Resources\Settings\Model\Settings::instance();
+		$settings = Settings::instance();
 		if ( 'yes' === $settings->show_stock_label ) {
 			Plugin::load_template(
 				 'stock',
