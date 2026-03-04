@@ -20,6 +20,13 @@ const index = () => {
 				<Heading className="mt-8">課程銷售頁</Heading>
 				<FiSwitch
 					formItemProps={{
+						name: ['show_stock_label'],
+						label: '顯示剩餘庫存標籤',
+						initialValue: 'yes',
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
 						name: ['fix_video_and_tabs_mobile'],
 						label: '手機版時，影片以及 tabs 黏性(sticky)置頂',
 						tooltip:

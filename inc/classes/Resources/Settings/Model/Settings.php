@@ -45,6 +45,9 @@ final class Settings extends DTO {
 	/** @var string $pc_watermark_text 浮水印文字 */
 	public string $pc_watermark_text = '用戶 {display_name} 正在觀看 {post_title} IP:{ip} <br /> Email:{email}';
 
+	/** @var string $show_stock_label 是否顯示庫存標籤 */
+	public string $show_stock_label = 'yes';
+
 	/** @var int $pc_pdf_watermark_qty PDF 浮水印數量 */
 	public int $pc_pdf_watermark_qty = 0;
 

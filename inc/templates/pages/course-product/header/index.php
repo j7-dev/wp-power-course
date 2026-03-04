@@ -66,13 +66,16 @@ if ( !is_array( $teacher_ids ) ) {
 
 		<?php
 		echo '<div class="flex gap-2 items-center mb-[10px] flex-wrap">';
-		Plugin::load_template(
-			 'stock',
-			[
-				'product' => $product,
-				'class' => 'flex items-center h-6',
-			]
-			);
+		$settings = \J7\PowerCourse\Resources\Settings\Model\Settings::instance();
+		if ( 'yes' === $settings->show_stock_label ) {
+			Plugin::load_template(
+				 'stock',
+				[
+					'product' => $product,
+					'class' => 'flex items-center h-6',
+				]
+				);
+		}
 
 		Plugin::load_template(
 			 'stock/total_sales',
