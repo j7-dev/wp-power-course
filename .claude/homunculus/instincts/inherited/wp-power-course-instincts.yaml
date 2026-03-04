@@ -1,0 +1,531 @@
+# Instincts generated from https://github.com/j7-dev/wp-power-course
+# Generated: 2026-03-04T06:57:13.752Z
+# Version: 2.0
+
+---
+id: wp-power-course-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: chore, fix, feat, refactor
+
+## Evidence
+
+- 200 commits analyzed
+- Detected conventional commit pattern
+- Examples: chore: 更新文件, docs: 整合 .claude 文件到 copilot-instructions 並建立 architecture 參考文件
+
+---
+id: wp-power-course-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Commit Length
+
+## Action
+
+Keep commit messages concise (under 50 characters)
+
+## Evidence
+
+- Average commit message length: 27 chars
+- Based on 200 commits
+
+---
+id: wp-power-course-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: wp-power-course-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: wp-power-course-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: wp-power-course-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: 
+
+---
+id: wp-power-course-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: wp-power-course-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~7x per month
+- Files: js/src/pages/admin/courses/edit/*, js/src/pages/admin/courses/list/types/*, inc/templates/components/card/*
+
+---
+id: wp-power-course-workflow-version-release
+trigger: "when doing version release"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Version Release
+
+## Action
+
+Follow the version-release workflow:
+1. Update package.json version
+2. Update plugin.php version
+3. Commit with 'chore: release vX.X.X' message
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~15x per month
+- Files: package.json, plugin.php
+
+---
+id: wp-power-course-workflow-documentation-update
+trigger: "when doing documentation update"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Documentation Update
+
+## Action
+
+Follow the documentation-update workflow:
+1. Update .claude/instructions.md or .claude/architecture.md
+2. Update .github/copilot-instructions.md
+3. Sometimes update README.md
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: .claude/instructions.md, .claude/architecture.md, .github/copilot-instructions.md
+
+---
+id: wp-power-course-workflow-product-admin-feature
+trigger: "when doing product admin feature"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Product Admin Feature
+
+## Action
+
+Follow the product-admin-feature workflow:
+1. Update PHP API class (inc/classes/Admin/Product.php or inc/classes/Api/Course.php)
+2. Update TypeScript types
+3. Update React admin components
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: inc/classes/Admin/Product.php, inc/classes/Api/Course.php, js/src/pages/admin/Courses/Edit/**
+
+---
+id: wp-power-course-workflow-template-component-update
+trigger: "when doing template component update"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Template Component Update
+
+## Action
+
+Follow the template-component-update workflow:
+1. Modify template files in inc/templates/components/
+2. Sometimes update related template pages
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: inc/templates/components/**/*.php, inc/templates/pages/**/*.php
+
+---
+id: wp-power-course-workflow-dependency-update
+trigger: "when doing dependency update"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/j7-dev/wp-power-course
+---
+
+# Wp Power Course Workflow Dependency Update
+
+## Action
+
+Follow the dependency-update workflow:
+1. Run composer update
+2. Commit updated composer.lock file
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: composer.lock
+
+---
+id: wp-power-course-conventional-commits
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Conventional Commits
+
+## Action
+
+Use conventional commit format with prefixes: chore, fix, feat, refactor, docs
+
+## Evidence
+
+- All commits follow conventional format
+- Examples: 'chore: 更新文件', 'feat: 新增 power-course-php PHP 開發規範 SKILL'
+
+---
+id: wp-power-course-camelcase-files
+trigger: "When creating new TypeScript/JavaScript files"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Camelcase Files
+
+## Action
+
+Use camelCase naming convention for file names
+
+## Evidence
+
+- Pattern in js/src/pages/admin/courses/edit/*
+- Consistent across TypeScript files
+
+---
+id: wp-power-course-pascalcase-classes
+trigger: "When defining TypeScript/JavaScript classes"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Pascalcase Classes
+
+## Action
+
+Use PascalCase naming convention for class names
+
+## Evidence
+
+- Established naming convention pattern
+- Consistent with TypeScript best practices
+
+---
+id: wp-power-course-screaming-snake-constants
+trigger: "When defining constants in TypeScript/JavaScript"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Screaming Snake Constants
+
+## Action
+
+Use SCREAMING_SNAKE_CASE naming convention
+
+## Evidence
+
+- Established naming convention pattern
+- Standard TypeScript practice
+
+---
+id: wp-power-course-try-catch-errors
+trigger: "When handling errors in code"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Try Catch Errors
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Commit: 'fix: 可能發生的 Email Exception'
+- Error handling style established
+
+---
+id: wp-power-course-release-workflow
+trigger: "When releasing a new version"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Release Workflow
+
+## Action
+
+Update package.json and plugin.php version numbers, then commit with 'chore: release vX.X.X'
+
+## Evidence
+
+- 15 version releases per month
+- Commit: 'chore: release v0.11.24'
+- Pattern in package.json and plugin.php files
+
+---
+id: wp-power-course-docs-sync
+trigger: "When updating project documentation"
+confidence: 0.8
+domain: workflow
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Docs Sync
+
+## Action
+
+Update .claude/instructions.md, .claude/architecture.md, and .github/copilot-instructions.md together
+
+## Evidence
+
+- 3 documentation updates per month
+- Commit: 'docs: 整合 .claude 文件到 copilot-instructions 並建立 architecture 參考文件'
+
+---
+id: wp-power-course-fullstack-product-changes
+trigger: "When modifying product admin functionality"
+confidence: 0.75
+domain: workflow
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Fullstack Product Changes
+
+## Action
+
+Update PHP API classes, TypeScript types, and React admin components together
+
+## Evidence
+
+- 4 product feature changes per month
+- Files: inc/classes/Api/Course.php, js/src/pages/admin/Courses/Edit/
+- Commit: 'feat: 新增課程 edit_url, 可以直接前往傳統介面編輯'
+
+---
+id: wp-power-course-template-component-updates
+trigger: "When modifying frontend display components"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Template Component Updates
+
+## Action
+
+Update files in inc/templates/components/ directory
+
+## Evidence
+
+- 3 template updates per month
+- Files: inc/templates/components/card/
+- Pattern of template modifications
+
+---
+id: wp-power-course-composer-dependency-update
+trigger: "When updating PHP dependencies"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Composer Dependency Update
+
+## Action
+
+Run composer update and commit the updated composer.lock file
+
+## Evidence
+
+- 3 dependency updates per month
+- composer.lock file modifications
+- Standard PHP dependency management
+
+---
+id: wp-power-course-bilingual-commits
+trigger: "When writing commit messages"
+confidence: 0.8
+domain: git
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Bilingual Commits
+
+## Action
+
+Use either English or Chinese (Traditional) for commit messages
+
+## Evidence
+
+- Mixed language commits: 'chore: 更新文件' and 'Add agentic workflow issue-triage-agent'
+- Consistent bilingual pattern
+
+---
+id: wp-power-course-type-based-organization
+trigger: "When organizing code modules"
+confidence: 0.9
+domain: architecture
+source: repo-analysis
+source_repo: j7-dev/wp-power-course
+---
+
+# Wp Power Course Type Based Organization
+
+## Action
+
+Organize code by type (js/, inc/, .github/ directories)
+
+## Evidence
+
+- Established folder structure
+- Clear separation: js/ for frontend, inc/ for backend PHP
+
