@@ -58,7 +58,7 @@ export class ApiClient {
 	}
 
 	/**
-	 * Power Course API — POST
+	 * Power Course API — POST (JSON)
 	 */
 	async pcPost<T = unknown>(
 		endpoint: string,
@@ -70,6 +70,29 @@ export class ApiClient {
 				headers: this.headers(),
 				data: body,
 			},
+		)
+		return {
+			status: resp.status(),
+			data: (await resp.json()) as T,
+			headers: resp.headers(),
+		}
+	}
+
+	/**
+	 * Power Course API — POST (form-encoded)
+	 *
+	 * PHP 端使用 $request->get_body_params() 讀取，
+	 * 必須以 application/x-www-form-urlencoded 格式送出。
+	 */
+	async pcPostForm<T = unknown>(
+		endpoint: string,
+		formData: Record<string, string>,
+	): Promise<ApiResponse<T>> {
+		const h: Record<string, string> = {}
+		if (this.nonce) h['X-WP-Nonce'] = this.nonce
+		const resp = await this.request.post(
+			`${BASE_URL}/wp-json/power-course/${endpoint}`,
+			{ headers: h, form: formData },
 		)
 		return {
 			status: resp.status(),
@@ -182,6 +205,33 @@ export class ApiClient {
 			headers: resp.headers(),
 		}
 	}
+
+	// ── 便利方法 ──────────────────────────────────
+
+	/**
+	 * 建立測試課程
+	 *
+	 * Power Course API 回傳格式: { code, message, data: { id: "string" } }
+	 * 此方法正確解析並回傳數字 ID。
+	 */
+	async createCourse(name: string = 'E2E 測試課程'): Promise<number> {
+		const resp = await this.pcPost('courses', { name })
+		const body = resp.data as { code: string; data: { id: string } }
+		const id = Number(body?.data?.id)
+		if (!id || isNaN(id)) {
+			throw new Error(
+				`課程建立失敗，API 回傳: ${JSON.stringify(resp.data)}`,
+			)
+		}
+		return id
+	}
+
+	/**
+	 * 批量刪除課程
+	 */
+	async deleteCourses(ids: number[]): Promise<void> {
+		await this.pcDelete('courses', { ids })
+	}
 }
 
 /**
@@ -194,4 +244,30 @@ export async function getNonceFromPage(
 		// @ts-expect-error — wpApiSettings is injected by WP
 		return window.wpApiSettings?.nonce || ''
 	})
+}
+
+/**
+ * 在 beforeAll/afterAll 中建立 API Client
+ *
+ * worker-scoped browser fixture 在 beforeAll 中可用。
+ * 此函式建立獨立的 context → 頁面 → 取 nonce → 回傳 ApiClient。
+ */
+export async function setupApiFromBrowser(
+	browser: import('@playwright/test').Browser,
+): Promise<{ api: ApiClient; dispose: () => Promise<void> }> {
+	const context = await browser.newContext({
+		storageState: '.auth/admin.json',
+	})
+	const page = await context.newPage()
+	const baseUrl = process.env.WP_BASE_URL || 'http://localhost:8889'
+	await page.goto(`${baseUrl}/wp-admin/`)
+	await page.waitForSelector('body.wp-admin', { timeout: 15_000 })
+	const nonce = await getNonceFromPage(page)
+	return {
+		api: new ApiClient(context.request, nonce),
+		dispose: async () => {
+			await page.close()
+			await context.close()
+		},
+	}
 }

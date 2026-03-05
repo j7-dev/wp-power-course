@@ -37,7 +37,10 @@ export default defineConfig({
 		{
 			name: 'admin',
 			testDir: './01-admin',
-			use: { ...devices['Desktop Chrome'] },
+			use: {
+				...devices['Desktop Chrome'],
+				viewport: { width: 1920, height: 1080 },
+			},
 		},
 		{
 			name: 'frontend',

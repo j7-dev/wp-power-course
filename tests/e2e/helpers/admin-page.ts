@@ -59,24 +59,19 @@ export async function waitForTableLoaded(page: Page): Promise<void> {
  * 等待 Ant Design ProTable 載入完成
  */
 export async function waitForProTableLoaded(page: Page): Promise<void> {
-	await page.waitForSelector('.ant-pro-table', { timeout: SPA_LOAD_TIMEOUT })
+	await page.waitForSelector('.ant-table-wrapper', { timeout: SPA_LOAD_TIMEOUT })
 	await waitForTableLoaded(page)
 }
 
 /**
  * 等待 Ant Design Form 載入完成
+ *
+ * 不依賴 skeleton 全部消失（部分 lazy-loaded 區塊的 skeleton 可能持續存在），
+ * 改為等待 form + tabs 都渲染完成即視為載入完畢。
  */
 export async function waitForFormLoaded(page: Page): Promise<void> {
 	await page.waitForSelector('.ant-form', { timeout: SPA_LOAD_TIMEOUT })
-
-	// 等待 skeleton 消失
-	await page.waitForFunction(
-		() => {
-			const skeletons = document.querySelectorAll('.ant-skeleton-active')
-			return skeletons.length === 0
-		},
-		{ timeout: SPA_LOAD_TIMEOUT },
-	)
+	await page.waitForSelector('.ant-tabs-tab', { timeout: SPA_LOAD_TIMEOUT })
 }
 
 /**
@@ -102,14 +97,50 @@ export async function waitForNotification(page: Page): Promise<void> {
 /**
  * 點擊 Ant Design Tabs 的指定 Tab
  *
+ * 策略：先嘗試直接點擊 tab，若因 overflow 導致 aria-selected 未改變，
+ * 則透過 overflow dropdown（ellipsis 按鈕）點擊。最終 fallback 使用
+ * dispatchEvent 直接觸發 React 事件。
+ *
  * @param page - Playwright Page
  * @param tabName - Tab 顯示文字
  */
 export async function clickTab(page: Page, tabName: string): Promise<void> {
-	await page.click(`.ant-tabs-tab:has-text("${tabName}")`)
+	const tab = page.getByRole('tab', { name: tabName })
 
-	// 等待 Tab 內容載入
-	await page.waitForTimeout(500)
+	// 策略 1：直接點擊 role="tab" 元素
+	await tab.click()
+
+	// 檢查是否成功切換
+	const isSelected = await tab
+		.getAttribute('aria-selected', { timeout: 1_500 })
+		.then((v) => v === 'true')
+		.catch(() => false)
+	if (isSelected) return
+
+	// 策略 2：透過 Ant Design overflow dropdown 點擊
+	const moreBtn = page.locator('.ant-tabs-nav-more')
+	if (await moreBtn.isVisible({ timeout: 1_000 }).catch(() => false)) {
+		await moreBtn.click()
+		const dropdownItem = page.locator('.ant-tabs-dropdown-menu-item').filter({ hasText: tabName })
+		if (await dropdownItem.isVisible({ timeout: 2_000 }).catch(() => false)) {
+			await dropdownItem.click()
+			await expect(tab).toHaveAttribute('aria-selected', 'true', { timeout: 5_000 })
+			return
+		}
+	}
+
+	// 策略 3：dispatchEvent 直接觸發 click（繞過 overflow clip）
+	await page.evaluate((name: string) => {
+		const btns = document.querySelectorAll<HTMLElement>('.ant-tabs-tab-btn')
+		for (const btn of btns) {
+			if (btn.textContent?.trim() === name) {
+				btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+				return
+			}
+		}
+	}, tabName)
+
+	await expect(tab).toHaveAttribute('aria-selected', 'true', { timeout: 5_000 })
 }
 
 /**
