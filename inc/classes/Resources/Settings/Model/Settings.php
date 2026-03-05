@@ -116,10 +116,28 @@ final class Settings extends DTO {
 			if ( null !== $limit_unit && !in_array( $limit_unit, [ 'day', 'month', 'year' ], true ) ) {
 				$limit_unit = null;
 			}
+			$limit_value = isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null;
+
+			// Enforce invariants between limit_type, limit_value and limit_unit.
+			if ( 'fixed' === $limit_type ) {
+				// Downgrade to unlimited if value/unit are not valid for a fixed limit.
+				if ( null === $limit_value || $limit_value <= 0 || null === $limit_unit ) {
+					$limit_type  = 'unlimited';
+					$limit_value = null;
+					$limit_unit  = null;
+				}
+			}
+
+			if ( 'unlimited' === $limit_type ) {
+				// Unlimited rules should not keep stale value/unit data.
+				$limit_value = null;
+				$limit_unit  = null;
+			}
+
 			$normalized_courses[] = [
 				'course_id'   => $course_id,
 				'limit_type'  => $limit_type,
-				'limit_value' => isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null,
+				'limit_value' => $limit_value,
 				'limit_unit'  => $limit_unit,
 			];
 		}
