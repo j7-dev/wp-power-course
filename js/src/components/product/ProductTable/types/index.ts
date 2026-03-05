@@ -107,6 +107,7 @@ export type TProductRecord = {
 	show_stock_quantity: 'yes' | 'no' | ''
 	show_customer_amount: 'yes' | 'no' | ''
 	show_total_sales: 'yes' | 'no' | ''
+	show_rest_stock: 'yes' | 'no' | ''
 	bind_courses_data: TBindCoursesData[]
 	link_course_ids: string
 }
