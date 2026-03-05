@@ -1,0 +1,11 @@
+{
+  "name": "antd-toolkit",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "index.js",
+  "module": "index.js",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  }
+}

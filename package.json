@@ -55,6 +55,7 @@
 		"@power/typescript-config": "workspace:*",
 		"@types/mjml-browser": "^4.15.0",
 		"@wordpress/e2e-test-utils-playwright": "^1.41.0",
-		"@wordpress/env": "^11.1.0"
+		"@wordpress/env": "^11.1.0",
+		"prettier-eslint-cli": "^8.0.1"
 	}
 }
