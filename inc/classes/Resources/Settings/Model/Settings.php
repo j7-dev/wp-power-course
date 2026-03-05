@@ -54,6 +54,9 @@ final class Settings extends DTO {
 	/** @var string $pc_pdf_watermark_text PDF 浮水印文字 */
 	public string $pc_pdf_watermark_text = '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}';
 
+	/** @var array<int, array{course_id: int, limit_type: string, limit_value: int|null, limit_unit: string|null}> $auto_grant_courses 註冊自動開通課程設定 */
+	public array $auto_grant_courses = [];
+
 	/** @return self 獲取實例*/
 	public static function instance(): self {
 		if ( self::$dto_instance ) {
@@ -78,6 +81,21 @@ final class Settings extends DTO {
 		foreach ( $properties as $property => $value ) {
 			if ( !property_exists( $this, $property ) ) {
 				$this->dto_error->add( 'invalid_property', "Invalid property: {$property}" );
+			}
+			if ( 'auto_grant_courses' === $property ) {
+				$this->auto_grant_courses = [];
+				foreach ( is_array( $value ) ? $value : [] as $item ) {
+					if ( !is_array( $item ) ) {
+						continue;
+					}
+					$this->auto_grant_courses[] = [
+						'course_id'   => (int) ( $item['course_id'] ?? 0 ),
+						'limit_type'  => (string) ( $item['limit_type'] ?? 'unlimited' ),
+						'limit_value' => isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null,
+						'limit_unit'  => isset( $item['limit_unit'] ) && '' !== $item['limit_unit'] ? (string) $item['limit_unit'] : null,
+					];
+				}
+				continue;
 			}
 			$this->$property = General::to_same_type( $this->$property, $value );
 		}
