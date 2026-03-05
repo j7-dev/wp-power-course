@@ -28,7 +28,11 @@ if (!$managing_stock) {
 }
 
 
-$show_stock_quantity = wc_string_to_bool($product->get_meta('show_stock_quantity'));
+$show_rest_stock = wc_string_to_bool($product->get_meta('show_rest_stock'));
+
+if (!$show_rest_stock) {
+	return;
+}
 
 $product_low_stock_amount = $product->get_low_stock_amount(); // 個別商品 override 低庫存通知數量
 
