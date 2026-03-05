@@ -9,6 +9,7 @@ namespace J7\PowerCourse\Resources\Course;
 
 use J7\PowerCourse\Plugin;
 use J7\PowerCourse\Resources\Settings\Model\Settings;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 /**
  * Class AutoGrant
@@ -42,6 +43,9 @@ final class AutoGrant {
 			if ( !$course_id ) {
 				continue;
 			}
+			if ( !CourseUtils::is_course_product( $course_id ) ) {
+				continue;
+			}
 
 			$limit_type   = (string) ( $auto_grant_course['limit_type'] ?? 'unlimited' );
 			$limit_value  = isset( $auto_grant_course['limit_value'] ) && \is_numeric( $auto_grant_course['limit_value'] )
@@ -52,11 +56,12 @@ final class AutoGrant {
 				: null;
 			$limit        = new Limit( $limit_type, $limit_value, $limit_unit );
 			$expire_date  = $limit->calc_expire_date( null );
+			$expire_label = ( new ExpireDate( $expire_date ) )->expire_date_label;
 
 			try {
 				\do_action( LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, $user_id, $course_id, $expire_date, null );
 				Plugin::logger(
-					"新用戶 #{$user_id} 自動開通課程 #{$course_id}，到期日 {$expire_date}",
+					"新用戶 #{$user_id} 自動開通課程 #{$course_id}，到期日 {$expire_label}",
 					'info',
 				);
 			} catch ( \Throwable $th ) {
