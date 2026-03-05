@@ -50,7 +50,7 @@ final class AutoGrant {
 			$limit_type   = (string) ( $auto_grant_course['limit_type'] ?? 'unlimited' );
 			if ( 'follow_subscription' === $limit_type ) {
 				Plugin::logger(
-					"新用戶 #{$user_id} 自動開通課程 #{$course_id} 跳過：follow_subscription 需要訂單上下文",
+					"新用戶 #{$user_id} 自動開通課程 #{$course_id} 跳過：`follow_subscription` 需要訂單上下文",
 					'warning'
 				);
 				continue;
