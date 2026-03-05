@@ -1,0 +1,53 @@
+import { defineConfig, devices } from '@playwright/test'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const STORAGE_STATE = path.join(__dirname, '.auth', 'admin.json')
+
+export default defineConfig({
+	testDir: '.',
+	fullyParallel: false,
+	forbidOnly: !!process.env.CI,
+	retries: process.env.CI ? 1 : 0,
+	workers: 1,
+	reporter: process.env.CI
+		? [['github'], ['html', { open: 'never' }]]
+		: [['list'], ['html', { open: 'on-failure' }]],
+
+	timeout: 30_000,
+	expect: { timeout: 5_000 },
+
+	globalSetup: './global-setup.ts',
+	globalTeardown: './global-teardown.ts',
+
+	use: {
+		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+		storageState: STORAGE_STATE,
+		locale: 'zh-TW',
+		timezoneId: 'Asia/Taipei',
+		screenshot: 'only-on-failure',
+		trace: 'on-first-retry',
+		video: 'retain-on-failure',
+		actionTimeout: 10_000,
+		navigationTimeout: 15_000,
+	},
+
+	projects: [
+		{
+			name: 'admin',
+			testDir: './01-admin',
+			use: { ...devices['Desktop Chrome'] },
+		},
+		{
+			name: 'frontend',
+			testDir: './02-frontend',
+			use: { ...devices['Desktop Chrome'] },
+		},
+		{
+			name: 'integration',
+			testDir: './03-integration',
+			use: { ...devices['Desktop Chrome'] },
+		},
+	],
+})
