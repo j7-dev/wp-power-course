@@ -36,7 +36,6 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 	return (
 		<Form {...formProps}>
 			<Heading>課程介紹區域</Heading>
-			{/* <Heading size="sm">課程標籤</Heading> */}
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch
 					formItemProps={{
@@ -51,14 +50,6 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 						),
 					}}
 				/>
-				{watchShowTotalSales && (
-					<div>
-						<p className="mb-2">預覽</p>
-						<span className="px-2 py-1 bg-red-100 text-red-500 text-xs rounded-md font-bold">
-							已售出 100 組
-						</span>
-					</div>
-				)}
 				<FiSwitch
 					formItemProps={{
 						name: ['is_popular'],
