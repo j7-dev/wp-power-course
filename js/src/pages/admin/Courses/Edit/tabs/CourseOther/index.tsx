@@ -52,6 +52,19 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 				/>
 				<FiSwitch
 					formItemProps={{
+						name: ['show_rest_stock'],
+						label: (
+							<div className="flex gap-x-2">
+								顯示
+								<span className="bg-green-100 text-green-500 text-xs flex items-center px-2 py-1 rounded-md size-fit mb-1">
+									剩餘 OO 組
+								</span>
+							</div>
+						),
+					}}
+				/>
+				<FiSwitch
+					formItemProps={{
 						name: ['is_popular'],
 						label: (
 							<div className="flex gap-x-2">
