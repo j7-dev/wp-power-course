@@ -81,25 +81,49 @@ final class Settings extends DTO {
 		foreach ( $properties as $property => $value ) {
 			if ( !property_exists( $this, $property ) ) {
 				$this->dto_error->add( 'invalid_property', "Invalid property: {$property}" );
+				continue;
 			}
 			if ( 'auto_grant_courses' === $property ) {
-				$this->auto_grant_courses = [];
-				foreach ( is_array( $value ) ? $value : [] as $item ) {
-					if ( !is_array( $item ) ) {
-						continue;
-					}
-					$this->auto_grant_courses[] = [
-						'course_id'   => (int) ( $item['course_id'] ?? 0 ),
-						'limit_type'  => (string) ( $item['limit_type'] ?? 'unlimited' ),
-						'limit_value' => isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null,
-						'limit_unit'  => isset( $item['limit_unit'] ) && '' !== $item['limit_unit'] ? (string) $item['limit_unit'] : null,
-					];
-				}
+				$this->auto_grant_courses = self::normalize_auto_grant_courses( is_array( $value ) ? $value : [] );
 				continue;
 			}
 			$this->$property = General::to_same_type( $this->$property, $value );
 		}
 		return $this;
+	}
+
+	/**
+	 * 正規化註冊自動開通課程設定
+	 *
+	 * @param array<mixed> $auto_grant_courses 註冊自動開通課程設定
+	 * @return array<int, array{course_id: int, limit_type: string, limit_value: int|null, limit_unit: string|null}>
+	 */
+	public static function normalize_auto_grant_courses( array $auto_grant_courses ): array {
+		$normalized_courses = [];
+		foreach ( $auto_grant_courses as $item ) {
+			if ( !is_array( $item ) ) {
+				continue;
+			}
+			$course_id = (int) ( $item['course_id'] ?? 0 );
+			if ( $course_id <= 0 ) {
+				continue;
+			}
+			$limit_type = (string) ( $item['limit_type'] ?? 'unlimited' );
+			if ( !in_array( $limit_type, [ 'unlimited', 'fixed' ], true ) ) {
+				$limit_type = 'unlimited';
+			}
+			$limit_unit = isset( $item['limit_unit'] ) && '' !== $item['limit_unit'] ? (string) $item['limit_unit'] : null;
+			if ( null !== $limit_unit && !in_array( $limit_unit, [ 'day', 'month', 'year' ], true ) ) {
+				$limit_unit = null;
+			}
+			$normalized_courses[] = [
+				'course_id'   => $course_id,
+				'limit_type'  => $limit_type,
+				'limit_value' => isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null,
+				'limit_unit'  => $limit_unit,
+			];
+		}
+		return $normalized_courses;
 	}
 
 

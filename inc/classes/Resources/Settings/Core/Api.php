@@ -60,28 +60,8 @@ final class Api extends ApiBase {
 
 		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
-		$body_params['auto_grant_courses'] = array_values(
-			array_map(
-				static function ( $course_data ): array {
-					if ( !is_array( $course_data ) ) {
-						return [];
-					}
-					$limit_value = $course_data['limit_value'] ?? null;
-					return [
-						'course_id'   => (int) ( $course_data['course_id'] ?? 0 ),
-						'limit_type'  => (string) ( $course_data['limit_type'] ?? 'unlimited' ),
-						'limit_value' => null !== $limit_value && '' !== $limit_value ? (int) $limit_value : null,
-						'limit_unit'  => isset( $course_data['limit_unit'] ) && '' !== $course_data['limit_unit'] ? (string) $course_data['limit_unit'] : null,
-					];
-				},
-				is_array( $body_params['auto_grant_courses'] ?? null ) ? $body_params['auto_grant_courses'] : []
-			)
-		);
-		$body_params['auto_grant_courses'] = array_values(
-			array_filter(
-				$body_params['auto_grant_courses'],
-				static fn( array $course_data ): bool => [] !== $course_data
-			)
+		$body_params['auto_grant_courses'] = Settings::normalize_auto_grant_courses(
+			is_array( $body_params['auto_grant_courses'] ?? null ) ? $body_params['auto_grant_courses'] : []
 		);
 
 		$settings = Settings::instance();
