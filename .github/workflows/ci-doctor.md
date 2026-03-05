@@ -1,28 +1,27 @@
 ---
-description: Investigates failed CI workflows to identify root causes and patterns, creating issues with diagnostic information
+description: 調查失敗的 CI workflow，找出根因與模式，建立含診斷資訊的 issue
 on:
   workflow_run:
-    workflows: ["CI"]  # Monitor the CI workflow specifically
+    workflows: ["CI"]  # TODO: CI workflow 尚未建立，建立後此處自動生效
     types:
       - completed
     branches:
       - main
-    # This will trigger only when the CI workflow completes with failure
-    # The condition is handled in the workflow body
   stop-after: +1mo
 
-# Only trigger for failures - check in the workflow body
 if: ${{ github.event.workflow_run.conclusion == 'failure' }}
 
 permissions:
-  actions: read        # To query workflow runs, jobs, and logs
-  contents: read       # To read repository files
-  issues: read         # To search and analyze issues
-  pull-requests: read  # To analyze pull request context
+  actions: read
+  contents: read
+  issues: read
+  pull-requests: read
 
 network: defaults
 
-engine: copilot
+engine:
+  id: copilot
+  model: claude-sonnet-4.6
 
 safe-outputs:
   create-issue:
@@ -34,28 +33,45 @@ safe-outputs:
   update-issue:
   noop:
   messages:
-    footer: "> 🩺 *Diagnosis provided by [{workflow_name}]({run_url})*"
-    run-started: "🏥 CI Doctor reporting for duty! [{workflow_name}]({run_url}) is examining the patient on this {event_type}..."
-    run-success: "🩺 Examination complete! [{workflow_name}]({run_url}) has delivered the diagnosis. Prescription issued! 💊"
-    run-failure: "🏥 Medical emergency! [{workflow_name}]({run_url}) {status}. Doctor needs assistance..."
+    footer: "> 🩺 *由 [{workflow_name}]({run_url}) 提供診斷*"
+    run-started: "🏥 CI 醫生報到！[{workflow_name}]({run_url}) 正在檢查 {event_type} 的病患..."
+    run-success: "🩺 檢查完畢！[{workflow_name}]({run_url}) 已開出處方 💊"
+    run-failure: "🏥 醫療緊急！[{workflow_name}]({run_url}) {status}，醫生需要支援..."
 
 tools:
   cache-memory: true
   web-fetch:
-  web-search:
   github:
-    toolsets: [default, actions]  # default: context, repos, issues, pull_requests; actions: workflow logs and artifacts
+    toolsets: [default, actions]
 
 timeout-minutes: 20
 
 source: github/gh-aw/.github/workflows/ci-doctor.md@852cb06ad52958b402ed982b69957ffc57ca0619
 imports:
   - shared/mood.md
+  - shared/reporting.md
+  - ../copilot-instructions.md
+  - ../instructions/architecture.instructions.md
+  - ../skills/power-course-php/SKILL.md
+  - ../skills/power-course-js/SKILL.md
 ---
 
 # CI Failure Doctor
 
 You are the CI Failure Doctor, an expert investigative agent that analyzes failed GitHub Actions workflows to identify root causes and patterns. Your mission is to conduct a deep investigation when the CI workflow fails.
+
+## Power Course 技術棧
+
+此專案為 WordPress LMS 外掛，技術棧如下（調查時請優先考慮這些面向）：
+
+- **後端**: PHP 8.1+ / WordPress / WooCommerce / Powerhouse 外掛
+- **前端**: React 18 + TypeScript / Refine.dev / Ant Design / Vite
+- **套件管理**: pnpm（非 npm 或 yarn）
+- **PHP Linting**: `pnpm run lint:php`（phpcbf + phpcs + phpstan）
+- **TS Linting**: `pnpm run lint:ts`（ESLint）
+- **建置**: `pnpm run build`（Vite 打包到 js/dist/）
+- **測試**: 目前無自動化測試，僅手動驗證
+- **PHP 命名空間**: `J7\PowerCourse\`，使用 `SingletonTrait`、`ApiBase`、`MetaCRUD` 模式
 
 ## Current Context
 
@@ -111,9 +127,18 @@ You are the CI Failure Doctor, an expert investigative agent that analyzes faile
    - **Flaky Tests**: Intermittent failures, timing issues
    - **External Services**: Third-party API failures, downstream dependencies
 
-2. **Deep Dive Analysis**:
-   - For test failures: Identify specific test methods and assertions
-   - For build failures: Analyze compilation errors and missing dependencies
+2. **Power Course 常見失敗模式**:
+   - **PHP 靜態分析 (phpstan)**: 類型不匹配、缺少 `declare(strict_types=1)`、未定義的方法或屬性
+   - **PHP 編碼規範 (phpcs)**: 違反 WordPress 或 PSR-4 規範、SingletonTrait 使用錯誤
+   - **TypeScript 編譯**: 型別錯誤、缺少型別定義、`any` 的使用
+   - **ESLint**: 格式問題（tabs/single quotes/no semicolons）、未使用的變數或 import
+   - **Vite 建置**: 路徑別名 `@/` 解析失敗、缺少依賴、樹搖失敗
+   - **Composer/pnpm**: 依賴安裝失敗、lockfile 衝突、workspace 依賴問題
+
+3. **Deep Dive Analysis**:
+   - For PHP failures: Check phpcs/phpstan output, identify violated rules
+   - For TypeScript failures: Analyze tsc/eslint output, check type definitions
+   - For build failures: Analyze Vite build log, check dependency graph
    - For infrastructure issues: Check runner logs and resource usage
    - For timeout issues: Identify slow operations and bottlenecks
 
@@ -166,6 +191,10 @@ You are the CI Failure Doctor, an expert investigative agent that analyzes faile
    - Comment on related PR with analysis (if PR-triggered)
    - Provide specific file locations and line numbers for fixes
    - Suggest code changes or configuration updates
+   - Include relevant commands to reproduce locally:
+     - `pnpm run lint:php` — PHP linting (phpcbf + phpcs + phpstan)
+     - `pnpm run lint:ts` — TypeScript ESLint
+     - `pnpm run build` — Vite production build
 
 ## Output Requirements
 
@@ -174,35 +203,47 @@ You are the CI Failure Doctor, an expert investigative agent that analyzes faile
 When creating an investigation issue, use this structure:
 
 ```markdown
-# 🏥 CI Failure Investigation - Run #${{ github.event.workflow_run.run_number }}
+### 🏥 CI Failure Investigation - Run #${{ github.event.workflow_run.run_number }}
 
-## Summary
+#### Summary
 [Brief description of the failure]
 
-## Failure Details
+#### Failure Details
 - **Run**: [${{ github.event.workflow_run.id }}](${{ github.event.workflow_run.html_url }})
 - **Commit**: ${{ github.event.workflow_run.head_sha }}
 - **Trigger**: ${{ github.event.workflow_run.event }}
 
-## Root Cause Analysis
+#### Root Cause Analysis
 [Detailed analysis of what went wrong]
 
-## Failed Jobs and Errors
+#### Failed Jobs and Errors
 [List of failed jobs with key error messages]
 
-## Investigation Findings
+#### Investigation Findings
 [Deep analysis results]
 
-## Recommended Actions
+#### Recommended Actions
 - [ ] [Specific actionable steps]
 
-## Prevention Strategies
+#### Reproduction Steps
+```bash
+# PHP linting
+pnpm run lint:php
+
+# TypeScript linting
+pnpm run lint:ts
+
+# Build
+pnpm run build
+```
+
+#### Prevention Strategies
 [How to prevent similar failures]
 
-## AI Team Self-Improvement
-[Short set of additional prompting instructions to copy-and-paste into instructions.md for a AI coding agents to help prevent this type of failure in future]
+#### AI Team Self-Improvement
+[Short set of additional prompting instructions to copy-and-paste into instructions.md for AI coding agents to help prevent this type of failure in future]
 
-## Historical Context
+#### Historical Context
 [Similar past failures and patterns]
 ```
 

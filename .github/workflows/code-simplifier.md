@@ -2,7 +2,7 @@
 name: Code Simplifier
 description: Analyzes recently modified code and creates pull requests with simplifications that improve clarity, consistency, and maintainability while preserving functionality
 on:
-  schedule: daily
+  schedule: weekly on monday around 01:00
   skip-if-match: 'is:pr is:open in:title "[code-simplifier]"'
 
 permissions:
@@ -15,6 +15,10 @@ tracker-id: code-simplifier
 imports:
   - shared/mood.md
   - shared/reporting.md
+  - ../copilot-instructions.md
+  - ../instructions/architecture.instructions.md
+  - ../skills/power-course-php/SKILL.md
+  - ../skills/power-course-js/SKILL.md
 
 safe-outputs:
   create-pull-request:
@@ -30,7 +34,9 @@ tools:
 timeout-minutes: 30
 strict: true
 source: github/gh-aw/.github/workflows/code-simplifier.md@852cb06ad52958b402ed982b69957ffc57ca0619
-engine: copilot
+engine:
+  id: copilot
+  model: claude-opus-4.6
 ---
 
 <!-- This prompt will be imported in the agentic workflow .github/workflows/code-simplifier.md at runtime. -->
@@ -74,8 +80,8 @@ Use GitHub tools to:
 For each merged PR or recent commit:
 - Use `pull_request_read` with `method: get_files` to list changed files
 - Use `get_commit` to see file changes in recent commits
-- Focus on source code files (`.go`, `.js`, `.ts`, `.tsx`, `.cjs`, `.py`, `.cs`, etc.)
-- Exclude test files, lock files, and generated files
+- Focus on source code files (`.php`, `.ts`, `.tsx`)
+- Exclude lock files, generated files, `vendor/`, `node_modules/`, `js/dist/`
 
 ### 1.3 Determine Scope
 
@@ -94,41 +100,30 @@ If **files were changed**, proceed to Phase 2.
 
 Before simplifying, review the project's coding standards from relevant documentation:
 
-- For Go projects: Check `AGENTS.md`, `DEVGUIDE.md`, or similar files
-- For JavaScript/TypeScript: Look for `CLAUDE.md`, style guides, or coding conventions
-- For Python: Check for style guides, PEP 8 adherence, or project-specific conventions
-- For .NET/C#: Check `.editorconfig`, `Directory.Build.props`, or coding conventions in docs
+- For JavaScript/TypeScript/React: See imported `.github/copilot-instructions.md` and `.github/skills/power-course-js/SKILL.md`
+- For PHP: See imported `.github/copilot-instructions.md` and `.github/skills/power-course-php/SKILL.md`
 
-**Key Standards to Apply:**
+**Power Course 專案關鍵標準：**
 
-For **JavaScript/TypeScript** projects:
-- Use ES modules with proper import sorting and extensions
-- Prefer `function` keyword over arrow functions for top-level functions
-- Use explicit return type annotations for top-level functions
-- Follow proper React component patterns with explicit Props types
-- Use proper error handling patterns (avoid try/catch when possible)
-- Maintain consistent naming conventions
+For **PHP (Power Course Plugin)**:
+- `declare(strict_types=1);` 必須在所有 PHP 檔案頂部
+- 所有服務類使用 `\J7\WpUtils\Traits\SingletonTrait` — 呼叫 `MyClass::instance()`，禁止 `new MyClass()`
+- REST API 類繼承 `J7\WpUtils\Classes\ApiBase`，callback 命名：`{method}_{endpoint_snake}_callback()`
+- Hooks (`add_action`, `add_filter`) 僅在 `__construct()` 中註冊
+- 自訂資料表使用 `AbstractMetaCRUD` 靜態方法（非原始 SQL）
+- 多步驟寫入使用 `$wpdb->query('START TRANSACTION')` / `COMMIT` / `ROLLBACK`
+- 陣列 meta 欄位：先 `delete_meta_data()` 再 `add_meta_data()` 循環（禁止 `update_post_meta()` 存陣列）
+- 開通課程權限必須透過 action hook：`do_action(LifeCycle::ADD_STUDENT_TO_COURSE_ACTION, ...)`
+- 每個 class 和 property 需要繁體中文說明註解
 
-For **Go** projects:
-- Use `any` instead of `interface{}`
-- Follow console formatting for CLI output
-- Use semantic type aliases for domain concepts
-- Prefer small, focused files (200-500 lines ideal)
-- Use table-driven tests with descriptive names
-
-For **Python** projects:
-- Follow PEP 8 style guide
-- Use type hints for function signatures
-- Prefer explicit over implicit code
-- Use list/dict comprehensions where they improve clarity (not complexity)
-
-For **.NET/C#** projects:
-- Follow Microsoft C# coding conventions
-- Use `var` only when the type is obvious from the right side
-- Use file-scoped namespaces (`namespace X;`) where supported
-- Prefer pattern matching over type casting
-- Use `async`/`await` consistently, avoid `.Result` or `.Wait()`
-- Use nullable reference types and annotate nullability
+For **TypeScript/React (Power Course Frontend)**:
+- 嚴格 TypeScript — 禁止 `any`；使用 `zod/v4` 做 runtime validation
+- 路徑別名 `@/` → `js/src/`
+- 使用 Refine.dev 的 `useList`, `useOne`, `useCreate`, `useUpdate`（dataProviderName: `'power-course'`）
+- 環境變數透過 `useEnv()` hook 取得 — 禁止直接存取 `window.power_course_data`
+- API 呼叫透過 `hooks/` 目錄的自訂 hooks
+- Ant Design + ProComponents 作為管理後台 UI
+- 格式化：tabs, single quotes, no semicolons (ESLint + Prettier)
 
 ### 2.2 Simplification Principles
 
@@ -205,19 +200,10 @@ Use the **edit** tool to modify files:
 
 After making simplifications, run the project's test suite to ensure no functionality was broken:
 
-```bash
-# For Go projects
-make test-unit
-
-# For JavaScript/TypeScript projects
-npm test
-
-# For Python projects
-pytest
-
-# For .NET projects
-dotnet test
-```
+> **注意：** Power Course 目前沒有自動化測試套件。驗證方式：
+> 1. 確認 PHP linting 和 TypeScript linting 通過（見 3.2）
+> 2. 確認 build 成功（見 3.3）
+> 3. 檢查修改的函數是否有 REST API 端點使用，確認回傳格式不變
 
 If tests fail:
 - Review the failures carefully
@@ -230,17 +216,11 @@ If tests fail:
 Ensure code style is consistent:
 
 ```bash
-# For Go projects
-make lint
+# PHP linting (phpcbf + phpcs + phpstan)
+pnpm run lint:php
 
-# For JavaScript/TypeScript projects
-npm run lint
-
-# For Python projects
-flake8 . || pylint .
-
-# For .NET projects
-dotnet format --verify-no-changes
+# TypeScript ESLint
+pnpm run lint:ts
 ```
 
 Fix any linting issues introduced by the simplifications.
@@ -250,18 +230,8 @@ Fix any linting issues introduced by the simplifications.
 Verify the project still builds successfully:
 
 ```bash
-# For Go projects
-make build
-
-# For JavaScript/TypeScript projects
-npm run build
-
-# For Python projects
-# (typically no build step, but check imports)
-python -m py_compile changed_files.py
-
-# For .NET projects
-dotnet build
+# Vite production build
+pnpm run build
 ```
 
 ## Phase 4: Create Pull Request
@@ -284,22 +254,22 @@ No simplifications needed - code already meets quality standards.
 
 ### 4.2 Generate PR Description
 
-If creating a PR, use this structure:
+If creating a PR, use this structure:****
 
 ```markdown
-## Code Simplification - [Date]
+### Code Simplification - [Date]
 
 This PR simplifies recently modified code to improve clarity, consistency, and maintainability while preserving all functionality.
 
-### Files Simplified
+#### Files Simplified
 
-- `path/to/file1.go` - [Brief description of improvements]
-- `path/to/file2.js` - [Brief description of improvements]
+- `inc/classes/Api/Course.php` - [Brief description of improvements]
+- `js/src/pages/admin/Courses/Edit.tsx` - [Brief description of improvements]
 
-### Improvements Made
+#### Improvements Made
 
 1. **Reduced Complexity**
-   - Simplified nested conditionals in `file1.go`
+   - Simplified nested conditionals in `Course.php`
    - Extracted helper function for repeated logic
 
 2. **Enhanced Clarity**
@@ -308,24 +278,24 @@ This PR simplifies recently modified code to improve clarity, consistency, and m
    - Applied consistent naming conventions
 
 3. **Applied Project Standards**
-   - Used `function` keyword instead of arrow functions
-   - Added explicit type annotations
-   - Followed established patterns
+   - Added `declare(strict_types=1)` where missing
+   - Used `SingletonTrait` pattern consistently
+   - Added proper PHPDoc with Traditional Chinese descriptions
 
-### Changes Based On
+#### Changes Based On
 
 Recent changes from:
 - #[PR_NUMBER] - [PR title]
 - Commit [SHORT_SHA] - [Commit message]
 
-### Testing
+#### Testing
 
-- ✅ All tests pass (`make test-unit`)
-- ✅ Linting passes (`make lint`)
-- ✅ Build succeeds (`make build`)
+- ✅ PHP linting passes (`pnpm run lint:php`)
+- ✅ TypeScript linting passes (`pnpm run lint:ts`)
+- ✅ Build succeeds (`pnpm run build`)
 - ✅ No functional changes - behavior is identical
 
-### Review Focus
+#### Review Focus
 
 Please verify:
 - Functionality is preserved

@@ -10,7 +10,9 @@ permissions:
   discussions: read
   issues: read
   pull-requests: read
-engine: copilot
+engine:
+  id: copilot
+  model: claude-opus-4.6
 tools:
   github:
     lockdown: false
@@ -27,6 +29,10 @@ safe-outputs:
 timeout-minutes: 10
 imports:
   - shared/mood.md
+  - ../copilot-instructions.md
+  - ../instructions/architecture.instructions.md
+  - ../skills/power-course-php/SKILL.md
+  - ../skills/power-course-js/SKILL.md
 source: github/gh-aw/.github/workflows/plan.md@852cb06ad52958b402ed982b69957ffc57ca0619
 ---
 
@@ -39,7 +45,7 @@ You are an expert planning assistant for GitHub Copilot agents. Your task is to 
 - **Repository**: ${{ github.repository }}
 - **Issue Number**: ${{ github.event.issue.number }}
 - **Discussion Number**: ${{ github.event.discussion.number }}
-- **Comment Content**: 
+- **Comment Content**:
 
 <comment>
 ${{ steps.sanitized.outputs.text }}
@@ -104,8 +110,8 @@ Since grouping is enabled, simply create sub-issues without parent references:
 ```json
 {
   "type": "create_issue",
-  "title": "Add user authentication middleware",
-  "body": "## Objective\n\nImplement JWT-based authentication middleware for API routes.\n\n## Context\n\nThis is needed to secure API endpoints before implementing user-specific features.\n\n## Approach\n\n1. Create middleware function in `src/middleware/auth.js`\n2. Add JWT verification using the existing auth library\n3. Attach user info to request object\n4. Handle token expiration and invalid tokens\n\n## Files to Modify\n\n- Create: `src/middleware/auth.js`\n- Update: `src/routes/api.js` (to use the middleware)\n- Update: `tests/middleware/auth.test.js` (add tests)\n\n## Acceptance Criteria\n\n- [ ] Middleware validates JWT tokens\n- [ ] Invalid tokens return 401 status\n- [ ] User info is accessible in route handlers\n- [ ] Tests cover success and error cases"
+  "title": "新增課程批量匯出 CSV API",
+  "body": "### Objective\n\n實作課程學員批量匯出 CSV 的 REST API 端點。\n\n### Context\n\n後台管理需要匯出特定課程的學員清單，包含學員名稱、Email、購買日期和到期日。\n\n### Approach\n\n1. 在 `inc/classes/Api/` 建立新的 API class，繼承 `ApiBase`，使用 `SingletonTrait`\n2. 在 `Bootstrap.php` 註冊新 singleton\n3. 前端在 `js/src/pages/admin/Students/` 加入匯出按鈕\n4. 使用 `useCustomMutation` hook 呼叫 API\n\n### Files to Modify\n\n- Create: `inc/classes/Api/ExportCSV.php`\n- Update: `inc/classes/Bootstrap.php`（加入 singleton）\n- Update: `js/src/pages/admin/Students/index.tsx`（加入匯出按鈕）\n\n### Acceptance Criteria\n\n- [ ] API 回傳正確的 CSV 內容\n- [ ] 前端匯出按鈕可正常觸發下載\n- [ ] `pnpm run lint:php` 通過\n- [ ] `pnpm run lint:ts` 通過\n- [ ] `pnpm run build` 成功"
 }
 ```
 
@@ -124,6 +130,17 @@ All created issues will be automatically grouped under a parent tracking issue.
 ## Instructions
 
 Review instructions in `.github/instructions/*.instructions.md` if you need guidance.
+
+## Power Course 專案慣例提醒
+
+規劃 sub-issue 時，確保每個任務遵循以下慣例：
+
+- **PHP**: 所有 class 使用 `SingletonTrait`，hooks 放在 `__construct()`，檔案開頭 `declare(strict_types=1);`
+- **API**: 繼承 `ApiBase`，callback 命名 `{method}_{endpoint_snake}_callback()`
+- **DB**: 使用 `AbstractMetaCRUD` 靜態方法，不使用 raw SQL
+- **前端**: 使用 Refine.dev 框架、Ant Design Pro 元件、`useEnv()` hook
+- **驗證**: `pnpm run lint:php`、`pnpm run lint:ts`、`pnpm run build`
+- **無自動化測試**: 專案目前只有手動測試
 
 ## Begin Planning
 

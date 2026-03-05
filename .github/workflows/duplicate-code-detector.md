@@ -3,14 +3,16 @@ name: Duplicate Code Detector
 description: Identifies duplicate code patterns across the codebase and suggests refactoring opportunities
 on:
   workflow_dispatch:
-  schedule: daily
+  schedule: weekly on monday around 01:30
 permissions:
   contents: read
   issues: read
   pull-requests: read
-engine: copilot
+engine:
+  id: copilot
+  model: claude-opus-4.6
 tools:
-  serena: ["go"]
+  serena: ["php", "typescript"]
 safe-outputs:
   create-issue:
     expires: 2d
@@ -23,6 +25,10 @@ timeout-minutes: 15
 strict: true
 imports:
   - shared/mood.md
+  - ../copilot-instructions.md
+  - ../instructions/architecture.instructions.md
+  - ../skills/power-course-php/SKILL.md
+  - ../skills/power-course-js/SKILL.md
 source: github/gh-aw/.github/workflows/duplicate-code-detector.md@852cb06ad52958b402ed982b69957ffc57ca0619
 ---
 
@@ -56,9 +62,9 @@ Activate the project in Serena:
 
 Identify and analyze modified files:
 - Determine files changed in the recent commits
-- **ONLY analyze .go and .cjs files** - exclude all other file types
-- **Exclude JavaScript files except .cjs** from analysis (files matching patterns: `*.js`, `*.mjs`, `*.jsx`, `*.ts`, `*.tsx`)
-- **Exclude test files** from analysis (files matching patterns: `*_test.go`, `*.test.js`, `*.test.cjs`, `*.spec.js`, `*.spec.cjs`, `*.test.ts`, `*.spec.ts`, `*_test.py`, `test_*.py`, or located in directories named `test`, `tests`, `__tests__`, or `spec`)
+- **ONLY analyze `.php`, `.ts`, `.tsx` files** - exclude all other file types
+- **Exclude vendor and build directories**: `vendor/`, `node_modules/`, `js/dist/`, `release/`
+- **Exclude lock and config files**: `*.lock.*`, `composer.lock`, `package-lock.json`
 - **Exclude workflow files** from analysis (files under `.github/workflows/*`)
 - Use `get_symbols_overview` to understand file structure
 - Use `read_file` to examine modified file contents
@@ -129,21 +135,23 @@ Create separate issues for each distinct duplication pattern found (maximum 3 pa
 
 ### Skip These Patterns
 
-- Standard boilerplate code (imports, exports, etc.)
-- Test setup/teardown code (acceptable duplication in tests)
-- **JavaScript files except .cjs** (files matching: `*.js`, `*.mjs`, `*.jsx`, `*.ts`, `*.tsx`)
-- **All test files** (files matching: `*_test.go`, `*.test.js`, `*.test.cjs`, `*.spec.js`, `*.spec.cjs`, `*.test.ts`, `*.spec.ts`, `*_test.py`, `test_*.py`, or in `test/`, `tests/`, `__tests__/`, `spec/` directories)
+- Standard boilerplate code (imports, exports, WordPress hooks registration patterns)
+- **Vendor and build directories**: `vendor/`, `node_modules/`, `js/dist/`, `release/`
+- **Lock and config files**: `*.lock.*`, `composer.lock`, `phpcs.xml`, `phpstan.neon`
 - **All workflow files** (files under `.github/workflows/*`)
 - Configuration files with similar structure
-- Language-specific patterns (constructors, getters/setters)
+- WordPress/WooCommerce hook registration boilerplate (`add_action`, `add_filter` in `__construct()`)
+- SingletonTrait usage pattern (expected duplication across all service classes)
+- `declare(strict_types=1);` at file top (mandatory, not duplication)
+- Refine.dev data provider hook calls (`useList`, `useOne`, `useCreate`, `useUpdate`)
 - Small code snippets (<5 lines) unless highly repetitive
 
 ### Analysis Depth
 
-- **File Type Restriction**: ONLY analyze .go and .cjs files - ignore all other file types
-- **Primary Focus**: All .go and .cjs files changed in the current push (excluding test files and workflow files)
-- **Secondary Analysis**: Check for duplication with existing .go and .cjs codebase (excluding test files and workflow files)
-- **Cross-Reference**: Look for patterns across .go and .cjs files in the repository
+- **File Type Restriction**: ONLY analyze `.php`, `.ts`, `.tsx` files - ignore all other file types
+- **Primary Focus**: All `.php`, `.ts`, `.tsx` files changed in the current push (excluding vendor, build, and workflow files)
+- **Secondary Analysis**: Check for duplication with existing `.php`, `.ts`, `.tsx` codebase (excluding vendor and build directories)
+- **Cross-Reference**: Look for patterns across PHP backend (`inc/`) and TypeScript frontend (`js/src/`) files
 - **Historical Context**: Consider if duplication is new or existing
 
 ## Issue Template
@@ -151,55 +159,56 @@ Create separate issues for each distinct duplication pattern found (maximum 3 pa
 For each distinct duplication pattern found, create a separate issue using this structure:
 
 ```markdown
-# 🔍 Duplicate Code Detected: [Pattern Name]
+### 🔍 Duplicate Code Detected: [Pattern Name]
 
 *Analysis of commit ${{ github.event.head_commit.id }}*
 
 **Assignee**: @copilot
 
-## Summary
+#### Summary
 
 [Brief overview of this specific duplication pattern]
 
-## Duplication Details
+#### Duplication Details
 
-### Pattern: [Description]
+##### Pattern: [Description]
 - **Severity**: High/Medium/Low
 - **Occurrences**: [Number of instances]
 - **Locations**:
-  - `path/to/file1.ext` (lines X-Y)
-  - `path/to/file2.ext` (lines A-B)
+  - `inc/classes/Api/Course.php` (lines X-Y)
+  - `inc/classes/Api/User.php` (lines A-B)
 - **Code Sample**:
-  ```[language]
+  ```php
   [Example of duplicated code]
   ```
 
-## Impact Analysis
+#### Impact Analysis
 
 - **Maintainability**: [How this affects code maintenance]
 - **Bug Risk**: [Potential for inconsistent fixes]
 - **Code Bloat**: [Impact on codebase size]
 
-## Refactoring Recommendations
+#### Refactoring Recommendations
 
 1. **[Recommendation 1]**
-   - Extract common functionality to: `suggested/path/utility.ext`
+   - Extract common functionality to: `inc/classes/Utils/NewHelper.php`
    - Estimated effort: [hours/complexity]
    - Benefits: [specific improvements]
 
 2. **[Recommendation 2]**
    [... additional recommendations ...]
 
-## Implementation Checklist
+#### Implementation Checklist
 
 - [ ] Review duplication findings
 - [ ] Prioritize refactoring tasks
 - [ ] Create refactoring plan
 - [ ] Implement changes
-- [ ] Update tests
+- [ ] Run `pnpm run lint:php` and `pnpm run lint:ts`
+- [ ] Run `pnpm run build`
 - [ ] Verify no functionality broken
 
-## Analysis Metadata
+#### Analysis Metadata
 
 - **Analyzed Files**: [count]
 - **Detection Method**: Serena semantic code analysis
