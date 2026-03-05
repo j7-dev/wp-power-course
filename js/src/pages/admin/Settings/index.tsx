@@ -4,6 +4,7 @@ import useSettings from './hooks/useSettings'
 import useSave from './hooks/useSave'
 import General from './General'
 import Appearance from './Appearance'
+import AutoGrant from './AutoGrant'
 
 const items: TabsProps['items'] = [
 	{
@@ -15,6 +16,11 @@ const items: TabsProps['items'] = [
 		key: 'appearance',
 		label: '外觀設定',
 		children: <Appearance />,
+	},
+	{
+		key: 'auto-grant',
+		label: '註冊自動開通',
+		children: <AutoGrant />,
 	},
 ]
 
