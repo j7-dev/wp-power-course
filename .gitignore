@@ -41,4 +41,5 @@ test-results/
 playwright-report/
 .e2e-backup/
 tests/e2e/.uploads/
+tests/e2e/.frontend-test-data.json
 blob-report/
