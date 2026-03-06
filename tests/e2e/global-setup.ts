@@ -5,7 +5,8 @@
  * 1. 套用 LC bypass（注入 'lc' => false 到 plugin.php）
  * 2. 登入 WordPress Admin
  * 3. 儲存認證狀態供後續測試使用
- * 4. 建立前台測試共用資料（課程、章節、訂閱者、BACS）
+ * 4. 透過 REST API 停用 Coming Soon、切換 Classic Checkout、清除舊資料
+ * 5. 建立前台測試共用資料（課程、章節、訂閱者、BACS）
  */
 import { chromium, type FullConfig } from '@playwright/test'
 import { applyLcBypass } from './helpers/lc-bypass'
@@ -13,7 +14,6 @@ import { ApiClient, getNonceFromPage } from './helpers/api-client'
 import { ensureFrontendTestData, clearFrontendTestDataCache } from './helpers/frontend-setup'
 import { WP_ADMIN } from './fixtures/test-data'
 import path from 'path'
-import { execSync } from 'child_process'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 
@@ -27,18 +27,6 @@ async function globalSetup(config: FullConfig): Promise<void> {
 	// 1. 套用 LC bypass
 	console.log('[Global Setup] Applying LC bypass...')
 	applyLcBypass()
-
-	// 1.5 停用 WooCommerce "Coming Soon" 模式
-	console.log('[Global Setup] Disabling WooCommerce Coming Soon mode...')
-	const projectRoot = path.resolve(__dirname, '..', '..')
-	try {
-		execSync(
-			'npx wp-env run cli -- wp option update woocommerce_coming_soon no',
-			{ cwd: projectRoot, stdio: 'pipe', timeout: 30_000 },
-		)
-	} catch (e) {
-		console.warn('[Global Setup] Could not disable Coming Soon mode:', e)
-	}
 
 	// 2. 確保 .auth 目錄存在
 	const authDir = path.dirname(STORAGE_STATE_PATH)
@@ -69,7 +57,6 @@ async function globalSetup(config: FullConfig): Promise<void> {
 		await context.storageState({ path: STORAGE_STATE_PATH })
 
 		// 3.5 刷新 WordPress 永久連結（flush rewrite rules）
-		//     確保 pc_chapter CPT 的 /classroom/ slug 生效
 		console.log('[Global Setup] Flushing rewrite rules via Permalinks page...')
 		try {
 			await page.goto(`${baseURL}/wp-admin/options-permalink.php`, {
@@ -83,39 +70,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
 			console.warn('[Global Setup] Flush rewrite rules warning:', e)
 		}
 
-		// 4. 清除舊 E2E 測試資料，避免重複 slug 造成 404
-		console.log('[Global Setup] Cleaning old E2E test data...')
-		try {
-			// 刪除所有 e2e 開頭的 pc_chapter
-			const chapterIds = execSync(
-				'npx wp-env run cli -- wp post list --post_type=pc_chapter --post_status=any --name__like=e2e --field=ID --format=csv',
-				{ cwd: projectRoot, stdio: 'pipe', timeout: 30_000 },
-			).toString().trim()
-			if (chapterIds) {
-				execSync(
-					`npx wp-env run cli -- wp post delete ${chapterIds.split('\n').join(' ')} --force`,
-					{ cwd: projectRoot, stdio: 'pipe', timeout: 30_000 },
-				)
-			}
-			// 刪除所有 e2e 開頭的 product
-			const productIds = execSync(
-				'npx wp-env run cli -- wp post list --post_type=product --post_status=any --name__like=e2e --field=ID --format=csv',
-				{ cwd: projectRoot, stdio: 'pipe', timeout: 30_000 },
-			).toString().trim()
-			if (productIds) {
-				execSync(
-					`npx wp-env run cli -- wp post delete ${productIds.split('\n').join(' ')} --force`,
-					{ cwd: projectRoot, stdio: 'pipe', timeout: 30_000 },
-				)
-			}
-		} catch (e) {
-			console.warn('[Global Setup] Cleanup warning (non-fatal):', e)
-		}
-
-		// 5. 建立前台測試共用資料（課程、章節、訂閱者帳號、BACS 付款）
-		console.log('[Global Setup] Ensuring frontend test data...')
-		clearFrontendTestDataCache() // 清除舊快取，強制以修正後的 API 重新建立
-		// 回到 wp-admin 首頁以確保 wpApiSettings.nonce 可用
+		// 4. 取得 nonce 並建立 API Client（後續用 REST API 取代 WP CLI）
 		await page.goto(`${baseURL}/wp-admin/`, {
 			waitUntil: 'domcontentloaded',
 			timeout: 30_000,
@@ -123,6 +78,92 @@ async function globalSetup(config: FullConfig): Promise<void> {
 		await page.waitForSelector('body.wp-admin', { timeout: 15_000 })
 		const nonce = await getNonceFromPage(page)
 		const api = new ApiClient(context.request, nonce)
+
+		// 4.1 停用 WooCommerce "Coming Soon" 模式
+		console.log('[Global Setup] Disabling WooCommerce Coming Soon mode via REST API...')
+		try {
+			await context.request.post(`${baseURL}/wp-json/wp/v2/settings`, {
+				headers: { 'X-WP-Nonce': nonce },
+				data: { woocommerce_coming_soon: 'no' },
+			})
+		} catch (e) {
+			console.warn('[Global Setup] Coming Soon disable (non-fatal):', e)
+		}
+
+		// 4.2 強制 WooCommerce 使用 Classic Checkout（WC 9.x 預設 Block Checkout）
+		console.log('[Global Setup] Switching to Classic Checkout via REST API...')
+		try {
+			// 找到 checkout 頁面 ID
+			const pagesResp = await context.request.get(
+				`${baseURL}/wp-json/wp/v2/pages?slug=checkout&per_page=1`,
+				{ headers: { 'X-WP-Nonce': nonce } },
+			)
+			const pages = await pagesResp.json()
+			if (Array.isArray(pages) && pages.length > 0) {
+				const checkoutPageId = pages[0].id
+				await context.request.post(
+					`${baseURL}/wp-json/wp/v2/pages/${checkoutPageId}`,
+					{
+						headers: { 'X-WP-Nonce': nonce },
+						data: {
+							content: '<!-- wp:shortcode -->[woocommerce_checkout]<!-- /wp:shortcode -->',
+						},
+					},
+				)
+				console.log(`[Global Setup] Checkout page #${checkoutPageId} switched to classic shortcode.`)
+			} else {
+				console.warn('[Global Setup] Checkout page not found by slug.')
+			}
+		} catch (e) {
+			console.warn('[Global Setup] Classic checkout switch (non-fatal):', e)
+		}
+
+		// 4.3 清除舊 E2E 測試資料，避免重複 slug 造成 404
+		console.log('[Global Setup] Cleaning old E2E test data via REST API...')
+		try {
+			const coursesResp = await api.pcGet<{ id: number; name: string }[]>('courses', {
+				per_page: '100',
+			})
+			if (coursesResp.status === 200 && Array.isArray(coursesResp.data)) {
+				const e2eCourseIds = coursesResp.data
+					.filter((c) => c.name?.toLowerCase().startsWith('e2e'))
+					.map((c) => c.id)
+				if (e2eCourseIds.length > 0) {
+					console.log(`[Global Setup] Deleting ${e2eCourseIds.length} old E2E courses...`)
+					await api.deleteCourses(e2eCourseIds)
+				}
+			}
+		} catch (e) {
+			console.warn('[Global Setup] Cleanup warning (non-fatal):', e)
+		}
+
+		// 4.4 清除舊 pc_chapter posts（含已刪除的），避免 slug 衝突與 Fatal Error
+		console.log('[Global Setup] Cleaning old pc_chapter posts via WP REST API...')
+		try {
+			for (const status of ['publish', 'draft', 'trash', 'pending', 'private']) {
+				const chapResp = await api.wpGet<{ id: number; title: { rendered: string } }[]>(
+					'pc_chapter',
+					{ per_page: '100', status },
+				)
+				if (chapResp.status === 200 && Array.isArray(chapResp.data) && chapResp.data.length > 0) {
+					console.log(`[Global Setup] Found ${chapResp.data.length} pc_chapter posts (status=${status}), force-deleting...`)
+					for (const ch of chapResp.data) {
+						try {
+							await api.wpDelete(`pc_chapter/${ch.id}`, { force: 'true' })
+						} catch {
+							// ignore individual delete failures
+						}
+					}
+				}
+			}
+			console.log('[Global Setup] pc_chapter cleanup done.')
+		} catch (e) {
+			console.warn('[Global Setup] Chapter cleanup warning (non-fatal):', e)
+		}
+
+		// 5. 建立前台測試共用資料（課程、章節、訂閱者帳號、BACS 付款）
+		console.log('[Global Setup] Ensuring frontend test data...')
+		clearFrontendTestDataCache()
 		await ensureFrontendTestData(api)
 		console.log('[Global Setup] Frontend test data ready.')
 	} catch (error) {

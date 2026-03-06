@@ -96,7 +96,7 @@ export async function loginAs(
 	await page.goto('/wp-login.php')
 	await page.locator('#user_login').fill(username)
 	await page.locator('#user_pass').fill(password)
-	await page.locator('#wp-submit').click({ timeout: 15_000 })
+	await page.locator('#wp-submit').click({ noWaitAfter: true, timeout: 15_000 })
 	// 等待離開登入頁面（管理員→wp-admin, 訂閱者→首頁或 profile）
 	await page.waitForURL((url) => !url.pathname.includes('wp-login'), {
 		timeout: 30_000,

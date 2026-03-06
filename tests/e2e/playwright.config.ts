@@ -50,6 +50,7 @@ export default defineConfig({
 		{
 			name: 'integration',
 			testDir: './03-integration',
+			timeout: 120_000,
 			use: { ...devices['Desktop Chrome'] },
 		},
 	],

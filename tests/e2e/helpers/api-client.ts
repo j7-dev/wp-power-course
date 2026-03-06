@@ -243,6 +243,27 @@ export class ApiClient {
 		}
 	}
 
+	/**
+	 * WordPress REST API (v2) — DELETE
+	 */
+	async wpDelete<T = unknown>(
+		endpoint: string,
+		params?: Record<string, string>,
+	): Promise<ApiResponse<T>> {
+		const url = new URL(`${BASE_URL}/wp-json/wp/v2/${endpoint}`)
+		if (params) {
+			Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
+		}
+		const resp = await this.request.delete(url.toString(), {
+			headers: this.headers(),
+		})
+		return {
+			status: resp.status(),
+			data: (await resp.json()) as T,
+			headers: resp.headers(),
+		}
+	}
+
 	// ── 便利方法 ──────────────────────────────────
 
 	/**
@@ -367,11 +388,14 @@ export class ApiClient {
 		courseId: number,
 		expireDate: number | string = 0,
 	): Promise<void> {
-		await this.pcPostForm('courses/add-students', {
+		const resp = await this.pcPostForm('courses/add-students', {
 			user_ids: [userId],
 			course_ids: [courseId],
 			expire_date: expireDate,
 		})
+		if (resp.status >= 400) {
+			throw new Error(`grantCourseAccess failed (${resp.status}): ${JSON.stringify(resp.data)}`)
+		}
 	}
 
 	/**
@@ -381,10 +405,13 @@ export class ApiClient {
 		userId: number,
 		courseId: number,
 	): Promise<void> {
-		await this.pcPostForm('courses/remove-students', {
+		const resp = await this.pcPostForm('courses/remove-students', {
 			user_ids: [userId],
 			course_ids: [courseId],
 		})
+		if (resp.status >= 400) {
+			throw new Error(`removeCourseAccess failed (${resp.status}): ${JSON.stringify(resp.data)}`)
+		}
 	}
 
 	/**
@@ -483,11 +510,14 @@ export class ApiClient {
 	): Promise<void> {
 		// 設定到期日為過去的時間戳
 		const pastTimestamp = Math.floor(Date.now() / 1000) - 86400
-		await this.pcPostForm('courses/update-students', {
+		const resp = await this.pcPostForm('courses/update-students', {
 			user_ids: [userId],
 			course_ids: [courseId],
 			timestamp: pastTimestamp,
 		})
+		if (resp.status >= 400) {
+			throw new Error(`setCourseExpired failed (${resp.status}): ${JSON.stringify(resp.data)}`)
+		}
 	}
 }
 
