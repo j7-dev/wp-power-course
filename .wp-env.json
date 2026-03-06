@@ -18,6 +18,6 @@
 		"wp-content/uploads": "./tests/e2e/.uploads"
 	},
 	"lifecycleScripts": {
-		"afterStart": "npx wp-env run cli -- wp option update blogname 'Power Course E2E' && npx wp-env run cli -- wp option update blogdescription 'E2E Testing Site' && npx wp-env run cli -- wp rewrite structure '/%postname%/' && npx wp-env run cli -- wp rewrite flush && npx wp-env run cli -- wp language core install zh_TW && npx wp-env run cli -- wp site switch-language zh_TW"
+		"afterStart": "npx wp-env run cli -- wp option update blogname PowerCourseE2E && npx wp-env run cli -- wp option update blogdescription E2ETesting && npx wp-env run cli -- wp rewrite structure /%postname%/ && npx wp-env run cli -- wp rewrite flush && npx wp-env run cli -- wp language core install zh_TW && npx wp-env run cli -- wp site switch-language zh_TW"
 	}
 }

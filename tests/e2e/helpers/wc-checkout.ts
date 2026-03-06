@@ -77,8 +77,12 @@ export async function completeCheckout(
 	// 2. 前往結帳
 	await goToCheckout(page)
 
-	// 3. 填寫帳單資訊（WooCommerce block checkout 或 classic checkout）
-	// 嘗試 Block checkout
+	// 3. 等待結帳表單渲染（Block 或 Classic）
+	await Promise.race([
+		page.locator('.wc-block-checkout').waitFor({ state: 'visible', timeout: 20_000 }),
+		page.locator('#customer_details').waitFor({ state: 'visible', timeout: 20_000 }),
+	]).catch(() => {})
+
 	const isBlockCheckout = await page
 		.locator('.wc-block-checkout')
 		.isVisible()
@@ -90,11 +94,17 @@ export async function completeCheckout(
 		await fillClassicCheckout(page, checkoutData)
 	}
 
-	// 4. 取得訂單編號
+	// 4. 取得訂單編號（從 URL 提取，兼容 WC 各版本）
 	await page.waitForURL(/order-received/, { timeout: 30_000 })
+	const urlMatch = page.url().match(/order-received\/(\d+)/)
+	if (urlMatch) {
+		return urlMatch[1]
+	}
+	// fallback: 嘗試 DOM selector
 	const orderNumber = await page
 		.locator('.woocommerce-order-overview__order strong')
-		.textContent()
+		.textContent({ timeout: 5_000 })
+		.catch(() => '')
 	return orderNumber?.trim() || ''
 }
 
@@ -164,6 +174,13 @@ async function fillClassicCheckout(
 	page: Page,
 	data: CheckoutData,
 ): Promise<void> {
+	// 國家（WC 必填，否則 validation 失敗）
+	const countrySelect = page.locator('#billing_country')
+	if (await countrySelect.isVisible().catch(() => false)) {
+		await countrySelect.selectOption('TW')
+		await page.waitForTimeout(500) // 等待 WC AJAX 更新州/省欄位
+	}
+
 	await page.fill('#billing_first_name', data.firstName || '')
 	await page.fill('#billing_last_name', data.lastName || '')
 	await page.fill('#billing_address_1', data.address || '')
@@ -177,6 +194,9 @@ async function fillClassicCheckout(
 	if (await bacsRadio.isVisible()) {
 		await bacsRadio.check()
 	}
+
+	// 等待 WC update_order_review AJAX 完成
+	await page.waitForTimeout(1000)
 
 	// 送出訂單
 	await page.click('#place_order')
