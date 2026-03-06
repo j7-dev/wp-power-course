@@ -116,6 +116,78 @@ export const API_ENDPOINTS = {
 	reports: 'power-course/reports/revenue/stats',
 }
 
+/** 前台測試用課程資料（含 slug） */
+export const FRONTEND_COURSE = {
+	name: 'E2E Frontend Test Course',
+	slug: 'e2e-frontend-test-course',
+	regularPrice: '1500',
+	chapters: [
+		{ name: 'E2E Chapter 1 Intro', slug: 'e2e-chapter-1' },
+		{ name: 'E2E Chapter 2 Core', slug: 'e2e-chapter-2' },
+		{ name: 'E2E Chapter 3 Practice', slug: 'e2e-chapter-3' },
+	],
+}
+
+/** 測試用訂閱者帳號（無課程存取權限） */
+export const TEST_SUBSCRIBER = {
+	username: 'e2e_subscriber',
+	password: 'e2e_subscriber_pass',
+	email: 'e2e_subscriber@test.local',
+}
+
+/** 前台 CSS 選擇器 */
+export const SELECTORS = {
+	// 課程銷售頁
+	courseProduct: {
+		featureVideo: '#courses-product__feature-video',
+		featureContent: '#courses-product__feature-content',
+		pricing: '#course-pricing',
+		tabsNav: '#courses-product__tabs-nav',
+		priceHtml: '.pc-price-html',
+		ctaButton: '.pc-add-to-cart-link',
+		addToCartWrapper: '.pc-add-to-cart',
+		addToCartButton: 'button.add_to_cart_button',
+		tabNavItem: '[id^="tab-nav-"]',
+		btnPrimary: '.pc-btn-primary',
+		badge: '.pc-badge',
+	},
+	// 章節折疊列表（銷售頁＆教室共用）
+	chapterCollapse: {
+		container: '#pc-sider__main-chapters',
+		list: '.pc-sider-chapters',
+		item: '#pc-sider__main-chapters li',
+		itemTitle: '#pc-sider__main-chapters li span',
+		arrow: '.icon-arrow',
+	},
+	// 教室頁面
+	classroom: {
+		header: '#pc-classroom-header',
+		chapterTitle: '#classroom-chapter_title',
+		titleBadge: '#classroom-chapter_title-badge',
+		finishButton: '#finish-chapter__button',
+		finishDialog: '#finish-chapter__dialog',
+		sider: '#pc-sider',
+		mainChapters: '#pc-sider__main-chapters',
+		body: '#pc-classroom-body',
+		chapterList: '.pc-sider-chapters',
+		chapterItem: '#pc-sider__main-chapters li',
+	},
+	// My Account
+	myAccount: {
+		courseCard: '.pc-course-card',
+		courseImage: '.pc-course-card__image',
+		courseName: '.pc-course-card__name',
+		courseTeachers: '.pc-course-card__teachers',
+	},
+	// 404 存取拒絕
+	accessDenied: {
+		alert: '.pc-alert',
+		alertError: '.pc-alert.pc-alert-error',
+		alertMessage: '.pc-alert span',
+		buyButton: 'a:has-text("前往購買")',
+	},
+}
+
 /** Timeout 常數 */
 export const TIMEOUTS = {
 	spaLoad: 15_000,
