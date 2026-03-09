@@ -622,9 +622,12 @@ final class Course extends ApiBase {
 			}
 		}
 
-		// 如果是非訂閱商品，則刪除訂閱商品的相關資料
+		// 如果是非訂閱商品，則刪除訂閱商品的相關資料，並同步從 $meta_data 移除避免後續 update loop 又寫回
 		if (!$is_subscription) {
 			SubscriptionUtils::delete_meta( $product );
+			foreach ( SubscriptionUtils::get_fields() as $field ) {
+				unset( $meta_data[ $field ] );
+			}
 		}
 
 		\do_action(LifeCycle::BEFORE_UPDATE_PRODUCT_META_ACTION, $product, $meta_data);
