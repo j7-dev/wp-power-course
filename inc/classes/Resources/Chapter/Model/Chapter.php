@@ -68,6 +68,11 @@ final class Chapter {
 		if ( ! $this->course_id ) {
 			return null;
 		}
-		return \wc_get_product( $this->course_id );
+
+		$product = \wc_get_product( $this->course_id );
+		if( ! $product instanceof \WC_Product ) {
+			return null;
+		}
+		return $product;
 	}
 }
