@@ -13,6 +13,7 @@ use J7\WpUtils\Classes\WC\Product as WcProduct;
 use J7\PowerCourse\Resources\Course\Limit;
 use J7\PowerCourse\Resources\Course\BindCoursesData;
 use J7\Powerhouse\Domains\Product\Utils\CRUD;
+use J7\PowerCourse\Utils\Subscription as SubscriptionUtils;
 
 /** Product API */
 final class Product {
@@ -510,14 +511,6 @@ final class Product {
 		$bind_courses_data_instance  = BindCoursesData::instance( (int) $product_id );
 		$formatted_bind_courses_data = $bind_courses_data_instance->get_data(ARRAY_N);
 
-		$subscription_price           = $product->get_meta( '_subscription_price' );
-		$subscription_period_interval = $product->get_meta( '_subscription_period_interval' );
-		$subscription_period          = $product->get_meta( '_subscription_period' );
-		$subscription_length          = $product->get_meta( '_subscription_length' );
-		$subscription_sign_up_fee     = $product->get_meta( '_subscription_sign_up_fee' );
-		$subscription_trial_length    = $product->get_meta( '_subscription_trial_length' );
-		$subscription_trial_period    = $product->get_meta( '_subscription_trial_period' );
-
 		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
 
 		$helper     = Helper::instance( $product );
@@ -598,14 +591,7 @@ final class Product {
 			Helper::LINK_COURSE_IDS_META_KEY     => $product->get_meta( Helper::LINK_COURSE_IDS_META_KEY ),
 
 			'bundle_type'                        => (string) $product->get_meta( 'bundle_type' ),
-			'_subscription_price'                => is_numeric($subscription_price) ? (float) $subscription_price : null,
-			'_subscription_period_interval'      => is_numeric($subscription_period_interval) ? (int) $subscription_period_interval : 1,
-			'_subscription_period'               => $subscription_period ?: 'month',
-			'_subscription_length'               => is_numeric($subscription_length) ? (int) $subscription_length : 0,
-			'_subscription_sign_up_fee'          => is_numeric($subscription_sign_up_fee) ? (float) $subscription_sign_up_fee : null,
-			'_subscription_trial_length'         => is_numeric($subscription_trial_length) ? (int) $subscription_trial_length : null,
-			'_subscription_trial_period'         => $subscription_trial_period ?: 'day',
-
+		] + SubscriptionUtils::get_normalized_meta( $product ) + [
 			'purchase_note'                      => $product->get_purchase_note(),
 
 		] + $children;
@@ -816,14 +802,17 @@ final class Product {
 		$is_subscription = 'subscription' === $meta_data['type'];
 		unset($meta_data['type']);
 
-		if ($is_subscription && !class_exists('WC_Subscription')) {
-			return new \WP_REST_Response(
-				[
-					'code'    => 'subscription_class_not_found',
-					'message' => 'WC_Subscription 訂閱商品類別不存在，請確認是否安裝 Woocommerce Subscription',
-				],
-				400
-			);
+		if ($is_subscription) {
+			$validation = SubscriptionUtils::validate_class();
+			if (\is_wp_error( $validation )) {
+				return new \WP_REST_Response(
+					[
+						'code'    => $validation->get_error_code(),
+						'message' => $validation->get_error_message(),
+					],
+					400
+				);
+			}
 		}
 
 		foreach ( $data as $key => $value ) {
@@ -831,19 +820,11 @@ final class Product {
 			$product->$method_name( $value );
 		}
 
-		// 如果是非訂閱商品，則刪除訂閱商品的相關資料
+		// 如果是非訂閱商品，則刪除訂閱商品的相關資料，並同步從 $meta_data 移除避免後續 update loop 又寫回
 		if (!$is_subscription) {
-			$fields_to_delete = [
-				'_subscription_price',
-				'_subscription_period_interval',
-				'_subscription_period',
-				'_subscription_length',
-				'_subscription_sign_up_fee',
-				'_subscription_trial_length',
-				'_subscription_trial_period',
-			];
-			foreach ($fields_to_delete as $field) {
-				$product->delete_meta_data($field);
+			SubscriptionUtils::delete_meta( $product );
+			foreach ( SubscriptionUtils::get_fields() as $field ) {
+				unset( $meta_data[ $field ] );
 			}
 		}
 
