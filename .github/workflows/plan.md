@@ -222,13 +222,46 @@ Create actionable sub-issues (at most 5):
 - Context: "In file X, add function Y to handle Z"
 - Relevant technical details and expected outcomes
 
-### Sub-Issue Example
+**Agent Assignment（執行 Agent 指派）**:
+
+每個 sub-issue 的 body **必須**在最上方加入 `## 執行 Agent` 區塊，明確指定應由哪個 agent 執行：
+
+| 任務類型 | 指派 Agent |
+| --- | --- |
+| PHP / WordPress 後端（`inc/`、`*.php`、REST API、WooCommerce hooks） | `wordpress-master` |
+| React / TypeScript 前端（`js/src/`、`*.tsx`、`*.ts`、Ant Design、Refine.dev） | `react-master` |
+| 混合（同時涉及前後端） | **拆成兩個 sub-issue**，分別指派 |
+
+在 body 最上方加入：
+```
+## 執行 Agent
+
+> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務）
+```
+或
+```
+## 執行 Agent
+
+> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（React/TypeScript 前端任務）
+```
+
+### Sub-Issue Example（PHP 後端）
 
 ```json
 {
   "type": "create_issue",
-  "title": "新增課程批量匯出 CSV API",
-  "body": "### Objective\n\n實作課程學員批量匯出 CSV 的 REST API 端點。\n\n### Context\n\n後台管理需要匯出特定課程的學員清單，包含學員名稱、Email、購買日期和到期日。\n\n### Approach\n\n1. 在 `inc/classes/Api/` 建立新的 API class，繼承 `ApiBase`，使用 `SingletonTrait`\n2. 在 `Bootstrap.php` 註冊新 singleton\n3. 前端在 `js/src/pages/admin/Students/` 加入匯出按鈕\n4. 使用 `useCustomMutation` hook 呼叫 API\n\n### Files to Modify\n\n- Create: `inc/classes/Api/ExportCSV.php`\n- Update: `inc/classes/Bootstrap.php`（加入 singleton）\n- Update: `js/src/pages/admin/Students/index.tsx`（加入匯出按鈕）\n\n### Acceptance Criteria\n\n- [ ] API 回傳正確的 CSV 內容\n- [ ] 前端匯出按鈕可正常觸發下載\n- [ ] `pnpm run lint:php` 通過\n- [ ] `pnpm run lint:ts` 通過\n- [ ] `pnpm run build` 成功"
+  "title": "[PHP] 新增課程批量匯出 CSV API",
+  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務）\n\n---\n\n### Objective\n\n實作課程學員批量匯出 CSV 的 REST API 端點。\n\n### Context\n\n後台管理需要匯出特定課程的學員清單，包含學員名稱、Email、購買日期和到期日。\n\n### Approach\n\n1. 在 `inc/classes/Api/` 建立新的 API class，繼承 `ApiBase`，使用 `SingletonTrait`\n2. 在 `Bootstrap.php` 註冊新 singleton\n3. 回傳 CSV 格式，正確設定 Content-Type header\n\n### Files to Modify\n\n- Create: `inc/classes/Api/ExportCSV.php`\n- Update: `inc/classes/Bootstrap.php`（加入 singleton）\n\n### Acceptance Criteria\n\n- [ ] API 回傳正確的 CSV 內容\n- [ ] `pnpm run lint:php` 通過\n- [ ] PHPStan 無錯誤"
+}
+```
+
+### Sub-Issue Example（React 前端）
+
+```json
+{
+  "type": "create_issue",
+  "title": "[React] 學員列表新增匯出 CSV 按鈕",
+  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（React/TypeScript 前端任務）\n\n---\n\n### Objective\n\n在學員管理頁面新增匯出 CSV 按鈕，呼叫後端 API 觸發下載。\n\n### Context\n\n後端 API 已由 [PHP] Issue 實作完成，前端需串接並提供 UI 入口。\n\n### Approach\n\n1. 在 `js/src/pages/admin/Students/` 加入匯出按鈕\n2. 使用 `useCustomMutation` hook 呼叫 API\n3. 處理 loading 狀態與錯誤提示\n\n### Files to Modify\n\n- Update: `js/src/pages/admin/Students/index.tsx`（加入匯出按鈕）\n\n### Acceptance Criteria\n\n- [ ] 前端匯出按鈕可正常觸發下載\n- [ ] `pnpm run lint:ts` 通過\n- [ ] `pnpm run build` 成功"
 }
 ```
 

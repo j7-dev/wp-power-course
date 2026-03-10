@@ -152,6 +152,37 @@ model: claude-sonnet-4.6
 
 --
 
+## Sub-Issue Agent 路由規則
+
+建立 sub-issue 時，**必須**在 body 最上方加入 `## 執行 Agent` 區塊，明確指定 agent：
+
+| 任務類型 | 執行 Agent |
+| --- | --- |
+| PHP / WordPress 後端（`inc/`、`*.php`、REST API、WooCommerce Hooks） | `wordpress-master` |
+| React / TypeScript 前端（`js/src/`、`*.tsx`、`*.ts`、Ant Design、Refine.dev） | `react-master` |
+| 混合（同時涉及前後端） | **拆成兩個 sub-issue**，分別指派 |
+
+### Sub-Issue Body 範本
+
+```markdown
+## 執行 Agent
+
+> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務）
+
+---
+
+[其餘 issue 內容]
+```
+
+### 命名慣例
+
+- PHP 後端 sub-issue 標題前綴：`[PHP]`
+- React 前端 sub-issue 標題前綴：`[React]`
+
+> **重要**：Copilot assign issue 時會讀取 body 最上方的 `## 執行 Agent` 區塊，以決定啟用 `wordpress-master` 或 `react-master` agent。請務必正確填寫。
+
+---
+
 ## 主要使用的 Skills
 
 - `/plan`
