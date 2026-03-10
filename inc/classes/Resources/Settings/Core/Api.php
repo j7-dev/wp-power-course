@@ -60,9 +60,6 @@ final class Api extends ApiBase {
 
 		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
-		$body_params['auto_grant_courses'] = Settings::normalize_auto_grant_courses(
-			is_array( $body_params['auto_grant_courses'] ?? null ) ? $body_params['auto_grant_courses'] : []
-		);
 
 		$settings = Settings::instance();
 		$settings->set_properties( $body_params );
