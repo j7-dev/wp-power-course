@@ -1,35 +1,43 @@
-import React, { useEffect, memo } from 'react'
+import React, { useEffect, useMemo, useCallback, memo } from 'react'
 import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
 import { DatePicker } from '@/components/formItem'
 import { useLink } from '@refinedev/core'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
+const RESET_BY_LIMIT_TYPE: Record<string, { value: unknown; unit: unknown }> = {
+	unlimited: { value: '', unit: '' },
+	fixed: { value: 1, unit: 'day' },
+	assigned: { value: undefined, unit: 'timestamp' },
+	follow_subscription: { value: '', unit: '' },
+}
 
-const WatchLimitComponent = () => {
+type TWatchLimitProps = {
+	namePrefix?: (string | number)[]
+	showFollowSubscription?: boolean
+}
+
+const WatchLimitComponent = ({
+	namePrefix = [],
+	showFollowSubscription = true,
+}: TWatchLimitProps) => {
 	const form = Form.useFormInstance()
+	const limitTypeName = useMemo(() => [...namePrefix, 'limit_type'], [namePrefix])
+	const limitValueName = useMemo(() => [...namePrefix, 'limit_value'], [namePrefix])
+	const limitUnitName = useMemo(() => [...namePrefix, 'limit_unit'], [namePrefix])
 	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
-		['limit_type'],
+		limitTypeName,
 		form,
 	)
 
-	const handleReset = (value: string) => {
-		if ('unlimited' === value) {
-			form.setFieldsValue({ limit_value: '', limit_unit: '' })
+	const handleReset = useCallback((value: string) => {
+		const resetValue = RESET_BY_LIMIT_TYPE[value]
+		if (!resetValue) {
+			return
 		}
-		if ('fixed' === value) {
-			form.setFieldsValue({ limit_value: 1, limit_unit: 'day' })
-		}
-		if ('assigned' === value) {
-			form.setFieldsValue({
-				limit_value: undefined,
-				limit_unit: 'timestamp',
-			})
-		}
-		if ('follow_subscription' === value) {
-			form.setFieldsValue({ limit_value: '', limit_unit: '' })
-		}
-	}
+		form.setFieldValue(limitValueName, resetValue.value)
+		form.setFieldValue(limitUnitName, resetValue.unit)
+	}, [form, limitValueName, limitUnitName])
 
 	const watchProductType = Form.useWatch(['type'], form)
 
@@ -38,26 +46,35 @@ const WatchLimitComponent = () => {
 			watchProductType === 'simple' &&
 			watchLimitType === 'follow_subscription'
 		) {
-			form.setFieldValue(['limit_type'], 'unlimited')
+			form.setFieldValue(limitTypeName, 'unlimited')
 		}
-	}, [watchProductType])
+	}, [watchProductType, watchLimitType, form, limitTypeName])
+
+	useEffect(() => {
+		if (!showFollowSubscription && watchLimitType === 'follow_subscription') {
+			form.setFieldValue(limitTypeName, 'unlimited')
+			handleReset('unlimited')
+		}
+	}, [showFollowSubscription, watchLimitType, form, limitTypeName, handleReset])
 
 	const Link = useLink()
+	const limitTypeOptions = [
+		{ label: '無期限', value: 'unlimited' },
+		{ label: '固定天數', value: 'fixed' },
+		{ label: '指定時間', value: 'assigned' },
+		{
+			label: '跟隨訂閱',
+			value: 'follow_subscription',
+			disabled: watchProductType === 'simple',
+		},
+	]
+
 	return (
 		<div>
-			<Item label="觀看期限" name={['limit_type']} initialValue={'unlimited'}>
+			<Item label="觀看期限" name={limitTypeName} initialValue={'unlimited'}>
 				<Radio.Group
 					className="w-full w-avg"
-					options={[
-						{ label: '無期限', value: 'unlimited' },
-						{ label: '固定天數', value: 'fixed' },
-						{ label: '指定時間', value: 'assigned' },
-						{
-							label: '跟隨訂閱',
-							value: 'follow_subscription',
-							disabled: watchProductType === 'simple',
-						},
-					]}
+					options={showFollowSubscription ? limitTypeOptions : limitTypeOptions.slice(0, 3)}
 					optionType="button"
 					buttonStyle="solid"
 					onChange={(e) => {
@@ -68,16 +85,16 @@ const WatchLimitComponent = () => {
 			</Item>
 			{'unlimited' === watchLimitType && (
 				<>
-					<Item name={['limit_value']} initialValue="" hidden />
-					<Item name={['limit_unit']} initialValue="" hidden />
+					<Item name={limitValueName} initialValue="" hidden />
+					<Item name={limitUnitName} initialValue="" hidden />
 				</>
 			)}
 			{'fixed' === watchLimitType && (
 				<Space.Compact block>
-					<Item name={['limit_value']} initialValue={1} className="w-full">
+					<Item name={limitValueName} initialValue={1} className="w-full">
 						<InputNumber className="w-full" min={1} />
 					</Item>
-					<Item name={['limit_unit']} initialValue="day">
+					<Item name={limitUnitName} initialValue="day">
 						<Select
 							options={[
 								{ label: '日', value: 'day' },
@@ -93,7 +110,7 @@ const WatchLimitComponent = () => {
 				<>
 					<DatePicker
 						formItemProps={{
-							name: ['limit_value'],
+							name: limitValueName,
 							className: 'mb-0',
 							rules: [
 								{
@@ -103,12 +120,12 @@ const WatchLimitComponent = () => {
 							],
 						}}
 					/>
-					<Item name={['limit_unit']} initialValue="timestamp" hidden>
+					<Item name={limitUnitName} initialValue="timestamp" hidden>
 						<Input />
 					</Item>
 				</>
 			)}
-			{'follow_subscription' === watchLimitType && (
+			{'follow_subscription' === watchLimitType && showFollowSubscription && (
 				<>
 					<Alert
 						className="my-4"
@@ -126,8 +143,8 @@ const WatchLimitComponent = () => {
 						type="warning"
 						showIcon
 					/>
-					<Item name={['limit_value']} initialValue="" hidden />
-					<Item name={['limit_unit']} initialValue="" hidden />
+					<Item name={limitValueName} initialValue="" hidden />
+					<Item name={limitUnitName} initialValue="" hidden />
 				</>
 			)}
 		</div>
