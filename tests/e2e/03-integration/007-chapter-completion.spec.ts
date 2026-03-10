@@ -90,7 +90,7 @@ test.describe('章節完成切換 & 進度計算', () => {
 		expect(resp.data.data.is_this_chapter_finished).toBe(true)
 		expect(resp.data.data.chapter_id).toBe(chapterIds[0])
 		expect(resp.data.data.course_id).toBe(courseId)
-		expect(resp.data.message).toContain('完成')
+		expect(resp.data.message).toContain('已標示為完成')
 	})
 
 	// ── Test 2: 取消章節完成 ────────────────
@@ -104,7 +104,7 @@ test.describe('章節完成切換 & 進度計算', () => {
 		expect(resp.status).toBeLessThan(400)
 		expect(resp.data.code).toBe('200')
 		expect(resp.data.data.is_this_chapter_finished).toBe(false)
-		expect(resp.data.message).toContain('未完成')
+		expect(resp.data.message).toContain('已標示為未完成')
 	})
 
 	// ── Test 3: 進度計算 — 部分完成 ─────────
