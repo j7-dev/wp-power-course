@@ -17,8 +17,7 @@ imports:
   - shared/reporting.md
   - ../copilot-instructions.md
   - ../instructions/architecture.instructions.md
-  - ../skills/power-course-php/SKILL.md
-  - ../skills/power-course-js/SKILL.md
+  - ../skills/power-course/SKILL.md
 
 safe-outputs:
   create-pull-request:
@@ -37,6 +36,7 @@ source: github/gh-aw/.github/workflows/code-simplifier.md@852cb06ad52958b402ed98
 engine:
   id: copilot
   model: claude-opus-4.6
+  agent: wordpress-reviewer
 ---
 
 <!-- This prompt will be imported in the agentic workflow .github/workflows/code-simplifier.md at runtime. -->
@@ -100,8 +100,8 @@ If **files were changed**, proceed to Phase 2.
 
 Before simplifying, review the project's coding standards from relevant documentation:
 
-- For JavaScript/TypeScript/React: See imported `.github/copilot-instructions.md` and `.github/skills/power-course-js/SKILL.md`
-- For PHP: See imported `.github/copilot-instructions.md` and `.github/skills/power-course-php/SKILL.md`
+- For JavaScript/TypeScript/React: See imported `.github/copilot-instructions.md` and `.github/skills/power-course/SKILL.md`
+- For PHP: See imported `.github/copilot-instructions.md` and `.github/skills/power-course/SKILL.md`
 
 **Power Course 專案關鍵標準：**
 

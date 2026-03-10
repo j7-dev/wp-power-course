@@ -52,8 +52,7 @@ imports:
   - shared/reporting.md
   - ../copilot-instructions.md
   - ../instructions/architecture.instructions.md
-  - ../skills/power-course-php/SKILL.md
-  - ../skills/power-course-js/SKILL.md
+  - ../skills/power-course/SKILL.md
 ---
 
 # CI Failure Doctor

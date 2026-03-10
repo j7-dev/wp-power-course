@@ -13,6 +13,7 @@ permissions:
 engine:
   id: copilot
   model: claude-opus-4.6
+  agent: planner
 tools:
   github:
     lockdown: false
@@ -39,8 +40,7 @@ imports:
   - shared/mood.md
   - ../copilot-instructions.md
   - ../instructions/architecture.instructions.md
-  - ../skills/power-course-php/SKILL.md
-  - ../skills/power-course-js/SKILL.md
+  - ../skills/power-course/SKILL.md
 source: github/gh-aw/.github/workflows/plan.md@852cb06ad52958b402ed982b69957ffc57ca0619
 ---
 
@@ -91,13 +91,13 @@ After reading the full issue/discussion, systematically scan for ambiguities acr
 
 ### Scanning Categories
 
-| Category | What to Check |
-|----------|--------------|
-| **A. 範圍邊界 (Scope)** | Which features/changes are in scope vs. out of scope? Are there implicit assumptions about what's included? |
-| **B. 行為規格 (Behavior)** | What are the expected default values, limits, error handling, and user-facing behaviors? |
-| **C. 技術決策 (Technical)** | Which files need modification? What patterns, libraries, or tools should be used? Are the file paths confirmed? |
-| **D. 驗收標準 (Acceptance)** | How do we know this is "done"? What tests or checks must pass? |
-| **E. 邊界情況 (Edge Cases)** | What happens with unexpected inputs, concurrent access, permission errors, or empty states? |
+| Category                     | What to Check                                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **A. 範圍邊界 (Scope)**      | Which features/changes are in scope vs. out of scope? Are there implicit assumptions about what's included?     |
+| **B. 行為規格 (Behavior)**   | What are the expected default values, limits, error handling, and user-facing behaviors?                        |
+| **C. 技術決策 (Technical)**  | Which files need modification? What patterns, libraries, or tools should be used? Are the file paths confirmed? |
+| **D. 驗收標準 (Acceptance)** | How do we know this is "done"? What tests or checks must pass?                                                  |
+| **E. 邊界情況 (Edge Cases)** | What happens with unexpected inputs, concurrent access, permission errors, or empty states?                     |
 
 ### Decision Logic
 
@@ -183,10 +183,10 @@ Before creating sub-issues, post a summary comment using `add-comment`:
 
 #### 已確認的決策
 
-| # | 項目 | 決策 |
-|---|------|------|
-| 1 | [決策項目] | [最終決定] |
-| 2 | [決策項目] | [最終決定] |
+| #   | 項目       | 決策       |
+| --- | ---------- | ---------- |
+| 1   | [決策項目] | [最終決定] |
+| 2   | [決策項目] | [最終決定] |
 
 #### 即將建立的工作項目
 
