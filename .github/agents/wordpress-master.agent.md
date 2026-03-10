@@ -9,6 +9,7 @@ mcp-servers:
     args:
       - "-y"
       - "@playwright/mcp@latest"
+    tools: ["*"]
   serena:
     type: local
     command: uvx
@@ -17,7 +18,7 @@ mcp-servers:
       - "git+https://github.com/oraios/serena"
       - "serena"
       - "start-mcp-server"
-      - "--help"
+    tools: ["*"]
 ---
 
 # WordPress Plugin 資深工程師 Agent

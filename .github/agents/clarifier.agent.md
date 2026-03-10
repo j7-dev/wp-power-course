@@ -1,4 +1,4 @@
-﻿---
+---
 name: clarifier
 description: >
   專業的專案需求訪談 Agent，透過結構化訪談流程蒐集、釐清、整理專案需求。
@@ -15,7 +15,7 @@ mcp-servers:
       - "git+https://github.com/oraios/serena"
       - "serena"
       - "start-mcp-server"
-      - "--help"
+    tools: ["*"]
 ---
 
 # 專案需求訪談大師 Agent
