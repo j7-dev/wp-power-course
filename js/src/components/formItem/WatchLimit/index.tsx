@@ -5,7 +5,11 @@ import { useLink } from '@refinedev/core'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
-const RESET_BY_LIMIT_TYPE: Record<string, { value: unknown; unit: unknown }> = {
+type TResetValue = {
+	value: '' | number | undefined
+	unit: '' | 'day' | 'month' | 'year' | 'timestamp'
+}
+const RESET_BY_LIMIT_TYPE: Record<TCoursesLimit['limit_type'], TResetValue> = {
 	unlimited: { value: '', unit: '' },
 	fixed: { value: 1, unit: 'day' },
 	assigned: { value: undefined, unit: 'timestamp' },
@@ -30,11 +34,8 @@ const WatchLimitComponent = ({
 		form,
 	)
 
-	const handleReset = useCallback((value: string) => {
+	const handleReset = useCallback((value: TCoursesLimit['limit_type']) => {
 		const resetValue = RESET_BY_LIMIT_TYPE[value]
-		if (!resetValue) {
-			return
-		}
 		form.setFieldValue(limitValueName, resetValue.value)
 		form.setFieldValue(limitUnitName, resetValue.unit)
 	}, [form, limitValueName, limitUnitName])
@@ -74,11 +75,19 @@ const WatchLimitComponent = ({
 			<Item label="觀看期限" name={limitTypeName} initialValue={'unlimited'}>
 				<Radio.Group
 					className="w-full w-avg"
-					options={showFollowSubscription ? limitTypeOptions : limitTypeOptions.slice(0, 3)}
+					options={
+						showFollowSubscription
+							? limitTypeOptions
+							: limitTypeOptions.filter(
+									(option) => option.value !== 'follow_subscription',
+							  )
+					}
 					optionType="button"
 					buttonStyle="solid"
 					onChange={(e) => {
-						const value = e?.target?.value || ''
+						const value =
+							(e?.target?.value as TCoursesLimit['limit_type'] | undefined) ??
+							'unlimited'
 						handleReset(value)
 					}}
 				/>

@@ -13,9 +13,9 @@ type TAutoGrantCourseRowProps = {
 
 const AutoGrantCourseRow = ({ field, onRemove }: TAutoGrantCourseRowProps) => {
 	const { selectProps } = useCourseSelect()
-	const { value, onChange, ...courseSelectProps } = selectProps
-	void value
-	void onChange
+	const courseSelectProps = { ...selectProps }
+	delete courseSelectProps.value
+	delete courseSelectProps.onChange
 
 	return (
 		<div className="rounded border border-gray-200 p-4">
@@ -28,7 +28,6 @@ const AutoGrantCourseRow = ({ field, onRemove }: TAutoGrantCourseRowProps) => {
 				>
 					<Select
 						{...courseSelectProps}
-						mode={undefined}
 						placeholder="搜尋課程關鍵字"
 					/>
 				</Form.Item>
