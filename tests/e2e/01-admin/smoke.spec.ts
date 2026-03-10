@@ -12,7 +12,7 @@ import { URLS } from '../fixtures/test-data'
 test.describe('E2E Infrastructure Smoke Test', () => {
 	test('WordPress 首頁可訪問', async ({ page }) => {
 		await page.goto('/')
-		await expect(page).toHaveTitle(/power-course|Power Course/i)
+		await expect(page).toHaveTitle(/power.?course/i)
 	})
 
 	test('WordPress 登入頁可訪問', async ({ page }) => {
