@@ -48,11 +48,6 @@ final class Settings extends DTO {
 	/** @var int $pc_pdf_watermark_qty PDF 浮水印數量 */
 	public int $pc_pdf_watermark_qty = 0;
 
-	/**
-	 * @var array<int, array{course_id?: int|string, limit_type?: string, limit_value?: int|string|null, limit_unit?: string|null}> $auto_grant_courses 註冊後自動開通課程設定
-	 */
-	public array $auto_grant_courses = [];
-
 	/** @var string $pc_pdf_watermark_color PDF 浮水印顏色 */
 	public string $pc_pdf_watermark_color = 'rgba(255, 255, 255, 0.5)';
 
