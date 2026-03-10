@@ -8,6 +8,7 @@ mcp-servers:
     args:
       - "-y"
       - "@playwright/mcp@latest"
+    tools: ["*"]
 ---
 # E2E 測試執行專家（WordPress Plugin 版）
 
