@@ -29,12 +29,11 @@
 #   Imports:
 #     - ../copilot-instructions.md
 #     - ../instructions/architecture.instructions.md
-#     - ../skills/power-course-js/SKILL.md
-#     - ../skills/power-course-php/SKILL.md
+#     - ../skills/power-course/SKILL.md
 #     - shared/mood.md
 #     - shared/reporting.md
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"802bed96ec3bf91cab534c65dba1d6606cb6968b10cb07c994a176bbcf972670","stop_time":"2026-04-04 08:14:42","compiler_version":"v0.52.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"4025ba4e48d023980f7b2ea52b17d138b8633ca5a1eeed1c629a32be8c071e85","stop_time":"2026-04-04 08:14:42","compiler_version":"v0.52.1"}
 #
 # Effective stop-time: 2026-04-04 08:14:42
 
@@ -202,10 +201,7 @@ jobs:
           {{#runtime-import ../instructions/architecture.instructions.md}}
           GH_AW_PROMPT_EOF
           cat << 'GH_AW_PROMPT_EOF'
-          {{#runtime-import ../skills/power-course-php/SKILL.md}}
-          GH_AW_PROMPT_EOF
-          cat << 'GH_AW_PROMPT_EOF'
-          {{#runtime-import ../skills/power-course-js/SKILL.md}}
+          {{#runtime-import ../skills/power-course/SKILL.md}}
           GH_AW_PROMPT_EOF
           cat << 'GH_AW_PROMPT_EOF'
           {{#runtime-import .github/workflows/ci-doctor.md}}

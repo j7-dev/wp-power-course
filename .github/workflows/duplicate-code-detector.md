@@ -11,6 +11,7 @@ permissions:
 engine:
   id: copilot
   model: claude-opus-4.6
+  agent: wordpress-reviewer
 tools:
   serena: ["php", "typescript"]
 safe-outputs:
@@ -27,8 +28,7 @@ imports:
   - shared/mood.md
   - ../copilot-instructions.md
   - ../instructions/architecture.instructions.md
-  - ../skills/power-course-php/SKILL.md
-  - ../skills/power-course-js/SKILL.md
+  - ../skills/power-course/SKILL.md
 source: github/gh-aw/.github/workflows/duplicate-code-detector.md@852cb06ad52958b402ed982b69957ffc57ca0619
 ---
 

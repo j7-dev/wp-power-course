@@ -28,7 +28,7 @@
 #     - ../copilot-instructions.md
 #     - ../instructions/architecture.instructions.md
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"36c565c86324e6be490b8775751ffb6a94e0827ace9ee14cc5d9cdbedc4a7245","stop_time":"2026-04-05 10:20:31","compiler_version":"v0.52.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"d79d96f4408ea3963dc90bcab3a868ef57747a8e6e5ef52923ec72697b800cbe","stop_time":"2026-04-05 10:20:31","compiler_version":"v0.52.1"}
 #
 # Effective stop-time: 2026-04-05 10:20:31
 
@@ -36,6 +36,8 @@ name: "CI Auto-Fix Agent"
 "on":
   workflow_run:
     # zizmor: ignore[dangerous-triggers] - workflow_run trigger is secured with role and fork validation
+    branches:
+    - master
     types:
     - completed
     workflows:
