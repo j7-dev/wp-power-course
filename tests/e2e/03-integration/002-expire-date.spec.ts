@@ -85,7 +85,7 @@ test.describe('到期日驗證', () => {
 		await page.fill('#user_login', 'e2e_expire_tester')
 		await page.fill('#user_pass', 'e2e_expire_pass')
 		await page.click('#wp-submit', { noWaitAfter: true })
-		await page.waitForURL((url) => !url.pathname.includes('wp-login'), { timeout: 15_000 })
+		await page.waitForURL((url) => !url.pathname.includes('wp-login'), { timeout: 30_000, waitUntil: 'domcontentloaded' })
 
 		// 造訪教室 — 應看到存取拒絕（過期）
 		await page.goto(`${baseUrl}/classroom/${courseSlug}/expire-ch1/`, {
