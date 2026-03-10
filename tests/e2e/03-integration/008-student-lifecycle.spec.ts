@@ -73,12 +73,15 @@ test.describe('學員生命週期', () => {
 		expect(addResp.status).toBeLessThan(400)
 
 		// 2. 查詢學員列表 — 確認學員存在
-		const listResp = await api.pcGet<{ data: { users: Array<{ id: number }> } }>(
-			'courses/student-logs',
-			{ course_id: String(courseId) },
-		)
-		// 若 API 回傳不同結構，至少確認回應成功
+		const listResp = await api.pcGet('students', {
+			meta_value: String(courseId),
+			posts_per_page: '100',
+			paged: '1',
+		})
 		expect(listResp.status).toBeLessThan(400)
+		// 確認學員出現在列表中
+		const studentIds = (listResp.data as Array<{ id: string }>).map((u) => u.id)
+		expect(studentIds).toContain(String(testUserId))
 
 		// 3. 更新到期日（30 天後）
 		const futureTimestamp = Math.floor(Date.now() / 1000) + 30 * 86400
