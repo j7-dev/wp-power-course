@@ -10,7 +10,7 @@ use J7\WpUtils\Classes\General;
 /** Class Settings */
 final class Settings extends DTO {
 
-	const SETTINGS_OPTION_NAME = 'power_course_settings';
+	public const SETTINGS_OPTION_NAME = 'power_course_settings';
 
 	/** @var string $course_access_trigger 當訂單處於什麼狀態時，會觸發課程開通 */
 	public string $course_access_trigger = 'completed';
@@ -54,7 +54,10 @@ final class Settings extends DTO {
 	/** @var string $pc_pdf_watermark_text PDF 浮水印文字 */
 	public string $pc_pdf_watermark_text = '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}';
 
-	/** @return self 獲取實例*/
+	/** @var array<int, array{course_id: int, limit_type: string, limit_value: int|null, limit_unit: string|null}> $auto_grant_courses 用戶註冊後自動開通課程設定 */
+	public array $auto_grant_courses = [];
+
+	/** @return self 獲取實例 */
 	public static function instance(): self {
 		if ( self::$dto_instance ) {
 			return self::$dto_instance;
@@ -74,9 +77,26 @@ final class Settings extends DTO {
 	 * @param array<string, mixed> $properties 屬性名稱與值
 	 * @return self
 	 */
-	public function set_properties( array $properties ) {
+	public function set_properties( array $properties ): self {
+		if ( isset( $properties['auto_grant_courses'] ) && is_array( $properties['auto_grant_courses'] ) ) {
+			$normalized = [];
+			foreach ( $properties['auto_grant_courses'] as $item ) {
+				if ( ! is_array( $item ) || empty( $item['course_id'] ) ) {
+					continue;
+				}
+				$normalized[] = [
+					'course_id'   => (int) $item['course_id'],
+					'limit_type'  => (string) ( $item['limit_type'] ?? 'unlimited' ),
+					'limit_value' => isset( $item['limit_value'] ) && '' !== $item['limit_value'] ? (int) $item['limit_value'] : null,
+					'limit_unit'  => isset( $item['limit_unit'] ) && '' !== $item['limit_unit'] ? (string) $item['limit_unit'] : null,
+				];
+			}
+			$this->auto_grant_courses = $normalized;
+			unset( $properties['auto_grant_courses'] );
+		}
+
 		foreach ( $properties as $property => $value ) {
-			if ( !property_exists( $this, $property ) ) {
+			if ( ! property_exists( $this, $property ) ) {
 				$this->dto_error->add( 'invalid_property', "Invalid property: {$property}" );
 			}
 			$this->$property = General::to_same_type( $this->$property, $value );
@@ -84,12 +104,10 @@ final class Settings extends DTO {
 		return $this;
 	}
 
-
 	/** 儲存設定到資料庫 */
 	public function save(): void {
 		\update_option( self::SETTINGS_OPTION_NAME, $this->to_array() );
 	}
-
 
 	/**
 	 * 設定屬性

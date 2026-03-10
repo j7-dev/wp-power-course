@@ -15,6 +15,7 @@ final class Loader {
 		Order::instance();
 		Comment::instance();
 		Course\LifeCycle::instance();
+		Course\AutoGrant::instance();
 		Teacher\Core\ExtendQuery::instance();
 		Settings\Core\Api::instance();
 	}

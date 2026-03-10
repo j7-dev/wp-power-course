@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace J7\PowerCourse\Resources\Settings\Core;
 
-use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\ApiBase;
+use J7\WpUtils\Classes\WP;
 use J7\PowerCourse\Resources\Settings\Model\Settings;
 
 /** Settings Api */
@@ -59,7 +59,7 @@ final class Api extends ApiBase {
 		$body_params = $request->get_json_params();
 
 		/** @var array<string, mixed> $body_params */
-		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text', 'auto_grant_courses' ] );
 
 		$settings = Settings::instance();
 		$settings->set_properties( $body_params );
@@ -72,6 +72,6 @@ final class Api extends ApiBase {
 				'data'    => $body_params,
 			],
 			200
-			);
+		);
 	}
 }
