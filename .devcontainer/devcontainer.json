@@ -2,9 +2,6 @@
   "name": "Power Course",
   "image": "mcr.microsoft.com/devcontainers/php:8.2",
 
-  "workspaceMount": "source=${localWorkspaceFolder}/../..,target=/workspaces/powerrepo,type=bind,consistency=cached",
-  "workspaceFolder": "/workspaces/powerrepo/apps/power-course",
-
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20"
