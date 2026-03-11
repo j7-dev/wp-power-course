@@ -57,7 +57,7 @@ final class Api extends ApiBase {
 		$body_params = $request->get_json_params();
 
 		/** @var array<string, mixed> $body_params */
-		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text' ] );
+		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text', 'auto_grant_courses' ] );
 
 		$settings = Settings::instance();
 		$settings->set_properties( $body_params );
@@ -67,7 +67,7 @@ final class Api extends ApiBase {
 			[
 				'code'    => 'post_user_success',
 				'message' => '修改成功',
-				'data'    => $body_params,
+				'data'    => $settings->to_array(),
 			],
 			200
 			);

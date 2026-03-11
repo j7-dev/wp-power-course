@@ -11,6 +11,8 @@ use J7\WpUtils\Classes\General;
 final class Settings extends DTO {
 
 	const SETTINGS_OPTION_NAME = 'power_course_settings';
+	const AUTO_GRANT_LIMIT_TYPES = [ 'unlimited', 'fixed', 'assigned' ];
+	const AUTO_GRANT_LIMIT_UNITS = [ 'timestamp', 'day', 'month', 'year' ];
 
 	/** @var string $course_access_trigger 當訂單處於什麼狀態時，會觸發課程開通 */
 	public string $course_access_trigger = 'completed';
@@ -54,6 +56,9 @@ final class Settings extends DTO {
 	/** @var string $pc_pdf_watermark_text PDF 浮水印文字 */
 	public string $pc_pdf_watermark_text = '用戶 {display_name} 正在觀看 {post_title} IP:{ip} \n Email:{email}';
 
+	/** @var array<int, array{course_id: int, limit_type: string, limit_value: ?int, limit_unit: ?string}> $auto_grant_courses 註冊時自動開通課程設定 */
+	public array $auto_grant_courses = [];
+
 	/** @return self 獲取實例*/
 	public static function instance(): self {
 		if ( self::$dto_instance ) {
@@ -78,10 +83,69 @@ final class Settings extends DTO {
 		foreach ( $properties as $property => $value ) {
 			if ( !property_exists( $this, $property ) ) {
 				$this->dto_error->add( 'invalid_property', "Invalid property: {$property}" );
+				continue;
 			}
+
+			if ( 'auto_grant_courses' === $property ) {
+				$this->auto_grant_courses = $this->normalize_auto_grant_courses( $value );
+				continue;
+			}
+
 			$this->$property = General::to_same_type( $this->$property, $value );
 		}
 		return $this;
+	}
+
+	/**
+	 * 正規化註冊自動開通課程設定
+	 *
+	 * @param mixed $value 原始設定值
+	 * @return array<int, array{course_id: int, limit_type: string, limit_value: ?int, limit_unit: ?string}>
+	 */
+	private function normalize_auto_grant_courses( mixed $value ): array {
+		if ( !\is_array( $value ) ) {
+			return [];
+		}
+
+		$normalized_courses = [];
+
+		foreach ( $value as $item ) {
+			if ( !\is_array( $item ) ) {
+				continue;
+			}
+
+			$course_id = isset( $item['course_id'] ) ? (int) $item['course_id'] : 0;
+			if ( $course_id <= 0 ) {
+				continue;
+			}
+
+			$limit_type = isset( $item['limit_type'] ) && \is_scalar( $item['limit_type'] ) ? (string) $item['limit_type'] : '';
+			if ( !\in_array( $limit_type, self::AUTO_GRANT_LIMIT_TYPES, true ) ) {
+				continue;
+			}
+
+			$limit_value = null;
+			if ( \array_key_exists( 'limit_value', $item ) && '' !== $item['limit_value'] && null !== $item['limit_value'] ) {
+				$limit_value = (int) $item['limit_value'];
+			}
+
+			$limit_unit = null;
+			if ( isset( $item['limit_unit'] ) && '' !== $item['limit_unit'] && \is_scalar( $item['limit_unit'] ) ) {
+				$candidate_limit_unit = (string) $item['limit_unit'];
+				if ( \in_array( $candidate_limit_unit, self::AUTO_GRANT_LIMIT_UNITS, true ) ) {
+					$limit_unit = $candidate_limit_unit;
+				}
+			}
+
+			$normalized_courses[] = [
+				'course_id'   => $course_id,
+				'limit_type'  => $limit_type,
+				'limit_value' => $limit_value,
+				'limit_unit'  => $limit_unit,
+			];
+		}
+
+		return $normalized_courses;
 	}
 
 
