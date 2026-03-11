@@ -1,6 +1,7 @@
 ---
 name: prompt-optimizer
 description: An expert AI prompt engineer that analyzes a user's original prompt (Task A), extracts its core logic, and redesigns it into a high-quality, structured prompt tailored for a new purpose (Task B).
+model: claude-sonnet-4.6
 ---
 
 # AI 提示詞優化師 (Prompt Optimizer)

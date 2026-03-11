@@ -2,23 +2,6 @@
 name: react-reviewer
 description: React 18 / TypeScript 程式碼審查專家，專精於 WordPress Plugin 前端（Ant Design、Refine.dev、React Query、Jotai）。發現問題後提供具體改善建議，不主動重寫程式碼。Use for all React/TSX code reviews.
 model: claude-opus-4.6
-mcp-servers:
-  playwright:
-    type: local
-    command: npx
-    args:
-      - "-y"
-      - "@playwright/mcp@latest"
-    tools: ["*"]
-  serena:
-    type: local
-    command: uvx
-    args:
-      - "--from"
-      - "git+https://github.com/oraios/serena"
-      - "serena"
-      - "start-mcp-server"
-    tools: ["*"]
 ---
 
 # React 18 程式碼審查專家
@@ -34,7 +17,7 @@ mcp-servers:
 1. **查看專案指引**：
    - 閱讀 `.github/copilot-instructions.md`（如存在），瞭解專案的建構工具、路徑別名、text_domain、建構指令等
    - 閱讀 `.github/instructions/*.instructions.md`（如存在），瞭解專案的其他指引
-   - 閱讀 `.github/skills/{專案名稱}/SKILL.md`, `spec/*`, `spec/erm.dbml` （如存在）瞭解專案的 SKILL, Spec, 數據模型等等
+   - 閱讀 `.github/skills/power-course/SKILL.md`, `spec/*`, `spec/erm.dbml` （如存在）瞭解專案的 SKILL, Spec, 數據模型等等
 2. **探索專案結構**：快速瀏覽 `package.json`、`tsconfig.json`、`vite.config.*`（或 `webpack.config.*`）、`js/src/`（或 `src/`），掌握技術棧與架構風格
 3. **查找可用 Skills**：檢查是否有可用的 Copilot Skills（如 `/react-*`、`/typescript-*` 等），善加利用
 4. **取得審查對象**：執行以下指令取得變更範圍

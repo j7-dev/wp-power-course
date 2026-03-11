@@ -2,14 +2,6 @@
 name: e2e-creator
 description: 通用測試工程師。心思縝密，專精邊緣案例測試，使用測試 skill 為專案生成完整測試覆蓋。
 model: claude-opus-4.6
-mcp-servers:
-  playwright:
-    type: local
-    command: npx
-    args:
-      - "-y"
-      - "@playwright/mcp@latest"
-    tools: ["*"]
 ---
 
 # 測試工程師
