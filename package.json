@@ -10,7 +10,7 @@
 		"build:wp": "vite --config vite.config-for-wp.ts build",
 		"preview": "vite preview",
 		"format": "prettier-eslint --write \"js/src/**/*.tsx\"",
-		"lint:php": "phpcbf && phpcs inc --report=full -v && phpstan analyze inc",
+		"lint:php": "phpcbf && phpcs inc --report=full -v && phpstan analyze inc --memory-limit=4096M",
 		"lint:ts": "npx eslint \"js/src/**/*.{ts,tsx}\" --ext .ts,.tsx --fix --rule \"no-unused-vars: off\"",
 		"release": "env-cmd -f ../../.env release-it patch --ci --verbose --config ./release/.release-it.cjs",
 		"release:build-only": "env-cmd -f ../../.env release-it patch --ci --verbose --config ./release/.release-it.cjs --build-only",

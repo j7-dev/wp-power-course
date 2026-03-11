@@ -4,6 +4,13 @@ set -e
 WORKSPACE_DIR=$(pwd)
 PARENT_DIR=$(dirname "$WORKSPACE_DIR")
 
+# ---------- PHP 設定 ----------
+
+# Codespaces 預設 memory_limit=128M，phpstan 需要更多記憶體
+PHP_INI_DIR=$(php -r "echo php_ini_scanned_dir();" 2>/dev/null || echo "/usr/local/etc/php/conf.d")
+echo "memory_limit = 4096M" | sudo tee "$PHP_INI_DIR/99-devcontainer.ini" > /dev/null
+echo "→ PHP memory_limit set to 4096M"
+
 # 安裝 pnpm
 npm install -g pnpm@10.32.0
 
