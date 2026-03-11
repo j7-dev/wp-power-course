@@ -125,7 +125,12 @@ final class Settings extends DTO {
 			}
 
 			$limit_value = null;
-			if ( \array_key_exists( 'limit_value', $item ) && '' !== $item['limit_value'] && null !== $item['limit_value'] ) {
+			if (
+				\array_key_exists( 'limit_value', $item )
+				&& '' !== $item['limit_value']
+				&& null !== $item['limit_value']
+				&& \is_numeric( (string) $item['limit_value'] )
+			) {
 				$limit_value = (int) $item['limit_value'];
 			}
 
