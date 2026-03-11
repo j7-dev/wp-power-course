@@ -30,10 +30,10 @@ if ( ! is_array( $teacher_ids ) ) {
 }
 
 /**
- * @var array{type: string, id: string, meta: ?array} $trial_video
+ * @var array{type: string, id: string, meta: ?array<string, mixed>} $trial_video
  */
 $trial_video = \get_post_meta( $product_id, 'trial_video', true );
-$video_type  = $trial_video['type'] ?? 'none';
+$video_type  = $trial_video['type'];
 
 if ( 'none' !== $video_type ) {
 	printf(
@@ -75,7 +75,7 @@ if ( (bool) $teacher_ids ) {
 }
 
 foreach ( $teacher_ids as $teacher_id ) {
-	$teacher = \get_user_by( 'id', $teacher_id );
+	$teacher = \get_user_by( 'id', (string) $teacher_id );
 	echo '<div class="mb-12">';
 	Plugin::load_template(
 		'user/about',

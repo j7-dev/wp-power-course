@@ -49,6 +49,7 @@ final class Chapter {
 		);
 
 		$chapter_ids = is_array( $chapter_ids ) ? $chapter_ids : [];
+		/** @var array<string> $chapter_ids */
 		return $chapter_ids;
 	}
 
@@ -64,14 +65,14 @@ final class Chapter {
 
 			$success_ids = [];
 			foreach ($chapter_ids as $chapter_id) {
-				$post_parent = \get_post_field( 'post_parent', $chapter_id );
+				$post_parent = \get_post_field( 'post_parent', (int) $chapter_id );
 				if (!$post_parent) {
 					continue;
 				}
 
 				$result = \wp_update_post(
 				[
-					'ID'          => $chapter_id,
+					'ID'          => (int) $chapter_id,
 					'post_parent' => 0,
 					'meta_input'  => [
 						'parent_course_id' => $post_parent,
@@ -79,8 +80,8 @@ final class Chapter {
 				]
 					);
 
-				if (!\is_numeric($result)) {
-					throw new \Exception($result->get_error_message());
+				if ($result === 0) {
+					throw new \Exception('更新文章失敗 ID: ' . $chapter_id);
 				}
 
 				$success_ids[] = $chapter_id;

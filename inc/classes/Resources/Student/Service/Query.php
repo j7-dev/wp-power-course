@@ -16,8 +16,9 @@ final class Query {
 	private string $where;
 
 	/**
-	 * @var array<string, mixed> 查詢參數
+	 * Constructor
 	 *
+	 * @param array<string, mixed> $args 查詢參數
 	 * @throws \Exception 如果 meta_value 為空
 	 *  */
 	public function __construct( private array $args ) {

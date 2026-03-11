@@ -6,8 +6,9 @@
 use J7\PowerCourse\Utils\Base;
 
 /**
- * @var mixed $args
+ * @var array<string, mixed> $args
  */
+$args = $args ?? [];
 
 $default_args = [
 	'children'   => '',

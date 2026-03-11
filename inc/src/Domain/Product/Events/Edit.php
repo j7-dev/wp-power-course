@@ -6,6 +6,9 @@ namespace J7\PowerCourse\Domain\Product\Events;
 
 use J7\PowerCourse\Domain\Product\Helper\IsCourse;
 
+/**
+ * Edit event handler for product.
+ */
 class Edit {
 
 
@@ -80,7 +83,7 @@ class Edit {
 			return;
 		}
 
-		$is_course = \wc_string_to_bool(  $_REQUEST[ IsCourse::META_KEY ] ?? 'no'); //phpcs:ignore
+		$is_course = \wc_string_to_bool( (string) $_REQUEST[ IsCourse::META_KEY ] ); //phpcs:ignore
 
 		\update_post_meta( $post_id, IsCourse::META_KEY, \wc_bool_to_string( $is_course) );
 	}

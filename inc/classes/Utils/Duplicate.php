@@ -94,23 +94,20 @@ final class Duplicate {
 
 		// 複製文章並設為草稿
 		/** @var \WP_Post $post */
-		// @phpstan-ignore-next-line
-		$post->ID = null;
+		$post_arr = (array) $post;
+		unset($post_arr['ID']);
 		if (0 === $depth) {
-			$post->post_title .= ' (複製)';
+			$post_arr['post_title'] .= ' (複製)';
 		}
 
 		// 在插入前處理 post_content
-		if (isset($post->post_excerpt)) {
-			$post->post_excerpt = \wp_slash($post->post_excerpt);
-		}
+		$post_arr['post_excerpt'] = \wp_slash( (string) $post_arr['post_excerpt']);
 
 		// 插入新文章
-		// @phpstan-ignore-next-line
-		$new_id = \wp_insert_post( (array) $post );
+		/** @var array{post_title: string, post_status: string, post_type: string, post_content: string, post_excerpt: string, post_author: int, post_date: string, post_date_gmt: string} $post_arr */
+		$new_id = \wp_insert_post( $post_arr, true );
 
-		// @phpstan-ignore-next-line
-		if (!\is_numeric($new_id)) {
+		if (\is_wp_error($new_id)) {
 			throw new \Exception(__('複製文章失敗', 'power-course') . ' ' . $new_id->get_error_message());
 		}
 
@@ -123,7 +120,9 @@ final class Duplicate {
 					continue;
 				}
 
-				\add_post_meta($new_id, $key, \wp_slash(\maybe_unserialize($value)));
+				/** @var array<string, mixed>|string $unserialized_value */
+				$unserialized_value = \maybe_unserialize($value);
+				\add_post_meta($new_id, $key, \wp_slash($unserialized_value));
 			}
 		}
 
@@ -203,8 +202,7 @@ final class Duplicate {
 		if (is_numeric($source)) {
 			$source_id = (int) $source;
 			$post      = \get_post($source_id);
-			// @phpstan-ignore-next-line
-			$post_type = $post ? $post->post_type : '';
+			$post_type = ( $post instanceof \WP_Post ) ? $post->post_type : '';
 		} elseif ($source instanceof \WC_Product) {
 			$source_id = $source->get_id();
 			$post_type = 'product';
@@ -317,7 +315,7 @@ final class Duplicate {
 		// 把這貼複製後的頂層 chapter meta_key parent_course_id 更新為新的課程 id
 		foreach ($copied_ids as $copied_id) {
 			$post = \get_post($copied_id);
-			if (!$post) {
+			if (!( $post instanceof \WP_Post )) {
 				continue;
 			}
 
@@ -352,20 +350,18 @@ final class Duplicate {
 
 		// 原課程身上的銷售方案
 		$bundle_product_ids = \get_posts(
-			// @phpstan-ignore-next-line
 			[
 				'post_type'   => 'product',
 				'numberposts' => -1,
-				'meta_key'    => Helper::LINK_COURSE_IDS_META_KEY,
-				'meta_value'  => $post_id,
+				'meta_query'  => [
+					[
+						'key'   => Helper::LINK_COURSE_IDS_META_KEY,
+						'value' => $post_id,
+					],
+				],
 				'fields'      => 'ids',
 			]
 		);
-
-		// @phpstan-ignore-next-line
-		if (!is_array($bundle_product_ids)) {
-			return;
-		}
 
 		foreach ($bundle_product_ids as $bundle_product_id) {
 			$duplicate->process($bundle_product_id, true, $new_id, $depth + 1);

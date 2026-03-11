@@ -45,7 +45,7 @@ abstract class Subscription {
 	 * 從 WC_Product 讀取並正規化所有訂閱相關 meta 欄位
 	 *
 	 * @param \WC_Product $product WooCommerce 商品物件
-	 * @return array<string, float|int|string|null> 已正規化的訂閱 meta 欄位陣列
+	 * @return array<string, mixed> 已正規化的訂閱 meta 欄位陣列
 	 */
 	public static function get_normalized_meta( \WC_Product $product ): array {
 		$subscription_price           = $product->get_meta( '_subscription_price' );

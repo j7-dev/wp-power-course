@@ -29,7 +29,8 @@ final class ExtendQuery {
 		$clause = $builder->find( 'avl_course_ids' );
 		if ($clause) {
 			$builder->remove( 'avl_course_ids' );
-			foreach ( $clause->value as $course_id ) {
+			$clause_values = is_array( $clause->value ) ? $clause->value : [ $clause->value ];
+			foreach ( $clause_values as $course_id ) {
 				$builder->add(
 					[
 						'key'     => 'avl_course_ids',

@@ -29,6 +29,7 @@ if ( ! is_array( $qa_list ) ) {
 	$qa_list = [];
 }
 foreach ( $qa_list as $qa ) {
+	/** @var array{question?: string, answer?: string} $qa */
 	if (!isset($qa['question']) || !isset($qa['answer'])) {
 		continue;
 	}
@@ -47,7 +48,7 @@ foreach ( $qa_list as $qa ) {
 		</div>
 	</div>
 ',
-		$qa['question'],
-		\wpautop( $qa['answer'])
+		(string) $qa['question'],
+		\wpautop( (string) $qa['answer'])
 	);
 }

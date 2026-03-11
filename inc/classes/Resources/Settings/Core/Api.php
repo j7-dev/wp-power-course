@@ -34,7 +34,6 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request REST請求對象。
 	 * @return \WP_REST_Response 返回包含選項資料的REST響應對象。
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_settings_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$settings = Settings::instance();
@@ -53,7 +52,6 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含更新選項所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回選項資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_settings_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_json_params();

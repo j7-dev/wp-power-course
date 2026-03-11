@@ -11,6 +11,8 @@ $default_args = [
 	'depth'   => 0,
 ];
 
+/** @var array<string, mixed> $args */
+$args = $args ?? [];
 $args = wp_parse_args( $args, $default_args );
 
 [
@@ -23,12 +25,12 @@ if ( ! $product_comment instanceof WP_Comment ) {
 	echo '$product_comment 不是 WP_Comment 實例';
 	return;
 }
-$comment_id      = $product_comment->comment_ID;
+$comment_id      = (int) $product_comment->comment_ID;
 $rating          = \get_comment_meta( $comment_id, 'rating', true );
-$user_id         = $product_comment->user_id;
+$user_id         = (int) $product_comment->user_id;
 $user            = \get_user_by( 'ID', $user_id );
 $user_name       = $user ? $user->display_name : '訪客';
-$user_avatar_url = \get_user_meta($user_id, 'user_avatar_url', true);
+$user_avatar_url = (string) \get_user_meta($user_id, 'user_avatar_url', true);
 $user_avatar_url = $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 $comment_date    = \get_comment_date( 'Y-m-d h:i:s', $comment_id );
 $comment_content = wpautop( $product_comment->comment_content );
@@ -75,7 +77,7 @@ printf(
 	$rating ? Plugin::load_template(
 		'rate',
 		[
-			'value' => $rating,
+			'value' => (string) $rating,
 		],
 		false
 		) : '',

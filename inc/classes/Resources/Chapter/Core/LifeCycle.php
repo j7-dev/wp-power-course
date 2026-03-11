@@ -184,9 +184,9 @@ final class LifeCycle {
 	/**
 	 * 處理文章儲存後的動作
 	 *
-	 * @param int     $post_id Post ID
-	 * @param WP_Post $post Post object
-	 * @param bool    $update Whether this is an existing post being updated
+	 * @param int      $post_id Post ID
+	 * @param \WP_Post $post Post object
+	 * @param bool     $update Whether this is an existing post being updated
 	 */
 	public static function delete_transient( $post_id, $post, $update ): void {
 		// 避免自動儲存
@@ -206,9 +206,9 @@ final class LifeCycle {
 	/**
 	 * 如果儲存時，editor 是 power-editor，則要清除 elementor 相關資料
 	 *
-	 * @param int     $post_id Post ID
-	 * @param WP_Post $post Post object
-	 * @param bool    $update Whether this is an existing post being updated
+	 * @param int      $post_id Post ID
+	 * @param \WP_Post $post Post object
+	 * @param bool     $update Whether this is an existing post being updated
 	 */
 	public static function delete_elementor_data( $post_id, $post, $update ): void {
 		// 避免自動儲存
@@ -220,9 +220,11 @@ final class LifeCycle {
 		if ( $editor === 'power-editor' ) {
 			$post_meta = \get_post_meta( $post_id );
 
-			foreach ( $post_meta as $key => $value ) {
-				if ( strpos( $key, '_elementor_' ) !== false ) {
-					\delete_post_meta( $post_id, $key );
+			if (is_array($post_meta)) {
+				foreach ( $post_meta as $key => $value ) {
+					if ( strpos( (string) $key, '_elementor_' ) !== false ) {
+						\delete_post_meta( $post_id, (string) $key );
+					}
 				}
 			}
 		}

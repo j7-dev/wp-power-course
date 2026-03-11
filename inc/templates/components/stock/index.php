@@ -11,7 +11,7 @@ $default_args = [
 ];
 
 /**
-	* @var array{product: \WC_Product} $args
+	* @var array{product: \WC_Product, class: string} $args
 	* @phpstan-ignore-next-line
 	*/
 $args = wp_parse_args( $args, $default_args );
@@ -28,7 +28,7 @@ if (!$managing_stock) {
 }
 
 
-$show_rest_stock = wc_string_to_bool($product->get_meta('show_rest_stock'));
+$show_rest_stock = wc_string_to_bool( (string) $product->get_meta('show_rest_stock'));
 
 if (!$show_rest_stock) {
 	return;
@@ -49,8 +49,9 @@ if ($stock_quantity <= 0) {
 	$color_class = 'bg-gray-100 text-gray-500';
 }
 
-echo <<<HTML
-    <div class="{$class}">
-        <span class="px-2 py-1 {$color_class} text-xs rounded-md font-bold">剩餘 {$stock_quantity} 組</span>
-    </div>
-HTML;
+printf(
+	'<div class="%1$s"><span class="px-2 py-1 %2$s text-xs rounded-md font-bold">剩餘 %3$s 組</span></div>',
+	esc_attr( $class ),
+	esc_attr( $color_class ),
+	esc_html( (string) $stock_quantity )
+);

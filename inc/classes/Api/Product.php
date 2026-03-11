@@ -23,12 +23,9 @@ final class Product {
 	/**
 	 * APIs
 	 *
-	 * @var array
-	 * - endpoint: string
-	 * - method: 'get' | 'post' | 'patch' | 'delete'
-	 * - permission_callback : callable
+	 * @var array<int, array{endpoint: string, method: string, permission_callback?: callable}>
 	 */
-	protected $apis = [
+	protected array $apis = [
 		[
 			'endpoint' => 'products',
 			'method'   => 'get',
@@ -134,8 +131,9 @@ final class Product {
 	 */
 	public function get_products_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? [];
+		$params = $request->get_query_params();
 
+		/** @var array<string, mixed> $params */
 		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
@@ -157,28 +155,32 @@ final class Product {
 			$args['meta_query']['relation'] = 'AND';
 			$args['meta_query'][]           = [
 				'key'     => '_price', // 價格自定義欄位
-				'value'   => $args['price_range'] ?? [ 0, 10000000 ], // 設定價格範圍
+				'value'   => $args['price_range'], // 設定價格範圍
 				'compare' => 'BETWEEN', // 在此範圍之間
 				'type'    => 'DECIMAL', // 處理為數值
 			];
 			unset( $args['price_range'] );
 		}
 
+		/** @var \stdClass $results */
 		$results = \wc_get_products( $args );
 
+		/** @var int $total */
 		$total       = $results->total;
+		/** @var int $total_pages */
 		$total_pages = $results->max_num_pages;
 
-		$products = $results->products;
-		$products = array_filter($products);
+		/** @var array<\WC_Product> $products_list */
+		$products_list = $results->products;
+		$products = $products_list;
 
 		$formatted_products = array_values(array_map( [ $this, 'format_product_details' ], $products ));
 
 		$response = new \WP_REST_Response( $formatted_products );
 
 		// set pagination in header
-		$response->header( 'X-WP-Total', $total );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$response->header( 'X-WP-Total', (string) $total );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 
 		return $response;
 	}
@@ -193,8 +195,9 @@ final class Product {
 	 */
 	public function get_products_select_callback( $request ) { // phpcs:ignore
 
-		$params = $request->get_query_params() ?? [];
+		$params = $request->get_query_params();
 
+		/** @var array<string, mixed> $params */
 		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
@@ -224,8 +227,8 @@ final class Product {
 		$response = new \WP_REST_Response( $formatted_products );
 
 		// set pagination in header
-		$response->header( 'X-WP-Total', $total );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$response->header( 'X-WP-Total', (string) $total );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 
 		return $response;
 	}
@@ -237,24 +240,23 @@ final class Product {
 	 * form-data 方式送出
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response|\WP_Error
+	 * @return \WP_REST_Response
 	 */
 	public function post_products_callback( $request ) {
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'action' ] );
+		WP::include_required_params( $body_params, [ 'action' ] );
 
-		if ( $include_required_params !== true ) {
-			return $include_required_params;
-		}
-
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
+		/** @var array<int> $ids */
 		$ids = $body_params['ids'] ?? []; // 修改才需要 ids
 		unset( $body_params['ids'] );
-		$qty = $body_params['qty'] ?? 0; // 創建才需要 qty
+		$qty = (int) ( $body_params['qty'] ?? 0 ); // 創建才需要 qty
 		unset( $body_params['qty'] );
+		/** @var string $action */
 		$action = $body_params['action'];
 		unset( $body_params['action'] );
 
@@ -265,7 +267,7 @@ final class Product {
 
 		$std_response = match ($action) {
 			'update' => WcProduct::multi_update( $ids, $data, $meta_data ),
-			'create' => WcProduct::multi_create( $qty, $data['product_type'] ?? 'simple' ),
+			'create' => WcProduct::multi_create( $qty, (string) ( $data['product_type'] ?? 'simple' ) ),
 			default => [
 				'code'    => 'post_failed',
 				'message' => '修改失敗，未知的 action',
@@ -289,19 +291,18 @@ final class Product {
 	 * @return \WP_REST_Response
 	 */
 	public function post_products_bind_courses_callback( $request ) {
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
+		WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
 
-		if ($include_required_params !== true) {
-			return $include_required_params;
-		}
-
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
-		$product_ids = $body_params['product_ids'];
-		$course_ids  = $body_params['course_ids'];
-		$limit       = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
+		/** @var array<int|string> $product_ids */
+		$product_ids = $body_params['product_ids'] ?? [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = $body_params['course_ids'] ?? [];
+		$limit       = new Limit( (string) ( $body_params['limit_type'] ?? '' ), (int) ( $body_params['limit_value'] ?? 0 ), isset( $body_params['limit_unit'] ) ? (string) $body_params['limit_unit'] : null );
 
 		$success_ids = [];
 		$failed_ids  = [];
@@ -345,21 +346,20 @@ final class Product {
 	 * 更新已綁定課程觀看權限到商品上
 	 *
 	 * @param \WP_REST_Request $request Request.
-	 * @return \WP_REST_Response|\WP_Error
+	 * @return \WP_REST_Response
 	 */
 	public function post_products_update_bound_courses_callback( $request ) {
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
+		WP::include_required_params( $body_params, [ 'product_ids', 'course_ids', 'limit_type' ] );
 
-		if ($include_required_params !== true) {
-			return $include_required_params;
-		}
-
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
-		$product_ids = $body_params['product_ids'];
-		$course_ids  = $body_params['course_ids'];
+		/** @var array<int|string> $product_ids */
+		$product_ids = $body_params['product_ids'] ?? [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = $body_params['course_ids'] ?? [];
 
 		$success_ids = [];
 		$failed_ids  = [];
@@ -367,7 +367,7 @@ final class Product {
 
 			$bind_courses_data_instance = BindCoursesData::instance( (int) $product_id);
 			foreach ($course_ids as $course_id) {
-				$limit = new Limit( $body_params['limit_type'], (int) $body_params['limit_value'], $body_params['limit_unit'] );
+				$limit = new Limit( (string) ( $body_params['limit_type'] ?? '' ), (int) ( $body_params['limit_value'] ?? 0 ), isset( $body_params['limit_unit'] ) ? (string) $body_params['limit_unit'] : null );
 				$bind_courses_data_instance->update_course_data( (int) $course_id, $limit );
 			}
 			$bind_courses_data_instance->save();
@@ -396,23 +396,24 @@ final class Product {
 	 * @return \WP_REST_Response
 	 */
 	public function post_products_unbind_courses_callback( $request ) {
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
+		WP::include_required_params( $body_params, [ 'product_ids', 'course_ids' ] );
 
-		if ($include_required_params !== true) {
-			return $include_required_params;
-		}
-
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
-		$product_ids = $body_params['product_ids'];
-		$course_ids  = $body_params['course_ids'];
+		/** @var array<int|string> $product_ids */
+		$product_ids = $body_params['product_ids'] ?? [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = $body_params['course_ids'] ?? [];
 
 		$success_ids = [];
 		$failed_ids  = [];
 		foreach ($product_ids as $product_id) {
-			$original_course_ids = \get_post_meta( $product_id, 'bind_course_ids' ) ?: [];
+			/** @var array<mixed> $original_course_ids */
+			$original_course_ids = \get_post_meta( (int) $product_id, 'bind_course_ids' ) ?: [];
+			/** @var array<string> $new_course_ids */
 			$new_course_ids      = \array_filter( $original_course_ids, fn( $original_course_id ) => ! \in_array( $original_course_id, $course_ids ) );
 
 			$result = WcProduct::update_meta_array( (int) $product_id, 'bind_course_ids', $new_course_ids );
@@ -450,13 +451,9 @@ final class Product {
 	 *
 	 * @param \WC_Product $product Product.
 	 * @param bool        $with_description With description.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
-	public function format_product_details( $product , $with_description = true) { // phpcs:ignore
-
-		if ( ! ( $product instanceof \WC_Product ) ) {
-			return [];
-		}
+	public function format_product_details( \WC_Product $product , $with_description = true) { // phpcs:ignore
 		$product_id    = $product->get_id();
 		$date_created  = $product->get_date_created();
 		$date_modified = $product->get_date_modified();
@@ -472,9 +469,9 @@ final class Product {
 			'short_description' => $product->get_short_description(),
 		] : [];
 
-		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product?->get_low_stock_amount();
+		$low_stock_amount = ( '' === $product->get_low_stock_amount() ) ? null : $product->get_low_stock_amount();
 
-		$variation_ids = $product?->get_children(); // get variations
+		$variation_ids = $product->get_children(); // get variations
 		$children      = [];
 		if ( ! empty( $variation_ids ) ) {
 			$variation_products = array_map( 'wc_get_product', $variation_ids );
@@ -486,16 +483,16 @@ final class Product {
 			];
 		}
 
-		$attributes = $product?->get_attributes(); // get attributes object
+		$attributes = $product->get_attributes(); // get attributes object
 
 		$attributes_arr = [];
 
 		foreach ( $attributes as $key => $attribute ) {
 			if ( $attribute instanceof \WC_Product_Attribute ) {
 				$attributes_arr[] = [
-					'name'     => \wc_attribute_label( $attribute?->get_name() ),
-					'options'  => $attribute?->get_options(),
-					'position' => $attribute?->get_position(),
+					'name'     => \wc_attribute_label( $attribute->get_name() ),
+					'options'  => $attribute->get_options(),
+					'position' => $attribute->get_position(),
 				];
 			}
 
@@ -514,7 +511,7 @@ final class Product {
 		$sale_date_range = [ (int) $product->get_date_on_sale_from()?->getTimestamp(), (int) $product->get_date_on_sale_to()?->getTimestamp() ];
 
 		$helper     = Helper::instance( $product );
-		$permalink  = $helper->link_course_id ? \get_permalink( $helper->link_course_id ) : \get_permalink( $product_id );
+		$permalink  = ( $helper !== null && $helper->link_course_id ) ? \get_permalink( $helper->link_course_id ) : \get_permalink( $product_id );
 		$base_array = [
 			// Get Product General Info
 			'id'                                 => (string) $product_id,
@@ -554,8 +551,8 @@ final class Product {
 			'sold_individually'                  => \wc_bool_to_string( $product->is_sold_individually() ),
 
 			// Get Linked Products
-			'upsell_ids'                         => array_map( 'strval', $product?->get_upsell_ids() ),
-			'cross_sell_ids'                     => array_map( 'strval', $product?->get_cross_sell_ids() ),
+			'upsell_ids'                         => array_map( 'strval', $product->get_upsell_ids() ),
+			'cross_sell_ids'                     => array_map( 'strval', $product->get_cross_sell_ids() ),
 
 			// Get Product Variations and Attributes
 			'attributes'                         => $attributes_arr,
@@ -581,7 +578,7 @@ final class Product {
 			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( Helper::instance( $product ) )->get_product_ids(),
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
 
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
@@ -607,13 +604,9 @@ final class Product {
 	 * Format product Select
 	 *
 	 * @param \WC_Product $product Product.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
-	public function format_select( $product) { // phpcs:ignore
-
-		if ( ! ( $product instanceof \WC_Product ) ) {
-			return [];
-		}
+	public function format_select( \WC_Product $product) { // phpcs:ignore
 
 		// 取出銷售方案
 		// $bundles  =Helper::get_bundle_products( $product->get_id());
@@ -656,7 +649,8 @@ final class Product {
 	 */
 	public function post_bundle_products_callback( $request ) {
 
-		$body_params = $request->get_body_params() ?? [];
+		$body_params = $request->get_body_params();
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 		$file_params = $request->get_file_params();
 
@@ -678,6 +672,7 @@ final class Product {
 		$meta_data = self::handle_special_fields( $meta_data, $product );
 
 		foreach ( $meta_data as $key => $value ) {
+			/** @var string|array<mixed> $value */
 			$product->update_meta_data( $key, $value );
 		}
 
@@ -703,12 +698,10 @@ final class Product {
 	 * @return \WP_REST_Response
 	 */
 	public function post_bundle_products_sort_callback( $request ) {
-		$body_params             = $request->get_json_params() ?? [];
+		$body_params             = $request->get_json_params();
+		/** @var array<string, mixed> $body_params */
 		$body_params             = WP::sanitize_text_field_deep( $body_params );
-		$include_required_params = WP::include_required_params( $body_params, [ 'sort_list' ] );
-		if ($include_required_params !== true) {
-			return $include_required_params;
-		}
+		WP::include_required_params( $body_params, [ 'sort_list' ] );
 
 		/**
 		 * @var array<int, array{id: int, menu_order: int}>
@@ -726,7 +719,7 @@ final class Product {
 					'menu_order' => $menu_order,
 				]
 				);
-			if (is_numeric($result)) {
+			if ($result > 0) {
 				$success_ids[] = $id;
 			} else {
 				$failed_ids[] = $id;
@@ -754,10 +747,11 @@ final class Product {
 	 * @return \WP_REST_Response
 	 */
 	public function post_bundle_products_with_id_callback( $request ) {
-		$id          = $request['id'];
-		$body_params = $request->get_body_params() ?? [];
+		$id          = (int) $request['id'];
+		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
 		$product = \wc_get_product( $id );
@@ -785,12 +779,13 @@ final class Product {
 			$images            = $meta_data['images'];
 			$images            = is_array($images) ? $images : [];
 			foreach ($images as $index => $image) {
+				/** @var array<string, mixed> $image */
 				$image_id = $image['id'] ?? null;
 				if (!$image_id) {
 					continue;
 				}
 				if ($index === 0) {
-					$product->set_image_id($image_id);
+					$product->set_image_id( (string) $image_id);
 				}
 				$gallery_image_ids[] = $image_id;
 			}
@@ -833,15 +828,22 @@ final class Product {
 		$meta_data = self::handle_special_fields( $meta_data, $product );
 
 		foreach ( $meta_data as $key => $value ) {
+			/** @var string|array<mixed> $value */
 			$product->update_meta_data( $key, $value );
 		}
 
 		$product->save_meta_data();
 
-		$result = \wp_set_object_terms($id, $is_subscription ? 'subscription' : 'simple', 'product_type');
-		\wc_delete_product_transients($id);
+		$result = \wp_set_object_terms( $id, $is_subscription ? 'subscription' : 'simple', 'product_type');
+		\wc_delete_product_transients( $id );
 		if (\is_wp_error($result)) {
-			return $result;
+			return new \WP_REST_Response(
+				[
+					'code'    => 'patch_failed',
+					'message' => $result->get_error_message(),
+				],
+				400
+			);
 		}
 
 		return new \WP_REST_Response(
@@ -864,7 +866,6 @@ final class Product {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_bundle_products_with_id_callback( $request ) {
 		return $this->delete_products_with_id_callback( $request );
@@ -877,7 +878,6 @@ final class Product {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_products_with_id_callback( $request ) {
 		$id = (int) $request['id'];
@@ -910,11 +910,11 @@ final class Product {
 	 * 針對特殊欄位處理
 	 * 例如要儲存成 array 的 meta data，或是要略過的 meta data
 	 *
-	 * @param array $meta_data Meta data.
-	 * @param mixed $product Product.
-	 * @return array
+	 * @param array<string, mixed> $meta_data Meta data.
+	 * @param \WC_Product          $product Product.
+	 * @return array<string, mixed>
 	 */
-	public static function handle_special_fields( $meta_data, $product ) {
+	public static function handle_special_fields( array $meta_data, \WC_Product $product ) {
 		$update_array_meta_keys = [
 			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
 			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程
@@ -932,6 +932,7 @@ final class Product {
 		foreach ($update_array_meta_keys as $meta_key) {
 			if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
 				// 先刪除原本的 meta data
+				/** @var array<string> $meta_values */
 				$meta_values = $meta_data[ $meta_key ];
 				WcProduct::update_meta_array( $product_id, $meta_key, $meta_values );
 				unset( $meta_data[ $meta_key ] );
@@ -942,14 +943,10 @@ final class Product {
 		foreach ($add_array_meta_keys as $meta_key) {
 			if ( isset( $meta_data[ $meta_key ] ) && is_array( $meta_data[ $meta_key ] ) ) {
 				// 先刪除原本的 meta data
+				/** @var array<int|string> $meta_values */
 				$meta_values = $meta_data[ $meta_key ];
 				WcProduct::add_meta_array( $product_id, $meta_key, $meta_values );
 				unset( $meta_data[ $meta_key ] );
-
-				if ('bind_course_ids' !== $meta_key) {
-					continue;
-				}
-				$product_id = $product->get_id();
 
 				$bind_courses_data_instance = BindCoursesData::instance( $product_id );
 				foreach ($meta_values as $course_id) {
@@ -973,11 +970,11 @@ final class Product {
 	/**
 	 * Format terms
 	 *
-	 * @param ?array<string, mixed> $params Params.
+	 * @param array<string, mixed> $params Params.
 	 *
-	 * @return array{id:string, name:string}
+	 * @return list<array{id: string, name: string}>
 	 */
-	public static function format_terms( ?array $params = null ): array {
+	public static function format_terms( array $params = [] ): array {
 		// it seems no need to add post_per_page, get_terms will return all terms
 		$default_args = [
 			'taxonomy'   => 'product_cat',
@@ -994,15 +991,18 @@ final class Product {
 
 		$terms = \get_terms( $args );
 
-		$formatted_terms = array_values(
-				array_map(
+		if ( !\is_array( $terms ) ) {
+			return [];
+		}
+
+		/** @var array<int|string, string> $terms */
+		$formatted_terms = array_map(
 				fn( $key, $value ) => [
 					'id'   => (string) $key,
-					'name' => $value,
+					'name' => (string) $value,
 				],
 				array_keys( $terms ),
 				array_values( $terms )
-				)
 				);
 
 		return $formatted_terms;
@@ -1018,7 +1018,8 @@ final class Product {
 
 		$max_min_prices = \get_transient( $transient_key );
 
-		if ( false !== $max_min_prices ) {
+		if ( is_array( $max_min_prices ) && isset( $max_min_prices['max_price'], $max_min_prices['min_price'] ) ) {
+			/** @var array{max_price: int, min_price: int} $max_min_prices */
 			return $max_min_prices;
 		}
 		// 獲取最高價格的商品
@@ -1034,7 +1035,7 @@ final class Product {
 		$max_price          = 0;
 		if ( ! empty( $max_price_products ) ) {
 			$max_price_product = reset( $max_price_products );     // 獲取第一個元素
-			$max_price         = $max_price_product?->get_price(); // 獲取最高價格
+			$max_price         = (int) ( $max_price_product instanceof \WC_Product ? $max_price_product->get_price() : 0 ); // 獲取最高價格
 		}
 
 		// 獲取最低價格的商品
@@ -1051,7 +1052,7 @@ final class Product {
 		$min_price = 0;
 		if ( ! empty( $min_price_products ) ) {
 			$min_price_product = reset( $min_price_products );     // 獲取第一個元素
-			$min_price         = $min_price_product?->get_price(); // 獲取最低價格
+			$min_price         = (int) ( $min_price_product instanceof \WC_Product ? $min_price_product->get_price() : 0 ); // 獲取最低價格
 		}
 
 		$max_min_prices = [
@@ -1070,8 +1071,7 @@ final class Product {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 *
-	 * @return array
-	 * @phpstan-ignore-next-line
+	 * @return array<string, mixed>
 	 */
 	public function get_products_options_callback( $request ) { // phpcs:ignore
 		$formatted_cats = self::format_terms();

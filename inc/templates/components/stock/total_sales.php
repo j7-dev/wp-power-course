@@ -9,7 +9,7 @@ $default_args = [
 ];
 
 /**
-	* @var array{product: \WC_Product} $args
+	* @var array{product: \WC_Product, class: string} $args
 	* @phpstan-ignore-next-line
 	*/
 $args = wp_parse_args( $args, $default_args );
@@ -19,7 +19,7 @@ $args = wp_parse_args( $args, $default_args );
 	'class'   => $class,
 ] = $args;
 
-$show_total_sales = \wc_string_to_bool($product->get_meta('show_total_sales'));
+$show_total_sales = \wc_string_to_bool( (string) $product->get_meta('show_total_sales'));
 
 if (!$show_total_sales) {
 	return;
@@ -32,8 +32,9 @@ $total_sales = $product->get_total_sales();
 $color_class = 'bg-red-100 text-red-500';
 
 
-echo <<<HTML
-    <div class="{$class}">
-        <span class="px-2 py-1 {$color_class} text-xs rounded-md font-bold">已售出 {$total_sales} 組</span>
-    </div>
-HTML;
+printf(
+	'<div class="%1$s"><span class="px-2 py-1 %2$s text-xs rounded-md font-bold">已售出 %3$s 組</span></div>',
+	esc_attr( $class ),
+	esc_attr( $color_class ),
+	esc_html( (string) $total_sales )
+);

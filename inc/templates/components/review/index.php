@@ -41,13 +41,14 @@ $product_comments = \get_comments(
 $reviews_allowed = $product->get_reviews_allowed(); // 後台設定，是否允許評價
 $has_bought      = wc_customer_bought_product( '', get_current_user_id(), $product->get_id() ); // 用戶是否已購買此課程
 // 檢查用戶是否評論過此商品
-$has_reviewed = get_comments(
+/** @var array<int|WP_Comment> $has_reviewed_comments */
+$has_reviewed_comments = get_comments(
 	[
 		'post_id' => $product->get_id(),
 		'user_id' => get_current_user_id(),
 	]
 );
-$has_reviewed = count( $has_reviewed ) > 0;
+$has_reviewed = count( $has_reviewed_comments ) > 0;
 
 
 if ($reviews_allowed && $has_bought && !$has_reviewed) {
@@ -58,7 +59,7 @@ if ($reviews_allowed && $has_bought && !$has_reviewed) {
 
 // Review List
 $show_review_list = $product->get_meta( 'show_review_list' ) === 'yes';
-if ( $show_review_list && count( $product_comments ) ) {
+if ( $show_review_list && is_array( $product_comments ) && count( $product_comments ) ) {
 	foreach ( $product_comments as $product_comment ) {
 		Plugin::load_template(
 			'review/item',

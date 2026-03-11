@@ -15,7 +15,7 @@ use J7\PowerCourse\Resources\Course\LifeCycle;
  * */
 final class AddStudent {
 
-	/** @var array<object{customer_id: int, course_id: string, expire_date: int|string, order: \WC_Order|null}> 學員以及課程資料 */
+	/** @var array<object{customer_id: int, course_id: int, expire_date: int|string, order: \WC_Order|null}> 學員以及課程資料 */
 	private array $items = [];
 
 

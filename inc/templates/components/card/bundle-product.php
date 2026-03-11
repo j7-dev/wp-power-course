@@ -39,7 +39,7 @@ $bundle_type_label = $product->get_meta( 'bundle_type_label' );
 $is_on_sale      = $product->is_on_sale();
 $date_on_sale_to = $product->get_date_on_sale_to()?->date('Y/m/d H:i');
 
-$image_id  = $product->get_image_id();
+$image_id  = (int) $product->get_image_id();
 $image_url = \wp_get_attachment_image_url($image_id, 'full');
 
 // 確認是否可以購買 以及還有沒有庫存
@@ -71,7 +71,7 @@ printf(
   <p class="text-xs text-center mb-1 text-error">%1$s</p>
 	<h6 class="text-base text-base-content font-semibold text-center">%2$s</h6>
 ',
-	$bundle_type_label,
+	(string) $bundle_type_label,
 	$product_name
 );
 

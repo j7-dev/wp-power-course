@@ -80,15 +80,18 @@ final class Api extends ApiBase {
 	 * - count_total 是否要計算總數
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_students_callback( $request ): \WP_REST_Response {
 		$params = $request->get_query_params();
 		$params = WP::sanitize_text_field_deep( $params, false );
 
-		[$meta_keys, $rest_params] = General::destruct($params, 'meta_keys');
+		/** @var array<string, mixed> $sanitized_params */
+		$sanitized_params              = is_array($params) ? $params : [];
+		[$meta_keys, $rest_params] = General::destruct($sanitized_params, 'meta_keys');
+		/** @var array<string> $meta_keys */
 		$meta_keys                 = is_array($meta_keys) ? $meta_keys : [];
 
+		/** @var array<string, mixed> $rest_params */
 		$query      = new Query($rest_params);
 		$user_ids   = $query->user_ids;
 		$pagination = $query->get_pagination();
@@ -115,7 +118,7 @@ final class Api extends ApiBase {
 	 */
 	public function extend_meta_keys( array $meta_keys_array, \WP_User $user ): array {
 		if (isset($meta_keys_array['is_teacher'])) {
-			$meta_keys_array['is_teacher'] = \wc_string_to_bool(\get_user_meta($user->ID, 'is_teacher', true));
+			$meta_keys_array['is_teacher'] = \wc_string_to_bool( (string) \get_user_meta($user->ID, 'is_teacher', true));
 		}
 
 		if (isset($meta_keys_array['avl_courses'])) {

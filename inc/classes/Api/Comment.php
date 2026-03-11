@@ -81,12 +81,12 @@ final class Comment {
 	 * - count_total 是否要計算總數
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_comments_callback( $request ): \WP_REST_Response {
 
 		$params = $request->get_query_params();
 
+		/** @var array<string, mixed> $params */
 		$params = WP::sanitize_text_field_deep( $params, false );
 
 		$default_args = [
@@ -130,8 +130,9 @@ final class Comment {
 
 		$count_args = array_merge($args, [ 'count' => true ]);
 		unset($count_args['paged']);
+		/** @var int $total */
 		$total       = \get_comments($count_args);
-		$total_pages = \floor( $total / $args['number'] ) + 1;
+		$total_pages = (int) \floor( $total / (int) $args['number'] ) + 1;
 		// set pagination in header
 		$response->header( 'X-WP-Total', (string) $total );
 		$response->header( 'X-WP-TotalPages', (string) $total_pages );
@@ -146,16 +147,26 @@ final class Comment {
 	 *
 	 * @param \WP_REST_Request $request 包含新增留言所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_comments_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_body_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$comment_type = $body_params['comment_type'];
-		$product_id   = $body_params['comment_post_ID'];
+		$comment_type = (string) ( $body_params['comment_type'] ?? '' );
+		$product_id   = (int) ( $body_params['comment_post_ID'] ?? 0 );
 		$product      = \wc_get_product($product_id);
+		if (!$product) {
+			return new \WP_REST_Response(
+			[
+				'code'    => 400,
+				'message' => '找不到商品',
+				'data'    => null,
+			],
+			400
+			);
+		}
 		$can_comment  = CommentUtils::can_comment($product, $comment_type);
 
 		if (true !== $can_comment) {
@@ -172,21 +183,24 @@ final class Comment {
 		[
 		'data' => $data,
 		'meta_data' => $meta_data,
-		] = WP::separator(  $body_params, 'comment' );
+		] = WP::separator( $body_params, 'comment' );
 
-		$data['comment_meta']      = array_merge($data['comment_meta'] ?? [], $meta_data);
+		$data['comment_meta']      = array_merge( (array) ( $data['comment_meta'] ?? [] ), $meta_data);
 		$data['comment_author_IP'] = $_SERVER['REMOTE_ADDR']; // phpcs:ignore
 		$data['comment_agent']     = $_SERVER['HTTP_USER_AGENT']; // phpcs:ignore
 
 		$user_id = \get_current_user_id();
 		if ($user_id) {
-			$user                         = \get_user_by('id', $user_id);
-			$data['comment_author']       = $user->display_name;
-			$data['comment_author_email'] = $user->user_email;
-			$data['comment_author_url']   = $user->user_url;
+			$user = \get_user_by('id', $user_id);
+			if ($user) {
+				$data['comment_author']       = $user->display_name;
+				$data['comment_author_email'] = $user->user_email;
+				$data['comment_author_url']   = $user->user_url;
+			}
 		}
 		$data['user_id'] = $user_id;
 
+		/** @var array{comment_agent?: string, comment_approved?: int|string, comment_author?: string, comment_author_email?: string, comment_author_IP?: string, comment_author_url?: string, comment_content?: string, comment_date?: string, comment_date_gmt?: string, comment_karma?: int, comment_meta?: array<string, mixed>, comment_parent?: int, comment_post_ID?: int, comment_type?: string, user_id?: int} $data */
 		$comment_id = \wp_insert_comment( $data );
 
 		if (!$comment_id) {
@@ -200,7 +214,7 @@ final class Comment {
 			);
 		}
 
-		$label = match ($data['comment_type']) {
+		$label = match ($data['comment_type'] ?? '') {
 			'comment' => '留言',
 			'review'  => '評價',
 			default   => '留言',
@@ -223,26 +237,14 @@ final class Comment {
 	 *
 	 * @param \WP_REST_Request $request 包含新增留言所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_comments_with_id_toggle_approved_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
-		$id = $request['id'];
-
-		if (!\is_numeric($id)) {
-			return new \WP_REST_Response(
-			[
-				'code'    => 400,
-				'message' => '留言 ID 錯誤',
-				'data'    => null,
-			],
-			400
-			);
-		}
+		$id = (int) $request['id'];
 
 		$comment = \get_comment($id);
 
-		if (!$comment) {
+		if (!( $comment instanceof \WP_Comment )) {
 			return new \WP_REST_Response(
 			[
 				'code'    => 400,
@@ -321,26 +323,14 @@ final class Comment {
 	 *
 	 * @param \WP_REST_Request $request 包含新增留言所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_comments_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
-		$id = $request['id'];
-
-		if (!\is_numeric($id)) {
-			return new \WP_REST_Response(
-			[
-				'code'    => 400,
-				'message' => '留言 ID 錯誤',
-				'data'    => null,
-			],
-			400
-			);
-		}
+		$id = (int) $request['id'];
 
 		$comment = \get_comment($id);
 
-		if (!$comment) {
+		if (!( $comment instanceof \WP_Comment )) {
 			return new \WP_REST_Response(
 			[
 				'code'    => 400,
@@ -408,20 +398,16 @@ final class Comment {
 	/**
 	 * Format comment details
 	 *
-	 * @param \WP_Comment $comment  Comment.
-	 * @param int         $depth        Depth.
-	 * @param array       $args         Args.
+	 * @param \WP_Comment                                                                                    $comment  Comment.
+	 * @param int                                                                                            $depth        Depth.
+	 * @param array{format?: string, status?: string, hierarchical?: string, orderby?: array<string>|string} $args         Args.
 	 *
-	 * @return array{id: string,user_login: string,user_email: string,display_name: string,user_registered: string,user_registered_human: string,user_avatar: string,avl_courses: array<string, mixed>}[]
+	 * @return array<string, mixed>
 	 */
-	public function format_comment_details( \WP_Comment $comment, int $depth = 0, ?array $args = [] ): array {
+	public function format_comment_details( \WP_Comment $comment, int $depth = 0, array $args = [] ): array {
 
-		if ( ! ( $comment instanceof \WP_Comment ) ) {
-			return [];
-		}
-
-		$comment_id        = $comment->comment_ID;
-		$user_id           = $comment->user_id;
+		$comment_id        = (int) $comment->comment_ID;
+		$user_id           = (int) $comment->user_id;
 		$user_avatar_url   = \get_user_meta($user_id, 'user_avatar_url', true);
 		$user_avatar_url   = (bool) $user_avatar_url ? $user_avatar_url : \get_avatar_url( $user_id  );
 		$user              = [
@@ -435,9 +421,7 @@ final class Comment {
 		$comment_author_IP = $comment->comment_author_IP; //phpcs:ignore
 		$comment_content   = \wpautop($comment->comment_content);
 		$comment_date      = $comment->comment_date;
-		/**
-		 * @var \WP_Comment[] $children
-		 */
+
 		$comment->populated_children(false); // 要關閉這個才會有 children
 
 		$children = $comment->get_children($args);
@@ -467,17 +451,19 @@ final class Comment {
 	 * @param int $comment_id Comment ID.
 	 * @return array<int>
 	 */
-	public static function get_all_children_ids( $comment_id ): array {
+	public static function get_all_children_ids( int $comment_id ): array {
 		$children_ids = [];
-		$children     = (array) \get_comments(
+		/** @var \WP_Comment[] $children */
+		$children = \get_comments(
 			[
 				'parent'       => $comment_id,
 				'hierarchical' => 'threaded',
 			]
 		);
 		foreach ($children as $child) {
-			$children_ids[] = $child->comment_ID;
-			$children_ids   = array_merge($children_ids, self::get_all_children_ids($child->comment_ID));
+			$child_id       = (int) $child->comment_ID;
+			$children_ids[] = $child_id;
+			$children_ids   = array_merge($children_ids, self::get_all_children_ids($child_id));
 		}
 		return $children_ids;
 	}

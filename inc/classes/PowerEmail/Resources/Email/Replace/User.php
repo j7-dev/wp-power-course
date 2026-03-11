@@ -40,7 +40,7 @@ abstract class User extends ReplaceBase {
 		$schema_keys   = array_map( fn( $key ) => '{' . $key . '}', array_keys( self::$schema ) );
 		$schema_values = [];
 		foreach ( self::$schema as $key => $value ) {
-			$schema_values[] = $user->get( $key );
+			$schema_values[] = (string) $user->get( $key );
 		}
 
 		$formatted_html = str_replace( $schema_keys, $schema_values, $html );

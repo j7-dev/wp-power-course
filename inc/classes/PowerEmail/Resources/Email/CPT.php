@@ -21,7 +21,7 @@ final class CPT {
 	 * Email headers
 	 * used in wp_mail
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	public static $email_headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
@@ -107,7 +107,7 @@ final class CPT {
 	 * @param Email $email 信件
 	 * @param int   $user_id 使用者 ID
 	 * @param int   $course_id 課程 ID
-	 * @param ?int  $chapter_id 單元 ID
+	 * @param int   $chapter_id 單元 ID
 	 */
 	public function record_user_id_after_send_email( Email $email, int $user_id, int $course_id, int $chapter_id ): void {
 		EmailRecord::add(

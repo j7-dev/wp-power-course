@@ -83,17 +83,19 @@ final class User extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含新增用戶所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回用戶資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_users_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$body_params = $request->get_body_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
-		[
-		'data' => $data,
-		'meta_data' => $meta_data,
-		] = WP::separator( $body_params, 'user' );
+		/** @var array{data: array<string, mixed>, meta_data: array<string, mixed>} $separated */
+		$separated = WP::separator( $body_params, 'user' );
+		/** @var array{ID?: int, user_pass?: string, user_login?: string, user_nicename?: string, user_url?: string, user_email?: string, display_name?: string, nickname?: string} $data */
+		$data      = $separated['data'];
+		/** @var array<string, mixed> $meta_data */
+		$meta_data = $separated['meta_data'];
 
 		$user_id = \wp_insert_user( $data );
 
@@ -134,19 +136,21 @@ final class User extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_users_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
-		$user_id     = $request['id'];
+		$user_id     = (int) $request['id'];
 		$body_params = $request->get_body_params();
 		$file_params = $request->get_file_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
 
-		[
-		'data' => $data,
-		'meta_data' => $meta_data,
-		] = WP::separator( $body_params, 'user', $file_params['files'] ?? [] );
+		/** @var array{data: array<string, mixed>, meta_data: array<string, mixed>} $separated */
+		$separated = WP::separator( $body_params, 'user', $file_params['files'] ?? null );
+		/** @var array<string, mixed> $data */
+		$data      = $separated['data'];
+		/** @var array<string, mixed> $meta_data */
+		$meta_data = $separated['meta_data'];
 
 		$data['ID'] = $user_id;
 		unset($meta_data['id']);
@@ -177,17 +181,18 @@ final class User extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request REST請求對象，包含需要處理的用戶ID。
 	 * @return \WP_REST_Response 返回REST響應對象，包含操作結果的狀態碼和訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_users_add_teachers_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
 		$body_params = $request->get_body_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
-		$user_ids    = $body_params['user_ids'] ?? [];
+		/** @var array<int|string> $user_ids */
+		$user_ids = $body_params['user_ids'] ?? [];
 
 		foreach ( $user_ids as $user_id ) {
-			\update_user_meta($user_id, 'is_teacher', 'yes' );
+			\update_user_meta( (int) $user_id, 'is_teacher', 'yes' );
 		}
 
 		return new \WP_REST_Response(
@@ -207,18 +212,19 @@ final class User extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含用戶ID的REST請求。
 	 * @return \WP_REST_Response 包含操作結果的響應對象。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_users_remove_teachers_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
 		$body_params = $request->get_body_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params );
-		$user_ids    = $body_params['user_ids'] ?? [];
+		/** @var array<int|string> $user_ids */
+		$user_ids = $body_params['user_ids'] ?? [];
 
 		$update_success = false;
 		foreach ( $user_ids as $user_id ) {
-			$update_success = (bool) \delete_user_meta($user_id, 'is_teacher' );
+			$update_success = (bool) \delete_user_meta( (int) $user_id, 'is_teacher' );
 			if (!$update_success) {
 				break;
 			}
@@ -241,7 +247,6 @@ final class User extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含上傳學員資料的REST請求對象。
 	 * @return \WP_REST_Response 包含操作結果的REST響應對象。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_users_upload_students_callback( \WP_REST_Request $request ): \WP_REST_Response {
 
@@ -254,7 +259,18 @@ final class User extends ApiBase {
 			$file = $file_params['files'];
 
 			// 上傳到媒體庫
-			$upload = \wp_upload_bits($file['name'], null, file_get_contents($file['tmp_name']));
+			$file_content = file_get_contents($file['tmp_name']);
+			if ($file_content === false) {
+				return new \WP_REST_Response(
+				[
+					'code'    => 'upload_students_error',
+					'message' => '讀取上傳檔案失敗',
+					'data'    => $file,
+				],
+				400
+				);
+			}
+			$upload = \wp_upload_bits($file['name'], null, (string) $file_content);
 
 			if ($upload['error'] !== false) {
 				return new \WP_REST_Response(
@@ -277,6 +293,7 @@ final class User extends ApiBase {
 				'post_status'    => 'inherit',
 			];
 
+			/** @var int|\WP_Error $attachment_id */
 			$attachment_id = \wp_insert_attachment($attachment, $upload['file']);
 
 			if (\is_wp_error($attachment_id)) {
@@ -453,7 +470,7 @@ final class User extends ApiBase {
 			$file_url = \trailingslashit($upload_dir['baseurl']) . $relative_path;
 
 			// 如果已經沒有下一批資料, 就發送 EMAIL
-			$admin_email = \get_option('admin_email');
+			$admin_email = (string) \get_option('admin_email');
 			\wp_mail(
 			$admin_email,
 			sprintf('csv 匯入學員結果，共 %1$d 筆，共 %2$d 批次，每批次 %3$d 筆', ( $batch ) * $batch_size + count($current_batch_rows), $batch + 1, $batch_size),

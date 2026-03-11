@@ -92,8 +92,8 @@ abstract class CRUD {
 	/**
 	 * 更新 record
 	 *
-	 * @param array{id?:string, post_id?:string, user_id?:string, email_id?:string, email_subject?:string, trigger_at?:string, mark_as_sent?:string, email_date?:string, identifier?:string} $where 要更新的資料
-	 * @param array<string, mixed>                                                                                                                                                           $data 要更新的資料
+	 * @param array{id?:string|int, post_id?:string|int, user_id?:string|int, email_id?:string|int, email_subject?:string, trigger_at?:string, mark_as_sent?:string|int, email_date?:string, identifier?:string} $where 要更新的資料
+	 * @param array<string, mixed>                                                                                                                                                                               $data 要更新的資料
 	 *
 	 * @return int|false 成功時回傳更新的數量，失敗時回傳 false
 	 */

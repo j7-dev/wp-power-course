@@ -24,7 +24,7 @@ $default_args = [
 $args = \wp_parse_args( $args, $default_args );
 
 /**
- * @var array{type: string, id: string, meta: ?array} $video_info
+ * @var array{type: string, id: string, meta: ?array<string, mixed>} $video_info
  */
 [
 	'class'      => $class,
@@ -34,7 +34,7 @@ $args = \wp_parse_args( $args, $default_args );
 	'next_post_url'  => $next_post_url,
 ] = $args;
 
-$video_type = $video_info['type'] ?? 'none';
+$video_type = $video_info['type'];
 
 if ('none' === $video_type) {
 	return;

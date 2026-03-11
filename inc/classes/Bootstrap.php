@@ -172,7 +172,7 @@ final class Bootstrap {
 				'API_URL'                    => \untrailingslashit( \esc_url_raw( rest_url() ) ),
 				'CURRENT_USER_ID'            => \get_current_user_id(),
 				'CURRENT_POST_ID'            => $post_id,
-				'PERMALINK'                  => \untrailingslashit( $permalink ),
+				'PERMALINK'                  => \untrailingslashit( (string) $permalink ),
 				'APP_NAME'                   => Plugin::$app_name,
 				'KEBAB'                      => Plugin::$kebab,
 				'SNAKE'                      => Plugin::$snake,

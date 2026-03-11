@@ -106,7 +106,6 @@ final class Api extends ApiBase {
 	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
 	 * @throws \Exception 當找不到商品時拋出異常。.
 	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
-	 * @phpstan-ignore-next-line
 	 */
 	private function separator( $request ): array {
 		$body_params = $request->get_body_params();
@@ -169,7 +168,6 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response|\WP_Error
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_chapters_sort_callback( $request ): \WP_REST_Response|\WP_Error {
 
@@ -177,7 +175,8 @@ final class Api extends ApiBase {
 
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$sort_result = ChapterUtils::sort_chapters( (array) $body_params );
+		/** @var array{from_tree: array<array{id: string, depth: string, menu_order: string, name: string, slug: string, parent_id: string}>, to_tree: array<array{id: string, depth: string, menu_order: string, name: string, slug: string, parent_id: string}>} $body_params */
+		$sort_result = ChapterUtils::sort_chapters( $body_params );
 
 		if ( $sort_result !== true ) {
 			return $sort_result;
@@ -208,9 +207,10 @@ final class Api extends ApiBase {
 			'meta_data' => $meta_data,
 		] = $this->separator( $request );
 
-		$data['ID']         = $id;
+		$data['ID']         = (int) $id;
 		$data['meta_input'] = $meta_data;
 
+		/** @var array{ID: int, meta_input: array<string, mixed>} $data */
 		$update_result = \wp_update_post($data);
 
 		if ( !is_numeric( $update_result ) ) { // @phpstan-ignore-line
@@ -234,10 +234,9 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_chapters_with_id_callback( $request ): \WP_REST_Response {
-		$id = $request['id'];
+		$id = (int) $request['id'];
 		\wp_trash_post( $id );
 
 		return new \WP_REST_Response(
@@ -267,10 +266,7 @@ final class Api extends ApiBase {
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
 		/** @var array<string, mixed> $body_params */
-		$include_required_params = WP::include_required_params( $body_params, [ 'course_id' ] );
-		if ( $include_required_params !== true ) {
-			return $include_required_params;
-		}
+		WP::include_required_params( $body_params, [ 'course_id' ] );
 
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();

@@ -8,6 +8,7 @@
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
 
 global $course;
+global $post;
 
 $prev_post_id = ChapterUtils::get_prev_post_id( $post->ID );
 /** @var WP_Post|null $prev_post */

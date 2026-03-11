@@ -60,7 +60,7 @@ printf(
 	</a>
 </div>
 ',
-$user_avatar_url,
+(string) $user_avatar_url,
 $display_name,
 $description,
 $user_link // TODO 等講師頁做好再開放，目前先 hidden 隱藏

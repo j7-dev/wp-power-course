@@ -101,7 +101,7 @@ final class StudentLog {
 				if ( \in_array( $key, $int_keys, true ) ) {
 					$instance->$key = (int) $object->$key;
 				} else {
-					$instance->$key = $object->$key;
+					$instance->$key = (string) $object->$key;
 				}
 			}
 		}

@@ -45,11 +45,10 @@ final class Shortcode extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request REST請求對象。
 	 * @return \WP_REST_Response 返回包含選項資料的REST響應對象。
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_shortcode_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$params    = $request->get_params();
-		$shortcode = \sanitize_text_field( $params['shortcode'] ?? '' );
+		$shortcode = \sanitize_text_field( (string) ( $params['shortcode'] ?? '' ) );
 
 		$shortcode_content = \do_shortcode( $shortcode, true );
 
