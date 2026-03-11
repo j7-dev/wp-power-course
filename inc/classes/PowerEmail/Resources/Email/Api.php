@@ -96,14 +96,15 @@ final class Api extends ApiBase {
 	/**
 	 * Copied from ActionScheduler_ListTable
 	 *
-	 * @var array<int, array{seconds: int, names: array<int, string>}>
+	 * @var array<int, array{seconds: int, names: array{0: string, 1: string, singular: string, plural: string, context: null, domain: string|null}}>
 	 */
 	protected static $time_periods = [];
 
 	/** Constructor */
 	public function __construct() {
 		parent::__construct();
-		self::$time_periods = [
+		/** @var array<int, array{seconds: int, names: array{0: string, 1: string, singular: string, plural: string, context: null, domain: string|null}}> $time_periods */
+		$time_periods       = [
 			[
 				'seconds' => YEAR_IN_SECONDS,
 				/* translators: %s: amount of time */
@@ -140,6 +141,7 @@ final class Api extends ApiBase {
 				'names'   => _n_noop( '%s second', '%s seconds', 'woocommerce' ),
 			],
 		];
+		self::$time_periods = $time_periods;
 	}
 
 	/**
@@ -178,15 +180,16 @@ final class Api extends ApiBase {
 		$total       = $results->found_posts;
 		$total_pages = $results->max_num_pages;
 
+		/** @var array<int> $post_ids */
 		$post_ids = $results->posts;
 
-		$emails = array_values(array_map( fn( $post_id ) => new EmailResource( (int) $post_id, false, true ), $post_ids ));
+		$emails = array_values(array_map( fn( int $post_id ) => new EmailResource( $post_id, false, true ), $post_ids ));
 
 		$response = new \WP_REST_Response( $emails );
 
 		// set pagination in header
-		$response->header( 'X-WP-Total', $total );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$response->header( 'X-WP-Total', (string) $total );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 
 		return $response;
 	}
@@ -218,8 +221,7 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
 	 * @throws \Exception 當找不到商品時拋出異常。.
-	 * @return array{product:\WC_Product, data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
-	 * @phpstan-ignore-next-line
+	 * @return array{data: array<string, mixed>, meta_data: array<string, mixed>} 包含資料和元數據的陣列。
 	 */
 	private function separator( $request ): array {
 		$body_params = $request->get_body_params();
@@ -230,6 +232,7 @@ final class Api extends ApiBase {
 			'post_content', // email html 內容
 			'post_excerpt', // email json 內容
 		];
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep($body_params, true, $skip_keys);
 
 		// 將 '[]' 轉為 []
@@ -238,7 +241,7 @@ final class Api extends ApiBase {
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( $body_params, 'post', $file_params['files'] ?? [] );
+		] = WP::separator( $body_params, 'post' );
 
 		return [
 			'data'      => $data,
@@ -302,7 +305,7 @@ final class Api extends ApiBase {
 		$data['ID']         = $request['id'];
 
 		// 使用 wp_slash 防止 JSON 跳脫字元在儲存時被過濾掉 再次編碼
-		$data['post_excerpt'] = \wp_slash($data['post_excerpt']);
+		$data['post_excerpt'] = \wp_slash( (string) ( $data['post_excerpt'] ?? '' ) );
 
 		/** @var array{ID?: int, post_author?: int, post_date?: string, post_date_gmt?: string, post_content?: string, post_content_filtered?: string, post_title?: string, post_excerpt?: string} $data */
 		$update_result = \wp_update_post($data);
@@ -333,10 +336,7 @@ final class Api extends ApiBase {
 	public function post_emails_send_now_callback( $request ): \WP_REST_Response|\WP_Error {
 		$body_params = $request->get_json_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'email_ids', 'user_ids' ] );
-		if ( $include_required_params !== true ) {
-			return $include_required_params;
-		}
+		WP::include_required_params( $body_params, [ 'email_ids', 'user_ids' ] );
 
 		$email_ids = $body_params['email_ids'];
 		$user_ids  = $body_params['user_ids'];
@@ -374,14 +374,11 @@ final class Api extends ApiBase {
 	public function post_emails_send_schedule_callback( $request ): \WP_REST_Response|\WP_Error {
 		$body_params = $request->get_json_params();
 
-		$include_required_params = WP::include_required_params( $body_params, [ 'email_ids', 'user_ids', 'timestamp' ] );
-		if ( $include_required_params !== true ) {
-			return $include_required_params;
-		}
+		WP::include_required_params( $body_params, [ 'email_ids', 'user_ids', 'timestamp' ] );
 
 		$email_ids = $body_params['email_ids'];
 		$user_ids  = $body_params['user_ids'];
-		$timestamp = $body_params['timestamp'];
+		$timestamp = (int) $body_params['timestamp'];
 
 		$action_id = \as_schedule_single_action(
 			$timestamp,
@@ -411,19 +408,20 @@ final class Api extends ApiBase {
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 * @throws \Exception 當刪除電子郵件失敗時拋出異常
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_emails_callback( $request ): \WP_REST_Response {
 		$body_params = $request->get_json_params();
 
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
 
-		$ids = (array) $body_params['ids'];
+		/** @var array<int|string> $ids */
+		$ids = (array) ( $body_params['ids'] ?? [] );
 
 		foreach ($ids as $id) {
-			$result = \wp_trash_post( $id );
+			$result = \wp_trash_post( (int) $id );
 			if (!$result) {
-				throw new \Exception(__('刪除電子郵件資料失敗', 'power-email') . " #{$id}");
+				throw new \Exception(__('刪除電子郵件資料失敗', 'power-email') . ' #' . (string) $id);
 			}
 		}
 
@@ -444,10 +442,9 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_emails_with_id_callback( $request ): \WP_REST_Response {
-		$id = $request['id'];
+		$id = (int) $request['id'];
 
 		\wp_trash_post( $id );
 
@@ -468,7 +465,6 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_emails_options_callback( $request ): \WP_REST_Response {
 		return new \WP_REST_Response(
@@ -489,7 +485,6 @@ final class Api extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_emails_scheduled_actions_callback( $request ): \WP_REST_Response {
 
@@ -521,8 +516,8 @@ final class Api extends ApiBase {
 		$response = new \WP_REST_Response( $items );
 
 		// set pagination in header
-		$response->header( 'X-WP-Total', $total_items );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$response->header( 'X-WP-Total', (string) $total_items );
+		$response->header( 'X-WP-TotalPages', (string) $total_pages );
 
 		return $response;
 	}
@@ -534,11 +529,16 @@ final class Api extends ApiBase {
 	 *
 	 * @param array<string, mixed> $args 查詢參數
 	 * @param string               $return_format OBJECT | ARRAY_A
-	 * @return array{total_items: int, per_page: int, total_pages: int, items: array<int, array<string, array{ID: int, hook: string, status_name: string, status: string, args: array<string, mixed>, group: string, log_entries: array<int, array<string, mixed>>, claim_id: int, recurrence: string, schedule: string}>>}
+	 * @return array{total_items: int, per_page: int, total_pages: int, items: list<array<string, mixed>>}
 	 */
 	private function as_get_scheduled_actions( $args = [], $return_format = OBJECT ) {
 		if ( ! \ActionScheduler::is_initialized( __FUNCTION__ ) ) {
-			return [];
+			return [
+				'total_items' => 0,
+				'per_page'    => 0,
+				'total_pages' => 0,
+				'items'       => [],
+			];
 		}
 
 		/** @var \ActionScheduler_DBStore $store */
@@ -558,11 +558,13 @@ final class Api extends ApiBase {
 
 		$items = [];
 
-		$total_items = $store->query_actions( $args, 'count' );
+		$total_items = (int) $store->query_actions( $args, 'count' );
 
 		$status_labels = $store->get_status_labels();
 
-		foreach ( $store->query_actions( $args ) as $action_id ) {
+		/** @var array<int, int> $action_ids */
+		$action_ids = $store->query_actions( $args );
+		foreach ( $action_ids as $action_id ) {
 			try {
 				$action = $store->fetch_action( $action_id );
 			} catch ( \Exception $e ) {
@@ -595,10 +597,11 @@ final class Api extends ApiBase {
 			];
 		}
 
+		$per_page = (int) $args['per_page'];
 		return [
-			'total_items' => (int) $total_items,
-			'per_page'    => $args['per_page'],
-			'total_pages' => ceil( $total_items / $args['per_page'] ),
+			'total_items' => $total_items,
+			'per_page'    => $per_page,
+			'total_pages' => (int) ceil( $total_items / max( $per_page, 1 ) ),
 			'items'       => array_values( $items ),
 		];
 	}
@@ -607,7 +610,7 @@ final class Api extends ApiBase {
 	/**
 	 * Returns the recurrence of an action or 'Non-repeating'. The output is human readable.
 	 *
-	 * @param ActionScheduler_Action $action Action object.
+	 * @param \ActionScheduler_Action $action Action object.
 	 *
 	 * @return string
 	 */
@@ -618,9 +621,9 @@ final class Api extends ApiBase {
 
 			if ( is_numeric( $recurrence ) ) {
 				/* translators: %s: time interval */
-				return sprintf( __( 'Every %s', 'woocommerce' ), self::human_interval( $recurrence ) );
+				return sprintf( __( 'Every %s', 'woocommerce' ), self::human_interval( (int) $recurrence ) );
 			} else {
-				return $recurrence;
+				return (string) $recurrence;
 			}
 		}
 
@@ -650,7 +653,7 @@ final class Api extends ApiBase {
 
 		for ( $time_period_index = 0, $periods_included = 0, $seconds_remaining = $interval; $time_period_index < $num_time_periods && $seconds_remaining > 0 && $periods_included < $periods_to_include; $time_period_index++ ) {
 
-			$periods_in_interval = floor( $seconds_remaining / self::$time_periods[ $time_period_index ]['seconds'] );
+			$periods_in_interval = (int) floor( $seconds_remaining / self::$time_periods[ $time_period_index ]['seconds'] );
 
 			if ( $periods_in_interval > 0 ) {
 				if ( ! empty( $output ) ) {

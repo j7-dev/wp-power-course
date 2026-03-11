@@ -255,9 +255,9 @@ final class Api extends ApiBase {
 	/**
 	 * 擴展學生數量統計
 	 *
-	 * @param object{totals: object{student_count: int}, intervals: array<array{subtotals: object{student_count: int}}>}                                                                                                                $data 數據
+	 * @param object                                                                                                                                                                                                                    $data 數據
 	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
-	 * @return object{totals: array{student_count: int}, intervals: array<array{subtotals: array{student_count: int}}>}
+	 * @return object
 	 */
 	public function extend_student_count_stats( object $data, array $query_args ): object { // phpcs:ignore
 		global $wpdb;
@@ -266,14 +266,20 @@ final class Api extends ApiBase {
 		$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
 		$total_student_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
 
-		$data->totals->student_count = $total_student_count;
-		$data->intervals             = array_map(
+		/** @var \stdClass $data */
+		$totals                = $data->totals;
+		$totals->student_count = $total_student_count;
+		/** @var array<int, array{interval: string, subtotals: \stdClass}> $intervals */
+		$intervals       = $data->intervals;
+		$data->intervals = array_map(
 				function ( $interval ) use ( $results ) {
+					/** @var array{interval: string, subtotals: \stdClass} $interval */
+					/** @var array{time_interval: string, record_value: string}|null $target */
 					$target                               = General::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
 					$interval['subtotals']->student_count = $target ? (float) $target['record_value'] : 0;
 					return $interval;
 				},
-			$data->intervals
+			$intervals
 			);
 		return $data;
 	}
@@ -281,11 +287,11 @@ final class Api extends ApiBase {
 	/**
 	 * 擴展完成的章節數量統計
 	 *
-	 *  @param object{totals: object{finished_chapters_count: int}, intervals: array<array{subtotals: object{finished_chapters_count: int}}>}                                                                                            $data 數據
+	 * @param object                                                                                                                                                                                                                    $data 數據
 	 * @param array{before: mixed, after: mixed, interval: mixed, page: int, per_page: int, orderby: mixed, order: mixed, segmentby: mixed, force_cache_refresh: mixed, date_type: mixed, fields: string[], product_includes: string[]} $query_args 查詢參數
-	 * @return object{totals: array{finished_chapters_count: int}, intervals: array<array{subtotals: array{finished_chapters_count: int}}>}
+	 * @return object
 	 */
-	public function extend_finished_chapters_count_stats( $data, $query_args ) {
+	public function extend_finished_chapters_count_stats( object $data, array $query_args ): object {
 		global $wpdb;
 
 		$sql = $this->get_chapter_sql( $query_args );
@@ -293,14 +299,20 @@ final class Api extends ApiBase {
 			$results             = $wpdb->get_results( $sql, ARRAY_A ); // phpcs:ignore
 		$total_finished_chapters_count = array_reduce( $results, fn( $acc, $item ) => $acc + (float) $item['record_value'], 0 );
 
-		$data->totals->finished_chapters_count = $total_finished_chapters_count;
-		$data->intervals                       = array_map(
+		/** @var \stdClass $data */
+		$totals                         = $data->totals;
+		$totals->finished_chapters_count = $total_finished_chapters_count;
+		/** @var array<int, array{interval: string, subtotals: \stdClass}> $intervals */
+		$intervals       = $data->intervals;
+		$data->intervals = array_map(
 				function ( $interval ) use ( $results ) {
+					/** @var array{interval: string, subtotals: \stdClass} $interval */
+					/** @var array{time_interval: string, record_value: string}|null $target */
 					$target = General::array_find( $results, fn( $item ) => $item['time_interval'] === $interval['interval'] );
 					$interval['subtotals']->finished_chapters_count = $target ? (float) $target['record_value'] : 0;
 					return $interval;
 				},
-			$data->intervals
+			$intervals
 			);
 		return $data;
 	}
@@ -324,7 +336,7 @@ final class Api extends ApiBase {
 			'interval' => $interval,
 		] = $query_args;
 
-		$date_format = $this->get_date_format( $interval );
+		$date_format = $this->get_date_format( (string) $interval );
 
 		$where_clause = '';
 		if (!empty($query_args['product_includes'])) {
@@ -360,7 +372,7 @@ final class Api extends ApiBase {
 			'interval' => $interval,
 		] = $query_args;
 
-		$date_format = $this->get_date_format( $interval );
+		$date_format = $this->get_date_format( (string) $interval );
 
 		$chapter_ids_in_specific_course = [];
 		if (!empty($query_args['product_includes'])) {

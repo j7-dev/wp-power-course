@@ -39,6 +39,7 @@ $args = wp_parse_args( $args, $default_args );
 	'video_info'   => $video_info,
 	'next_post_url'  => $next_post_url,
 ] = $args;
+/** @var string $next_post_url */
 
 [
 	'id'   => $video_id,
@@ -65,11 +66,8 @@ if ( !$video_id || !$src || ( !$bunny_cdn_hostname && 'bunny-stream-api' === $vi
 }
 
 $settings = Settings::instance();
-/** @var string $watermark_qty */
-$watermark_qty = $hide_watermark ? '0' : (string) $settings->pc_watermark_qty;
-/** @var string $watermark_color */
-$watermark_color = $settings->pc_watermark_color;
-/** @var string $watermark_interval */
+$watermark_qty      = $hide_watermark ? '0' : (string) $settings->pc_watermark_qty;
+$watermark_color    = $settings->pc_watermark_color;
 $watermark_interval = $settings->pc_watermark_interval;
 $watermark_text     = ChapterUtils::get_formatted_watermark_text();
 
@@ -106,6 +104,6 @@ printf(
 	$watermark_qty,
 	$watermark_color,
 	$watermark_interval,
-	$next_post_url,
+	(string) $next_post_url,
 	$autoplay,
 );

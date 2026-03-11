@@ -67,11 +67,15 @@ trait UserTrait {
 	 */
 	public function post_courses_add_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
-		$body_params =WP::sanitize_text_field_deep($body_params, false );
+		/** @var array<string, mixed> $body_params */
+		$body_params = WP::sanitize_text_field_deep($body_params, false );
 
-		$user_ids    = $body_params['user_ids'] ?? [];
-		$course_ids  = $body_params['course_ids'] ?? [];
-		$expire_date = $body_params['expire_date'] ?? 0;
+		/** @var array<int|string> $user_ids */
+		$user_ids    = isset($body_params['user_ids']) && is_array($body_params['user_ids']) ? $body_params['user_ids'] : [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = isset($body_params['course_ids']) && is_array($body_params['course_ids']) ? $body_params['course_ids'] : [];
+		/** @var int|string $expire_date */
+		$expire_date = isset($body_params['expire_date']) ? ( is_int($body_params['expire_date']) ? $body_params['expire_date'] : (string) $body_params['expire_date'] ) : 0;
 
 		try {
 			if (empty($user_ids) || empty($course_ids)) {
@@ -122,10 +126,13 @@ trait UserTrait {
 	 */
 	public function post_courses_update_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
-		$user_ids    = $body_params['user_ids'] ?? [];
+		/** @var array<int|string> $user_ids */
+		$user_ids    = isset($body_params['user_ids']) && is_array($body_params['user_ids']) ? $body_params['user_ids'] : [];
 		$timestamp   = (int) ( $body_params['timestamp'] ?? 0 ); // 一般為 10 位數字，如果是0就是無期限 //TODO 可能會跟隨訂閱!?
-		$course_ids  = $body_params['course_ids'] ?? [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = isset($body_params['course_ids']) && is_array($body_params['course_ids']) ? $body_params['course_ids'] : [];
 
 		try {
 			foreach ($course_ids as $course_id) {
@@ -172,9 +179,12 @@ trait UserTrait {
 	 */
 	public function post_courses_remove_students_callback( \WP_REST_Request $request ):\WP_REST_Response { // phpcs:ignore
 		$body_params = $request->get_body_params();
+		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false );
-		$user_ids    = $body_params['user_ids'] ?? [];
-		$course_ids  = $body_params['course_ids'] ?? [];
+		/** @var array<int|string> $user_ids */
+		$user_ids    = isset($body_params['user_ids']) && is_array($body_params['user_ids']) ? $body_params['user_ids'] : [];
+		/** @var array<int|string> $course_ids */
+		$course_ids  = isset($body_params['course_ids']) && is_array($body_params['course_ids']) ? $body_params['course_ids'] : [];
 
 		try {
 			foreach ($course_ids as $course_id) {

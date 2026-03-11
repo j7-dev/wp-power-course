@@ -76,7 +76,11 @@ final class Product {
 		$option = self::PRODUCT_OPTION_NAME;
 		$option = "_{$option}";
 
-		if (!isset( $_REQUEST[ $option ] )) { // phpcs:ignore
+		if ( ! isset( $_POST['woocommerce_meta_nonce'] ) || ! \wp_verify_nonce( \sanitize_key( (string) $_POST['woocommerce_meta_nonce'] ), 'woocommerce_save_data' ) ) {
+			return;
+		}
+
+		if (!isset( $_REQUEST[ $option ] )) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			// 只有在傳統的 WordPress 商品編輯才會預設儲存為 no
 			$is_admin = \is_admin() && ( isset($_POST['publish']) || isset($_POST['save']) );
 			if ($is_admin) {
@@ -89,7 +93,7 @@ final class Product {
 			return;
 		}
 
-		$is_course = \wc_string_to_bool( $_REQUEST[ $option ] ) || 'on' === $_REQUEST[ $option ]; // phpcs:ignore
+		$is_course = \wc_string_to_bool( (string) $_REQUEST[ $option ] ) || 'on' === $_REQUEST[ $option ]; // phpcs:ignore
 
 		\update_post_meta( $post_id, $option, \wc_bool_to_string( $is_course) ); // phpcs:ignore
 	}

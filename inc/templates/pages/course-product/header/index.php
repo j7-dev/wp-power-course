@@ -67,20 +67,20 @@ if ( !is_array( $teacher_ids ) ) {
 		<?php
 		echo '<div class="flex gap-2 items-center mb-[10px] flex-wrap">';
 		Plugin::load_template(
-			 'stock',
+			'stock',
 			[
 				'product' => $product,
-				'class' => 'flex items-center h-6',
+				'class'   => 'flex items-center h-6',
 			]
-			);
+		);
 
 		Plugin::load_template(
-			 'stock/total_sales',
+			'stock/total_sales',
 			[
 				'product' => $product,
-				'class' => 'flex items-center h-6',
-			 ]
-			);
+				'class'   => 'flex items-center h-6',
+			]
+		);
 
 		if ( $is_popular ) {
 			Plugin::load_template( 'badge/popular' );

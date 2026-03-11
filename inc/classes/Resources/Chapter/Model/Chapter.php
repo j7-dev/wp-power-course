@@ -70,7 +70,7 @@ final class Chapter {
 		}
 
 		$product = \wc_get_product( $this->course_id );
-		if( ! $product instanceof \WC_Product ) {
+		if ( ! $product instanceof \WC_Product ) {
 			return null;
 		}
 		return $product;

@@ -27,7 +27,7 @@ abstract class Utils {
 	 *
 	 * 簡單的新增，沒有太多參數，所以不使用 Converter
 	 *
-	 * @param array $args Arguments.
+	 * @param array<string, mixed> $args Arguments.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -38,9 +38,13 @@ abstract class Utils {
 		$args['post_type']            = CPT::POST_TYPE;
 		$args['page_template']        = self::TEMPLATE;
 		$args['meta_input']           = $args['meta_input'] ?? [];
-		$args['meta_input']['editor'] = $args['meta_input']['editor'] ?? 'power-editor';
+		/** @var array<string, mixed> $meta_input */
+		$meta_input                   = $args['meta_input'];
+		$meta_input['editor']         = $meta_input['editor'] ?? 'power-editor';
+		$args['meta_input']           = $meta_input;
 		$args['menu_order']           = $args['menu_order'] ?? PHP_INT_MAX; // 預設排在最底下
 
+		/** @var array{post_title: string, post_status: string, post_author: int, post_type: string, page_template: string, meta_input: array<string, mixed>, menu_order: int} $args */
 		return \wp_insert_post($args);
 	}
 
@@ -52,7 +56,7 @@ abstract class Utils {
 	 * @param bool     $with_description With description.
 	 * @param int      $depth            Depth.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function format_chapter_details(
 		\WP_Post $post,
@@ -63,7 +67,7 @@ abstract class Utils {
 		$date_modified = $post->post_modified;
 
 		$image_id  = \get_post_thumbnail_id($post->ID);
-		$image_ids = [ $image_id ];
+		$image_ids = [ (int) $image_id ];
 		$images    = array_map([ WP::class, 'get_image_info' ], $image_ids);
 
 		$description_array = $with_description ? [
@@ -71,7 +75,8 @@ abstract class Utils {
 			'short_description' => $post->post_excerpt,
 		] : [];
 
-		$chapters = array_values(
+		/** @var array<int, \WP_Post> $chapters_posts */
+		$chapters_posts = array_values(
 			\get_children(
 				[
 					'post_parent' => $post->ID,
@@ -86,13 +91,14 @@ abstract class Utils {
 				]
 			)
 		);
-		$chapters = array_values(
-			array_map(
-			[ __CLASS__, 'format_chapter_details' ],
-			$chapters,
-			array_fill(0, count($chapters), false),
-				array_fill(0, count($chapters), $depth + 1)
-			)
+		/** @var \WP_Post[] $chapters_posts */
+		$chapters = array_map(
+			static function ( \WP_Post $ch, bool $with_desc, int $d ): array {
+				return self::format_chapter_details($ch, $with_desc, $d);
+			},
+			$chapters_posts,
+			array_fill(0, count($chapters_posts), false),
+			array_fill(0, count($chapters_posts), $depth + 1)
 		);
 
 		$children = $chapters ? [
@@ -191,8 +197,8 @@ abstract class Utils {
 	 * @throws \Exception 更新錯誤
 	 */
 	public static function sort_chapters( array $params ): bool|\WP_Error {
-		$from_tree = $params['from_tree'] ?? [];
-		$to_tree   = $params['to_tree'] ?? [];
+		$from_tree = $params['from_tree'];
+		$to_tree   = $params['to_tree'];
 
 		$delete_ids = [];
 		foreach ($from_tree as $from_node) {
@@ -259,11 +265,6 @@ abstract class Utils {
 					$parent_course_id_cases[] = $wpdb->prepare('WHEN ID = %d THEN %d', $id, $parent_course_id);
 				}
 
-				// 如果沒有要處理的ID，則跳過
-				if (!$ids) {
-					continue;
-				}
-
 				// 構建ID列表
 				$id_list = implode(',', $ids);
 
@@ -272,12 +273,10 @@ abstract class Utils {
 				$sql .= implode(' ', $menu_order_cases);
 				$sql .= ' ELSE menu_order END ';
 
-				// 如果有post_parent需要更新，加入post_parent的更新語句
-				if ($parent_cases) {
-					$sql .= ', post_parent = CASE ';
-					$sql .= implode(' ', $parent_cases);
-					$sql .= ' ELSE post_parent END ';
-				}
+				// 加入post_parent的更新語句
+				$sql .= ', post_parent = CASE ';
+				$sql .= implode(' ', $parent_cases);
+				$sql .= ' ELSE post_parent END ';
 
 				// 加入WHERE條件，限制只更新需要的記錄
 				$sql .= " WHERE ID IN ($id_list)";
@@ -421,7 +420,7 @@ abstract class Utils {
 		}
 
 		foreach ($delete_ids as $id) {
-			\wp_trash_post( $id );
+			\wp_trash_post( (int) $id );
 		}
 
 		return true;
@@ -433,9 +432,9 @@ abstract class Utils {
 	 *
 	 * 前端圖片欄位就傳 'image_ids' string[] 就好
 	 *
-	 * @param array $args    Arguments.
+	 * @param array<string, mixed> $args    Arguments.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function converter( array $args ): array {
 		$fields_mapper = [
@@ -470,20 +469,21 @@ abstract class Utils {
 	/**
 	 * Update a chapter
 	 *
-	 * @param string $id   chapter id.
-	 * @param array  $args Arguments.
+	 * @param string               $id   chapter id.
+	 * @param array<string, mixed> $args Arguments.
 	 *
 	 * @return integer|\WP_Error
 	 */
 	public static function update_chapter( string $id, array $args ): int|\WP_Error {
 
-		$args['ID']            = $id;
+		$args['ID']            = (int) $id;
 		$args['post_title']    = $args['post_title'] ?? '新章節';
 		$args['post_status']   = $args['status'] ?? 'publish';
 		$args['post_author']   = \get_current_user_id();
 		$args['post_type']     = CPT::POST_TYPE;
 		$args['page_template'] = self::TEMPLATE;
 
+		/** @var array{ID: int, post_title: string, post_status: string, post_author: int, post_type: string, page_template: string} $args */
 		$update_result = \wp_update_post($args);
 
 		return $update_result;
@@ -559,9 +559,8 @@ abstract class Utils {
 		$username        = $wp_current_user->user_login ?: '';
 		$ip              = General::get_client_ip() ?? '';
 
-		/** @var \WP_Post $chapter */
 		global $chapter;
-		$post_title = $chapter?->post_title ?? '';
+		$post_title = ( $chapter instanceof \WP_Post ) ? $chapter->post_title : '';
 
 		$formatted_watermark_text = str_replace( [ '{email}', '{ip}', '{display_name}', '{username}', '{post_title}' ], [ $email, $ip, $display_name, $username, $post_title ], $watermark_text );
 
@@ -591,7 +590,7 @@ abstract class Utils {
 		$cache_key = self::get_cache_key( $post_id );
 		$html      = \get_transient( $cache_key );
 
-		if ( $html ) {
+		if ( is_string($html) && $html !== '' ) {
 			return $html;
 		}
 
@@ -613,38 +612,45 @@ abstract class Utils {
 	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
 		global $post; // 當前文章
 
-		$html           = '';
-		$children_posts = $children_posts === null ? match ($depth) {
-			// 因為課程 與章節關係不是 post_parent 而是 parent_course_id
-			0 => \get_posts(
-				[
-					'post_type'      => CPT::POST_TYPE,
-					'meta_key'       => 'parent_course_id',
-					'meta_value'     => $post_id,
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-					'orderby'        => [
-						'menu_order' => 'ASC',
-						'ID'         => 'DESC',
-						'date'       => 'DESC',
-					],
-				]
-				),
-			// 如果是抓取子章節的子章節
-			default => \get_posts(
-				[
-					'post_type'      => CPT::POST_TYPE,
-					'post_parent'    => $post_id,
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-					'orderby'        => [
-						'menu_order' => 'ASC',
-						'ID'         => 'DESC',
-						'date'       => 'DESC',
-					],
-				]
-				),
-		} : $children_posts;
+		$html = '';
+		if ($children_posts === null) {
+			if ($depth === 0) {
+				// 因為課程 與章節關係不是 post_parent 而是 parent_course_id
+				$children_posts = \get_posts(
+					[
+						'post_type'      => CPT::POST_TYPE,
+						'meta_query'     => [
+							[
+								'key'   => 'parent_course_id',
+								'value' => $post_id,
+							],
+						],
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'orderby'        => [
+							'menu_order' => 'ASC',
+							'ID'         => 'DESC',
+							'date'       => 'DESC',
+						],
+					]
+				);
+			} else {
+				// 如果是抓取子章節的子章節
+				$children_posts = \get_posts(
+					[
+						'post_type'      => CPT::POST_TYPE,
+						'post_parent'    => $post_id,
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'orderby'        => [
+							'menu_order' => 'ASC',
+							'ID'         => 'DESC',
+							'date'       => 'DESC',
+						],
+					]
+				);
+			}
+		}
 
 		if (!$children_posts) {
 			return '';
@@ -657,6 +663,7 @@ abstract class Utils {
 		foreach ($children_posts as $child_post) {
 
 			// 取得子章節的子章節
+			/** @var \WP_Post[] $child_children_posts */
 			$child_children_posts = \get_posts(
 			[
 				'post_type'      => CPT::POST_TYPE,
@@ -750,7 +757,8 @@ abstract class Utils {
 	public static function get_flatten_post_ids( int $course_id ): array {
 
 		$flatten_post_ids = \wp_cache_get( 'flatten_post_ids_' . $course_id, 'prev_next' );
-		if (false !== $flatten_post_ids) {
+		if (is_array($flatten_post_ids)) {
+			/** @var array<int> $flatten_post_ids */
 			return $flatten_post_ids;
 		}
 
@@ -758,31 +766,35 @@ abstract class Utils {
 
 		/** @var array<int> $top_chapter_ids */
 		$top_chapter_ids = \get_posts(
-				[
-					'post_type'      => CPT::POST_TYPE,
-					'meta_key'       => 'parent_course_id',
-					'meta_value'     => $course_id,
-					'post_status'    => 'publish',
-					'fields'         => 'ids',
-					'posts_per_page' => -1,
-					'orderby'        => [
-						'menu_order' => 'ASC',
-						'ID'         => 'DESC',
-						'date'       => 'DESC',
+			[
+				'post_type'      => CPT::POST_TYPE,
+				'meta_query'     => [
+					[
+						'key'   => 'parent_course_id',
+						'value' => $course_id,
 					],
-				]
-				);
+				],
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'posts_per_page' => -1,
+				'orderby'        => [
+					'menu_order' => 'ASC',
+					'ID'         => 'DESC',
+					'date'       => 'DESC',
+				],
+			]
+		);
 
 		foreach ($top_chapter_ids as $top_chapter_id) {
 			$child_chapter_ids = PostUtils::get_flatten_post_ids(
-				$top_chapter_id,
+				(int) $top_chapter_id,
 				[
 					'post_status' => 'publish',
 				]
 				);
 			$flatten_post_ids  = [
 				...$flatten_post_ids,
-				$top_chapter_id,
+				(int) $top_chapter_id,
 				...$child_chapter_ids,
 			];
 		}
@@ -805,7 +817,10 @@ abstract class Utils {
 			return $prev_post_id ? (int) $prev_post_id : null;
 		}
 
-		$course_id        = self::get_course_id( $chapter_id );
+		$course_id = self::get_course_id( $chapter_id );
+		if (null === $course_id) {
+			return null;
+		}
 		$all_children_ids = self::get_flatten_post_ids( $course_id);
 
 		// find index of current post id
@@ -838,7 +853,10 @@ abstract class Utils {
 			return $next_post_id === null ? null : (int) $next_post_id;
 		}
 
-		$course_id        = self::get_course_id( $chapter_id );
+		$course_id = self::get_course_id( $chapter_id );
+		if (null === $course_id) {
+			return null;
+		}
 		$all_children_ids = self::get_flatten_post_ids( $course_id);
 
 		// find index of current post id

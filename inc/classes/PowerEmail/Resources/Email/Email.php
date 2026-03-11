@@ -38,7 +38,7 @@ final class Email {
 	/** @var string Email 寄送條件 */
 	public string $trigger_at = '';
 
-	/** @var Trigger\Condition|array|null Email 寄送條件 */
+	/** @var Trigger\Condition|array<string, mixed>|null Email 寄送條件 */
 	public Trigger\Condition|array|null $condition = null;
 
 
@@ -48,7 +48,7 @@ final class Email {
 	/** @var string Email 修改時間 */
 	public string $date_modified;
 
-	/** @var array Email post meta 欄位 */
+	/** @var array<int, string> Email post meta 欄位 */
 	public static array $meta_keys = [
 		'subject',
 	];
@@ -77,20 +77,19 @@ final class Email {
 		$this->date_modified = $post->post_modified;
 
 		foreach ( self::$meta_keys as $key ) {
-			$this->$key = \get_post_meta( $this->id, $key, true );
+			$this->$key = (string) \get_post_meta( (int) $this->id, $key, true );
 		}
 
-		$condition_array = \get_post_meta( $this->id, 'condition', true );
-		if ( !$condition_array ) {
+		$condition_array = \get_post_meta( (int) $this->id, 'condition', true );
+		if ( !$condition_array || !\is_array($condition_array) ) {
 			$this->condition = null;
 			return;
 		}
 
-		$this->trigger_at              = \get_post_meta( $this->id, 'trigger_at', true );
+		$this->trigger_at              = (string) \get_post_meta( (int) $this->id, 'trigger_at', true );
 		$condition_array['trigger_at'] = $this->trigger_at;
-		if ( $condition_array ) {
-			$this->condition = $api_format ? $condition_array : new Trigger\Condition( $condition_array );
-		}
+		/** @var array{trigger_at: ?string, trigger_condition: string, course_ids: ?array<string|int>, chapter_ids: ?array<string|int>, qty: ?int, sending: array{type: ?string, value: ?string, unit: ?string, range: ?array{start: string, end: string}}} $condition_array */
+		$this->condition = $api_format ? $condition_array : new Trigger\Condition( $condition_array );
 
 		$replace_classes = [
 			Replace\User::class,
@@ -110,10 +109,15 @@ final class Email {
 	 * @return bool 是否寄送成功
 	 */
 	public function send_email( int $user_id ): bool {
-		$user       = \get_user_by( 'ID', $user_id );
+		$user = \get_user_by( 'ID', $user_id );
+		if (!$user) {
+			return false;
+		}
 		$user_email = $user->user_email;
 
+		/** @var string $subject */
 		$subject = \apply_filters('power_email_course_subject', $this->subject, $user_id, 0, 0);
+		/** @var string $html */
 		$html    = \apply_filters('power_email_course_html', $this->description, $user_id, 0, 0);
 		$sent    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		if ($sent) {
@@ -137,15 +141,15 @@ final class Email {
 		}
 
 		// 目前先判斷 each 就好，其他條件 all, qty_greater_than 再用 filter 過濾
-		return \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
+		return (bool) \apply_filters( 'power_email_can_send', $can_send, $this, $user_id, $course_id, $chapter_id );
 	}
 
 	/**
 	 * 寄送課程 Email
 	 *
-	 * @param int  $user_id 使用者 ID
-	 * @param int  $course_id 課程 ID
-	 * @param ?int $chapter_id 章節 ID
+	 * @param int $user_id 使用者 ID
+	 * @param int $course_id 課程 ID
+	 * @param int $chapter_id 章節 ID
 	 * @return bool 是否寄送成功
 	 */
 	public function send_course_email( int $user_id, int $course_id, int $chapter_id = 0 ): bool {
@@ -159,8 +163,10 @@ final class Email {
 			return false;
 		}
 		$user_email = $user->user_email;
-		$subject    = \apply_filters('power_email_course_subject', $this->subject, $user_id, $course_id, $chapter_id);
-		$html       = \apply_filters('power_email_course_html', $this->description, $user_id, $course_id, $chapter_id);
+		/** @var string $subject */
+		$subject = \apply_filters('power_email_course_subject', $this->subject, $user_id, $course_id, $chapter_id);
+		/** @var string $html */
+		$html    = \apply_filters('power_email_course_html', $this->description, $user_id, $course_id, $chapter_id);
 
 		$sent                    = \wp_mail( $user_email, $subject, $html, CPT::$email_headers );
 		$this->formatted_subject = $subject;
@@ -218,8 +224,11 @@ final class Email {
 	 */
 	private function get_offset_seconds(): int {
 		$condition = $this->condition;
+		if (!$condition instanceof Trigger\Condition) {
+			return 0;
+		}
 
-		$value = (int) $condition->sending_value ?? 0;
+		$value = (int) ( $condition->sending_value ?? 0 );
 		$unit  = $condition->sending_unit ?? 'day';
 
 		// 這邊只要先判斷 延遲 N 天|小時|分鐘 就好，指定時間區段寄送，等個別事件發生時再來判斷
@@ -227,6 +236,7 @@ final class Email {
 			'day' => DAY_IN_SECONDS * $value,
 			'hour' => HOUR_IN_SECONDS * $value,
 			'minute' => MINUTE_IN_SECONDS * $value,
+			default => DAY_IN_SECONDS * $value,
 		};
 	}
 
@@ -237,7 +247,7 @@ final class Email {
 	 */
 	public function get_sending_timestamp(): int|null {
 		$condition = $this->condition;
-		if (!$condition) {
+		if (!$condition instanceof Trigger\Condition) {
 			return null;
 		}
 
@@ -275,8 +285,13 @@ final class Email {
 		$input_date_string = \wp_date('Y-m-d', $timestamp);
 		$next_timestamp    = WP::wp_strtotime("{$input_date_string} {$hh_mm_str}"); // 先用同一天時間算 timestamp
 
+		if (null === $next_timestamp) {
+			return $timestamp;
+		}
+
 		if ($next_timestamp < $timestamp) {
-			$next_timestamp = WP::wp_strtotime('+1 day', $next_timestamp);
+			$next_day_string = \wp_date('Y-m-d', $next_timestamp + DAY_IN_SECONDS);
+			$next_timestamp  = WP::wp_strtotime("{$next_day_string} {$hh_mm_str}") ?? $timestamp;
 		}
 
 		return $next_timestamp;
@@ -294,7 +309,7 @@ final class Email {
 		$find_record = EmailRecord::get(
 			[
 				'identifier'   => $this->get_identifier([ $post_id ], $user_id),
-				'mark_as_sent' => 1,
+				'mark_as_sent' => '1',
 			]
 			);
 

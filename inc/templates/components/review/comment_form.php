@@ -47,4 +47,5 @@ Plugin::load_template(
 
 
 
+/** @var \WC_Product $product */
 comment_form( $comment_form, $product->get_id() );

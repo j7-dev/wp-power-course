@@ -200,8 +200,8 @@ final class LifeCycle {
 	 * 刪除課程與相關項目
 	 * 刪除課程時連帶刪除子章節以及銷售方案(bundle product)
 	 *
-	 * @param int              $id 課程 id
-	 * @param ?string|\WP_Post $post_or_previous_status WP_Post(delete_post) 或 前一個狀態(trashed_post)
+	 * @param int                  $id 課程 id
+	 * @param string|\WP_Post|null $post_or_previous_status WP_Post(delete_post) 或 前一個狀態(trashed_post)
 	 * @return array<int> 刪除的 post id
 	 */
 	public static function delete_course_and_related_items( int $id, $post_or_previous_status = null ): array {
@@ -217,9 +217,11 @@ final class LifeCycle {
 		$deleted_post_ids = [];
 
 		foreach ([ ...$chapter_ids, ...$bundle_ids ] as $post_id) {
-			$result = \wp_trash_post( $post_id );
+			/** @var int|\WP_Post|\WC_Product $post_id */
+			$int_post_id = is_object($post_id) ? ( $post_id instanceof \WC_Product ? $post_id->get_id() : (int) $post_id->ID ) : (int) $post_id;
+			$result      = \wp_trash_post( $int_post_id );
 			if ( $result ) {
-				$deleted_post_ids[] = $post_id;
+				$deleted_post_ids[] = $int_post_id;
 			}
 		}
 
@@ -261,17 +263,20 @@ final class LifeCycle {
 			[
 				'post_type'      => [ 'product', 'product_variation' ],
 				'meta_key'       => 'bind_course_ids',
-				'meta_value'     => $course_id,
+				'meta_value'     => (string) $course_id,
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
 			]
 			);
 
 		foreach ($product_ids as $product_id) {
-			\delete_post_meta($product_id, 'bind_course_id', $course_id);
-			$bind_courses_data = \get_post_meta($product_id, 'bind_courses_data', true) ?: [];
-			$bind_courses_data = array_filter($bind_courses_data, fn( $item ) => ( (int) $item['id'] ) !== $course_id);
-			\update_post_meta($product_id, 'bind_courses_data', $bind_courses_data);
+			$int_product_id = (int) $product_id;
+			\delete_post_meta($int_product_id, 'bind_course_id', $course_id);
+			$bind_courses_data = \get_post_meta($int_product_id, 'bind_courses_data', true) ?: [];
+			if (is_array($bind_courses_data)) {
+				$bind_courses_data = array_filter($bind_courses_data, fn( $item ) => is_array($item) && ( (int) $item['id'] ) !== $course_id);
+			}
+			\update_post_meta($int_product_id, 'bind_courses_data', $bind_courses_data);
 		}
 	}
 
@@ -296,16 +301,16 @@ final class LifeCycle {
 		$restored_post_ids = [];
 
 		foreach ([ ...$chapter_ids, ...$bundle_ids ] as $post_id) {
-			$post_status = \get_post_status( (int) $post_id );
-			$result      = \wp_update_post(
+			/** @var int|\WP_Post|\WC_Product $post_id */
+			$int_post_id = is_object($post_id) ? ( $post_id instanceof \WC_Product ? $post_id->get_id() : (int) $post_id->ID ) : (int) $post_id;
+			$post_status = \get_post_status( $int_post_id );
+			\wp_update_post(
 				[
-					'ID'          => (int) $post_id,
-					'post_status' => $post_status === 'trash' ? 'publish' : $post_status,
+					'ID'          => $int_post_id,
+					'post_status' => $post_status === 'trash' ? 'publish' : ( is_string($post_status) ? $post_status : 'publish' ),
 				]
 			);
-			if (!\is_wp_error($result)) {
-				$restored_post_ids[] = $post_id;
-			}
+			$restored_post_ids[] = $int_post_id;
 		}
 
 		return $restored_post_ids;
@@ -379,9 +384,11 @@ final class LifeCycle {
 
 		if ( $editor === 'power-editor' ) {
 			$post_meta = \get_post_meta(    $product_id );
-			foreach ( $post_meta as $key => $value ) {
-				if ( strpos( $key, '_elementor_' ) !== false ) {
-					\delete_post_meta(  $product_id, $key );
+			if (is_array($post_meta)) {
+				foreach ( $post_meta as $key => $value ) {
+					if ( strpos( (string) $key, '_elementor_' ) !== false ) {
+						\delete_post_meta(  $product_id, (string) $key );
+					}
 				}
 			}
 		}
@@ -430,13 +437,13 @@ final class LifeCycle {
 	 */
 	public static function update_email_mark_as_sent( int $user_id, int $course_id ): void {
 		$where = [
-			'user_id'    => $user_id,
-			'post_id'    => $course_id,
+			'user_id'    => (string) $user_id,
+			'post_id'    => (string) $course_id,
 			'trigger_at' => 'course_granted',
 		];
 
 		$data = [
-			'mark_as_sent' => 0,
+			'mark_as_sent' => '0',
 		];
 
 		EmailRecord::update($where, $data);

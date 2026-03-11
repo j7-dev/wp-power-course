@@ -31,7 +31,7 @@ if ($helper?->is_bundle_product ) {
 	$course_product = $product;
 }
 
-$show_customer_amount = wc_string_to_bool($course_product->get_meta('show_customer_amount'));
+$show_customer_amount = wc_string_to_bool( (string) $course_product->get_meta('show_customer_amount'));
 
 if (!$total_sales || !$show_customer_amount) {
 	return;

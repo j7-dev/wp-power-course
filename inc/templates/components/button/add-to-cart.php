@@ -25,7 +25,8 @@ $default_props = [
 	'wrapper_class' => '[&_.added]:tw-hidden', // 🆕
 ];
 
-/** @var array $args */
+/** @var array<string, mixed> $args */
+$args = $args ?? [];
 $args    = wp_parse_args( $args, $default_props );
 $product = $args['product'];
 if (!( $product instanceof \WC_Product )) {

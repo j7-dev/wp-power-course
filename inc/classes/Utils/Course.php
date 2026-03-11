@@ -49,6 +49,10 @@ abstract class Course {
 			$product = \wc_get_product( $product );
 		}
 
+		if (!$product instanceof \WC_Product) {
+			return false;
+		}
+
 		return $product->get_meta( 'course_schedule' ) < time();
 	}
 
@@ -196,7 +200,7 @@ abstract class Course {
 	 * @param int|null  $user_id 用户 ID
 	 * @param bool|null $return_ids 是否只回傳 id
 	 *
-	 * @return array<\WP_Post|string>
+	 * @return array<int|string|array<int|string, mixed>|\WP_Post|null>
 	 */
 	public static function get_finished_sub_chapters( int $course_id, ?int $user_id = 0, ?bool $return_ids = false ): array {
 		if (!$user_id) {
@@ -262,7 +266,7 @@ abstract class Course {
 	 * 也會查找用戶買的 Bundle Products 裡面有沒有包含課程商品
 	 * 如果你要取得用戶能上的課程，請使用 get_avl_courses_by_user
 	 *
-	 * @param array|null $args 參數
+	 * @param array<string, mixed>|null $args 參數
 	 *                         - numberposts int 每頁数量
 	 *                         - offset int 跳過的数量
 	 *                         - order string 排序
@@ -276,9 +280,9 @@ abstract class Course {
 		$courses = [];
 
 		foreach ( $order_item_ids as $order_item_id ) {
-			$order_item = new \WC_Order_Item_Product( $order_item_id );
+			$order_item = new \WC_Order_Item_Product( (int) $order_item_id );
 			$product    = $order_item->get_product();
-			if ( $product ) {
+			if ( $product instanceof \WC_Product ) {
 				$courses[] = $product;
 			}
 		}
@@ -290,14 +294,14 @@ abstract class Course {
 	 * 取得用戶已購買的課程 order_item_id[]
 	 * 如果你要取得用戶能上的課程，請使用 get_avl_courses_by_user
 	 *
-	 * @param array|null $args 參數
+	 * @param array<string, mixed>|null $args 參數
 	 *                         - numberposts int 每頁数量
 	 *                         - offset int 跳過的数量
 	 *                         - order string 排序
 	 *                         - user_id int 用户 ID 查询
 	 *                         - status string[]|string 訂單狀態，預設找已完成 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed'
 	 *
-	 * @return array string[] order_item_ids
+	 * @return array<string> order_item_ids
 	 */
 	public static function get_course_order_item_ids_by_user( ?array $args = [] ): array {
 		$defaults = [
@@ -309,7 +313,7 @@ abstract class Course {
 			'status'      => [ 'wc-completed' ],                  // 訂單狀態
 		];
 
-		$args = \wp_parse_args( $args, $defaults );
+		$args = \wp_parse_args( $args ?? [], $defaults );
 		[
 			'numberposts' => $numberposts,
 			'offset'      => $offset,
@@ -323,7 +327,7 @@ abstract class Course {
 				',',
 				array_map(
 					function ( $status ) {
-						return '"' . $status . '"';
+						return '"' . (string) $status . '"';
 					},
 					$statuses
 				)
@@ -335,7 +339,7 @@ abstract class Course {
 		} else {
 			$status_condition = ( $statuses === 'any' ) ? '' : sprintf(
 				'AND posts.post_status = %1$s',
-				$statuses
+				(string) $statuses
 			);
 		}
 
@@ -385,14 +389,14 @@ abstract class Course {
 	 *
 	 * @hint 如果想知道當時購買的限制條件可以用這個
 	 *
-	 * @param array|null $args 參數
+	 * @param array<string, mixed>|null $args 參數
 	 *                         - numberposts int 每頁数量
 	 *                         - offset int 跳過的数量
 	 *                         - order string 排序
 	 *                         - user_id int 用户 ID 查询
 	 *                         - status string[]|string 訂單狀態，預設找已完成 'any' | 'wc-completed' | 'wc-processing' | 'wc-on-hold' | 'wc-pending' | 'wc-cancelled' | 'wc-refunded' | 'wc-failed'
 	 *
-	 * @return array \WC_Order_Item_Product[] order_items
+	 * @return array<\WC_Order_Item_Product> order_items
 	 */
 	public static function get_course_order_items_by_user( ?array $args = [] ): array {
 		$order_item_ids = self::get_course_order_item_ids_by_user( $args );
@@ -400,7 +404,7 @@ abstract class Course {
 		$course_order_items = [];
 
 		foreach ( $order_item_ids as $order_item_id ) {
-			$order_item_product   = new \WC_Order_Item_Product( $order_item_id );
+			$order_item_product   = new \WC_Order_Item_Product( (int) $order_item_id );
 			$course_order_items[] = $order_item_product;
 		}
 
@@ -574,7 +578,7 @@ abstract class Course {
 			'status'  => [ 'wc-completed' ],                  // 訂單狀態
 		];
 
-		$args = \wp_parse_args( $args, $defaults );
+		$args = \wp_parse_args( $args ?? [], $defaults );
 		[
 			'user_id' => $user_id,
 			'status'  => $statuses,
@@ -586,7 +590,7 @@ abstract class Course {
 				',',
 				array_map(
 					function ( $status ) {
-						return '"' . $status . '"';
+						return '"' . (string) $status . '"';
 					},
 					$statuses
 				)
@@ -598,7 +602,7 @@ abstract class Course {
 		} else {
 			$status_condition = ( $statuses === 'any' ) ? '' : sprintf(
 				'AND posts.post_status = %1$s',
-				$statuses
+				(string) $statuses
 			);
 		}
 		// 構建 target_product_ids 查詢條件
@@ -701,15 +705,16 @@ abstract class Course {
 	 * @return string
 	 */
 	public static function get_course_permalink_structure(): string {
-		$course_permalink_structure = \wp_unslash(
+		$permalinks = \wp_unslash(
 			\get_option(
 			'woocommerce_permalinks',
 			[
 				'product_base' => 'product',
 			]
 			)
-		)['product_base'] ?? 'product';
-		return preg_replace('/^\//', '', $course_permalink_structure);
+		);
+		$course_permalink_structure = is_array($permalinks) ? ( $permalinks['product_base'] ?? 'product' ) : 'product';
+		return (string) preg_replace('/^\//', '', (string) $course_permalink_structure);
 	}
 
 	/**
@@ -728,7 +733,7 @@ abstract class Course {
 			[
 				'post_type'      => ChapterCPT::POST_TYPE,
 				'meta_key'       => 'parent_course_id',
-				'meta_value'     => $course_id,
+				'meta_value'     => (string) $course_id,
 				'post_status'    => $status,
 				'fields'         => 'ids',
 				'posts_per_page' => 1,
@@ -762,12 +767,14 @@ abstract class Course {
 		$current_user_id = $current_user_id ?? \get_current_user_id();
 		$last_visit_info = AVLCourseMeta::get( $course_id, $current_user_id, 'last_visit_info', true );
 
-		if ( $last_visit_info ) {
+		if ( is_array($last_visit_info) ) {
 			$last_chapter_id = $last_visit_info['chapter_id'] ?? null;
-			$last_chapter    = \get_post( $last_chapter_id );
-			if ('publish' === $last_chapter?->post_status) {
-				$last_classroom_link = \get_permalink($last_chapter_id);
-				return $last_classroom_link;
+			$last_chapter    = \get_post( (int) $last_chapter_id );
+			if ($last_chapter instanceof \WP_Post && 'publish' === $last_chapter->post_status) {
+				$last_classroom_link = \get_permalink( (int) $last_chapter_id);
+				if (is_string($last_classroom_link)) {
+					return $last_classroom_link;
+				}
 			}
 		}
 
@@ -777,7 +784,7 @@ abstract class Course {
 
 		if ($first_chapter_id) {
 			$first_classroom_link = \get_permalink($first_chapter_id);
-			if ($first_classroom_link) {
+			if (is_string($first_classroom_link) && $first_classroom_link !== '') {
 				return $first_classroom_link;
 			}
 		}

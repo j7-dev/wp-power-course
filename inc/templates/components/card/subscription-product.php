@@ -38,7 +38,7 @@ printf(
   <p class="text-xs text-center mb-1 text-error">%1$s</p>
 	<h6 class="text-base text-base-content font-semibold text-center">%2$s</h6>
 ',
-	$bundle_type_label,
+	(string) $bundle_type_label,
 	$product_name
 );
 

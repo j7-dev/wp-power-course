@@ -132,7 +132,6 @@ final class Course extends ApiBase {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_courses_callback( $request ) { // phpcs:ignore
 
@@ -194,7 +193,6 @@ final class Course extends ApiBase {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_courses_with_id_callback( $request ) { // phpcs:ignore
 		$id = $request['id'] ?? null;
@@ -233,8 +231,7 @@ final class Course extends ApiBase {
 	 *
 	 * @param \WC_Product $product Product.
 	 *
-	 * @return array
-	 * @phpstan-ignore-next-line
+	 * @return array<string, mixed>
 	 */
 	public function format_course_records( $product ) { // phpcs:ignore
 
@@ -329,8 +326,7 @@ final class Course extends ApiBase {
 	 *
 	 * @param \WC_Product $product Product.
 	 *
-	 * @return array
-	 * @phpstan-ignore-next-line
+	 * @return array<string, mixed>
 	 */
 	public function format_course_base_records( $product ) { // phpcs:ignore
 
@@ -365,14 +361,16 @@ final class Course extends ApiBase {
 		// @phpstan-ignore-next-line
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters ));
 		// 把子章節的時間加總
+		/** @var array<int, array<string, mixed>> $chapters */
 		$course_length = array_reduce(
 			$chapters,
 			function ( $acc, $chapter ) {
+				/** @var array<int, array<string, mixed>> $sub_chapters */
 				$sub_chapters       = $chapter['chapters'] ?? [];
 				$sub_chapter_length = array_reduce(
 					$sub_chapters,
 					function ( $acc, $sub_chapter ) {
-						return $acc + $sub_chapter['chapter_length'];
+						return $acc + (int) $sub_chapter['chapter_length'];
 					},
 					0
 					);
@@ -483,7 +481,6 @@ final class Course extends ApiBase {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response|\WP_Error
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_courses_callback( $request ): \WP_REST_Response|\WP_Error {
 		/** @var array<string, array<mixed>|string> $meta_data */
@@ -519,7 +516,6 @@ final class Course extends ApiBase {
 	 * @param \WP_REST_Request $request 包含產品資訊的請求對象。
 	 * @throws \Exception 當找不到商品時拋出異常。.
 	 * @return array{product:\WC_Product, data: array<string, mixed>, meta_data: array<string, mixed>} 包含產品對象、資料和元數據的陣列。
-	 * @phpstan-ignore-next-line
 	 */
 	private function separator( $request ): array {
 		$id = $request['id'] ?? '';
@@ -545,7 +541,6 @@ final class Course extends ApiBase {
 			$product = new \WC_Product_Simple();
 		}
 
-		// @phpstan-ignore-next-line
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
@@ -695,7 +690,6 @@ final class Course extends ApiBase {
 	 *
 	 * @return \WP_REST_Response
 	 * @throws \Exception 當刪除課程資料失敗時拋出異常
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_courses_callback( $request ) {
 		$body_params = $request->get_json_params();
@@ -730,7 +724,6 @@ final class Course extends ApiBase {
 	 * @param \WP_REST_Request $request Request.
 	 *
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function delete_courses_with_id_callback( $request ) {
 		$id = (int) $request['id'];

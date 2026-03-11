@@ -33,13 +33,14 @@ $chapter_ids = ChapterUtils::get_flatten_post_ids($product_id);
 
 $name              = $product->get_name();
 $product_image_url = Base::get_image_url_by_product( $product, 'full' );
+/** @var array<int, mixed> $teacher_ids */
 $teacher_ids       = \get_post_meta( $product_id, 'teacher_ids', false );
 $teacher_name      = 'by ';
 foreach ( $teacher_ids as $key => $teacher_id ) {
 	$is_last       = $key === count( $teacher_ids ) - 1;
 	$connect       = $is_last ? '' : ' & ';
-	$teacher       = \get_user_by( 'id', $teacher_id );
-	$teacher_name .= $teacher->display_name . $connect;
+	$teacher       = \get_user_by( 'id', (string) $teacher_id );
+	$teacher_name .= ( $teacher instanceof \WP_User ) ? $teacher->display_name . $connect : $connect;
 }
 $teacher_name = count($teacher_ids) > 0 ? $teacher_name : '&nbsp;';
 

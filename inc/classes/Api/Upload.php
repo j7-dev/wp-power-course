@@ -47,7 +47,6 @@ final class Upload extends ApiBase {
 	 *
 	 * @param  \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_upload_callback( $request ): \WP_REST_Response {
 		// get data from form-data
@@ -58,9 +57,11 @@ final class Upload extends ApiBase {
 		if ( ! empty( $file_params['files']['tmp_name'] ) ) {
 
 			if ( ! function_exists( 'media_handle_upload' ) ) {
-				require_once 'wp-admin/includes/image.php';
-				require_once 'wp-admin/includes/file.php';
-				require_once 'wp-admin/includes/media.php';
+				/** @var string $abspath */
+				$abspath = ABSPATH;
+				require_once $abspath . 'wp-admin/includes/image.php';
+				require_once $abspath . 'wp-admin/includes/file.php';
+				require_once $abspath . 'wp-admin/includes/media.php';
 			}
 
 			if (\is_array($file_params['files']['tmp_name'])) {
@@ -139,8 +140,10 @@ final class Upload extends ApiBase {
 		if ( $upload_only ) {
 			// 直接上傳到 wp-content/uploads 不會新增到媒體庫
 			$upload_overrides = [ 'test_form' => false ];
+			/** @var array<string, mixed> $upload_result */
 			$upload_result    = \wp_handle_upload( $file, $upload_overrides );
 
+			/** @var array{name: string, type: string, tmp_name: string, error: int, size: int} $file */
 			unset( $upload_result['file'] );
 			$upload_result['id']     = null;
 			$upload_result['type']   = $file['type'];
@@ -177,6 +180,7 @@ final class Upload extends ApiBase {
 				);
 			}
 
+			/** @var array{name: string, type: string, tmp_name: string, error: int, size: int} $file */
 			$upload_result = [
 				'id'     => (string) $attachment_id,
 				'url'    => \wp_get_attachment_url( $attachment_id ),
@@ -213,8 +217,10 @@ final class Upload extends ApiBase {
 		if ( $upload_only ) {
 			// 直接上傳到 wp-content/uploads 不會新增到媒體庫
 			$upload_overrides = [ 'test_form' => false ];
+			/** @var array<string, mixed> $upload_result */
 			$upload_result    = \wp_handle_upload( $file, $upload_overrides );
 
+			/** @var array{name: string, type: string, tmp_name: string, error: int, size: int} $file */
 			unset( $upload_result['file'] );
 			$upload_result['id']   = null;
 			$upload_result['type'] = $file['type'];
@@ -249,6 +255,7 @@ final class Upload extends ApiBase {
 				);
 			}
 
+			/** @var array{name: string, type: string, tmp_name: string, error: int, size: int} $file */
 			$upload_result = [
 				'id'   => (string) $attachment_id,
 				'url'  => \wp_get_attachment_url( $attachment_id ),
@@ -312,12 +319,16 @@ final class Upload extends ApiBase {
 
 				if ( $upload_only ) {
 					// 直接上傳到 wp-content/uploads 不會新增到媒體庫
+					$file_type = $file['type'];
+					$file_name = $file['name'];
+					$file_size = $file['size'];
+					/** @var array<string, mixed> $upload_result */
 					$upload_result = \wp_handle_upload( $file, $upload_overrides );
 					unset( $upload_result['file'] );
 					$upload_result['id']     = null;
-					$upload_result['type']   = $file['type'];
-					$upload_result['name']   = $file['name'];
-					$upload_result['size']   = $file['size'];
+					$upload_result['type']   = $file_type;
+					$upload_result['name']   = $file_name;
+					$upload_result['size']   = $file_size;
 					$upload_result['width']  = $width;
 					$upload_result['height'] = $height;
 					if ( isset( $upload_result['error'] ) ) {

@@ -21,7 +21,7 @@ final class ExportCSV extends ExportCSVBase {
 	/** @var string 檔案名稱 */
 	protected string $filename;
 
-	/** @var array<object> 資料 */
+	/** @var array<object{user_id: int, display_name: string, user_email: string, user_registered: string, course_name: string, course_id: int, progress: string, expire_date_label: string, is_expired: string, subscription_id: int|string}> 資料 */
 	protected array $rows;
 
 	/** @var array<string, string> 欄位名稱，預設會從 $row 身上拿屬性 */
@@ -30,7 +30,11 @@ final class ExportCSV extends ExportCSVBase {
 	/** @var string 課程名稱 */
 	private string $course_name;
 
-	/** @var int 課程 ID */
+	/**
+	 * Constructor
+	 *
+	 * @param int $course_id 課程 ID
+	 */
 	public function __construct( private int $course_id ) {
 		$this->course_name = \get_the_title($this->course_id);
 		$this->filename    = "{$this->course_name}學員名單";
@@ -54,7 +58,7 @@ final class ExportCSV extends ExportCSVBase {
 	/**
 	 * 取得學員資料
 	 *
-	 * @return array{user_id: int, display_name: string, user_email: string, course_name: string, course_id: int, progress: string}
+	 * @return array<object{user_id: int, display_name: string, user_email: string, user_registered: string, course_name: string, course_id: int, progress: string, expire_date_label: string, is_expired: string, subscription_id: int|string}>
 	 * */
 	private function get_rows(): array {
 		try {

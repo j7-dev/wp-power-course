@@ -117,10 +117,10 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		/**
 		 * 記錄日誌
 		 *
-		 * @param string $message 訊息
-		 * @param string $level 日誌等級
-		 * @param array  $context 上下文
-		 * @param int    $trace_limit 堆疊限制
+		 * @param string               $message 訊息
+		 * @param string               $level 日誌等級
+		 * @param array<string, mixed> $context 上下文
+		 * @param int                  $trace_limit 堆疊限制
 		 * @return void
 		 */
 		public static function logger( string $message, string $level = 'debug', array $context = [], int $trace_limit = 0 ): void {

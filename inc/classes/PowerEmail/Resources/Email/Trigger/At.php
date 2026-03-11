@@ -230,8 +230,8 @@ final class At {
 
 			$args['email_id'] = $email_id;
 			$args['context']  = $context;
-			$user_id          = $args['user_id'] ?? 0;
-			$course_id        = $args['course_id'] ?? 0;
+			$user_id          = $args['user_id'];
+			$course_id        = $args['course_id'];
 			$chapter_id       = $args['chapter_id'] ?? 0;
 			$group            = $email->get_identifier([ $course_id, $chapter_id ], $user_id);
 

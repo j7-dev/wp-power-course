@@ -43,7 +43,6 @@ final class Option extends ApiBase {
 	 * @deprecated 使用 Settings Api 取代
 	 * @param \WP_REST_Request $request REST請求對象。
 	 * @return \WP_REST_Response 返回包含選項資料的REST響應對象。
-	 * @phpstan-ignore-next-line
 	 */
 	public function get_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		return SettingsApi::instance()->get_settings_callback( $request );
@@ -54,7 +53,6 @@ final class Option extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含更新選項所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回選項資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_options_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		return SettingsApi::instance()->post_settings_callback( $request );
@@ -66,7 +64,6 @@ final class Option extends ApiBase {
 	 *
 	 * @param \WP_REST_Request $request 包含更新選項所需資料的REST請求對象。
 	 * @return \WP_REST_Response 返回包含操作結果的REST響應對象。成功時返回選項資料，失敗時返回錯誤訊息。
-	 * @phpstan-ignore-next-line
 	 */
 	public function post_duplicate_with_id_callback( \WP_REST_Request $request ): \WP_REST_Response {
 		$id = $request['id'] ?? null;

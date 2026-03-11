@@ -41,6 +41,6 @@ printf(
 	'<span href="%1$s" target="_blank" class="text-sm flex gap-2 items-center text-base-content hover:text-base-content/75">
 	<img class="rounded-full size-6" src="%2$s" alt="%3$s" loading="lazy" decoding="async"/>%3$s</span>',
 	'#', // TODO 先隱藏 $user_link,
-	$user_avatar_url,
+	(string) $user_avatar_url,
 	$display_name
 );

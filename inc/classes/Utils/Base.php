@@ -27,7 +27,7 @@ abstract class Base {
 		\WC_Product $product,
 		?string $size = 'single-post-thumbnail'
 	): string {
-		return WC::get_image_url_by_product( $product, $size, self::DEFAULT_IMAGE );
+		return WC::get_image_url_by_product( $product, $size ?? 'single-post-thumbnail', self::DEFAULT_IMAGE );
 	}
 
 	/**
