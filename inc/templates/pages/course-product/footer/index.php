@@ -29,11 +29,10 @@ if ( ! is_array( $teacher_ids ) ) {
 	$teacher_ids = [];
 }
 
-/**
- * @var array{type: string, id: string, meta: ?array<string, mixed>} $trial_video
- */
 $trial_video = \get_post_meta( $product_id, 'trial_video', true );
-$video_type  = $trial_video['type'];
+/** @var array{type: string, id: string, meta: ?array<string, mixed>}|array<empty> $trial_video */
+$trial_video = is_array( $trial_video ) ? $trial_video : [];
+$video_type  = $trial_video['type'] ?? 'none';
 
 if ( 'none' !== $video_type ) {
 	printf(
