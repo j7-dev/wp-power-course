@@ -1,0 +1,58 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer
+          ini-values: memory_limit=4096M
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Clone Powerhouse (phpstan dependency)
+        run: |
+          if [ ! -d "../powerhouse" ]; then
+            git clone --depth 1 https://github.com/j7-dev/wp-powerhouse.git ../powerhouse
+          fi
+          cd ../powerhouse && composer install --no-interaction --prefer-dist
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Add vendor/bin to PATH
+        run: echo "$(pwd)/vendor/bin" >> $GITHUB_PATH
+
+      - name: Setup pnpm workspace (standalone mode)
+        run: |
+          if [ ! -f "../../pnpm-workspace.yaml" ]; then
+            cat > pnpm-workspace.yaml << 'EOF'
+          packages:
+            - "packages/*"
+          EOF
+          fi
+
+      - name: Install Node dependencies
+        run: pnpm install --no-frozen-lockfile
