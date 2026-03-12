@@ -18,6 +18,11 @@ final class Settings extends DTO {
 	/** @var string $course_permalink_structure 課程永久連結結構 */
 	public string $course_permalink_structure = '';
 
+	/**
+	 * @var array<int, array{course_id:int, limit_type:string, limit_value:int|null, limit_unit:string|null}> $auto_grant_courses 註冊會員後自動開通的課程設定
+	 */
+	public array $auto_grant_courses = [];
+
 	/** @var string $hide_myaccount_courses 是否隱藏我的帳戶中的課程 */
 	public string $hide_myaccount_courses = 'no';
 
@@ -78,10 +83,54 @@ final class Settings extends DTO {
 		foreach ( $properties as $property => $value ) {
 			if ( !property_exists( $this, $property ) ) {
 				$this->dto_error->add( 'invalid_property', "Invalid property: {$property}" );
+				continue;
 			}
+
+			if ( 'auto_grant_courses' === $property ) {
+				$this->auto_grant_courses = $this->normalize_auto_grant_courses( $value );
+				continue;
+			}
+
 			$this->$property = General::to_same_type( $this->$property, $value );
 		}
 		return $this;
+	}
+
+	/**
+	 * 標準化自動開通課程設定
+	 *
+	 * @param mixed $auto_grant_courses 自動開通課程設定
+	 * @return array<int, array{course_id:int, limit_type:string, limit_value:int|null, limit_unit:string|null}>
+	 */
+	private function normalize_auto_grant_courses( mixed $auto_grant_courses ): array {
+		if ( !is_array( $auto_grant_courses ) ) {
+			return [];
+		}
+
+		$normalized_auto_grant_courses = [];
+		foreach ( $auto_grant_courses as $auto_grant_course ) {
+			if ( !is_array( $auto_grant_course ) ) {
+				continue;
+			}
+
+			$course_id = (int) ( $auto_grant_course['course_id'] ?? 0 );
+			if ( $course_id <= 0 ) {
+				continue;
+			}
+
+			$limit_type      = (string) ( $auto_grant_course['limit_type'] ?? 'unlimited' );
+			$limit_value_raw = $auto_grant_course['limit_value'] ?? null;
+			$limit_unit_raw  = $auto_grant_course['limit_unit'] ?? null;
+
+			$normalized_auto_grant_courses[] = [
+				'course_id'   => $course_id,
+				'limit_type'  => $limit_type,
+				'limit_value' => ( '' === $limit_value_raw || null === $limit_value_raw ) ? null : (int) $limit_value_raw,
+				'limit_unit'  => ( '' === $limit_unit_raw || null === $limit_unit_raw ) ? null : (string) $limit_unit_raw,
+			];
+		}
+
+		return array_values( $normalized_auto_grant_courses );
 	}
 
 
