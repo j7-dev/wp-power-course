@@ -52,13 +52,13 @@ tools:
     toolsets: [default, discussions] # 允許讀取 Issue、PR 與程式碼
   edit: # 賦予 AI 在 Workspace 中修改檔案的能力
   bash: # 賦予 AI 執行本地驗證指令的能力
-    - "composer:*"
-    - "vendor/bin/phpcbf:*"
-    - "vendor/bin/phpcs:*"
-    - "vendor/bin/phpstan:*"
-    - "vendor/bin/phpunit:*"
-    - "npx:*"
-    - "pnpm:*"
+    - "composer *"
+    - "vendor/bin/phpcbf *"
+    - "vendor/bin/phpcs *"
+    - "vendor/bin/phpstan *"
+    - "vendor/bin/phpunit *"
+    - "npx *"
+    - "pnpm *"
 safe-outputs:
   create-pull-request:
     title-prefix: "[WP] "
