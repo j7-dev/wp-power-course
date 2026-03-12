@@ -34,9 +34,7 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 	)
 
 	const { selectProps } = useCourseSelect({ selectProps: { mode: undefined } })
-	const courseSelectProps = { ...selectProps }
-	delete courseSelectProps.value
-	delete courseSelectProps.onChange
+	const courseSelectProps = (({ value, onChange, ...rest }) => rest)(selectProps)
 
 	const handleLimitTypeChange = (value: TLimitType) => {
 		const basePath = ['auto_grant_courses', field.name]
@@ -134,7 +132,7 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 	)
 }
 
-const index = () => {
+const AutoGrant = () => {
 	return (
 		<div className="w-full max-w-[640px]">
 			<Form.List name={['auto_grant_courses']}>
@@ -157,4 +155,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(AutoGrant)
