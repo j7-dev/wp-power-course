@@ -33,7 +33,6 @@
 		"test:e2e:debug": "cd tests/e2e && npx playwright test --debug"
 	},
 	"dependencies": {
-		"antd-toolkit": "workspace:*",
 		"@ant-design/charts": "^2.3.0",
 		"@ant-design/pro-components": "^2.8.7",
 		"@arco-themes/react-easy-email-theme": "^0.0.3",
@@ -50,26 +49,9 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.58.2",
-		"@power/eslint-config": "workspace:*",
-		"@power/tailwind-config": "workspace:*",
-		"@power/typescript-config": "workspace:*",
 		"@types/mjml-browser": "^4.15.0",
 		"@wordpress/e2e-test-utils-playwright": "^1.41.0",
 		"@wordpress/env": "^11.1.0",
 		"prettier-eslint-cli": "^8.0.1"
-	},
-	"dependenciesMeta": {
-		"antd-toolkit": {
-			"injected": true
-		},
-		"@power/eslint-config": {
-			"injected": true
-		},
-		"@power/tailwind-config": {
-			"injected": true
-		},
-		"@power/typescript-config": {
-			"injected": true
-		}
 	}
 }
