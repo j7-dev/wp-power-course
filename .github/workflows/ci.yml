@@ -136,6 +136,15 @@ jobs:
         working-directory: tests/e2e
         run: npx playwright install-deps chromium
 
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
       - name: Cache wp-env
         uses: actions/cache@v4
         with:

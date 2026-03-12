@@ -45,6 +45,7 @@ tools:
 safe-outputs:
   create-pull-request:
     title-prefix: "[React] "
+    draft: false
   add-comment:
     hide-older-comments: true
   noop:

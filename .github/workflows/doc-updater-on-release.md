@@ -55,6 +55,7 @@ safe-outputs:
     labels: [documentation, automation]
     reviewers: [copilot]
     expires: 3d
+    draft: false
   noop:
 
 tools:

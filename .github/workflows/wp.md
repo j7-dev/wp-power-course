@@ -62,6 +62,7 @@ tools:
 safe-outputs:
   create-pull-request:
     title-prefix: "[WP] "
+    draft: false
   add-comment:
     hide-older-comments: true # 保持 Issue 討論串乾淨 [4]
   noop:
