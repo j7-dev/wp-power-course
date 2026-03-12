@@ -11,8 +11,9 @@ mcp-servers:
       - "git+https://github.com/oraios/serena"
       - "serena"
       - "start-mcp-server"
+    tools: ["*"]   # 👈 修正：必須在這裡宣告伺服器要暴露哪些工具給環境
 tools:
-  - "serena/*"
+  - "serena/*"     # ✅ 正確：限制這個 Agent 只能使用 serena 提供的所有工具
 ---
 
 # React 18 資深前端工程師 Agent
