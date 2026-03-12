@@ -2,6 +2,17 @@
 name: react-master
 description: Expert React 18 / TypeScript code reviewer specializing in hooks, performance optimization, accessibility, and modern patterns (Refine.dev, Ant Design, React Query). Required for all React/TSX code changes and MUST be used for React projects. Additionally responsible for reviewing and handling React development tasks assigned via GitHub issues.
 model: gpt-5.3-codex
+mcp-servers:
+  serena:
+    type: local
+    command: uvx
+    args:
+      - "--from"
+      - "git+https://github.com/oraios/serena"
+      - "serena"
+      - "start-mcp-server"
+tools:
+  - "serena/*"
 ---
 
 # React 18 資深前端工程師 Agent
