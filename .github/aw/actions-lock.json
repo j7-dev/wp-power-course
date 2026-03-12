@@ -5,6 +5,11 @@
       "version": "v8",
       "sha": "ed597411d8f924073f98dfc5c65a23a2325f34cd"
     },
+    "actions/setup-node@v4": {
+      "repo": "actions/setup-node",
+      "version": "v4",
+      "sha": "49933ea5288caeca8642d1e84afbd3f7d6820020"
+    },
     "actions/upload-artifact@v6": {
       "repo": "actions/upload-artifact",
       "version": "v6",
@@ -14,6 +19,16 @@
       "repo": "github/gh-aw/actions/setup",
       "version": "v0.52.1",
       "sha": "a86e657586e4ac5f549a790628971ec02f6a4a8f"
+    },
+    "pnpm/action-setup@v4": {
+      "repo": "pnpm/action-setup",
+      "version": "v4",
+      "sha": "b906affcce14559ad1aafd4ab0e942779e9f58b1"
+    },
+    "shivammathur/setup-php@v2": {
+      "repo": "shivammathur/setup-php",
+      "version": "v2",
+      "sha": "44454db4f0199b8b9685a5d763dc37cbf79108e1"
     }
   }
 }

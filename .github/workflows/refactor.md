@@ -12,6 +12,40 @@ permissions:
   issues: read
   pull-requests: read
 
+network:
+  allowed:
+    - defaults
+    - node
+
+steps:
+  - uses: shivammathur/setup-php@v2
+    with:
+      php-version: "8.2"
+      tools: composer
+      ini-values: memory_limit=4096M
+  - uses: pnpm/action-setup@v4
+    with:
+      version: latest
+  - uses: actions/setup-node@v4
+    with:
+      node-version: "20"
+  - name: Setup dependencies
+    run: |
+      if [ ! -d "../powerhouse" ]; then
+        git clone --depth 1 https://github.com/j7-dev/wp-powerhouse.git ../powerhouse
+        cd ../powerhouse && composer install --no-interaction --prefer-dist
+        cd $GITHUB_WORKSPACE
+      fi
+      composer install --no-interaction --prefer-dist
+      echo "$(pwd)/vendor/bin" >> $GITHUB_PATH
+      if [ ! -f "../../pnpm-workspace.yaml" ]; then
+        cat > pnpm-workspace.yaml << 'WSEOF'
+      packages:
+        - "packages/*"
+      WSEOF
+      fi
+      pnpm install --no-frozen-lockfile
+
 tracker-id: code-refactor
 
 imports:
@@ -39,6 +73,8 @@ tools:
   github:
     toolsets: [default]
   serena: ["php", "typescript"]
+  bash: true
+  edit:
 
 timeout-minutes: 45
 strict: true

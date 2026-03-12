@@ -212,8 +212,10 @@ ${{ steps.sanitized.outputs.text }}
 - 最後進行驗證和文件
 
 **適當的粒度**：
+- **預設拆為 2 個 sub-issue**：一個前端（`@react-master`，使用 /react 指派）、一個後端（`@wordpress-master`，使用 /wp 指派）
+- 只有當任務規模確實很大時，才進一步拆分更多 sub-issue
+- 若任務只涉及單一端（純前端或純後端），建立 1 個 sub-issue 即可
 - 可在單一 PR 中完成
-- 單一焦點或目標 — 保持極小且專注
 - 清楚的驗收標準
 
 **SWE Agent 格式**：
@@ -235,13 +237,13 @@ ${{ steps.sanitized.outputs.text }}
 ```
 ## 執行 Agent
 
-> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務）
+> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務），使用 /wp 指派
 ```
 或
 ```
 ## 執行 Agent
 
-> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（前端任務）
+> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（前端任務），使用 /react 指派
 ```
 
 ### Sub-Issue 範例（PHP 後端）
@@ -250,7 +252,7 @@ ${{ steps.sanitized.outputs.text }}
 {
   "type": "create_issue",
   "title": "[PHP] 新增資料匯出 CSV API",
-  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務）\n\n---\n\n### Objective\n\n實作資料批量匯出 CSV 的 REST API 端點。\n\n### Context\n\n後台管理需要匯出特定資料集，包含相關欄位資訊。\n\n### Approach\n\n1. 在適當的目錄建立新的 API class\n2. 註冊 REST API 路由\n3. 回傳 CSV 格式，正確設定 Content-Type header\n\n### Files to Modify\n\n- Create: `{src_dir}/Api/ExportCSV.php`（TODO: 依專案調整路徑）\n- Update: `{src_dir}/Bootstrap.php`（或對應的主要啟動檔案）\n\n### Acceptance Criteria\n\n- [ ] API 回傳正確的 CSV 內容\n- [ ] `pnpm run lint:php` 通過\n- [ ] PHPStan 無錯誤"
+  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@wordpress-master`** agent 執行（PHP/WordPress 後端任務），使用 /wp 指派\n\n---\n\n### Objective\n\n實作資料批量匯出 CSV 的 REST API 端點。\n\n### Context\n\n後台管理需要匯出特定資料集，包含相關欄位資訊。\n\n### Approach\n\n1. 在適當的目錄建立新的 API class\n2. 註冊 REST API 路由\n3. 回傳 CSV 格式，正確設定 Content-Type header\n\n### Files to Modify\n\n- Create: `{src_dir}/Api/ExportCSV.php`（TODO: 依專案調整路徑）\n- Update: `{src_dir}/Bootstrap.php`（或對應的主要啟動檔案）\n\n### Acceptance Criteria\n\n- [ ] API 回傳正確的 CSV 內容\n- [ ] `pnpm run lint:php` 通過\n- [ ] PHPStan 無錯誤"
 }
 ```
 
@@ -260,7 +262,7 @@ ${{ steps.sanitized.outputs.text }}
 {
   "type": "create_issue",
   "title": "[前端] 列表頁面新增匯出 CSV 按鈕",
-  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（前端任務）\n\n---\n\n### Objective\n\n在管理頁面新增匯出 CSV 按鈕，呼叫後端 API 觸發下載。\n\n### Context\n\n後端 API 已由 [PHP] Issue 實作完成，前端需串接並提供 UI 入口。\n\n### Approach\n\n1. 在對應的頁面元件加入匯出按鈕\n2. 呼叫 API 並處理下載\n3. 處理 loading 狀態與錯誤提示\n\n### Files to Modify\n\n- Update: `{frontend_dir}/pages/admin/List/index.tsx`（TODO: 依專案調整路徑）\n\n### Acceptance Criteria\n\n- [ ] 前端匯出按鈕可正常觸發下載\n- [ ] `pnpm run lint:ts` 通過\n- [ ] `pnpm run build` 成功"
+  "body": "## 執行 Agent\n\n> ⚙️ 此 Issue 應指派給 **`@react-master`** agent 執行（前端任務），使用 /react 指派\n\n---\n\n### Objective\n\n在管理頁面新增匯出 CSV 按鈕，呼叫後端 API 觸發下載。\n\n### Context\n\n後端 API 已由 [PHP] Issue 實作完成，前端需串接並提供 UI 入口。\n\n### Approach\n\n1. 在對應的頁面元件加入匯出按鈕\n2. 呼叫 API 並處理下載\n3. 處理 loading 狀態與錯誤提示\n\n### Files to Modify\n\n- Update: `{frontend_dir}/pages/admin/List/index.tsx`（TODO: 依專案調整路徑）\n\n### Acceptance Criteria\n\n- [ ] 前端匯出按鈕可正常觸發下載\n- [ ] `pnpm run lint:ts` 通過\n- [ ] `pnpm run build` 成功"
 }
 ```
 
