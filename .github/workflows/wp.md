@@ -71,6 +71,15 @@ imports:
   - ../skills/power-course/SKILL.md
 ---
 
+### 任務上下文
+* 當前 Issue 編號：#${{ github.event.issue.number }}
+* 你的任務觸發來源：使用者留言 `${{ needs.activation.outputs.text }}`
+
+### 執行步驟
+1. **獲取需求**：你目前只載入了執行規範。在做任何動作之前，你**必須先使用 GitHub Tools** 讀取 Issue #${{ github.event.issue.number }} 的完整主文（Body）以及所有歷史留言，以獲取實際的需求內容與要修改的檔案位置。
+2. **分析與實作**：確認你已經完全理解 Issue #${{ github.event.issue.number }} 的具體需求後，請嚴格遵守 `SKILL.md` 的規範，使用 `edit` 工具進行精準的程式碼修改。
+3. **完成任務**：修改完畢後，使用 `create-pull-request` 建立 PR，並使用 `add-comment` 回報完成。
+
 ### 執行準則
 
 你是一位頂尖的 WordPress 核心與外掛開發專家。你已經載入了 `wordpress-master` 的專業設定，請嚴格套用該設定中的 WordPress Coding Standards 與架構規範來執行任務。
