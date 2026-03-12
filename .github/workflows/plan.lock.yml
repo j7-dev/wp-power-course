@@ -30,7 +30,7 @@
 #     - ../skills/power-course/SKILL.md
 #     - shared/mood.md
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"ea9fbaa4a98ee761d196877cd2d2adf3c1b5f8d30a44d56e5e1f3426b103070e","compiler_version":"v0.52.1"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"637ac1ee314b02d97636e0e0c16c6089d3c060612b973198486ae1b066112e44","compiler_version":"v0.52.1"}
 
 name: "Plan Command"
 "on":
