@@ -61,6 +61,7 @@ safe-outputs:
     labels: [refactoring, code-quality, automation]
     reviewers: [copilot]
     expires: 1d
+    draft: false
   create-issue:
     expires: 2d
     title-prefix: "[refactor] "
