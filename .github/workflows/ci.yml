@@ -146,8 +146,12 @@ jobs:
           key: wp-env-${{ runner.os }}-${{ hashFiles('.wp-env.json') }}
 
       - name: Start WordPress environment
-        run: ./tests/e2e/node_modules/.bin/wp-env start
-        timeout-minutes: 10
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 10
+          command: ./tests/e2e/node_modules/.bin/wp-env start
 
       - name: Run E2E tests
         working-directory: tests/e2e
