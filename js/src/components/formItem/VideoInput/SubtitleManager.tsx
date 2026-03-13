@@ -103,6 +103,7 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 			{
 				url: `${apiUrl}/chapters/${chapterId}/subtitles/${srclang}`,
 				method: 'delete',
+				values: {},
 			},
 			{
 				onSuccess: () => {
