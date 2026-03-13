@@ -60,6 +60,8 @@ tags:
     description: 章節留言
   - name: Media
     description: 媒體上傳
+  - name: Subtitles
+    description: 章節字幕管理
 
 # ============================================================
 # COMPONENTS
@@ -543,6 +545,32 @@ components:
         url:
           type: string
           description: 媒體檔案 URL 或路徑
+
+    SubtitleTrack:
+      type: object
+      description: 字幕軌道物件
+      required:
+        - srclang
+        - label
+        - url
+        - attachment_id
+      properties:
+        srclang:
+          type: string
+          description: BCP-47 語言代碼
+          example: "zh-TW"
+        label:
+          type: string
+          description: 語言顯示名稱
+          example: "繁體中文"
+        url:
+          type: string
+          description: WebVTT 檔案 URL
+          example: "https://example.com/wp-content/uploads/subtitle-zh-tw.vtt"
+        attachment_id:
+          type: integer
+          description: WordPress 媒體庫附件 ID
+          example: 301
 
   # ---------- Reusable Responses ----------
   responses:
@@ -3208,6 +3236,225 @@ paths:
                     message: "必須提供檔案"
                     data:
                       status: 400
+
+  # ----------------------------------------------------------
+  # /chapters/{id}/subtitles  (GET list + POST upload)
+  # ----------------------------------------------------------
+  /chapters/{id}/subtitles:
+    get:
+      summary: 取得章節字幕列表
+      operationId: listChapterSubtitles
+      tags: [Subtitles]
+      description: |
+        取得指定章節的所有字幕軌道列表。
+
+        **前置（狀態）:** 章節必須存在
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 章節 ID
+      responses:
+        "200":
+          description: 字幕列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubtitleTrack'
+        "404":
+          $ref: '#/components/responses/404NotFound'
+
+    post:
+      summary: 上傳章節字幕
+      operationId: uploadChapterSubtitle
+      tags: [Subtitles]
+      description: |
+        為指定章節上傳字幕檔案。接受 .srt 和 .vtt 格式，SRT 會自動轉換為 WebVTT 後儲存到 WordPress 媒體庫。
+
+        **前置（狀態）:**
+        - 章節必須存在
+        - 同語言字幕不可重複上傳（需先刪除再上傳）
+
+        **前置（參數）:**
+        - 必須提供字幕檔案（.srt 或 .vtt）
+        - 必須指定語言代碼（BCP-47 格式）
+
+        **後置（狀態）:**
+        - SRT 自動轉換為 WebVTT 後儲存
+        - 字幕與章節建立關聯（存入 chapter postmeta）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 章節 ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - srclang
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: 字幕檔案（僅接受 .srt 和 .vtt 格式）
+                srclang:
+                  type: string
+                  description: BCP-47 語言代碼（如 zh-TW、en、ja）
+                  example: "zh-TW"
+      responses:
+        "200":
+          description: 字幕上傳成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubtitleTrack'
+        "400":
+          description: 參數驗證失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noFile:
+                  summary: 未提供字幕檔案
+                  value:
+                    code: rest_invalid_param
+                    message: "必須提供字幕檔案"
+                    data:
+                      status: 400
+                noSrclang:
+                  summary: 未指定語言代碼
+                  value:
+                    code: rest_invalid_param
+                    message: "必須指定字幕語言"
+                    data:
+                      status: 400
+                invalidFormat:
+                  summary: 不支援的檔案格式
+                  value:
+                    code: rest_invalid_param
+                    message: "僅支援 .srt 和 .vtt 格式"
+                    data:
+                      status: 400
+                invalidSrclang:
+                  summary: 無效的語言代碼
+                  value:
+                    code: rest_invalid_param
+                    message: "無效的語言代碼"
+                    data:
+                      status: 400
+        "404":
+          $ref: '#/components/responses/404NotFound'
+        "422":
+          description: 業務規則不符
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duplicateLang:
+                  summary: 同語言字幕已存在
+                  value:
+                    code: rest_forbidden
+                    message: "該語言字幕已存在，請先刪除再上傳"
+                    data:
+                      status: 422
+
+  # ----------------------------------------------------------
+  # /chapters/{id}/subtitles/{srclang}  (DELETE)
+  # ----------------------------------------------------------
+  /chapters/{id}/subtitles/{srclang}:
+    delete:
+      summary: 刪除章節字幕
+      operationId: deleteChapterSubtitle
+      tags: [Subtitles]
+      description: |
+        刪除指定章節的指定語言字幕，同時刪除 WordPress 媒體庫中的附件。
+
+        **前置（狀態）:**
+        - 章節必須存在
+        - 指定語言的字幕必須存在
+
+        **後置（狀態）:**
+        - 從章節 postmeta 移除該語言字幕記錄
+        - 刪除 WordPress 媒體庫中對應的附件
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 章節 ID
+        - name: srclang
+          in: path
+          required: true
+          schema:
+            type: string
+          description: BCP-47 語言代碼
+          example: "zh-TW"
+      responses:
+        "200":
+          description: 字幕刪除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  deleted_srclang:
+                    type: string
+                    description: 已刪除的語言代碼
+                    example: "zh-TW"
+        "400":
+          description: 參數驗證失敗
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptySrclang:
+                  summary: 未指定語言代碼
+                  value:
+                    code: rest_invalid_param
+                    message: "srclang 為必填"
+                    data:
+                      status: 400
+        "404":
+          description: 章節或字幕不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                chapterNotFound:
+                  summary: 章節不存在
+                  value:
+                    code: rest_not_found
+                    message: "章節不存在"
+                    data:
+                      status: 404
+                subtitleNotFound:
+                  summary: 該語言字幕不存在
+                  value:
+                    code: rest_not_found
+                    message: "該語言字幕不存在"
+                    data:
+                      status: 404
 
   # ==========================================================
   # Power Email endpoints (base path: /wp-json/power-email)
