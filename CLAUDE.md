@@ -6,9 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Power Course 是一個 WordPress 課程外掛，採用前後端分離架構。前端在 refine.dev 這個大框架內使用 React + TypeScript + Ant Design，後端使用 PHP + WordPress + Woocommerce 外掛 + Powerhouse 外掛 + composer。
 
-Power Course 位於 Powerrepo 是這個 monorepo 底下的 submodule
-Power Course 依賴的 Powerhouse 也是 Powerrepo 這個 monorepo 底下的 submodule
-如果需要查看 Powerrepo 的文件內容，可以 cd ../../ 進入 Powerrepo 的根目錄
+Power Course 是獨立的 WordPress 外掛專案。
 
 ## 常用指令
 
@@ -75,22 +73,14 @@ pnpm run zip            # 打包外掛檔案
 ## 開發注意事項
 請遵照 .claude/instructions.md 文檔的規範進行開發
 
-### Monorepo 依賴
-此專案使用 workspace 依賴，相關配置位於：
-- `@power/eslint-config`: ESLint 共用配置
-- `@power/tailwind-config`: Tailwind CSS 配置
-- `@power/typescript-config`: TypeScript 配置
-
-
 ### Wordpress 依賴
 - 依賴 Woocommerce Plugin
 - 依賴 Powerhouse Plugin
 - Powerhouse 內有個 lib J7\WpUtils 非常常使用
 
 ### 參考文件
-- Powerhouse php 文件參考路徑 (與 Power Course同一個 monorepo 內): ../powerhouse/inc/classes/Domains/
+- Powerhouse php 文件參考路徑（依賴 Powerhouse Plugin）: ../powerhouse/inc/classes/Domains/
 - J7\WpUtils php 文件參考路徑 (Powerhouse 的 php 依賴): ../powerhouse/vendor/j7-dev/wp-utils/src
-- antd-toolkit 前端組件參考路徑 (與 Power Course同一個 monorepo 內): ../../packages/antd-toolkit/lib
 - refine.dev 文件: https://refine.dev/docs/
 - WordPress 文件: https://developer.wordpress.org/reference/
 - Woocommerce 文件: https://woocommerce.github.io/code-reference/

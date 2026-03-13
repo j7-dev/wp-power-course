@@ -22,12 +22,13 @@ export default defineConfig({
 	globalTeardown: './global-teardown.ts',
 
 	use: {
+		headless: false,
 		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
 		storageState: STORAGE_STATE,
 		locale: 'zh-TW',
 		timezoneId: 'Asia/Taipei',
-		screenshot: 'only-on-failure',
 		trace: 'on-first-retry',
+		screenshot: 'only-on-failure',
 		video: 'retain-on-failure',
 		actionTimeout: 10_000,
 		navigationTimeout: 15_000,

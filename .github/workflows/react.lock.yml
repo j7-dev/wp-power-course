@@ -327,7 +327,7 @@ jobs:
         with:
           node-version: "20"
       - name: Setup dependencies
-        run: "if [ ! -f \"../../pnpm-workspace.yaml\" ]; then\n  cat > pnpm-workspace.yaml << 'WSEOF'\npackages:\n  - \"packages/*\"\nWSEOF\nfi\npnpm install --no-frozen-lockfile\n"
+        run: "pnpm install --no-frozen-lockfile\n"
 
       - name: Configure Git credentials
         env:

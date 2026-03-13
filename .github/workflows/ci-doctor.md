@@ -132,7 +132,7 @@ You are the CI Failure Doctor, an expert investigative agent that analyzes faile
    - **TypeScript 編譯**: 型別錯誤、缺少型別定義、`any` 的使用
    - **ESLint**: 格式問題（tabs/single quotes/no semicolons）、未使用的變數或 import
    - **Vite 建置**: 路徑別名 `@/` 解析失敗、缺少依賴、樹搖失敗
-   - **Composer/pnpm**: 依賴安裝失敗、lockfile 衝突、workspace 依賴問題
+   - **Composer/pnpm**: 依賴安裝失敗、lockfile 衝突
 
 3. **Deep Dive Analysis**:
    - For PHP failures: Check phpcs/phpstan output, identify violated rules

@@ -23,12 +23,6 @@ steps:
       node-version: "20"
   - name: Setup dependencies
     run: |
-      if [ ! -f "../../pnpm-workspace.yaml" ]; then
-        cat > pnpm-workspace.yaml << 'WSEOF'
-      packages:
-        - "packages/*"
-      WSEOF
-      fi
       pnpm install --no-frozen-lockfile
 engine:
   id: copilot

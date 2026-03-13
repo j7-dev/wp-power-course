@@ -49,16 +49,13 @@ Optional:
 4. Install and activate **Power Course**
 5. Plugin will automatically create required database tables on activation
 
-### Development (Monorepo)
+### Development
 
 ```bash
-# From the monorepo root
-cd apps/power-course
-
 # Install PHP dependencies
 composer install
 
-# Install JS dependencies (from monorepo root)
+# Install JS dependencies
 pnpm install
 
 # Start Vite dev server (port 5174)
@@ -67,8 +64,6 @@ pnpm run dev
 # Build for production
 pnpm run build
 ```
-
-> **Note:** This plugin is part of the `powerrepo` monorepo. Run `pnpm install` from the monorepo root, not from this directory.
 
 ---
 
@@ -271,7 +266,7 @@ composer run test       # PHPUnit tests
 ### Code Standards
 
 - **PHP:** WordPress Coding Standards (WPCS), PHPStan level configured in `phpstan.neon`
-- **TypeScript:** ESLint with `@power/eslint-config` (monorepo shared config)
+- **TypeScript:** ESLint
 - **Formatting:** Prettier with tabs, single quotes, no semicolons
 
 ### Environment Setup
@@ -280,20 +275,6 @@ Bunny Stream CDN credentials are configured in the **Powerhouse** plugin setting
 - `bunny_library_id`
 - `bunny_cdn_hostname`
 - `bunny_stream_api_key`
-
----
-
-## Monorepo Context
-
-This plugin is part of the `powerrepo` monorepo:
-
-| Package | Path | Usage |
-|---------|------|-------|
-| `powerhouse` | `../powerhouse/` | PHP utilities, shared settings |
-| `antd-toolkit` | `../../packages/antd-toolkit/` | Shared React components |
-| `@power/eslint-config` | workspace | ESLint config |
-| `@power/tailwind-config` | workspace | Tailwind CSS config |
-| `@power/typescript-config` | workspace | TypeScript config |
 
 ---
 

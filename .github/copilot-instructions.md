@@ -15,7 +15,7 @@
 - **React Entry:** `js/src/main.tsx` → builds to `js/dist/`
 - **Text Domain:** `power-course`
 - **Required Plugins:** WooCommerce ≥ 7.6.0, Powerhouse ≥ 3.3.41
-- **Part of monorepo** `powerrepo` — sibling packages at `../powerhouse/` and `../../packages/antd-toolkit/`
+- **Depends on** sibling plugin `../powerhouse/`
 
 ---
 
@@ -371,7 +371,7 @@ REST namespace: `power-email`. Email triggers via `AtHelper` constants:
 ### Library Preference Order
 1. Reuse patterns from existing project code first
 2. `antd`, `@ant-design/pro-components`
-3. `antd-toolkit` (monorepo package at `../../packages/antd-toolkit/lib/`)
+3. `antd-toolkit`
 
 ### Rules
 - Strict TypeScript — no `any`; use `zod/v4` for runtime validation

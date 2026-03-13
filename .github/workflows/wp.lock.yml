@@ -332,7 +332,7 @@ jobs:
         with:
           node-version: "20"
       - name: Setup dependencies
-        run: "if [ ! -d \"../powerhouse\" ]; then\n  git clone --depth 1 https://github.com/j7-dev/wp-powerhouse.git ../powerhouse\n  cd ../powerhouse && composer install --no-interaction --prefer-dist\n  cd $GITHUB_WORKSPACE\nfi\ncomposer install --no-interaction --prefer-dist\necho \"$(pwd)/vendor/bin\" >> $GITHUB_PATH\nif [ ! -f \"../../pnpm-workspace.yaml\" ]; then\n  cat > pnpm-workspace.yaml << 'WSEOF'\npackages:\n  - \"packages/*\"\nWSEOF\nfi\npnpm install --no-frozen-lockfile\n"
+        run: "if [ ! -d \"../powerhouse\" ]; then\n  git clone --depth 1 https://github.com/j7-dev/wp-powerhouse.git ../powerhouse\n  cd ../powerhouse && composer install --no-interaction --prefer-dist\n  cd $GITHUB_WORKSPACE\nfi\ncomposer install --no-interaction --prefer-dist\necho \"$(pwd)/vendor/bin\" >> $GITHUB_PATH\npnpm install --no-frozen-lockfile\n"
 
       - name: Configure Git credentials
         env:

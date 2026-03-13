@@ -45,14 +45,5 @@ jobs:
       - name: Add vendor/bin to PATH
         run: echo "$(pwd)/vendor/bin" >> $GITHUB_PATH
 
-      - name: Setup pnpm workspace (standalone mode)
-        run: |
-          if [ ! -f "../../pnpm-workspace.yaml" ]; then
-            cat > pnpm-workspace.yaml << 'EOF'
-          packages:
-            - "packages/*"
-          EOF
-          fi
-
       - name: Install Node dependencies
         run: pnpm install --no-frozen-lockfile
