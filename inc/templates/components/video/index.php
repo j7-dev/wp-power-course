@@ -15,6 +15,7 @@ $default_args = [
 	'thumbnail_url'  => '',
 	'hide_watermark' => false,
 	'next_post_url'  => '',
+	'subtitles'      => [],
 ];
 
 /**
@@ -32,6 +33,7 @@ $args = \wp_parse_args( $args, $default_args );
 	'thumbnail_url' => $thumbnail_url,
 	'hide_watermark' => $hide_watermark,
 	'next_post_url'  => $next_post_url,
+	'subtitles'      => $subtitles,
 ] = $args;
 
 $video_type = $video_info['type'];
@@ -59,5 +61,6 @@ Plugin::load_template(
 		'thumbnail_url'  => $thumbnail_url,
 		'hide_watermark' => $hide_watermark,
 		'next_post_url'  => $next_post_url,
+		'subtitles'      => $subtitles,
 	]
 );
