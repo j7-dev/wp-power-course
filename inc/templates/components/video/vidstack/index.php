@@ -21,6 +21,7 @@ $default_args = [
 		'meta' => [],
 	],
 	'next_post_url'  => '',
+	'subtitles'      => [],
 ];
 
 /**
@@ -38,8 +39,10 @@ $args = wp_parse_args( $args, $default_args );
 	'hide_watermark'  => $hide_watermark,
 	'video_info'   => $video_info,
 	'next_post_url'  => $next_post_url,
+	'subtitles'      => $subtitles,
 ] = $args;
 /** @var string $next_post_url */
+/** @var array<int, array<string, mixed>> $subtitles */
 
 [
 	'id'   => $video_id,
@@ -82,6 +85,9 @@ if ($next_post_url) {
 	$next_post_url = \add_query_arg( 'autoplay', 'yes', $next_post_url );
 }
 
+$subtitles_json = \wp_json_encode( $subtitles );
+$subtitles_json = \is_string( $subtitles_json ) ? $subtitles_json : '[]';
+
 printf(
 /*html*/'
 <div class="pc-vidstack relative aspect-video %1$s !overflow-hidden"
@@ -93,6 +99,7 @@ printf(
 	data-watermark_interval="%7$s"
 	data-next_post_url="%8$s"
 	data-autoplay="%9$s"
+	data-subtitles="%10$s"
 >
 	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
 </div>
@@ -106,4 +113,5 @@ printf(
 	$watermark_interval,
 	(string) $next_post_url,
 	$autoplay,
+	\esc_attr( $subtitles_json ),
 );
