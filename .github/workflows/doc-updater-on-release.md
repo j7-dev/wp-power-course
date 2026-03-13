@@ -22,8 +22,6 @@ steps:
       tools: composer
       ini-values: memory_limit=4096M
   - uses: pnpm/action-setup@v4
-    with:
-      version: latest
   - uses: actions/setup-node@v4
     with:
       node-version: "20"

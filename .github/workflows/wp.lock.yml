@@ -326,8 +326,6 @@ jobs:
           php-version: "8.2"
           tools: composer
       - uses: pnpm/action-setup@90f659ecb4e9337ce0ccede6ef8e59e5bb6d4724 # v4
-        with:
-          version: latest
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "20"

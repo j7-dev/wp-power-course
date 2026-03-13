@@ -16,8 +16,6 @@ network:
     - node
 steps:
   - uses: pnpm/action-setup@v4
-    with:
-      version: latest
   - uses: actions/setup-node@v4
     with:
       node-version: "20"
