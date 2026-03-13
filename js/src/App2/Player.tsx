@@ -25,6 +25,11 @@ import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
 
+const getSubtitleType = (url: string): 'srt' | 'vtt' => {
+	const normalizedUrl = url.toLowerCase().split('?')[0]
+	return normalizedUrl.endsWith('.srt') ? 'srt' : 'vtt'
+}
+
 export type TPlayerProps = {
 	src: string
 	thumbnail_url: string
@@ -101,7 +106,7 @@ const index = ({
 							kind="subtitles"
 							label={track.label}
 							lang={track.srclang}
-							type="vtt"
+							type={getSubtitleType(track.url)}
 						/>
 					))}
 				</MediaProvider>
