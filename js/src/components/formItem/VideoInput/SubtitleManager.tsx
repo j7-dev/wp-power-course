@@ -1,8 +1,19 @@
-import { useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
-import { Button, Empty, List, Select, Space, Upload, UploadFile, message } from 'antd'
 import { useApiUrl, useCustom, useCustomMutation } from '@refinedev/core'
+import {
+	Button,
+	Empty,
+	List,
+	Select,
+	Space,
+	Upload,
+	UploadFile,
+	message,
+} from 'antd'
+import { useState } from 'react'
+
 import { PopconfirmDelete } from '@/components/general'
+
 import { TSubtitleTrack } from './types'
 
 type TSubtitleManagerProps = {
@@ -49,7 +60,7 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 	const subtitles = Array.isArray(payload) ? payload : payload?.data || []
 	const uploadedLangSet = new Set(subtitles.map((track) => track.srclang))
 	const availableLanguages = LANGUAGE_OPTIONS.filter(
-		(option) => !uploadedLangSet.has(option.value),
+		(option) => !uploadedLangSet.has(option.value)
 	)
 
 	if (!shouldRender) {
@@ -83,7 +94,7 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 				onError: () => {
 					message.error('字幕上傳失敗')
 				},
-			},
+			}
 		)
 	}
 
@@ -101,7 +112,7 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 				onError: () => {
 					message.error('字幕刪除失敗')
 				},
-			},
+			}
 		)
 	}
 
@@ -111,7 +122,12 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 			<List
 				loading={isLoading}
 				locale={{
-					emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="尚無字幕" />,
+					emptyText: (
+						<Empty
+							image={Empty.PRESENTED_IMAGE_SIMPLE}
+							description="尚無字幕"
+						/>
+					),
 				}}
 				dataSource={subtitles}
 				renderItem={(subtitle) => (
