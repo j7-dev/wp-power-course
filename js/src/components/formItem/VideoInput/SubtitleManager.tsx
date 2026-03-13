@@ -71,11 +71,6 @@ const SubtitleManager = ({ chapterId, videoType }: TSubtitleManagerProps) => {
 				url: `${apiUrl}/chapters/${chapterId}/subtitles`,
 				method: 'post',
 				values: formData,
-				config: {
-					headers: {
-						'Content-Type': 'multipart/form-data;',
-					},
-				},
 			},
 			{
 				onSuccess: () => {

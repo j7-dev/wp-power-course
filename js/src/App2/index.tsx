@@ -32,8 +32,8 @@ const parseSubtitles = (value?: string): TSubtitleTrack[] => {
 }
 
 function App2(dataset: TPlayerProps) {
-	const subtitles = parseSubtitles(dataset?.subtitles)
-	return <Player {...dataset} subtitles={subtitles} />
+	const parsedSubtitles = parseSubtitles(dataset?.subtitles)
+	return <Player {...dataset} subtitles={parsedSubtitles} />
 }
 
 export default App2

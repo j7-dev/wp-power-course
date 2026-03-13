@@ -31,6 +31,7 @@ export type TPlayerProps = {
 	watermark_interval: string
 	next_post_url: string
 	autoplay: 'yes' | 'no'
+	/** 原始 data-subtitles JSON 字串，會在 App2/index.tsx 先轉為 TSubtitleTrack[] */
 	subtitles: string
 }
 
