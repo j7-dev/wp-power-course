@@ -7,17 +7,20 @@ import {
 	Poster,
 	MediaPlayerInstance,
 	Track,
+
 	// useStore,
 } from '@vidstack/react'
-
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
-import { WaterMark } from '@/components/general'
+
 import { TSubtitleTrack } from '@/components/formItem/VideoInput/types'
+import { WaterMark } from '@/components/general'
+
 import Ended from './Ended'
+
 import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
@@ -31,6 +34,7 @@ export type TPlayerProps = {
 	watermark_interval: string
 	next_post_url: string
 	autoplay: 'yes' | 'no'
+
 	/** 原始 data-subtitles JSON 字串，會在 App2/index.tsx 先轉為 TSubtitleTrack[] */
 	subtitles: string
 }
@@ -52,6 +56,7 @@ const index = ({
 }: TParsedPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
+
 	// const playerRef = useRef<MediaPlayerInstance>(null)
 	// const { playing } = useStore(MediaPlayerInstance, playerRef)
 
