@@ -216,6 +216,7 @@ npx eslint src/ --ext .ts,.tsx
 
 - `/react-coding-standards`
 - `/refine`
+- `/vidstack`
 - `/git-commit`
 
 > 如果專案有定義額外的 Skills，請自行查找並善加利用。

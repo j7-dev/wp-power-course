@@ -158,6 +158,7 @@ Table chapters {
   parent_course_id integer      [not null, note: 'postmeta: parent_course_id，根課程 ID（任意巢狀深度皆有效）']
   menu_order       integer      [not null, default: 0, note: 'wp_posts.menu_order，排序鍵 ASC']
   chapter_video    json         [null, note: 'postmeta: chapter_video，schema: {type: video_type, id: string, meta: object}']
+  chapter_subtitles json        [null, note: 'postmeta: chapter_subtitles，schema: [{srclang: string, label: string, url: string, attachment_id: integer}]']
   chapter_length   integer      [not null, default: 0, note: 'postmeta: chapter_length（秒）']
   enable_comment   pc_yes_no    [not null, default: 'no', note: 'postmeta: enable_comment']
   editor           varchar(30)  [null, note: 'postmeta: editor — power-editor | elementor']
@@ -182,6 +183,13 @@ Table chapters {
   post_parent is polymorphic:
     - References courses.id  when the chapter is at top level
     - References chapters.id when the chapter is nested (sub-chapter)
+
+  Composite postmeta fields (stored as serialized arrays):
+    - chapter_video: {type, id, meta}
+    - chapter_subtitles: [{srclang, label, url, attachment_id}]
+      Each entry represents a subtitle track. SRT files are converted to WebVTT on upload.
+      attachment_id references wp_posts.ID (post_type="attachment") in WordPress media library.
+      srclang uses BCP-47 language codes (e.g. zh-TW, en, ja).
 
   Sorted by menu_order ASC. Admin UI is hidden in production
   (only visible when Plugin::$is_local === true).

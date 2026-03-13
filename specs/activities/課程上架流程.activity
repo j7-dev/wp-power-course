@@ -7,6 +7,10 @@
   [BRANCH:2a:需要子章節 -> 2] @管理員 {features/chapter/建立章節.feature}
   [BRANCH:2a:章節結構完成] @管理員 {features/chapter/排序章節.feature}
 [MERGE:2a]
+[DECISION:2b] 是否需要為章節上傳字幕
+  [BRANCH:2b:上傳字幕] @管理員 {features/chapter/上傳章節字幕.feature}
+  [BRANCH:2b:不需要字幕] @管理員 {features/chapter/排序章節.feature}
+[MERGE:2b]
 [STEP:3] @管理員 {features/chapter/排序章節.feature}
 [STEP:4] @管理員 {features/product/綁定課程到商品.feature}
 [DECISION:4a] 是否需要多元定價方案
