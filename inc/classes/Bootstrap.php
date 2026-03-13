@@ -27,6 +27,7 @@ final class Bootstrap {
 
 		Resources\Loader::instance();
 		Resources\Course\AutoGrant::instance();
+		Resources\Chapter\Subtitle\Api::instance();
 
 		Admin\Entry::instance();
 		Admin\Product::instance();
