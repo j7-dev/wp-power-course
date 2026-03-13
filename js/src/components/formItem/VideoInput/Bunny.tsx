@@ -2,6 +2,7 @@ import { Form, FormItemProps, Button } from 'antd'
 import { FC } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
 import { TVideo } from './types'
+import SubtitleManager from './SubtitleManager'
 import { useEnv } from '@/hooks'
 import { MediaLibraryModal, useMediaLibraryModal } from 'antd-toolkit/refine'
 
@@ -90,6 +91,12 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 						</div>
 					</div>
 				</div>
+			)}
+			{recordId && !isEmpty && (
+				<SubtitleManager
+					chapterId={String(recordId)}
+					videoType={savedVideo?.type || ''}
+				/>
 			)}
 		</div>
 	)

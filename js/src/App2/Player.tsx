@@ -6,6 +6,7 @@ import {
 	MediaProvider,
 	Poster,
 	MediaPlayerInstance,
+	Track,
 	// useStore,
 } from '@vidstack/react'
 
@@ -15,6 +16,7 @@ import {
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
 import { WaterMark } from '@/components/general'
+import { TSubtitleTrack } from '@/components/formItem/VideoInput/types'
 import Ended from './Ended'
 import { stringToBool } from 'antd-toolkit/wp'
 
@@ -29,6 +31,11 @@ export type TPlayerProps = {
 	watermark_interval: string
 	next_post_url: string
 	autoplay: 'yes' | 'no'
+	subtitles: string
+}
+
+type TParsedPlayerProps = Omit<TPlayerProps, 'subtitles'> & {
+	subtitles: TSubtitleTrack[]
 }
 
 const index = ({
@@ -40,7 +47,8 @@ const index = ({
 	watermark_interval,
 	next_post_url,
 	autoplay,
-}: TPlayerProps) => {
+	subtitles,
+}: TParsedPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
 	// const playerRef = useRef<MediaPlayerInstance>(null)
@@ -80,6 +88,16 @@ const index = ({
 			>
 				<MediaProvider>
 					<Poster className="vds-poster" />
+					{subtitles.map((track) => (
+						<Track
+							key={track.srclang}
+							src={track.url}
+							kind="subtitles"
+							label={track.label}
+							lang={track.srclang}
+							type="vtt"
+						/>
+					))}
 				</MediaProvider>
 				<DefaultAudioLayout
 					smallLayoutWhen={true}
