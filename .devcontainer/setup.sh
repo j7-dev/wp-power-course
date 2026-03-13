@@ -33,26 +33,8 @@ composer install --no-interaction
 
 # ---------- JS 依賴 ----------
 
-# 檢查是否在 monorepo 內（上兩層有 pnpm-workspace.yaml）
-MONOREPO_ROOT=$(dirname "$PARENT_DIR")
-
-if [ -f "$MONOREPO_ROOT/pnpm-workspace.yaml" ]; then
-  # monorepo 模式：從根目錄安裝
-  echo "→ Installing JS dependencies (monorepo mode)..."
-  cd "$MONOREPO_ROOT"
-  pnpm install
-else
-  # standalone 模式：建立本地 workspace 讓 workspace:* 依賴可解析
-  # power-course 的 packages/ 目錄已包含 eslint-config、typescript-config 等套件
-  echo "→ Creating pnpm-workspace.yaml for standalone mode..."
-  cat > "$WORKSPACE_DIR/pnpm-workspace.yaml" << 'EOF'
-packages:
-  - "packages/*"
-EOF
-
-  echo "→ Installing JS dependencies (standalone mode)..."
-  cd "$WORKSPACE_DIR"
-  pnpm install --no-frozen-lockfile
-fi
+echo "→ Installing JS dependencies..."
+cd "$WORKSPACE_DIR"
+pnpm install --no-frozen-lockfile
 
 echo "✓ Setup complete"

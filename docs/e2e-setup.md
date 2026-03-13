@@ -26,7 +26,7 @@
 
 ### 為什麼用 npm 而非 pnpm？
 
-Power Course 位於 `powerrepo` monorepo 中，使用 pnpm workspace。但 E2E 測試目錄 (`tests/e2e/`) 有獨立的 `package.json`，使用 npm 安裝以避免 Windows NTFS junction 權限問題。
+E2E 測試目錄 (`tests/e2e/`) 有獨立的 `package.json`，使用 npm 安裝以避免 Windows NTFS junction 權限問題。
 
 ---
 

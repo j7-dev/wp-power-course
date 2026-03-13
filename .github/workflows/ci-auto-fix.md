@@ -43,12 +43,6 @@ steps:
       fi
       composer install --no-interaction --prefer-dist
       echo "$(pwd)/vendor/bin" >> $GITHUB_PATH
-      if [ ! -f "../../pnpm-workspace.yaml" ]; then
-        cat > pnpm-workspace.yaml << 'WSEOF'
-      packages:
-        - "packages/*"
-      WSEOF
-      fi
       pnpm install --no-frozen-lockfile
 
 engine:
