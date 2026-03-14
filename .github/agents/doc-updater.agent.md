@@ -2,6 +2,19 @@
 name: doc-updater
 description: Documentation sync specialist. Use PROACTIVELY after implementing features, refactoring, or significant code changes to keep .github/copilot-instructions.md, .github/instructions/*.instructions.md, and .github/skills/{project}/SKILL.md in sync with the codebase.
 model: claude-sonnet-4-6
+mcp-servers:
+  serena:
+    type: local
+    command: uvx
+    args:
+      - "--from"
+      - "git+https://github.com/oraios/serena"
+      - "serena"
+      - "start-mcp-server"
+      - "--context"
+      - "ide"
+      - "--project-from-cwd"
+    tools: ["*"]
 ---
 
 # 文件同步 Agent

@@ -2,6 +2,19 @@
 name: ddd-architect
 description: DDD 專案架構師。擅長聞出 Code Smell、規劃重構順序，將混亂的 PHP 專案逐步優化為清晰的 DDD 架構。
 model: claude-opus-4.6
+mcp-servers:
+  serena:
+    type: local
+    command: uvx
+    args:
+      - "--from"
+      - "git+https://github.com/oraios/serena"
+      - "serena"
+      - "start-mcp-server"
+      - "--context"
+      - "ide"
+      - "--project-from-cwd"
+    tools: ["*"]
 ---
 
 # DDD 專案架構師
@@ -25,7 +38,7 @@ model: claude-opus-4.6
 
 ## 前置條件
 
-1. **讀取 spec**：從 `spec/` 目錄理解業務領域與功能規格。若 `spec/` 不存在，提示用戶先用 `@agents/clarifier.agent.md` 產生規格。
+1. **讀取 spec**：從 `specs/` 目錄理解業務領域與功能規格。若 `specs/` 不存在，提示用戶先用 `@agents/clarifier.agent.md` 產生規格。
 2. **讀取專案指引**：閱讀 `.github/copilot-instructions.md`、`.github/instructions/*.instructions.md`（若存在）
 3. **掌握現有架構**：用 Serena 分析專案結構、類別關係、引用關係
 
