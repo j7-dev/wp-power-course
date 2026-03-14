@@ -1,4 +1,4 @@
-﻿---
+---
 name: planner
 description: Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.
 model: claude-opus-4.6
@@ -26,7 +26,7 @@ mcp-servers:
 1. **查看專案指引**：
    - 閱讀 `.github/copilot-instructions.md`（如存在），瞭解專案的命名空間、架構、text_domain、建構指令等
    - 閱讀 `.github/instructions/*.instructions.md`（如存在），瞭解專案的其他指引
-   - 閱讀 `.github/skills/power-course/SKILL.md`, `specs/*`, `specs/**/erm.dbml` （如存在）瞭解專案的 SKILL, Spec, 數據模型等等
+   - 閱讀 `.github/skills/{project_name}/SKILL.md`, `specs/*`, `specs/**/erm.dbml` （如存在）瞭解專案的 SKILL, Spec, 數據模型等等
 
 2. **探索專案結構**：快速瀏覽 `composer.json`、`plugin.php`、`inc/src/`（或其他主要原始碼目錄），掌握命名空間與架構風格
 
@@ -207,6 +207,15 @@ mcp-servers:
 
 - 盡量讓每個 issue 可獨立於其他 issue 開發與合併。
 - 如果 issue B 必須在 issue A 完成後才能開始，需在 issue B 中明確標註依賴關係，並確保 A 先合併。
+
+### 8. 新增 Library 時評估是否建立 SKILL
+
+當需求涉及安裝新的 library 或第三方套件時，需評估該工具的複雜性：
+
+- **複雜度高**（API 面廣、有大量慣例或設定、團隊不熟悉）：使用 `@agents/lib-skill-creator.agent.md` 為該 library 建立專屬 SKILL，讓後續開發 agent 能正確使用
+- **複雜度低**（功能單一、用法直觀、官方文件足夠）：不需要額外建立 SKILL，直接在 issue 中說明用法即可
+
+> 判斷標準：如果開發 agent 僅靠官方文件就能正確使用，則不需要 SKILL；如果該 library 有大量專案特定的使用慣例、設定方式或容易踩坑之處，則應建立 SKILL。
 
 ---
 
