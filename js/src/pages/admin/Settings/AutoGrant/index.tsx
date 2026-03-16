@@ -1,6 +1,16 @@
-import { memo } from 'react'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Card, Form, Input, InputNumber, Select, Space } from 'antd'
+import {
+	Button,
+	Card,
+	Form,
+	Input,
+	InputNumber,
+	Select,
+	Space,
+	Alert,
+} from 'antd'
+import { memo } from 'react'
+
 import { DatePicker } from '@/components/formItem'
 import { useCourseSelect } from '@/hooks/useCourseSelect'
 
@@ -30,11 +40,13 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 	const form = Form.useFormInstance()
 	const limitType: TLimitType | undefined = Form.useWatch(
 		['auto_grant_courses', field.name, 'limit_type'],
-		form,
+		form
 	)
 
 	const { selectProps } = useCourseSelect({ selectProps: { mode: undefined } })
-	const courseSelectProps = (({ value, onChange, ...rest }) => rest)(selectProps)
+	const courseSelectProps = (({ value, onChange, ...rest }) => rest)(
+		selectProps
+	)
 
 	const handleLimitTypeChange = (value: TLimitType) => {
 		const basePath = ['auto_grant_courses', field.name]
@@ -73,7 +85,10 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 						name={[field.name, 'limit_type']}
 						initialValue="unlimited"
 					>
-						<Select options={LIMIT_TYPE_OPTIONS} onChange={handleLimitTypeChange} />
+						<Select
+							options={LIMIT_TYPE_OPTIONS}
+							onChange={handleLimitTypeChange}
+						/>
 					</Form.Item>
 
 					{'fixed' === limitType && (
@@ -105,7 +120,11 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 									rules: [{ required: true, message: '請選擇到期日' }],
 								}}
 							/>
-							<Form.Item name={[field.name, 'limit_unit']} initialValue="timestamp" hidden>
+							<Form.Item
+								name={[field.name, 'limit_unit']}
+								initialValue="timestamp"
+								hidden
+							>
 								<Input />
 							</Form.Item>
 						</>
@@ -113,8 +132,16 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 
 					{'unlimited' === limitType && (
 						<>
-							<Form.Item name={[field.name, 'limit_value']} initialValue="" hidden />
-							<Form.Item name={[field.name, 'limit_unit']} initialValue="" hidden />
+							<Form.Item
+								name={[field.name, 'limit_value']}
+								initialValue=""
+								hidden
+							/>
+							<Form.Item
+								name={[field.name, 'limit_unit']}
+								initialValue=""
+								hidden
+							/>
 						</>
 					)}
 				</div>
@@ -134,7 +161,13 @@ const AutoGrantRow = ({ field, onRemove }: TAutoGrantRowProps) => {
 
 const AutoGrant = () => {
 	return (
-		<div className="w-full max-w-[640px]">
+		<div className="w-full max-w-[400px]">
+			<Alert
+				className="mb-4"
+				message="用戶註冊後，可以自動獲的課程權限"
+				type="info"
+				showIcon
+			/>
 			<Form.List name={['auto_grant_courses']}>
 				{(fields, { add, remove }) => (
 					<>
@@ -144,7 +177,13 @@ const AutoGrant = () => {
 						<Button
 							type="dashed"
 							icon={<PlusOutlined />}
-							onClick={() => add({ limit_type: 'unlimited', limit_value: '', limit_unit: '' })}
+							onClick={() =>
+								add({
+									limit_type: 'unlimited',
+									limit_value: '',
+									limit_unit: '',
+								})
+							}
 						>
 							新增課程
 						</Button>
