@@ -37,8 +37,6 @@ $chapter_id = $chapter->ID;
 // @phpstan-ignore-next-line
 $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 
-/** @var array<int, array<string, mixed>> $chapter_subtitles */
-$chapter_subtitles = \get_post_meta( $chapter_id, 'chapter_subtitles', true ) ?: [];
 
 $next_post_id  = ChapterUtils::get_next_post_id( $chapter_id );
 $next_post_url = $next_post_id ? ( \get_permalink( $next_post_id ) ?: '' ) : '';
@@ -82,7 +80,6 @@ Plugin::load_template(
 		'video_info'    => $video_info,
 		'class'         => sprintf('rounded-none %s', $next_post_url ? 'has-next-post' : ''),
 		'next_post_url' => $next_post_url,
-		'subtitles'     => $chapter_subtitles,
 	]
 );
 echo '</div>';
