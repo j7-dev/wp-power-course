@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
-import { TableProps, Typography, Button, Progress, Switch, Tooltip } from 'antd'
-import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
-import { UserName } from '@/components/user'
-import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
-import { useSetAtom } from 'jotai'
-import { historyDrawerAtom } from '../atom'
 import { FieldTimeOutlined } from '@ant-design/icons'
 import { useParsed } from '@refinedev/core'
+import { TableProps, Typography, Button, Progress, Switch, Tooltip } from 'antd'
+import { useSetAtom } from 'jotai'
+import React, { useState } from 'react'
+
+import { WatchStatusTag, getWatchStatusTagTooltip } from '@/components/general'
+import { UserName } from '@/components/user'
+import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
+
+import { historyDrawerAtom } from '../atom'
 
 type TUseColumnsParams = {
 	onClick?: (_record: TUserRecord | undefined) => () => void
@@ -48,7 +50,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 					showAllCourses || !currentCourseId
 						? avl_courses
 						: avl_courses.filter(
-								(course) => String(course.id) === String(currentCourseId),
+								(course) => String(course.id) === String(currentCourseId)
 							)
 
 				return filtered_avl_courses.map(
@@ -136,7 +138,7 @@ const useColumns = (params?: TUseColumnsParams) => {
 								</span>
 							</div>
 						</div>
-					),
+					)
 				)
 			},
 		},

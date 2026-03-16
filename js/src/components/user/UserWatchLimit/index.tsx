@@ -1,7 +1,8 @@
-import { FC } from 'react'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import { Form } from 'antd'
 import { DateTime } from 'antd-toolkit'
+import { FC } from 'react'
+
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
 export const UserWatchLimit: FC<{
 	record: TUserRecord

@@ -3,7 +3,7 @@ import { TDataProvider } from '@/types'
 export const getTypeText = (
 	resource: string,
 	method: string,
-	statusText: string,
+	statusText: string
 ) => {
 	const getMethodText = (theMethod: string) => {
 		switch (theMethod) {

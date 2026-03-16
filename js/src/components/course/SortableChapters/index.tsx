@@ -1,9 +1,4 @@
-import { useState, useEffect, memo } from 'react'
 import { SortableTree, TreeData } from '@ant-design/pro-editor'
-import { TChapterRecord } from '@/pages/admin/Courses/List/types'
-import { Form, message, Button } from 'antd'
-import NodeRender from './NodeRender'
-import { chapterToTreeNode, treeToParams } from './utils'
 import {
 	useCustomMutation,
 	useApiUrl,
@@ -13,11 +8,18 @@ import {
 	useDeleteMany,
 	useParsed,
 } from '@refinedev/core'
+import { Form, message, Button } from 'antd'
+import { cn } from 'antd-toolkit'
 import { isEqual as _isEqual } from 'lodash-es'
+import { useState, useEffect, memo } from 'react'
+
 import { ChapterEdit } from '@/components/chapters'
 import { PopconfirmDelete } from '@/components/general'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
+
 import AddChapters from './AddChapters'
-import { cn } from 'antd-toolkit'
+import NodeRender from './NodeRender'
+import { chapterToTreeNode, treeToParams } from './utils'
 
 // 定義最大深度
 export const MAX_DEPTH = 2
@@ -81,7 +83,7 @@ const SortableChaptersComponent = () => {
 				// 恢復原本的 collapsed 狀態
 				const newChapterTree = restoreOriginCollapsedState(
 					chapterTree,
-					openedNodeIds,
+					openedNodeIds
 				)
 
 				return newChapterTree
@@ -98,7 +100,7 @@ const SortableChaptersComponent = () => {
 			}, [] as TChapterRecord[])
 
 			setSelectedChapter(
-				flattenChapters.find((c) => c.id === selectedChapter?.id) || null,
+				flattenChapters.find((c) => c.id === selectedChapter?.id) || null
 			)
 		}
 	}, [isListFetching])
@@ -144,12 +146,12 @@ const SortableChaptersComponent = () => {
 						invalidates: ['list'],
 					})
 				},
-			},
+			}
 		)
 	}
 
 	const [selectedChapter, setSelectedChapter] = useState<TChapterRecord | null>(
-		null,
+		null
 	)
 
 	const [selectedIds, setSelectedIds] = useState<string[]>([]) // 批次刪除選中的 ids
@@ -182,7 +184,7 @@ const SortableChaptersComponent = () => {
 									onSuccess: () => {
 										setSelectedIds([])
 									},
-								},
+								}
 							),
 					}}
 					buttonProps={{
@@ -198,7 +200,7 @@ const SortableChaptersComponent = () => {
 			<div
 				className={cn(
 					'grid grid-cols-1 xl:grid-cols-2 gap-6',
-					isSorting || isListFetching ? 'pointer-events-none' : '',
+					isSorting || isListFetching ? 'pointer-events-none' : ''
 				)}
 			>
 				{isListLoading && <LoadingChapters />}
@@ -247,7 +249,7 @@ export const SortableChapters = memo(SortableChaptersComponent)
  * 取得所有展開的 ids
  * 遞迴取得所有 collapsed = false 的 id
  * @param treeData 樹狀結構
- * @returns 所有 collapsed = false 的 id
+ * @return 所有 collapsed = false 的 id
  */
 function getOpenedNodeIds(treeData: TreeData<TChapterRecord>) {
 	// 遞迴取得所有 collapsed = false 的 id
@@ -261,17 +263,17 @@ function getOpenedNodeIds(treeData: TreeData<TChapterRecord>) {
 
 /**
  * 恢復原本的 collapsed 狀態
- * @param treeData 樹狀結構
+ * @param treeData      樹狀結構
  * @param openedNodeIds 展開的 ids
- * @returns newTreeData 恢復原本的 collapsed 狀態
+ * @return newTreeData 恢復原本的 collapsed 狀態
  */
 function restoreOriginCollapsedState(
 	treeData: TreeData<TChapterRecord>,
-	openedNodeIds: string[],
+	openedNodeIds: string[]
 ) {
 	// 遞迴恢復原本的 collapsed 狀態
 	const newTreeData: TreeData<TChapterRecord> = treeData?.map((item) => {
-		let newItem = item
+		const newItem = item
 		if (openedNodeIds.includes(item.id as string)) {
 			newItem.collapsed = false
 		}
@@ -279,7 +281,7 @@ function restoreOriginCollapsedState(
 		if (item?.children?.length) {
 			newItem.children = restoreOriginCollapsedState(
 				item.children,
-				openedNodeIds,
+				openedNodeIds
 			)
 		}
 		return item
@@ -290,8 +292,8 @@ function restoreOriginCollapsedState(
 /**
  * 取得樹狀結構的最大深度
  * @param treeData 樹狀結構
- * @param depth 當前深度
- * @returns 最大深度
+ * @param depth    當前深度
+ * @return 最大深度
  */
 function getMaxDepth(treeData: TreeData<TChapterRecord>, depth = 0) {
 	// 如果沒有資料，回傳當前深度

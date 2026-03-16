@@ -1,8 +1,9 @@
-import Table from '@/pages/admin/Emails/List/Table'
-import AsTable from '@/pages/admin/Emails/List/AsTable'
 import { List } from '@refinedev/antd'
 import { Tabs, Button } from 'antd'
+
 import { useEnv } from '@/hooks'
+import AsTable from '@/pages/admin/Emails/List/AsTable'
+import Table from '@/pages/admin/Emails/List/Table'
 
 const EmailsList = () => {
 	const { SITE_URL } = useEnv()

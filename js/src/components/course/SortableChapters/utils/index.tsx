@@ -1,4 +1,5 @@
 import { TreeData, TreeNode } from '@ant-design/pro-editor'
+
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
 
 /**
@@ -9,7 +10,7 @@ import { TChapterRecord } from '@/pages/admin/Courses/List/types'
  */
 
 export function chapterToTreeNode(
-	chapter: TChapterRecord,
+	chapter: TChapterRecord
 ): TreeNode<TChapterRecord> {
 	const { id, chapters, ...rest } = chapter
 	return {
@@ -52,12 +53,12 @@ export type TParam = {
 export function treeToParams(
 	treeData: TreeData<TChapterRecord>,
 	parentId: string,
-	depth: number = 0,
+	depth: number = 0
 ): TParam[] {
 	function getFlatArray(
 		_treeData: TreeData<TChapterRecord>,
 		_parentId: string,
-		_depth: number = 0,
+		_depth: number = 0
 	): TParam[] {
 		const flatArray = _treeData.reduce((acc, node, index) => {
 			acc.push({
@@ -75,7 +76,7 @@ export function treeToParams(
 				const childrenFlatArray = getFlatArray(
 					children,
 					node.id as string,
-					_depth + 1,
+					_depth + 1
 				)
 				acc.push(...childrenFlatArray)
 			}

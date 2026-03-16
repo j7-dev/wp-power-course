@@ -1,6 +1,7 @@
-import React, { memo } from 'react'
-import { Button, message, Form } from 'antd'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { Button, message, Form } from 'antd'
+import React, { memo } from 'react'
+
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const UpdateBoundCoursesComponent = ({
@@ -55,7 +56,7 @@ const UpdateBoundCoursesComponent = ({
 				onSettled: () => {
 					onSettled()
 				},
-			},
+			}
 		)
 	}
 

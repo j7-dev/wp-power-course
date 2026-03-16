@@ -1,10 +1,11 @@
-import { memo } from 'react'
 import { Form, Button, Tabs, TabsProps } from 'antd'
-import useSettings from './hooks/useSettings'
-import useSave from './hooks/useSave'
-import General from './General'
+import { memo } from 'react'
+
 import Appearance from './Appearance'
 import AutoGrant from './AutoGrant'
+import General from './General'
+import useSave from './hooks/useSave'
+import useSettings from './hooks/useSettings'
 
 const items: TabsProps['items'] = [
 	{

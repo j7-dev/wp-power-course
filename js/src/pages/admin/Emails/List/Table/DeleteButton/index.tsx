@@ -1,5 +1,6 @@
-import { memo } from 'react'
 import { useDeleteMany } from '@refinedev/core'
+import { memo } from 'react'
+
 import { PopconfirmDelete } from '@/components/general'
 
 const DeleteButton = ({
@@ -35,7 +36,7 @@ const DeleteButton = ({
 				onSuccess: () => {
 					setSelectedRowKeys([])
 				},
-			},
+			}
 		)
 	}
 

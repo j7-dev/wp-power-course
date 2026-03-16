@@ -1,16 +1,17 @@
-import React, { useState } from 'react'
 import { Tabs } from 'antd'
 import { stringToBool } from 'antd-toolkit/wp'
+import React, { useState } from 'react'
+
+import Condition from './Condition'
 import useSendCondition from './hooks'
 import Specific from './Specific'
-import Condition from './Condition'
 import Variables from './Variables'
 
 export const SendCondition = ({ email_ids }: { email_ids: string[] }) => {
 	const [activeKey, setActiveKey] = useState('condition')
 	const { data } = useSendCondition()
 	const enable_manual_send_email = stringToBool(
-		data?.data?.enable_manual_send_email || 'no',
+		data?.data?.enable_manual_send_email || 'no'
 	)
 
 	const items = [

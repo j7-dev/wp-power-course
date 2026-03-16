@@ -1,8 +1,9 @@
-import { Form, InputNumber, Select, Button, Alert } from 'antd'
 import { ExportOutlined } from '@ant-design/icons'
-import { FiSwitch as Switch } from '@/components/formItem'
+import { Form, InputNumber, Select, Button, Alert } from 'antd'
 import { useEnv } from 'antd-toolkit'
 import { PRODUCT_STOCK_STATUS, useWoocommerce } from 'antd-toolkit/wp'
+
+import { FiSwitch as Switch } from '@/components/formItem'
 
 const { Item } = Form
 

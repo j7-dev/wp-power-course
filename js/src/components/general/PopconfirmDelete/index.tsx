@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import { DeleteOutlined } from '@ant-design/icons'
 import {
 	Button,
 	Popconfirm,
@@ -7,7 +7,7 @@ import {
 	Tooltip,
 	TooltipProps,
 } from 'antd'
-import { DeleteOutlined } from '@ant-design/icons'
+import React, { FC } from 'react'
 
 type PopconfirmDeleteProps = {
 	popconfirmProps: Omit<PopconfirmProps, 'title'> & { title?: React.ReactNode }

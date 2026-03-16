@@ -1,9 +1,11 @@
+import { useParsed } from '@refinedev/core'
+import { Form } from 'antd'
 import React from 'react'
+
 import SimplePriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Simple'
 import SubscriptionPriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Subscription'
 import StockFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/StockFields'
-import { Form } from 'antd'
-import { useParsed } from '@refinedev/core'
+
 import { INCLUDED_PRODUCT_IDS_FIELD_NAME } from '../utils'
 
 const { Item } = Form
@@ -18,10 +20,10 @@ const ProductPriceFields = ({
 	const isSubscription = 'subscription' === watchProductType
 
 	const watchRegularPrice = Number(
-		Form.useWatch(['regular_price'], bundleProductForm),
+		Form.useWatch(['regular_price'], bundleProductForm)
 	)
 	const watchSalePrice = Number(
-		Form.useWatch(['sale_price'], bundleProductForm),
+		Form.useWatch(['sale_price'], bundleProductForm)
 	)
 
 	const { id: courseId } = useParsed()

@@ -1,10 +1,11 @@
-import { TFilterProps, TTerm } from '@/components/product/ProductTable/types'
 import { PaginationProps, TableProps, RadioGroupProps } from 'antd'
+
+import { TFilterProps, TTerm } from '@/components/product/ProductTable/types'
 
 export * from './onSearch'
 
 export const getFilterLabels = (
-	label = '商品',
+	label = '商品'
 ): {
 	[key in keyof TFilterProps]: string
 } => ({

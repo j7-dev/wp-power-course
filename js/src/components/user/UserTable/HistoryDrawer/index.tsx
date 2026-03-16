@@ -1,11 +1,13 @@
-import React, { useState, memo } from 'react'
+import { LoadingOutlined, UserOutlined } from '@ant-design/icons'
+import { useList } from '@refinedev/core'
 import { Drawer, Timeline, Empty, Pagination, PaginationProps } from 'antd'
 import { useAtom } from 'jotai'
+import React, { useState, memo } from 'react'
+
 import { historyDrawerAtom } from '../atom'
+
 import { TimelineItemAdapter } from './adapter'
 import { TimelineLogType, THistoryDrawerProps, TStudentLog } from './types'
-import { useList } from '@refinedev/core'
-import { LoadingOutlined, UserOutlined } from '@ant-design/icons'
 
 export const defaultHistoryDrawerProps: THistoryDrawerProps = {
 	user_id: undefined,
@@ -76,7 +78,7 @@ const index = () => {
 		return new TimelineItemAdapter(
 			log_type as TimelineLogType,
 			title,
-			created_at,
+			created_at
 		).itemProps
 	})
 

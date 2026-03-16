@@ -1,8 +1,9 @@
-import { memo } from 'react'
 import { Form, Input, InputNumber, ColorPicker, Alert, Select } from 'antd'
-import { Heading, SimpleImage } from '@/components/general'
 import { useWoocommerce } from 'antd-toolkit/wp'
+import { memo } from 'react'
+
 import cantPlayVideo from '@/assets/images/cant_play.jpg'
+import { Heading, SimpleImage } from '@/components/general'
 
 const { Item } = Form
 
@@ -22,7 +23,7 @@ const index = () => {
 				'refunded',
 				'failed',
 				'checkout-draft',
-			]?.includes(status?.value),
+			]?.includes(status?.value)
 	)
 
 	return (

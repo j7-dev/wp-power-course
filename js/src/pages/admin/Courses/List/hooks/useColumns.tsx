@@ -1,6 +1,9 @@
-import React from 'react'
+import { useNavigation } from '@refinedev/core'
 import { Table, TableProps, Tag } from 'antd'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
+import { DateTime } from 'antd-toolkit'
+import React from 'react'
+
+import { SecondToStr } from '@/components/general'
 import {
 	ProductName,
 	ProductPrice,
@@ -8,10 +11,8 @@ import {
 	ProductCat,
 	ProductAction,
 } from '@/components/product'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { getPostStatus } from '@/utils'
-import { DateTime } from 'antd-toolkit'
-import { SecondToStr } from '@/components/general'
-import { useNavigation } from '@refinedev/core'
 
 const useColumns = () => {
 	const { edit } = useNavigation()

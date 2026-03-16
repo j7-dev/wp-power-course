@@ -1,7 +1,8 @@
-import React, { memo } from 'react'
-import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { message } from 'antd'
+import React, { memo } from 'react'
+
+import { PopconfirmDelete } from '@/components/general'
 
 const RemoveCourseAccessComponent = ({
 	user_ids,
@@ -53,7 +54,7 @@ const RemoveCourseAccessComponent = ({
 				onSettled: () => {
 					onSettled()
 				},
-			},
+			}
 		)
 	}
 

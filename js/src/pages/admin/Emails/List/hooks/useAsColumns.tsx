@@ -1,10 +1,11 @@
-import React from 'react'
-import { Table, TableProps, Tag } from 'antd'
-import { TAsRecord } from '@/pages/admin/Emails/types'
 import { useNavigation } from '@refinedev/core'
-import { getASStatus } from '@/utils'
-import { ProductName } from '@/components/product'
+import { Table, TableProps, Tag } from 'antd'
 import { renderHTML } from 'antd-toolkit'
+import React from 'react'
+
+import { ProductName } from '@/components/product'
+import { TAsRecord } from '@/pages/admin/Emails/types'
+import { getASStatus } from '@/utils'
 
 const useAsColumns = () => {
 	const { edit } = useNavigation()

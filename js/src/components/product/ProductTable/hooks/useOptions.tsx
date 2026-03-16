@@ -1,7 +1,8 @@
-import React from 'react'
 import { useCustom, useApiUrl } from '@refinedev/core'
-import { TTerm } from '@/components/product/ProductTable/types'
 import { QueryObserverResult } from '@tanstack/react-query'
+import React from 'react'
+
+import { TTerm } from '@/components/product/ProductTable/types'
 
 type TOptions = {
 	product_cats: TTerm[]

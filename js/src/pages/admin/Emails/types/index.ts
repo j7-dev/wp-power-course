@@ -1,4 +1,5 @@
 import { IBlockData } from 'j7-easy-email-core'
+
 import {
 	TriggerAt,
 	TriggerCondition,

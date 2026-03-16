@@ -1,15 +1,16 @@
+import { useDelete } from '@refinedev/core'
+import { Tag } from 'antd'
+import { ProductName } from 'antd-toolkit/wp'
 import React, { memo } from 'react'
-import { TBundleProductRecord } from '@/components/product/ProductTable/types'
+
+import { DuplicateButton, PopconfirmDelete } from '@/components/general'
 import {
 	ProductPrice,
 	ProductTotalSales,
 	ProductBoundCourses,
 } from '@/components/product'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { getPostStatus, productTypes } from '@/utils'
-import { Tag } from 'antd'
-import { DuplicateButton, PopconfirmDelete } from '@/components/general'
-import { useDelete } from '@refinedev/core'
-import { ProductName } from 'antd-toolkit/wp'
 
 const ListItem = ({
 	record,

@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react'
-import { DatePicker, Button, Select, Form, Checkbox, Tooltip, Tag } from 'antd'
-import dayjs from 'dayjs'
-import { useSelect } from '@refinedev/antd'
-import { TProductSelectOption } from '@/components/product/ProductTable/types'
-import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
 import { AreaChartOutlined, LineChartOutlined } from '@ant-design/icons'
-import { EViewType } from '@/pages/admin/Analytics/types'
-import { RANGE_PRESETS, maxDateRange } from '@/pages/admin/Analytics/utils'
-import { productTypes } from '@/utils'
-import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
-import Tags from '@/pages/admin/Analytics/Filter/Tags'
+import { useSelect } from '@refinedev/antd'
+import { DatePicker, Button, Select, Form, Checkbox, Tooltip, Tag } from 'antd'
 import { defaultSelectProps } from 'antd-toolkit'
 import { objToCrudFilters } from 'antd-toolkit/refine'
+import dayjs from 'dayjs'
+import React, { useState, useEffect } from 'react'
+
+import { TProductSelectOption } from '@/components/product/ProductTable/types'
+import Tags from '@/pages/admin/Analytics/Filter/Tags'
+import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
+import { EViewType } from '@/pages/admin/Analytics/types'
+import { RANGE_PRESETS, maxDateRange } from '@/pages/admin/Analytics/utils'
+import { useRecord } from '@/pages/admin/Courses/Edit/hooks'
+import { productTypes } from '@/utils'
 
 const { RangePicker } = DatePicker
 const { Item } = Form
@@ -84,7 +85,7 @@ const index = () => {
 
 	useEffect(() => {
 		const selectedCourseProductOptions = (productSelectOptions?.filter(
-			(option) => watchProductIds?.includes(option?.id) && option?.is_course,
+			(option) => watchProductIds?.includes(option?.id) && option?.is_course
 		) || []) as TProductSelectOption[]
 		setSelectedCourseProducts(selectedCourseProductOptions)
 	}, [watchProductIds?.length, productSelectOptions?.length])
@@ -160,10 +161,10 @@ const index = () => {
 						placeholder="可多選，可搜尋關鍵字"
 						optionRender={({ value, label }) => {
 							const option = productSelectOptions.find(
-								(productOption) => productOption?.id === value,
+								(productOption) => productOption?.id === value
 							)
 							const productType = productTypes.find(
-								(pt) => pt?.value === option?.type,
+								(pt) => pt?.value === option?.type
 							)
 							return (
 								<span>

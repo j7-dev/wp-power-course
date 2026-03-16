@@ -1,12 +1,13 @@
-import { FC } from 'react'
 import {
 	Form,
 	DatePicker as AntdDatePicker,
 	DatePickerProps,
 	FormItemProps,
 } from 'antd'
-import { parseDatePickerValue } from '@/utils'
 import dayjs from 'dayjs'
+import { FC } from 'react'
+
+import { parseDatePickerValue } from '@/utils'
 
 const { Item } = Form
 

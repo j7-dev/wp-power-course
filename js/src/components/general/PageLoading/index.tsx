@@ -2,7 +2,7 @@ import { LoadingOutlined } from '@ant-design/icons'
 
 /**
  * 頁面載入中畫面
- * @returns
+ * @return
  */
 export const PageLoading = ({
 	type = 'empty',

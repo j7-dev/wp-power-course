@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { UseSelectProps, HttpError } from '@refinedev/core'
-
-import { TProductRecord } from '@/components/product/ProductTable/types'
 import { SelectProps } from 'antd'
 import { defaultSelectProps } from 'antd-toolkit'
+import React, { useState } from 'react'
+
+import { TProductRecord } from '@/components/product/ProductTable/types'
 
 type TUseProductSelectParams = {
 	selectProps?: SelectProps

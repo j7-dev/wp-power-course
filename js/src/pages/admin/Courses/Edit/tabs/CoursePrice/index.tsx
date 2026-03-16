@@ -1,4 +1,3 @@
-import React, { useEffect, memo } from 'react'
 import {
 	Form,
 	Input,
@@ -8,13 +7,14 @@ import {
 	FormProps,
 	FormInstance,
 } from 'antd'
-import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
-import { PRODUCT_TYPE_OPTIONS } from '@/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils'
-import SubscriptionPriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Subscription'
-import SimplePriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Simple'
-import StockFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/StockFields'
+import React, { useEffect, memo } from 'react'
 
+import { FiSwitch, DatePicker, WatchLimit } from '@/components/formItem'
 import { Heading } from '@/components/general'
+import { PRODUCT_TYPE_OPTIONS } from '@/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils'
+import SimplePriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Simple'
+import SubscriptionPriceFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/ProductPriceFields/Subscription'
+import StockFields from '@/pages/admin/Courses/Edit/tabs/CoursePrice/StockFields'
 
 const { Item } = Form
 

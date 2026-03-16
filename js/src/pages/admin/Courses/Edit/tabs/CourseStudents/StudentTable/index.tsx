@@ -1,24 +1,26 @@
-import React, { useState, memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
-import { Table, message, DatePicker, Space, Button, TableProps } from 'antd'
-import useColumns from '@/components/user/UserTable/hooks/useColumns'
-import { PopconfirmDelete } from '@/components/general'
 import {
 	useCustomMutation,
 	useApiUrl,
 	useInvalidate,
 	useParsed,
 } from '@refinedev/core'
+import { Table, message, DatePicker, Space, Button, TableProps } from 'antd'
+import { useRowSelection } from 'antd-toolkit'
 import { Dayjs } from 'dayjs'
+import React, { useState, memo } from 'react'
+
+import { PopconfirmDelete } from '@/components/general'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import AddOtherCourse from '../AddOtherCourse'
 import HistoryDrawer from '@/components/user/UserTable/HistoryDrawer'
-import { useRowSelection } from 'antd-toolkit'
+import useColumns from '@/components/user/UserTable/hooks/useColumns'
 import { useEnv } from '@/hooks'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
+
+import AddOtherCourse from '../AddOtherCourse'
 
 const StudentTable = () => {
 	const apiUrl = useApiUrl('power-course')
@@ -100,7 +102,7 @@ const StudentTable = () => {
 						key: 'remove-students',
 					})
 				},
-			},
+			}
 		)
 	}
 
@@ -143,7 +145,7 @@ const StudentTable = () => {
 						key: 'update-students',
 					})
 				},
-			},
+			}
 		)
 	}
 
@@ -151,7 +153,7 @@ const StudentTable = () => {
 	const handleExport = () => {
 		window.open(
 			`${apiUrl}/students/export/${courseId}?_wpnonce=${NONCE}`,
-			'_blank',
+			'_blank'
 		)
 	}
 

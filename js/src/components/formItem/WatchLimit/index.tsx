@@ -1,7 +1,8 @@
-import React, { useEffect, memo } from 'react'
-import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
-import { DatePicker } from '@/components/formItem'
 import { useLink } from '@refinedev/core'
+import { Form, Radio, Space, InputNumber, Select, Input, Alert } from 'antd'
+import React, { useEffect, memo } from 'react'
+
+import { DatePicker } from '@/components/formItem'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
@@ -10,7 +11,7 @@ const WatchLimitComponent = () => {
 	const form = Form.useFormInstance()
 	const watchLimitType: TCoursesLimit['limit_type'] = Form.useWatch(
 		['limit_type'],
-		form,
+		form
 	)
 
 	const handleReset = (value: string) => {

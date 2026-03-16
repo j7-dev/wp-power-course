@@ -1,6 +1,6 @@
-import React, { FC, memo } from 'react'
-import { Divider, Typography, TypographyProps, DividerProps } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
+import { Divider, Typography, TypographyProps, DividerProps } from 'antd'
+import React, { FC, memo } from 'react'
 
 const { Title } = Typography
 

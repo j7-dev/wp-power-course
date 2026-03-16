@@ -38,7 +38,7 @@ export const FileUpload = ({ uploadProps, buttonProps }: TFileUploadProps) => {
 		onChange(info) {
 			if (info.file.status === 'done') {
 				message.success(
-					`${info.file.name} 檔案上傳成功，上傳完成後會寄信通知管理員`,
+					`${info.file.name} 檔案上傳成功，上傳完成後會寄信通知管理員`
 				)
 			} else if (info.file.status === 'error') {
 				message.error(`${info.file.name} file upload failed.`)

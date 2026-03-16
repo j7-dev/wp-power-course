@@ -1,10 +1,11 @@
-import React from 'react'
-import { Table, TableProps, Tag } from 'antd'
-import { TEmailListRecord } from '@/pages/admin/Emails/types'
 import { useNavigation } from '@refinedev/core'
-import { getPostStatus } from '@/utils'
-import { ProductName } from '@/components/product'
+import { Table, TableProps, Tag } from 'antd'
+import React from 'react'
+
 import { DuplicateButton } from '@/components/general'
+import { ProductName } from '@/components/product'
+import { TEmailListRecord } from '@/pages/admin/Emails/types'
+import { getPostStatus } from '@/utils'
 
 const useColumns = () => {
 	const { edit } = useNavigation()

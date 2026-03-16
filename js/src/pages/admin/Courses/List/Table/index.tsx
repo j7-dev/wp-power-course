@@ -1,11 +1,14 @@
-import { memo } from 'react'
+import { PlusOutlined } from '@ant-design/icons'
 import { useTable } from '@refinedev/antd'
+import { HttpError, useCreate } from '@refinedev/core'
 import { Table, FormInstance, Spin, Button, TableProps, Card } from 'antd'
+import { useRowSelection } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
+import { memo } from 'react'
+
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
-import { HttpError, useCreate } from '@refinedev/core'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	onSearch,
@@ -13,13 +16,12 @@ import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { getInitialFilters, getIsVariation } from '@/utils'
-import useValueLabelMapper from '@/pages/admin/Courses/List/hooks/useValueLabelMapper'
 import useColumns from '@/pages/admin/Courses/List/hooks/useColumns'
-import { PlusOutlined } from '@ant-design/icons'
+import useValueLabelMapper from '@/pages/admin/Courses/List/hooks/useValueLabelMapper'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
+import { getInitialFilters, getIsVariation } from '@/utils'
+
 import DeleteButton from './DeleteButton'
-import { useRowSelection } from 'antd-toolkit'
-import { FilterTags } from 'antd-toolkit/refine'
 
 const Main = () => {
 	const { tableProps, searchFormProps } = useTable<

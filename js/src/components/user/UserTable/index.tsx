@@ -1,28 +1,31 @@
-import React, { memo, useEffect } from 'react'
 import { useTable, useModal } from '@refinedev/antd'
-import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
+import { HttpError } from '@refinedev/core'
 import { Table, TableProps, FormInstance, Button, Modal, CardProps } from 'antd'
-import useColumns from './hooks/useColumns'
+import { useRowSelection, Card } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
+import { useAtom } from 'jotai'
+import React, { memo, useEffect } from 'react'
+
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { useGCDItems } from '@/hooks'
 import {
 	GrantCourseAccess,
 	RemoveCourseAccess,
 	ModifyCourseExpireDate,
 } from '@/components/user'
-import Filter, { TFilterValues } from './Filter'
-import { HttpError } from '@refinedev/core'
-import { keyLabelMapper } from './utils'
-import CsvUpload from './CsvUpload'
+import { useGCDItems } from '@/hooks'
+import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
+
 import { selectedUserIdsAtom } from './atom'
-import { useAtom } from 'jotai'
+import CsvUpload from './CsvUpload'
+import Filter, { TFilterValues } from './Filter'
+import useColumns from './hooks/useColumns'
+
 import SelectedUser from './SelectedUser'
+import { keyLabelMapper } from './utils'
 import HistoryDrawer from './HistoryDrawer'
-import { useRowSelection, Card } from 'antd-toolkit'
-import { FilterTags } from 'antd-toolkit/refine'
 
 const UserTableComponent = ({
 	canGrantCourseAccess = false,
@@ -78,7 +81,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const setSelectedUserIdsNotInCurrentPage = selectedUserIds.filter(
-					(selectedUserId) => !currentAllKeys.includes(selectedUserId),
+					(selectedUserId) => !currentAllKeys.includes(selectedUserId)
 				)
 
 				/**
@@ -86,7 +89,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const currentSelectedRowKeysStringify = currentSelectedRowKeys.map(
-					(key) => key.toString(),
+					(key) => key.toString()
 				)
 
 				setSelectedUserIds(() => {

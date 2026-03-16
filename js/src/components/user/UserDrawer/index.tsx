@@ -1,5 +1,6 @@
-import { FC } from 'react'
 import { Drawer, DrawerProps, Form, Input } from 'antd'
+import { FC } from 'react'
+
 import { UserAvatarUpload } from '@/components/user'
 
 const { Item } = Form

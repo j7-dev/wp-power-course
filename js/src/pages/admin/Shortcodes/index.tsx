@@ -1,8 +1,8 @@
-import { memo } from 'react'
 import { Tabs, TabsProps } from 'antd'
+import { memo } from 'react'
 
-import General from './General'
 import Cart from './Cart'
+import General from './General'
 
 const items: TabsProps['items'] = [
 	{

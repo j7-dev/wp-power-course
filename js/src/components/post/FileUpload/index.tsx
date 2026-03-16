@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import ImgCrop from 'antd-img-crop'
-import { Upload, UploadProps, Form, UploadFile, GetProp } from 'antd'
 import { InboxOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Upload, UploadProps, Form, UploadFile, GetProp } from 'antd'
+import ImgCrop from 'antd-img-crop'
+import React, { useState, useEffect } from 'react'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 

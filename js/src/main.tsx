@@ -1,14 +1,16 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { APP1_SELECTOR, APP2_SELECTOR, env } from '@/utils'
 import { StyleProvider } from '@ant-design/cssinjs'
-import { TPlayerProps } from './App2/Player'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConfigProvider } from 'antd'
-import App1 from './App1'
-import App2 from './App2'
 import { EnvProvider } from 'antd-toolkit'
 import { BunnyProvider } from 'antd-toolkit/refine'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+
+import { APP1_SELECTOR, APP2_SELECTOR, env } from '@/utils'
+
+import App1 from './App1'
+import App2 from './App2'
+import { TPlayerProps } from './App2/Player'
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 								</BunnyProvider>
 							</EnvProvider>
 						</StyleProvider>
-					</QueryClientProvider>,
+					</QueryClientProvider>
 				)
 			})
 		}
@@ -76,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		ReactDOM.createRoot(vidstackNode).render(
 			<React.StrictMode>
 				<App2 {...dataset} />
-			</React.StrictMode>,
+			</React.StrictMode>
 		)
 	})
 })

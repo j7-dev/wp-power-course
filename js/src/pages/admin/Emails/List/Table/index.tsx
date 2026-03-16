@@ -1,16 +1,18 @@
-import { memo } from 'react'
+import { PlusOutlined } from '@ant-design/icons'
 import { useTable } from '@refinedev/antd'
+import { HttpError, useCreate } from '@refinedev/core'
 import { Table, Button, TableProps, Card } from 'antd'
 import { useRowSelection } from 'antd-toolkit'
-import { HttpError, useCreate } from '@refinedev/core'
-import { TEmailListRecord } from '@/pages/admin/Emails/types'
+import { memo } from 'react'
+
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
 import useColumns from '@/pages/admin/Emails/List/hooks/useColumns'
-import { PlusOutlined } from '@ant-design/icons'
+import { TEmailListRecord } from '@/pages/admin/Emails/types'
+
 import DeleteButton from './DeleteButton'
 const Main = () => {
 	const { tableProps } = useTable<TEmailListRecord, HttpError, TFilterProps>({

@@ -10,9 +10,11 @@ import {
 	CloseCircleOutlined,
 	CalendarOutlined,
 } from '@ant-design/icons'
-import { TimelineLogType, TimelineItemConfig } from '../types'
 import { TimelineItemProps } from 'antd'
+
 import { TriggerAt } from '@/components/emails/SendCondition/enum'
+
+import { TimelineLogType, TimelineItemConfig } from '../types'
 
 const timelineItemMapper: Record<TimelineLogType, TimelineItemConfig> = {
 	[TriggerAt.COURSE_GRANTED]: {
@@ -60,7 +62,7 @@ export class TimelineItemAdapter {
 	constructor(
 		public readonly log_type: TimelineLogType,
 		public readonly title: string,
-		public readonly created_at: string,
+		public readonly created_at: string
 	) {
 		this.validateLogType(log_type)
 	}

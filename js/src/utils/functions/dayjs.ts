@@ -11,7 +11,7 @@ import dayjs, { Dayjs } from 'dayjs'
 export function formatRangePickerValue(
 	values: unknown,
 	format = 'YYYY-MM-DD',
-	fallback = [],
+	fallback = []
 ) {
 	if (!Array.isArray(values)) {
 		return fallback
@@ -71,7 +71,7 @@ export function parseRangePickerValue(values: unknown) {
 export function formatDatePickerValue(
 	value: unknown,
 	format = 'YYYY-MM-DD',
-	fallback = '',
+	fallback = ''
 ) {
 	if (!(value instanceof dayjs)) {
 		return fallback
@@ -87,7 +87,7 @@ export function formatDatePickerValue(
  * @return {(Dayjs | undefined)} 格式化後的日期或未定義
  */
 export function parseDatePickerValue(value: unknown) {
-	try{
+	try {
 		if (value instanceof dayjs) {
 			return value
 		}
@@ -101,6 +101,7 @@ export function parseDatePickerValue(value: unknown) {
 			}
 			return undefined
 		}
+
 		// @ts-ignore
 		return dayjs(value)
 	} catch {

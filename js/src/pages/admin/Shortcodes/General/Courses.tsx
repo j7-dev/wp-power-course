@@ -1,4 +1,4 @@
-import { memo, useState } from 'react'
+import { useCustom, useApiUrl } from '@refinedev/core'
 import {
 	Typography,
 	Form,
@@ -9,15 +9,16 @@ import {
 	Checkbox,
 	Spin,
 } from 'antd'
+import { renderHTML, defaultSelectProps } from 'antd-toolkit'
+import { memo, useState } from 'react'
+
 import { Heading } from '@/components/general'
-import { useCourseSelect } from '@/hooks'
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
 import {
 	keyLabelMapper,
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
-import { useCustom, useApiUrl } from '@refinedev/core'
-import { renderHTML, defaultSelectProps } from 'antd-toolkit'
+import { useCourseSelect } from '@/hooks'
 
 const { Item } = Form
 const { Text } = Typography

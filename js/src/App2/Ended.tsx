@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
 import { PlayIcon } from '@vidstack/react/icons'
+import React, { useState, useEffect } from 'react'
 
 // 倒數幾秒
 const COUNTDOWN = 5
@@ -52,9 +52,9 @@ const Ended = ({ next_post_url }: { next_post_url: string }) => {
 							fill="none"
 							stroke="#ffffff"
 							strokeWidth="4"
-							stroke-linecap="butt"
-							stroke-dasharray="176"
-							stroke-dashoffset="176"
+							strokeLinecap="butt"
+							strokeDasharray="176"
+							strokeDashoffset="176"
 							transform="rotate(-90,32,32)"
 							style={{
 								animation: `circle-progress ${COUNTDOWN}s linear forwards`,

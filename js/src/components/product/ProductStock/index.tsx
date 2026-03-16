@@ -1,7 +1,3 @@
-import { FC } from 'react'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { TStockStatus } from '@/components/product/ProductTable/types'
-import { Tag } from 'antd'
 import {
 	FieldTimeOutlined,
 	QuestionCircleOutlined,
@@ -9,6 +5,11 @@ import {
 	CloseCircleFilled,
 	CheckCircleFilled,
 } from '@ant-design/icons'
+import { Tag } from 'antd'
+import { FC } from 'react'
+
+import { TStockStatus } from '@/components/product/ProductTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 type TProductStockProps = {
 	record: TCourseRecord
@@ -24,7 +25,7 @@ export const ProductStock: FC<TProductStockProps> = ({
 	const { label, color, Icon } = getTagProps(
 		stock_status,
 		stock_quantity,
-		low_stock_amount,
+		low_stock_amount
 	)
 
 	if (type === 'tag') {
@@ -48,7 +49,7 @@ export const ProductStock: FC<TProductStockProps> = ({
 function getTagProps(
 	stock_status: TStockStatus,
 	stock_quantity: number | null,
-	low_stock_amount: number | null,
+	low_stock_amount: number | null
 ) {
 	switch (stock_status) {
 		case 'instock':

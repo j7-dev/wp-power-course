@@ -1,6 +1,6 @@
-import React from 'react'
 import { Table, TableProps, Tag } from 'antd'
-import { TProductRecord } from '@/components/product/ProductTable/types'
+import React from 'react'
+
 import {
 	ProductName,
 	ProductPrice,
@@ -9,6 +9,7 @@ import {
 	ProductBoundCourses,
 	ProductType,
 } from '@/components/product'
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import { getPostStatus } from '@/utils'
 
 const useColumns = () => {

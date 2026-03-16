@@ -1,7 +1,7 @@
-import React, { useState, memo } from 'react'
+import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { Space, DatePicker, Button, message } from 'antd'
 import { Dayjs } from 'dayjs'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import React, { useState, memo } from 'react'
 
 const ModifyCourseExpireDateComponent = ({
 	user_ids,
@@ -54,7 +54,7 @@ const ModifyCourseExpireDateComponent = ({
 				onSettled: () => {
 					onSettled()
 				},
-			},
+			}
 		)
 	}
 

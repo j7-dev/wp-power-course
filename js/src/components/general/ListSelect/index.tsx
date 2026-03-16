@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
-import { List, Input } from 'antd'
 import { CheckOutlined } from '@ant-design/icons'
 import { BaseRecord } from '@refinedev/core'
-import { TListSelectProps } from './useListSelect'
-import { PopconfirmDelete } from '@/components/general'
+import { List, Input } from 'antd'
+import React, { useState } from 'react'
+
 import defaultImage from '@/assets/images/defaultImage.jpg'
+import { PopconfirmDelete } from '@/components/general'
+
+import { TListSelectProps } from './useListSelect'
 
 const { Search } = Input
 
@@ -52,7 +54,7 @@ export const ListSelect = <T extends BaseRecord>({
 							const { [rowKey]: key, [rowUrl]: url, [rowName]: name } = item
 							const isInclude = selectedItems?.some(
 								({ [rowKey]: theKey = '' }) =>
-									theKey === item?.[rowKey as keyof T],
+									theKey === item?.[rowKey as keyof T]
 							)
 							return (
 								<div
@@ -102,15 +104,15 @@ export const ListSelect = <T extends BaseRecord>({
 										onConfirm: () => {
 											setSelectedItems(
 												selectedItems?.filter(
-													({ [rowKey]: theKey }) => theKey !== key,
-												),
+													({ [rowKey]: theKey }) => theKey !== key
+												)
 											)
 										},
 									}}
 								/>
 							</div>
 						</div>
-					),
+					)
 				)}
 
 			{/* Loading */}

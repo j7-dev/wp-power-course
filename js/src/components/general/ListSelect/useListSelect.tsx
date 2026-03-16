@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import {
 	BaseRecord,
 	useList,
@@ -8,6 +7,7 @@ import {
 	GetListResponse,
 } from '@refinedev/core'
 import { UseQueryOptions, QueryKey } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 
 export type TListSelectProps<T> = {
 	loading: boolean
@@ -72,7 +72,7 @@ export const useListSelect = <T extends BaseRecord>({
 
 	const onListClick = (item: T) => () => {
 		const isInclude = selectedItems?.some(
-			(theItem) => theItem?.[rowKey as keyof T] === item?.[rowKey as keyof T],
+			(theItem) => theItem?.[rowKey as keyof T] === item?.[rowKey as keyof T]
 		)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
@@ -80,8 +80,8 @@ export const useListSelect = <T extends BaseRecord>({
 			setSelectedItems(
 				selectedItems.filter(
 					(theItem) =>
-						theItem?.[rowKey as keyof T] !== item?.[rowKey as keyof T],
-				),
+						theItem?.[rowKey as keyof T] !== item?.[rowKey as keyof T]
+				)
 			)
 		} else {
 			// 當前列表中沒有這個商品，所以要加入

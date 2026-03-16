@@ -1,6 +1,8 @@
 import { FormItemProps } from 'antd'
 import { FC } from 'react'
+
 import { getVimeoVideoId } from '@/utils'
+
 import Iframe from './Iframe'
 
 const Vimeo: FC<FormItemProps> = (formItemProps) => {

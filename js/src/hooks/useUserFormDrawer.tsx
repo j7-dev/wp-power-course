@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
-import { DrawerProps, Button, FormInstance, Popconfirm, Form } from 'antd'
 import { useCreate, useUpdate, useInvalidate } from '@refinedev/core'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
+import { DrawerProps, Button, FormInstance, Popconfirm, Form } from 'antd'
 import { toFormData } from 'antd-toolkit'
 import { isEqual } from 'lodash-es'
+import { useState, useEffect, useRef } from 'react'
+
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
 export function useUserFormDrawer({
 	form,
@@ -37,7 +38,7 @@ export function useUserFormDrawer({
 		// 與原本的值相比是否有變更
 		const newValues = form.getFieldsValue()
 		const fieldNames = Object.keys(newValues).filter(
-			(fieldName) => !['files'].includes(fieldName),
+			(fieldName) => !['files'].includes(fieldName)
 		)
 		const isEquals = fieldNames.every((fieldName) => {
 			const originValue = record?.[fieldName as keyof typeof record]
@@ -91,7 +92,7 @@ export function useUserFormDrawer({
 								invalidates: ['list'],
 							})
 						},
-					},
+					}
 				)
 			} else {
 				const formData = toFormData({
@@ -112,7 +113,7 @@ export function useUserFormDrawer({
 							}
 							setUnsavedChangesCheck(false)
 						},
-					},
+					}
 				)
 			}
 		})

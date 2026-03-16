@@ -1,9 +1,10 @@
-import { FC } from 'react'
 import { FormItemProps, Select, Form } from 'antd'
-import Youtube from './Youtube'
-import Vimeo from './Vimeo'
+import { FC } from 'react'
+
 import Bunny from './Bunny'
 import Code from './Code'
+import Vimeo from './Vimeo'
+import Youtube from './Youtube'
 
 const { Item } = Form
 

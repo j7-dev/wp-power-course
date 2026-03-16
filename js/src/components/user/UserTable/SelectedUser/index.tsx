@@ -1,5 +1,5 @@
-import React from 'react'
 import { Tooltip, Button } from 'antd'
+import React from 'react'
 
 const SelectedUser = ({
 	user_ids,

@@ -1,4 +1,4 @@
-import React from 'react'
+import type { RefineLayoutThemedTitleProps } from '@refinedev/antd'
 import {
 	useRouterContext,
 	useRouterType,
@@ -6,7 +6,7 @@ import {
 	useRefineOptions,
 } from '@refinedev/core'
 import { Typography, theme, Space } from 'antd'
-import type { RefineLayoutThemedTitleProps } from '@refinedev/antd'
+import React from 'react'
 
 export const ThemedTitleV2: React.FC<RefineLayoutThemedTitleProps> = ({
 	collapsed,
