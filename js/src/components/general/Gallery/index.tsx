@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+
 import defaultImage from '@/assets/images/defaultImage.jpg'
 
 export const Gallery: React.FC<{

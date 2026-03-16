@@ -1,28 +1,30 @@
-import React, { useState, memo, useEffect } from 'react'
-import { Form, Input, Tag, List, Select, Switch } from 'antd'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { TBundleProductRecord } from '@/components/product/ProductTable/types'
-import defaultImage from '@/assets/images/defaultImage.jpg'
-import { renderHTML } from 'antd-toolkit'
-import { PopconfirmDelete, Heading } from '@/components/general'
-import { FiSwitch } from '@/components/formItem'
 import {
 	CheckOutlined,
 	PlusOutlined,
 	ExclamationCircleOutlined,
 } from '@ant-design/icons'
+import { useList } from '@refinedev/core'
+import { Form, Input, Tag, List, Select, Switch } from 'antd'
+import { renderHTML } from 'antd-toolkit'
 import { useAtomValue, useAtom } from 'jotai'
+import React, { useState, memo, useEffect } from 'react'
+
+import defaultImage from '@/assets/images/defaultImage.jpg'
+import { FiSwitch } from '@/components/formItem'
+import { PopconfirmDelete, Heading } from '@/components/general'
+import { TBundleProductRecord } from '@/components/product/ProductTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import { productTypes } from '@/utils'
+
 import { courseAtom, selectedProductsAtom, bundleProductAtom } from './atom'
+import Gallery from './Gallery'
+import ProductPriceFields from './ProductPriceFields'
 import {
 	BUNDLE_TYPE_OPTIONS,
 	INCLUDED_PRODUCT_IDS_FIELD_NAME,
 	PRODUCT_TYPE_OPTIONS,
 	getPrice,
 } from './utils'
-import { useList } from '@refinedev/core'
-import ProductPriceFields from './ProductPriceFields'
-import { productTypes } from '@/utils'
-import Gallery from './Gallery'
 
 const { Search } = Input
 const { Item } = Form
@@ -98,7 +100,7 @@ const BundleForm = () => {
 			// 當前列表中已經有這個商品，所以要移除
 
 			setSelectedProducts(
-				selectedProducts.filter(({ id }) => id !== product.id),
+				selectedProducts.filter(({ id }) => id !== product.id)
 			)
 		} else {
 			// 當前列表中沒有這個商品，所以要加入
@@ -149,7 +151,7 @@ const BundleForm = () => {
 				]
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
-			productIds,
+			productIds
 		)
 
 		bundleProductForm.setFieldValue(
@@ -159,7 +161,7 @@ const BundleForm = () => {
 				products: selectedProducts,
 				course,
 				excludeMainCourse: watchExcludeMainCourse,
-			}),
+			})
 		)
 	}, [selectedProducts.length, watchExcludeMainCourse])
 
@@ -282,10 +284,10 @@ const BundleForm = () => {
 							renderItem={(product) => {
 								const { id, images, name, price_html } = product
 								const isInclude = selectedProducts?.some(
-									({ id: theId }) => theId === product.id,
+									({ id: theId }) => theId === product.id
 								)
 								const tag = productTypes.find(
-									(productType) => productType.value === product.type,
+									(productType) => productType.value === product.type
 								)
 								return (
 									<div
@@ -321,7 +323,7 @@ const BundleForm = () => {
 				{!initIsFetching &&
 					selectedProducts?.map(({ id, images, name, price_html, type }) => {
 						const tag = productTypes.find(
-							(productType) => productType.value === type,
+							(productType) => productType.value === type
 						)
 
 						return (
@@ -349,8 +351,8 @@ const BundleForm = () => {
 											onConfirm: () => {
 												setSelectedProducts(
 													selectedProducts?.filter(
-														({ id: productId }) => productId !== id,
-													),
+														({ id: productId }) => productId !== id
+													)
 												)
 											},
 										}}

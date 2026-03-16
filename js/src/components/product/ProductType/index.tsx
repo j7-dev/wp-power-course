@@ -1,13 +1,14 @@
-import React, { FC, memo } from 'react'
-import { TProductRecord } from '@/components/product/ProductTable/types'
-import { Tag, Tooltip } from 'antd'
 import {
 	StarFilled,
 	StarOutlined,
 	CloudOutlined,
 	CloudFilled,
 } from '@ant-design/icons'
+import { Tag, Tooltip } from 'antd'
+import React, { FC, memo } from 'react'
 import { IoMdDownload } from 'react-icons/io'
+
+import { TProductRecord } from '@/components/product/ProductTable/types'
 import { productTypes, getBundleType } from '@/utils'
 
 const ProductTypeComponent: FC<{

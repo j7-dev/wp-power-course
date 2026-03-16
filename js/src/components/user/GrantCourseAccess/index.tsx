@@ -1,7 +1,8 @@
-import React, { memo, useState } from 'react'
+import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { Select, Button, Space, DatePicker, message } from 'antd'
 import { Dayjs } from 'dayjs'
-import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import React, { memo, useState } from 'react'
+
 import { useCourseSelect } from '@/hooks'
 
 const GrantCourseAccessComponent = ({
@@ -57,7 +58,7 @@ const GrantCourseAccessComponent = ({
 						key: 'add-students',
 					})
 				},
-			},
+			}
 		)
 	}
 

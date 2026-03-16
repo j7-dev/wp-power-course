@@ -1,4 +1,13 @@
-import React, { useContext } from 'react'
+import {
+	DashboardOutlined,
+	LogoutOutlined,
+	UnorderedListOutlined,
+	BarsOutlined,
+	LeftOutlined,
+	RightOutlined,
+} from '@ant-design/icons'
+import { ThemedTitleV2, useThemedLayoutContext } from '@refinedev/antd'
+import type { RefineThemedLayoutV2SiderProps } from '@refinedev/antd'
 import {
 	useTranslate,
 	useLogout,
@@ -13,15 +22,6 @@ import {
 	pickNotDeprecated,
 	useWarnAboutChange,
 } from '@refinedev/core'
-import { ThemedTitleV2, useThemedLayoutContext } from '@refinedev/antd'
-import {
-	DashboardOutlined,
-	LogoutOutlined,
-	UnorderedListOutlined,
-	BarsOutlined,
-	LeftOutlined,
-	RightOutlined,
-} from '@ant-design/icons'
 import {
 	Layout,
 	Menu,
@@ -32,7 +32,7 @@ import {
 	ConfigProvider,
 	Divider,
 } from 'antd'
-import type { RefineThemedLayoutV2SiderProps } from '@refinedev/antd'
+import React, { useContext } from 'react'
 import type { CSSProperties } from 'react'
 import { FaBook } from 'react-icons/fa'
 
@@ -151,8 +151,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 			const confirm = window.confirm(
 				translate(
 					'warnWhenUnsavedChanges',
-					'Are you sure you want to leave? You have unsaved changes.',
-				),
+					'Are you sure you want to leave? You have unsaved changes.'
+				)
 			)
 
 			if (confirm) {

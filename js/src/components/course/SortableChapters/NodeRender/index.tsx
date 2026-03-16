@@ -1,15 +1,16 @@
-import { FC } from 'react'
-import { TChapterRecord } from '@/pages/admin/Courses/List/types'
-import { getPostStatus } from '@/utils'
 import { FlattenNode, useSortableTree } from '@ant-design/pro-editor'
+import { Checkbox, CheckboxProps } from 'antd'
+import { flatMapDeep } from 'lodash-es'
+import { FC } from 'react'
+
 import { ChapterName } from '@/components/course'
 import {
 	SecondToStr,
 	DuplicateButton,
 	PopconfirmDelete,
 } from '@/components/general'
-import { Checkbox, CheckboxProps } from 'antd'
-import { flatMapDeep } from 'lodash-es'
+import { TChapterRecord } from '@/pages/admin/Courses/List/types'
+import { getPostStatus } from '@/utils'
 
 const NodeRender: FC<{
 	node: FlattenNode<TChapterRecord>
@@ -37,12 +38,12 @@ const NodeRender: FC<{
 	}
 
 	const getFlattenChildrenIds = (
-		_node: FlattenNode<TChapterRecord>,
+		_node: FlattenNode<TChapterRecord>
 	): string[] => {
 		return flatMapDeep([_node], (__node: FlattenNode<TChapterRecord>) => [
 			__node?.id as string,
 			...__node?.children?.map((child) =>
-				getFlattenChildrenIds(child as FlattenNode<TChapterRecord>),
+				getFlattenChildrenIds(child as FlattenNode<TChapterRecord>)
 			),
 		])
 	}
@@ -53,7 +54,7 @@ const NodeRender: FC<{
 			setSelectedIds((prev) => [...prev, ...flattenChildrenIds])
 		} else {
 			setSelectedIds((prev) =>
-				prev.filter((id) => !flattenChildrenIds.includes(id)),
+				prev.filter((id) => !flattenChildrenIds.includes(id))
 			)
 		}
 	}

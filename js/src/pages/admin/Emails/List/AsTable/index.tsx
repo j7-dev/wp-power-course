@@ -1,14 +1,15 @@
-import { memo } from 'react'
 import { useTable } from '@refinedev/antd'
-import { Table, TableProps, Card } from 'antd'
 import { HttpError } from '@refinedev/core'
-import { TAsRecord } from '@/pages/admin/Emails/types'
+import { Table, TableProps, Card } from 'antd'
+import { memo } from 'react'
+
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
 import useAsColumns from '@/pages/admin/Emails/List/hooks/useAsColumns'
+import { TAsRecord } from '@/pages/admin/Emails/types'
 
 /**
  * TODO Action Scheduler 紀錄

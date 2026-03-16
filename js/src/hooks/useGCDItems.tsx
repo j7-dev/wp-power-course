@@ -1,6 +1,7 @@
-import React, { useState, useEffect, FC } from 'react'
 import { CheckCircleOutlined } from '@ant-design/icons'
 import { Tag } from 'antd'
+import React, { useState, useEffect, FC } from 'react'
+
 import { getGCDItems } from '@/utils'
 
 export function useGCDItems<T>({
@@ -31,7 +32,7 @@ export function useGCDItems<T>({
 					onClick={() => {
 						if (isSelected) {
 							setSelectedGCDs(
-								selectedGCDs.filter((id) => id !== item?.[key as keyof T]),
+								selectedGCDs.filter((id) => id !== item?.[key as keyof T])
 							)
 						} else {
 							setSelectedGCDs([

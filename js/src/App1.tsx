@@ -1,25 +1,25 @@
 /* eslint-disable quote-props */
-import React, { lazy, Suspense } from 'react'
-import { Refine } from '@refinedev/core'
 import { ErrorComponent } from '@refinedev/antd'
+import { Refine } from '@refinedev/core'
 import routerBindings, {
 	UnsavedChangesNotifier,
 	NavigateToResource,
 } from '@refinedev/react-router'
-import { HashRouter, Outlet, Route, Routes } from 'react-router'
-import { resources } from '@/resources'
-import { ConfigProvider } from 'antd'
-
-import { PageLoading } from '@/components/general'
-import { ThemedLayoutV2, ThemedSiderV2 } from '@/components/layout'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { useEnv } from '@/hooks'
+import { ConfigProvider } from 'antd'
 import {
 	dataProvider,
 	notificationProvider,
 	useBunny,
 	MediaLibraryNotification,
 } from 'antd-toolkit/refine'
+import React, { lazy, Suspense } from 'react'
+import { HashRouter, Outlet, Route, Routes } from 'react-router'
+
+import { PageLoading } from '@/components/general'
+import { ThemedLayoutV2, ThemedSiderV2 } from '@/components/layout'
+import { useEnv } from '@/hooks'
+import { resources } from '@/resources'
 
 const Analytics = lazy(() => import('@/pages/admin/Analytics'))
 const CoursesList = lazy(() => import('@/pages/admin/Courses/List'))
@@ -32,7 +32,7 @@ const Shortcodes = lazy(() => import('@/pages/admin/Shortcodes'))
 const EmailsList = lazy(() => import('@/pages/admin/Emails/List'))
 const EmailsEdit = lazy(() => import('@/pages/admin/Emails/Edit'))
 const BunnyMediaLibraryPage = lazy(
-	() => import('@/pages/admin/BunnyMediaLibraryPage'),
+	() => import('@/pages/admin/BunnyMediaLibraryPage')
 )
 const MediaLibraryPage = lazy(() => import('@/pages/admin/MediaLibraryPage'))
 
@@ -41,21 +41,30 @@ function App() {
 	const { KEBAB, API_URL, AXIOS_INSTANCE } = useEnv()
 
 	return (
-		<div className='overflow-x-auto'>
+		<div className="overflow-x-auto">
 			<div className="w-[1200px] xl:w-full">
 				<HashRouter>
 					<Refine
 						dataProvider={{
 							default: dataProvider(`${API_URL}/v2/powerhouse`, AXIOS_INSTANCE),
-							'power-email': dataProvider(`${API_URL}/power-email`, AXIOS_INSTANCE),
-							'power-course': dataProvider(`${API_URL}/${KEBAB}`, AXIOS_INSTANCE),
+							'power-email': dataProvider(
+								`${API_URL}/power-email`,
+								AXIOS_INSTANCE
+							),
+							'power-course': dataProvider(
+								`${API_URL}/${KEBAB}`,
+								AXIOS_INSTANCE
+							),
 							'wc-analytics': dataProvider(
 								`${API_URL}/wc-analytics`,
-								AXIOS_INSTANCE,
+								AXIOS_INSTANCE
 							),
 							'wp-rest': dataProvider(`${API_URL}/wp/v2`, AXIOS_INSTANCE),
 							'wc-rest': dataProvider(`${API_URL}/wc/v3`, AXIOS_INSTANCE),
-							'wc-store': dataProvider(`${API_URL}/wc/store/v1`, AXIOS_INSTANCE),
+							'wc-store': dataProvider(
+								`${API_URL}/wc/store/v1`,
+								AXIOS_INSTANCE
+							),
 							'bunny-stream': bunny_data_provider_result,
 						}}
 						notificationProvider={notificationProvider}
@@ -102,7 +111,10 @@ function App() {
 									</ConfigProvider>
 								}
 							>
-								<Route index element={<NavigateToResource resource="courses" />} />
+								<Route
+									index
+									element={<NavigateToResource resource="courses" />}
+								/>
 								<Route path="courses">
 									<Route
 										index

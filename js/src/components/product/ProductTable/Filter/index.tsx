@@ -1,7 +1,9 @@
-import React, { FC, memo } from 'react'
-import { FormProps } from 'antd'
-import { TUseOptionsParams } from '@/components/product/ProductTable/hooks/useOptions'
 import { useWindowSize } from '@uidotdev/usehooks'
+import { FormProps } from 'antd'
+import React, { FC, memo } from 'react'
+
+import { TUseOptionsParams } from '@/components/product/ProductTable/hooks/useOptions'
+
 import FullFilter from './FullFilter'
 import MobileFilter from './MobileFilter'
 

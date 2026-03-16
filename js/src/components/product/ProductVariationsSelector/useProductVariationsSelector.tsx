@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { TProductVariationsSelectorParams } from './index'
+
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+
+import { TProductVariationsSelectorParams } from './index'
 
 type TProductVariationsSelectorProps = Omit<
 	TProductVariationsSelectorParams,
@@ -12,7 +14,7 @@ type TUseProductVariationsSelector = (record: TCourseRecord) => {
 }
 
 export const useProductVariationsSelector: TUseProductVariationsSelector = (
-	record,
+	record
 ) => {
 	const [selectedAttributes, setSelectedAttributes] = useState<
 		{ name: string; value: string }[]

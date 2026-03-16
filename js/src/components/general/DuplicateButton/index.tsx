@@ -1,12 +1,12 @@
-import { FC, memo } from 'react'
 import { CopyOutlined } from '@ant-design/icons'
-import { Button, Tooltip, TooltipProps } from 'antd'
 import {
 	useCustomMutation,
 	useApiUrl,
 	useInvalidate,
 	UseInvalidateProp,
 } from '@refinedev/core'
+import { Button, Tooltip, TooltipProps } from 'antd'
+import { FC, memo } from 'react'
 
 const DuplicateButtonComponent: FC<{
 	id: string
@@ -32,7 +32,7 @@ const DuplicateButtonComponent: FC<{
 						...invalidateProps,
 					})
 				},
-			},
+			}
 		)
 	}
 

@@ -1,7 +1,8 @@
-import React from 'react'
 import { TableProps } from 'antd'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
+import React from 'react'
+
 import { UserName } from '@/components/user'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
 const useColumns = ({
 	onClick: show,

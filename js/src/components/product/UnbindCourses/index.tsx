@@ -1,7 +1,8 @@
-import React, { memo } from 'react'
-import { PopconfirmDelete } from '@/components/general'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
 import { message } from 'antd'
+import React, { memo } from 'react'
+
+import { PopconfirmDelete } from '@/components/general'
 
 const UnbindCoursesComponent = ({
 	product_ids,
@@ -54,7 +55,7 @@ const UnbindCoursesComponent = ({
 				onSettled: () => {
 					onSettled()
 				},
-			},
+			}
 		)
 	}
 

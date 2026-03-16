@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
 import { useSelect } from '@refinedev/antd'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { SelectProps } from 'antd'
 import { defaultSelectProps } from 'antd-toolkit'
+import React, { useState } from 'react'
+
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 type TUseCourseSelectParams = {
 	selectProps?: SelectProps

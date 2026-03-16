@@ -1,5 +1,3 @@
-import React, { useRef, memo, useState } from 'react'
-import { Button, Empty, message } from 'antd'
 import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import { RenderItem } from '@ant-design/pro-editor/es/SortableList/type'
 import {
@@ -10,11 +8,15 @@ import {
 	useCustomMutation,
 	useApiUrl,
 } from '@refinedev/core'
+import { Button, Empty, message } from 'antd'
+import { toFormData } from 'antd-toolkit'
+import React, { useRef, memo, useState } from 'react'
+
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import ListItem from './ListItem'
-import { toFormData } from 'antd-toolkit'
+
 import { EditBundle } from './Edit'
+import ListItem from './ListItem'
 
 export type TRenderItemOptions = Parameters<RenderItem<TBundleProductRecord>>[1]
 
@@ -151,7 +153,7 @@ const CourseBundlesComponent = () => {
 												key: 'bundle-sorting',
 											})
 										},
-									},
+									}
 								)
 							}}
 							getItemStyles={() => ({

@@ -1,9 +1,10 @@
-import React, { FC, memo } from 'react'
 import { useSelect } from '@refinedev/antd'
 import { Form, Select, FormItemProps, SelectProps } from 'antd'
+import { defaultSelectProps } from 'antd-toolkit'
+import React, { FC, memo } from 'react'
+
 import { TFilterProps, TTerm } from '@/components/product/ProductTable/types'
 import { keyLabelMapper } from '@/components/product/ProductTable/utils'
-import { defaultSelectProps } from 'antd-toolkit'
 
 const { Item } = Form
 

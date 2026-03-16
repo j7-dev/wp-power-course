@@ -1,22 +1,23 @@
-import { memo, useEffect, useState } from 'react'
 import { Form, Input, Select, FormProps, FormInstance } from 'antd'
-import {
-	keyLabelMapper,
-	termToOptions,
-} from '@/components/product/ProductTable/utils'
-import useOptions from '@/components/product/ProductTable/hooks/useOptions'
-import { Heading, ListSelect, useListSelect } from '@/components/general'
-import { FiSwitch, VideoInput } from '@/components/formItem'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
-import { FileUpload } from '@/components/post'
-import { useParseData, useRecord } from '@/pages/admin/Courses/Edit/hooks'
-import { useEnv } from '@/hooks'
 import {
 	CopyText,
 	DescriptionDrawer,
 	defaultSelectProps,
 	BlockNoteDrawer,
 } from 'antd-toolkit'
+import { memo, useEffect, useState } from 'react'
+
+import { FiSwitch, VideoInput } from '@/components/formItem'
+import { Heading, ListSelect, useListSelect } from '@/components/general'
+import { FileUpload } from '@/components/post'
+import useOptions from '@/components/product/ProductTable/hooks/useOptions'
+import {
+	keyLabelMapper,
+	termToOptions,
+} from '@/components/product/ProductTable/utils'
+import { useEnv } from '@/hooks'
+import { useParseData, useRecord } from '@/pages/admin/Courses/Edit/hooks'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
 
@@ -52,7 +53,7 @@ const CourseDescriptionComponent = ({
 	useEffect(() => {
 		form.setFieldValue(
 			['teacher_ids'],
-			selectedTeachers.map((item) => item.id),
+			selectedTeachers.map((item) => item.id)
 		)
 	}, [selectedTeachers.length])
 

@@ -1,6 +1,7 @@
-import React, { memo } from 'react'
-import { Select, Button, Space, message, Form } from 'antd'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { Select, Button, Space, message, Form } from 'antd'
+import React, { memo } from 'react'
+
 import { useCourseSelect } from '@/hooks'
 import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
@@ -53,7 +54,7 @@ const BindCoursesComponent = ({
 						key: 'bind-courses',
 					})
 				},
-			},
+			}
 		)
 	}
 

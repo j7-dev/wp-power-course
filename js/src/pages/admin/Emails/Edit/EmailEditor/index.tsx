@@ -1,13 +1,14 @@
-import React, { memo, lazy, Suspense } from 'react'
-import { BlockManager, BasicType, IBlockData } from 'j7-easy-email-core'
-import type { FormApi, FormState } from 'final-form'
-import { useApiUrl, HttpError } from '@refinedev/core'
 import type { UseFormReturnType } from '@refinedev/antd'
-import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
+import { useApiUrl, HttpError } from '@refinedev/core'
 import type { FormInstance } from 'antd'
-import parseJson from 'parse-json'
+import type { FormApi, FormState } from 'final-form'
+import { BlockManager, BasicType, IBlockData } from 'j7-easy-email-core'
 import { IEmailTemplate } from 'j7-easy-email-editor'
+import parseJson from 'parse-json'
+import React, { memo, lazy, Suspense } from 'react'
+
 import { useEnv } from '@/hooks'
+import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
 
 const EmailEditor = lazy(() =>
 	Promise.all([
@@ -19,19 +20,19 @@ const EmailEditor = lazy(() =>
 		import('@arco-themes/react-easy-email-theme/css/arco.css'),
 	]).then(([module]) => ({
 		default: module.EmailEditor,
-	})),
+	}))
 )
 
 const EmailEditorProvider = lazy(() =>
 	import('j7-easy-email-editor').then((module) => ({
 		default: module.EmailEditorProvider,
-	})),
+	}))
 )
 
 const StandardLayout = lazy(() =>
 	import('j7-easy-email-extensions').then((module) => ({
 		default: module.StandardLayout,
-	})),
+	}))
 )
 
 const initBlock = BlockManager.getBlockByType(BasicType.PAGE)!.create({})
@@ -73,7 +74,7 @@ const CustomEmailEditor = (
 		TEmailRecord,
 		TEmailRecord,
 		HttpError
-	>,
+	>
 ) => {
 	const { form, query } = props
 
@@ -114,14 +115,14 @@ const CustomEmailEditor = (
 							headers: {
 								'Content-Type': 'multipart/form-data;',
 							},
-						},
+						}
 					)
 					return res?.data?.data?.url
 				}}
 			>
 				{(
 					formState: FormState<IEmailTemplate>,
-					helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>,
+					helper: FormApi<IEmailTemplate, Partial<IEmailTemplate>>
 				) => {
 					form.setFieldValue(['short_description'], formState?.values?.content)
 					return (

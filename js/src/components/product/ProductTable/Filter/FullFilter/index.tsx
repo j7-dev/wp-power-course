@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, memo } from 'react'
+import { SearchOutlined, UndoOutlined } from '@ant-design/icons'
 import {
 	FormProps,
 	Form,
@@ -10,18 +10,19 @@ import {
 	Divider,
 	Spin,
 } from 'antd'
+import { defaultSelectProps, BooleanRadioButton } from 'antd-toolkit'
+import React, { FC, useState, useEffect, memo } from 'react'
+import { BsChevronDoubleDown, BsChevronDoubleUp } from 'react-icons/bs'
+
+import useOptions, {
+	TUseOptionsParams,
+} from '@/components/product/ProductTable/hooks/useOptions'
 import { TFilterProps } from '@/components/product/ProductTable/types'
 import {
 	keyLabelMapper,
 	termToOptions,
 } from '@/components/product/ProductTable/utils'
-import useOptions, {
-	TUseOptionsParams,
-} from '@/components/product/ProductTable/hooks/useOptions'
 import { backordersOptions, stockStatusOptions, statusOptions } from '@/utils'
-import { SearchOutlined, UndoOutlined } from '@ant-design/icons'
-import { BsChevronDoubleDown, BsChevronDoubleUp } from 'react-icons/bs'
-import { defaultSelectProps, BooleanRadioButton } from 'antd-toolkit'
 
 const { Item } = Form
 const { RangePicker } = DatePicker

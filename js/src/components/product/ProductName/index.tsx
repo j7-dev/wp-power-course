@@ -1,7 +1,8 @@
-import defaultImage from '@/assets/images/defaultImage.jpg'
-import { renderHTML } from 'antd-toolkit'
-import { Image } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
+import { Image } from 'antd'
+import { renderHTML } from 'antd-toolkit'
+
+import defaultImage from '@/assets/images/defaultImage.jpg'
 
 type TBaseRecord = {
 	id: string

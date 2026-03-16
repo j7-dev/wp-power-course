@@ -6,16 +6,19 @@ import {
 	MediaProvider,
 	Poster,
 	MediaPlayerInstance,
+
 	// useStore,
 } from '@vidstack/react'
-
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
+
 import { WaterMark } from '@/components/general'
+
 import Ended from './Ended'
+
 import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
@@ -43,6 +46,7 @@ const index = ({
 }: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
+
 	// const playerRef = useRef<MediaPlayerInstance>(null)
 	// const { playing } = useStore(MediaPlayerInstance, playerRef)
 

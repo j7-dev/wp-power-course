@@ -1,14 +1,15 @@
-import { memo, useMemo } from 'react'
-import { Card, Form, Tooltip } from 'antd'
-import { Line, LineConfig } from '@ant-design/plots'
-import dayjs from 'dayjs'
-import { TTotals } from '@/pages/admin/Analytics/types'
-import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
-import { cards, tickFilter } from '@/pages/admin/Analytics/utils'
 import { QuestionCircleOutlined } from '@ant-design/icons'
-import { nanoid } from 'nanoid'
-import LoadingCard from '@/pages/admin/Analytics/ViewType/LoadingCard'
+import { Line, LineConfig } from '@ant-design/plots'
+import { Card, Form, Tooltip } from 'antd'
 import { TrendIndicator } from 'antd-toolkit'
+import dayjs from 'dayjs'
+import { nanoid } from 'nanoid'
+import { memo, useMemo } from 'react'
+
+import { useRevenueContext } from '@/pages/admin/Analytics/hooks'
+import { TTotals } from '@/pages/admin/Analytics/types'
+import { cards, tickFilter } from '@/pages/admin/Analytics/utils'
+import LoadingCard from '@/pages/admin/Analytics/ViewType/LoadingCard'
 
 const Default = () => {
 	const { viewTypeProps, form, isFetching } = useRevenueContext()

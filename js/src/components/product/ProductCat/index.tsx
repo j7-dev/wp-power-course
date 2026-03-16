@@ -1,8 +1,8 @@
+import { Tag } from 'antd'
 import React, { FC } from 'react'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 
 import { TTerm, TProductRecord } from '@/components/product/ProductTable/types'
-import { Tag } from 'antd'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 
 export const ProductCat: FC<{
 	record: TProductRecord | TCourseBaseRecord

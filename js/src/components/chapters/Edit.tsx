@@ -1,11 +1,11 @@
-import { memo, useEffect } from 'react'
+import { ExclamationCircleFilled } from '@ant-design/icons'
+import { Edit, useForm } from '@refinedev/antd'
 import { Form, Input, Switch, Space, Button, Typography } from 'antd'
+import { toFormData, CopyText, DescriptionDrawer } from 'antd-toolkit'
+import { memo, useEffect } from 'react'
+
 import { VideoInput, VideoLength, FiSwitch } from '@/components/formItem'
 import { TChapterRecord } from '@/pages/admin/Courses/List/types'
-import { Edit, useForm } from '@refinedev/antd'
-import { toFormData } from 'antd-toolkit'
-import { ExclamationCircleFilled } from '@ant-design/icons'
-import { CopyText, DescriptionDrawer } from 'antd-toolkit'
 
 const { Item } = Form
 const { Text } = Typography

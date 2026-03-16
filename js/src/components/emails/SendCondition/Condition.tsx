@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react'
+import { useSelect } from '@refinedev/antd'
+import { BaseOption, GetListResponse } from '@refinedev/core'
+import type { QueryObserverResult } from '@tanstack/react-query'
 import {
 	Form,
 	Select,
@@ -8,16 +10,16 @@ import {
 	Input,
 	SelectProps,
 } from 'antd'
-import { TriggerAt, TriggerCondition, SendingType, SendingUnit } from './enum'
-import { useSelect } from '@refinedev/antd'
-import { BaseOption, GetListResponse } from '@refinedev/core'
-import type { QueryObserverResult } from '@tanstack/react-query'
+import { defaultSelectProps } from 'antd-toolkit'
+import dayjs, { Dayjs } from 'dayjs'
+import React, { useEffect } from 'react'
+
 import {
 	TCourseBaseRecord,
 	TChapterRecord,
 } from '@/pages/admin/Courses/List/types'
-import dayjs, { Dayjs } from 'dayjs'
-import { defaultSelectProps } from 'antd-toolkit'
+
+import { TriggerAt, TriggerCondition, SendingType, SendingUnit } from './enum'
 
 const { Item } = Form
 
@@ -27,16 +29,16 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 	const watchTriggerAt = Form.useWatch([TriggerAt.FIELD_NAME], form)
 	const watchTriggerCondition = Form.useWatch(
 		['condition', TriggerCondition.FIELD_NAME],
-		form,
+		form
 	)
 	const watchCourseIds = Form.useWatch(['condition', 'course_ids'], form)
 	const watchSendingType = Form.useWatch(
 		['condition', 'sending', SendingType.FIELD_NAME],
-		form,
+		form
 	)
 	const watchSendingUnit = Form.useWatch(
 		['condition', 'sending', SendingUnit.FIELD_NAME],
-		form,
+		form
 	)
 
 	const { selectProps: courseSelectProps } = useSelect<TCourseBaseRecord>({
@@ -87,7 +89,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 					],
 			queryOptions: {
 				enabled: [TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
-					watchTriggerAt,
+					watchTriggerAt
 				),
 			},
 		})
@@ -95,14 +97,14 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 	// 將 option 分組
 	const formattedChapterSelectProps = formatChapterSelectProps(
 		chapterSelectProps,
-		chapterQuery,
+		chapterQuery
 	)
 
 	useEffect(() => {
 		if (watchTriggerAt === TriggerAt.COURSE_LAUNCH) {
 			form.setFieldValue(
 				['condition', TriggerCondition.FIELD_NAME],
-				TriggerCondition.EACH,
+				TriggerCondition.EACH
 			)
 		}
 	}, [watchTriggerAt])
@@ -157,7 +159,7 @@ const Condition = ({ email_ids }: { email_ids: string[] }) => {
 				</Item>
 
 				{[TriggerAt.CHAPTER_FINISH, TriggerAt.CHAPTER_ENTER].includes(
-					watchTriggerAt,
+					watchTriggerAt
 				) && (
 					<Item
 						label="選擇單元"
@@ -317,7 +319,7 @@ export default Condition
 // 將 option 分組
 function formatChapterSelectProps(
 	props: SelectProps<BaseOption, any>,
-	query: QueryObserverResult<GetListResponse<TChapterRecord>>,
+	query: QueryObserverResult<GetListResponse<TChapterRecord>>
 ) {
 	const chapters = query.data?.data || []
 	const newOptions = chapters.reduce(
@@ -338,7 +340,7 @@ function formatChapterSelectProps(
 			acc?.push(newOption)
 			return acc
 		},
-		[] as SelectProps['options'],
+		[] as SelectProps['options']
 	)
 
 	const newProps = {

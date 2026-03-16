@@ -1,5 +1,6 @@
-import { FC } from 'react'
 import { Form, DatePicker, GetProps, FormItemProps } from 'antd'
+import { FC } from 'react'
+
 import { parseRangePickerValue } from '@/utils'
 
 const { Item } = Form

@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
 import dayjs from 'dayjs'
+import React, { FC } from 'react'
 
 export const SaleRange: FC<{
 	saleDateRange: [number, number] // 只可能是 10 位數或 0

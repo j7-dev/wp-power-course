@@ -1,7 +1,8 @@
-import React, { memo } from 'react'
-import UserSelector from './UserSelector'
-import StudentTable from './StudentTable'
 import { Alert } from 'antd'
+import React, { memo } from 'react'
+
+import StudentTable from './StudentTable'
+import UserSelector from './UserSelector'
 
 const CourseStudentsComponent = () => {
 	return (

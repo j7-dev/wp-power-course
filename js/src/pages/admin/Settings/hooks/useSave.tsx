@@ -42,7 +42,7 @@ const useSave = ({ form }: { form: FormInstance }) => {
 							key: 'save',
 						})
 					},
-				},
+				}
 			)
 		})
 	}, [form])

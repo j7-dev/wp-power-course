@@ -1,8 +1,9 @@
-import React from 'react'
-import useSendCondition from './hooks'
-import { Form, Tooltip, Tag, message } from 'antd'
-import { TriggerAt } from './enum'
 import { useCopyToClipboard } from '@uidotdev/usehooks'
+import { Form, Tooltip, Tag, message } from 'antd'
+import React from 'react'
+
+import { TriggerAt } from './enum'
+import useSendCondition from './hooks'
 
 const Variables = ({ activeKey }: { activeKey: string }) => {
 	const { data } = useSendCondition()

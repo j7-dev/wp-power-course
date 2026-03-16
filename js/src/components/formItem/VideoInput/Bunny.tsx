@@ -1,9 +1,11 @@
-import { Form, FormItemProps, Button } from 'antd'
-import { FC } from 'react'
 import { DeleteOutlined } from '@ant-design/icons'
-import { TVideo } from './types'
-import { useEnv } from '@/hooks'
+import { Form, FormItemProps, Button } from 'antd'
 import { MediaLibraryModal, useMediaLibraryModal } from 'antd-toolkit/refine'
+import { FC } from 'react'
+
+import { useEnv } from '@/hooks'
+
+import { TVideo } from './types'
 
 const { Item } = Form
 const Bunny: FC<FormItemProps> = (formItemProps) => {

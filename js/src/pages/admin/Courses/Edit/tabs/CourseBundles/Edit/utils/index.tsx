@@ -1,5 +1,5 @@
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
 
@@ -43,8 +43,8 @@ export const getPrice = ({
 			products?.reduce(
 				(acc, product) =>
 					acc + Number(product?.[type] || product.regular_price),
-				0,
-			),
+				0
+			)
 		) + (excludeMainCourse ? 0 : coursePrice)
 
 	if ('number' === returnType) return total

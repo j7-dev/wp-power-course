@@ -1,19 +1,22 @@
-import React from 'react'
+import { PlusOutlined } from '@ant-design/icons'
 import { useTable } from '@refinedev/antd'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
-import { Table, message, Button, Form, TableProps } from 'antd'
-import useColumns from './hooks/useColumns'
-import { useRowSelection } from 'antd-toolkit'
 import { useCustomMutation, useApiUrl, useInvalidate } from '@refinedev/core'
+import { Table, message, Button, Form, TableProps } from 'antd'
+import { useRowSelection } from 'antd-toolkit'
+import React from 'react'
+
+import { PopconfirmDelete } from '@/components/general'
 import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import UserSelector from '../UserSelector'
-import { PopconfirmDelete } from '@/components/general'
-import { useUserFormDrawer } from '@/hooks'
-import { PlusOutlined } from '@ant-design/icons'
 import { UserDrawer } from '@/components/user'
+import { useUserFormDrawer } from '@/hooks'
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
+
+import UserSelector from '../UserSelector'
+
+import useColumns from './hooks/useColumns'
 
 const index = () => {
 	const apiUrl = useApiUrl('power-course')
@@ -80,7 +83,7 @@ const index = () => {
 						key: 'remove-teachers',
 					})
 				},
-			},
+			}
 		)
 	}
 

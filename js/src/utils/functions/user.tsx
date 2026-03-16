@@ -15,7 +15,7 @@ export function getGCDItems<T>(items: T[][], key = 'id'): T[] {
 	firstItemIds.forEach((id) => {
 		if (
 			sortedItems.every((item) =>
-				item.some((course) => course?.[key as keyof T] === id),
+				item.some((course) => course?.[key as keyof T] === id)
 			)
 		) {
 			gcdIds.push(id as string)

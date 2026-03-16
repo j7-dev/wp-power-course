@@ -1,5 +1,6 @@
-import React, { memo } from 'react'
 import { Form, InputNumber, FormItemProps } from 'antd'
+import React, { memo } from 'react'
+
 import { RangePicker } from '@/components/formItem'
 
 const { Item } = Form

@@ -1,11 +1,13 @@
-import { FC } from 'react'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
-import ToggleVisibility from './ToggleVisibility'
 import { ExportOutlined } from '@ant-design/icons'
 import { Tooltip, Button } from 'antd'
+import { FC } from 'react'
 import { SiGoogleclassroom } from 'react-icons/si'
+
 import { DuplicateButton } from '@/components/general'
 import { useEnv } from '@/hooks'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
+
+import ToggleVisibility from './ToggleVisibility'
 
 export const ProductAction: FC<{
 	record: TCourseBaseRecord

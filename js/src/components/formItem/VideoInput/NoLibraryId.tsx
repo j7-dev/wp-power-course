@@ -1,6 +1,6 @@
+import { DoubleRightOutlined } from '@ant-design/icons'
 import { Button, Alert } from 'antd'
 import { Link } from 'react-router'
-import { DoubleRightOutlined } from '@ant-design/icons'
 
 const NoLibraryId = ({
 	bunny_library_id,

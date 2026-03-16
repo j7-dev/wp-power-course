@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import { ArrowsAltOutlined, ExclamationCircleFilled } from '@ant-design/icons'
+import { useModal } from '@refinedev/antd'
+import { useCustomMutation, useApiUrl } from '@refinedev/core'
 import {
 	Form,
 	Button,
@@ -9,16 +11,15 @@ import {
 	DatePickerProps,
 	message,
 } from 'antd'
-import { useModal } from '@refinedev/antd'
+import dayjs, { Dayjs } from 'dayjs'
+import { useAtom } from 'jotai'
+import React, { useState } from 'react'
+
 import {
 	UserTable,
 	selectedUserIdsAtom,
 	SelectedUser,
 } from '@/components/user/UserTable'
-import { useAtom } from 'jotai'
-import { ArrowsAltOutlined, ExclamationCircleFilled } from '@ant-design/icons'
-import { useCustomMutation, useApiUrl } from '@refinedev/core'
-import dayjs, { Dayjs } from 'dayjs'
 
 const disabledDate: DatePickerProps['disabledDate'] = (current) => {
 	// Can not select days before today and today
@@ -66,7 +67,7 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 				onError: () => {
 					message.error('Email 發送失敗')
 				},
-			},
+			}
 		)
 	}
 
@@ -90,7 +91,7 @@ const Specific = ({ email_ids }: { email_ids: string[] }) => {
 				onError: () => {
 					message.error('Email 排程失敗')
 				},
-			},
+			}
 		)
 	}
 

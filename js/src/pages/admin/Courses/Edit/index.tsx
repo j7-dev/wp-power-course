@@ -1,12 +1,18 @@
-import { memo, useMemo, useState } from 'react'
 import { Edit, useForm } from '@refinedev/antd'
 import { Tabs, TabsProps, Form, Switch, Button, Tooltip, FormProps } from 'antd'
+import { toFormData, formatDateRangeData } from 'antd-toolkit'
+import { memo, useMemo, useState } from 'react'
+
 import { SortableChapters } from '@/components/course'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
-import { RecordContext, ParseDataContext } from '@/pages/admin/Courses/Edit/hooks'
+import { useEnv } from '@/hooks'
+import {
+	RecordContext,
+	ParseDataContext,
+} from '@/pages/admin/Courses/Edit/hooks'
 import {
 	CourseDescription,
 	CourseQA,
+
 	// CourseAnnouncement,
 	CoursePrice,
 	CourseBundles,
@@ -14,14 +20,14 @@ import {
 	CourseStudents,
 	CourseAnalysis,
 } from '@/pages/admin/Courses/Edit/tabs'
-import { useEnv } from '@/hooks'
-import { toFormData, formatDateRangeData } from 'antd-toolkit'
+import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 const { Item } = Form
 
 export const CoursesEdit = () => {
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
 	const [activeKey, setActiveKey] = useState('CourseDescription')
+
 	// 初始化資料
 	const {
 		formProps: _formProps,
@@ -90,6 +96,7 @@ export const CoursesEdit = () => {
 			label: 'QA設定',
 			children: <CourseQA formProps={formProps} />,
 		},
+
 		// {
 		// 	key: 'CourseAnnouncement',
 		// 	forceRender: false,

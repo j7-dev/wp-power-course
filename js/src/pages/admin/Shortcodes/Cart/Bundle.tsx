@@ -1,10 +1,10 @@
-import { memo, useState } from 'react'
+import { useCustom, useApiUrl } from '@refinedev/core'
 import { Typography, Form, Select, Checkbox, Spin, Alert } from 'antd'
+import { renderHTML } from 'antd-toolkit'
+import { memo, useState } from 'react'
+
 import { Heading } from '@/components/general'
 import { useProductSelect } from '@/hooks'
-
-import { useCustom, useApiUrl } from '@refinedev/core'
-import { renderHTML } from 'antd-toolkit'
 
 const { Item } = Form
 const { Text } = Typography
@@ -41,7 +41,7 @@ const Bundle = () => {
 	const handleValuesChange = () => {
 		const { product_id } = form.getFieldsValue()
 		setShortcode(
-			`[pc_bundle_card${product_id ? ` product_id="${product_id}"` : ''}]`,
+			`[pc_bundle_card${product_id ? ` product_id="${product_id}"` : ''}]`
 		)
 	}
 

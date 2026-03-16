@@ -1,10 +1,11 @@
+import { CloseCircleFilled, CheckCircleFilled } from '@ant-design/icons'
+import { Button } from 'antd'
 import React, { FC } from 'react'
+
 import {
 	TCourseRecord,
 	TProductVariation,
 } from '@/pages/admin/Courses/List/types'
-import { CloseCircleFilled, CheckCircleFilled } from '@ant-design/icons'
-import { Button } from 'antd'
 
 export type TProductVariationsSelectorParams = {
 	record: TCourseRecord
@@ -37,7 +38,7 @@ export const ProductVariationsSelector: FC<
 
 	const handleClick = (name: string, option: string) => () => {
 		const selectedAttribute = selectedAttributes?.find(
-			(item) => item?.name === name,
+			(item) => item?.name === name
 		)
 		if (selectedAttribute) {
 			setSelectedAttributes([
@@ -57,7 +58,7 @@ export const ProductVariationsSelector: FC<
 			{attributes?.map(
 				({ name = 'unknown_attr', options = [], position = 0 }) => {
 					const selectedAttribute = selectedAttributes?.find(
-						(item) => item?.name === name,
+						(item) => item?.name === name
 					)
 					return (
 						<div key={name} className="mb-4">
@@ -79,7 +80,7 @@ export const ProductVariationsSelector: FC<
 							</div>
 						</div>
 					)
-				},
+				}
 			)}
 
 			{!hasSelectedAllAttributes && (

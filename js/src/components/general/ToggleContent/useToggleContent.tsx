@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 export const useToggleContent = (
 	isExpandDefault = false,
-	showReadMoreDefault = false,
+	showReadMoreDefault = false
 ) => {
 	const [isExpand, setIsExpand] = useState(isExpandDefault)
 	const [showReadMore, setShowReadMore] = useState(showReadMoreDefault)

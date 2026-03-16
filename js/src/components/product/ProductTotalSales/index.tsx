@@ -1,10 +1,11 @@
-import React, { FC } from 'react'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
-import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Badge, Tooltip } from 'antd'
+import React, { FC } from 'react'
+
 import useOptions, {
 	TUseOptionsParams,
 } from '@/components/product/ProductTable/hooks/useOptions'
+import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 
 const COLOR_GRADE = {
 	'tier-5': '#ffccc7',

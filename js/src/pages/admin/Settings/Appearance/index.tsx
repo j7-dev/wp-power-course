@@ -1,5 +1,6 @@
-import { memo, useEffect } from 'react'
 import { Form, InputNumber } from 'antd'
+import { memo, useEffect } from 'react'
+
 import { FiSwitch } from '@/components/formItem'
 import { Heading } from '@/components/general'
 const { Item } = Form

@@ -1,6 +1,6 @@
-import React, { useState, FC, memo } from 'react'
-import { Drawer } from 'antd'
 import { SlidersOutlined, CloseOutlined } from '@ant-design/icons'
+import { Drawer } from 'antd'
+import React, { useState, FC, memo } from 'react'
 
 const MobileFilter: FC<{
 	children: React.ReactNode

@@ -1,9 +1,10 @@
-import React, { memo, FC } from 'react'
-import { TProductRecord } from '@/components/product/ProductTable/types'
 import { Typography, Tag, Tooltip } from 'antd'
-import dayjs from 'dayjs'
-import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 import { cn } from 'antd-toolkit'
+import dayjs from 'dayjs'
+import React, { memo, FC } from 'react'
+
+import { TProductRecord } from '@/components/product/ProductTable/types'
+import { TCoursesLimit } from '@/pages/admin/Courses/List/types'
 
 const { Text } = Typography
 
@@ -16,7 +17,7 @@ const LIMIT_UNIT_LABEL = {
 const getLimitLabel = (
 	limit_type: TCoursesLimit['limit_type'],
 	limit_value: TCoursesLimit['limit_value'],
-	limit_unit: TCoursesLimit['limit_unit'],
+	limit_unit: TCoursesLimit['limit_unit']
 ) => {
 	switch (limit_type) {
 		case 'unlimited':
@@ -66,7 +67,7 @@ const ProductBoundCoursesComponent: FC<{
 					</div>
 				</div>
 			)
-		},
+		}
 	)
 }
 

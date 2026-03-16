@@ -1,9 +1,10 @@
-import React, { FC } from 'react'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
-import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
-import { Tooltip, Button } from 'antd'
 import { useUpdate } from '@refinedev/core'
+import { Tooltip, Button } from 'antd'
 import { toFormData } from 'antd-toolkit'
+import React, { FC } from 'react'
+
+import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 
 const ToggleVisibility: FC<{
 	record: TCourseBaseRecord

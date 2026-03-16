@@ -1,4 +1,5 @@
 import React from 'react'
+
 import TeacherTable from './TeacherTable'
 
 const index = () => {

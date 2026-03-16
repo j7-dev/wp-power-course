@@ -1,4 +1,5 @@
 import { DrawerProps } from 'antd'
+
 import { TTriggerAt, TriggerAt } from '@/components/emails/SendCondition/enum'
 
 export type THistoryDrawerProps = {

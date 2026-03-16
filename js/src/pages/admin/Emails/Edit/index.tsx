@@ -1,11 +1,13 @@
-import { Switch, Form, Empty, Input } from 'antd'
 import { Edit, useForm } from '@refinedev/antd'
 import { useParsed, HttpError } from '@refinedev/core'
-import EmailEditor from './EmailEditor'
-import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
-import mjml2html from 'mjml-browser'
+import { Switch, Form, Empty, Input } from 'antd'
 import { JsonToMjml, IBlockData } from 'j7-easy-email-core'
+import mjml2html from 'mjml-browser'
+
 import { SendCondition } from '@/components/emails'
+import type { TEmailRecord, TFormValues } from '@/pages/admin/Emails/types'
+
+import EmailEditor from './EmailEditor'
 
 const { Item } = Form
 
@@ -45,7 +47,7 @@ const EmailsEdit = () => {
 				}),
 				{
 					minify: true,
-				},
+				}
 			)?.html,
 		} as TFormValues)
 	}

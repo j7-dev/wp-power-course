@@ -1,5 +1,6 @@
 /* eslint-disable lines-around-comment */
-import React, { useRef, useEffect, memo } from 'react'
+import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
+import { SortableList, SortableListRef } from '@ant-design/pro-editor'
 import {
 	Input,
 	Button,
@@ -10,9 +11,8 @@ import {
 	FormProps,
 	FormInstance,
 } from 'antd'
-import { SortableList, SortableListRef } from '@ant-design/pro-editor'
-import { HolderOutlined, DeleteOutlined } from '@ant-design/icons'
 import { nanoid } from 'nanoid'
+import React, { useRef, useEffect, memo } from 'react'
 
 type TCollapseItem = NonNullable<CollapseProps['items']>[number]
 type TListItem = {
@@ -57,7 +57,7 @@ const CourseQAComponent = ({ formProps }: { formProps: FormProps }) => {
 				<SortableList<TListItem>
 					value={watchQAList.filter(
 						(item) =>
-							!(item.question === undefined && item.answer === undefined),
+							!(item.question === undefined && item.answer === undefined)
 					)}
 					ref={ref}
 					onChange={(newList) => {
@@ -110,7 +110,7 @@ const CourseQAComponent = ({ formProps }: { formProps: FormProps }) => {
 											const list = form.getFieldValue(['qa_list'])
 											form.setFieldValue(
 												['qa_list'],
-												list.filter((_: TListItem, i: number) => i !== index),
+												list.filter((_: TListItem, i: number) => i !== index)
 											)
 										}}
 									/>

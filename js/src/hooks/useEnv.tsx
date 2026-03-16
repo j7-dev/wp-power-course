@@ -1,5 +1,5 @@
-import { AxiosInstance } from 'axios'
 import { useEnv as useATEnv, TEnv } from 'antd-toolkit'
+import { AxiosInstance } from 'axios'
 
 type Env = TEnv & {
 	APP1_SELECTOR: string

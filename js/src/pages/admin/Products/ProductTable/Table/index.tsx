@@ -1,10 +1,20 @@
-import { useEffect, memo } from 'react'
 import { useTable } from '@refinedev/antd'
+import { HttpError } from '@refinedev/core'
 import { Table, FormInstance, Spin, TableProps, Card, Form } from 'antd'
+import { useRowSelection } from 'antd-toolkit'
+import { FilterTags } from 'antd-toolkit/refine'
+import { useSetAtom } from 'jotai'
+import { useEffect, memo } from 'react'
+
+import { WatchLimit } from '@/components/formItem'
+import {
+	BindCourses,
+	UpdateBoundCourses,
+	UnbindCourses,
+} from '@/components/product'
 import Filter, {
 	initialFilteredValues,
 } from '@/components/product/ProductTable/Filter'
-import { HttpError } from '@refinedev/core'
 import {
 	TFilterProps,
 	TProductRecord,
@@ -17,20 +27,11 @@ import {
 	getDefaultPaginationProps,
 	defaultTableProps,
 } from '@/components/product/ProductTable/utils'
-import { getInitialFilters } from '@/utils'
-import useValueLabelMapper from '@/pages/admin/Products/ProductTable/hooks/useValueLabelMapper'
-import {
-	BindCourses,
-	UpdateBoundCourses,
-	UnbindCourses,
-} from '@/components/product'
-import { useSetAtom } from 'jotai'
-import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
-import { productsAtom } from '@/pages/admin/Products/ProductTable'
 import { useGCDItems } from '@/hooks'
-import { WatchLimit } from '@/components/formItem'
-import { useRowSelection } from 'antd-toolkit'
-import { FilterTags } from 'antd-toolkit/refine'
+import { productsAtom } from '@/pages/admin/Products/ProductTable'
+import useColumns from '@/pages/admin/Products/ProductTable/hooks/useColumns'
+import useValueLabelMapper from '@/pages/admin/Products/ProductTable/hooks/useValueLabelMapper'
+import { getInitialFilters } from '@/utils'
 
 const Main = () => {
 	const [form] = Form.useForm()
@@ -82,11 +83,11 @@ const Main = () => {
 					}
 					return acc
 				},
-				[] as string[],
+				[] as string[]
 			)
 
 			const removeNonSubscriptionProductIds = selectedRowKeys?.filter((id) =>
-				subscriptionProductIds?.includes(id as string),
+				subscriptionProductIds?.includes(id as string)
 			)
 			setSelectedRowKeys(removeNonSubscriptionProductIds)
 		}

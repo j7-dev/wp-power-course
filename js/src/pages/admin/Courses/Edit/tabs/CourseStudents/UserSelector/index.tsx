@@ -1,17 +1,18 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
-import { useState, memo } from 'react'
 import { useSelect } from '@refinedev/antd'
-import { Select, Space, Button, Form, message } from 'antd'
-import { TUserRecord } from '@/pages/admin/Courses/List/types'
 import {
 	useCustomMutation,
 	useApiUrl,
 	useInvalidate,
 	useParsed,
 } from '@refinedev/core'
+import { Select, Space, Button, Form, message } from 'antd'
 import { defaultSelectProps } from 'antd-toolkit'
+import { useState, memo } from 'react'
+
+import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
 const index = () => {
 	const apiUrl = useApiUrl('power-course')
@@ -107,7 +108,7 @@ const index = () => {
 						key: 'add-students',
 					})
 				},
-			},
+			}
 		)
 	}
 

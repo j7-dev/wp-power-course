@@ -1,8 +1,9 @@
-import { TFilterProps } from '@/components/product/ProductTable/types'
 import { CrudFilters } from '@refinedev/core'
 
+import { TFilterProps } from '@/components/product/ProductTable/types'
+
 export const onSearch = (
-	values: TFilterProps,
+	values: TFilterProps
 ): CrudFilters | Promise<CrudFilters> => {
 	return [
 		{

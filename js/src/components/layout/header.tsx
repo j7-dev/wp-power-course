@@ -1,11 +1,11 @@
-import React from 'react'
+import type { RefineThemedLayoutV2HeaderProps } from '@refinedev/antd'
 import {
 	pickNotDeprecated,
 	useActiveAuthProvider,
 	useGetIdentity,
 } from '@refinedev/core'
 import { Layout as AntdLayout, Typography, Avatar, Space, theme } from 'antd'
-import type { RefineThemedLayoutV2HeaderProps } from '@refinedev/antd'
+import React from 'react'
 
 export const ThemedHeaderV2: React.FC<RefineThemedLayoutV2HeaderProps> = ({
 	isSticky,

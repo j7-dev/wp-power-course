@@ -1,5 +1,5 @@
-import { FC, useState, useEffect } from 'react'
 import { FormItemProps, Form, Space, InputNumber } from 'antd'
+import { FC, useState, useEffect } from 'react'
 
 const { Item } = Form
 

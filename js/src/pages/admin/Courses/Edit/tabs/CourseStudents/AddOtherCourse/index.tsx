@@ -1,6 +1,7 @@
-import React, { useState, memo } from 'react'
-import { GrantCourseAccess } from '@/components/user'
 import { ExportOutlined } from '@ant-design/icons'
+import React, { useState, memo } from 'react'
+
+import { GrantCourseAccess } from '@/components/user'
 import { useEnv } from '@/hooks'
 
 const AddOtherCourse = ({ user_ids }: { user_ids: string[] }) => {

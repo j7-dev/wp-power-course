@@ -1,5 +1,6 @@
-import { atom } from 'jotai'
 import { ModalProps, FormInstance } from 'antd'
+import { atom } from 'jotai'
+
 import { TMediaLibraryProps } from '@/bunny'
 import { TBunnyVideo } from '@/bunny/types'
 

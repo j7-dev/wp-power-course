@@ -1,4 +1,5 @@
 import React from 'react'
+
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
 import {
 	backordersOptions,
@@ -31,7 +32,7 @@ const useValueLabelMapper = () => {
 	const valueLabelMapper = (value: string) => {
 		const label =
 			[...formattedTerms, ...formattedExtraMapper]?.find(
-				(formattedTerm) => formattedTerm?.value === value,
+				(formattedTerm) => formattedTerm?.value === value
 			)?.label || value
 		return label as string
 	}
