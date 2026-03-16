@@ -6,29 +6,19 @@ import {
 	MediaProvider,
 	Poster,
 	MediaPlayerInstance,
-	Track,
-
 	// useStore,
 } from '@vidstack/react'
+
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
-
-import { TSubtitleTrack } from '@/components/formItem/VideoInput/types'
 import { WaterMark } from '@/components/general'
-
 import Ended from './Ended'
-
 import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
-
-const getSubtitleType = (url: string): 'srt' | 'vtt' => {
-	const normalizedUrl = url.toLowerCase().split('?')[0]
-	return normalizedUrl.endsWith('.srt') ? 'srt' : 'vtt'
-}
 
 export type TPlayerProps = {
 	src: string
@@ -39,13 +29,6 @@ export type TPlayerProps = {
 	watermark_interval: string
 	next_post_url: string
 	autoplay: 'yes' | 'no'
-
-	/** 原始 data-subtitles JSON 字串，會在 App2/index.tsx 先轉為 TSubtitleTrack[] */
-	subtitles: string
-}
-
-type TParsedPlayerProps = Omit<TPlayerProps, 'subtitles'> & {
-	subtitles: TSubtitleTrack[]
 }
 
 const index = ({
@@ -57,11 +40,9 @@ const index = ({
 	watermark_interval,
 	next_post_url,
 	autoplay,
-	subtitles,
-}: TParsedPlayerProps) => {
+}: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
-
 	// const playerRef = useRef<MediaPlayerInstance>(null)
 	// const { playing } = useStore(MediaPlayerInstance, playerRef)
 
@@ -99,16 +80,6 @@ const index = ({
 			>
 				<MediaProvider>
 					<Poster className="vds-poster" />
-					{subtitles.map((track) => (
-						<Track
-							key={track.srclang}
-							src={track.url}
-							kind="subtitles"
-							label={track.label}
-							lang={track.srclang}
-							type={getSubtitleType(track.url)}
-						/>
-					))}
 				</MediaProvider>
 				<DefaultAudioLayout
 					smallLayoutWhen={true}
