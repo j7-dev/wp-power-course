@@ -7,10 +7,3 @@ export type TVideo = {
 		[key: string]: any
 	}
 }
-
-export type TSubtitleTrack = {
-	srclang: string
-	label: string
-	url: string
-	attachment_id: number
-}
