@@ -7,7 +7,7 @@
 import { test, expect } from '@playwright/test'
 import { ApiClient, setupApiFromBrowser } from '../helpers/api-client'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889'
+const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 // ── 回應型別 ────────────────────────────────
 interface ToggleResponse {

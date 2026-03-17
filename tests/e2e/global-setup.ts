@@ -37,7 +37,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
 	// 3. 登入 WordPress Admin 並儲存 storageState
 	console.log('[Global Setup] Logging in to WordPress Admin...')
 	const browser = await chromium.launch()
-	const context = await browser.newContext()
+	const context = await browser.newContext({ ignoreHTTPSErrors: true })
 	const page = await context.newPage()
 
 	try {
@@ -164,8 +164,12 @@ async function globalSetup(config: FullConfig): Promise<void> {
 		// 5. 建立前台測試共用資料（課程、章節、訂閱者帳號、BACS 付款）
 		console.log('[Global Setup] Ensuring frontend test data...')
 		clearFrontendTestDataCache()
-		await ensureFrontendTestData(api)
-		console.log('[Global Setup] Frontend test data ready.')
+		try {
+			await ensureFrontendTestData(api)
+			console.log('[Global Setup] Frontend test data ready.')
+		} catch (e) {
+			console.warn('[Global Setup] Frontend test data setup warning (non-fatal):', e)
+		}
 	} catch (error) {
 		console.error('[Global Setup] Failed:', error)
 		throw error

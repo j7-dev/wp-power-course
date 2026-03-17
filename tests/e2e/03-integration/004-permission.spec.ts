@@ -6,7 +6,7 @@
 import { test, expect, type APIRequestContext } from '@playwright/test'
 import { ApiClient, setupApiFromBrowser, getNonceFromPage } from '../helpers/api-client'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889'
+const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 let adminApi: ApiClient
 let dispose: () => Promise<void>

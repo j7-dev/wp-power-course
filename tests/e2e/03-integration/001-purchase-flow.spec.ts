@@ -9,7 +9,7 @@ import { loginAs } from '../helpers/frontend-setup'
 import { completeCheckout, completeOrderViaAdmin } from '../helpers/wc-checkout'
 import { SELECTORS, FRONTEND_COURSE, TEST_SUBSCRIBER, WP_ADMIN } from '../fixtures/test-data'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889'
+const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 let api: ApiClient
 let dispose: () => Promise<void>

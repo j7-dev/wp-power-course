@@ -1,8 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
+import * as dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 const STORAGE_STATE = path.join(__dirname, '.auth', 'admin.json')
 
 export default defineConfig({
@@ -22,8 +24,9 @@ export default defineConfig({
 	globalTeardown: './global-teardown.ts',
 
 	use: {
-		headless: false,
-		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+		headless: process.env.CI === 'true',
+		baseURL: process.env.TEST_SITE_URL || 'http://localhost:8889',
+		ignoreHTTPSErrors: true,
 		storageState: STORAGE_STATE,
 		locale: 'zh-TW',
 		timezoneId: 'Asia/Taipei',

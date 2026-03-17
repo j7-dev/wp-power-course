@@ -9,7 +9,7 @@ import { ApiClient, setupApiFromBrowser } from '../helpers/api-client'
 import { loginAs } from '../helpers/frontend-setup'
 import { SELECTORS } from '../fixtures/test-data'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889'
+const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 // ── 共用變數 ────────────────────────────────
 let api: ApiClient
