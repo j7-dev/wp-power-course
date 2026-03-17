@@ -35,7 +35,7 @@ const AddChapters = ({ records }: { records: TChapterRecord[] }) => {
 			invalidates: ['list'],
 			successNotification: (data) => {
 				const ids = data?.data || []
-				const idsString = ids?.map((id) => `#${id}`).join(', ')
+				const idsString = ids?.map((chapterId) => `#${chapterId}`).join(', ')
 				return {
 					message: `新增 ${values?.qty} 個章節成功 (${idsString})，可以在底部查看 ⬇️`,
 					type: 'success',

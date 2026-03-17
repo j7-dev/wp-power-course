@@ -37,7 +37,7 @@ const loadingItems = new Array(8).fill(null).map((_, index) => ({
 	),
 }))
 
-const index = () => {
+const HistoryDrawer = () => {
 	const [historyDrawerProps, setHistoryDrawerProps] = useAtom(historyDrawerAtom)
 	const { user_id, course_id, drawerProps, user_name, course_name } =
 		historyDrawerProps
@@ -135,4 +135,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(HistoryDrawer)

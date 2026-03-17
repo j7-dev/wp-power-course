@@ -6,29 +6,13 @@ export const Gallery: React.FC<{
 	images: string[] | false[]
 	selectedImage?: string
 }> = ({ images, selectedImage }) => {
-	if (images.length === 0) {
-		return (
-			<img className="aspect-square w-full object-cover" src={defaultImage} />
-		)
-	}
 	const isInclude = images?.some((i) => i === selectedImage)
 
-	const [
-		selected,
-		setSelected,
-	] = useState(images[0])
+	const [selected, setSelected] = useState(images[0])
 
 	useEffect(() => {
 		setSelected(images[0])
 	}, [images])
-
-	const handleClick = (src: string | false) => () => {
-		if (src) {
-			setSelected(src)
-		} else {
-			setSelected(defaultImage)
-		}
-	}
 
 	useEffect(() => {
 		if (!!selectedImage && isInclude) {
@@ -38,11 +22,30 @@ export const Gallery: React.FC<{
 		}
 	}, [selectedImage])
 
+	const handleClick = (src: string | false) => () => {
+		if (src) {
+			setSelected(src)
+		} else {
+			setSelected(defaultImage)
+		}
+	}
+
+	if (images.length === 0) {
+		return (
+			<img
+				alt=""
+				className="aspect-square w-full object-cover"
+				src={defaultImage}
+			/>
+		)
+	}
+
 	return (
 		<>
 			{images.map((image, i) => (
 				<img
 					key={`main-${image}-${i}`}
+					alt=""
 					className={`aspect-square w-full object-cover ${image === selected ? 'tw-block' : 'tw-hidden'}`}
 					src={image || defaultImage}
 				/>
@@ -52,6 +55,7 @@ export const Gallery: React.FC<{
 					{images.map((image, i) => (
 						<img
 							key={`${image}-${i}`}
+							alt=""
 							className={`aspect-square cursor-pointer object-cover w-full ${image === selected && 'border-2 border-blue-500 border-solid'}`}
 							onClick={handleClick(image)}
 							src={image || defaultImage}

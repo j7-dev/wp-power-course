@@ -1,7 +1,9 @@
-import { ThemedLayoutContextProvider } from '@refinedev/antd'
-import type { RefineThemedLayoutV2Props } from '@refinedev/antd'
+import {
+	ThemedLayoutContextProvider,
+	type RefineThemedLayoutV2Props,
+} from '@refinedev/antd'
 import { Grid, Layout as AntdLayout } from 'antd'
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { ThemedHeaderV2 as DefaultHeader } from './header'
 import { ThemedSiderV2 as DefaultSider } from './sider'

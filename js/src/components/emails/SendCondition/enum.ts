@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-shadow
 export enum TriggerAt {
 	FIELD_NAME = 'trigger_at',
 	COURSE_GRANTED = 'course_granted',
@@ -13,6 +14,7 @@ export enum TriggerAt {
 
 export type TTriggerAt = (typeof TriggerAt)[keyof typeof TriggerAt]
 
+// eslint-disable-next-line no-shadow
 export enum TriggerCondition {
 	FIELD_NAME = 'trigger_condition',
 	EACH = 'each',
@@ -20,12 +22,14 @@ export enum TriggerCondition {
 	QUANTITY_GREATER_THAN = 'qty_greater_than',
 }
 
+// eslint-disable-next-line no-shadow
 export enum SendingType {
 	FIELD_NAME = 'type',
 	NOW = 'send_now',
 	LATER = 'send_later',
 }
 
+// eslint-disable-next-line no-shadow
 export enum SendingUnit {
 	FIELD_NAME = 'unit',
 	DAY = 'day',
