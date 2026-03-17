@@ -6,8 +6,8 @@
 
 /** WordPress Admin 帳密 */
 export const WP_ADMIN = {
-	username: process.env.WP_ADMIN_USERNAME || 'admin',
-	password: process.env.WP_ADMIN_PASSWORD || 'password',
+	username: process.env.TEST_USERNAME || 'admin',
+	password: process.env.TEST_PASSWORD || 'password',
 }
 
 /** 測試用學員帳號 */

@@ -6,7 +6,7 @@
  */
 import { type APIRequestContext } from '@playwright/test'
 
-const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889'
+const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 /**
  * 從可能包含 PHP warnings/notices 的文字中萃取 JSON
@@ -431,7 +431,7 @@ export class ApiClient {
 			context: 'edit',
 		})
 		const users = search.data as { id: number; slug: string }[]
-		const existing = users.find((u) => u.slug === username)
+		const existing = Array.isArray(users) ? users.find((u) => u.slug === username) : undefined
 		if (existing) return existing.id
 
 		// 不存在則建立
@@ -546,7 +546,7 @@ export async function setupApiFromBrowser(
 		storageState: '.auth/admin.json',
 	})
 	const page = await context.newPage()
-	const baseUrl = process.env.WP_BASE_URL || 'http://localhost:8889'
+	const baseUrl = process.env.TEST_SITE_URL || 'http://localhost:8889'
 	await page.goto(`${baseUrl}/wp-admin/`)
 	await page.waitForSelector('body.wp-admin', { timeout: 15_000 })
 	const nonce = await getNonceFromPage(page)

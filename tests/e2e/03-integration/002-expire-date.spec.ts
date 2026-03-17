@@ -78,7 +78,7 @@ test.describe('到期日驗證', () => {
 		// 透過瀏覽器驗證（需要以學員登入）
 		const ctx = await browser.newContext()
 		const page = await ctx.newPage()
-		const baseUrl = process.env.WP_BASE_URL || 'http://localhost:8889'
+		const baseUrl = process.env.TEST_SITE_URL || 'http://localhost:8889'
 
 		// 登入學員
 		await page.goto(`${baseUrl}/wp-login.php`)
