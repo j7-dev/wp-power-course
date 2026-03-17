@@ -1,7 +1,8 @@
 {
 	"core": "WordPress/WordPress#6.8",
 	"phpVersion": "8.2",
-	"port": 8894,
+	"port": 8895,
+	"testsPort": 8893,
 	"plugins": [
 		"https://downloads.wordpress.org/plugin/woocommerce.zip",
 		"https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip",
@@ -12,16 +13,6 @@
 		"WP_DEBUG_LOG": true,
 		"SCRIPT_DEBUG": true,
 		"WP_ENVIRONMENT_TYPE": "local"
-	},
-	"env": {
-		"tests": {
-			"port": 8892,
-			"testsPort": 8893,
-			"config": {
-				"WP_DEBUG": true,
-				"WP_DEBUG_LOG": true
-			}
-		}
 	},
 	"mappings": {
 		"wp-content/uploads": "./tests/e2e/.uploads"

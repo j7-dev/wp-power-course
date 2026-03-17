@@ -44,7 +44,7 @@ npx playwright install
 npx wp-env start
 ```
 
-E2E 預設打的站點 port：`8894`（開發環境），可透過 `.env` 的 `TEST_SITE_URL` 覆蓋。
+E2E 測試目標站點由 `.env` 的 `TEST_SITE_URL` 決定，未設定時 fallback 為 `http://localhost:8889`（Playwright config 預設值）。wp-env 主環境 port 為 `8895`，但 E2E 測試不一定打 wp-env，視 `.env` 設定而定。
 
 ---
 
@@ -257,8 +257,9 @@ cd tests/e2e && npx playwright show-report
 在 plugin 根目錄建立 `.env`（參考 `.env.example`）：
 
 ```bash
-# E2E 測試目標站點 URL（預設 http://localhost:8894）
-TEST_SITE_URL=http://localhost:8894
+# E2E 測試目標站點 URL（未設定時 fallback 為 http://localhost:8889）
+# 若使用 Local WP 等本地開發環境，填入該站點 URL 即可
+TEST_SITE_URL=http://localhost:8889
 
 # WordPress Admin 帳號（global-setup 登入用）
 # 這些值也可以在 tests/e2e/fixtures/test-data.ts 的 WP_ADMIN 物件中直接設定

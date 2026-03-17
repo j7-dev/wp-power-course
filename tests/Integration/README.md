@@ -32,6 +32,11 @@ npx wp-env start
 
 tests 環境 port：`8892`（HTTP）、`8893`（MySQL via tests）
 
+停止 wp-env：
+```bash
+npx wp-env stop
+```
+
 ---
 
 ## 快速開始
@@ -270,3 +275,49 @@ class MyFeatureTest extends TestCase {
 2. **每個測試必須繼承 `TestCase`** 並實作 `configure_dependencies()`。
 3. **失敗情境**：catch `\Throwable` 後賦值給 `$this->lastError`，再用 `assert_operation_failed*()` 驗證。
 4. **不要 mock 資料庫**：整合測試必須打真實 WordPress DB，這是為了在過去遭遇 mock/prod 不一致問題後的規範。
+
+---
+
+## 常見問題（Troubleshooting）
+
+### Port 衝突：`Bind for 0.0.0.0:XXXX failed: port is already allocated`
+
+主環境 port（預設 `8895`）或 tests 環境 port（`8892`/`8893`）被其他服務佔用。
+
+**解法：**
+
+```bash
+# 方法一：找出並停掉佔用 port 的服務
+# Windows
+netstat -ano | findstr :8895
+# macOS / Linux
+lsof -i :8895
+
+# 方法二：修改 .wp-env.json 的 port 為未佔用的值
+```
+
+### Docker 未啟動
+
+wp-env 依賴 Docker，若 Docker Desktop 未執行會報錯。
+
+**解法：** 啟動 Docker Desktop，等待 Docker Engine 就緒後再執行 `npx wp-env start`。
+
+### `service "tests-cli" is not running`
+
+wp-env 環境未啟動或啟動失敗。
+
+**解法：**
+
+```bash
+# 確認 wp-env 狀態
+npx wp-env status
+
+# 如果未啟動，啟動它
+npx wp-env start
+
+# 如果啟動失敗，嘗試完全重建
+npx wp-env destroy
+npx wp-env start
+```
+
+> **注意：** `wp-env destroy` 會清除所有資料（資料庫、上傳檔案等），僅在測試環境使用。
