@@ -104,11 +104,13 @@ const Gallery = ({
 
 	return (
 		<>
+			{/* eslint-disable jsx-a11y/label-has-associated-control */}
 			{'small' !== size && (
 				<label className="text-sm font-normal inline-block pb-2">
 					商品圖片
 				</label>
 			)}
+			{/* eslint-enable jsx-a11y/label-has-associated-control */}
 			<Item name={imageName} hidden />
 			<div className={wrapClassName}>
 				{watchImages?.map(

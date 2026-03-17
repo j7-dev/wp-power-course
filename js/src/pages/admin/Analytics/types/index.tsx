@@ -1,6 +1,7 @@
 import { TProductType } from 'antd-toolkit/wp'
 import dayjs from 'dayjs'
 
+// eslint-disable-next-line no-shadow
 export enum EViewType {
 	DEFAULT = 'default',
 	AREA = 'area', // 面積比較圖

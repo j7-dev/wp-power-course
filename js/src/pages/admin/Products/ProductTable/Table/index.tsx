@@ -172,6 +172,7 @@ const Main = () => {
 							</div>
 							<div className="mb-4 flex gap-x-6">
 								<div>
+									{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 									<label className="tw-block mb-2">批次操作</label>
 									<div className="flex gap-x-4">
 										<UpdateBoundCourses
@@ -192,6 +193,7 @@ const Main = () => {
 								</div>
 								{!!gcdItems.length && (
 									<div className="flex-1">
+										{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 										<label className="tw-block mb-2">選擇課程</label>
 										<GcdItemsTags />
 									</div>

@@ -125,6 +125,7 @@ const CourseDescriptionComponent = ({
 				</div>
 				<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 					<div>
+						{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 						<label className="text-sm pb-2 inline-block">簡短說明</label>
 						<div>
 							<BlockNoteDrawer
@@ -144,6 +145,7 @@ const CourseDescriptionComponent = ({
 					</div>
 
 					<div className="mb-8">
+						{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 						<label className="mb-3 tw-block">課程封面圖</label>
 						<FileUpload />
 						<Item hidden name={['files']} label="課程封面圖">

@@ -2,7 +2,7 @@ import React from 'react'
 
 import TeacherTable from './TeacherTable'
 
-const index = () => {
+const Teachers = () => {
 	return (
 		<>
 			<TeacherTable />
@@ -10,4 +10,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default Teachers

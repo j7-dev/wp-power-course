@@ -2,7 +2,7 @@ import React from 'react'
 
 import { UserTable } from '@/components/user'
 
-const index = () => {
+const Students = () => {
 	return (
 		<>
 			<UserTable canGrantCourseAccess={true} />
@@ -10,4 +10,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default Students

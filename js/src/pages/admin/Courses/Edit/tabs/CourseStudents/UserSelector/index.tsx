@@ -14,7 +14,7 @@ import { useState, memo } from 'react'
 
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
-const index = () => {
+const UserSelector = () => {
 	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const [userIds, setUserIds] = useState<string[]>([])
@@ -150,4 +150,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(UserSelector)
