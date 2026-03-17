@@ -42,3 +42,6 @@ playwright-report/
 tests/e2e/.uploads/
 tests/e2e/.frontend-test-data.json
 blob-report/
+
+# PHPUnit
+.phpunit.result.cache

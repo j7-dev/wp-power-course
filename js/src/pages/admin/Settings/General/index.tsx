@@ -12,7 +12,7 @@ const DEFAULT_ORDER_STATUS_OPTIONS = [
 	{ label: '處理中', value: 'completed' },
 ]
 
-const index = () => {
+const General = () => {
 	const { order_statuses = DEFAULT_ORDER_STATUS_OPTIONS } = useWoocommerce()
 	const paid_statuses = order_statuses?.filter(
 		(status) =>
@@ -164,4 +164,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(General)

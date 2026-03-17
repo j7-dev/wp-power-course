@@ -3,6 +3,7 @@ import React, { memo, useEffect } from 'react'
 
 const { Item } = Form
 
+// eslint-disable-next-line no-shadow
 export enum SUBSCRIPTION {
 	PRICE = '_subscription_price', // 訂閱價格每 M 個月 [N 元] - number
 	PERIOD_INTERVAL = '_subscription_period_interval', // 訂閱價格每 [M 個] 月 N 元 - number
@@ -57,6 +58,7 @@ const Subscription = () => {
 			<Item name={['regular_price']} label="原價" hidden />
 
 			<div className="mb-6">
+				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 				<label className="tw-block mb-2">訂閱價格</label>
 				<Space.Compact block>
 					<Item name={SUBSCRIPTION.PRICE} noStyle rules={[{ required: true }]}>
@@ -77,6 +79,7 @@ const Subscription = () => {
 			</div>
 
 			<div className="mb-6">
+				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 				<label className="tw-block mb-2">續訂截止日(扣款期數)</label>
 				<Space.Compact block>
 					<Item
@@ -104,6 +107,7 @@ const Subscription = () => {
 			</Item>
 
 			<div className="mb-6">
+				{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
 				<label className="tw-block mb-2">免費試用</label>
 				<Space.Compact block>
 					<Item name={SUBSCRIPTION.TRIAL_LENGTH} noStyle initialValue={0}>

@@ -17,7 +17,7 @@ import { productTypes } from '@/utils'
 const { RangePicker } = DatePicker
 const { Item } = Form
 
-const index = () => {
+const AnalyticsFilter = () => {
 	const {
 		viewType,
 		setViewType,
@@ -251,4 +251,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default AnalyticsFilter

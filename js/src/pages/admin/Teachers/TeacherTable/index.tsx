@@ -18,7 +18,7 @@ import UserSelector from '../UserSelector'
 
 import useColumns from './hooks/useColumns'
 
-const index = () => {
+const TeacherTable = () => {
 	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 
@@ -141,4 +141,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default TeacherTable

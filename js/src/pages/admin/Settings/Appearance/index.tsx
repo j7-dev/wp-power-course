@@ -5,7 +5,7 @@ import { FiSwitch } from '@/components/formItem'
 import { Heading } from '@/components/general'
 const { Item } = Form
 
-const index = () => {
+const Appearance = () => {
 	const form = Form.useFormInstance()
 	const watchFVT = Form.useWatch(['fix_video_and_tabs_mobile'], form)
 
@@ -72,4 +72,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(Appearance)

@@ -17,8 +17,8 @@ const items: TabsProps['items'] = [
 	},
 ]
 
-const index = () => {
+const Shortcodes = () => {
 	return <Tabs defaultActiveKey="general" items={items} />
 }
 
-export default memo(index)
+export default memo(Shortcodes)

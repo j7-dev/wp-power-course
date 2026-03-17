@@ -29,7 +29,7 @@
 
 | 類型 | 路徑 |
 |------|------|
-| 澄清紀錄 | `specs/open/clarify/2026-03-13-2012.md` |
+| 澄清紀錄 | `specs/open-issue/clarify/2026-03-13-2012.md` |
 | Activity（更新） | `specs/activities/課程上架流程.activity` — 新增 DECISION:2b |
 | Feature | `specs/features/chapter/上傳章節字幕.feature` |
 | Feature | `specs/features/chapter/刪除章節字幕.feature` |

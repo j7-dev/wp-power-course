@@ -5,8 +5,8 @@ import Table from '@/pages/admin/Products/ProductTable/Table'
 
 export const productsAtom = atom<TProductRecord[]>([])
 
-const index = () => {
+const ProductTable = () => {
 	return <Table />
 }
 
-export default index
+export default ProductTable

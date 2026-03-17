@@ -245,6 +245,7 @@ const BundleForm = () => {
 					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
 				>
 					<img
+						alt=""
 						src={course?.images?.[0]?.url || defaultImage}
 						className="h-9 w-16 rounded object-cover"
 					/>
@@ -296,6 +297,7 @@ const BundleForm = () => {
 										onClick={handleClick(product)}
 									>
 										<img
+											alt=""
 											src={images?.[0]?.url || defaultImage}
 											className="h-9 w-16 rounded object-cover"
 										/>
@@ -333,6 +335,7 @@ const BundleForm = () => {
 							>
 								<div className="rounded aspect-video w-16 overflow-hidden">
 									<img
+										alt=""
 										src={images?.[0]?.url || defaultImage}
 										className="w-full h-full rounded object-cover"
 									/>

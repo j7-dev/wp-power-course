@@ -25,7 +25,7 @@ const items: TabsProps['items'] = [
 	},
 ]
 
-const index = () => {
+const Settings = () => {
 	const [form] = Form.useForm()
 	const { handleSave, mutation } = useSave({ form })
 	const { isLoading: isSaveLoading } = mutation
@@ -54,4 +54,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(Settings)

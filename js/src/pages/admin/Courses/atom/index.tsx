@@ -1,7 +1,9 @@
 import { ModalProps, FormInstance } from 'antd'
 import { atom } from 'jotai'
 
+// eslint-disable-next-line import/extensions
 import { TMediaLibraryProps } from '@/bunny'
+// eslint-disable-next-line import/extensions
 import { TBunnyVideo } from '@/bunny/types'
 
 export const mediaLibraryAtom = atom<{

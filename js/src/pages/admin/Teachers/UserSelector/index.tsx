@@ -9,7 +9,7 @@ import { useState } from 'react'
 
 import { TUserRecord } from '@/pages/admin/Courses/List/types'
 
-const index = () => {
+const TeacherUserSelector = () => {
 	const apiUrl = useApiUrl('power-course')
 	const invalidate = useInvalidate()
 	const [userIds, setUserIds] = useState<string[]>([])
@@ -103,4 +103,4 @@ const index = () => {
 	)
 }
 
-export default index
+export default TeacherUserSelector
