@@ -6,8 +6,11 @@ import {
 	LeftOutlined,
 	RightOutlined,
 } from '@ant-design/icons'
-import { ThemedTitleV2, useThemedLayoutContext } from '@refinedev/antd'
-import type { RefineThemedLayoutV2SiderProps } from '@refinedev/antd'
+import {
+	ThemedTitleV2,
+	useThemedLayoutContext,
+	type RefineThemedLayoutV2SiderProps,
+} from '@refinedev/antd'
 import {
 	useTranslate,
 	useLogout,
@@ -32,8 +35,7 @@ import {
 	ConfigProvider,
 	Divider,
 } from 'antd'
-import React, { useContext } from 'react'
-import type { CSSProperties } from 'react'
+import React, { useContext, type CSSProperties } from 'react'
 import { FaBook } from 'react-icons/fa'
 
 const drawerButtonStyles: CSSProperties = {
@@ -77,7 +79,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 
 	const RenderToTitle = TitleFromProps ?? TitleFromContext ?? ThemedTitleV2
 
-	const renderTreeView = (tree: ITreeMenu[], selectedKey?: string) => {
+	const renderTreeView = (tree: ITreeMenu[], siderSelectedKey?: string) => {
 		return tree.map((item: ITreeMenu) => {
 			const {
 				icon,
@@ -87,7 +89,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 				name,
 				children,
 				parentName,
-				meta,
+				meta: routeMeta,
 				options,
 			} = item
 
@@ -106,14 +108,14 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 							icon={icon ?? <UnorderedListOutlined />}
 							title={label}
 						>
-							{renderTreeView(children, selectedKey)}
+							{renderTreeView(children, siderSelectedKey)}
 						</Menu.SubMenu>
 					</CanAccess>
 				)
 			}
-			const isSelected = key === selectedKey
+			const isSelected = key === siderSelectedKey
 			const isRoute = !(
-				pickNotDeprecated(meta?.parent, options?.parent, parentName) !==
+				pickNotDeprecated(routeMeta?.parent, options?.parent, parentName) !==
 					undefined && children.length === 0
 			)
 
@@ -148,6 +150,7 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 
 	const handleLogout = () => {
 		if (warnWhen) {
+			// eslint-disable-next-line no-alert
 			const confirm = window.confirm(
 				translate(
 					'warnWhenUnsavedChanges',

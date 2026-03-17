@@ -1,25 +1,17 @@
-import React, { useState } from 'react'
 import '@vidstack/react/player/styles/default/theme.css'
 import '@vidstack/react/player/styles/default/layouts/video.css'
-import {
-	MediaPlayer,
-	MediaProvider,
-	Poster,
-	MediaPlayerInstance,
-
-	// useStore,
-} from '@vidstack/react'
+import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react'
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
+import { stringToBool } from 'antd-toolkit/wp'
+import React, { useState } from 'react'
 
 import { WaterMark } from '@/components/general'
 
 import Ended from './Ended'
-
-import { stringToBool } from 'antd-toolkit/wp'
 
 let showWatermark = false
 
@@ -34,7 +26,7 @@ export type TPlayerProps = {
 	autoplay: 'yes' | 'no'
 }
 
-const index = ({
+const Player = ({
 	src,
 	thumbnail_url,
 	watermark_text,
@@ -119,4 +111,4 @@ const index = ({
 	)
 }
 
-export default index
+export default Player

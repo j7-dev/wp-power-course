@@ -21,6 +21,7 @@ export const SimpleImage: FC<SimpleImageProps> = ({
 	return (
 		<div className={cn('relative', className, ratio)} {...rest}>
 			<img
+				alt=""
 				src={src}
 				loading="lazy"
 				className={`relative z-20 w-full ${ratio} object-cover ${children ? 'opacity-50' : ''}`}

@@ -104,6 +104,7 @@ export const OnChangeUpload = () => {
 						<div className="w-full h-full absolute top-0 left-0 p-2">
 							<div className="w-full h-full rounded-lg overflow-hidden">
 								<img
+									alt=""
 									src={fileList?.[0]?.url}
 									className="w-full h-full object-cover"
 								/>

@@ -107,6 +107,7 @@ const Iframe: FC<{
 								}}
 							>
 								<iframe
+									title="影片播放器"
 									className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
 									src={embedVideoUrl}
 									loading="lazy"

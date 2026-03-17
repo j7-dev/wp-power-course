@@ -6,7 +6,7 @@ import { PiMicrosoftExcelLogoFill } from 'react-icons/pi'
 import { FileUpload } from '@/components/general'
 import { useEnv } from '@/hooks'
 
-const index = () => {
+const CsvUpload = () => {
 	const { SITE_URL } = useEnv()
 	const apiUrl = useApiUrl('power-course')
 	return (
@@ -111,4 +111,4 @@ const index = () => {
 	)
 }
 
-export default memo(index)
+export default memo(CsvUpload)
