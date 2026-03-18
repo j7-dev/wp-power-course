@@ -48,35 +48,42 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
 		await page.fill('#user_login', WP_ADMIN.username)
 		await page.fill('#user_pass', WP_ADMIN.password)
-		await page.click('#wp-submit')
 
-		// 等待登入成功 — 重導到 dashboard
-		await page.waitForURL(/wp-admin/, { timeout: 30_000 })
+		// 送出表單並等待導航完成
+		await Promise.all([
+			page.waitForNavigation({
+				waitUntil: 'domcontentloaded',
+				timeout: 60_000,
+			}),
+			page.locator('#wp-submit').click(),
+		])
+
+		// 確認已到 wp-admin（若被重導到其他位置則手動導航）
+		if (!page.url().includes('wp-admin')) {
+			await page.goto(`${baseURL}/wp-admin/`, {
+				waitUntil: 'domcontentloaded',
+				timeout: 30_000,
+			})
+		}
 
 		console.log('[Global Setup] Login successful, saving storage state...')
 		await context.storageState({ path: STORAGE_STATE_PATH })
 
-		// 3.5 刷新 WordPress 永久連結（flush rewrite rules）
-		console.log('[Global Setup] Flushing rewrite rules via Permalinks page...')
+		// 4. 取得 nonce（直接從登入後的 dashboard 頁面取，避免二次導航問題）
+		const nonce = await getNonceFromPage(page)
+		console.log('[Global Setup] Nonce acquired.')
+
+		// 3.5 刷新 WordPress 永久連結（透過 REST API 觸發 flush_rewrite_rules）
+		console.log('[Global Setup] Flushing rewrite rules via REST API...')
 		try {
-			await page.goto(`${baseURL}/wp-admin/options-permalink.php`, {
-				waitUntil: 'domcontentloaded',
-				timeout: 30_000,
+			await context.request.post(`${baseURL}/wp-json/wp/v2/settings`, {
+				headers: { 'X-WP-Nonce': nonce },
+				data: { permalink_structure: '/%postname%/' },
 			})
-			await page.click('#submit')
-			await page.waitForURL(/options-permalink/, { timeout: 30_000 })
 			console.log('[Global Setup] Rewrite rules flushed.')
 		} catch (e) {
-			console.warn('[Global Setup] Flush rewrite rules warning:', e)
+			console.warn('[Global Setup] Flush rewrite rules warning (non-fatal):', e)
 		}
-
-		// 4. 取得 nonce 並建立 API Client（後續用 REST API 取代 WP CLI）
-		await page.goto(`${baseURL}/wp-admin/`, {
-			waitUntil: 'domcontentloaded',
-			timeout: 30_000,
-		})
-		await page.waitForSelector('body.wp-admin', { timeout: 15_000 })
-		const nonce = await getNonceFromPage(page)
 		const api = new ApiClient(context.request, nonce)
 
 		// 4.1 停用 WooCommerce "Coming Soon" 模式

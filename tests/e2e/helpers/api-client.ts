@@ -547,8 +547,14 @@ export async function setupApiFromBrowser(
 	})
 	const page = await context.newPage()
 	const baseUrl = process.env.TEST_SITE_URL || 'http://localhost:8889'
-	await page.goto(`${baseUrl}/wp-admin/`)
-	await page.waitForSelector('body.wp-admin', { timeout: 15_000 })
+	await page.goto(`${baseUrl}/wp-admin/`, {
+		waitUntil: 'domcontentloaded',
+		timeout: 30_000,
+	})
+	// 等待 wpApiSettings 可用（比 body.wp-admin selector 更可靠）
+	await page.waitForFunction(() => !!(window as any).wpApiSettings?.nonce, {
+		timeout: 30_000,
+	})
 	const nonce = await getNonceFromPage(page)
 	return {
 		api: new ApiClient(context.request, nonce),
