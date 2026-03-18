@@ -7,17 +7,9 @@ import React, { useState, memo } from 'react'
 import { historyDrawerAtom } from '../atom'
 
 import { TimelineItemAdapter } from './adapter'
-import { TimelineLogType, THistoryDrawerProps, TStudentLog } from './types'
+import { TimelineLogType, TStudentLog } from './types'
 
-export const defaultHistoryDrawerProps: THistoryDrawerProps = {
-	user_id: undefined,
-	user_name: '',
-	course_id: undefined,
-	course_name: '',
-	drawerProps: {
-		open: false,
-	},
-}
+export { defaultHistoryDrawerProps } from './types'
 
 const loadingItems = new Array(8).fill(null).map((_, index) => ({
 	dot: <LoadingOutlined />,
