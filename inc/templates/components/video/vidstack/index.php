@@ -21,6 +21,7 @@ $default_args = [
 		'meta' => [],
 	],
 	'next_post_url'  => '',
+	'chapter_id'     => 0,
 ];
 
 /**
@@ -33,11 +34,12 @@ $args = wp_parse_args( $args, $default_args );
  * @var array{type: string, id: string, meta: ?array<string, mixed>} $video_info
  */
 [
-	'class'      => $class,
-	'thumbnail_url' => $thumbnail_url,
-	'hide_watermark'  => $hide_watermark,
-	'video_info'   => $video_info,
+	'class'          => $class,
+	'thumbnail_url'  => $thumbnail_url,
+	'hide_watermark' => $hide_watermark,
+	'video_info'     => $video_info,
 	'next_post_url'  => $next_post_url,
+	'chapter_id'     => $chapter_id,
 ] = $args;
 /** @var string $next_post_url */
 
@@ -82,6 +84,19 @@ if ($next_post_url) {
 	$next_post_url = \add_query_arg( 'autoplay', 'yes', $next_post_url );
 }
 
+// 讀取章節字幕列表，僅在有 chapter_id 時才讀取.
+/** @var int $chapter_id */
+$subtitles_attr = '';
+if ( $chapter_id > 0 ) {
+	$raw_subtitles = \get_post_meta( $chapter_id, 'chapter_subtitles', true );
+	if ( \is_array( $raw_subtitles ) && ! empty( $raw_subtitles ) ) {
+		$subtitles_json = \wp_json_encode( $raw_subtitles );
+		if ( $subtitles_json ) {
+			$subtitles_attr = \sprintf( ' data-subtitles="%s"', \esc_attr( $subtitles_json ) );
+		}
+	}
+}
+
 printf(
 /*html*/'
 <div class="pc-vidstack relative aspect-video %1$s !overflow-hidden"
@@ -93,6 +108,7 @@ printf(
 	data-watermark_interval="%7$s"
 	data-next_post_url="%8$s"
 	data-autoplay="%9$s"
+	%10$s
 >
 	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
 </div>
@@ -106,4 +122,5 @@ printf(
 	$watermark_interval,
 	(string) $next_post_url,
 	$autoplay,
+	$subtitles_attr,
 );

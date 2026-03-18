@@ -80,6 +80,7 @@ Plugin::load_template(
 		'video_info'    => $video_info,
 		'class'         => sprintf('rounded-none %s', $next_post_url ? 'has-next-post' : ''),
 		'next_post_url' => $next_post_url,
+		'chapter_id'    => $chapter_id,
 	]
 );
 echo '</div>';
