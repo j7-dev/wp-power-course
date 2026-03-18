@@ -15,6 +15,7 @@ $default_args = [
 	'thumbnail_url'  => '',
 	'hide_watermark' => false,
 	'next_post_url'  => '',
+	'chapter_id'     => 0,
 ];
 
 /**
@@ -27,11 +28,12 @@ $args = \wp_parse_args( $args, $default_args );
  * @var array{type: string, id: string, meta: ?array<string, mixed>} $video_info
  */
 [
-	'class'      => $class,
-	'video_info'   => $video_info,
-	'thumbnail_url' => $thumbnail_url,
+	'class'          => $class,
+	'video_info'     => $video_info,
+	'thumbnail_url'  => $thumbnail_url,
 	'hide_watermark' => $hide_watermark,
 	'next_post_url'  => $next_post_url,
+	'chapter_id'     => $chapter_id,
 ] = $args;
 
 $video_type = $video_info['type'];
@@ -59,5 +61,6 @@ Plugin::load_template(
 		'thumbnail_url'  => $thumbnail_url,
 		'hide_watermark' => $hide_watermark,
 		'next_post_url'  => $next_post_url,
+		'chapter_id'     => $chapter_id,
 	]
 );
