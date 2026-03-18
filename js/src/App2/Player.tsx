@@ -1,19 +1,29 @@
 import '@vidstack/react/player/styles/default/theme.css'
 import '@vidstack/react/player/styles/default/layouts/video.css'
-import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react'
+import { MediaPlayer, MediaProvider, Poster, Track } from '@vidstack/react'
 import {
 	defaultLayoutIcons,
 	DefaultVideoLayout,
 	DefaultAudioLayout,
 } from '@vidstack/react/player/layouts/default'
 import { stringToBool } from 'antd-toolkit/wp'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { WaterMark } from '@/components/general'
 
 import Ended from './Ended'
 
 let showWatermark = false
+
+/**
+ * 字幕軌道資料型別
+ */
+type TSubtitleTrack = {
+	srclang: string
+	label: string
+	url: string
+	attachment_id: number
+}
 
 export type TPlayerProps = {
 	src: string
@@ -24,6 +34,7 @@ export type TPlayerProps = {
 	watermark_interval: string
 	next_post_url: string
 	autoplay: 'yes' | 'no'
+	subtitles?: string
 }
 
 const Player = ({
@@ -35,27 +46,28 @@ const Player = ({
 	watermark_interval,
 	next_post_url,
 	autoplay,
+	subtitles,
 }: TPlayerProps) => {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isEnded, setIsEnded] = useState(false)
 
-	// const playerRef = useRef<MediaPlayerInstance>(null)
-	// const { playing } = useStore(MediaPlayerInstance, playerRef)
+	// 解析字幕 JSON 字串為陣列
+	const subtitleTracks: TSubtitleTrack[] = useMemo(() => {
+		if (!subtitles) return []
+		try {
+			const parsed = JSON.parse(subtitles)
+			if (Array.isArray(parsed)) {
+				return parsed as TSubtitleTrack[]
+			}
+		} catch (_e) {
+			// 字幕 JSON 解析失敗，忽略
+		}
+		return []
+	}, [subtitles])
 
 	return (
 		<>
 			<MediaPlayer
-				// ref={playerRef}
-				// onTouchEnd={(e) => {
-				// 	if (!playerRef?.current) {
-				// 		return
-				// 	}
-				// 	e.preventDefault()
-				// 	e.stopPropagation()
-
-				// 	const remoteControl = playerRef.current.remoteControl
-				// 	remoteControl.togglePaused()
-				// }}
 				src={src}
 				viewType="video"
 				streamType="on-demand"
@@ -76,6 +88,16 @@ const Player = ({
 			>
 				<MediaProvider>
 					<Poster className="vds-poster" />
+					{subtitleTracks.map((track) => (
+						<Track
+							key={track.srclang}
+							src={track.url}
+							kind="subtitles"
+							label={track.label}
+							language={track.srclang}
+							type="vtt"
+						/>
+					))}
 				</MediaProvider>
 				<DefaultAudioLayout
 					smallLayoutWhen={true}

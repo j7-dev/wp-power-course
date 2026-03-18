@@ -5,6 +5,7 @@ import { FC } from 'react'
 
 import { useEnv } from '@/hooks'
 
+import SubtitleManager from './SubtitleManager'
 import { TVideo } from './types'
 
 const { Item } = Form
@@ -64,35 +65,38 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 			<Item hidden {...formItemProps} />
 			{/* 如果章節已經有存影片，則顯示影片，有瀏覽器 preview，則以 瀏覽器 preview 優先 */}
 			{recordId && !isEmpty && (
-				<div className="relative aspect-video rounded-lg border border-dashed border-gray-300">
-					<div className="absolute w-full h-full top-0 left-0 p-2">
-						<div className="w-full h-full rounded-xl overflow-hidden">
-							<div
-								className={`rounded-xl bg-gray-200 ${!isEmpty ? 'tw-block' : 'tw-hidden'}`}
-								style={{
-									position: 'relative',
-									paddingTop: '56.25%',
-								}}
-							>
-								<iframe
-									title="影片播放器"
-									className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
-									src={videoUrl}
-									loading="lazy"
-									allow="encrypted-media;picture-in-picture;"
-									allowFullScreen={true}
-								></iframe>
-
+				<>
+					<div className="relative aspect-video rounded-lg border border-dashed border-gray-300">
+						<div className="absolute w-full h-full top-0 left-0 p-2">
+							<div className="w-full h-full rounded-xl overflow-hidden">
 								<div
-									onClick={handleDelete}
-									className="group absolute top-4 right-4 rounded-md size-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+									className={`rounded-xl bg-gray-200 ${!isEmpty ? 'tw-block' : 'tw-hidden'}`}
+									style={{
+										position: 'relative',
+										paddingTop: '56.25%',
+									}}
 								>
-									<DeleteOutlined className="text-red-500 group-hover:text-white" />
+									<iframe
+										title="影片播放器"
+										className="border-0 absolute top-0 left-0 w-full h-full rounded-xl"
+										src={videoUrl}
+										loading="lazy"
+										allow="encrypted-media;picture-in-picture;"
+										allowFullScreen={true}
+									></iframe>
+
+									<div
+										onClick={handleDelete}
+										className="group absolute top-4 right-4 rounded-md size-12 bg-white shadow-lg flex justify-center items-center transition duration-300 hover:bg-red-500 cursor-pointer"
+									>
+										<DeleteOutlined className="text-red-500 group-hover:text-white" />
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+					<SubtitleManager chapterId={recordId} />
+				</>
 			)}
 		</div>
 	)
