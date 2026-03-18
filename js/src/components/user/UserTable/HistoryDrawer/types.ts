@@ -10,6 +10,16 @@ export type THistoryDrawerProps = {
 	drawerProps?: DrawerProps
 }
 
+export const defaultHistoryDrawerProps: THistoryDrawerProps = {
+	user_id: undefined,
+	user_name: '',
+	course_id: undefined,
+	course_name: '',
+	drawerProps: {
+		open: false,
+	},
+}
+
 export type TStudentLog = {
 	id: string | number
 	user_id: string | number
