@@ -50,9 +50,48 @@ export default CoursesList
 - **Jotai atoms**: 局部 UI 狀態（sidebar collapse、selected items、form state）
   - atom 檔案命名為 `atom.tsx`，放在對應功能目錄內
 - **TanStack Query 4.x**: 所有伺服器端資料的 fetch/mutate
-- **Refine.dev hooks**: `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete`
+- **Refine.dev hooks**: `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete` 等（詳見下方 Refine.dev 資料存取規範）
   - 透過 resource name 對應 API 端點
   - DataProvider 類型：`wp-rest` | `wc-rest` | `wc-store`
+
+## Refine.dev 資料存取規範
+
+### SKILL 優先參考
+
+進行任何 Refine.dev 相關開發時，**必須**優先參考以下 SKILL 文件（位於 `~/.claude/skills/refine/references/`）：
+
+| SKILL 文件 | 用途 |
+|------------|------|
+| `references/app-setup.md` | Refine App 初始化、Provider 配置 |
+| `references/data-provider.md` | Data Provider 介面與自訂實作 |
+| `references/rest-data-provider.md` | REST Data Provider 設定與 API 對接 |
+| `references/auth-provider.md` | Auth Provider 認證流程 |
+| `references/data-hooks.md` | `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete` 等 Data Hooks |
+| `references/antd-crud.md` | Ant Design 整合 CRUD 元件（List, Show, Edit, Create） |
+
+### 禁止直接 API 呼叫
+
+- **禁止**使用 `fetch`、`axios`、`ky` 或其他 HTTP 客戶端直接呼叫 API
+- **所有資料讀取與寫入必須透過 Refine 的 Data Provider + Data Hooks** 進行
+- 這確保與 Refine 的快取機制、樂觀更新、錯誤處理、loading 狀態管理完整整合
+- 唯一例外：Refine Data Provider 本身的實作內部可使用 HTTP 客戶端
+
+```tsx
+// ❌ 錯誤：直接使用 fetch
+const response = await fetch('/wp-json/power-course/v2/courses')
+
+// ❌ 錯誤：直接使用 axios
+const { data } = await axios.get('/wp-json/power-course/v2/courses')
+
+// ✅ 正確：使用 Refine Data Hook
+const { data } = useList({ resource: 'courses' })
+
+// ✅ 正確：使用 Refine Data Hook 搭配 DataProvider 類型
+const { data } = useList({
+  resource: 'products',
+  meta: { dataProviderName: 'wc-rest' },
+})
+```
 
 ## Refine.dev 資源定義
 
