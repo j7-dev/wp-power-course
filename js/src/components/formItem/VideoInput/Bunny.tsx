@@ -6,7 +6,14 @@ import { FC } from 'react'
 import { useEnv } from '@/hooks'
 
 import SubtitleManager from './SubtitleManager'
-import { TVideo } from './types'
+import { TVideo, TVideoSlot } from './types'
+
+/** 有效的 Video Slot 值，用於 runtime 驗證 */
+const VALID_VIDEO_SLOTS: TVideoSlot[] = [
+	'chapter_video',
+	'feature_video',
+	'trial_video',
+]
 
 const { Item } = Form
 const Bunny: FC<FormItemProps> = (formItemProps) => {
@@ -16,6 +23,15 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 	if (!name) {
 		throw new Error('name is required')
 	}
+
+	/** 從 NamePath 陣列最後一個元素取得 video slot，並做 runtime 驗證 */
+	const nameArray = Array.isArray(name) ? name : [name]
+	const rawSlot = nameArray[nameArray.length - 1]
+	const videoSlot: TVideoSlot = VALID_VIDEO_SLOTS.includes(
+		rawSlot as TVideoSlot
+	)
+		? (rawSlot as TVideoSlot)
+		: 'chapter_video'
 
 	const recordId = Form.useWatch(['id'], form)
 
@@ -95,7 +111,7 @@ const Bunny: FC<FormItemProps> = (formItemProps) => {
 							</div>
 						</div>
 					</div>
-					<SubtitleManager chapterId={recordId} />
+					<SubtitleManager postId={recordId} videoSlot={videoSlot} />
 				</>
 			)}
 		</div>

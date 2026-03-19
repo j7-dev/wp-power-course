@@ -49,6 +49,8 @@ if ( 'none' !== $video_type ) {
 			'class'          => 'md:rounded-2xl',
 			'thumbnail_url'  => $image_url,
 			'hide_watermark' => true,
+			'chapter_id'     => $product_id,
+			'video_slot'     => 'feature_video',
 		]
 	);
 } else {

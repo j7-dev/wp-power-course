@@ -12,6 +12,8 @@ import {
 } from 'antd'
 import { FC, useState, useEffect, useCallback } from 'react'
 
+import { TVideoSlot } from './types'
+
 /** 字幕軌道資料 */
 type TSubtitleTrack = {
 	srclang: string
@@ -22,12 +24,14 @@ type TSubtitleTrack = {
 
 /** SubtitleManager 元件 Props */
 type TSubtitleManagerProps = {
-	/** 章節 ID，用於呼叫字幕相關 API */
-	chapterId: number
+	/** Post ID，用於呼叫字幕相關 API */
+	postId: number
+	/** Video slot 名稱，例如 chapter_video, feature_video, trial_video */
+	videoSlot?: TVideoSlot
 }
 
 /** 可選語言列表 */
-const LANGUAGES = [
+const SUBTITLE_LANGUAGES = [
 	{ value: 'zh-TW', label: '繁體中文' },
 	{ value: 'zh-CN', label: '简体中文' },
 	{ value: 'en', label: 'English' },
@@ -51,23 +55,28 @@ const LANGUAGES = [
  * 提供字幕上傳、列表顯示與刪除功能
  * 用於 Bunny Stream 影片的字幕管理
  */
-const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
+const SubtitleManager: FC<TSubtitleManagerProps> = ({
+	postId,
+	videoSlot = 'chapter_video',
+}) => {
 	const apiUrl = useApiUrl('power-course')
 
 	const [subtitles, setSubtitles] = useState<TSubtitleTrack[]>([])
 	const [loading, setLoading] = useState(false)
 	const [uploading, setUploading] = useState(false)
 	const [deletingLang, setDeletingLang] = useState<string | null>(null)
-	const [selectedLang, setSelectedLang] = useState<string>('zh-TW')
+	const [selectedLang, setSelectedLang] = useState<string | undefined>(
+		undefined
+	)
 
 	/** 字幕 API 的基礎路徑 */
-	const subtitleBaseUrl = `${apiUrl}/chapters/${chapterId}/subtitles`
+	const subtitleBaseUrl = `${apiUrl}/posts/${postId}/subtitles/${videoSlot}`
 
 	/** 取得 WP REST API Nonce */
 	const getNonce = (): string => window?.wpApiSettings?.nonce || ''
 
-	/** 取得已上傳的字幕列表 */
-	const fetchSubtitles = useCallback(async () => {
+	/** 取得已上傳的字幕列表，回傳最新資料供呼叫端使用 */
+	const fetchSubtitles = useCallback(async (): Promise<TSubtitleTrack[]> => {
 		setLoading(true)
 		try {
 			const response = await fetch(subtitleBaseUrl, {
@@ -83,8 +92,10 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 
 			const data: TSubtitleTrack[] = await response.json()
 			setSubtitles(data)
+			return data
 		} catch (_error) {
 			message.error('無法載入字幕列表')
+			return []
 		} finally {
 			setLoading(false)
 		}
@@ -99,17 +110,31 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 	const uploadedLangs = new Set(subtitles.map((s) => s.srclang))
 
 	/** 過濾已上傳的語言，只顯示未上傳的語言選項 */
-	const availableLanguages = LANGUAGES.filter(
+	const availableLanguages = SUBTITLE_LANGUAGES.filter(
 		(lang) => !uploadedLangs.has(lang.value)
 	)
 
+	/** 根據最新字幕列表計算下一個可用語言 */
+	const getNextAvailableLang = (
+		currentSubtitles: TSubtitleTrack[]
+	): string | undefined => {
+		const uploaded = new Set(currentSubtitles.map((s) => s.srclang))
+		const next = SUBTITLE_LANGUAGES.find((lang) => !uploaded.has(lang.value))
+		return next?.value
+	}
+
 	/** 根據語言代碼取得語言 label */
 	const getLangLabel = (srclang: string): string => {
-		return LANGUAGES.find((lang) => lang.value === srclang)?.label || srclang
+		return (
+			SUBTITLE_LANGUAGES.find((lang) => lang.value === srclang)?.label ||
+			srclang
+		)
 	}
 
 	/** 上傳字幕檔案 */
 	const handleUpload = async (file: File) => {
+		if (!selectedLang) return false
+
 		setUploading(true)
 		try {
 			const formData = new FormData()
@@ -133,15 +158,11 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 			}
 
 			message.success(`${getLangLabel(selectedLang)} 字幕上傳成功`)
-			await fetchSubtitles()
 
-			// 上傳成功後，自動選擇下一個可用語言
-			const nextAvailable = LANGUAGES.find(
-				(lang) => !uploadedLangs.has(lang.value) && lang.value !== selectedLang
-			)
-			if (nextAvailable) {
-				setSelectedLang(nextAvailable.value)
-			}
+			// 取得最新字幕列表，並自動切換至下一個可用語言
+			const latestSubtitles = await fetchSubtitles()
+			const nextLang = getNextAvailableLang(latestSubtitles)
+			setSelectedLang(nextLang)
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : '字幕上傳失敗'
@@ -191,7 +212,7 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 					value={selectedLang}
 					onChange={setSelectedLang}
 					options={availableLanguages}
-					placeholder="選擇語言"
+					placeholder="請選擇字幕語言"
 					disabled={availableLanguages.length === 0}
 				/>
 				<Upload
@@ -201,13 +222,15 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 						handleUpload(file)
 						return false
 					}}
-					disabled={uploading || availableLanguages.length === 0}
+					disabled={
+						uploading || availableLanguages.length === 0 || !selectedLang
+					}
 				>
 					<Button
 						size="small"
 						icon={<UploadOutlined />}
 						loading={uploading}
-						disabled={availableLanguages.length === 0}
+						disabled={availableLanguages.length === 0 || !selectedLang}
 					>
 						上傳字幕
 					</Button>
@@ -215,9 +238,8 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 			</div>
 
 			{/* 已上傳字幕列表 */}
-			{loading ? (
-				<Spin size="small" />
-			) : subtitles.length > 0 ? (
+			{loading && <Spin size="small" />}
+			{!loading && subtitles.length > 0 && (
 				<div className="flex flex-wrap gap-2">
 					{subtitles.map((track) => (
 						<Tag
@@ -243,7 +265,8 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({ chapterId }) => {
 						</Tag>
 					))}
 				</div>
-			) : (
+			)}
+			{!loading && subtitles.length === 0 && (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
 					description="尚未上傳字幕"
