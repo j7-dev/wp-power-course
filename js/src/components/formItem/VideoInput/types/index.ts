@@ -7,3 +7,6 @@ export type TVideo = {
 		[key: string]: any
 	}
 }
+
+/** Video slot 類型，對應後端的影片欄位名稱 */
+export type TVideoSlot = 'chapter_video' | 'feature_video' | 'trial_video'

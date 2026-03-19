@@ -49,22 +49,13 @@ async function globalSetup(config: FullConfig): Promise<void> {
 		await page.fill('#user_login', WP_ADMIN.username)
 		await page.fill('#user_pass', WP_ADMIN.password)
 
-		// 送出表單並等待導航完成
-		await Promise.all([
-			page.waitForNavigation({
-				waitUntil: 'domcontentloaded',
-				timeout: 60_000,
-			}),
-			page.locator('#wp-submit').click(),
-		])
-
-		// 確認已到 wp-admin（若被重導到其他位置則手動導航）
-		if (!page.url().includes('wp-admin')) {
-			await page.goto(`${baseURL}/wp-admin/`, {
-				waitUntil: 'domcontentloaded',
-				timeout: 30_000,
-			})
-		}
+		// 送出表單後直接導航到 wp-admin（避免 waitForNavigation race condition）
+		await page.locator('#wp-submit').click()
+		await page.waitForTimeout(2_000)
+		await page.goto(`${baseURL}/wp-admin/`, {
+			waitUntil: 'domcontentloaded',
+			timeout: 60_000,
+		})
 
 		console.log('[Global Setup] Login successful, saving storage state...')
 		await context.storageState({ path: STORAGE_STATE_PATH })

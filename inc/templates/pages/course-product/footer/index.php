@@ -57,6 +57,8 @@ if ( 'none' !== $video_type ) {
 	[
 		'video_info'     => $trial_video,
 		'hide_watermark' => true,
+		'chapter_id'     => $product_id,
+		'video_slot'     => 'trial_video',
 	],
 	false
 	)

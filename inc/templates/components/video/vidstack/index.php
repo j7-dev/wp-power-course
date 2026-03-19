@@ -22,6 +22,7 @@ $default_args = [
 	],
 	'next_post_url'  => '',
 	'chapter_id'     => 0,
+	'video_slot'     => 'chapter_video',
 ];
 
 /**
@@ -40,8 +41,10 @@ $args = wp_parse_args( $args, $default_args );
 	'video_info'     => $video_info,
 	'next_post_url'  => $next_post_url,
 	'chapter_id'     => $chapter_id,
+	'video_slot'     => $video_slot,
 ] = $args;
 /** @var string $next_post_url */
+/** @var string $video_slot */
 
 [
 	'id'   => $video_id,
@@ -84,11 +87,12 @@ if ($next_post_url) {
 	$next_post_url = \add_query_arg( 'autoplay', 'yes', $next_post_url );
 }
 
-// 讀取章節字幕列表，僅在有 chapter_id 時才讀取.
+// 讀取字幕列表，根據 video_slot 動態決定 meta key.
 /** @var int $chapter_id */
 $subtitles_attr = '';
 if ( $chapter_id > 0 ) {
-	$raw_subtitles = \get_post_meta( $chapter_id, 'chapter_subtitles', true );
+	$meta_key      = "pc_subtitles_{$video_slot}";
+	$raw_subtitles = \get_post_meta( $chapter_id, $meta_key, true );
 	if ( \is_array( $raw_subtitles ) && ! empty( $raw_subtitles ) ) {
 		$subtitles_json = \wp_json_encode( $raw_subtitles );
 		if ( $subtitles_json ) {

@@ -129,7 +129,7 @@ class SubtitleUploadTest extends TestCase {
 	 * @param array<int, array{srclang: string, label: string, url: string, attachment_id: int}> $subtitles 字幕資料
 	 */
 	private function seed_subtitles( int $chapter_id, array $subtitles ): void {
-		\update_post_meta( $chapter_id, 'chapter_subtitles', $subtitles );
+		\update_post_meta( $chapter_id, 'pc_subtitles_chapter_video', $subtitles );
 	}
 
 	// ========== 前置（狀態）==========
@@ -137,24 +137,24 @@ class SubtitleUploadTest extends TestCase {
 	/**
 	 * @test
 	 * @group error
-	 * Rule: 前置（狀態）- 章節必須存在
-	 * Example: 不存在的章節上傳字幕失敗
+	 * Rule: 前置（狀態）- post 必須存在且 post type 支援
+	 * Example: 不存在的 post 上傳字幕失敗
 	 */
 	public function test_不存在的章節上傳字幕失敗(): void {
 		// Given 暫存 SRT 檔案
 		$srt_path = $this->create_temp_srt_file();
 
-		// When 管理員為不存在的章節 9999 上傳字幕
+		// When 管理員為不存在的 post 9999 上傳字幕
 		try {
-			$this->services->subtitle->upload_subtitle( 9999, $srt_path, 'subtitle.srt', 'zh-TW' );
+			$this->services->subtitle->upload_subtitle( 9999, $srt_path, 'subtitle.srt', 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
 		}
 
-		// Then 操作失敗，錯誤為「章節不存在」
+		// Then 操作失敗，錯誤訊息包含 post_not_found
 		$this->assert_operation_failed();
-		$this->assert_operation_failed_with_message( '章節不存在' );
+		$this->assert_operation_failed_with_message( 'post_not_found' );
 	}
 
 	/**
@@ -181,7 +181,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員為同章節上傳相同語言字幕
 		try {
-			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'new-subtitle.srt', 'zh-TW' );
+			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'new-subtitle.srt', 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -203,7 +203,7 @@ class SubtitleUploadTest extends TestCase {
 	public function test_未提供檔案時上傳失敗(): void {
 		// When 管理員未提供檔案上傳字幕
 		try {
-			$this->services->subtitle->upload_subtitle( $this->chapter_id, '', 'subtitle.srt', 'zh-TW' );
+			$this->services->subtitle->upload_subtitle( $this->chapter_id, '', 'subtitle.srt', 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -225,7 +225,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員未提供語言代碼上傳字幕
 		try {
-			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', '' );
+			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', '', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -249,7 +249,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員上傳不支援的格式
 		try {
-			$this->services->subtitle->upload_subtitle( $this->chapter_id, $txt_path, 'subtitle.txt', 'zh-TW' );
+			$this->services->subtitle->upload_subtitle( $this->chapter_id, $txt_path, 'subtitle.txt', 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -273,7 +273,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員使用無效的語言代碼上傳字幕
 		try {
-			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', 'zzz' );
+			$this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', 'zzz', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -297,7 +297,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員為章節上傳 SRT 字幕
 		try {
-			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', 'zh-TW' );
+			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $srt_path, 'subtitle.srt', 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -309,7 +309,7 @@ class SubtitleUploadTest extends TestCase {
 		$this->assertNotNull( $result );
 
 		// And 章節的字幕列表應包含 zh-TW
-		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id );
+		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id, 'chapter_video' );
 		$zh_track  = array_filter( $subtitles, fn( $s ) => $s['srclang'] === 'zh-TW' );
 		$this->assertCount( 1, $zh_track, '字幕列表應包含 zh-TW' );
 
@@ -336,7 +336,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員為章節上傳 VTT 字幕
 		try {
-			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $vtt_path, 'subtitle.vtt', 'en' );
+			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $vtt_path, 'subtitle.vtt', 'en', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -348,7 +348,7 @@ class SubtitleUploadTest extends TestCase {
 		$this->assertNotNull( $result );
 
 		// And 章節的字幕列表應包含 en
-		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id );
+		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id, 'chapter_video' );
 		$en_track  = array_filter( $subtitles, fn( $s ) => $s['srclang'] === 'en' );
 		$this->assertCount( 1, $en_track, '字幕列表應包含 en' );
 
@@ -388,7 +388,7 @@ class SubtitleUploadTest extends TestCase {
 
 		// When 管理員為同章節上傳英文字幕
 		try {
-			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $vtt_path, 'subtitle-en.vtt', 'en' );
+			$result          = $this->services->subtitle->upload_subtitle( $this->chapter_id, $vtt_path, 'subtitle-en.vtt', 'en', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -399,7 +399,7 @@ class SubtitleUploadTest extends TestCase {
 		$this->assert_operation_succeeded();
 
 		// And 章節的字幕列表應包含兩種語言
-		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id );
+		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id, 'chapter_video' );
 		$this->assertCount( 2, $subtitles, '字幕列表應有 2 個語言' );
 
 		$srclangs = array_column( $subtitles, 'srclang' );

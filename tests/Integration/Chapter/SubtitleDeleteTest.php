@@ -111,10 +111,10 @@ class SubtitleDeleteTest extends TestCase {
 	 *
 	 * @param int                                       $chapter_id 章節 ID
 	 * @param array<int, array{srclang: string, label: string}> $tracks 字幕軌道定義
-	 * @return array<string, int> srclang → attachment_id 映射
+	 * @return array<string, int> srclang -> attachment_id 映射
 	 */
 	private function seed_subtitles_with_attachments( int $chapter_id, array $tracks ): array {
-		$subtitles     = [];
+		$subtitles      = [];
 		$attachment_map = [];
 
 		foreach ( $tracks as $track ) {
@@ -131,7 +131,7 @@ class SubtitleDeleteTest extends TestCase {
 			$attachment_map[ $track['srclang'] ] = $attachment_id;
 		}
 
-		\update_post_meta( $chapter_id, 'chapter_subtitles', $subtitles );
+		\update_post_meta( $chapter_id, 'pc_subtitles_chapter_video', $subtitles );
 		return $attachment_map;
 	}
 
@@ -140,21 +140,21 @@ class SubtitleDeleteTest extends TestCase {
 	/**
 	 * @test
 	 * @group error
-	 * Rule: 前置（狀態）- 章節必須存在
-	 * Example: 不存在的章節刪除字幕失敗
+	 * Rule: 前置（狀態）- post 必須存在且 post type 支援
+	 * Example: 不存在的 post 刪除字幕失敗
 	 */
 	public function test_不存在的章節刪除字幕失敗(): void {
-		// When 管理員刪除不存在的章節 9999 的字幕
+		// When 管理員刪除不存在的 post 9999 的字幕
 		try {
-			$this->services->subtitle->delete_subtitle( 9999, 'zh-TW' );
+			$this->services->subtitle->delete_subtitle( 9999, 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
 		}
 
-		// Then 操作失敗，錯誤為「章節不存在」
+		// Then 操作失敗，錯誤訊息包含 post_not_found
 		$this->assert_operation_failed();
-		$this->assert_operation_failed_with_message( '章節不存在' );
+		$this->assert_operation_failed_with_message( 'post_not_found' );
 	}
 
 	/**
@@ -175,7 +175,7 @@ class SubtitleDeleteTest extends TestCase {
 
 		// When 管理員刪除不存在的 ja 語言字幕
 		try {
-			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'ja' );
+			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'ja', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -197,7 +197,7 @@ class SubtitleDeleteTest extends TestCase {
 	public function test_未指定語言代碼時刪除失敗(): void {
 		// When 管理員未指定語言代碼刪除字幕
 		try {
-			$this->services->subtitle->delete_subtitle( $this->chapter_id, '' );
+			$this->services->subtitle->delete_subtitle( $this->chapter_id, '', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -230,7 +230,7 @@ class SubtitleDeleteTest extends TestCase {
 
 		// When 管理員刪除 zh-TW 字幕
 		try {
-			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'zh-TW' );
+			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -240,7 +240,7 @@ class SubtitleDeleteTest extends TestCase {
 		$this->assert_operation_succeeded();
 
 		// And 章節字幕列表應只包含 en
-		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id );
+		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id, 'chapter_video' );
 		$this->assertCount( 1, $subtitles );
 
 		$srclangs = array_column( $subtitles, 'srclang' );
@@ -268,7 +268,7 @@ class SubtitleDeleteTest extends TestCase {
 
 		// When 管理員刪除 zh-TW 字幕
 		try {
-			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'zh-TW' );
+			$this->services->subtitle->delete_subtitle( $this->chapter_id, 'zh-TW', 'chapter_video' );
 			$this->lastError = null;
 		} catch ( \Throwable $e ) {
 			$this->lastError = $e;
@@ -278,7 +278,7 @@ class SubtitleDeleteTest extends TestCase {
 		$this->assert_operation_succeeded();
 
 		// And 章節字幕列表應為空
-		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id );
+		$subtitles = $this->services->subtitle->get_subtitles( $this->chapter_id, 'chapter_video' );
 		$this->assertEmpty( $subtitles, '字幕列表應為空' );
 	}
 }

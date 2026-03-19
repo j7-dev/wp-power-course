@@ -162,7 +162,7 @@ abstract class Utils {
 			'chapter_video'      => \get_post_meta($post->ID, 'chapter_video', true),
 			'enable_comment'     => \get_post_meta($post->ID, 'enable_comment', true) ?: 'no',
 			'editor'             => \get_post_meta($post->ID, 'editor', true) ?: 'power-editor',
-			'chapter_subtitles'  => \get_post_meta($post->ID, 'chapter_subtitles', true) ?: [],
+			'chapter_subtitles'  => \get_post_meta($post->ID, 'pc_subtitles_chapter_video', true) ?: [],
 		] + $children;
 
 		return array_merge(
