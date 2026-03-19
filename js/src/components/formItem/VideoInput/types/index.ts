@@ -10,3 +10,11 @@ export type TVideo = {
 
 /** Video slot 類型，對應後端的影片欄位名稱 */
 export type TVideoSlot = 'chapter_video' | 'feature_video' | 'trial_video'
+
+/** 字幕軌道資料 */
+export type TSubtitleTrack = {
+	srclang: string
+	label: string
+	url: string
+	attachment_id: number
+}
