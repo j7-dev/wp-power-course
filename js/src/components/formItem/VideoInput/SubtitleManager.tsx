@@ -1,26 +1,9 @@
 import { DeleteOutlined, UploadOutlined } from '@ant-design/icons'
-import { useApiUrl } from '@refinedev/core'
-import {
-	Button,
-	Select,
-	Upload,
-	message,
-	Tag,
-	Spin,
-	Popconfirm,
-	Empty,
-} from 'antd'
-import { FC, useState, useEffect, useCallback } from 'react'
+import { Button, Select, Upload, Tag, Spin, Popconfirm, Empty } from 'antd'
+import { FC, useState } from 'react'
 
+import { useSubtitles } from './hooks'
 import { TVideoSlot } from './types'
-
-/** 字幕軌道資料 */
-type TSubtitleTrack = {
-	srclang: string
-	label: string
-	url: string
-	attachment_id: number
-}
 
 /** SubtitleManager 元件 Props */
 type TSubtitleManagerProps = {
@@ -59,53 +42,18 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 	postId,
 	videoSlot = 'chapter_video',
 }) => {
-	const apiUrl = useApiUrl('power-course')
-
-	const [subtitles, setSubtitles] = useState<TSubtitleTrack[]>([])
-	const [loading, setLoading] = useState(false)
-	const [uploading, setUploading] = useState(false)
-	const [deletingLang, setDeletingLang] = useState<string | null>(null)
 	const [selectedLang, setSelectedLang] = useState<string | undefined>(
 		undefined
 	)
 
-	/** 字幕 API 的基礎路徑 */
-	const subtitleBaseUrl = `${apiUrl}/posts/${postId}/subtitles/${videoSlot}`
-
-	/** 取得 WP REST API Nonce */
-	const getNonce = (): string => window?.wpApiSettings?.nonce || ''
-
-	/** 取得已上傳的字幕列表，回傳最新資料供呼叫端使用 */
-	const fetchSubtitles = useCallback(async (): Promise<TSubtitleTrack[]> => {
-		setLoading(true)
-		try {
-			const response = await fetch(subtitleBaseUrl, {
-				headers: {
-					'X-WP-Nonce': getNonce(),
-				},
-				credentials: 'include',
-			})
-
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}`)
-			}
-
-			const data: TSubtitleTrack[] = await response.json()
-			setSubtitles(data)
-			return data
-		} catch (_error) {
-			message.error('無法載入字幕列表')
-
-			return []
-		} finally {
-			setLoading(false)
-		}
-	}, [subtitleBaseUrl])
-
-	/** 初始載入字幕列表 */
-	useEffect(() => {
-		fetchSubtitles()
-	}, [fetchSubtitles])
+	const {
+		subtitles,
+		isLoading,
+		isUploading,
+		deletingLang,
+		handleUpload,
+		handleDelete,
+	} = useSubtitles({ postId, videoSlot })
 
 	/** 已上傳語言的 Set，用於過濾可選語言 */
 	const uploadedLangs = new Set(subtitles.map((s) => s.srclang))
@@ -115,91 +63,12 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 		(lang) => !uploadedLangs.has(lang.value)
 	)
 
-	/** 根據最新字幕列表計算下一個可用語言 */
-	const getNextAvailableLang = (
-		currentSubtitles: TSubtitleTrack[]
-	): string | undefined => {
-		const uploaded = new Set(currentSubtitles.map((s) => s.srclang))
-		const next = SUBTITLE_LANGUAGES.find((lang) => !uploaded.has(lang.value))
-		return next?.value
-	}
-
 	/** 根據語言代碼取得語言 label */
 	const getLangLabel = (srclang: string): string => {
 		return (
 			SUBTITLE_LANGUAGES.find((lang) => lang.value === srclang)?.label ||
 			srclang
 		)
-	}
-
-	/** 上傳字幕檔案 */
-	const handleUpload = async (file: File) => {
-		if (!selectedLang) return false
-
-		setUploading(true)
-		try {
-			const formData = new FormData()
-			formData.append('file', file)
-			formData.append('srclang', selectedLang)
-
-			const response = await fetch(subtitleBaseUrl, {
-				method: 'POST',
-				headers: {
-					'X-WP-Nonce': getNonce(),
-				},
-				credentials: 'include',
-				body: formData,
-			})
-
-			if (!response.ok) {
-				const errorData = await response.json().catch(() => null)
-				throw new Error(
-					errorData?.message || `上傳失敗 (HTTP ${response.status})`
-				)
-			}
-
-			message.success(`${getLangLabel(selectedLang)} 字幕上傳成功`)
-
-			// 取得最新字幕列表，並自動切換至下一個可用語言
-			const latestSubtitles = await fetchSubtitles()
-			const nextLang = getNextAvailableLang(latestSubtitles)
-			setSelectedLang(nextLang)
-		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : '字幕上傳失敗'
-			message.error(errorMessage)
-		} finally {
-			setSelectedLang(undefined)
-			setUploading(false)
-		}
-
-		// 回傳 false 阻止 Ant Design Upload 的預設上傳行為
-		return false
-	}
-
-	/** 刪除指定語言的字幕 */
-	const handleDelete = async (srclang: string) => {
-		setDeletingLang(srclang)
-		try {
-			const response = await fetch(`${subtitleBaseUrl}/${srclang}`, {
-				method: 'DELETE',
-				headers: {
-					'X-WP-Nonce': getNonce(),
-				},
-				credentials: 'include',
-			})
-
-			if (!response.ok) {
-				throw new Error(`刪除失敗 (HTTP ${response.status})`)
-			}
-
-			message.success(`${getLangLabel(srclang)} 字幕已刪除`)
-			await fetchSubtitles()
-		} catch (_error) {
-			message.error('字幕刪除失敗')
-		} finally {
-			setDeletingLang(null)
-		}
 	}
 
 	return (
@@ -221,17 +90,21 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 					accept=".srt,.vtt"
 					showUploadList={false}
 					beforeUpload={(file) => {
-						handleUpload(file)
+						if (selectedLang) {
+							handleUpload(file, selectedLang, {
+								onSettled: () => setSelectedLang(undefined),
+							})
+						}
 						return false
 					}}
 					disabled={
-						uploading || availableLanguages.length === 0 || !selectedLang
+						isUploading || availableLanguages.length === 0 || !selectedLang
 					}
 				>
 					<Button
 						size="small"
 						icon={<UploadOutlined />}
-						loading={uploading}
+						loading={isUploading}
 						disabled={availableLanguages.length === 0 || !selectedLang}
 					>
 						上傳字幕
@@ -240,8 +113,8 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 			</div>
 
 			{/* 已上傳字幕列表 */}
-			{loading && <Spin size="small" />}
-			{!loading && subtitles.length > 0 && (
+			{isLoading && <Spin size="small" />}
+			{!isLoading && subtitles.length > 0 && (
 				<div className="flex flex-wrap gap-2">
 					{subtitles.map((track) => (
 						<Tag
@@ -268,7 +141,7 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 					))}
 				</div>
 			)}
-			{!loading && subtitles.length === 0 && (
+			{!isLoading && subtitles.length === 0 && (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
 					description="尚未上傳字幕"
