@@ -95,6 +95,7 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 			return data
 		} catch (_error) {
 			message.error('無法載入字幕列表')
+
 			return []
 		} finally {
 			setLoading(false)
@@ -168,6 +169,7 @@ const SubtitleManager: FC<TSubtitleManagerProps> = ({
 				error instanceof Error ? error.message : '字幕上傳失敗'
 			message.error(errorMessage)
 		} finally {
+			setSelectedLang(undefined)
 			setUploading(false)
 		}
 
