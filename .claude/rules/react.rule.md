@@ -50,7 +50,7 @@ export default CoursesList
 - **Jotai atoms**: 局部 UI 狀態（sidebar collapse、selected items、form state）
   - atom 檔案命名為 `atom.tsx`，放在對應功能目錄內
 - **TanStack Query 4.x**: 所有伺服器端資料的 fetch/mutate
-- **Refine.dev hooks**: `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete` 等（詳見下方 Refine.dev 資料存取規範）
+- **Refine.dev hooks**: `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete`, `useTable` , `useCustom`, `useCustomMutation` 等（詳見下方 Refine.dev 資料存取規範）
   - 透過 resource name 對應 API 端點
   - DataProvider 類型：`wp-rest` | `wc-rest` | `wc-store`
 
@@ -66,7 +66,7 @@ export default CoursesList
 | `references/data-provider.md` | Data Provider 介面與自訂實作 |
 | `references/rest-data-provider.md` | REST Data Provider 設定與 API 對接 |
 | `references/auth-provider.md` | Auth Provider 認證流程 |
-| `references/data-hooks.md` | `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete` 等 Data Hooks |
+| `references/data-hooks.md` | `useList`, `useOne`, `useCreate`, `useUpdate`, `useDelete`, `useTable` , `useCustom`, `useCustomMutation` 等 Data Hooks |
 | `references/antd-crud.md` | Ant Design 整合 CRUD 元件（List, Show, Edit, Create） |
 
 ### 禁止直接 API 呼叫
