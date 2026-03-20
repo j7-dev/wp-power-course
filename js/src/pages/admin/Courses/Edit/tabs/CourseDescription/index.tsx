@@ -1,15 +1,21 @@
-import { Form, Input, Select, FormProps, FormInstance } from 'antd'
+import { PlusOutlined, EyeOutlined, CloseOutlined } from '@ant-design/icons'
+import { Form, Input, Select, Image, FormProps, FormInstance } from 'antd'
 import {
 	CopyText,
 	DescriptionDrawer,
 	defaultSelectProps,
 	BlockNoteDrawer,
+	defaultImage,
 } from 'antd-toolkit'
+import {
+	TImage,
+	MediaLibraryModal,
+	useMediaLibraryModal,
+} from 'antd-toolkit/wp'
 import { memo, useEffect, useState } from 'react'
 
 import { FiSwitch, VideoInput } from '@/components/formItem'
 import { Heading, ListSelect, useListSelect } from '@/components/general'
-import { FileUpload } from '@/components/post'
 import useOptions from '@/components/product/ProductTable/hooks/useOptions'
 import {
 	keyLabelMapper,
@@ -34,6 +40,26 @@ const CourseDescriptionComponent = ({
 	const [initTeacherIds, setInitTeacherIds] = useState<string[]>([])
 	const course = useRecord()
 	const parseData = useParseData()
+
+	// 課程封面圖：使用 WordPress Media Library 選圖器
+	const watchImages: TImage[] = (Form.useWatch(['images'], form) || [])?.filter(
+		(i: TImage) => !!i
+	)
+
+	const { show, modalProps, ...mediaLibraryProps } = useMediaLibraryModal({
+		initItems: watchImages,
+		onConfirm: (selectedItems) => {
+			form.setFieldValue(['images'], selectedItems)
+		},
+	})
+
+	/** 移除課程封面圖 */
+	const handleRemoveImage = (_imageId: string) => () => {
+		form.setFieldValue(
+			['images'],
+			watchImages.filter(({ id: imageId }) => imageId !== _imageId)
+		)
+	}
 
 	const { listSelectProps } = useListSelect<TUserRecord>({
 		resource: 'users',
@@ -146,14 +172,52 @@ const CourseDescriptionComponent = ({
 
 					<div className="mb-8">
 						{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-						<label className="mb-3 tw-block">課程封面圖</label>
-						<FileUpload />
-						<Item hidden name={['files']} label="課程封面圖">
-							<Input />
-						</Item>
-						<Item hidden name={['images']} initialValue={[]}>
-							<Input />
-						</Item>
+						<label className="text-sm font-normal inline-block pb-2">
+							課程封面圖
+						</label>
+						<Item name={['images']} hidden initialValue={[]} />
+						<div className="flex flex-wrap gap-2">
+							{watchImages?.map(({ id: _imageId, url }) => (
+								<Image
+									key={_imageId}
+									className="product-image aspect-square rounded-lg object-cover w-24 h-24"
+									preview={{
+										mask: (
+											<div className="flex flex-col items-center justify-center">
+												<div>
+													<EyeOutlined />
+													<CloseOutlined
+														className="ml-2"
+														onClick={handleRemoveImage(_imageId)}
+													/>
+												</div>
+											</div>
+										),
+										maskClassName: 'rounded-lg',
+									}}
+									src={url || defaultImage}
+									fallback={defaultImage}
+								/>
+							))}
+							{watchImages?.length < 1 && (
+								<div
+									className="group aspect-square rounded-lg cursor-pointer bg-gray-100 hover:bg-blue-100 border-dashed border-2 border-gray-200 hover:border-blue-200 transition-all duration-300 flex justify-center items-center w-24 h-24"
+									onClick={show}
+								>
+									<PlusOutlined className="text-gray-500 group-hover:text-blue-500 transition-all duration-300" />
+								</div>
+							)}
+						</div>
+						<MediaLibraryModal
+							modalProps={modalProps}
+							mediaLibraryProps={{
+								...mediaLibraryProps,
+								limit: 1,
+								uploadProps: {
+									accept: 'image/*',
+								},
+							}}
+						/>
 					</div>
 					<div className="mb-8">
 						<p className="mb-3">課程封面影片</p>

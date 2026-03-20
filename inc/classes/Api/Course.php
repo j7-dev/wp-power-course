@@ -521,7 +521,6 @@ final class Course extends ApiBase {
 		$id = $request['id'] ?? '';
 
 		$body_params = $request->get_body_params();
-		$file_params = $request->get_file_params();
 
 		$skip_keys   = [
 			'feature_video',
@@ -544,11 +543,7 @@ final class Course extends ApiBase {
 		[
 			'data'      => $data,
 			'meta_data' => $meta_data,
-		] = WP::separator( $body_params, 'product', $file_params['files'] ?? [] );
-
-		if (!( $meta_data['files'] ?? '' )) {
-			unset($meta_data['files']);
-		}
+		] = WP::separator( $body_params, 'product' );
 
 		return [
 			'product'   => $product,
@@ -594,7 +589,6 @@ final class Course extends ApiBase {
 		}
 
 		unset( $meta_data['images'] ); // 圖片只做顯示用，不用存
-		unset( $meta_data['files'] ); // files 會上傳，不用存
 
 		// 將 teacher_ids 分離出來，因為要單獨處理，不是直接存 serialized array 進 db
 		$array_keys = [ 'teacher_ids' ];
