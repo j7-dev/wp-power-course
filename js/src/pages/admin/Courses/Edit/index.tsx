@@ -1,6 +1,7 @@
 import { Edit, useForm } from '@refinedev/antd'
 import { Tabs, TabsProps, Form, Switch, Button, Tooltip, FormProps } from 'antd'
-import { toFormData, formatDateRangeData } from 'antd-toolkit'
+import { formatDateRangeData } from 'antd-toolkit'
+import { TImage } from 'antd-toolkit/wp'
 import { memo, useMemo, useState } from 'react'
 
 import { SortableChapters } from '@/components/course'
@@ -45,16 +46,34 @@ export const CoursesEdit = () => {
 	}, [query])
 
 	const parseData = (values: Partial<TCourseRecord>) => {
-		const formattedValues = formatDateRangeData(values, 'sale_date_range', [
+		return formatDateRangeData(values, 'sale_date_range', [
 			'date_on_sale_from',
 			'date_on_sale_to',
 		])
-		return toFormData(formattedValues) as Partial<TCourseRecord>
 	}
 
-	// 將 [] 轉為 '[]'，例如，清除原本分類時，如果空的，前端會是 undefined，轉成 formData 時會遺失
+	/**
+	 * 表單提交前轉換資料
+	 * 將 images 欄位轉為 image_id / gallery_image_ids，
+	 * 並移除不需要的 files、images 欄位
+	 */
 	const handleOnFinish = (values: Partial<TCourseRecord>) => {
-		onFinish(parseData(values))
+		const formattedValues = parseData(values)
+		const {
+			images = [],
+			// @ts-ignore -- files 欄位已廢棄，從表單值中移除以免傳送
+			files,
+			...rest
+		} = formattedValues
+		const [mainImage, ...galleryImages] = images as TImage[]
+
+		onFinish({
+			...rest,
+			image_id: mainImage ? mainImage.id : '0',
+			gallery_image_ids: galleryImages?.length
+				? galleryImages.map(({ id }) => id)
+				: '[]',
+		})
 	}
 
 	// 重組 formProps
