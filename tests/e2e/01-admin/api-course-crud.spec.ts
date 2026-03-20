@@ -388,6 +388,131 @@ test.describe('Course CRUD API', () => {
 		})
 	})
 
+	// ── 課程封面圖（image_id）────────────────────
+
+	/**
+	 * 驗證課程 API 的 image_id 欄位處理
+	 *
+	 * TDD 紅燈階段：測試預期在 MediaLibraryModal 重構完成後通過。
+	 * 重構目標：前端改用 image_id 傳送，後端需正確處理此欄位。
+	 */
+	test.describe('課程封面圖 API', () => {
+		let imageId: number
+		let imageCourseId: number
+
+		test.beforeAll(async () => {
+			// 建立測試用課程
+			imageCourseId = await api.createCourse('CRUD 測試 — 封面圖')
+			createdCourseIds.push(imageCourseId)
+
+			// 取得媒體庫中的第一張圖片 ID（若無則使用 0）
+			const mediaResp = await api.wpGet<{ id: number }[]>('media', {
+				per_page: '1',
+				media_type: 'image',
+			})
+			const media = mediaResp.data as { id: number }[]
+			imageId = Array.isArray(media) && media.length > 0 ? media[0].id : 0
+		})
+
+		test('更新課程時傳送有效 image_id — API 應回傳成功', async () => {
+			if (imageId === 0) {
+				test.skip()
+				return
+			}
+
+			// 傳送 image_id（新的欄位格式，重構後支援）
+			const resp = await api.pcPostForm<UpdateResponse>(
+				`courses/${imageCourseId}`,
+				{
+					image_id: String(imageId),
+					type: 'simple',
+					course_schedule: '0',
+					editor: 'power-editor',
+				},
+			)
+
+			expect(resp.status).toBe(200)
+			expect(resp.data.code).toBe('update_success')
+
+			// 驗證圖片已正確設定 — GET 後 images 陣列應包含該圖片
+			const getResp = await api.pcGet<Record<string, unknown>>(
+				`courses/${imageCourseId}`,
+			)
+			expect(getResp.status).toBe(200)
+
+			const images = getResp.data.images as { id: number; url: string }[] | undefined
+			expect(Array.isArray(images)).toBe(true)
+			expect(images?.length).toBeGreaterThan(0)
+			expect(images?.[0].id).toBe(imageId)
+			expect(images?.[0].url).toBeTruthy()
+		})
+
+		test('更新課程時傳送 image_id 為 0 — 應清除封面圖並回傳成功', async () => {
+			// 先設定一張圖片
+			if (imageId !== 0) {
+				await api.wcPost(`products/${imageCourseId}`, {
+					images: [{ id: imageId }],
+				})
+			}
+
+			// 傳送 image_id: '0' 清除封面圖
+			const resp = await api.pcPostForm<UpdateResponse>(
+				`courses/${imageCourseId}`,
+				{
+					image_id: '0',
+					type: 'simple',
+					course_schedule: '0',
+					editor: 'power-editor',
+				},
+			)
+
+			expect(resp.status).toBe(200)
+			expect(resp.data.code).toBe('update_success')
+
+			// 驗證封面圖已清除 — images 陣列應為空或不含主圖
+			const getResp = await api.pcGet<Record<string, unknown>>(
+				`courses/${imageCourseId}`,
+			)
+			expect(getResp.status).toBe(200)
+
+			const images = getResp.data.images as { id: number }[] | undefined
+			// 清除封面圖後 images 應為空陣列
+			expect(Array.isArray(images)).toBe(true)
+			expect(images?.length).toBe(0)
+		})
+
+		test('GET 課程後 images 陣列應包含正確的圖片資訊結構', async () => {
+			if (imageId === 0) {
+				test.skip()
+				return
+			}
+
+			// 設定封面圖
+			await api.wcPost(`products/${imageCourseId}`, {
+				images: [{ id: imageId }],
+			})
+
+			const resp = await api.pcGet<Record<string, unknown>>(
+				`courses/${imageCourseId}`,
+			)
+			expect(resp.status).toBe(200)
+
+			// 驗證 images 陣列的資料結構正確
+			const images = resp.data.images as Record<string, unknown>[] | undefined
+			expect(Array.isArray(images)).toBe(true)
+
+			if (images && images.length > 0) {
+				const firstImage = images[0]
+				// 每張圖片應包含 id 和 url 欄位
+				expect(firstImage).toHaveProperty('id')
+				expect(firstImage).toHaveProperty('url')
+				expect(typeof firstImage.id).toBe('number')
+				expect(typeof firstImage.url).toBe('string')
+				expect(firstImage.url).toMatch(/^https?:\/\//)
+			}
+		})
+	})
+
 	// ── 分頁 ──────────────────────────────────────
 
 	test.describe('列表分頁', () => {
