@@ -33,6 +33,20 @@ Feature: 取得課程進度
       Then 操作成功
       And 回應中 expired 應為 true
 
+    Example: 訂閱為 pending-cancel 時仍可查詢進度
+      Given 用戶 "Alice" 在課程 100 的 expire_date 為 "subscription_789"
+      And 訂閱 789 的狀態為 "pending-cancel"
+      When 用戶 "Alice" 查詢課程 100 的進度
+      Then 操作成功
+      And 回應中 expired 應為 false
+
+    Example: 訂閱為 cancelled 時回傳 expired 標記
+      Given 用戶 "Alice" 在課程 100 的 expire_date 為 "subscription_789"
+      And 訂閱 789 的狀態為 "cancelled"
+      When 用戶 "Alice" 查詢課程 100 的進度
+      Then 操作成功
+      And 回應中 expired 應為 true
+
   # ========== 前置（參數）==========
 
   Rule: 前置（參數）- course_id 必須提供且為正整數
