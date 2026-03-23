@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Video component
  */
@@ -23,10 +24,10 @@ $default_args = [
  * @var array $args
  * @phpstan-ignore-next-line
  */
-$args = \wp_parse_args( $args, $default_args );
+$args = \wp_parse_args($args, $default_args);
 
 /**
- * @var array{type: string, id: string, meta: ?array<string, mixed>} $video_info
+ * @var array{type: string, id: string, meta: ?array<string, mixed>}|string $video_info
  */
 [
 	'class'          => $class,
@@ -38,7 +39,7 @@ $args = \wp_parse_args( $args, $default_args );
 	'video_slot'     => $video_slot,
 ] = $args;
 
-$video_type = $video_info['type'];
+$video_type = is_array($video_info) ? $video_info['type'] : 'none';
 
 if ('none' === $video_type) {
 	return;
@@ -51,7 +52,7 @@ if ('code' === $video_type) {
 			'video_info' => $video_info,
 			'class'      => $class,
 		]
-		);
+	);
 	return;
 }
 
