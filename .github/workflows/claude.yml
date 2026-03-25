@@ -57,7 +57,7 @@ jobs:
             actions: read
           settings: .claude/settings.json
           plugin_marketplaces: |
-            j7-dev/wp-workflows
+            https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows
           claude_args: |
