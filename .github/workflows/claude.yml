@@ -30,21 +30,40 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: 解析留言中的 Agent 參數
+        id: parse_agent
+        run: |
+          # 讀取留言內容
+          COMMENT="${{ github.event.comment.body }}"
+
+          # 使用正則表達式尋找 "--agent 某個名稱" (例如 --agent clarifier)
+          # 如果沒找到，預設不帶入 agent (或是你可以設定一個預設的 agent)
+          AGENT_NAME=$(echo "$COMMENT" | grep -oP -- '--agent \K\S+' || echo "")
+
+          if [ -n "$AGENT_NAME" ]; then
+            echo "擷取到指定 Agent: $AGENT_NAME"
+            echo "AGENT_ARG=--agent $AGENT_NAME" >> $GITHUB_ENV
+          else
+            echo "未指定 Agent，將使用預設模式"
+            echo "AGENT_ARG=" >> $GITHUB_ENV
+          fi
+
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
-
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
-
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr:*)'
-
+          settings: .claude/settings.json
+          plugin_marketplaces: |
+            j7-dev/wp-workflows
+          plugins: |
+            wp-workflows
+          claude_args: |
+            --dangerously-skip-permissions
+            --allowedTools
+            --max-turns 20
+            --model claude-opus-4-6
+            --teammate-mode in-process
+            ${{ env.AGENT_ARG }}
