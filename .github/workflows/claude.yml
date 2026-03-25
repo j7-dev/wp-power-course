@@ -45,10 +45,23 @@ jobs:
             COMMENT="$COMMENT_BODY"
           fi
 
+          # 先檢查有沒有明確指定 --agent
           AGENT_NAME=$(echo "$COMMENT" | grep -oP -- '--agent \K\S+' || echo "")
 
+          # 如果沒有明確指定，就用關鍵字判斷
+          if [ -z "$AGENT_NAME" ]; then
+            # 擷取 @claude 後面的文字來比對關鍵字
+            AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
+
+            if echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格)'; then
+              AGENT_NAME="wp-workflows:clarifier"
+            elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|實作)'; then
+              AGENT_NAME="wp-workflows:planner"
+            fi
+          fi
+
           if [ -n "$AGENT_NAME" ]; then
-            echo "擷取到指定 Agent: $AGENT_NAME"
+            echo "擷取到 Agent: $AGENT_NAME"
             echo "AGENT_ARG=--agent $AGENT_NAME" >> $GITHUB_ENV
           else
             echo "未指定 Agent，將使用預設模式"
@@ -71,5 +84,4 @@ jobs:
             --dangerously-skip-permissions
             --max-turns 20
             --model claude-opus-4-6
-            --teammate-mode in-process
             ${{ env.AGENT_ARG }}
