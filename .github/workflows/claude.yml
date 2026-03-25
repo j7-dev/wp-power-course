@@ -67,4 +67,5 @@ jobs:
             --dangerously-skip-permissions
             --max-turns 20
             --model claude-opus-4-6
+            --teammate-mode in-process
             ${{ env.AGENT_ARG }}
