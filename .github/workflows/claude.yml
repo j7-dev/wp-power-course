@@ -32,13 +32,17 @@ jobs:
 
       - name: 解析留言中的 Agent 參數
         id: parse_agent
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REVIEW_BODY: ${{ github.event.review.body }}
         run: |
           if [ "${{ github.event_name }}" = "issues" ]; then
-            COMMENT="${{ github.event.issue.body }}"
+            COMMENT="$ISSUE_BODY"
           elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
-            COMMENT="${{ github.event.review.body }}"
+            COMMENT="$REVIEW_BODY"
           else
-            COMMENT="${{ github.event.comment.body }}"
+            COMMENT="$COMMENT_BODY"
           fi
 
           AGENT_NAME=$(echo "$COMMENT" | grep -oP -- '--agent \K\S+' || echo "")
