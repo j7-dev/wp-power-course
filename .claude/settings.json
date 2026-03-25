@@ -3,6 +3,5 @@
 		"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
 	},
 	"language": "traditional chinese",
-	"effortLevel": "high",
-	"skipDangerousModePermissionPrompt": true
+	"effortLevel": "high"
 }
