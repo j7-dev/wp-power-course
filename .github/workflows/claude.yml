@@ -33,11 +33,14 @@ jobs:
       - name: 解析留言中的 Agent 參數
         id: parse_agent
         run: |
-          # 讀取留言內容
-          COMMENT="${{ github.event.comment.body }}"
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            COMMENT="${{ github.event.issue.body }}"
+          elif [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            COMMENT="${{ github.event.review.body }}"
+          else
+            COMMENT="${{ github.event.comment.body }}"
+          fi
 
-          # 使用正則表達式尋找 "--agent 某個名稱" (例如 --agent clarifier)
-          # 如果沒找到，預設不帶入 agent (或是你可以設定一個預設的 agent)
           AGENT_NAME=$(echo "$COMMENT" | grep -oP -- '--agent \K\S+' || echo "")
 
           if [ -n "$AGENT_NAME" ]; then
@@ -62,8 +65,6 @@ jobs:
             wp-workflows
           claude_args: |
             --dangerously-skip-permissions
-            --allowedTools
             --max-turns 20
             --model claude-opus-4-6
-            --teammate-mode in-process
             ${{ env.AGENT_ARG }}
