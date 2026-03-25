@@ -68,8 +68,65 @@ jobs:
             echo "AGENT_ARG=" >> $GITHUB_ENV
           fi
 
-      - name: Run Claude Code
-        id: claude
+      # ── 第 1 次嘗試 ──────────────────────────────────
+      - name: "Run Claude Code (attempt 1/3)"
+        id: claude_attempt_1
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          settings: .claude/settings.json
+          plugin_marketplaces: |
+            https://github.com/j7-dev/wp-workflows.git
+          plugins: |
+            wp-workflows
+          claude_args: |
+            --dangerously-skip-permissions
+            --max-turns 30
+            --model claude-opus-4-6
+            ${{ env.AGENT_ARG }}
+
+      # ── 第 1 次失敗 → 等待後重試 ──────────────────────
+      - name: "等待重試 (attempt 1 failed)"
+        if: steps.claude_attempt_1.outcome == 'failure'
+        run: |
+          echo "⚠️ 第 1 次嘗試失敗，等待 30 秒後重試..."
+          sleep 30
+
+      # ── 第 2 次嘗試 ──────────────────────────────────
+      - name: "Run Claude Code (attempt 2/3)"
+        id: claude_attempt_2
+        if: steps.claude_attempt_1.outcome == 'failure'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          settings: .claude/settings.json
+          plugin_marketplaces: |
+            https://github.com/j7-dev/wp-workflows.git
+          plugins: |
+            wp-workflows
+          claude_args: |
+            --dangerously-skip-permissions
+            --max-turns 30
+            --model claude-opus-4-6
+            ${{ env.AGENT_ARG }}
+
+      # ── 第 2 次失敗 → 等待後重試 ──────────────────────
+      - name: "等待重試 (attempt 2 failed)"
+        if: steps.claude_attempt_1.outcome == 'failure' && steps.claude_attempt_2.outcome == 'failure'
+        run: |
+          echo "⚠️ 第 2 次嘗試失敗，等待 60 秒後重試..."
+          sleep 60
+
+      # ── 第 3 次嘗試（最後一次，不加 continue-on-error）──
+      - name: "Run Claude Code (attempt 3/3 - final)"
+        id: claude_attempt_3
+        if: steps.claude_attempt_1.outcome == 'failure' && steps.claude_attempt_2.outcome == 'failure'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
