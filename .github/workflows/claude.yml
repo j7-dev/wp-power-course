@@ -192,38 +192,9 @@ jobs:
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: composer install --no-interaction --prefer-dist
 
-      - name: 清除所有 Docker 容器（確保乾淨環境）
-        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
-        run: |
-          docker rm -f $(docker ps -aq) 2>/dev/null || true
-          docker volume prune -f 2>/dev/null || true
-
-      - name: 建立 CI wp-env 覆蓋設定（避免 plugin 自動啟用失敗）
-        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
-        run: |
-          cat > .wp-env.override.json << 'OVERRIDE_EOF'
-          {
-            "plugins": [
-              "https://downloads.wordpress.org/plugin/woocommerce.zip",
-              "https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip"
-            ],
-            "mappings": {
-              "wp-content/uploads": "./tests/e2e/.uploads",
-              "wp-content/plugins/wp-power-course": "."
-            }
-          }
-          OVERRIDE_EOF
-
       - name: 啟動 wp-env 測試環境
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: npx wp-env start
-
-      - name: 安裝 Composer 依賴並啟用 Plugin
-        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
-        run: |
-          npx wp-env run cli --env-cwd=wp-content/plugins/wp-power-course -- composer install --no-interaction --prefer-dist
-          npx wp-env run cli -- wp plugin activate wp-power-course
-          npx wp-env run tests-cli -- wp plugin activate wp-power-course
 
       # ── 測試循環 1/3 ─────────────────────────────────
       - name: "PHPUnit 測試 (cycle 1/3)"
@@ -232,7 +203,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          npx wp-env run tests-cli --env-cwd=wp-content/plugins/wp-power-course \
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
             vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
 
       - name: "載入測試輸出 (cycle 1)"
@@ -282,7 +253,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          npx wp-env run tests-cli --env-cwd=wp-content/plugins/wp-power-course \
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
             vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
 
       - name: "載入測試輸出 (cycle 2)"
@@ -333,7 +304,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          npx wp-env run tests-cli --env-cwd=wp-content/plugins/wp-power-course \
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
             vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
 
       # ── 彙整測試結果 ─────────────────────────────────
