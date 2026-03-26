@@ -30,6 +30,10 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: 儲存初始 Git SHA
+        id: save_sha
+        run: echo "initial_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
       - name: 解析留言中的 Agent 參數
         id: parse_agent
         env:
@@ -142,3 +146,256 @@ jobs:
             --max-turns 30
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
+
+      # ══════════════════════════════════════════════════
+      # PHPUnit 整合測試 + 自動修復循環
+      # ══════════════════════════════════════════════════
+
+      # ── 檢查 Claude 結果與程式碼變更 ──────────────────
+      - name: 檢查 Claude 結果與程式碼變更
+        id: check_result
+        run: |
+          CLAUDE_OK="false"
+          if [ "${{ steps.claude_attempt_1.outcome }}" = "success" ] || \
+             [ "${{ steps.claude_attempt_2.outcome }}" = "success" ] || \
+             [ "${{ steps.claude_attempt_3.outcome }}" = "success" ]; then
+            CLAUDE_OK="true"
+          fi
+          echo "claude_ok=$CLAUDE_OK" >> $GITHUB_OUTPUT
+
+          CURRENT_SHA=$(git rev-parse HEAD)
+          if [ "$CURRENT_SHA" != "${{ steps.save_sha.outputs.initial_sha }}" ] || \
+             [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "✅ 偵測到程式碼變更，將執行整合測試"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ 無程式碼變更，跳過測試"
+          fi
+
+      # ── 測試環境設置 ─────────────────────────────────
+      - name: 設定 Node.js
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 設定 pnpm
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 安裝 Node 依賴
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: pnpm install
+
+      - name: 啟動 wp-env 測試環境
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: npx wp-env start
+
+      - name: 安裝 Composer 依賴（測試容器內）
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: |
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
+            composer install --no-interaction
+
+      # ── 測試循環 1/3 ─────────────────────────────────
+      - name: "PHPUnit 測試 (cycle 1/3)"
+        id: test_cycle_1
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
+            vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
+
+      - name: "載入測試輸出 (cycle 1)"
+        if: steps.test_cycle_1.outcome == 'failure'
+        run: |
+          {
+            echo 'TEST_OUTPUT<<GHEOF'
+            tail -c 45000 /tmp/phpunit_output.txt
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
+
+      - name: "Claude 修復程式碼 (fix 1/3)"
+        id: claude_fix_1
+        if: steps.test_cycle_1.outcome == 'failure'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          settings: .claude/settings.json
+          plugin_marketplaces: |
+            https://github.com/j7-dev/wp-workflows.git
+          plugins: |
+            wp-workflows
+          direct_prompt: |
+            PHPUnit 整合測試失敗了。請根據以下測試輸出修復程式碼。
+
+            測試輸出：
+            ```
+            ${{ env.TEST_OUTPUT }}
+            ```
+
+            規則：
+            1. 分析失敗的測試，只修改需要修復的生產程式碼
+            2. 不要修改測試檔案（除非測試本身有明顯 bug）
+            3. 修復後請 commit 變更
+          claude_args: |
+            --dangerously-skip-permissions
+            --max-turns 15
+            --model claude-opus-4-6
+
+      # ── 測試循環 2/3 ─────────────────────────────────
+      - name: "PHPUnit 測試 (cycle 2/3)"
+        id: test_cycle_2
+        if: steps.test_cycle_1.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
+            vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
+
+      - name: "載入測試輸出 (cycle 2)"
+        if: steps.test_cycle_2.outcome == 'failure'
+        run: |
+          {
+            echo 'TEST_OUTPUT<<GHEOF'
+            tail -c 45000 /tmp/phpunit_output.txt
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
+
+      - name: "Claude 修復程式碼 (fix 2/3)"
+        id: claude_fix_2
+        if: steps.test_cycle_2.outcome == 'failure'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          settings: .claude/settings.json
+          plugin_marketplaces: |
+            https://github.com/j7-dev/wp-workflows.git
+          plugins: |
+            wp-workflows
+          direct_prompt: |
+            PHPUnit 整合測試第二次仍然失敗。請更仔細分析根本原因並修復。
+
+            測試輸出：
+            ```
+            ${{ env.TEST_OUTPUT }}
+            ```
+
+            規則：
+            1. 這是第 2 次修復嘗試，請更仔細地分析根本原因
+            2. 只修改需要修復的生產程式碼
+            3. 不要修改測試檔案（除非測試本身有明顯 bug）
+            4. 修復後請 commit 變更
+          claude_args: |
+            --dangerously-skip-permissions
+            --max-turns 15
+            --model claude-opus-4-6
+
+      # ── 測試循環 3/3（最終測試，無修復）───────────────
+      - name: "PHPUnit 測試 (cycle 3/3 - final)"
+        id: test_cycle_3
+        if: steps.test_cycle_2.outcome == 'failure'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course \
+            vendor/bin/phpunit --testdox --colors=never 2>&1 | tee /tmp/phpunit_output.txt
+
+      # ── 彙整測試結果 ─────────────────────────────────
+      - name: 彙整測試結果
+        id: final_result
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: |
+          if [ "${{ steps.test_cycle_1.outcome }}" = "success" ]; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+            echo "cycle=1" >> $GITHUB_OUTPUT
+            echo "fix_count=0" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.test_cycle_2.outcome }}" = "success" ]; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+            echo "cycle=2" >> $GITHUB_OUTPUT
+            echo "fix_count=1" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.test_cycle_3.outcome }}" = "success" ]; then
+            echo "status=passed" >> $GITHUB_OUTPUT
+            echo "cycle=3" >> $GITHUB_OUTPUT
+            echo "fix_count=2" >> $GITHUB_OUTPUT
+          else
+            echo "status=failed" >> $GITHUB_OUTPUT
+            if [ "${{ steps.test_cycle_3.outcome }}" != "skipped" ]; then
+              echo "cycle=3" >> $GITHUB_OUTPUT
+              echo "fix_count=2" >> $GITHUB_OUTPUT
+            elif [ "${{ steps.test_cycle_2.outcome }}" != "skipped" ]; then
+              echo "cycle=2" >> $GITHUB_OUTPUT
+              echo "fix_count=1" >> $GITHUB_OUTPUT
+            else
+              echo "cycle=1" >> $GITHUB_OUTPUT
+              echo "fix_count=0" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+          # 載入最終測試輸出供留言使用
+          {
+            echo 'FINAL_TEST_OUTPUT<<GHEOF'
+            tail -c 45000 /tmp/phpunit_output.txt
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
+
+      # ── 發佈測試結果留言 ─────────────────────────────
+      - name: 發佈測試結果留言
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const status = '${{ steps.final_result.outputs.status }}';
+            const cycle = '${{ steps.final_result.outputs.cycle }}';
+            const fixCount = '${{ steps.final_result.outputs.fix_count }}';
+            const testOutput = process.env.FINAL_TEST_OUTPUT || '（無測試輸出）';
+
+            const passed = status === 'passed';
+            const emoji = passed ? '✅' : '❌';
+            const statusText = passed ? '通過' : '失敗';
+
+            let fixInfo = '';
+            if (passed && parseInt(fixCount) > 0) {
+              fixInfo = `\n> 🔧 Claude 自動修復了 ${fixCount} 次後測試通過`;
+            } else if (!passed) {
+              fixInfo = `\n> ⚠️ Claude 嘗試修復 ${fixCount} 次後測試仍然失敗，需要人工介入`;
+            }
+
+            const body = [
+              `## ${emoji} PHPUnit 整合測試${statusText}`,
+              fixInfo,
+              '',
+              '<details>',
+              '<summary>📋 測試輸出（點擊展開）</summary>',
+              '',
+              '```',
+              testOutput.substring(0, 60000),
+              '```',
+              '',
+              '</details>',
+              '',
+              '---',
+              `*🤖 測試在 Claude Code 開發完成後自動執行（cycle ${cycle}/3）*`,
+            ].join('\n');
+
+            const issueNumber = context.issue?.number
+              || context.payload?.issue?.number
+              || context.payload?.pull_request?.number;
+            if (issueNumber) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: body,
+              });
+            }
