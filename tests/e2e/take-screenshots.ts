@@ -156,6 +156,7 @@ async function main(): Promise<void> {
 	try {
 		// 使用 admin storageState 建立 context
 		const context = await browser.newContext({
+			baseURL: BASE_URL,
 			storageState: STORAGE_STATE,
 			viewport: { width: 1920, height: 1080 },
 			ignoreHTTPSErrors: true,

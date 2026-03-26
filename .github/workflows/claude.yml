@@ -348,6 +348,58 @@ jobs:
             fi
           fi
 
+          # 解析 PHPUnit 測試統計
+          # PHPUnit 成功格式: "OK (42 tests, 120 assertions)"
+          # PHPUnit 失敗格式: "Tests: 42, Assertions: 120, Failures: 3, Errors: 1."
+          SUMMARY_LINE=$(grep -E '(^OK \(|^Tests: )' /tmp/phpunit_output.txt | tail -1 || echo "")
+
+          if echo "$SUMMARY_LINE" | grep -q '^OK'; then
+            # 成功格式
+            TOTAL_TESTS=$(echo "$SUMMARY_LINE" | grep -oP '\d+(?= tests?)' || echo "0")
+            TOTAL_ASSERTIONS=$(echo "$SUMMARY_LINE" | grep -oP '\d+(?= assertions?)' || echo "0")
+            TOTAL_FAILURES=0
+            TOTAL_ERRORS=0
+            TOTAL_WARNINGS=$(echo "$SUMMARY_LINE" | grep -oP '\d+(?= warnings?)' || echo "0")
+            TOTAL_SKIPPED=$(echo "$SUMMARY_LINE" | grep -oP '\d+(?= skipped)' || echo "0")
+            TOTAL_INCOMPLETE=$(echo "$SUMMARY_LINE" | grep -oP '\d+(?= incomplete)' || echo "0")
+          elif echo "$SUMMARY_LINE" | grep -q '^Tests:'; then
+            # 失敗格式
+            TOTAL_TESTS=$(echo "$SUMMARY_LINE" | grep -oP 'Tests: \K\d+' || echo "0")
+            TOTAL_ASSERTIONS=$(echo "$SUMMARY_LINE" | grep -oP 'Assertions: \K\d+' || echo "0")
+            TOTAL_FAILURES=$(echo "$SUMMARY_LINE" | grep -oP 'Failures: \K\d+' || echo "0")
+            TOTAL_ERRORS=$(echo "$SUMMARY_LINE" | grep -oP 'Errors: \K\d+' || echo "0")
+            TOTAL_WARNINGS=$(echo "$SUMMARY_LINE" | grep -oP 'Warnings: \K\d+' || echo "0")
+            TOTAL_SKIPPED=$(echo "$SUMMARY_LINE" | grep -oP 'Skipped: \K\d+' || echo "0")
+            TOTAL_INCOMPLETE=$(echo "$SUMMARY_LINE" | grep -oP 'Incomplete: \K\d+' || echo "0")
+          else
+            TOTAL_TESTS="?"
+            TOTAL_ASSERTIONS="?"
+            TOTAL_FAILURES="?"
+            TOTAL_ERRORS="?"
+            TOTAL_WARNINGS="0"
+            TOTAL_SKIPPED="0"
+            TOTAL_INCOMPLETE="0"
+          fi
+
+          # 計算通過數
+          if [ "$TOTAL_TESTS" != "?" ]; then
+            TOTAL_PASSED=$((TOTAL_TESTS - ${TOTAL_FAILURES:-0} - ${TOTAL_ERRORS:-0} - ${TOTAL_SKIPPED:-0} - ${TOTAL_INCOMPLETE:-0}))
+            [ "$TOTAL_PASSED" -lt 0 ] && TOTAL_PASSED=0
+          else
+            TOTAL_PASSED="?"
+          fi
+
+          echo "test_total=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+          echo "test_passed=$TOTAL_PASSED" >> $GITHUB_OUTPUT
+          echo "test_failures=$TOTAL_FAILURES" >> $GITHUB_OUTPUT
+          echo "test_errors=$TOTAL_ERRORS" >> $GITHUB_OUTPUT
+          echo "test_assertions=$TOTAL_ASSERTIONS" >> $GITHUB_OUTPUT
+          echo "test_skipped=$TOTAL_SKIPPED" >> $GITHUB_OUTPUT
+          echo "test_incomplete=$TOTAL_INCOMPLETE" >> $GITHUB_OUTPUT
+          echo "test_warnings=$TOTAL_WARNINGS" >> $GITHUB_OUTPUT
+
+          echo "📊 測試統計: ${TOTAL_TESTS} tests, ${TOTAL_PASSED} passed, ${TOTAL_FAILURES} failures, ${TOTAL_ERRORS} errors"
+
           # 載入最終測試輸出供留言使用
           {
             echo 'FINAL_TEST_OUTPUT<<GHEOF'
@@ -497,6 +549,16 @@ jobs:
             const fixCount = '${{ steps.final_result.outputs.fix_count }}';
             const testOutput = process.env.FINAL_TEST_OUTPUT || '（無測試輸出）';
 
+            // 測試統計
+            const testTotal = '${{ steps.final_result.outputs.test_total }}';
+            const testPassed = '${{ steps.final_result.outputs.test_passed }}';
+            const testFailures = '${{ steps.final_result.outputs.test_failures }}';
+            const testErrors = '${{ steps.final_result.outputs.test_errors }}';
+            const testAssertions = '${{ steps.final_result.outputs.test_assertions }}';
+            const testSkipped = '${{ steps.final_result.outputs.test_skipped }}';
+            const testIncomplete = '${{ steps.final_result.outputs.test_incomplete }}';
+            const testWarnings = '${{ steps.final_result.outputs.test_warnings }}';
+
             const passed = status === 'passed';
             const emoji = passed ? '✅' : '❌';
             const statusText = passed ? '通過' : '失敗';
@@ -506,6 +568,44 @@ jobs:
               fixInfo = `\n> 🔧 Claude 自動修復了 ${fixCount} 次後測試通過`;
             } else if (!passed) {
               fixInfo = `\n> ⚠️ Claude 嘗試修復 ${fixCount} 次後測試仍然失敗，需要人工介入`;
+            }
+
+            // 測試統計摘要
+            let summaryTable = '';
+            if (testTotal !== '?') {
+              const totalNum = parseInt(testTotal) || 0;
+              const passedNum = parseInt(testPassed) || 0;
+              const passRate = totalNum > 0 ? ((passedNum / totalNum) * 100).toFixed(1) : '0.0';
+
+              summaryTable = [
+                '',
+                '### 📊 測試統計',
+                '',
+                '| 項目 | 數量 |',
+                '|------|------|',
+                `| 測試總數 | **${testTotal}** |`,
+                `| ✅ 通過 | **${testPassed}** |`,
+              ].join('\n');
+
+              if (parseInt(testFailures) > 0) {
+                summaryTable += `\n| ❌ 失敗 | **${testFailures}** |`;
+              }
+              if (parseInt(testErrors) > 0) {
+                summaryTable += `\n| 💥 錯誤 | **${testErrors}** |`;
+              }
+              if (parseInt(testSkipped) > 0) {
+                summaryTable += `\n| ⏭️ 跳過 | **${testSkipped}** |`;
+              }
+              if (parseInt(testIncomplete) > 0) {
+                summaryTable += `\n| 🚧 未完成 | **${testIncomplete}** |`;
+              }
+              if (parseInt(testWarnings) > 0) {
+                summaryTable += `\n| ⚠️ 警告 | **${testWarnings}** |`;
+              }
+
+              summaryTable += `\n| 斷言數 | **${testAssertions}** |`;
+              summaryTable += `\n| 通過率 | **${passRate}%** |`;
+              summaryTable += '\n';
             }
 
             // 截圖區塊
@@ -529,7 +629,7 @@ jobs:
             const body = [
               `## ${emoji} PHPUnit 整合測試${statusText}`,
               fixInfo,
-              '',
+              summaryTable,
               '<details>',
               '<summary>📋 測試輸出（點擊展開）</summary>',
               '',
@@ -555,3 +655,82 @@ jobs:
                 body: body,
               });
             }
+
+      # ══════════════════════════════════════════════════
+      # 自動建立 Pull Request
+      # ══════════════════════════════════════════════════
+
+      - name: 自動建立 PR
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_BRANCH=$(git branch --show-current)
+
+          # 如果已經在 master，就沒有 PR 可開
+          if [ "$CURRENT_BRANCH" = "master" ] || [ "$CURRENT_BRANCH" = "main" ]; then
+            echo "ℹ️ 已在主分支上，跳過 PR 建立"
+            exit 0
+          fi
+
+          # 確保所有變更都已推送
+          git push origin "$CURRENT_BRANCH" 2>/dev/null || true
+
+          # 檢查是否已有此分支的 PR
+          EXISTING_PR=$(gh pr list --head "$CURRENT_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$EXISTING_PR" ]; then
+            echo "ℹ️ 此分支已有 PR #${EXISTING_PR}，跳過建立"
+            exit 0
+          fi
+
+          # 取得 issue 標題作為 PR 標題
+          ISSUE_NUMBER="${{ github.event.issue.number || github.event.comment.issue_url && '' }}"
+          if [ -z "$ISSUE_NUMBER" ]; then
+            ISSUE_NUMBER=$(echo "${{ github.event.comment.issue_url || '' }}" | grep -oP '\d+$' || echo "")
+          fi
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            ISSUE_TITLE=$(gh issue view "$ISSUE_NUMBER" --json title --jq '.title' 2>/dev/null || echo "")
+            PR_TITLE="${ISSUE_TITLE:-Claude Code 自動修改}"
+            CLOSE_LINE="Closes #${ISSUE_NUMBER}"
+          else
+            PR_TITLE="Claude Code 自動修改"
+            CLOSE_LINE=""
+          fi
+
+          # 取得測試結果資訊
+          TEST_STATUS="${{ steps.final_result.outputs.status }}"
+          TEST_CYCLE="${{ steps.final_result.outputs.cycle }}"
+          FIX_COUNT="${{ steps.final_result.outputs.fix_count }}"
+
+          if [ "$TEST_STATUS" = "passed" ]; then
+            TEST_BADGE="✅ 測試通過（cycle ${TEST_CYCLE}/3，自動修復 ${FIX_COUNT} 次）"
+          else
+            TEST_BADGE="❌ 測試失敗（cycle ${TEST_CYCLE}/3，自動修復 ${FIX_COUNT} 次）需人工介入"
+          fi
+
+          # 建立 PR
+          gh pr create \
+            --title "$PR_TITLE" \
+            --body "$(cat <<EOF
+          ## Summary
+          ${CLOSE_LINE}
+
+          由 Claude Code 根據 Issue 需求自動實作。
+
+          ## 測試結果
+          ${TEST_BADGE}
+
+          ## Checklist
+          - [ ] Code review 完成
+          - [ ] 測試通過確認
+          - [ ] 無安全性疑慮
+
+          ---
+          *🤖 此 PR 由 Claude Code CI 自動建立*
+          EOF
+          )" \
+            --base master \
+            --head "$CURRENT_BRANCH"
+
+          echo "✅ PR 建立完成"
