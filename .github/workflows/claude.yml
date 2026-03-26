@@ -192,16 +192,35 @@ jobs:
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: composer install --no-interaction --prefer-dist
 
-      - name: 啟動 wp-env 測試環境
+      - name: 清除既有 wp-env 環境
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
-        continue-on-error: true
-        run: npx wp-env start
+        run: npx wp-env destroy 2>/dev/null || true
 
-      - name: 確認 Plugin 正確啟用
+      - name: 建立 CI wp-env 覆蓋設定（避免 plugin 自動啟用失敗）
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: |
-          npx wp-env run cli -- wp plugin activate wp-power-course || true
-          npx wp-env run tests-cli -- wp plugin activate wp-power-course || true
+          cat > .wp-env.override.json << 'OVERRIDE_EOF'
+          {
+            "plugins": [
+              "https://downloads.wordpress.org/plugin/woocommerce.zip",
+              "https://github.com/j7-dev/wp-powerhouse/releases/latest/download/powerhouse.zip"
+            ],
+            "mappings": {
+              "wp-content/uploads": "./tests/e2e/.uploads",
+              "wp-content/plugins/wp-power-course": "."
+            }
+          }
+          OVERRIDE_EOF
+
+      - name: 啟動 wp-env 測試環境
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: npx wp-env start
+
+      - name: 啟用 Plugin
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
+        run: |
+          npx wp-env run cli -- wp plugin activate wp-power-course
+          npx wp-env run tests-cli -- wp plugin activate wp-power-course
 
       # ── 測試循環 1/3 ─────────────────────────────────
       - name: "PHPUnit 測試 (cycle 1/3)"
