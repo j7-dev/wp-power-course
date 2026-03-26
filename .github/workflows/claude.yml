@@ -192,9 +192,11 @@ jobs:
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: composer install --no-interaction --prefer-dist
 
-      - name: 清除既有 wp-env 環境
+      - name: 清除所有 Docker 容器（確保乾淨環境）
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
-        run: npx wp-env destroy 2>/dev/null || true
+        run: |
+          docker rm -f $(docker ps -aq) 2>/dev/null || true
+          docker volume prune -f 2>/dev/null || true
 
       - name: 建立 CI wp-env 覆蓋設定（避免 plugin 自動啟用失敗）
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
@@ -216,9 +218,10 @@ jobs:
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: npx wp-env start
 
-      - name: 啟用 Plugin
+      - name: 安裝 Composer 依賴並啟用 Plugin
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: |
+          npx wp-env run cli --env-cwd=wp-content/plugins/wp-power-course -- composer install --no-interaction --prefer-dist
           npx wp-env run cli -- wp plugin activate wp-power-course
           npx wp-env run tests-cli -- wp plugin activate wp-power-course
 
