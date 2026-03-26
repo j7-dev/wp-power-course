@@ -1,10 +1,18 @@
 import { useTable, useModal } from '@refinedev/antd'
-import { HttpError } from '@refinedev/core'
-import { Table, TableProps, FormInstance, Button, Modal, CardProps } from 'antd'
+import { HttpError, useApiUrl } from '@refinedev/core'
+import {
+	Table,
+	TableProps,
+	FormInstance,
+	Button,
+	Modal,
+	CardProps,
+	message,
+} from 'antd'
 import { useRowSelection, Card } from 'antd-toolkit'
 import { FilterTags } from 'antd-toolkit/refine'
 import { useAtom } from 'jotai'
-import React, { memo, useEffect } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 
 import {
 	getDefaultPaginationProps,
@@ -15,7 +23,7 @@ import {
 	RemoveCourseAccess,
 	ModifyCourseExpireDate,
 } from '@/components/user'
-import { useGCDItems } from '@/hooks'
+import { useGCDItems, useEnv } from '@/hooks'
 import { TUserRecord, TAVLCourse } from '@/pages/admin/Courses/List/types'
 
 import { selectedUserIdsAtom } from './atom'
@@ -80,7 +88,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const setSelectedUserIdsNotInCurrentPage = selectedUserIds.filter(
-					(selectedUserId) => !currentAllKeys.includes(selectedUserId)
+					(selectedUserId) => !currentAllKeys.includes(selectedUserId),
 				)
 
 				/**
@@ -88,7 +96,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const currentSelectedRowKeysStringify = currentSelectedRowKeys.map(
-					(key) => key.toString()
+					(key) => key.toString(),
 				)
 
 				setSelectedUserIds(() => {
@@ -147,6 +155,70 @@ const UserTableComponent = ({
 	// CSV 上傳 Modal
 	const { show, modalProps } = useModal()
 
+	// 學員匯出 CSV
+	const apiUrl = useApiUrl('power-course')
+	const { NONCE, AXIOS_INSTANCE } = useEnv()
+	const [exportLoading, setExportLoading] = useState(false)
+
+	/**
+	 * 從篩選表單取得當前篩選值，建構 URL query string
+	 */
+	const getExportParams = () => {
+		const form = searchFormProps?.form as FormInstance<TFilterValues>
+		const values = form?.getFieldsValue()
+		const params = new URLSearchParams()
+		params.append('_wpnonce', NONCE)
+		if (values?.search) {
+			params.append('search', values.search)
+		}
+		if (values?.avl_course_ids?.length) {
+			values.avl_course_ids.forEach((id) =>
+				params.append('avl_course_ids[]', id),
+			)
+		}
+		if (values?.include?.length) {
+			values.include.forEach((id) => params.append('include[]', id))
+		}
+		return params.toString()
+	}
+
+	/**
+	 * 點擊匯出按鈕：先取得預估筆數，再彈出確認 Modal
+	 */
+	const handleExportClick = async () => {
+		setExportLoading(true)
+		try {
+			const exportParams = getExportParams()
+			const { data } = await AXIOS_INSTANCE.get<{ count: number }>(
+				`${apiUrl}/students/export-count?${exportParams}`,
+			)
+			const count = data?.count ?? 0
+			Modal.confirm({
+				title: '學員匯出 CSV',
+				content:
+					count > 0
+						? `預估匯出 ${count} 筆資料，確認要匯出嗎？`
+						: '目前篩選條件下無學員資料',
+				okText: '確認匯出',
+				cancelText: '取消',
+				onOk:
+					count > 0
+						? () => {
+								window.open(
+									`${apiUrl}/students/export-all?${exportParams}`,
+									'_blank',
+								)
+							}
+						: undefined,
+				okButtonProps: { disabled: count === 0 },
+			})
+		} catch {
+			message.error('取得匯出筆數失敗')
+		} finally {
+			setExportLoading(false)
+		}
+	}
+
 	return (
 		<>
 			<Card title="篩選" variant="borderless" className="mb-4" {...cardProps}>
@@ -194,14 +266,19 @@ const UserTableComponent = ({
 									<GcdItemsTags />
 								</div>
 							)}
-							<Button
-								onClick={show}
-								color="primary"
-								variant="outlined"
-								className="self-end"
-							>
-								CSV 批次上傳學員權限
-							</Button>
+							<div className="flex gap-x-4 self-end">
+								<Button
+									onClick={handleExportClick}
+									color="primary"
+									variant="outlined"
+									loading={exportLoading}
+								>
+									學員匯出 CSV
+								</Button>
+								<Button onClick={show} color="primary" variant="outlined">
+									CSV 批次上傳學員權限
+								</Button>
+							</div>
 						</div>
 					</>
 				)}
