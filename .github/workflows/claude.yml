@@ -57,9 +57,9 @@ jobs:
             # 擷取 @claude 後面的文字來比對關鍵字
             AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
 
-            if echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格|clarifier)'; then
+            if echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格|釐清規格|clarifier|clarify)'; then
               AGENT_NAME="wp-workflows:clarifier"
-            elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|實作|計畫|planner)'; then
+            elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|實作|計畫|planner|plan)'; then
               AGENT_NAME="wp-workflows:planner"
             fi
           fi
@@ -183,8 +183,6 @@ jobs:
       - name: 設定 pnpm
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: 安裝 Node 依賴
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
