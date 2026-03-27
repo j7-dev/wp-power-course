@@ -160,7 +160,7 @@ jobs:
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
@@ -189,7 +189,7 @@ jobs:
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
@@ -217,7 +217,7 @@ jobs:
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
@@ -312,7 +312,7 @@ jobs:
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           direct_prompt: |
             PHPUnit 整合測試失敗了。請根據以下測試輸出修復程式碼。
 
@@ -364,7 +364,7 @@ jobs:
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           direct_prompt: |
             PHPUnit 整合測試第二次仍然失敗。請更仔細分析根本原因並修復。
 
