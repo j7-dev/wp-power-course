@@ -116,16 +116,14 @@ jobs:
             # 擷取 @claude 後面的文字來比對關鍵字
             AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
 
-            # 全流程管線模式（最高優先）
-            if echo "$AFTER_CLAUDE" | grep -qP '(開工|pipeline|full|全自動)'; then
+            # 全流程管線模式（最高優先）— 釐清完畢後由用戶觸發
+            if echo "$AFTER_CLAUDE" | grep -qiP '(開工|pipeline|full|全自動|確認|OK|沒問題|開始|go|start|LGTM)'; then
               AGENT_NAME="wp-workflows:clarifier"
               PIPELINE_MODE="true"
             elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|計畫|planner|plan)'; then
               AGENT_NAME="wp-workflows:planner"
-            elif echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格|釐清規格|clarifier|clarify)'; then
-              AGENT_NAME="wp-workflows:clarifier"
             else
-              # 預設：走 Clarifier（若已釐清會自動 cascade 到 Planner → TDD-Coordinator）
+              # 預設：走 Clarifier 互動澄清模式（只問問題，不寫 code）
               AGENT_NAME="wp-workflows:clarifier"
             fi
           fi
@@ -166,64 +164,78 @@ jobs:
       - name: 組合 Pipeline 模式的 Prompt
         if: env.PIPELINE_MODE == 'true'
         run: |
+          ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
           {
             echo 'PIPELINE_PROMPT<<GHEOF'
             echo "$ISSUE_CONTEXT"
             echo ""
-            cat <<'INNER'
-          ---
-          你現在處於 CI 全流程管線模式（@claude 開工）。
-          上方是 Issue 完整內容（包含所有留言），視為已完成的釐清。
-
-          請按照以下流程一氣呵成執行：
-
-          1. **規格生成**：根據 Issue 內容生成規格文件到 ./specs 目錄
-             - 使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill 產出完整規格
-             - 如果 ./specs 目錄已有此功能的相關規格文件，可跳過此步驟
-
-          2. **規劃**：規格完成後，自動交接給 @wp-workflows:planner
-             - planner 不需要詢問用戶確認
-
-          3. **實作**：planner 完成後，自動交接給 @wp-workflows:tdd-coordinator
-             - 在 CI 環境中直接在當前分支工作
-             - 所有變更 commit 到當前分支
-
-          ⚠️ 重要：
-          - 整條鏈路自動執行到底，中間不等待用戶回覆
-          - 使用 `gh issue comment $ISSUE_NUM --body "..."` 回報進度
-          INNER
+            echo "---"
+            echo "你現在處於 CI 全流程管線模式（@claude 開工）。"
+            echo "上方是 Issue #${ISSUE_NUM} 完整內容（包含所有留言與澄清紀錄），視為已完成的釐清。"
+            echo ""
+            echo "請按照以下流程一氣呵成執行，不要停下來等用戶確認："
+            echo ""
+            echo "### 第 1 步：規格生成（你自己做）"
+            echo "- 根據 Issue 內容（含澄清留言）生成規格文件到 ./specs 目錄"
+            echo "- 使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill 產出完整 .feature 規格"
+            echo "- 如果 ./specs 目錄已有此功能的相關規格文件，可跳過此步驟"
+            echo "- 完成後 commit specs 到當前分支"
+            echo ""
+            echo "### 第 2 步：規劃（spawn planner sub-agent）"
+            echo "- 使用 Agent tool 啟動 planner：Agent(subagent_type='wp-workflows:planner', prompt='根據 ./specs 目錄的規格文件，制定實作計畫。不需要詢問用戶確認，直接輸出計畫。')"
+            echo "- planner 不需要詢問用戶確認"
+            echo ""
+            echo "### 第 3 步：實作（spawn tdd-coordinator sub-agent）"
+            echo "- 使用 Agent tool 啟動 tdd-coordinator：Agent(subagent_type='wp-workflows:tdd-coordinator', prompt='根據 planner 的計畫，以 TDD 流程實作。在 CI 環境中直接在當前分支工作，所有變更 commit 到當前分支。')"
+            echo ""
+            echo "⚠️ 重要："
+            echo "- 整條鏈路自動執行到底：specs → planner → tdd-coordinator"
+            echo "- 每個階段完成後不要停下來問用戶，直接進入下一步"
+            echo "- 使用 \`gh issue comment ${ISSUE_NUM} --body \"...\"\` 回報每個階段的進度"
             echo 'GHEOF'
           } >> $GITHUB_ENV
 
       - name: 組合 Clarifier 互動模式的 Prompt
         if: env.PIPELINE_MODE != 'true'
         run: |
+          ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
           {
             echo 'CLARIFIER_PROMPT<<GHEOF'
             echo "$ISSUE_CONTEXT"
             echo ""
-            cat <<'INNER'
-          ---
-          你是 clarifier agent，在 CI 環境中運作。
-
-          請閱讀上方 Issue 內容（含所有留言），然後判斷：
-
-          **如果需求不夠明確（缺少驗收條件、邊界情境、技術細節）：**
-          1. 使用 `gh issue comment $ISSUE_NUM --body "問題內容"` 發表澄清問題
-          2. 每次只問一個最關鍵的問題
-          3. Commit 澄清紀錄到 specs/clarify/ 目錄
-          4. 結束本次 run，等待用戶回覆後再次觸發
-
-          **如果需求已經足夠清晰（有明確目標、驗收條件、情境描述）：**
-          1. 直接生成規格文件到 ./specs 目錄
-          2. 自動交接給 @wp-workflows:planner
-          3. Planner 完成後交接給 @wp-workflows:tdd-coordinator
-
-          ⚠️ 重要：
-          - 絕對不要直接實作功能程式碼
-          - 你的任務是澄清需求或生成規格，不是寫 code
-          - 使用 `gh` CLI 與 Issue 互動
-          INNER
+            echo "---"
+            echo "你是 clarifier agent，在 CI 環境中運作。"
+            echo ""
+            echo "### 第 1 步：計算已問的澄清問題數量"
+            echo "閱讀上方 Issue Comments，計算由 claude[bot] 或 github-actions[bot] 發表的澄清問題數量。"
+            echo "只計算「向用戶提問並等待回答」的留言，不計算狀態更新或進度報告。"
+            echo ""
+            echo "### 第 2 步：根據問題數量決定行動"
+            echo ""
+            echo "**情況 A：已問的澄清問題 < 3 個（必須繼續提問）**"
+            echo "1. 分析需求中缺少的細節（邊界情境、錯誤處理、UI 行為、資料模型、API 格式等）"
+            echo "2. 使用 \`gh issue comment ${ISSUE_NUM} --body \"問題內容\"\` 在 Issue 上發表 1 個澄清問題"
+            echo "3. 優先選擇題格式（A/B/C 選項讓用戶選）"
+            echo "4. 結束本次 run"
+            echo "⚠️ 在問滿 3 個問題之前，嚴禁判斷「需求已夠清晰」，嚴禁生成 specs"
+            echo ""
+            echo "**情況 B：已問的澄清問題 ≥ 3 個**"
+            echo "判斷需求是否已足夠清晰（所有邊界情境、錯誤處理、資料模型都已被用戶確認）。"
+            echo ""
+            echo "- 如果仍不夠清晰 → 繼續問下一個問題（同情況 A 的流程）"
+            echo "- 如果已足夠清晰 → 進入全流程管線："
+            echo "  1. 生成規格文件到 ./specs 目錄（使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill）"
+            echo "  2. Commit specs 到當前分支"
+            echo "  3. 使用 Agent tool 啟動 planner sub-agent：Agent(subagent_type='wp-workflows:planner', prompt='根據 ./specs 目錄的規格文件，制定實作計畫。不需要詢問用戶確認，直接輸出計畫。')"
+            echo "  4. Planner 完成後使用 Agent tool 啟動 tdd-coordinator：Agent(subagent_type='wp-workflows:tdd-coordinator', prompt='根據 planner 的計畫，以 TDD 流程實作。在 CI 環境中直接在當前分支工作，所有變更 commit 到當前分支。')"
+            echo "  5. 使用 \`gh issue comment ${ISSUE_NUM} --body \"...\"\` 回報每個階段的進度"
+            echo ""
+            echo "### 嚴禁"
+            echo "- 在問滿 3 個問題之前，不允許判斷「夠清晰了」"
+            echo "- 不要直接實作功能程式碼（實作由 tdd-coordinator 負責）"
+            echo ""
+            echo "### 手動 override"
+            echo "用戶隨時可留言 \`@claude 確認\` 或 \`@claude 開工\` 跳過提問限制，直接啟動管線。"
             echo 'GHEOF'
           } >> $GITHUB_ENV
 
@@ -244,7 +256,7 @@ jobs:
           prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
@@ -273,7 +285,7 @@ jobs:
           prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
@@ -301,7 +313,7 @@ jobs:
           prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
