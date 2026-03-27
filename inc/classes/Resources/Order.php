@@ -118,14 +118,17 @@ final class Order {
 						continue;
 					}
 
-					// ex: 買了 3 份銷售方案，應該要扣除3份庫存
-					$qty = $item->get_quantity() ?: 1;
+					// 取得銷售方案中該商品的數量設定，預設為 1
+					$bundle_qty = $helper->get_product_quantity( (int) $included_product_id );
+
+					// ex: 買了 3 份銷售方案，且方案內 T-shirt 數量為 2，則扣除 3 * 2 = 6 份庫存
+					$order_item_qty = ( $item->get_quantity() ?: 1 ) * $bundle_qty;
 
 					$order->add_product(
 						$included_product,
-						$qty, // TODO: 應該也要記錄數量
+						$order_item_qty,
 						[
-							'name'     => $product->get_name() . ' - ' . $included_product->get_name(),
+							'name'     => $product->get_name() . ' - ' . $included_product->get_name() . ( $bundle_qty > 1 ? " x{$bundle_qty}" : '' ),
 							'subtotal' => 0,
 							'total'    => 0,
 						]

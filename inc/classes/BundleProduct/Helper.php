@@ -14,8 +14,9 @@ namespace J7\PowerCourse\BundleProduct;
  * 銷售方案 Helper
  */
 final class Helper {
-	const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
-	const LINK_COURSE_IDS_META_KEY     = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const INCLUDE_PRODUCT_IDS_META_KEY       = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
+	const INCLUDE_PRODUCT_QUANTITIES_META_KEY = 'pbp_product_quantities'; // 此銷售方案裡面每個商品的數量 (JSON: {product_id: quantity})
+	const LINK_COURSE_IDS_META_KEY           = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
 
 	/**
 	 * 銷售方案類型 'bundle'
@@ -182,6 +183,47 @@ final class Helper {
 		$this->product->save_meta_data();
 	}
 
+
+	/**
+	 * 取得銷售方案裡面每個商品的數量
+	 * 回傳 associative array: product_id => quantity
+	 *
+	 * @return array<string, int> 商品數量映射
+	 */
+	public function get_product_quantities(): array {
+		$id         = $this->product->get_id();
+		$quantities = \get_post_meta( $id, self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, true );
+		if ( ! is_array( $quantities ) ) {
+			return [];
+		}
+		/** @var array<string, int> $quantities */
+		return $quantities;
+	}
+
+	/**
+	 * 設定銷售方案裡面每個商品的數量
+	 *
+	 * @param array<string, int> $quantities 商品數量映射 {product_id: quantity}
+	 *
+	 * @return void
+	 */
+	public function set_product_quantities( array $quantities ): void {
+		$this->product->update_meta_data( self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, $quantities );
+		$this->product->save_meta_data();
+	}
+
+	/**
+	 * 取得某個商品在銷售方案中的數量
+	 * 如果找不到，回傳預設值 1
+	 *
+	 * @param int $product_id 商品 id
+	 *
+	 * @return int 商品數量
+	 */
+	public function get_product_quantity( int $product_id ): int {
+		$quantities = $this->get_product_quantities();
+		return (int) ( $quantities[ (string) $product_id ] ?? 1 );
+	}
 
 	/**
 	 * 取得銷售方案連結的課程商品

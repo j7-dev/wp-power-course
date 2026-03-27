@@ -4,7 +4,7 @@ import {
 	ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { useList } from '@refinedev/core'
-import { Form, Input, Tag, List, Select, Switch } from 'antd'
+import { Form, Input, InputNumber, Tag, List, Select, Switch } from 'antd'
 import { renderHTML } from 'antd-toolkit'
 import { useAtomValue, useAtom } from 'jotai'
 import React, { useState, memo, useEffect } from 'react'
@@ -16,12 +16,18 @@ import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { productTypes } from '@/utils'
 
-import { courseAtom, selectedProductsAtom, bundleProductAtom } from './atom'
+import {
+	courseAtom,
+	selectedProductsAtom,
+	bundleProductAtom,
+	productQuantitiesAtom,
+} from './atom'
 import Gallery from './Gallery'
 import ProductPriceFields from './ProductPriceFields'
 import {
 	BUNDLE_TYPE_OPTIONS,
 	INCLUDED_PRODUCT_IDS_FIELD_NAME,
+	INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME,
 	PRODUCT_TYPE_OPTIONS,
 	getPrice,
 } from './utils'
@@ -33,6 +39,7 @@ const BundleForm = () => {
 	const course = useAtomValue(courseAtom)
 	const record = useAtomValue(bundleProductAtom)
 	const [selectedProducts, setSelectedProducts] = useAtom(selectedProductsAtom)
+	const [quantities, setQuantities] = useAtom(productQuantitiesAtom)
 
 	const {
 		id: courseId,
@@ -45,6 +52,9 @@ const BundleForm = () => {
 	const bundleProductForm = Form.useFormInstance()
 	const watchExcludeMainCourse =
 		Form.useWatch(['exclude_main_course'], bundleProductForm) === 'yes'
+
+	// 當前課程的數量
+	const courseQuantity = quantities[courseId] || 1
 
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
@@ -93,19 +103,33 @@ const BundleForm = () => {
 
 	const searchProducts = searchProductsResult.data?.data || []
 
+	// 更新某個商品的數量
+	const handleQuantityChange = (productId: string, qty: number | null) => {
+		const newQuantities = { ...quantities, [productId]: qty || 1 }
+		setQuantities(newQuantities)
+		bundleProductForm.setFieldValue(
+			[INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME],
+			JSON.stringify(newQuantities),
+		)
+	}
+
 	// 處理點擊商品，有可能是加入也可能是移除
 	const handleClick = (product: TBundleProductRecord) => () => {
 		const isInclude = selectedProducts?.some(({ id }) => id === product.id)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
-
 			setSelectedProducts(
-				selectedProducts.filter(({ id }) => id !== product.id)
+				selectedProducts.filter(({ id }) => id !== product.id),
 			)
+			// 同時移除數量記錄
+			const newQuantities = { ...quantities }
+			delete newQuantities[product.id]
+			setQuantities(newQuantities)
 		} else {
 			// 當前列表中沒有這個商品，所以要加入
-
 			setSelectedProducts([...selectedProducts, product])
+			// 預設數量為 1
+			setQuantities({ ...quantities, [product.id]: 1 })
 		}
 	}
 
@@ -138,6 +162,15 @@ const BundleForm = () => {
 		if (!initIsFetching) {
 			// 初始化商品
 			setSelectedProducts(includedProducts)
+			// 初始化數量，從 record 讀取
+			const initQuantities =
+				record?.[INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME] || {}
+			// 確保是物件（API 可能回傳空物件或 null）
+			setQuantities(
+				typeof initQuantities === 'object' && initQuantities !== null
+					? (initQuantities as Record<string, number>)
+					: {},
+			)
 		}
 	}, [initIsFetching])
 
@@ -151,7 +184,13 @@ const BundleForm = () => {
 				]
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
-			productIds
+			productIds,
+		)
+
+		// 同步數量到表單
+		bundleProductForm.setFieldValue(
+			[INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME],
+			JSON.stringify(quantities),
 		)
 
 		bundleProductForm.setFieldValue(
@@ -161,9 +200,11 @@ const BundleForm = () => {
 				products: selectedProducts,
 				course,
 				excludeMainCourse: watchExcludeMainCourse,
-			})
+				quantities,
+				courseQuantity,
+			}),
 		)
-	}, [selectedProducts.length, watchExcludeMainCourse])
+	}, [selectedProducts.length, watchExcludeMainCourse, quantities])
 
 	const bundlePrices = {
 		regular_price: getPrice({
@@ -173,6 +214,8 @@ const BundleForm = () => {
 			course,
 			returnType: 'string',
 			excludeMainCourse: watchExcludeMainCourse,
+			quantities,
+			courseQuantity,
 		}),
 		sale_price: getPrice({
 			isFetching: initIsFetching,
@@ -181,6 +224,8 @@ const BundleForm = () => {
 			course,
 			returnType: 'string',
 			excludeMainCourse: watchExcludeMainCourse,
+			quantities,
+			courseQuantity,
 		}),
 	}
 
@@ -227,6 +272,11 @@ const BundleForm = () => {
 			</Item>
 
 			<Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
+			<Item
+				name={[INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME]}
+				initialValue="{}"
+				hidden
+			/>
 
 			<Heading className="mb-3">自由搭配你的銷售方案，選擇要加入的商品</Heading>
 			<FiSwitch
@@ -249,10 +299,19 @@ const BundleForm = () => {
 						src={course?.images?.[0]?.url || defaultImage}
 						className="h-9 w-16 rounded object-cover"
 					/>
-					<div className="w-full">
+					<div className="flex-1">
 						{courseName} #{courseId} {renderHTML(coursePrice || '')}
 					</div>
-					<div>
+					<div className="flex items-center gap-2">
+						<InputNumber
+							min={1}
+							max={999}
+							value={courseQuantity}
+							onChange={(val) => handleQuantityChange(courseId, val)}
+							size="small"
+							className="w-16"
+							disabled={watchExcludeMainCourse}
+						/>
 						<Tag color="blue">目前課程</Tag>
 					</div>
 				</div>
@@ -343,7 +402,15 @@ const BundleForm = () => {
 								<div className="flex-1">
 									{name} #{id} {renderHTML(price_html)}
 								</div>
-								<div>
+								<div className="flex items-center gap-2">
+									<InputNumber
+										min={1}
+										max={999}
+										value={quantities[id] || 1}
+										onChange={(val) => handleQuantityChange(id, val)}
+										size="small"
+										className="w-16"
+									/>
 									<Tag bordered={false} color={tag?.color} className="m-0">
 										{tag?.label}
 									</Tag>
@@ -354,9 +421,13 @@ const BundleForm = () => {
 											onConfirm: () => {
 												setSelectedProducts(
 													selectedProducts?.filter(
-														({ id: productId }) => productId !== id
-													)
+														({ id: productId }) => productId !== id,
+													),
 												)
+												// 移除數量記錄
+												const newQuantities = { ...quantities }
+												delete newQuantities[id]
+												setQuantities(newQuantities)
 											},
 										}}
 									/>

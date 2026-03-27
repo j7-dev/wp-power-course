@@ -578,7 +578,9 @@ final class Product {
 			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY       => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			// Bundle 商品每個商品的數量
+			Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY => ( $helper !== null ? $helper->get_product_quantities() : (object) [] ),
 
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
@@ -922,6 +924,9 @@ final class Product {
 		$add_array_meta_keys    = [
 			'bind_course_ids', // 綁定的課程
 		];
+		$json_meta_keys         = [
+			Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY, // 商品數量映射，以 JSON 格式儲存
+		];
 		$unset_meta_keys        = [
 			'product_type', // product_type 就不用處理了，前端會帶
 		];
@@ -954,6 +959,25 @@ final class Product {
 					$bind_courses_data_instance->add_course_data( (int) $course_id, $limit );
 				}
 				$bind_courses_data_instance->save();
+			}
+		}
+
+		// 處理 JSON 格式的 meta data（前端傳入 JSON string，解碼後存入）
+		foreach ($json_meta_keys as $meta_key) {
+			if ( isset( $meta_data[ $meta_key ] ) ) {
+				$value = $meta_data[ $meta_key ];
+				if ( is_string( $value ) ) {
+					$value = json_decode( $value, true );
+				}
+				if ( is_array( $value ) ) {
+					// 確保數量為正整數，並轉換 key 為 string
+					$sanitized = [];
+					foreach ( $value as $pid => $qty ) {
+						$sanitized[ (string) $pid ] = max( 1, (int) $qty );
+					}
+					\update_post_meta( $product_id, $meta_key, $sanitized );
+				}
+				unset( $meta_data[ $meta_key ] );
 			}
 		}
 

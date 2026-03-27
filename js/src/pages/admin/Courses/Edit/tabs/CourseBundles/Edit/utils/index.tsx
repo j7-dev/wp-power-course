@@ -2,6 +2,7 @@ import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
 export const INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids' // 包含商品的 ids
+export const INCLUDED_PRODUCT_QUANTITIES_FIELD_NAME = 'pbp_product_quantities' // 每個商品的數量
 
 export const BUNDLE_TYPE_OPTIONS = [
 	{ label: '合購優惠', value: 'bundle', color: 'cyan' },
@@ -18,7 +19,7 @@ export const PRODUCT_TYPE_OPTIONS = [
 	{ label: '定期定額', value: 'subscription' },
 ]
 
-// 取得總金額
+// 取得總金額（考慮每個商品的數量）
 export const getPrice = ({
 	isFetching = false,
 	type,
@@ -26,6 +27,8 @@ export const getPrice = ({
 	course,
 	returnType = 'number',
 	excludeMainCourse = false,
+	quantities = {},
+	courseQuantity = 1,
 }: {
 	isFetching?: boolean
 	type: 'regular_price' | 'sale_price'
@@ -33,6 +36,8 @@ export const getPrice = ({
 	course: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
 	excludeMainCourse?: boolean
+	quantities?: Record<string, number>
+	courseQuantity?: number
 }): React.ReactNode => {
 	if (isFetching) {
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
@@ -40,12 +45,11 @@ export const getPrice = ({
 	const coursePrice = Number(course?.[type] || course?.regular_price || 0)
 	const total =
 		Number(
-			products?.reduce(
-				(acc, product) =>
-					acc + Number(product?.[type] || product.regular_price),
-				0
-			)
-		) + (excludeMainCourse ? 0 : coursePrice)
+			products?.reduce((acc, product) => {
+				const qty = quantities[product.id] || 1
+				return acc + Number(product?.[type] || product.regular_price) * qty
+			}, 0)
+		) + (excludeMainCourse ? 0 : coursePrice * courseQuantity)
 
 	if ('number' === returnType) return total
 	return `NT$ ${total?.toLocaleString()}`
