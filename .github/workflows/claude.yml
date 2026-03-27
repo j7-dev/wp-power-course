@@ -449,13 +449,36 @@ jobs:
         working-directory: tests/e2e
         run: npx playwright install chromium
 
+      - name: 驗證 WordPress 環境健康（截圖前置檢查）
+        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
+        continue-on-error: true
+        run: |
+          echo "🔍 檢查 WordPress 環境..."
+          npx wp-env run cli -- wp plugin list --format=table
+          echo ""
+          echo "🔍 檢查站點 URL..."
+          npx wp-env run cli -- wp option get siteurl
+          echo ""
+          echo "🔍 檢查 Power Course 外掛狀態..."
+          npx wp-env run cli -- wp plugin is-active wp-power-course && echo "✅ Power Course 已啟用" || echo "⚠️ Power Course 未啟用"
+          echo ""
+          echo "🔍 檢查 WooCommerce 狀態..."
+          npx wp-env run cli -- wp plugin is-active woocommerce && echo "✅ WooCommerce 已啟用" || echo "⚠️ WooCommerce 未啟用"
+
       - name: 準備截圖環境 (smoke test 觸發 global-setup)
         if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
         env:
           TEST_SITE_URL: http://localhost:8895
           CI: "true"
         working-directory: tests/e2e
-        run: npx playwright test 01-admin/smoke.spec.ts --project=admin || true
+        run: |
+          npx playwright test 01-admin/smoke.spec.ts --project=admin || true
+          # 檢查 auth state 是否建立成功
+          if [ -f ".auth/admin.json" ]; then
+            echo "✅ Auth state 建立成功"
+          else
+            echo "⚠️ Auth state 未建立，截圖腳本將嘗試自行登入"
+          fi
 
       - name: 自動截圖
         id: take_screenshots
