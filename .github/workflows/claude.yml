@@ -83,6 +83,11 @@ jobs:
             echo "branch_switched=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: 強制 Git 使用 HTTPS（避免 plugin 安裝 SSH 失敗）
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
       - name: 儲存初始 Git SHA
         id: save_sha
         run: echo "initial_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
