@@ -1,0 +1,195 @@
+openapi: 3.0.3
+info:
+  title: Power Course - Bundle Product Quantity API
+  description: 銷售方案商品數量自訂 (Issue #140) API 變更
+  version: 1.0.0
+
+paths:
+  /wp-json/power-course/v1/bundle_products:
+    post:
+      summary: 建立銷售方案（含商品數量）
+      description: |
+        建立新的銷售方案，支援指定每個綑綁商品的數量。
+        新增 `pbp_product_quantities` 欄位。
+      tags:
+        - BundleProduct
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - link_course_ids
+                - bundle_type
+                - pbp_product_ids[]
+              properties:
+                name:
+                  type: string
+                  description: 銷售方案名稱
+                  example: 超值學習組合
+                link_course_ids:
+                  type: string
+                  description: 歸屬課程 ID
+                  example: "100"
+                bundle_type:
+                  type: string
+                  enum: [bundle]
+                  description: 銷售方案類型
+                pbp_product_ids[]:
+                  type: array
+                  items:
+                    type: string
+                  description: 綑綁商品 IDs
+                  example: ["100", "200"]
+                pbp_product_quantities:
+                  type: string
+                  description: |
+                    JSON 字串，key 為商品 ID，value 為數量。
+                    未提供時所有商品預設數量為 1。
+                  example: '{"100": 2, "200": 3}'
+                regular_price:
+                  type: string
+                  description: 原價
+                sale_price:
+                  type: string
+                  description: 特價
+                catalog_visibility:
+                  type: string
+                  default: hidden
+      responses:
+        '200':
+          description: 建立成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: create_success
+                  message:
+                    type: string
+                    example: 新增成功
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+
+  /wp-json/power-course/v1/bundle_products/{id}:
+    post:
+      summary: 更新銷售方案（含商品數量）
+      description: |
+        更新既有銷售方案，支援更新每個綑綁商品的數量。
+      tags:
+        - BundleProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 銷售方案商品 ID
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                pbp_product_ids[]:
+                  type: array
+                  items:
+                    type: string
+                  description: 綑綁商品 IDs
+                pbp_product_quantities:
+                  type: string
+                  description: |
+                    JSON 字串，key 為商品 ID，value 為數量。
+                  example: '{"100": 2, "200": 3}'
+                regular_price:
+                  type: string
+                sale_price:
+                  type: string
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: update_success
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+
+    get:
+      summary: 取得銷售方案詳情（含商品數量）
+      description: |
+        取得銷售方案商品資料，回傳中包含 `pbp_product_quantities`。
+        若該銷售方案無此 meta（舊資料），回傳空物件 `{}`，前端預設各商品數量為 1。
+      tags:
+        - BundleProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BundleProduct'
+
+components:
+  schemas:
+    BundleProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        bundle_type:
+          type: string
+          enum: [bundle, '']
+        pbp_product_ids:
+          type: array
+          items:
+            type: string
+          description: 綑綁商品 IDs
+        pbp_product_quantities:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 1
+          description: |
+            商品數量映射，key 為商品 ID (string)，value 為數量 (integer >= 1)。
+            向後相容：若此欄位不存在或為空物件，所有商品數量預設為 1。
+          example:
+            "100": 2
+            "200": 3
+        link_course_ids:
+          type: string
+        exclude_main_course:
+          type: string
+          enum: ['yes', 'no', '']
+        regular_price:
+          type: string
+        sale_price:
+          type: string
+        status:
+          type: string

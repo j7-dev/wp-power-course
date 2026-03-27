@@ -1,0 +1,63 @@
+// Entity Relationship Model: 銷售方案商品數量 (Issue #140)
+// 儲存方式：WordPress post meta（非自訂資料表）
+
+// ============================================================
+// 既有結構（不變更）
+// ============================================================
+
+Table wp_posts {
+  ID bigint [pk]
+  post_type varchar [note: 'product']
+  post_title varchar
+  post_status varchar
+  menu_order int
+}
+
+Table wp_postmeta {
+  meta_id bigint [pk]
+  post_id bigint [ref: > wp_posts.ID]
+  meta_key varchar
+  meta_value longtext
+}
+
+// ============================================================
+// 銷售方案 Meta Keys（既有）
+// ============================================================
+// 以下為 wp_postmeta 中與銷售方案相關的 meta_key：
+//
+// meta_key: 'bundle_type'
+//   - meta_value: 'bundle' | ''
+//   - 說明：標記此商品為銷售方案
+//   - 儲存：單一 row
+//
+// meta_key: 'link_course_ids'
+//   - meta_value: course_id (string)
+//   - 說明：此銷售方案歸屬的課程
+//   - 儲存：多 row（目前實作為 update_meta_array）
+//
+// meta_key: 'pbp_product_ids'
+//   - meta_value: product_id (string)
+//   - 說明：此銷售方案包含的商品 ID
+//   - 儲存：多 row（每個 product_id 一個 row）
+//
+// meta_key: 'bundle_type_label'
+//   - meta_value: string
+//   - 說明：前台顯示的紅色標籤文字（如「合購優惠」）
+//
+// meta_key: 'exclude_main_course'
+//   - meta_value: 'yes' | 'no'
+//   - 說明：是否排除主課程
+
+// ============================================================
+// 新增 Meta Key (Issue #140)
+// ============================================================
+//
+// meta_key: 'pbp_product_quantities'
+//   - meta_value: JSON string
+//     格式: {"product_id": quantity, "product_id": quantity}
+//     範例: {"100": 2, "200": 3}
+//   - 說明：各綑綁商品的數量
+//   - 儲存：單一 row（JSON 字串）
+//   - 預設：若此 meta 不存在，所有綑綁商品數量預設為 1（向後相容）
+//   - 驗證：所有 quantity 值必須為正整數 (>= 1)
+//   - 約束：JSON keys 必須是 pbp_product_ids 中存在的 product_id

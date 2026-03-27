@@ -1,0 +1,58 @@
+# Activity: 銷售方案商品數量自訂 (Issue #140)
+
+## 概述
+讓銷售方案的組合裡面的每個商品都可以自由選擇數量（包含當前課程），
+並在結帳時按照各商品設定的數量正確扣減庫存。
+
+## Actors
+- **站長（Admin）**: 在後台課程編輯頁建立/編輯銷售方案
+- **訪客/客戶**: 在前台瀏覽銷售方案卡片，加入購物車並結帳
+
+## 主要流程
+
+### Flow 1: 站長設定銷售方案商品數量
+
+```
+[站長開啟課程編輯頁]
+  → [點擊銷售方案 Tab]
+  → [新增或編輯銷售方案]
+  → [搜尋並加入商品]
+  → [為每個商品設定數量（InputNumber）]
+  → [系統自動計算建議售價]
+  → [站長可覆寫售價]
+  → [儲存銷售方案]
+  → [API 將 pbp_product_quantities 存入 post meta]
+```
+
+### Flow 2: 客戶購買銷售方案
+
+```
+[客戶瀏覽銷售方案卡片]
+  → [卡片顯示各商品及數量（x2, x3）]
+  → [點擊「立即報名」或加入購物車]
+  → [完成結帳]
+  → [系統為每個綑綁商品依數量新增 order item]
+  → [WooCommerce 依 order item quantity 扣減庫存]
+```
+
+## 變更影響範圍
+
+### 後端 PHP
+1. **BundleProduct/Helper.php** - 新增 `pbp_product_quantities` meta 常數與存取方法
+2. **Api/Product.php** - 更新 create/update bundle API 接受 `pbp_product_quantities`
+3. **Resources/Order.php** - 結帳時讀取 per-product quantity 作為 order item 數量
+4. **templates/components/card/bundle-product.php** - 前台卡片顯示數量標示
+
+### 前端 React/TypeScript
+1. **BundleForm.tsx** - 每個商品旁加入 InputNumber，當前課程也要有
+2. **utils/index.tsx** (getPrice) - 價格計算加入數量乘法
+3. **atom.tsx** - 狀態增加 per-product quantity
+4. **types/index.ts** - TBundleProductRecord 增加 `pbp_product_quantities` 欄位
+
+## 資料模型變更
+
+### 新增 Meta Key
+- `pbp_product_quantities`: JSON 字串，格式為 `{"product_id": quantity, ...}`
+  - 例如: `{"100": 2, "200": 3}`
+  - 儲存為單一 post meta row（與 pbp_product_ids 的多 row 策略不同）
+  - 當此 meta 不存在時（向後相容），所有商品數量預設為 1
