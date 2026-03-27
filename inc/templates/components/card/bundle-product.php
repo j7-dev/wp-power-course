@@ -28,7 +28,8 @@ if ( ! $helper?->is_bundle_product ) {
 }
 
 
-$pbp_product_ids = $helper?->get_product_ids() ?? []; // @phpstan-ignore-line
+$pbp_product_ids        = $helper?->get_product_ids() ?? []; // @phpstan-ignore-line
+$pbp_product_quantities = $helper?->get_product_quantities() ?? []; // @phpstan-ignore-line
 
 $product_name = $product->get_name();
 
@@ -87,7 +88,21 @@ foreach ( $pbp_product_ids as $pbp_product_id ) :
 		continue;
 	}
 	$pbp_product = \wc_get_product( $pbp_product_id );
+	if ( !$pbp_product ) {
+		continue;
+	}
+	// 取得此商品在銷售方案中的數量，預設為 1
+	$pbp_qty          = isset( $pbp_product_quantities[ (string) $pbp_product_id ] )
+		? (int) $pbp_product_quantities[ (string) $pbp_product_id ]
+		: 1;
+	$pbp_product_name = $pbp_product->get_name();
 	echo '<div>';
+	// 顯示「商品名 × 數量」格式
+	printf(
+		/*html*/'<p class="text-sm mb-1">%1$s <span class="text-gray-500">× %2$d</span></p>',
+		\esc_html( $pbp_product_name ),
+		$pbp_qty
+	);
 	Plugin::load_template(
 		'course-product/list',
 		[
