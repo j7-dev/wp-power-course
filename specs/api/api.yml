@@ -277,6 +277,20 @@ components:
           type: string
         regular_price:
           type: string
+        pbp_product_ids:
+          type: array
+          items:
+            type: string
+          description: 包含的商品 ID 列表
+        pbp_product_quantities:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 1
+          description: |
+            每個商品的數量映射（key = product_id 字串, value = 數量整數）。
+            舊資料若無此欄位，回傳空物件 {}。
+          example: {"100": 2, "200": 3}
 
     BundleProduct:
       type: object
@@ -301,6 +315,23 @@ components:
         regular_price:
           type: string
           example: "599"
+        pbp_product_ids:
+          type: array
+          items:
+            type: string
+          description: 包含的商品 ID 列表
+          example: ["100", "200"]
+        pbp_product_quantities:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 1
+          description: |
+            每個商品的數量映射（key = product_id 字串, value = 數量整數）。
+            未設定數量的商品預設為 1。舊資料若無此欄位，回傳空物件 {}。
+            結帳時庫存扣減 = 此數量 × 銷售方案購買數量。
+            課程類商品：數量僅影響庫存扣減，課程授權只給 1 次。
+          example: {"100": 2, "200": 3}
         bind_courses_data:
           type: array
           items:
@@ -2618,6 +2649,8 @@ paths:
 
         **後置（狀態）:**
         - 建立 WooCommerce 商品並設定 bundle_type meta
+        - 儲存 pbp_product_quantities（每個商品的數量，JSON 格式）
+        - 未指定 pbp_product_quantities 時，所有 pbp_product_ids 中的商品預設數量為 1
         - 支援設定 bind_courses_data（與普通商品共用綁定課程到商品邏輯）
       requestBody:
         required: true
@@ -2648,6 +2681,21 @@ paths:
                 regular_price:
                   type: string
                   example: "599"
+                pbp_product_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: 包含的商品 ID 列表
+                  example: ["100", "200"]
+                pbp_product_quantities:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                  description: |
+                    每個商品的數量映射（key = product_id 字串, value = 正整數 ≥ 1）。
+                    若不提供，所有 pbp_product_ids 中的商品預設數量為 1。
+                  example: {"100": 2, "200": 3}
                 bind_courses_data:
                   type: array
                   items:
@@ -2775,6 +2823,20 @@ paths:
                   type: string
                 link_course_id:
                   type: integer
+                pbp_product_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: 包含的商品 ID 列表
+                pbp_product_quantities:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                  description: |
+                    每個商品的數量映射（key = product_id 字串, value = 正整數 ≥ 1）。
+                    若提供 pbp_product_ids 但不提供此欄位，不變更既有數量。
+                  example: {"100": 2, "200": 3}
                 bind_courses_data:
                   type: array
                   items:
