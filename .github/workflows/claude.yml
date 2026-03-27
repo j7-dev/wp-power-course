@@ -138,20 +138,48 @@ jobs:
             echo "🚀 全流程管線模式啟動 (clarifier → planner → tdd-coordinator)"
           fi
 
+      - name: 擷取 Issue 上下文
+        id: fetch_context
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
+          if [ -n "$ISSUE_NUM" ]; then
+            ISSUE_TITLE=$(gh issue view "$ISSUE_NUM" --json title --jq '.title' 2>/dev/null || echo "")
+            ISSUE_BODY=$(gh issue view "$ISSUE_NUM" --json body --jq '.body' 2>/dev/null || echo "")
+            COMMENTS=$(gh issue view "$ISSUE_NUM" --json comments \
+              --jq '.comments[] | "### [\(.author.login)] (\(.createdAt))\n\(.body)\n"' 2>/dev/null || echo "")
+            {
+              echo 'ISSUE_CONTEXT<<GHEOF'
+              echo "# Issue #${ISSUE_NUM}: ${ISSUE_TITLE}"
+              echo ""
+              echo "${ISSUE_BODY}"
+              echo ""
+              echo "---"
+              echo "# Issue Comments"
+              echo "${COMMENTS}"
+              echo 'GHEOF'
+            } >> $GITHUB_ENV
+            echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
+          fi
+
       - name: 組合 Pipeline 模式的 Prompt
         if: env.PIPELINE_MODE == 'true'
         run: |
           {
             echo 'PIPELINE_PROMPT<<GHEOF'
+            echo "$ISSUE_CONTEXT"
+            echo ""
             cat <<'INNER'
+          ---
           你現在處於 CI 全流程管線模式（@claude 開工）。
+          上方是 Issue 完整內容（包含所有留言），視為已完成的釐清。
 
           請按照以下流程一氣呵成執行：
 
-          1. **規格生成**：閱讀 Issue 完整內容（包含所有留言），視為已完成的釐清
-             - 不要向用戶提問，直接根據 Issue 內容生成規格文件到 ./specs 目錄
-             - 如果 ./specs 目錄已有此功能的相關規格文件，可跳過此步驟
+          1. **規格生成**：根據 Issue 內容生成規格文件到 ./specs 目錄
              - 使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill 產出完整規格
+             - 如果 ./specs 目錄已有此功能的相關規格文件，可跳過此步驟
 
           2. **規劃**：規格完成後，自動交接給 @wp-workflows:planner
              - planner 不需要詢問用戶確認
@@ -160,7 +188,41 @@ jobs:
              - 在 CI 環境中直接在當前分支工作
              - 所有變更 commit 到當前分支
 
-          ⚠️ 重要：整條鏈路自動執行到底，中間不等待用戶回覆。
+          ⚠️ 重要：
+          - 整條鏈路自動執行到底，中間不等待用戶回覆
+          - 使用 `gh issue comment $ISSUE_NUM --body "..."` 回報進度
+          INNER
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
+
+      - name: 組合 Clarifier 互動模式的 Prompt
+        if: env.PIPELINE_MODE != 'true'
+        run: |
+          {
+            echo 'CLARIFIER_PROMPT<<GHEOF'
+            echo "$ISSUE_CONTEXT"
+            echo ""
+            cat <<'INNER'
+          ---
+          你是 clarifier agent，在 CI 環境中運作。
+
+          請閱讀上方 Issue 內容（含所有留言），然後判斷：
+
+          **如果需求不夠明確（缺少驗收條件、邊界情境、技術細節）：**
+          1. 使用 `gh issue comment $ISSUE_NUM --body "問題內容"` 發表澄清問題
+          2. 每次只問一個最關鍵的問題
+          3. Commit 澄清紀錄到 specs/clarify/ 目錄
+          4. 結束本次 run，等待用戶回覆後再次觸發
+
+          **如果需求已經足夠清晰（有明確目標、驗收條件、情境描述）：**
+          1. 直接生成規格文件到 ./specs 目錄
+          2. 自動交接給 @wp-workflows:planner
+          3. Planner 完成後交接給 @wp-workflows:tdd-coordinator
+
+          ⚠️ 重要：
+          - 絕對不要直接實作功能程式碼
+          - 你的任務是澄清需求或生成規格，不是寫 code
+          - 使用 `gh` CLI 與 Issue 互動
           INNER
             echo 'GHEOF'
           } >> $GITHUB_ENV
@@ -179,7 +241,7 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows@wp-workflows
-          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
+          prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
             --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
@@ -208,7 +270,7 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows@wp-workflows
-          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
+          prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
             --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
@@ -236,7 +298,7 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows@wp-workflows
-          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
+          prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || env.CLARIFIER_PROMPT }}
           claude_args: |
             --dangerously-skip-permissions
             --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
@@ -331,7 +393,7 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows@wp-workflows
-          direct_prompt: |
+          prompt: |
             PHPUnit 整合測試失敗了。請根據以下測試輸出修復程式碼。
 
             測試輸出：
@@ -383,7 +445,7 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows@wp-workflows
-          direct_prompt: |
+          prompt: |
             PHPUnit 整合測試第二次仍然失敗。請更仔細分析根本原因並修復。
 
             測試輸出：
