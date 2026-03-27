@@ -25,6 +25,19 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
+      - name: 👀 對觸發留言加上 eyes reaction
+        if: github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+              -f content=eyes --silent
+          elif [ "${{ github.event_name }}" = "pull_request_review_comment" ]; then
+            gh api repos/${{ github.repository }}/pulls/comments/${{ github.event.comment.id }}/reactions \
+              -f content=eyes --silent
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
