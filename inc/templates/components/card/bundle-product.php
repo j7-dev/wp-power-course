@@ -28,7 +28,8 @@ if ( ! $helper?->is_bundle_product ) {
 }
 
 
-$pbp_product_ids = $helper?->get_product_ids() ?? []; // @phpstan-ignore-line
+$pbp_product_ids      = $helper?->get_product_ids() ?? []; // @phpstan-ignore-line
+$product_quantities   = $helper?->get_product_quantities() ?? [];
 
 $product_name = $product->get_name();
 
@@ -87,13 +88,17 @@ foreach ( $pbp_product_ids as $pbp_product_id ) :
 		continue;
 	}
 	$pbp_product = \wc_get_product( $pbp_product_id );
-	echo '<div>';
+	$qty         = max( 1, (int) ( $product_quantities[ (string) $pbp_product_id ] ?? 1 ) );
+	echo '<div class="flex items-center">';
+	echo '<div class="flex-1">';
 	Plugin::load_template(
 		'course-product/list',
 		[
 			'product' => $pbp_product,
 		]
 		);
+	echo '</div>';
+	printf( '<span class="text-sm font-semibold text-gray-500 ml-1 whitespace-nowrap">×%d</span>', $qty );
 	echo '</div>';
 	Plugin::load_template( 'divider' );
 endforeach;

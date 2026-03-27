@@ -4,7 +4,7 @@ import {
 	ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { useList } from '@refinedev/core'
-import { Form, Input, Tag, List, Select, Switch } from 'antd'
+import { Form, Input, InputNumber, Tag, List, Select, Switch } from 'antd'
 import { renderHTML } from 'antd-toolkit'
 import { useAtomValue, useAtom } from 'jotai'
 import React, { useState, memo, useEffect } from 'react'
@@ -16,12 +16,18 @@ import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { productTypes } from '@/utils'
 
-import { courseAtom, selectedProductsAtom, bundleProductAtom } from './atom'
+import {
+	courseAtom,
+	selectedProductsAtom,
+	bundleProductAtom,
+	productQuantitiesAtom,
+} from './atom'
 import Gallery from './Gallery'
 import ProductPriceFields from './ProductPriceFields'
 import {
 	BUNDLE_TYPE_OPTIONS,
 	INCLUDED_PRODUCT_IDS_FIELD_NAME,
+	PRODUCT_QUANTITIES_FIELD_NAME,
 	PRODUCT_TYPE_OPTIONS,
 	getPrice,
 } from './utils'
@@ -33,6 +39,7 @@ const BundleForm = () => {
 	const course = useAtomValue(courseAtom)
 	const record = useAtomValue(bundleProductAtom)
 	const [selectedProducts, setSelectedProducts] = useAtom(selectedProductsAtom)
+	const [quantities, setQuantities] = useAtom(productQuantitiesAtom)
 
 	const {
 		id: courseId,
@@ -98,14 +105,18 @@ const BundleForm = () => {
 		const isInclude = selectedProducts?.some(({ id }) => id === product.id)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
-
 			setSelectedProducts(
 				selectedProducts.filter(({ id }) => id !== product.id)
 			)
+			// 同步清理數量
+			const newQuantities = { ...quantities }
+			delete newQuantities[product.id]
+			setQuantities(newQuantities)
 		} else {
 			// 當前列表中沒有這個商品，所以要加入
-
 			setSelectedProducts([...selectedProducts, product])
+			// 預設數量 1
+			setQuantities({ ...quantities, [product.id]: 1 })
 		}
 	}
 
@@ -141,6 +152,13 @@ const BundleForm = () => {
 		}
 	}, [initIsFetching])
 
+	// 初始化數量
+	useEffect(() => {
+		if (record?.pbp_product_quantities) {
+			setQuantities(record.pbp_product_quantities)
+		}
+	}, [record?.id])
+
 	useEffect(() => {
 		// 選擇商品改變時，同步更新到表單上
 		const productIds = watchExcludeMainCourse
@@ -154,6 +172,9 @@ const BundleForm = () => {
 			productIds
 		)
 
+		// 同步數量到表單
+		bundleProductForm.setFieldValue([PRODUCT_QUANTITIES_FIELD_NAME], quantities)
+
 		bundleProductForm.setFieldValue(
 			['regular_price'],
 			getPrice({
@@ -161,9 +182,10 @@ const BundleForm = () => {
 				products: selectedProducts,
 				course,
 				excludeMainCourse: watchExcludeMainCourse,
+				quantities,
 			})
 		)
-	}, [selectedProducts.length, watchExcludeMainCourse])
+	}, [selectedProducts.length, watchExcludeMainCourse, quantities])
 
 	const bundlePrices = {
 		regular_price: getPrice({
@@ -173,6 +195,7 @@ const BundleForm = () => {
 			course,
 			returnType: 'string',
 			excludeMainCourse: watchExcludeMainCourse,
+			quantities,
 		}),
 		sale_price: getPrice({
 			isFetching: initIsFetching,
@@ -181,8 +204,18 @@ const BundleForm = () => {
 			course,
 			returnType: 'string',
 			excludeMainCourse: watchExcludeMainCourse,
+			quantities,
 		}),
 	}
+
+	// 更新數量的 handler
+	const handleQuantityChange =
+		(productId: string) => (value: number | null) => {
+			setQuantities({
+				...quantities,
+				[productId]: Math.max(1, value ?? 1),
+			})
+		}
 
 	return (
 		<>
@@ -227,6 +260,7 @@ const BundleForm = () => {
 			</Item>
 
 			<Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
+			<Item name={[PRODUCT_QUANTITIES_FIELD_NAME]} initialValue={{}} hidden />
 
 			<Heading className="mb-3">自由搭配你的銷售方案，選擇要加入的商品</Heading>
 			<FiSwitch
@@ -249,9 +283,18 @@ const BundleForm = () => {
 						src={course?.images?.[0]?.url || defaultImage}
 						className="h-9 w-16 rounded object-cover"
 					/>
-					<div className="w-full">
+					<div className="flex-1">
 						{courseName} #{courseId} {renderHTML(coursePrice || '')}
 					</div>
+					<InputNumber
+						min={1}
+						step={1}
+						value={quantities[courseId] ?? 1}
+						onChange={handleQuantityChange(courseId)}
+						disabled={watchExcludeMainCourse}
+						size="small"
+						className="w-16"
+					/>
 					<div>
 						<Tag color="blue">目前課程</Tag>
 					</div>
@@ -348,6 +391,14 @@ const BundleForm = () => {
 										{tag?.label}
 									</Tag>
 								</div>
+								<InputNumber
+									min={1}
+									step={1}
+									value={quantities[id] ?? 1}
+									onChange={handleQuantityChange(id)}
+									size="small"
+									className="w-16"
+								/>
 								<div className="w-8 text-right">
 									<PopconfirmDelete
 										popconfirmProps={{
@@ -357,6 +408,10 @@ const BundleForm = () => {
 														({ id: productId }) => productId !== id
 													)
 												)
+												// 同步清理數量
+												const newQuantities = { ...quantities }
+												delete newQuantities[id]
+												setQuantities(newQuantities)
 											},
 										}}
 									/>
