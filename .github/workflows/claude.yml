@@ -28,7 +28,47 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+
+      - name: 檢查並切換到已存在的 issue 分支
+        id: resolve_branch
+        run: |
+          # 取得 issue number
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            ISSUE_NUM="${{ github.event.issue.number }}"
+          elif [ "${{ github.event_name }}" = "issue_comment" ]; then
+            ISSUE_NUM=$(echo "${{ github.event.comment.issue_url }}" | grep -oP '\d+$' || echo "")
+            if [ -z "$ISSUE_NUM" ]; then
+              ISSUE_NUM="${{ github.event.issue.number }}"
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request_review_comment" ] || \
+               [ "${{ github.event_name }}" = "pull_request_review" ]; then
+            ISSUE_NUM="${{ github.event.pull_request.number }}"
+          fi
+
+          echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
+
+          if [ -z "$ISSUE_NUM" ]; then
+            echo "⚠️ 無法取得 issue number，使用 master"
+            echo "branch_switched=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # 尋找最新的 claude/issue-{N}-* 分支
+          git fetch origin 'refs/heads/claude/*:refs/remotes/origin/claude/*' 2>/dev/null || true
+          EXISTING_BRANCH=$(git branch -r --list "origin/claude/issue-${ISSUE_NUM}-*" \
+            --sort=-committerdate | head -1 | tr -d ' ')
+
+          if [ -n "$EXISTING_BRANCH" ]; then
+            LOCAL_BRANCH=$(echo "$EXISTING_BRANCH" | sed 's|origin/||')
+            echo "✅ 找到已存在的分支: $LOCAL_BRANCH"
+            git checkout -b "$LOCAL_BRANCH" "$EXISTING_BRANCH"
+            echo "branch_switched=true" >> $GITHUB_OUTPUT
+            echo "branch_name=$LOCAL_BRANCH" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ 無已存在的 issue 分支，使用 master"
+            echo "branch_switched=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: 儲存初始 Git SHA
         id: save_sha
@@ -51,26 +91,61 @@ jobs:
 
           # 先檢查有沒有明確指定 --agent
           AGENT_NAME=$(echo "$COMMENT" | grep -oP -- '--agent \K\S+' || echo "")
+          PIPELINE_MODE="false"
 
           # 如果沒有明確指定，就用關鍵字判斷
           if [ -z "$AGENT_NAME" ]; then
             # 擷取 @claude 後面的文字來比對關鍵字
             AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
 
-            if echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格|釐清規格|clarifier|clarify)'; then
+            # 全流程管線模式（最高優先）
+            if echo "$AFTER_CLAUDE" | grep -qP '(開工|pipeline|full|全自動)'; then
               AGENT_NAME="wp-workflows:clarifier"
-            elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|實作|計畫|planner|plan)'; then
+              PIPELINE_MODE="true"
+            elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|計畫|planner|plan)'; then
               AGENT_NAME="wp-workflows:planner"
+            elif echo "$AFTER_CLAUDE" | grep -qP '(釐清|規格|釐清規格|clarifier|clarify)'; then
+              AGENT_NAME="wp-workflows:clarifier"
+            else
+              # 預設：走 Clarifier（若已釐清會自動 cascade 到 Planner → TDD-Coordinator）
+              AGENT_NAME="wp-workflows:clarifier"
             fi
           fi
 
-          if [ -n "$AGENT_NAME" ]; then
-            echo "擷取到 Agent: $AGENT_NAME"
-            echo "AGENT_ARG=--agent $AGENT_NAME" >> $GITHUB_ENV
-          else
-            echo "未指定 Agent，將使用預設模式"
-            echo "AGENT_ARG=" >> $GITHUB_ENV
+          echo "擷取到 Agent: $AGENT_NAME"
+          echo "AGENT_ARG=--agent $AGENT_NAME" >> $GITHUB_ENV
+          echo "PIPELINE_MODE=$PIPELINE_MODE" >> $GITHUB_ENV
+
+          if [ "$PIPELINE_MODE" = "true" ]; then
+            echo "🚀 全流程管線模式啟動 (clarifier → planner → tdd-coordinator)"
           fi
+
+      - name: 組合 Pipeline 模式的 Prompt
+        if: env.PIPELINE_MODE == 'true'
+        run: |
+          {
+            echo 'PIPELINE_PROMPT<<GHEOF'
+            cat <<'INNER'
+          你現在處於 CI 全流程管線模式（@claude 開工）。
+
+          請按照以下流程一氣呵成執行：
+
+          1. **規格生成**：閱讀 Issue 完整內容（包含所有留言），視為已完成的釐清
+             - 不要向用戶提問，直接根據 Issue 內容生成規格文件到 ./specs 目錄
+             - 如果 ./specs 目錄已有此功能的相關規格文件，可跳過此步驟
+             - 使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill 產出完整規格
+
+          2. **規劃**：規格完成後，自動交接給 @wp-workflows:planner
+             - planner 不需要詢問用戶確認
+
+          3. **實作**：planner 完成後，自動交接給 @wp-workflows:tdd-coordinator
+             - 在 CI 環境中直接在當前分支工作
+             - 所有變更 commit 到當前分支
+
+          ⚠️ 重要：整條鏈路自動執行到底，中間不等待用戶回覆。
+          INNER
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
 
       # ── 第 1 次嘗試 ──────────────────────────────────
       - name: "Run Claude Code (attempt 1/3)"
@@ -86,9 +161,10 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows
+          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns 60
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
@@ -114,9 +190,10 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows
+          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns 60
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
@@ -141,9 +218,10 @@ jobs:
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
             wp-workflows
+          direct_prompt: ${{ env.PIPELINE_MODE == 'true' && env.PIPELINE_PROMPT || '' }}
           claude_args: |
             --dangerously-skip-permissions
-            --max-turns 60
+            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '60' }}
             --model claude-opus-4-6
             ${{ env.AGENT_ARG }}
 
