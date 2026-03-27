@@ -295,6 +295,24 @@ components:
         link_course_ids:
           type: integer
           description: 綁定的課程 ID
+        pbp_product_ids:
+          type: array
+          description: 此銷售方案包含的商品 ID 列表
+          items:
+            type: string
+          example: ["100", "202"]
+        pbp_product_quantities:
+          type: object
+          description: |
+            各商品數量對照表，key 為商品 ID（string），value 為數量（integer）。
+            若此欄位不存在或某商品 ID 不在此物件中，該商品數量預設為 1（向後兼容）。
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
+          example:
+            "100": 2
+            "202": 3
         price:
           type: string
           example: "399"
@@ -2615,9 +2633,12 @@ paths:
         - `name` 不可為空
         - `link_course_id` 不可為空
         - `bundle_type` 不可為空
+        - `pbp_product_quantities` 中的數量必須為 1~999 正整數（若提供）
 
         **後置（狀態）:**
         - 建立 WooCommerce 商品並設定 bundle_type meta
+        - 若提供 `pbp_product_quantities`，存為 JSON 格式的 post meta
+        - 未提供 `pbp_product_quantities` 時，所有商品預設數量為 1（向後兼容）
         - 支援設定 bind_courses_data（與普通商品共用綁定課程到商品邏輯）
       requestBody:
         required: true
@@ -2648,6 +2669,18 @@ paths:
                 regular_price:
                   type: string
                   example: "599"
+                pbp_product_quantities:
+                  type: object
+                  description: |
+                    各商品數量對照表，key 為商品 ID（string），value 為數量（integer 1~999）。
+                    未提供時所有商品預設數量為 1。
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
+                  example:
+                    "100": 2
+                    "202": 3
                 bind_courses_data:
                   type: array
                   items:
@@ -2775,6 +2808,18 @@ paths:
                   type: string
                 link_course_id:
                   type: integer
+                pbp_product_quantities:
+                  type: object
+                  description: |
+                    各商品數量對照表，key 為商品 ID（string），value 為數量（integer 1~999）。
+                    未提供時保留原有數量；原有銷售方案無此欄位時預設數量為 1。
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
+                  example:
+                    "100": 2
+                    "202": 3
                 bind_courses_data:
                   type: array
                   items:

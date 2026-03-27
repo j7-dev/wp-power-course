@@ -15,6 +15,7 @@
 [STEP:4] @管理員 {features/product/綁定課程到商品.feature}
 [DECISION:4a] 是否需要多元定價方案
   [BRANCH:4a:建立銷售方案] @管理員 {features/bundle/管理銷售方案.feature}
+    [STEP:4a.1] @管理員 {features/bundle/銷售方案商品數量.feature}
   [BRANCH:4a:單一商品定價] {specs/ui/課程商品設定頁.md}
 [MERGE:4a]
 [STEP:5] @管理員 {features/course/更新課程.feature}

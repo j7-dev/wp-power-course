@@ -328,6 +328,7 @@ Table bundle_products {
   link_course_id   integer      [not null, note: 'postmeta: link_course_ids — the single course this bundle grants access to']
   price            varchar(30)  [null, note: 'WC _price meta']
   regular_price    varchar(30)  [null]
+  pbp_product_quantities json   [null, note: 'postmeta: pbp_product_quantities — JSON {"product_id": qty}，各商品數量對照表。不存在時預設 qty=1（向後兼容）']
   bind_courses_data json        [null, note: 'postmeta: bind_courses_data — [{course_id, limit_type, limit_value, limit_unit}]']
   created_at       timestamp    [not null]
   updated_at       timestamp    [not null]
@@ -343,14 +344,16 @@ Table bundle_products {
   Stored in wp_posts (post_type="product") with additional wp_postmeta.
 
   Key postmeta fields:
-    - bundle_type:        non-empty string (presence = is a bundle product)
-    - link_course_ids:    int — the course this bundle grants access to
-    - pbp_product_ids:    multiple meta rows (included WC product IDs for bundle packages)
-    - bind_courses_data:  serialized array of BindCourseData objects
+    - bundle_type:              non-empty string (presence = is a bundle product)
+    - link_course_ids:          int — the course this bundle grants access to
+    - pbp_product_ids:          multiple meta rows (included WC product IDs for bundle packages)
+    - pbp_product_quantities:   JSON {"product_id": qty} — 各商品數量，不存在時預設 1（向後兼容）
+    - bind_courses_data:        serialized array of BindCourseData objects
 
   Constraints:
     - Cannot nest bundle products inside other bundles.
     - bind_courses_data.limit_type = "fixed" requires limit_value + limit_unit to be set.
+    - pbp_product_quantities 中的 qty 必須為 1~999 正整數
 
   Helper: Helper::instance($product_id) → J7\PowerCourse\BundleProduct\Helper
   '''
