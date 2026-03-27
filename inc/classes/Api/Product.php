@@ -578,7 +578,9 @@ final class Product {
 			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY    => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			// Bundle 商品每個商品的數量
+			Helper::PRODUCT_QUANTITIES_META_KEY     => ( $helper !== null ? ( $helper->get_product_quantities() ?: new \stdClass() ) : new \stdClass() ),
 
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
@@ -927,6 +929,24 @@ final class Product {
 		];
 
 		$product_id = $product->get_id();
+
+		// 處理商品數量 JSON meta（單一 JSON 字串，非多行 meta）
+		if ( isset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] ) ) {
+			$raw_quantities = $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ];
+			if ( is_string( $raw_quantities ) ) {
+				$decoded = json_decode( $raw_quantities, true );
+				if ( is_array( $decoded ) ) {
+					/** @var array<string, int> $decoded */
+					$helper = Helper::instance( $product );
+					$helper?->set_product_quantities( $decoded );
+				}
+			} elseif ( is_array( $raw_quantities ) ) {
+				/** @var array<string, int> $raw_quantities */
+				$helper = Helper::instance( $product );
+				$helper?->set_product_quantities( $raw_quantities );
+			}
+			unset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] );
+		}
 
 		// 直接更新 array 的 meta data
 		foreach ($update_array_meta_keys as $meta_key) {

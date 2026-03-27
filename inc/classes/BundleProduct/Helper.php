@@ -14,8 +14,9 @@ namespace J7\PowerCourse\BundleProduct;
  * 銷售方案 Helper
  */
 final class Helper {
-	const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
-	const LINK_COURSE_IDS_META_KEY     = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const INCLUDE_PRODUCT_IDS_META_KEY      = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
+	const LINK_COURSE_IDS_META_KEY          = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const PRODUCT_QUANTITIES_META_KEY       = 'pbp_product_quantities'; // 此銷售方案裡每個商品的數量
 
 	/**
 	 * 銷售方案類型 'bundle'
@@ -182,6 +183,57 @@ final class Helper {
 		$this->product->save_meta_data();
 	}
 
+
+	/**
+	 * 取得銷售方案中各商品的數量 map
+	 *
+	 * @return array<string, int> key = product_id, value = quantity
+	 */
+	public function get_product_quantities(): array {
+		$id   = $this->product->get_id();
+		$json = \get_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, true );
+		if ( ! is_string( $json ) || '' === $json ) {
+			return [];
+		}
+		$decoded = json_decode( $json, true );
+		if ( ! is_array( $decoded ) ) {
+			return [];
+		}
+
+		/** @var array<string, int> $result */
+		$result = [];
+		foreach ( $decoded as $key => $value ) {
+			$result[ (string) $key ] = max( 1, (int) $value );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * 設定銷售方案中各商品的數量 map
+	 *
+	 * @param array<string, int> $quantities key = product_id, value = quantity
+	 *
+	 * @return void
+	 */
+	public function set_product_quantities( array $quantities ): void {
+		$id = $this->product->get_id();
+		\update_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, (string) wp_json_encode( $quantities ) );
+	}
+
+	/**
+	 * 取得指定商品在銷售方案中的數量
+	 * 若未設定則 fallback 為 1
+	 *
+	 * @param int $product_id product_id
+	 *
+	 * @return int
+	 */
+	public function get_quantity_for_product( int $product_id ): int {
+		$quantities = $this->get_product_quantities();
+
+		return max( 1, (int) ( $quantities[ (string) $product_id ] ?? 1 ) );
+	}
 
 	/**
 	 * 取得銷售方案連結的課程商品
