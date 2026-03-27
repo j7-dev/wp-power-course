@@ -20,7 +20,15 @@ const SPA_LOAD_TIMEOUT = 15_000
  */
 export async function navigateToAdmin(page: Page, hash: string): Promise<void> {
 	const url = `${ADMIN_PAGE}#${hash}`
-	await page.goto(url, { waitUntil: 'domcontentloaded' })
+	await page.goto(url, { waitUntil: 'domcontentloaded', timeout: SPA_LOAD_TIMEOUT })
+
+	// 檢查是否被重導到登入頁（auth session 無效）
+	const currentUrl = page.url()
+	if (currentUrl.includes('wp-login.php')) {
+		throw new Error(
+			`Admin navigation redirected to login page: ${currentUrl}. Session may have expired.`,
+		)
+	}
 
 	// 等待 React SPA 根節點掛載
 	await page.waitForSelector('#power_course', {
