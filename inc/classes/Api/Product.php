@@ -578,7 +578,10 @@ final class Product {
 			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY  => ( $helper !== null ? $helper->get_product_ids() : [] ),
+
+			// Bundle 商品每個商品的數量，無資料時回傳空物件
+			Helper::PRODUCT_QUANTITIES_META_KEY   => ( $helper !== null ? $helper->get_product_quantities() : (object) [] ),
 
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
@@ -915,6 +918,47 @@ final class Product {
 	 * @return array<string, mixed>
 	 */
 	public static function handle_special_fields( array $meta_data, \WC_Product $product ) {
+		// 處理 pbp_product_quantities：驗證並儲存
+		if ( isset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] ) ) {
+			/** @var mixed $quantities_raw */
+			$quantities_raw = $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ];
+
+			// 支援 JSON 字串或陣列
+			if ( is_string( $quantities_raw ) ) {
+				$decoded = \json_decode( $quantities_raw, true );
+				if ( is_array( $decoded ) ) {
+					$quantities_raw = $decoded;
+				} else {
+					$quantities_raw = [];
+				}
+			}
+
+			if ( is_array( $quantities_raw ) ) {
+				// 驗證所有數量 >= 1
+				foreach ( $quantities_raw as $qty ) {
+					$qty_int = (int) $qty;
+					if ( $qty_int < 1 ) {
+						\wp_send_json_error(
+							[
+								'code'    => 'invalid_quantity',
+								'message' => 'pbp_product_quantities 中的數量必須為正整數（≥ 1）',
+							],
+							400
+						);
+						exit; // phpcs:ignore
+					}
+				}
+
+				$helper = Helper::instance( $product );
+				if ( $helper !== null ) {
+					/** @var array<int|string, int> $quantities_raw */
+					$helper->set_product_quantities( $quantities_raw );
+				}
+			}
+
+			unset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] );
+		}
+
 		$update_array_meta_keys = [
 			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
 			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程

@@ -14,8 +14,9 @@ namespace J7\PowerCourse\BundleProduct;
  * 銷售方案 Helper
  */
 final class Helper {
-	const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
-	const LINK_COURSE_IDS_META_KEY     = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const INCLUDE_PRODUCT_IDS_META_KEY  = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
+	const LINK_COURSE_IDS_META_KEY      = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const PRODUCT_QUANTITIES_META_KEY   = 'pbp_product_quantities'; // 此銷售方案中每個商品的數量
 
 	/**
 	 * 銷售方案類型 'bundle'
@@ -73,6 +74,67 @@ final class Helper {
 		return new self($product);
 	}
 
+
+	/**
+	 * 取得銷售方案中每個商品的數量
+	 * 格式：[product_id => quantity]
+	 * 不存在時回傳空陣列 []
+	 *
+	 * @return array<string, int>
+	 */
+	public function get_product_quantities(): array {
+		$id   = $this->product->get_id();
+		$json = \get_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, true );
+
+		if ( ! $json || ! is_string( $json ) ) {
+			return [];
+		}
+
+		$decoded = \json_decode( $json, true );
+		if ( ! is_array( $decoded ) ) {
+			return [];
+		}
+
+		/** @var array<string, int> $result */
+		$result = [];
+		foreach ( $decoded as $product_id => $qty ) {
+			$result[ (string) $product_id ] = (int) $qty;
+		}
+		return $result;
+	}
+
+	/**
+	 * 儲存銷售方案中每個商品的數量
+	 *
+	 * @param array<int|string, int> $quantities [product_id => quantity]
+	 *
+	 * @return void
+	 */
+	public function set_product_quantities( array $quantities ): void {
+		$id              = $this->product->get_id();
+		$normalized      = [];
+		foreach ( $quantities as $product_id => $qty ) {
+			$normalized[ (string) $product_id ] = (int) $qty;
+		}
+		$json = \wp_json_encode( $normalized );
+		if ( false === $json ) {
+			return;
+		}
+		\update_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, $json );
+	}
+
+	/**
+	 * 取得銷售方案中單一商品的數量
+	 * 無資料時回傳預設值 1
+	 *
+	 * @param int $product_id 商品 ID
+	 *
+	 * @return int 商品數量（最小為 1）
+	 */
+	public function get_quantity_for_product( int $product_id ): int {
+		$quantities = $this->get_product_quantities();
+		return $quantities[ (string) $product_id ] ?? 1;
+	}
 
 	/**
 	 * 取得某個課程的銷售方案
