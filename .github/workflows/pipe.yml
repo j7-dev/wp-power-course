@@ -5,8 +5,6 @@ on:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  issues:
-    types: [opened, assigned]
   pull_request_review:
     types: [submitted]
 
@@ -15,8 +13,7 @@ jobs:
     if: |
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -142,7 +139,7 @@ jobs:
             AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
 
             # 全流程管線模式（最高優先）— 釐清完畢後由用戶觸發
-            if echo "$AFTER_CLAUDE" | grep -qiP '(開工|pipeline|full|全自動|確認|OK|沒問題|開始|go|start|LGTM)'; then
+            if echo "$AFTER_CLAUDE" | grep -qiP '(開工|全自動|確認|OK|沒問題|開始|go|start)'; then
               AGENT_NAME="wp-workflows:clarifier"
               PIPELINE_MODE="true"
             elif echo "$AFTER_CLAUDE" | grep -qP '(規劃|計畫|planner|plan)'; then
@@ -605,91 +602,114 @@ jobs:
           } >> $GITHUB_ENV
 
       # ══════════════════════════════════════════════════
-      # 自動截圖（測試通過且有 UI 變更時）
+      # E2E 測試（僅當有 E2E 測試變更時）
       # ══════════════════════════════════════════════════
 
-      - name: 分類變更檔案
-        id: classify_changes
-        if: steps.final_result.outputs.status == 'passed'
+      - name: 偵測變更的 E2E 測試檔案
+        id: detect_e2e
+        if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: |
           INITIAL_SHA="${{ steps.save_sha.outputs.initial_sha }}"
-          CHANGED_FILES=$(git diff --name-only "$INITIAL_SHA" HEAD)
-          HAS_ADMIN=false
-          HAS_FRONTEND=false
+          CHANGED_E2E=$(git diff --name-only --diff-filter=AM "$INITIAL_SHA" HEAD | grep -E '^tests/e2e/.*\.spec\.ts$' || true)
 
-          while IFS= read -r file; do
-            case "$file" in
-              js/src/*|inc/classes/Admin/*|inc/classes/Resources/*|inc/classes/PowerEmail/*|inc/classes/BundleProduct/*|inc/classes/Shortcodes/*)
-                HAS_ADMIN=true ;;
-              inc/templates/*|inc/assets/*|inc/classes/FrontEnd/*|inc/classes/Templates/*)
-                HAS_FRONTEND=true ;;
-            esac
-          done <<< "$CHANGED_FILES"
+          if [ -n "$CHANGED_E2E" ]; then
+            echo "has_e2e_changes=true" >> $GITHUB_OUTPUT
+            echo "$CHANGED_E2E" > /tmp/changed_e2e_files.txt
+            FILE_COUNT=$(echo "$CHANGED_E2E" | wc -l)
+            echo "e2e_file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
 
-          if $HAS_ADMIN && $HAS_FRONTEND; then
-            echo "mode=both" >> $GITHUB_OUTPUT
-          elif $HAS_ADMIN; then
-            echo "mode=admin" >> $GITHUB_OUTPUT
-          elif $HAS_FRONTEND; then
-            echo "mode=frontend" >> $GITHUB_OUTPUT
+            {
+              echo 'E2E_CHANGED_LIST<<GHEOF'
+              while IFS= read -r f; do
+                echo "- \`${f}\`"
+              done <<< "$CHANGED_E2E"
+              echo 'GHEOF'
+            } >> $GITHUB_ENV
+
+            echo "[E2E 測試階段] 此次修改/新增 ${FILE_COUNT} 個 E2E 測試案例"
+            echo "$CHANGED_E2E"
           else
-            echo "mode=skip" >> $GITHUB_OUTPUT
+            echo "has_e2e_changes=false" >> $GITHUB_OUTPUT
+            echo "[E2E 測試階段] 此次變更無 E2E 測試案例，不進行 E2E 測試"
           fi
-          echo "📸 截圖模式: $(cat $GITHUB_OUTPUT | grep mode | cut -d= -f2)"
 
-      - name: 建置前端 (截圖用)
-        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
+      - name: 建置前端 (E2E 測試用)
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         run: pnpm run build
 
       - name: 安裝 Playwright 瀏覽器
-        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         working-directory: tests/e2e
         run: npx playwright install chromium
 
-      - name: 驗證 WordPress 環境健康（截圖前置檢查）
-        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
-        continue-on-error: true
-        run: |
-          echo "🔍 檢查 WordPress 環境..."
-          npx wp-env run cli -- wp plugin list --format=table
-          echo ""
-          echo "🔍 檢查站點 URL..."
-          npx wp-env run cli -- wp option get siteurl
-          echo ""
-          echo "🔍 檢查 Power Course 外掛狀態..."
-          npx wp-env run cli -- wp plugin is-active wp-power-course && echo "✅ Power Course 已啟用" || echo "⚠️ Power Course 未啟用"
-          echo ""
-          echo "🔍 檢查 WooCommerce 狀態..."
-          npx wp-env run cli -- wp plugin is-active woocommerce && echo "✅ WooCommerce 已啟用" || echo "⚠️ WooCommerce 未啟用"
-
-      - name: 準備截圖環境 (smoke test 觸發 global-setup)
-        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
+      - name: 準備 E2E 測試環境 (smoke test 觸發 global-setup)
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         env:
           TEST_SITE_URL: http://localhost:8895
           CI: "true"
         working-directory: tests/e2e
         run: |
           npx playwright test 01-admin/smoke.spec.ts --project=admin || true
-          # 檢查 auth state 是否建立成功
           if [ -f ".auth/admin.json" ]; then
             echo "✅ Auth state 建立成功"
           else
-            echo "⚠️ Auth state 未建立，截圖腳本將嘗試自行登入"
+            echo "⚠️ Auth state 未建立"
           fi
 
-      - name: 自動截圖
-        id: take_screenshots
-        if: steps.final_result.outputs.status == 'passed' && steps.classify_changes.outputs.mode != 'skip'
+      - name: 執行 E2E 測試（僅變更的測試案例）
+        id: run_e2e
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         continue-on-error: true
         env:
           TEST_SITE_URL: http://localhost:8895
           CI: "true"
+          PW_FORCE_VIDEO: "1"
         working-directory: tests/e2e
-        run: npx tsx take-screenshots.ts --mode ${{ steps.classify_changes.outputs.mode }}
+        run: |
+          E2E_FILES=""
+          while IFS= read -r f; do
+            REL=$(echo "$f" | sed 's|^tests/e2e/||')
+            E2E_FILES="$E2E_FILES $REL"
+          done < /tmp/changed_e2e_files.txt
 
-      - name: 上傳截圖到臨時分支
-        id: upload_screenshots
-        if: steps.take_screenshots.outcome == 'success'
+          echo "🧪 執行測試: $E2E_FILES"
+          npx playwright test $E2E_FILES --reporter=list 2>&1 | tee /tmp/e2e_output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+
+          if [ "$EXIT_CODE" -eq 0 ]; then
+            echo "e2e_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "e2e_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 收集 E2E 測試影片與截圖
+        id: collect_e2e_media
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
+        working-directory: tests/e2e
+        run: |
+          mkdir -p /tmp/e2e-media
+
+          # 以測試目錄名為前綴，避免同名覆蓋
+          for dir in test-results/*/; do
+            [ -d "$dir" ] || continue
+            dirname=$(basename "$dir")
+            for file in "$dir"*.webm "$dir"*.png; do
+              [ -f "$file" ] || continue
+              ext="${file##*.}"
+              cp "$file" "/tmp/e2e-media/${dirname}.${ext}"
+            done
+          done
+
+          VIDEO_COUNT=$(ls /tmp/e2e-media/*.webm 2>/dev/null | wc -l || echo "0")
+          SCREENSHOT_COUNT=$(ls /tmp/e2e-media/*.png 2>/dev/null | wc -l || echo "0")
+
+          echo "video_count=$VIDEO_COUNT" >> $GITHUB_OUTPUT
+          echo "screenshot_count=$SCREENSHOT_COUNT" >> $GITHUB_OUTPUT
+          echo "📁 收集到 ${VIDEO_COUNT} 個影片, ${SCREENSHOT_COUNT} 個截圖"
+
+      - name: 上傳 E2E 測試媒體到臨時分支
+        id: upload_e2e_media
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         continue-on-error: true
         env:
           GIT_AUTHOR_NAME: "github-actions[bot]"
@@ -697,66 +717,132 @@ jobs:
           GIT_COMMITTER_NAME: "github-actions[bot]"
           GIT_COMMITTER_EMAIL: "github-actions[bot]@users.noreply.github.com"
         run: |
-          BRANCH_NAME="ci-screenshots-${{ github.run_id }}"
+          BRANCH_NAME="ci-e2e-media-${{ github.run_id }}"
           CURRENT_BRANCH=$(git branch --show-current || git rev-parse --abbrev-ref HEAD)
 
-          # 暫存當前變更
           git stash --include-untracked || true
 
-          # 建立 orphan branch
           git checkout --orphan "$BRANCH_NAME"
           git reset
-          mkdir -p screenshots
-          cp tests/e2e/screenshots/*.png screenshots/ 2>/dev/null || true
+          mkdir -p media
+          cp /tmp/e2e-media/* media/ 2>/dev/null || true
 
-          SCREENSHOT_COUNT=$(ls screenshots/*.png 2>/dev/null | wc -l || echo "0")
-          if [ "$SCREENSHOT_COUNT" -gt 0 ]; then
-            git add screenshots/
-            git commit -m "ci: screenshots for run ${{ github.run_id }}"
+          MEDIA_COUNT=$(ls media/* 2>/dev/null | wc -l || echo "0")
+          if [ "$MEDIA_COUNT" -gt 0 ]; then
+            git add media/
+            git commit -m "ci: e2e media for run ${{ github.run_id }}"
             git push origin "$BRANCH_NAME"
 
-            # 構建 markdown 圖片語法
-            URLS=""
-            for img in screenshots/*.png; do
+            # 構建截圖 markdown（內嵌顯示）
+            SCREENSHOT_MD=""
+            for img in media/*.png; do
+              [ -f "$img" ] || continue
               filename=$(basename "$img")
               label=$(echo "$filename" | sed 's/.png//' | sed 's/-/ /g')
-              url="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH_NAME}/screenshots/${filename}"
-              URLS="${URLS}### ${label}"$'\n'"![${label}](${url})"$'\n\n'
+              url="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH_NAME}/media/${filename}"
+              SCREENSHOT_MD="${SCREENSHOT_MD}### ${label}"$'\n'"![${label}](${url})"$'\n\n'
+            done
+
+            # 構建影片 markdown（連結到 GitHub blob 頁面播放器）
+            VIDEO_MD=""
+            for vid in media/*.webm; do
+              [ -f "$vid" ] || continue
+              filename=$(basename "$vid")
+              label=$(echo "$filename" | sed 's/.webm//' | sed 's/-/ /g')
+              blob_url="https://github.com/${{ github.repository }}/blob/${BRANCH_NAME}/media/${filename}?raw=true"
+              VIDEO_MD="${VIDEO_MD}### 📹 ${label}"$'\n'"[▶️ 觀看測試影片](${blob_url})"$'\n\n'
             done
 
             {
-              echo 'SCREENSHOT_URLS<<GHEOF'
-              echo "$URLS"
+              echo 'E2E_SCREENSHOT_MD<<GHEOF'
+              echo "$SCREENSHOT_MD"
               echo 'GHEOF'
             } >> $GITHUB_ENV
-            echo "has_screenshots=true" >> $GITHUB_OUTPUT
+            {
+              echo 'E2E_VIDEO_MD<<GHEOF'
+              echo "$VIDEO_MD"
+              echo 'GHEOF'
+            } >> $GITHUB_ENV
+
+            echo "has_media=true" >> $GITHUB_OUTPUT
           else
-            echo "has_screenshots=false" >> $GITHUB_OUTPUT
+            echo "has_media=false" >> $GITHUB_OUTPUT
           fi
 
-          # 回到原分支
           git checkout "$CURRENT_BRANCH" 2>/dev/null || git checkout -
           git stash pop 2>/dev/null || true
 
-      - name: 清理舊截圖分支 (保留最近 5 個)
-        if: steps.upload_screenshots.outputs.has_screenshots == 'true'
+      - name: 清理舊 E2E 媒體分支 (保留最近 5 個)
+        if: steps.upload_e2e_media.outputs.has_media == 'true'
         continue-on-error: true
         run: |
-          git fetch origin 'refs/heads/ci-screenshots-*:refs/remotes/origin/ci-screenshots-*' 2>/dev/null || true
-          BRANCHES=$(git branch -r --list 'origin/ci-screenshots-*' --sort=-committerdate | tail -n +6)
+          git fetch origin 'refs/heads/ci-e2e-media-*:refs/remotes/origin/ci-e2e-media-*' 2>/dev/null || true
+          BRANCHES=$(git branch -r --list 'origin/ci-e2e-media-*' --sort=-committerdate | tail -n +6)
           for branch in $BRANCHES; do
             REMOTE_BRANCH=$(echo "$branch" | sed 's|origin/||' | tr -d ' ')
             echo "刪除舊分支: $REMOTE_BRANCH"
             git push origin --delete "$REMOTE_BRANCH" 2>/dev/null || true
           done
 
-      - name: 上傳截圖 Artifact (備份)
-        if: steps.take_screenshots.outcome == 'success'
+      - name: 上傳 E2E 測試媒體 Artifact (備份)
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: ai-change-screenshots
-          path: tests/e2e/screenshots/
+          name: e2e-test-media
+          path: tests/e2e/test-results/
           retention-days: 7
+
+      # ── 發佈 E2E 測試報告 ───────────────────────────
+      - name: 發佈 E2E 測試報告
+        if: steps.detect_e2e.outputs.has_e2e_changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const e2eStatus = '${{ steps.run_e2e.outputs.e2e_status }}';
+            const changedList = process.env.E2E_CHANGED_LIST || '（無變更清單）';
+            const screenshotMd = process.env.E2E_SCREENSHOT_MD || '';
+            const videoMd = process.env.E2E_VIDEO_MD || '';
+            const hasMedia = '${{ steps.upload_e2e_media.outputs.has_media }}' === 'true';
+
+            const passed = e2eStatus === 'passed';
+            const emoji = passed ? '✅' : '❌';
+            const statusText = passed ? '通過' : '失敗';
+
+            let mediaSection = '';
+            if (hasMedia) {
+              if (screenshotMd) {
+                mediaSection += `\n## 📸 測試截圖\n\n${screenshotMd}\n`;
+              }
+              if (videoMd) {
+                mediaSection += `\n## 📹 測試影片\n\n${videoMd}\n`;
+              }
+            } else {
+              mediaSection = '\n> ⚠️ 未收集到測試媒體檔案\n';
+            }
+
+            const body = [
+              `## 🧪 E2E 測試報告`,
+              '',
+              `### 測試結果：${emoji} ${statusText}`,
+              '',
+              '### 測試的項目',
+              changedList,
+              mediaSection,
+              '---',
+              `*🤖 E2E 測試由 CI 自動執行（run \`${{ github.run_id }}\`）*`,
+            ].join('\n');
+
+            const issueNumber = context.issue?.number
+              || context.payload?.issue?.number
+              || context.payload?.pull_request?.number;
+            if (issueNumber) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: body,
+              });
+            }
 
       # ── 發佈測試結果留言 ─────────────────────────────
       - name: 發佈測試結果留言
@@ -828,24 +914,6 @@ jobs:
               summaryTable += '\n';
             }
 
-            // 截圖區塊
-            const screenshotMode = '${{ steps.classify_changes.outputs.mode }}' || 'skip';
-            const hasScreenshots = '${{ steps.upload_screenshots.outputs.has_screenshots }}' === 'true';
-            const screenshotUrls = process.env.SCREENSHOT_URLS || '';
-
-            let screenshotSection = '';
-            if (screenshotMode !== 'skip' && hasScreenshots && screenshotUrls) {
-              screenshotSection = [
-                '',
-                '## 📸 自動截圖',
-                `> 截圖模式：\`${screenshotMode}\``,
-                '',
-                screenshotUrls,
-              ].join('\n');
-            } else if (screenshotMode === 'skip') {
-              screenshotSection = '\n> 📸 本次變更為純 API/邏輯變更，無需截圖';
-            }
-
             const body = [
               `## ${emoji} PHPUnit 整合測試${statusText}`,
               fixInfo,
@@ -858,7 +926,6 @@ jobs:
               '```',
               '',
               '</details>',
-              screenshotSection,
               '',
               '---',
               `*🤖 測試在 Claude Code 開發完成後自動執行（cycle ${cycle}/3）*`,
