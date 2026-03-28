@@ -390,8 +390,9 @@ jobs:
       - name: 建立 uploads 目錄（必須在 wp-env start 之前，否則 Docker 會以 root 建立）
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
         run: |
+          sudo rm -rf ./tests/e2e/.uploads
           mkdir -p ./tests/e2e/.uploads
-          chmod -R 777 ./tests/e2e/.uploads
+          chmod 777 ./tests/e2e/.uploads
 
       - name: 啟動 wp-env 測試環境
         if: steps.check_result.outputs.claude_ok == 'true' && steps.check_result.outputs.has_changes == 'true'
