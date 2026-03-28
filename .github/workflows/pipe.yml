@@ -961,8 +961,16 @@ jobs:
             exit 0
           fi
 
-          # 確保所有變更都已推送
-          git push origin "$CURRENT_BRANCH" 2>/dev/null || true
+          # 重新設定 git 認證（claude-code-action 可能覆蓋了 checkout 的設定）
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+
+          # 推送分支到遠端
+          echo "🔄 推送分支 $CURRENT_BRANCH 到遠端..."
+          if ! git push -u origin "$CURRENT_BRANCH"; then
+            echo "❌ git push 失敗，無法建立 PR"
+            exit 1
+          fi
+          echo "✅ 分支推送成功"
 
           # 檢查是否已有此分支的 PR
           EXISTING_PR=$(gh pr list --head "$CURRENT_BRANCH" --state open --json number --jq '.[0].number' 2>/dev/null || echo "")
