@@ -24,11 +24,20 @@ jobs:
           AFTER_CLAUDE=$(echo "$ISSUE_BODY" | grep -oP '@claude\s+\K.*' || echo "")
 
           # 比對觸發關鍵字（新增關鍵字只需在這裡加）
-          if echo "$AFTER_CLAUDE" | grep -qiP '(展開|探討)'; then
+          if echo "$AFTER_CLAUDE" | grep -qiP '(展開|探討|dev|工程|領域)'; then
             echo "matched=true" >> $GITHUB_OUTPUT
-            echo "✅ 匹配到觸發關鍵字: $AFTER_CLAUDE"
+
+            # 判斷模式：包含 dev 或 工程 → DEV，否則 → PM（預設）
+            if echo "$AFTER_CLAUDE" | grep -qiP '(dev|工程|領域)'; then
+              echo "mode=dev" >> $GITHUB_OUTPUT
+              echo "✅ DEV 模式：$AFTER_CLAUDE"
+            else
+              echo "mode=pm" >> $GITHUB_OUTPUT
+              echo "✅ PM 模式（預設）：$AFTER_CLAUDE"
+            fi
           else
             echo "matched=false" >> $GITHUB_OUTPUT
+            echo "mode=pm" >> $GITHUB_OUTPUT
             echo "⚠️ 未匹配到觸發關鍵字，跳過後續步驟"
           fi
 
@@ -107,7 +116,14 @@ jobs:
             echo "上方是用戶在 Issue #${ISSUE_NUM} 提出的粗略需求。"
             echo ""
             echo "### 任務"
-            echo "1. 使用 /wp-workflows:issue-creator skill 將上方粗略需求展開為結構化的完整需求文件"
+            MODE="${{ steps.check_keyword.outputs.mode }}"
+            if [ "$MODE" = "dev" ]; then
+              echo "1. 使用 /wp-workflows:issue-creator skill（DEV 開發者模式）將上方粗略需求展開為結構化的完整需求文件"
+              echo "   ⚠️ 重要：此為 DEV 模式，產出內容面向開發者，需包含技術細節、影響檔案範圍、API 規格等"
+            else
+              echo "1. 使用 /wp-workflows:issue-creator skill（PM 客服模式）將上方粗略需求展開為結構化的完整需求文件"
+              echo "   ⚠️ 重要：此為 PM 模式（預設），產出內容面向非技術人員，使用用戶旅程、業務價值描述"
+            fi
             echo "2. issue-creator 會自動讀取 ./specs 目錄下的既有規格作為專案上下文"
             echo "3. 展開完成後，將結果作為 Issue 留言發表（使用 gh issue comment）"
             echo ""
