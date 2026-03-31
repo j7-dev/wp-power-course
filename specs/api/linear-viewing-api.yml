@@ -1,0 +1,98 @@
+# Power Course — Linear Viewing API Additions
+# 此檔案描述「課程章節線性觀看」功能的 API 變更
+# 應整合至主 api.yml 中
+
+# ============================================================
+# 變更 1：CourseBase schema 新增 enable_linear_viewing 欄位
+# ============================================================
+# 在 components.schemas.CourseBase.properties 中新增：
+#
+#   enable_linear_viewing:
+#     type: string
+#     enum: [yes, no]
+#     default: "no"
+#     description: 是否啟用線性觀看模式。啟用後學員需按章節順序完成才能解鎖下一個章節。
+
+# ============================================================
+# 變更 2：GET /chapters 回應新增 is_locked 欄位
+# ============================================================
+# 在 ChapterBase.properties 中新增：
+#
+#   is_locked:
+#     type: boolean
+#     description: |
+#       章節是否被鎖定（僅在課程啟用 enable_linear_viewing = "yes" 時有效）。
+#       鎖定判斷基於扁平化順序（menu_order ASC）：
+#       - 第一個章節永遠不鎖定
+#       - 已完成的章節永遠不鎖定（已完成=已解鎖）
+#       - 前一個章節已完成則解鎖
+#       未啟用線性觀看時，所有章節 is_locked = false。
+#       管理員預覽模式下，所有章節 is_locked = false。
+#     example: false
+
+# ============================================================
+# 變更 3：POST /progress/toggle/{chapter_id} 回應新增欄位
+# ============================================================
+# 在 toggleFinishChapter 200 回應 schema properties 中新增：
+#
+#   next_unlocked_chapter_id:
+#     type: integer
+#     nullable: true
+#     description: |
+#       下一個新解鎖的章節 ID。
+#       僅在課程啟用線性觀看（enable_linear_viewing = "yes"）且完成操作後有效。
+#       若所有章節都已完成或當前為取消完成操作，則為 null。
+#     example: 201
+
+# ============================================================
+# 變更 4：POST /progress/toggle/{chapter_id} 新增 403 錯誤場景
+# ============================================================
+# 在 toggleFinishChapter 403 responses examples 中新增：
+#
+#   chapterLocked:
+#     summary: 章節尚未解鎖（線性觀看模式）
+#     value:
+#       code: rest_forbidden
+#       message: "章節尚未解鎖，請先完成前面的章節"
+#       data:
+#         status: 403
+
+# ============================================================
+# 變更 5：POST /courses/{id} (更新課程) 接受 enable_linear_viewing
+# ============================================================
+# 在更新課程 API 的 request body 中新增可選欄位：
+#
+#   enable_linear_viewing:
+#     type: string
+#     enum: [yes, no]
+#     description: 設定是否啟用線性觀看模式
+
+# ============================================================
+# 完整 API 行為描述
+# ============================================================
+
+# GET /chapters?post_parent={course_id}
+# ─────────────────────────────────────
+# 當課程啟用 enable_linear_viewing = "yes" 時：
+# - 回應中每個章節物件額外包含 `is_locked` 布林欄位
+# - 鎖定邏輯：
+#   1. 取得該課程的扁平化章節序列（get_flatten_post_ids）
+#   2. 第一個章節 is_locked = false
+#   3. 已有 finished_at 的章節 is_locked = false（已完成=已解鎖）
+#   4. 前一個章節有 finished_at → 當前章節 is_locked = false
+#   5. 否則 is_locked = true
+# - 管理員（has manage_woocommerce cap）所有章節 is_locked = false
+
+# POST /progress/toggle/{chapter_id}
+# ────────────────────────────────────
+# 新增前置檢查（在線性觀看模式下）：
+# - 若該章節 is_locked = true → 回傳 403 "章節尚未解鎖"
+# 新增回應欄位：
+# - next_unlocked_chapter_id: 完成當前章節後新解鎖的下一章節 ID（若有）
+
+# 前台教室頁面（PHP SSR）
+# ────────────────────────
+# 章節頁面載入前檢查鎖定狀態：
+# - 若 is_locked = true 且非管理員 → HTTP 302 重導向至第一個可觀看的未完成章節
+# - 重導向 URL 附加 ?pc_locked=1 query parameter
+# - 前端 JS 讀取 pc_locked=1 時顯示 toast 提示

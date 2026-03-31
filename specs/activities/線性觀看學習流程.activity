@@ -1,0 +1,106 @@
+@startuml 線性觀看學習流程
+
+|管理員|
+start
+:進入課程設定頁面;
+:找到「線性觀看」開關;
+if (啟用線性觀看?) then (yes)
+  :切換為「開啟」;
+  :儲存設定;
+  note right
+    POST /courses/{id}
+    body: { enable_linear_viewing: "yes" }
+    儲存為 product meta
+  end note
+else (no)
+  :保持「關閉」;
+  stop
+endif
+
+|學員|
+:進入課程教室頁面;
+note right
+  PHP SSR: classroom/chapters.php
+  呼叫 LinearViewing::get_chapter_lock_status()
+  取得各章節 is_locked 狀態
+end note
+
+:查看章節列表;
+note right
+  扁平化順序：
+  第一章 → 1-1 → 1-2 → 第二章 → 2-1
+
+  鎖定判斷邏輯：
+  1. 第一個章節永遠解鎖
+  2. 已完成章節永遠解鎖
+  3. 前一個章節已完成 → 解鎖
+  4. 否則 → 鎖定（灰色+鎖頭圖示）
+end note
+
+if (章節已解鎖?) then (yes)
+  :點擊進入章節;
+  :觀看章節內容;
+  :點擊「標示為已完成」;
+  note right
+    POST /progress/toggle/{chapter_id}
+    body: { course_id }
+
+    前置檢查：
+    - 章節未鎖定（enable_linear_viewing 模式下）
+    - 有課程存取權
+
+    回應新增：
+    - next_unlocked_chapter_id
+  end note
+
+  :側邊欄即時更新;
+  note right
+    AJAX 回應後：
+    1. 更新當前章節圖示（已完成）
+    2. 下一個章節從鎖頭→影片圖示
+    3. 更新 cursor 樣式
+  end note
+
+  if (還有下一章節?) then (yes)
+    :前往下一章節;
+    note right: 重複學習流程
+  else (no)
+    :課程完成!;
+    stop
+  endif
+
+else (no)
+  if (嘗試點擊鎖定章節?) then (yes)
+    :無法點擊;
+    note right
+      cursor:not-allowed
+      tooltip:「請先完成前面的章節」
+    end note
+  else (no)
+    if (嘗試 URL 直接存取?) then (yes)
+      :HTTP 302 重導向;
+      note right
+        重導向到下一個應完成的章節
+        URL 附加 ?pc_locked=1
+      end note
+      :顯示提示 toast;
+      note right: 「請先完成前面的章節，才能觀看該章節」
+    endif
+  endif
+endif
+
+|學員|
+:（可選）取消完成某章節;
+note right
+  POST /progress/toggle/{chapter_id}
+  取消 finished_at
+
+  連鎖影響：
+  - 不清除後續已完成章節的 finished_at
+  - 但未完成的後續章節重新鎖定
+  - 已完成的後續章節仍可觀看（已完成=已解鎖）
+end note
+
+stop
+
+@enduml
