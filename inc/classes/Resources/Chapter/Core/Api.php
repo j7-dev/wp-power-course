@@ -14,6 +14,7 @@ use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Resources\Chapter\Core\LifeCycle as ChapterLifeCycle;
 use J7\Powerhouse\Utils\Base as PowerhouseBase;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearViewing;
 
 
 
@@ -91,6 +92,21 @@ final class Api extends ApiBase {
 
 		$chapters = \get_posts($args);
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters )); // @phpstan-ignore-line
+
+		// 線性觀看：若帶有 post_parent（課程 ID），批量附加 is_locked 欄位
+		$post_parent = (int) ( $params['post_parent'] ?? 0 );
+		if ( $post_parent > 0 ) {
+			$user_id    = \get_current_user_id();
+			$lock_map   = LinearViewing::get_chapters_lock_map( $post_parent, $user_id );
+			$chapters   = array_map(
+				static function ( array $chapter ) use ( $lock_map ): array {
+					$chapter_id             = (int) ( $chapter['id'] ?? 0 );
+					$chapter['is_locked']   = $lock_map[ $chapter_id ] ?? false;
+					return $chapter;
+				},
+				$chapters
+			);
+		}
 
 		$response = new \WP_REST_Response( $chapters );
 
@@ -286,6 +302,23 @@ final class Api extends ApiBase {
 			);
 		}
 
+		// 線性觀看：鎖定前置檢查（只在「完成」操作時檢查，取消完成不受限）
+		if ( !$is_this_chapter_finished ) {
+			$enable_linear = (string) $product->get_meta( 'enable_linear_viewing' );
+			if ( 'yes' === $enable_linear && !current_user_can( 'manage_woocommerce' ) ) {
+				if ( LinearViewing::is_chapter_locked( $chapter_id, $course_id, $user_id ) ) {
+					return new \WP_REST_Response(
+						[
+							'code'    => 'rest_forbidden',
+							'message' => '章節尚未解鎖，請先完成前面的章節',
+							'data'    => [ 'status' => 403 ],
+						],
+						403
+					);
+				}
+			}
+		}
+
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {
@@ -309,6 +342,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? false : true,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_unlocked_chapter_id' => null,
 					],
 				],
 				$success ? 200 : 400
@@ -325,6 +359,13 @@ final class Api extends ApiBase {
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
+		// 線性觀看：取得完成後新解鎖的章節
+		$next_unlocked_chapter_id = null;
+		$enable_linear_for_finish = (string) $product->get_meta( 'enable_linear_viewing' );
+		if ( 'yes' === $enable_linear_for_finish && $success ) {
+			$next_unlocked_chapter_id = LinearViewing::get_next_unlocked_chapter_id( $chapter_id, $course_id, $user_id );
+		}
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
@@ -335,6 +376,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_unlocked_chapter_id' => $next_unlocked_chapter_id,
 					],
 				],
 				$success ? 200 : 400

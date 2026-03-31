@@ -311,6 +311,7 @@ final class Course extends ApiBase {
 			'bundle_ids'                    => $bundle_ids,
 		] + SubscriptionUtils::get_normalized_meta( $product ) + [
 			'editor'                        => (string) $product->get_meta( 'editor' ) ?: 'power-editor',
+			'enable_linear_viewing'         => (string) $product->get_meta( 'enable_linear_viewing' ) ?: 'no',
 
 		] + $children;
 

@@ -7,6 +7,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearViewing;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -76,22 +77,33 @@ if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
 		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多章節</button>';
 	} else {
-		$next_chapter_button_html = sprintf(
-			/*html*/'
-		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
-					前往下一章節
-					<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-						<g id="SVGRepo_iconCarrier">
-							<path fill-rule="evenodd" clip-rule="evenodd" d="M5.60439 4.23093C4.94586 3.73136 4 4.20105 4 5.02762V18.9724C4 19.799 4.94586 20.2686 5.60439 19.7691L14.7952 12.7967C15.3227 12.3965 15.3227 11.6035 14.7952 11.2033L5.60439 4.23093ZM2 5.02762C2 2.54789 4.83758 1.13883 6.81316 2.63755L16.004 9.60993C17.5865 10.8104 17.5865 13.1896 16.004 14.3901L6.81316 21.3625C4.83758 22.8612 2 21.4521 2 18.9724V5.02762Z" fill="#ffffff"></path>
-							<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
-						</g>
-					</svg>
-		</a>
-',
-			\get_permalink($next_chapter_id)
-		);
+		// 線性觀看：檢查下一章節是否鎖定
+		$enable_linear_for_header    = (string) \get_post_meta( $product_id, 'enable_linear_viewing', true );
+		$next_chapter_is_locked      = false;
+		if ( 'yes' === $enable_linear_for_header && ! \current_user_can( 'manage_woocommerce' ) ) {
+			$next_chapter_is_locked = LinearViewing::is_chapter_locked( (int) $next_chapter_id, $product_id, $user_id );
+		}
+
+		if ( $next_chapter_is_locked ) {
+			$next_chapter_button_html = '<div class="pc-tooltip w-full lg:w-auto" data-tip="請先完成當前章節"><button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base cursor-not-allowed opacity-70" tabindex="-1" role="button" aria-disabled="true">前往下一章節</button></div>';
+		} else {
+			$next_chapter_button_html = sprintf(
+				/*html*/'
+			<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
+						前往下一章節
+						<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+							<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+							<g id="SVGRepo_iconCarrier">
+								<path fill-rule="evenodd" clip-rule="evenodd" d="M5.60439 4.23093C4.94586 3.73136 4 4.20105 4 5.02762V18.9724C4 19.799 4.94586 20.2686 5.60439 19.7691L14.7952 12.7967C15.3227 12.3965 15.3227 11.6035 14.7952 11.2033L5.60439 4.23093ZM2 5.02762C2 2.54789 4.83758 1.13883 6.81316 2.63755L16.004 9.60993C17.5865 10.8104 17.5865 13.1896 16.004 14.3901L6.81316 21.3625C4.83758 22.8612 2 21.4521 2 18.9724V5.02762Z" fill="#ffffff"></path>
+								<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
+							</g>
+						</svg>
+			</a>
+	',
+				\get_permalink($next_chapter_id)
+			);
+		}
 	}
 }
 

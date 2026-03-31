@@ -608,9 +608,10 @@ abstract class Utils {
 	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
 	 * @param int                            $depth 深度，預設從 0 (課程) 開始
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param array<int, bool>               $lock_map 章節鎖定狀態 map，key 為章節 ID，value 為是否鎖定。預設空陣列（無鎖定）
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', array $lock_map = [] ): string {
 		global $post; // 當前文章
 
 		$html = '';
@@ -678,31 +679,62 @@ abstract class Utils {
 			]
 			);
 
-			$html .= sprintf(
-			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
-				<div class="py-2 flex items-center flex-1">
-					%2$s
-					<span class="ml-2">%3$s</span>
+			// 判斷是否鎖定
+			$is_locked = $lock_map[ $child_post->ID ] ?? false;
+
+			if ( $is_locked ) {
+				// 鎖定章節：灰色 + 鎖頭圖示 + 不可點擊
+				$lock_icon_html = '<div class="pc-tooltip pc-tooltip-right h-6" data-tip="請先完成前面的章節"><svg class="w-6 h-6 fill-base-content opacity-40" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C9.23858 1 7 3.23858 7 6V8H6C4.89543 8 4 8.89543 4 10V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V10C20 8.89543 19.1046 8 18 8H17V6C17 3.23858 14.7614 1 12 1ZM15 8V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V8H15ZM12 13C11.4477 13 11 13.4477 11 14V16C11 16.5523 11.4477 17 12 17C12.5523 17 13 16.5523 13 16V14C13 13.4477 12.5523 13 12 13Z"/></svg></div>';
+				$html .= sprintf(
+				/*html*/'
+				<li data-post-id="%5$s" class="pr-2 transition-all duration-300 rounded-btn flex items-center justify-between text-sm mb-1 opacity-50 cursor-not-allowed pointer-events-none %6$s" style="padding-left: %4$s;">
+					<div class="py-2 flex items-center flex-1">
+						<div class="pc-chapter-icon size-8 p-1">%1$s</div>
+						<span class="ml-2">%2$s</span>
+					</div>
+					<div class="flex items-center justify-end gap-x-0 w-8">
+						%3$s
+					</div>
+				</li>
+				',
+				$lock_icon_html,
+				\esc_html( $child_post->post_title ),
+				$child_children_posts ? /*html*/'
+					<div class="p-2 icon-arrow flex items-center">
+						<svg class="w-4 h-4 fill-base-content" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z"></path> </g></svg>
+					</div>
+				' : '',
+				( ( $depth * 2 ) + 0.5 ) . 'rem',
+				$child_post->ID,
+				$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content'
+				);
+			} else {
+				$html .= sprintf(
+				/*html*/'
+				<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+					<div class="py-2 flex items-center flex-1">
+						%2$s
+						<span class="ml-2">%3$s</span>
+					</div>
+					<div class="flex items-center justify-end gap-x-0 w-8">
+						%4$s
+					</div>
+				</li>
+				',
+				\get_the_permalink($child_post->ID),
+				$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
+				$child_post->post_title,
+					// 如果有子章節，就顯示箭頭
+				$child_children_posts ? /*html*/'
+					<div class="p-2 icon-arrow flex items-center">
+						<svg class="w-4 h-4 fill-base-content" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z"></path> </g></svg>
 				</div>
-				<div class="flex items-center justify-end gap-x-0 w-8">
-					%4$s
-				</div>
-			</li>
-			',
-			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
-			$child_post->post_title,
-				// 如果有子章節，就顯示箭頭
-			$child_children_posts ? /*html*/'
-				<div class="p-2 icon-arrow flex items-center">
-					<svg class="w-4 h-4 fill-base-content" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z"></path> </g></svg>
-				</div>
-			' : '',
-			( ( $depth * 2 ) + 0.5 ) . 'rem',
-			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
-			);
+				' : '',
+				( ( $depth * 2 ) + 0.5 ) . 'rem',
+				$child_post->ID,
+				$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+				);
+			}
 
 			// 沒有子章節就結束
 			if (!$child_children_posts) {
@@ -710,7 +742,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $lock_map);
 		}
 		$html .= /* html */'</ul>';
 

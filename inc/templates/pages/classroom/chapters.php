@@ -5,6 +5,7 @@
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearViewing;
 use J7\PowerCourse\Resources\Chapter\Core\CPT;
 
 
@@ -28,7 +29,16 @@ if (! ( $product instanceof \WC_Product )) {
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
+
+// 線性觀看：計算章節鎖定狀態 map
+$current_user_id_for_lock = \get_current_user_id();
+$lock_map                 = [];
+$enable_linear_viewing    = (string) $product->get_meta( 'enable_linear_viewing' );
+if ( 'yes' === $enable_linear_viewing && $current_user_id_for_lock && ! \current_user_can( 'manage_woocommerce' ) ) {
+	$lock_map = LinearViewing::get_chapters_lock_map( $product->get_id(), $current_user_id_for_lock );
+}
+
+$chapters_html            = ChapterUtils::get_children_posts_html_uncached( $product->get_id(), null, 0, 'classroom', $lock_map );
 
 /** @var \WP_Post $chapter */
 global $chapter;
