@@ -9,8 +9,8 @@
  * 4. API 回傳 403 當嘗試標記被鎖定章節為完成
  * 5. 直接 URL 存取被鎖定章節顯示鎖定提示頁面
  */
-import { test, expect, type Page } from '@playwright/test'
-import { ApiClient, setupApiFromBrowser } from '../helpers/api-client'
+import { test, expect } from '@playwright/test'
+import { ApiClient, getNonceFromPage, setupApiFromBrowser } from '../helpers/api-client'
 import { navigateToAdmin, waitForFormLoaded, clickTab } from '../helpers/admin-page'
 import { loginAs } from '../helpers/frontend-setup'
 import { WP_ADMIN } from '../fixtures/test-data'
@@ -30,9 +30,20 @@ interface ToggleResponse {
   }
 }
 
+// ── 章節定義（slug 用於建構教室 URL） ────────────────────────────────
+const CHAPTER_DEFS = [
+  { name: '第一章', slug: 'e2e-linear-ch1' },
+  { name: '1-1', slug: 'e2e-linear-ch1-1' },
+  { name: '1-2', slug: 'e2e-linear-ch1-2' },
+  { name: '第二章', slug: 'e2e-linear-ch2' },
+  { name: '2-1', slug: 'e2e-linear-ch2-1' },
+]
+
 // ── 共用變數 ────────────────────────────────
 let api: ApiClient
+let studentApi: ApiClient
 let dispose: () => Promise<void>
+let disposeStudent: () => Promise<void>
 let courseId: number
 let chapterIds: number[]
 let courseSlug: string
@@ -52,13 +63,7 @@ test.describe.serial('線性觀看整合測試', () => {
     const result = await api.createCourseWithChapters(
       'E2E 線性觀看測試課程',
       '0',
-      [
-        { name: '第一章', slug: 'e2e-linear-ch1' },
-        { name: '1-1', slug: 'e2e-linear-ch1-1' },
-        { name: '1-2', slug: 'e2e-linear-ch1-2' },
-        { name: '第二章', slug: 'e2e-linear-ch2' },
-        { name: '2-1', slug: 'e2e-linear-ch2-1' },
-      ],
+      CHAPTER_DEFS,
       'e2e-linear-view-course',
     )
     courseId = result.courseId
@@ -75,11 +80,31 @@ test.describe.serial('線性觀看整合測試', () => {
 
     // 授權學員存取課程
     await api.grantCourseAccess(studentId, courseId)
-    // 授權 admin（ID=1）存取課程（供 toggle API 測試）
+    // 授權 admin（ID=1）存取課程（供 admin 測試用）
     await api.grantCourseAccess(1, courseId)
 
     // 預設：確保線性觀看為關閉狀態
     await api.updateCourse(courseId, { enable_linear_mode: 'no' })
+
+    // 建立學員 API Client（用於測試學員身份的 API 呼叫）
+    const studentContext = await browser.newContext()
+    const studentPage = await studentContext.newPage()
+    await loginAs(studentPage, STUDENT_USERNAME, STUDENT_PASSWORD)
+    // 導航到 wp-admin 取得 nonce（subscriber 可存取 /wp-admin/ profile 頁面）
+    await studentPage.goto(`${BASE_URL}/wp-admin/`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 30_000,
+    })
+    await studentPage.waitForFunction(
+      () => !!(window as any).wpApiSettings?.nonce,
+      { timeout: 30_000 },
+    )
+    const studentNonce = await getNonceFromPage(studentPage)
+    studentApi = new ApiClient(studentContext.request, studentNonce)
+    disposeStudent = async () => {
+      await studentPage.close()
+      await studentContext.close()
+    }
   })
 
   test.afterAll(async () => {
@@ -96,6 +121,7 @@ test.describe.serial('線性觀看整合測試', () => {
     try {
       await api.deleteCourses([courseId])
     } catch { /* ignore */ }
+    await disposeStudent()
     await dispose()
   })
 
@@ -121,16 +147,9 @@ test.describe.serial('線性觀看整合測試', () => {
     // Given 開啟線性觀看
     await api.updateCourse(courseId, { enable_linear_mode: 'yes' })
 
-    // And 第一章有 finished_at（讓 1-1 解鎖，1-2 仍鎖定）
-    // 直接標記第一章完成（使用 admin 帳號）
-    await api.pcPostForm<ToggleResponse>(
-      `toggle-finish-chapters/${chapterIds[0]}`,
-      { course_id: courseId },
-    )
-
-    // 以學員身份登入並進入教室
-    await loginAs(page, WP_ADMIN.username, WP_ADMIN.password)
-    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${(await getChapterSlug(page, chapterIds[0]))}/`
+    // 以學員身份登入並進入教室（管理員會被 is_chapter_locked 豁免，必須用學員）
+    await loginAs(page, STUDENT_USERNAME, STUDENT_PASSWORD)
+    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${CHAPTER_DEFS[0].slug}/`
     await page.goto(chapter1Url)
     await page.waitForLoadState('networkidle')
 
@@ -141,15 +160,9 @@ test.describe.serial('線性觀看整合測試', () => {
     })
 
     // 驗證有章節顯示鎖頭圖示（data-locked="true" 的 li 元素）
-    // 注意：功能尚未實作，此測試應處於 Red 狀態
+    // 學員未完成任何章節，所以第二個以後的章節都應被鎖定
     const lockedChapterItems = page.locator('#pc-sider__main-chapters li[data-locked="true"]')
     await expect(lockedChapterItems.first()).toBeVisible({ timeout: 10_000 })
-
-    // 清理：取消第一章完成狀態
-    await api.pcPostForm<ToggleResponse>(
-      `toggle-finish-chapters/${chapterIds[0]}`,
-      { course_id: courseId },
-    )
   })
 
   // ── Test 3: 點擊鎖定章節顯示 Toast，不跳轉 ─────────────────────────────
@@ -159,10 +172,9 @@ test.describe.serial('線性觀看整合測試', () => {
 
     // And 未完成任何章節（第二章及後面都鎖定）
 
-    // 登入並進入第一章教室
-    await loginAs(page, WP_ADMIN.username, WP_ADMIN.password)
-    const chapterSlug = await getChapterSlug(page, chapterIds[0])
-    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${chapterSlug}/`
+    // 以學員身份登入並進入第一章教室
+    await loginAs(page, STUDENT_USERNAME, STUDENT_PASSWORD)
+    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${CHAPTER_DEFS[0].slug}/`
     await page.goto(chapter1Url)
     await page.waitForLoadState('networkidle')
 
@@ -174,7 +186,7 @@ test.describe.serial('線性觀看整合測試', () => {
     // 記錄當前 URL
     const currentUrl = page.url()
 
-    // 點擊第二個章節（1-1，已鎖定）
+    // 點擊鎖定的章節
     const lockedItem = page.locator('#pc-sider__main-chapters li[data-locked="true"]').first()
     await lockedItem.waitFor({ state: 'visible', timeout: 10_000 })
     await lockedItem.click()
@@ -185,34 +197,34 @@ test.describe.serial('線性觀看整合測試', () => {
     // 驗證：頁面沒有跳轉
     expect(page.url()).toBe(currentUrl)
 
-    // 驗證：顯示 Toast 訊息（DaisyUI toast）
+    // 驗證：顯示 Toast 訊息
     // Toast 應包含「請先完成前面的章節才能觀看此章節」
     const toast = page.getByText(/請先完成前面的章節才能觀看此章節/).first()
     await expect(toast).toBeVisible({ timeout: 5_000 })
   })
 
   // ── Test 4: API 回傳 403 當嘗試標記被鎖定章節為完成 ──────────────────────
-  test('API 拒絕標記被鎖定章節為完成，回傳 403', async ({ page }) => {
+  test('API 拒絕標記被鎖定章節為完成，回傳 403', async () => {
     // Given 線性觀看開啟
     await api.updateCourse(courseId, { enable_linear_mode: 'yes' })
 
-    // And 未完成任何章節
-    // 確保第一章未完成（若已完成則取消）
-    const checkResp = await api.pcPostForm<ToggleResponse>(
+    // And 確保學員未完成第一章（使用 admin API 查詢後透過 student API 操作）
+    // 先用 studentApi 嘗試 toggle 第一章，確認狀態
+    const checkResp = await studentApi.pcPostForm<ToggleResponse>(
       `toggle-finish-chapters/${chapterIds[0]}`,
       { course_id: courseId },
     )
-    // 若剛才是完成操作（state becomes true），再次取消
+    // 若剛才使第一章變為完成，再次取消
     if (checkResp.data?.data?.is_this_chapter_finished === true) {
-      await api.pcPostForm<ToggleResponse>(
+      await studentApi.pcPostForm<ToggleResponse>(
         `toggle-finish-chapters/${chapterIds[0]}`,
         { course_id: courseId },
       )
     }
 
-    // When 嘗試標記第二個章節（1-1，索引1）為完成
+    // When 學員嘗試標記第二個章節（1-1，索引1）為完成
     // 1-1 的前一章（第一章）未完成，所以 1-1 被鎖定
-    const resp = await api.pcPostForm<ToggleResponse>(
+    const resp = await studentApi.pcPostForm<ToggleResponse>(
       `toggle-finish-chapters/${chapterIds[1]}`,
       { course_id: courseId },
     )
@@ -230,13 +242,12 @@ test.describe.serial('線性觀看整合測試', () => {
     // Given 線性觀看開啟
     await api.updateCourse(courseId, { enable_linear_mode: 'yes' })
 
-    // And Alice（用學員帳號）未完成任何章節
+    // And 學員未完成任何章節
 
     // 取得第二個章節（1-1）的 URL
-    const lockedChapterSlug = await getChapterSlug(page, chapterIds[1])
-    const lockedChapterUrl = `${BASE_URL}/classroom/${courseSlug}/${lockedChapterSlug}/`
+    const lockedChapterUrl = `${BASE_URL}/classroom/${courseSlug}/${CHAPTER_DEFS[1].slug}/`
 
-    // 登入學員帳號（此測試需要非 admin 帳號）
+    // 登入學員帳號
     await loginAs(page, STUDENT_USERNAME, STUDENT_PASSWORD)
 
     // When 直接存取被鎖定章節
@@ -259,8 +270,8 @@ test.describe.serial('線性觀看整合測試', () => {
     // Given 關閉線性觀看
     await api.updateCourse(courseId, { enable_linear_mode: 'no' })
 
-    // When 標記最後一個章節（2-1）為完成，且前面章節未完成
-    const resp = await api.pcPostForm<ToggleResponse>(
+    // When 學員標記最後一個章節（2-1）為完成，且前面章節未完成
+    const resp = await studentApi.pcPostForm<ToggleResponse>(
       `toggle-finish-chapters/${chapterIds[4]}`,
       { course_id: courseId },
     )
@@ -270,7 +281,7 @@ test.describe.serial('線性觀看整合測試', () => {
     expect(resp.status).toBeLessThan(400)
 
     // 清理：取消完成
-    const cleanup = await api.pcPostForm<ToggleResponse>(
+    const cleanup = await studentApi.pcPostForm<ToggleResponse>(
       `toggle-finish-chapters/${chapterIds[4]}`,
       { course_id: courseId },
     )
@@ -285,12 +296,11 @@ test.describe.serial('線性觀看整合測試', () => {
     // Given 線性觀看開啟
     await api.updateCourse(courseId, { enable_linear_mode: 'yes' })
 
-    // And 未完成任何章節（第一章的下一章 1-1 應被鎖定）
+    // And 學員未完成任何章節（第一章的下一章 1-1 應被鎖定）
 
-    // 登入並進入第一章教室
-    await loginAs(page, WP_ADMIN.username, WP_ADMIN.password)
-    const chapterSlug = await getChapterSlug(page, chapterIds[0])
-    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${chapterSlug}/`
+    // 以學員身份登入並進入第一章教室
+    await loginAs(page, STUDENT_USERNAME, STUDENT_PASSWORD)
+    const chapter1Url = `${BASE_URL}/classroom/${courseSlug}/${CHAPTER_DEFS[0].slug}/`
     await page.goto(chapter1Url)
     await page.waitForLoadState('networkidle')
 
@@ -300,35 +310,9 @@ test.describe.serial('線性觀看整合測試', () => {
       timeout: 15_000,
     })
 
-    // 驗證「前往下一章節」按鈕應為禁用狀態
-    // 功能尚未實作，此測試預期 Red（按鈕可能仍可點擊）
-    const nextChapterBtn = page.locator('#pc-classroom-header button[aria-disabled="true"], #pc-classroom-header a[aria-disabled="true"]').filter({ hasText: /前往下一章節/ })
-    // 或者尋找 disabled 屬性的按鈕
-    const disabledNextBtn = page.locator('#pc-classroom-header').getByRole('button', { disabled: true }).filter({ hasText: /前往下一章節/ })
-
-    // 至少一種方式能找到禁用按鈕
-    const btnCount1 = await nextChapterBtn.count()
-    const btnCount2 = await disabledNextBtn.count()
-    expect(btnCount1 + btnCount2).toBeGreaterThan(0)
+    // 驗證下一章節按鈕應為禁用狀態
+    // 鎖定時按鈕文字為「請先完成本章節」，帶有 aria-disabled="true"
+    const lockedNextBtn = page.locator('#pc-classroom-header button[aria-disabled="true"]').filter({ hasText: /請先完成本章節/ })
+    await expect(lockedNextBtn).toBeVisible({ timeout: 10_000 })
   })
 })
-
-// ── Helper ──────────────────────────────────────────────────────────────
-/**
- * 取得章節的 slug（透過 WP REST API）
- */
-async function getChapterSlug(page: Page, chapterId: number): Promise<string> {
-  const baseUrl = process.env.TEST_SITE_URL || 'http://localhost:8889'
-  const response = await page.request.get(
-    `${baseUrl}/wp-json/wp/v2/pc_chapter/${chapterId}`,
-    {
-      headers: { 'Content-Type': 'application/json' },
-    },
-  )
-  if (!response.ok()) {
-    // Fallback：直接使用 ID 作為部分 URL
-    throw new Error(`無法取得章節 ${chapterId} 的 slug，狀態碼：${response.status()}`)
-  }
-  const data = (await response.json()) as { slug: string }
-  return data.slug
-}
