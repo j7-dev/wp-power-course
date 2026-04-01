@@ -271,6 +271,17 @@ final class Api extends ApiBase {
 		$course_id = (int) $body_params['course_id'];
 		$user_id   = \get_current_user_id();
 
+		// 線性觀看模式：鎖定的章節不允許標記完成
+		if ( ChapterUtils::is_chapter_locked( $chapter_id, $user_id ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => '403',
+					'message' => '請先完成前面的章節',
+				],
+				403
+			);
+		}
+
 		$chapter                  = new Chapter( $chapter_id, (int) $user_id );
 		$is_this_chapter_finished = (bool) $chapter->finished_at;
 		$title                    = \get_the_title( $chapter_id);
@@ -287,6 +298,8 @@ final class Api extends ApiBase {
 		}
 
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
+
+		$enable_linear_mode = ( 'yes' === (string) $product->get_meta( 'enable_linear_mode' ) );
 
 		if ($is_this_chapter_finished) {
 			$success = AVLChapterMeta::delete(
@@ -309,6 +322,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? false : true,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'enable_linear_mode'       => $enable_linear_mode,
 					],
 				],
 				$success ? 200 : 400
@@ -335,6 +349,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'enable_linear_mode'       => $enable_linear_mode,
 					],
 				],
 				$success ? 200 : 400

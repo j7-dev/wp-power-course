@@ -75,6 +75,7 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				const $li = $(this);
 				const href = $li.data('href');
+				const isLocked = $li.data('locked') === true || $li.data('locked') === 'true';
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
@@ -84,6 +85,12 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				// 如果點擊的是箭頭，就只展開/收合，不要跳轉頁面
 				if ($(e.target).closest('.icon-arrow').length > 0) {
+					return;
+				}
+
+				// 線性觀看模式：鎖定的章節顯示 Toast 提示
+				if (isLocked) {
+					showLockedToast();
 					return;
 				}
 
@@ -97,6 +104,14 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				// 阻止原本的超連結行為
 				e.preventDefault();
 				e.stopPropagation();
+
+				// 線性觀看模式：鎖定的章節顯示 Toast 提示
+				const $parentLi = $(this).closest('li');
+				const isLocked = $parentLi.data('locked') === true || $parentLi.data('locked') === 'true';
+				if (isLocked) {
+					showLockedToast();
+					return;
+				}
 
 				handle_save_expanded_post_ids()
 
@@ -149,6 +164,22 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				// 恢復完畢，清除 sessionStorage，顯示 #pc-sider__main-chapters
 				sessionStorage.removeItem('expanded_post_ids');
 				$el.show();
+			}
+
+			// 線性觀看模式：顯示鎖定章節的 Toast 提示
+			function showLockedToast() {
+				// 移除現有的 Toast（如果有）
+				$('.pc-locked-toast').remove();
+
+				const $toast = $('<div class="pc-locked-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;background:#333;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,0.15);white-space:nowrap;transition:opacity 0.3s;">請先完成前面的章節才能觀看此章節</div>')
+				$('body').append($toast)
+
+				setTimeout(function() {
+					$toast.css('opacity', '0')
+					setTimeout(function() {
+						$toast.remove()
+					}, 300)
+				}, 3000)
 			}
 		})
 	})(jQuery)

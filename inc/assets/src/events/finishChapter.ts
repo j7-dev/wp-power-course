@@ -121,6 +121,7 @@ export function finishChapter() {
 					xhr?.responseJSON?.data?.is_this_chapter_finished
 				const progress = xhr?.responseJSON?.data?.progress
 				const icon_html = xhr?.responseJSON?.data?.icon_html
+				const enable_linear_mode = xhr?.responseJSON?.data?.enable_linear_mode
 
 				store.set(finishChapterAtom, (prev) => ({
 					...prev,
@@ -131,6 +132,13 @@ export function finishChapter() {
 					progress,
 					icon_html,
 				}))
+
+				// 線性觀看模式：完成/取消完成後重新載入頁面以更新鎖定狀態
+				if (enable_linear_mode && xhr?.responseJSON?.code === '200') {
+					setTimeout(() => {
+						window.location.reload()
+					}, 1500)
+				}
 			},
 		})
 	})

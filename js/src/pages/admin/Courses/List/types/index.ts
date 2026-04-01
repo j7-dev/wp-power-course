@@ -88,6 +88,7 @@ export type TCourseRecord = TCourseBaseRecord &
 		show_total_student: 'yes' | 'no' | ''
 		teacher_ids: string[]
 		enable_comment: 'yes' | 'no' | ''
+		enable_linear_mode: 'yes' | 'no' | ''
 		hide_single_course: 'yes' | 'no' | ''
 		extra_student_count: number
 		feature_video: TVideo

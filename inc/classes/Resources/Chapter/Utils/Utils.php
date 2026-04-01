@@ -678,20 +678,33 @@ abstract class Utils {
 			]
 			);
 
+			// 線性觀看模式：判斷章節是否被鎖定
+			$is_locked = ( 'classroom' === $context ) && self::is_chapter_locked( (int) $child_post->ID );
+
+			// 鎖定的章節使用鎖頭圖示，並標記 data-locked
+			$icon_html = '';
+			if ( 'course-product' !== $context ) {
+				if ( $is_locked ) {
+					$icon_html = '<div class="pc-chapter-icon size-8 p-1">' . self::get_locked_icon_html( (int) $child_post->ID, \get_current_user_id() ) . '</div>';
+				} else {
+					$icon_html = '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html( $child_post->ID ) . '</div>';
+				}
+			}
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" data-locked="%8$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
-					<span class="ml-2">%3$s</span>
+					<span class="ml-2 %9$s">%3$s</span>
 				</div>
 				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
 				</div>
 			</li>
 			',
-			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
+			$is_locked ? '' : \get_the_permalink($child_post->ID),
+			$icon_html,
 			$child_post->post_title,
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
@@ -701,7 +714,9 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$is_locked ? 'true' : 'false',
+			$is_locked ? 'opacity-50' : ''
 			);
 
 			// 沒有子章節就結束
@@ -874,5 +889,95 @@ abstract class Utils {
 		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
 
 		return $next_post_id === null ? null : (int) $next_post_id;
+	}
+
+	/**
+	 * 判斷章節是否因線性觀看模式而被鎖定
+	 *
+	 * 線性觀看模式下，學員必須按照章節順序完成前一章節才能觀看下一章節。
+	 * 第一個章節永遠不會被鎖定。管理員和講師豁免此限制。
+	 *
+	 * @param int      $chapter_id 章節 ID.
+	 * @param int|null $user_id 用戶 ID，預設為當前用戶.
+	 * @return bool 是否被鎖定
+	 */
+	public static function is_chapter_locked( int $chapter_id, ?int $user_id = null ): bool {
+		$user_id = $user_id ?? \get_current_user_id();
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		// 管理員豁免
+		if ( \user_can( $user_id, 'manage_woocommerce' ) ) {
+			return false;
+		}
+
+		$course_id = self::get_course_id( $chapter_id );
+		if ( ! $course_id ) {
+			return false;
+		}
+
+		// 檢查課程是否開啟線性觀看模式
+		$product = \wc_get_product( $course_id );
+		if ( ! $product ) {
+			return false;
+		}
+
+		$enable_linear_mode = (string) $product->get_meta( 'enable_linear_mode' );
+		if ( 'yes' !== $enable_linear_mode ) {
+			return false;
+		}
+
+		// 講師豁免
+		$teacher_ids = \get_post_meta( $course_id, 'teacher_ids', false );
+		$teacher_ids = \is_array( $teacher_ids ) ? $teacher_ids : [];
+		if ( \in_array( (string) $user_id, $teacher_ids, true ) || \in_array( $user_id, $teacher_ids ) ) {
+			return false;
+		}
+
+		// 取得扁平章節序列
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return false;
+		}
+
+		// 第一個章節永遠不鎖定
+		if ( $flatten_ids[0] === $chapter_id ) {
+			return false;
+		}
+
+		// 找到當前章節在序列中的位置
+		$current_index = \array_search( $chapter_id, $flatten_ids, true );
+		if ( false === $current_index ) {
+			return false;
+		}
+
+		// 檢查前一個章節是否已完成
+		$prev_chapter_id = $flatten_ids[ $current_index - 1 ];
+		$prev_chapter    = new Chapter( (int) $prev_chapter_id, (int) $user_id );
+
+		return ! (bool) $prev_chapter->finished_at;
+	}
+
+	/**
+	 * 取得線性觀看模式下章節的鎖定圖示 HTML
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @param int $user_id 用戶 ID.
+	 * @return string 鎖定圖示的 HTML，如果未鎖定則回傳空字串
+	 */
+	public static function get_locked_icon_html( int $chapter_id, int $user_id ): string {
+		if ( ! self::is_chapter_locked( $chapter_id, $user_id ) ) {
+			return '';
+		}
+
+		return sprintf(
+			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">
+				<svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M12 14.5V16.5M7 10.0288C7.47142 10 8.05259 10 8.8 10H15.2C15.9474 10 16.5286 10 17 10.0288M7 10.0288C6.41168 10.0647 5.99429 10.1455 5.63803 10.327C5.07354 10.6146 4.6146 11.0735 4.32698 11.638C4 12.2798 4 13.1199 4 14.8V16.2C4 17.8802 4 18.7202 4.32698 19.362C4.6146 19.9265 5.07354 20.3854 5.63803 20.673C6.27976 21 7.11984 21 8.8 21H15.2C16.8802 21 17.7202 21 18.362 20.673C18.9265 20.3854 19.3854 19.9265 19.673 19.362C20 18.7202 20 17.8802 20 16.2V14.8C20 13.1199 20 12.2798 19.673 11.638C19.3854 11.0735 18.9265 10.6146 18.362 10.327C18.0057 10.1455 17.5883 10.0647 17 10.0288M7 10.0288V8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8V10.0288" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+			</div>',
+			'請先完成前面的章節'
+		);
 	}
 }
