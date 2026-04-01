@@ -765,7 +765,7 @@ abstract class Utils {
 			$icon_html              = Plugin::load_template( 'icon/lock', null, false );
 			$icon_html_with_tooltip = sprintf(
 				/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
-				'此章節已鎖定，請先完成前一章節',
+				\esc_attr( '此章節已鎖定，請先完成前一章節' ),
 				$icon_html
 			);
 			return $icon_html_with_tooltip;
@@ -1073,10 +1073,6 @@ abstract class Utils {
 	 */
 	public static function get_next_should_complete_chapter_id( int $course_id, int $user_id ): int|null {
 		$flat_ids = self::get_flatten_post_ids( $course_id );
-		if (empty($flat_ids)) {
-			return null;
-		}
-
 		if (empty($flat_ids)) {
 			return null;
 		}
