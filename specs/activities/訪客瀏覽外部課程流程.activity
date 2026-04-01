@@ -1,0 +1,11 @@
+[ACTIVITY] 訪客瀏覽外部課程流程
+[ACTOR] 訪客
+
+[STEP:1] 訪客瀏覽課程列表頁，看到站內課程與外部課程混合顯示
+[STEP:2] 訪客點擊外部課程卡片，進入站內銷售頁
+[STEP:3] 訪客閱讀課程介紹、查看封面圖
+[DECISION:3a] 訪客是否點擊 CTA 按鈕
+  [BRANCH:3a:點擊前往課程] 以新視窗開啟外部平台課程頁面 {features/external-course/前台展示外部課程.feature}
+  [BRANCH:3a:返回列表] 訪客回到課程列表繼續瀏覽
+[MERGE:3a]
+[END]

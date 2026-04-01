@@ -1,0 +1,10 @@
+[ACTIVITY] 外部課程上架流程
+[ACTOR] 管理員 -> {specs/actors/管理員.md}
+
+[STEP:1] @管理員 {features/external-course/建立外部課程.feature}
+[STEP:2] @管理員 {features/external-course/更新外部課程.feature}
+[DECISION:2a] 是否需要修改外部連結或按鈕文字
+  [BRANCH:2a:需要修改] @管理員 {features/external-course/更新外部課程.feature}
+  [BRANCH:2a:無須修改] 繼續
+[MERGE:2a]
+[END]

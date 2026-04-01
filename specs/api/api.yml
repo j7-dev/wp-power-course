@@ -20,7 +20,7 @@ info:
     - **排程開課通知**：Action Scheduler 定時檢查 `course_schedule`，到達時觸發 `power_course_course_launch`
     - **觸發自動郵件**：監聽 `power_course_after_add_student_to_course` 等 action，自動發送對應 `pe_email` 模板
     - **自動授權課程**：新用戶註冊時（`user_register` hook），自動授予 `auto_grant_course_ids` 中的課程
-  version: "0.12.0"
+  version: "0.13.0"
   contact:
     name: Power Course
 
@@ -144,14 +144,34 @@ components:
         status:
           type: string
           enum: [publish, draft]
+        product_type:
+          type: string
+          enum: [simple, external]
+          description: |
+            產品類型：simple = 站內課程, external = 外部課程。
+            外部課程使用 WC_Product_External，不可購買。
         price:
           type: string
-          description: 售價（WooCommerce 格式字串）
+          description: 售價（WooCommerce 格式字串）；外部課程為展示用價格
           example: "1200"
         regular_price:
           type: string
-          description: 原價
+          description: 原價；外部課程為展示用原價
           example: "1500"
+        external_url:
+          type: string
+          nullable: true
+          description: |
+            外部課程連結（僅 product_type=external 時有值）。
+            必須為 http:// 或 https:// 開頭的合法 URL。
+          example: "https://hahow.in/courses/12345"
+        button_text:
+          type: string
+          nullable: true
+          description: |
+            外部課程 CTA 按鈕文字（僅 product_type=external 時有值）。
+            預設為「前往課程」，管理員可自訂。
+          example: "前往 Hahow"
         limit_type:
           type: string
           enum: [unlimited, fixed, assigned, follow_subscription]
@@ -182,7 +202,7 @@ components:
           enum: [yes, no]
         total_students:
           type: integer
-          description: 選課人數
+          description: 選課人數（外部課程固定為 0）
         created_at:
           type: string
           format: date-time
@@ -884,9 +904,17 @@ paths:
           description: 課程名稱關鍵字搜尋
           schema:
             type: string
+        - name: product_type
+          in: query
+          description: |
+            篩選產品類型：simple = 僅站內課程, external = 僅外部課程。
+            不提供時回傳所有類型（混合顯示）。
+          schema:
+            type: string
+            enum: [simple, external]
       responses:
         "200":
-          description: 課程列表（含分頁 Headers）
+          description: 課程列表（含分頁 Headers，站內課程與外部課程混合回傳）
           headers:
             X-WP-Total:
               $ref: '#/components/headers/X-WP-Total'
@@ -907,17 +935,21 @@ paths:
       tags: [Courses]
       description: |
         建立新的 WooCommerce 課程商品，設定名稱、售價、存取期限、開課時間、講師等基本資訊。
+        支援建立站內課程（simple）或外部課程（external）。
 
         **前置（狀態）:** 無
 
         **前置（參數）:**
         - `name` 不可為空
-        - `limit_type` 為 `fixed` 時，`limit_value` 與 `limit_unit` 不可為空
-        - `limit_type` 為 `assigned` 時，`limit_value` 必須是有效的 10 位 Unix timestamp
+        - `product_type` 為 `external` 時，`external_url` 為必填，且必須為 http/https 開頭的合法 URL
+        - `product_type` 為 `simple`（預設）時，走原有站內課程驗證邏輯：
+          - `limit_type` 為 `fixed` 時，`limit_value` 與 `limit_unit` 不可為空
+          - `limit_type` 為 `assigned` 時，`limit_value` 必須是有效的 10 位 Unix timestamp
         - `price` 若有設定須為非負數
 
         **後置（狀態）:**
-        - 建立 WooCommerce 商品並設 `_is_course` 為 `yes`
+        - 站內課程：建立 WC_Product_Simple 並設 `_is_course` 為 `yes`
+        - 外部課程：建立 WC_Product_External 並設 `_is_course` 為 `yes`，設定 `_product_url` 和 `_button_text`
         - `teacher_ids` 以多筆 meta rows 分別儲存
         - 回傳新建課程的完整資料（含 ID）
       requestBody:
@@ -933,6 +965,13 @@ paths:
                   type: string
                   description: 課程名稱（必填）
                   example: PHP 基礎入門
+                product_type:
+                  type: string
+                  enum: [simple, external]
+                  default: simple
+                  description: |
+                    產品類型：simple = 站內課程（預設）, external = 外部課程。
+                    建立後不可變更。
                 status:
                   type: string
                   enum: [publish, draft]
@@ -943,27 +982,41 @@ paths:
                   type: string
                 price:
                   type: string
-                  description: 售價（非負數字串）
+                  description: 售價（非負數字串）；外部課程為展示用價格（選填）
                   example: "1200"
                 regular_price:
                   type: string
                   example: "1500"
+                external_url:
+                  type: string
+                  description: |
+                    外部課程連結（僅 product_type=external 時必填）。
+                    必須為 http:// 或 https:// 開頭的合法 URL。
+                  example: "https://hahow.in/courses/12345"
+                button_text:
+                  type: string
+                  description: |
+                    外部課程 CTA 按鈕文字（僅 product_type=external 時適用）。
+                    預設為「前往課程」。
+                  default: "前往課程"
+                  example: "前往 Hahow"
                 limit_type:
                   type: string
                   enum: [unlimited, fixed, assigned, follow_subscription]
                   default: unlimited
+                  description: 存取期限類型（僅 simple 類型適用）
                 limit_value:
                   type: integer
                   nullable: true
-                  description: 期限數值（fixed 時必填）
+                  description: 期限數值（fixed 時必填，僅 simple 類型適用）
                 limit_unit:
                   type: string
                   enum: [day, month, year, timestamp]
                   nullable: true
-                  description: 期限單位（fixed 時必填）
+                  description: 期限單位（fixed 時必填，僅 simple 類型適用）
                 course_schedule:
                   type: integer
-                  description: 開課時間 Unix timestamp（0 = 立即開課）
+                  description: 開課時間 Unix timestamp（0 = 立即開課，僅 simple 類型適用）
                   default: 0
                 teacher_ids:
                   type: array
@@ -982,6 +1035,7 @@ paths:
                   type: string
                   enum: [yes, no]
                   default: no
+                  description: 是否為免費課程（僅 simple 類型適用）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -1033,6 +1087,20 @@ paths:
                   value:
                     code: rest_invalid_param
                     message: "limit_value 必須是有效的 10 位 Unix timestamp"
+                    data:
+                      status: 400
+                missingExternalUrl:
+                  summary: 外部課程缺少連結
+                  value:
+                    code: rest_invalid_param
+                    message: "product_type 為 external 時 external_url 為必填"
+                    data:
+                      status: 400
+                invalidExternalUrl:
+                  summary: 外部連結格式不合法
+                  value:
+                    code: rest_invalid_param
+                    message: "external_url 必須為 http:// 或 https:// 開頭的合法 URL"
                     data:
                       status: 400
 
