@@ -29,110 +29,106 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	return;
 }
 
-$product_id          = $product->get_id();
-$classroom_permalink = CourseUtils::get_classroom_permalink($product_id);
+$product_id  = $product->get_id();
+$is_external = $product instanceof \WC_Product_External;
+
+$classroom_permalink = $is_external ? '' : CourseUtils::get_classroom_permalink($product_id);
 
 echo '<div class="flex-1 px-4 md:px-0">';
 echo '<div class="mb-12">';
 
-$is_avl = CourseUtils::is_avl( $product->get_id() );
-if ( $is_avl ) {
-	Plugin::load_template(
-		'alert',
-	[
-		'type'    => 'info',
-		'message' => '您已經購買課程',
-		'buttons' => $classroom_permalink ? sprintf(
-			/*html*/'<a  href="%1$s" target="_blank" class="pc-btn pc-btn-sm pc-btn-primary text-white">%2$s</a>',
-				$classroom_permalink,
-				'前往教室',
-				) : '',
-		] // phpcs:ignore
-	);
+// 外部課程不顯示「已購買」提示
+if ( ! $is_external ) {
+	$is_avl = CourseUtils::is_avl( $product->get_id() );
+	if ( $is_avl ) {
+		Plugin::load_template(
+			'alert',
+		[
+			'type'    => 'info',
+			'message' => '您已經購買課程',
+			'buttons' => $classroom_permalink ? sprintf(
+				/*html*/'<a  href="%1$s" target="_blank" class="pc-btn pc-btn-sm pc-btn-primary text-white">%2$s</a>',
+					$classroom_permalink,
+					'前往教室',
+					) : '',
+			] // phpcs:ignore
+		);
+	}
 }
 
+// 外部課程不顯示章節列表、觀看期限等站內課程資訊
+if ( ! $is_external ) {
+	$course_schedule_in_timestamp = $product->get_meta( 'course_schedule' );
+	$course_schedule              = $course_schedule_in_timestamp ? \wp_date(
+				'Y/m/d H:i',
+				(int) $course_schedule_in_timestamp
+			) : '未設定';
+	$course_hour                  = (int) $product->get_meta( 'course_hour' );
+	$course_minute                = (int) $product->get_meta( 'course_minute' );
+
+	$count_all_chapters = count( ChapterUtils::get_flatten_post_ids( $product->get_id() ) );
 
 
-$course_schedule_in_timestamp = $product->get_meta( 'course_schedule' );
-$course_schedule              = $course_schedule_in_timestamp ? \wp_date(
-			'Y/m/d H:i',
-			(int) $course_schedule_in_timestamp
-		) : '未設定';
-$course_hour                  = (int) $product->get_meta( 'course_hour' );
-$course_minute                = (int) $product->get_meta( 'course_minute' );
+	$total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
+	$limit_labels  = Limit::instance($product)->get_limit_label();
 
-$count_all_chapters = count( ChapterUtils::get_flatten_post_ids( $product->get_id() ) );
+	$items = [
+		[
+			'icon'     => 'check',
+			'label'    => '課程已全數上架完畢',
+			'value'    => '',
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_complete' ) ?: 'no'),
+		],
+		[
+			'icon'     => 'calendar',
+			'label'    => '開課時間',
+			'value'    => $course_schedule,
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_schedule' ) ?: 'yes'),
+		],
+		[
+			'icon'     => 'clock',
+			'label'    => '課程時長',
+			'value'    => "{$course_hour} 小時 {$course_minute} 分",
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_time' ) ?: 'yes'),
+		],
+		[
+			'icon'     => 'list',
+			'label'    => '章節數量',
+			'value'    => "{$count_all_chapters} 個",
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_chapters' ) ?: 'yes'),
+		],
+		[
+			'icon'     => 'eye',
+			'label'    => '觀看時間',
+			'value'    =>"{$limit_labels->type} {$limit_labels->value}",
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_limit' ) ?: 'yes'),
+		],
+		[
+			'icon'     => 'team',
+			'label'    => '課程學員',
+			'value'    => "{$total_student} 人",
+			'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes'),
+		],
+	];
 
+	$items = array_filter($items, fn( $item ) => !( $item['disabled'] ));
 
-$total_student = ( UserUtils::count_student( $product->get_id() ) ) + ( (int) $product->get_meta( 'extra_student_count' ) );
-$limit_labels  = Limit::instance($product)->get_limit_label();
-
-$items = [
-	[
-		'icon'     => 'check',
-		'label'    => '課程已全數上架完畢',
-		'value'    => '',
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_complete' ) ?: 'no'),
-	],
-	[
-		'icon'     => 'calendar',
-		'label'    => '開課時間',
-		'value'    => $course_schedule,
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_schedule' ) ?: 'yes'),
-	],
-	[
-		'icon'     => 'clock',
-		'label'    => '課程時長',
-		'value'    => "{$course_hour} 小時 {$course_minute} 分",
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_time' ) ?: 'yes'),
-	],
-	[
-		'icon'     => 'list',
-		'label'    => '章節數量',
-		'value'    => "{$count_all_chapters} 個",
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_chapters' ) ?: 'yes'),
-	],
-	[
-		'icon'     => 'eye',
-		'label'    => '觀看時間',
-		'value'    =>"{$limit_labels->type} {$limit_labels->value}",
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_course_limit' ) ?: 'yes'),
-	],
-	[
-		'icon'     => 'team',
-		'label'    => '課程學員',
-		'value'    => "{$total_student} 人",
-		'disabled' => !\wc_string_to_bool( (string) $product->get_meta( 'show_total_student' ) ?: 'yes'),
-	],
-];
-
-$items = array_filter($items, fn( $item ) => !( $item['disabled'] ));
-
-if ($items) {
-	Plugin::load_template(
-	'typography/title',
-	[
-		'value' => '課程資訊',
-		'class' => 'mb-8 text-xl font-normal text-base-content',
-	]
-	);
-
-	Plugin::load_template(
-			'course-product/info',
-			$items
+	if ($items) {
+		Plugin::load_template(
+		'typography/title',
+		[
+			'value' => '課程資訊',
+			'class' => 'mb-8 text-xl font-normal text-base-content',
+		]
 		);
 
+		Plugin::load_template(
+				'course-product/info',
+				$items
+			);
+
+	}
 }
-// echo '<div class="mt-8 flex items-end gap-4">';
-// Plugin::load_template(
-// 'countdown',
-// [
-// 'type'       => 'lg',
-// 'item_class' => '',
-// ]
-// );
-// echo '<h2>後課程即將停賣</h2>';
-// echo '</div>';
 
 echo '</div>';
 // Tabs
@@ -140,6 +136,11 @@ Plugin::load_template( 'course-product/tabs', null, true, true );
 // Footer
 Plugin::load_template( 'course-product/footer', null, true, true );
 echo '</div>';
+
+// 外部課程不顯示 mobile fixed CTA（站內購物流程專用）
+if ( $is_external ) {
+	return;
+}
 
 // 是否啟用 enable_mobile_fixed_cta
 $enable_mobile_fixed_cta = $product->get_meta( 'enable_mobile_fixed_cta' ) === 'yes';
