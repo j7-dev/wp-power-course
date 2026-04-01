@@ -180,6 +180,13 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        enable_linear_mode:
+          type: string
+          enum: [yes, no]
+          description: |
+            線性觀看模式。啟用後學員必須按照章節排序依序完成，
+            前一章節未完成時後續章節鎖定。預設 'no'。
+            管理員（manage_woocommerce）及講師（teacher_ids）不受限制。
         total_students:
           type: integer
           description: 選課人數
@@ -2476,6 +2483,10 @@ paths:
         **前置（狀態）:**
         - 學員必須已有該章節所屬課程的存取權
         - 課程存取未到期（expire_date = 0 或 expire_date > now()）
+        - **線性觀看**：若課程 `enable_linear_mode = 'yes'`，標記完成時該章節必須為已解鎖狀態
+          （即展開排序中前一章節已完成，或此章節為排序首位）。
+          取消完成不受此限制（允許取消任何已完成的章節）。
+          管理員（`manage_woocommerce`）及講師（`teacher_ids`）不受此限制。
 
         **前置（參數）:**
         - `chapter_id`（路徑參數）必須存在且 `post_type = 'pc_chapter'`
@@ -2535,6 +2546,13 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "課程存取已到期"
+                    data:
+                      status: 403
+                chapterLocked:
+                  summary: 章節已鎖定（線性觀看模式）
+                  value:
+                    code: rest_forbidden
+                    message: "章節已鎖定，請先完成前面的章節"
                     data:
                       status: 403
                 notLoggedIn:
