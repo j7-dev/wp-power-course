@@ -171,8 +171,12 @@ abstract class TestCase extends \WP_UnitTestCase {
 		$post_args  = wp_parse_args( $args, $defaults );
 		$chapter_id = $this->factory()->post->create( $post_args );
 
-		// 設定章節所屬課程 meta
-		update_post_meta( $chapter_id, 'parent_course_id', $course_id );
+		// 只為頂層章節設定 parent_course_id（與生產環境一致）
+		// 生產環境中，子章節的 parent_course_id 會被刪除（sort_chapters 中 depth > 0 時設為 0）
+		$is_child = isset( $args['post_parent'] ) && $args['post_parent'] !== $course_id;
+		if ( ! $is_child ) {
+			update_post_meta( $chapter_id, 'parent_course_id', $course_id );
+		}
 
 		return $chapter_id;
 	}

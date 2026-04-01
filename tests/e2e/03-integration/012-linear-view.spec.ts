@@ -11,6 +11,7 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import { ApiClient, setupApiFromBrowser } from '../helpers/api-client'
+import { navigateToAdmin, waitForFormLoaded, clickTab } from '../helpers/admin-page'
 import { loginAs } from '../helpers/frontend-setup'
 import { WP_ADMIN } from '../fixtures/test-data'
 
@@ -102,20 +103,12 @@ test.describe.serial('線性觀看整合測試', () => {
   test('管理員在課程「其他設定」tab 看到線性觀看開關', async ({ page }) => {
     await loginAs(page, WP_ADMIN.username, WP_ADMIN.password)
 
-    // 前往課程編輯頁（React SPA）
-    await page.goto(`${BASE_URL}/wp-admin/admin.php?page=power-course#/courses/${courseId}`)
-    await page.waitForLoadState('networkidle')
+    // 前往課程編輯頁（React SPA）— 使用正確的 /courses/edit/:id 路由
+    await navigateToAdmin(page, `/courses/edit/${courseId}`)
+    await waitForFormLoaded(page)
 
-    // 等待 SPA 載入
-    await page.waitForTimeout(3000)
-
-    // 尋找「其他設定」tab
-    const otherTab = page.getByRole('tab', { name: /其他設定|Other/i }).first()
-    await otherTab.waitFor({ state: 'visible', timeout: 15_000 })
-    await otherTab.click()
-
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(1000)
+    // 點擊「其他設定」tab
+    await clickTab(page, '其他設定')
 
     // 驗證「線性觀看」開關存在
     // 使用 label 文字定位（FiSwitch 的 label 文字）
