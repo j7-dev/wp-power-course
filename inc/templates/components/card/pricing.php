@@ -76,12 +76,21 @@ $show_total_student = \wc_string_to_bool( (string) $product->get_meta( 'show_tot
 $total_student = $total_student;
 $total_student_html = $show_total_student ? Plugin::load_template( 'icon/team', null, false ) . $total_student : '';
 
+// 外部課程標記
+$is_external = $product instanceof \WC_Product_External;
+$external_badge_html = $is_external
+	? '<div class="absolute top-2 right-2 bg-black/50 rounded-full p-1">'
+		. Plugin::load_template( 'icon/external-link', [ 'class' => 'size-4 fill-white' ], false )
+		. '</div>'
+	: '';
+
 printf(
 /*html*/ '
 <div class="pc-course-card">
 	<a href="%1$s">
-		<div class="pc-course-card__image-wrap pc-course-card__image-wrap-product group mb-0">
+		<div class="pc-course-card__image-wrap pc-course-card__image-wrap-product group mb-0 relative">
 			<img class="pc-course-card__image group-hover:scale-105 duration-500 transition ease-in-out" src="%2$s" alt="%3$s"  loading="lazy" decoding="async">
+			%9$s
 	  </div>
   </a>
 	%4$s
@@ -104,4 +113,5 @@ printf(
 	CRUD::get_price_html( $product ),
 		 $course_length_html,
 	$total_student_html,
+	$external_badge_html,
 );
