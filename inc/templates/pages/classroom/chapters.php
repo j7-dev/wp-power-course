@@ -75,6 +75,7 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				const $li = $(this);
 				const href = $li.data('href');
+				const isLocked = $li.data('locked');
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
@@ -84,6 +85,12 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				// 如果點擊的是箭頭，就只展開/收合，不要跳轉頁面
 				if ($(e.target).closest('.icon-arrow').length > 0) {
+					return;
+				}
+
+				// 被鎖定的章節顯示 Toast 警告，不跳轉
+				if (isLocked) {
+					showLockedToast();
 					return;
 				}
 
@@ -112,6 +119,22 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 			});
 
 			restore_expanded_post_ids();
+
+			// 顯示鎖定章節的 Toast 警告
+			function showLockedToast() {
+				// 避免重複顯示
+				if ($('.pc-locked-toast').length > 0) {
+					return;
+				}
+
+				const $toast = $('<div class="pc-locked-toast pc-alert pc-alert-warning fixed bottom-4 left-1/2 -translate-x-1/2 z-[9999] shadow-lg w-auto max-w-sm text-sm" role="alert"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current size-5 shrink-0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><span>請先完成前面的章節才能觀看此章節</span></div>');
+				$('body').append($toast);
+				setTimeout(function() {
+					$toast.fadeOut(300, function() {
+						$toast.remove();
+					});
+				}, 3000);
+			}
 
 			// 把當前展開的章節 id 先記錄起來
 			function handle_save_expanded_post_ids() {

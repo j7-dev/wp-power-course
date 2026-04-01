@@ -606,13 +606,20 @@ abstract class Utils {
 	 * 取得課程章節的 HTML
 	 *
 	 * @param int                            $post_id 課程 id
-	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
+	 * @param array<int, \WP_Post>|null      $children_posts 子章節
 	 * @param int                            $depth 深度，預設從 0 (課程) 開始
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
-	 * @return string
+	 * @param array<int>|null                $locked_chapter_ids 被鎖定的章節 ID 陣列，null 時自動計算
+	 *
+	 * @return string 章節列表 HTML
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', ?array $locked_chapter_ids = null ): string {
 		global $post; // 當前文章
+
+		// depth=0 時計算一次鎖定章節列表，透過遞迴參數傳遞
+		if ( 0 === $depth && null === $locked_chapter_ids && 'classroom' === $context ) {
+			$locked_chapter_ids = self::get_locked_chapter_ids( $post_id );
+		}
 
 		$html = '';
 		if ($children_posts === null) {
@@ -658,11 +665,15 @@ abstract class Utils {
 			return '';
 		}
 
+		/** @var array<int> $locked_ids */
+		$locked_ids = $locked_chapter_ids ?? [];
+
 		$html .= sprintf(
 		/*html*/'<ul class="m-0 p-0 list-none" %1$s>',
 			$depth > 0 ? 'style="display: none;"' : ''
 		);
 		foreach ($children_posts as $child_post) {
+			$is_locked = \in_array( $child_post->ID, $locked_ids, true );
 
 			// 取得子章節的子章節
 			/** @var \WP_Post[] $child_children_posts */
@@ -679,9 +690,13 @@ abstract class Utils {
 			]
 			);
 
+			// 鎖定章節使用較淺的文字顏色
+			$locked_text_class = $is_locked ? 'text-gray-400' : '';
+			$locked_data_attr  = $is_locked ? ' data-locked="true"' : '';
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s %8$s"%9$s style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -692,7 +707,7 @@ abstract class Utils {
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
+			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID, $is_locked) . '</div>',
 			$child_post->post_title,
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
@@ -702,7 +717,9 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$locked_text_class,
+			$locked_data_attr
 			);
 
 			// 沒有子章節就結束
@@ -711,7 +728,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $locked_ids);
 		}
 		$html .= /* html */'</ul>';
 
@@ -722,10 +739,23 @@ abstract class Utils {
 	/**
 	 * 取得章節的 icon html
 	 *
-	 * @param int $chapter_id 章節 ID.
-	 * @return string
+	 * @param int  $chapter_id 章節 ID
+	 * @param bool $is_locked  是否被線性觀看模式鎖定
+	 *
+	 * @return string icon HTML 字串
 	 */
-	public static function get_chapter_icon_html( int $chapter_id ): string {
+	public static function get_chapter_icon_html( int $chapter_id, bool $is_locked = false ): string {
+		// 鎖定時優先顯示鎖頭圖示
+		if ( $is_locked ) {
+			$icon_html = Plugin::load_template( 'icon/lock', null, false );
+			$tooltip   = '請先完成前面的章節才能觀看此章節';
+			return \sprintf(
+				/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
+				\esc_attr( $tooltip ),
+				$icon_html
+			);
+		}
+
 		$avl_chapter    = new Chapter( (int) $chapter_id );
 		$first_visit_at = $avl_chapter->first_visit_at;
 		$finished_at    = $avl_chapter->finished_at;
