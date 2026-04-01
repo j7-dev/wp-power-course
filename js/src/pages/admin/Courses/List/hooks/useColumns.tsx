@@ -27,10 +27,17 @@ const useColumns = () => {
 			width: 300,
 			key: 'name',
 			render: (_, record) => (
-				<ProductName<TCourseBaseRecord>
-					record={record}
-					onClick={onClick(record)}
-				/>
+				<>
+					<ProductName<TCourseBaseRecord>
+						record={record}
+						onClick={onClick(record)}
+					/>
+					{record?.product_type === 'external' && (
+						<Tag color="orange" className="ml-1 mt-1">
+							外部
+						</Tag>
+					)}
+				</>
 			),
 		},
 		{

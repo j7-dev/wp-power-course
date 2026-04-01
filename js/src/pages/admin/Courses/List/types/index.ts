@@ -13,6 +13,7 @@ export * from './user'
 export type TCourseBaseRecord = {
 	id: string
 	type: TProductType
+	product_type: 'simple' | 'external'
 	name: string
 	slug: string
 	date_created: string
@@ -54,6 +55,8 @@ export type TCourseBaseRecord = {
 	course_minute: number
 	course_length: number
 	classroom_link: string
+	external_url: string
+	button_text: string
 }
 
 export type TCoursesLimit = {

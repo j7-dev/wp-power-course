@@ -13,6 +13,8 @@ export const ProductAction: FC<{
 	record: TCourseBaseRecord
 }> = ({ record }) => {
 	const { SITE_URL, COURSE_PERMALINK_STRUCTURE } = useEnv()
+	const isExternal = record?.product_type === 'external'
+
 	return (
 		<div className="flex gap-1">
 			<DuplicateButton
@@ -20,24 +22,26 @@ export const ProductAction: FC<{
 				invalidateProps={{ resource: 'courses' }}
 				tooltipProps={{ title: '複製課程' }}
 			/>
-			<Tooltip
-				title={
-					record?.classroom_link
-						? '開啟課程教室'
-						: '此課程還沒有章節，無法前往教室'
-				}
-			>
-				<Button
-					type="text"
-					icon={
-						<SiGoogleclassroom className="relative top-0.5 text-gray-400" />
+			{!isExternal && (
+				<Tooltip
+					title={
+						record?.classroom_link
+							? '開啟課程教室'
+							: '此課程還沒有章節，無法前往教室'
 					}
-					href={record?.classroom_link}
-					target="_blank"
-					rel="noreferrer"
-					disabled={!record?.classroom_link}
-				/>
-			</Tooltip>
+				>
+					<Button
+						type="text"
+						icon={
+							<SiGoogleclassroom className="relative top-0.5 text-gray-400" />
+						}
+						href={record?.classroom_link}
+						target="_blank"
+						rel="noreferrer"
+						disabled={!record?.classroom_link}
+					/>
+				</Tooltip>
+			)}
 			<Tooltip title="開啟課程銷售頁">
 				<Button
 					type="text"

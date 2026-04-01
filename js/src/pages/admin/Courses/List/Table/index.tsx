@@ -1,7 +1,16 @@
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, DownOutlined } from '@ant-design/icons'
 import { useTable } from '@refinedev/antd'
 import { HttpError, useCreate } from '@refinedev/core'
-import { Table, FormInstance, Spin, Button, TableProps, Card } from 'antd'
+import {
+	Table,
+	FormInstance,
+	Spin,
+	Button,
+	TableProps,
+	Card,
+	Dropdown,
+	MenuProps,
+} from 'antd'
 import { useRowSelection } from 'antd-toolkit'
 import { FilterTags } from 'antd-toolkit/refine'
 import { memo } from 'react'
@@ -61,13 +70,27 @@ const Main = () => {
 		},
 	})
 
-	const createCourse = () => {
-		create({
-			values: {
-				name: '新課程',
-			},
-		})
+	const createCourse = (productType: 'simple' | 'external' = 'simple') => {
+		const values: Record<string, string> =
+			productType === 'external'
+				? { name: '新課程', product_type: 'external', external_url: '' }
+				: { name: '新課程' }
+
+		create({ values })
 	}
+
+	const createMenuItems: MenuProps['items'] = [
+		{
+			key: 'simple',
+			label: '站內課程',
+			onClick: () => createCourse('simple'),
+		},
+		{
+			key: 'external',
+			label: '外部課程',
+			onClick: () => createCourse('external'),
+		},
+	]
 
 	return (
 		<Spin spinning={tableProps?.loading as boolean}>
@@ -95,14 +118,15 @@ const Main = () => {
 			</Card>
 			<Card>
 				<div className="mb-4 flex justify-between">
-					<Button
-						loading={isCreating}
-						type="primary"
-						icon={<PlusOutlined />}
-						onClick={createCourse}
-					>
-						新增課程
-					</Button>
+					<Dropdown menu={{ items: createMenuItems }} trigger={['click']}>
+						<Button
+							loading={isCreating}
+							type="primary"
+							icon={<PlusOutlined />}
+						>
+							新增課程 <DownOutlined />
+						</Button>
+					</Dropdown>
 					<DeleteButton
 						selectedRowKeys={selectedRowKeys}
 						setSelectedRowKeys={setSelectedRowKeys}
