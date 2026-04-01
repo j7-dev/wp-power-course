@@ -180,6 +180,11 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        enable_linear_mode:
+          type: string
+          enum: [yes, no]
+          description: 線性觀看模式開關。yes = 學員必須按章節順序完成；no = 自由觀看（預設）
+          default: "no"
         total_students:
           type: integer
           description: 選課人數
@@ -249,6 +254,14 @@ components:
         menu_order:
           type: integer
           description: 顯示排序（ASC）
+        is_locked:
+          type: boolean
+          description: |
+            章節是否被線性觀看模式鎖定。
+            僅在所屬課程 enable_linear_mode = yes 時有意義。
+            管理員 / 講師永遠為 false。
+            第一個章節永遠為 false。
+          default: false
 
     ChapterNode:
       allOf:
@@ -1206,6 +1219,10 @@ paths:
                 is_free:
                   type: string
                   enum: [yes, no]
+                enable_linear_mode:
+                  type: string
+                  enum: [yes, no]
+                  description: 線性觀看模式開關（預設 no）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -2425,6 +2442,27 @@ paths:
                     type: boolean
                     description: 課程是否已到期（true 時其他欄位仍回傳但應為最後已知值）
                     example: false
+                  enable_linear_mode:
+                    type: string
+                    enum: [yes, no]
+                    description: 課程是否開啟線性觀看模式
+                    example: "no"
+                  locked_chapters:
+                    type: array
+                    description: |
+                      被線性觀看模式鎖定的章節 ID 列表。
+                      僅在 enable_linear_mode = yes 時有值，否則為空陣列。
+                      管理員 / 講師永遠為空陣列。
+                    items:
+                      type: integer
+                    example: [202, 203, 204]
+                  next_unlocked_chapter:
+                    type: integer
+                    nullable: true
+                    description: |
+                      下一個待完成的已解鎖章節 ID（線性觀看模式中，學員目前應進行的章節）。
+                      若所有章節已完成或功能未開啟，為 null。
+                    example: 201
         "403":
           description: 前置狀態不符
           content:
