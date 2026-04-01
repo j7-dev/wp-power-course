@@ -20,6 +20,10 @@
             <group>error</group>
             <group>edge</group>
             <group>security</group>
+            <group>linear-viewing</group>
+            <group>command</group>
+            <group>query</group>
+            <group>access-control</group>
         </include>
     </groups>
 

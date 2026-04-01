@@ -31,6 +31,9 @@ final class LifeCycle {
 	/** Constructor */
 	public function __construct() {
 
+		// 線性觀看：在 register_visit_chapter 之前（priority 5）檢查並重導向
+		\add_action( 'power_course_before_classroom_render', [ __CLASS__, 'redirect_if_chapter_locked' ], 5 );
+
 		\add_action( 'power_course_before_classroom_render', [ __CLASS__, 'register_visit_chapter' ] );
 
 		// 進入章節時要註記
@@ -202,6 +205,58 @@ final class LifeCycle {
 		\wp_cache_flush_group('prev_next');
 	}
 
+
+	/**
+	 * 線性觀看：若學員存取鎖定章節，302 重導向到下一個應完成的章節
+	 * 管理員（manage_woocommerce）跳過檢查
+	 */
+	public static function redirect_if_chapter_locked(): void {
+		global $product, $chapter, $course;
+
+		/** @var \WC_Product|null $current_product */
+		$current_product = $course ?? $product;
+
+		if ( ! ( $current_product instanceof \WC_Product ) || ! ( $chapter instanceof \WP_Post ) ) {
+			return;
+		}
+
+		$course_id = $current_product->get_id();
+
+		// 未啟用線性觀看，不做任何事
+		$enable_linear_viewing = (string) \get_post_meta( $course_id, 'enable_linear_viewing', true );
+		if ( 'yes' !== $enable_linear_viewing ) {
+			return;
+		}
+
+		// 管理員跳過檢查
+		if ( \current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+
+		$user_id    = \get_current_user_id();
+		$chapter_id = $chapter->ID;
+
+		// 檢查章節是否鎖定
+		$is_locked = ChapterUtils::is_chapter_locked( $chapter_id, $user_id, $course_id );
+
+		if ( ! $is_locked ) {
+			return;
+		}
+
+		// 取得下一個應完成的章節 URL
+		$next_chapter_id = ChapterUtils::get_next_should_complete_chapter_id( $course_id, $user_id );
+
+		if ( $next_chapter_id ) {
+			$redirect_url = \get_permalink( $next_chapter_id );
+		} else {
+			$redirect_url = $current_product->get_permalink();
+		}
+
+		$redirect_url = \add_query_arg( 'pc_locked', '1', $redirect_url );
+
+		\wp_redirect( $redirect_url, 302 );
+		exit;
+	}
 
 	/**
 	 * 如果儲存時，editor 是 power-editor，則要清除 elementor 相關資料

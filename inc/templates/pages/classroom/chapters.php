@@ -28,7 +28,15 @@ if (! ( $product instanceof \WC_Product )) {
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
+
+// 線性觀看：取得鎖定狀態映射
+$lock_status_map = null;
+$user_id         = \get_current_user_id();
+if ( $user_id && 'yes' === (string) $product->get_meta('enable_linear_viewing') ) {
+	$lock_status_map = ChapterUtils::get_all_chapters_lock_status( $product->get_id(), $user_id );
+}
+
+$chapters_html = ChapterUtils::get_children_posts_html_uncached($product->get_id(), null, 0, 'classroom', $lock_status_map);
 
 /** @var \WP_Post $chapter */
 global $chapter;
@@ -62,6 +70,16 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 <script type="module" async>
 	(function($) {
 		$(document).ready(function() {
+			// 線性觀看：若 URL 帶有 pc_locked=1 顯示提示訊息
+			const urlParams = new URLSearchParams(window.location.search);
+			if (urlParams.get('pc_locked') === '1') {
+				const $msg = $('<div class="pc-locked-notice alert alert-warning mb-4" role="alert">請先完成本章節，才能觀看後面的章節</div>');
+				$('#pc-sider__main-chapters').before($msg);
+				// 移除 URL 上的 pc_locked 參數，避免重新整理重複顯示
+				const newUrl = window.location.pathname + window.location.hash;
+				history.replaceState(null, '', newUrl);
+			}
+
 			const $el = $('#pc-sider__main-chapters')
 			if(!$el.length){
 				console.error('#pc-sider__main-chapters 節點不存在')

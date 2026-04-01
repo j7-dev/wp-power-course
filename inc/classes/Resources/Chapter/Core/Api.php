@@ -92,6 +92,23 @@ final class Api extends ApiBase {
 		$chapters = \get_posts($args);
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters )); // @phpstan-ignore-line
 
+		// 注入 is_locked 欄位
+		$user_id   = \get_current_user_id();
+		$course_id = isset( $params['post_parent'] ) ? (int) $params['post_parent'] : 0;
+
+		// 只有在帶入 course_id（post_parent）且有登入用戶時才注入鎖定狀態
+		if ( $course_id && $user_id ) {
+			$lock_status = ChapterUtils::get_all_chapters_lock_status( $course_id, $user_id );
+			$chapters    = array_map(
+				static function ( array $chapter ) use ( $lock_status ): array {
+					$chapter_id              = (int) $chapter['id'];
+					$chapter['is_locked']    = $lock_status[ $chapter_id ] ?? false;
+					return $chapter;
+				},
+				$chapters
+			);
+		}
+
 		$response = new \WP_REST_Response( $chapters );
 
 		return $response;
@@ -288,6 +305,10 @@ final class Api extends ApiBase {
 
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
+		// 判斷課程是否啟用線性觀看
+		$enable_linear_viewing = (string) \get_post_meta( $course_id, 'enable_linear_viewing', true );
+		$is_linear             = 'yes' === $enable_linear_viewing;
+
 		if ($is_this_chapter_finished) {
 			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
@@ -299,17 +320,33 @@ final class Api extends ApiBase {
 
 			\do_action(ChapterLifeCycle::CHAPTER_UNFINISHEDED_ACTION, $chapter_id, $course_id, $user_id);
 
+			// 線性觀看：計算取消後重新鎖定的章節列表
+			$locked_chapter_ids = [];
+			if ( $is_linear && $success ) {
+				$lock_status = ChapterUtils::get_all_chapters_lock_status( $course_id, $user_id );
+				foreach ($lock_status as $cid => $locked) {
+					if ($locked) {
+						$locked_chapter_ids[] = $cid;
+					}
+				}
+			}
+
+			$data = [
+				'chapter_id'               => $chapter_id,
+				'course_id'                => $course_id,
+				'is_this_chapter_finished' => $success ? false : true,
+				'progress'                 => $progress,
+				'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+			];
+			if ( $is_linear ) {
+				$data['locked_chapter_ids'] = $locked_chapter_ids;
+			}
+
 			return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
 					'message' => $success ? "單元 {$title} 已標示為未完成！" : "單元 {$title} 標示為未完成時出錯了！",
-					'data'    => [
-						'chapter_id'               => $chapter_id,
-						'course_id'                => $course_id,
-						'is_this_chapter_finished' => $success ? false : true,
-						'progress'                 => $progress,
-						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
-					],
+					'data'    => $data,
 				],
 				$success ? 200 : 400
 			);
@@ -325,17 +362,28 @@ final class Api extends ApiBase {
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
+		// 線性觀看：計算下一個解鎖的章節 ID
+		$next_unlocked_chapter_id = null;
+		if ( $is_linear && $success ) {
+			$next_unlocked_chapter_id = ChapterUtils::get_next_should_complete_chapter_id( $course_id, $user_id );
+		}
+
+		$data = [
+			'chapter_id'               => $chapter_id,
+			'course_id'                => $course_id,
+			'is_this_chapter_finished' => $success ? true : false,
+			'progress'                 => $progress,
+			'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+		];
+		if ( $is_linear ) {
+			$data['next_unlocked_chapter_id'] = $next_unlocked_chapter_id;
+		}
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
 					'message' => $success ? "單元 {$title} 已標示為完成！" : "單元 {$title} 標示為未完成時出錯了！",
-					'data'    => [
-						'chapter_id'               => $chapter_id,
-						'course_id'                => $course_id,
-						'is_this_chapter_finished' => $success ? true : false,
-						'progress'                 => $progress,
-						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
-					],
+					'data'    => $data,
 				],
 				$success ? 200 : 400
 			);
