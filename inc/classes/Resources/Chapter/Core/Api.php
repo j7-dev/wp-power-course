@@ -92,6 +92,15 @@ final class Api extends ApiBase {
 		$chapters = \get_posts($args);
 		$chapters = array_values(array_map( [ ChapterUtils::class, 'format_chapter_details' ], $chapters )); // @phpstan-ignore-line
 
+		// 為每個章節加入線性觀看模式的鎖定狀態
+		$chapters = array_map(
+			static function ( array $chapter ): array {
+				$chapter['is_locked'] = ChapterUtils::is_chapter_locked( (int) $chapter['id'] );
+				return $chapter;
+			},
+			$chapters
+		);
+
 		$response = new \WP_REST_Response( $chapters );
 
 		return $response;
