@@ -52,9 +52,9 @@ final class Product {
 
 		$product_type_options[ $option ] = [
 			'id'            => "_{$option}",
-			'wrapper_class' => 'show_if_simple',
+			'wrapper_class' => 'show_if_simple show_if_external',
 			'label'         => '課程',
-			'description'   => '是否為課程商品，課程商品只能用於【簡單商品】以及【簡易訂閱】',
+			'description'   => '是否為課程商品，課程商品可用於【簡單商品】、【簡易訂閱】及【外部/聯盟商品】',
 			'default'       => 'no',
 		];
 
@@ -112,7 +112,12 @@ final class Product {
 		}
 
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
-			$post_states['course'] = '課程商品';
+			$product = \wc_get_product( $post->ID );
+			if ( $product instanceof \WC_Product_External ) {
+				$post_states['course'] = '外部課程商品';
+			} else {
+				$post_states['course'] = '課程商品';
+			}
 		}
 		$helper = Helper::instance( $post->ID );
 		if ( $helper?->is_bundle_product ) {

@@ -75,25 +75,28 @@ Plugin::load_template( 'course-product/sider', null, true, true );
 echo '</div>';
 echo '</div>';
 
-printf(
-/*html*/'
-<dialog class="pc-already-bought-modal pc-modal">
-  <div class="pc-modal-box">
-    <h3 class="text-lg font-bold">%1$s</h3>
-    <p>%2$s</p>
-		<div class="pc-modal-action">
-			<button class="pc-already-bought-modal__cancel pc-btn">取消</button>
-			<button class="pc-already-bought-modal__confirm pc-btn pc-btn-primary text-white">確認購買</button>
+// 外部課程不顯示「已購買」確認對話框（外部課程不走站內購物流程）
+if ( ! ( $product instanceof \WC_Product_External ) ) {
+	printf(
+	/*html*/'
+	<dialog class="pc-already-bought-modal pc-modal">
+	  <div class="pc-modal-box">
+	    <h3 class="text-lg font-bold">%1$s</h3>
+	    <p>%2$s</p>
+			<div class="pc-modal-action">
+				<button class="pc-already-bought-modal__cancel pc-btn">取消</button>
+				<button class="pc-already-bought-modal__confirm pc-btn pc-btn-primary text-white">確認購買</button>
+			</div>
 		</div>
-	</div>
-  <form method="dialog" class="pc-modal-backdrop">
-    <button class="opacity-0">close</button>
-  </form>
-</dialog>
-',
-'您已經購買過此課程',
-'還是要購買嗎?'
-);
+	  <form method="dialog" class="pc-modal-backdrop">
+	    <button class="opacity-0">close</button>
+	  </form>
+	</dialog>
+	',
+	'您已經購買過此課程',
+	'還是要購買嗎?'
+	);
+}
 
 Theme::render_button();
 

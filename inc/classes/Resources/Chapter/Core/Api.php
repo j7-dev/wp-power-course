@@ -143,6 +143,21 @@ final class Api extends ApiBase {
 			'meta_data' => $meta_data,
 		] = $this->separator( $request );
 
+		// 外部課程不可建立章節
+		$parent_course_id = (int) ( $meta_data['parent_course_id'] ?? ( $data['post_parent'] ?? 0 ) );
+		if ( $parent_course_id > 0 ) {
+			$parent_product = \wc_get_product( $parent_course_id );
+			if ( $parent_product instanceof \WC_Product_External ) {
+				return new \WP_REST_Response(
+					[
+						'code'    => 'external_course_no_chapters',
+						'message' => '外部課程（external）不可建立章節',
+					],
+					400
+				);
+			}
+		}
+
 		$qty = (int) ( $meta_data['qty'] ?? 1 );
 		unset($meta_data['qty']);
 

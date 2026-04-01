@@ -59,6 +59,23 @@ final class Api extends ApiBase {
 		/** @var array<string, mixed> $body_params */
 		$body_params = WP::sanitize_text_field_deep( $body_params, false, [ 'pc_watermark_text', 'auto_grant_courses' ] );
 
+		// 自動授權課程清單不可包含外部課程，靜默過濾
+		if ( isset( $body_params['auto_grant_courses'] ) && is_array( $body_params['auto_grant_courses'] ) ) {
+			$body_params['auto_grant_courses'] = array_values(
+				array_filter(
+					$body_params['auto_grant_courses'],
+					static function ( $item ) {
+						$course_id = (int) ( $item['course_id'] ?? 0 );
+						if ( $course_id <= 0 ) {
+							return true; // 讓後續邏輯處理無效 ID
+						}
+						$product = \wc_get_product( $course_id );
+						return ! ( $product instanceof \WC_Product_External );
+					}
+				)
+			);
+		}
+
 		$settings = Settings::instance();
 		$settings->set_properties( $body_params );
 		$settings->save();

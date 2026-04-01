@@ -82,6 +82,14 @@ trait UserTrait {
 				throw new \Exception('新增學員失敗，缺少 user_ids 或 course_ids');
 			}
 
+			// 外部課程不可新增學員
+			foreach ( $course_ids as $course_id ) {
+				$course_product = \wc_get_product( (int) $course_id );
+				if ( $course_product instanceof \WC_Product_External ) {
+					throw new \Exception( '外部課程（external）不可新增學員' );
+				}
+			}
+
 			$add_student = new AddStudent();
 			foreach ($course_ids as $course_id) {
 				foreach ($user_ids as  $user_id) {
@@ -135,6 +143,14 @@ trait UserTrait {
 		$course_ids  = isset($body_params['course_ids']) && is_array($body_params['course_ids']) ? $body_params['course_ids'] : [];
 
 		try {
+			// 外部課程不可更新學員
+			foreach ( $course_ids as $course_id ) {
+				$course_product = \wc_get_product( (int) $course_id );
+				if ( $course_product instanceof \WC_Product_External ) {
+					throw new \Exception( '外部課程（external）不可更新學員' );
+				}
+			}
+
 			foreach ($course_ids as $course_id) {
 				foreach ($user_ids as  $user_id) {
 					\do_action(LifeCycle::AFTER_UPDATE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id, $timestamp);
@@ -187,6 +203,14 @@ trait UserTrait {
 		$course_ids  = isset($body_params['course_ids']) && is_array($body_params['course_ids']) ? $body_params['course_ids'] : [];
 
 		try {
+			// 外部課程不可移除學員
+			foreach ( $course_ids as $course_id ) {
+				$course_product = \wc_get_product( (int) $course_id );
+				if ( $course_product instanceof \WC_Product_External ) {
+					throw new \Exception( '外部課程（external）不可移除學員' );
+				}
+			}
+
 			foreach ($course_ids as $course_id) {
 				foreach ($user_ids as $user_id) {
 					\do_action(LifeCycle::AFTER_REMOVE_STUDENT_FROM_COURSE_ACTION, $user_id, $course_id);

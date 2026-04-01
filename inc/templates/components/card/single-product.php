@@ -23,6 +23,17 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 	return;
 }
 
+// 外部課程使用專用卡片模板
+if ( $product instanceof \WC_Product_External ) {
+	Plugin::load_template(
+		'card/single-product-external',
+		[
+			'product' => $product,
+		]
+		);
+	return;
+}
+
 $is_free = 'yes' === $product->get_meta( 'is_free' );
 
 if ( $is_free ) {

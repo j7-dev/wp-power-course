@@ -38,6 +38,12 @@ final class AutoGrant {
 				continue;
 			}
 
+			// 外部課程不參與自動授權
+			$product = \wc_get_product( $course_id );
+			if ( $product instanceof \WC_Product_External ) {
+				continue;
+			}
+
 			$limit_type = (string) ( $auto_grant_course['limit_type'] ?? 'unlimited' );
 			if ( 'follow_subscription' === $limit_type ) {
 				continue;
