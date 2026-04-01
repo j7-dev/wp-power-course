@@ -180,6 +180,13 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        enable_linear_viewing:
+          type: string
+          enum: [yes, no]
+          default: no
+          description: |
+            是否啟用線性觀看模式。
+            啟用後學員必須按章節排列順序依序完成才能觀看下一章節。
         total_students:
           type: integer
           description: 選課人數
@@ -249,6 +256,13 @@ components:
         menu_order:
           type: integer
           description: 顯示排序（ASC）
+        is_locked:
+          type: boolean
+          description: |
+            章節是否被線性觀看鎖定。
+            僅在課程 enable_linear_viewing=yes 且用戶已登入時計算。
+            未啟用線性觀看或未登入時固定為 false。
+          default: false
 
     ChapterNode:
       allOf:
@@ -2516,6 +2530,23 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  next_unlocked_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: |
+                      下一個因此次切換而解鎖的章節 ID。
+                      僅在課程啟用 enable_linear_viewing 且本次為「標記完成」時回傳。
+                      若無下一章或未啟用線性觀看，回傳 null。
+                    example: 201
+                  locked_chapter_ids:
+                    type: array
+                    items:
+                      type: integer
+                    description: |
+                      因此次切換而重新鎖定的章節 ID 列表。
+                      僅在課程啟用 enable_linear_viewing 且本次為「取消完成」時回傳。
+                      只包含因前方未完成而鎖定且自身未完成的章節。
+                    example: [202, 203]
         "403":
           description: 前置狀態不符
           content:

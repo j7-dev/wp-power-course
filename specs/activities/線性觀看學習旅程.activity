@@ -1,0 +1,24 @@
+[ACTIVITY] 線性觀看學習旅程
+[ACTOR] 管理員 -> {specs/actors/管理員.md}
+[ACTOR] 學員 -> {specs/actors/學員.md}
+
+[STEP:1] @管理員 啟用課程線性觀看 {features/linear-viewing/設定線性觀看.feature}
+[STEP:2] @學員 進入教室頁面 {specs/ui/教室頁面.md}
+[STEP:3] @學員 系統計算章節鎖定狀態 {features/linear-viewing/查詢章節鎖定狀態.feature}
+[DECISION:3a] 學員點擊章節
+  [BRANCH:3a:章節已解鎖] @學員 觀看章節內容 {specs/ui/章節內容頁.md}
+  [BRANCH:3a:章節已鎖定] @學員 存取控制阻擋 {features/linear-viewing/線性觀看存取控制.feature}
+    [STEP:3a:鎖定:1] 系統 302 重導向到下一個應完成的章節
+    [STEP:3a:鎖定:2] 顯示提示訊息「請先完成本章節」
+    [GOTO:2]
+[MERGE:3a]
+[STEP:4] @學員 標記章節完成 {features/progress/切換章節完成狀態.feature}
+[DECISION:4a] 完成後的下一步
+  [BRANCH:4a:下一章節自動解鎖] @學員 前往下一章節
+    [GOTO:2]
+  [BRANCH:4a:所有章節已完成] 課程完成 {specs/ui/課程完成頁面.md}
+[MERGE:4a]
+[END]
+
+[NOTE] 管理員可隨時關閉線性觀看 {features/linear-viewing/設定線性觀看.feature}
+[NOTE] 關閉後所有學員立即恢復自由觀看模式，已完成紀錄不受影響
