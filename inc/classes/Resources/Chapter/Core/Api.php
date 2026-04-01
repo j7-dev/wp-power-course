@@ -297,6 +297,10 @@ final class Api extends ApiBase {
 
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
+		// 清除教室側邊欄 HTML transient 快取，確保線性觀看模式的鎖定狀態即時更新
+		$cache_key = ChapterUtils::get_cache_key( $course_id );
+		\delete_transient( $cache_key );
+
 		if ($is_this_chapter_finished) {
 			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
