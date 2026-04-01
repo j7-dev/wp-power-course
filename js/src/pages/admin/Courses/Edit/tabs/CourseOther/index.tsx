@@ -291,6 +291,15 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 
 				<FiSwitch
 					formItemProps={{
+						name: ['enable_linear_mode'],
+						label: '線性觀看模式',
+						tooltip:
+							'開啟後學員必須按照章節順序依序完成，才能觀看後續章節',
+					}}
+				/>
+
+				<FiSwitch
+					formItemProps={{
 						name: ['show_review_tab'],
 						label: '顯示評價',
 					}}
