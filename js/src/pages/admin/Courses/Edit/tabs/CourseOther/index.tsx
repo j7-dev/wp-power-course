@@ -3,6 +3,7 @@ import {
 	Switch,
 	Slider,
 	InputNumber,
+	Input,
 	Rate,
 	Tooltip,
 	FormProps,
@@ -15,7 +16,13 @@ import { Heading } from '@/components/general'
 
 const { Item } = Form
 
-const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
+const CourseOtherComponent = ({
+	formProps,
+	isExternal = false,
+}: {
+	formProps: FormProps
+	isExternal?: boolean
+}) => {
 	const form = formProps.form as FormInstance
 	const watchShowTotalStudent: boolean =
 		Form.useWatch(['show_total_student'], form) === 'yes'
@@ -36,6 +43,27 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 
 	return (
 		<Form {...formProps}>
+			{isExternal && (
+				<>
+					<Heading>外部連結設定</Heading>
+					<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+						<Item
+							name={['external_url']}
+							label="外部連結 URL"
+							rules={[{ type: 'url', message: '請輸入有效的 URL' }]}
+						>
+							<Input type="url" placeholder="https://example.com/course" />
+						</Item>
+						<Item
+							name={['button_text']}
+							label="CTA 按鈕文字"
+							initialValue="前往課程"
+						>
+							<Input placeholder="前往課程" />
+						</Item>
+					</div>
+				</>
+			)}
 			<Heading>課程介紹區域</Heading>
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch
