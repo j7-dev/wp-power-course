@@ -9,6 +9,7 @@ use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Resources\Chapter\Core\CPT;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
+use J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD as AVLChapterMeta;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Domains\Post\Utils as PostUtils;
 use J7\PowerCourse\Resources\Settings\Model\Settings;
@@ -874,5 +875,192 @@ abstract class Utils {
 		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
 
 		return $next_post_id === null ? null : (int) $next_post_id;
+	}
+
+	/**
+	 * 判斷章節是否因線性觀看模式而被鎖定
+	 *
+	 * Fail-open 設計：任何異常情況都回傳 false（不鎖定），避免誤擋已購買用戶。
+	 * 豁免對象：管理員（manage_woocommerce）與講師（teacher_ids）。
+	 *
+	 * @param int      $chapter_id 章節 ID
+	 * @param int|null $user_id    用戶 ID，null 時使用當前登入用戶
+	 *
+	 * @return bool 是否鎖定（true = 鎖定，false = 可存取）
+	 */
+	public static function is_chapter_locked( int $chapter_id, ?int $user_id = null ): bool {
+		$user_id = $user_id ?? \get_current_user_id();
+
+		// 未登入 → 不鎖定（由其他機制處理未登入）
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		// 管理員豁免
+		if ( \user_can( $user_id, 'manage_woocommerce' ) ) {
+			return false;
+		}
+
+		// 取得課程 ID
+		$course_id = self::get_course_id( $chapter_id );
+		if ( null === $course_id ) {
+			return false;
+		}
+
+		// 講師豁免
+		/** @var array<int, string> $teacher_ids */
+		$teacher_ids = \get_post_meta( $course_id, 'teacher_ids', false );
+		if ( \in_array( (string) $user_id, $teacher_ids, true ) ) {
+			return false;
+		}
+
+		// 檢查是否啟用線性觀看模式
+		$enable_linear_mode = (string) \get_post_meta( $course_id, 'enable_linear_mode', true );
+		if ( 'yes' !== $enable_linear_mode ) {
+			return false;
+		}
+
+		// 取得 DFS 扁平章節列表
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return false;
+		}
+
+		// 找到當前章節在列表中的位置
+		/** @var int|false $index */
+		$index = \array_search( $chapter_id, $flatten_ids, true );
+
+		// 章節不在列表中 → 不鎖定
+		if ( false === $index ) {
+			return false;
+		}
+
+		// 第一個章節永遠不鎖定
+		if ( 0 === $index ) {
+			return false;
+		}
+
+		// 檢查 index 0 到 index-1 的所有章節是否都已完成
+		for ( $i = 0; $i < $index; $i++ ) {
+			$prev_chapter_id = $flatten_ids[ $i ];
+			$finished_at     = (string) AVLChapterMeta::get( $prev_chapter_id, $user_id, 'finished_at', true );
+			if ( '' === $finished_at ) {
+				return true; // 有任一前置章節未完成 → 鎖定
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * 批量取得課程中所有被鎖定的章節 ID
+	 *
+	 * 避免 N+1 查詢：一次取得所有章節的完成狀態，計算鎖定清單。
+	 * 管理員/講師/未啟用線性模式 → 回傳空陣列。
+	 *
+	 * @param int      $course_id 課程 ID
+	 * @param int|null $user_id   用戶 ID，null 時使用當前登入用戶
+	 *
+	 * @return array<int> 被鎖定的章節 ID 陣列
+	 */
+	public static function get_locked_chapter_ids( int $course_id, ?int $user_id = null ): array {
+		$user_id = $user_id ?? \get_current_user_id();
+
+		// 未登入 → 空陣列
+		if ( ! $user_id ) {
+			return [];
+		}
+
+		// 管理員豁免
+		if ( \user_can( $user_id, 'manage_woocommerce' ) ) {
+			return [];
+		}
+
+		// 講師豁免
+		/** @var array<int, string> $teacher_ids */
+		$teacher_ids = \get_post_meta( $course_id, 'teacher_ids', false );
+		if ( \in_array( (string) $user_id, $teacher_ids, true ) ) {
+			return [];
+		}
+
+		// 檢查是否啟用線性觀看模式
+		$enable_linear_mode = (string) \get_post_meta( $course_id, 'enable_linear_mode', true );
+		if ( 'yes' !== $enable_linear_mode ) {
+			return [];
+		}
+
+		// 取得 DFS 扁平章節列表
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return [];
+		}
+
+		// 一次性查詢所有章節的 finished_at 狀態
+		$finished_map = self::get_chapters_finished_map( $flatten_ids, $user_id );
+
+		$locked_ids        = [];
+		$has_unfinished    = false;
+
+		foreach ( $flatten_ids as $i => $chapter_id ) {
+			if ( 0 === $i ) {
+				// 第一個章節永遠不鎖定
+				if ( empty( $finished_map[ $chapter_id ] ) ) {
+					$has_unfinished = true;
+				}
+				continue;
+			}
+
+			if ( $has_unfinished ) {
+				$locked_ids[] = $chapter_id;
+			} else {
+				// 檢查當前章節前面的所有章節是否都已完成
+				if ( empty( $finished_map[ $chapter_id ] ) ) {
+					$has_unfinished = true;
+				}
+			}
+		}
+
+		return $locked_ids;
+	}
+
+	/**
+	 * 批量查詢多個章節的 finished_at 狀態
+	 *
+	 * @param array<int> $chapter_ids 章節 ID 陣列
+	 * @param int        $user_id     用戶 ID
+	 *
+	 * @return array<int, string> key 為章節 ID，value 為 finished_at 值（空字串表示未完成）
+	 */
+	private static function get_chapters_finished_map( array $chapter_ids, int $user_id ): array {
+		if ( empty( $chapter_ids ) ) {
+			return [];
+		}
+
+		global $wpdb;
+
+		$table_name   = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
+		$placeholders = \implode( ',', \array_fill( 0, \count( $chapter_ids ), '%d' ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$sql = "SELECT post_id, meta_value FROM {$table_name} WHERE post_id IN ({$placeholders}) AND user_id = %d AND meta_key = 'finished_at'";
+
+		$prepare_values = [ ...$chapter_ids, $user_id ];
+
+		/** @var array<int, object{post_id: string, meta_value: string}>|null $results */
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				$sql, // phpcs:ignore
+				$prepare_values
+			)
+		);
+
+		$map = [];
+		if ( $results ) {
+			foreach ( $results as $row ) {
+				$map[ (int) $row->post_id ] = (string) $row->meta_value;
+			}
+		}
+
+		return $map;
 	}
 }
