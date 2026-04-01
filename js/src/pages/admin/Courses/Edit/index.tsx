@@ -83,8 +83,18 @@ export const CoursesEdit = () => {
 		onFinish: handleOnFinish,
 	}
 
+	const isExternal = record?.product_type === 'external'
+
+	// 外部課程隱藏的 Tab keys
+	const externalHiddenKeys = [
+		'Chapters',
+		'CourseBundle',
+		'CourseStudents',
+		'CourseAnalysis',
+	]
+
 	// TAB items
-	const items: TabsProps['items'] = [
+	const allItems: TabsProps['items'] = [
 		{
 			key: 'CourseDescription',
 			forceRender: true,
@@ -95,7 +105,7 @@ export const CoursesEdit = () => {
 			key: 'CoursePrice',
 			forceRender: true,
 			label: '課程訂價',
-			children: <CoursePrice formProps={formProps} />,
+			children: <CoursePrice formProps={formProps} isExternal={isExternal} />,
 		},
 		{
 			key: 'CourseBundle',
@@ -126,7 +136,9 @@ export const CoursesEdit = () => {
 			key: 'CourseOther',
 			forceRender: true,
 			label: '其他設定',
-			children: <CourseOther formProps={formProps} />,
+			children: (
+				<CourseOther formProps={formProps} isExternal={isExternal} />
+			),
 		},
 		{
 			key: 'CourseStudents',
@@ -141,6 +153,10 @@ export const CoursesEdit = () => {
 			children: <CourseAnalysis />,
 		},
 	]
+
+	const items = isExternal
+		? allItems.filter((item) => !externalHiddenKeys.includes(item.key as string))
+		: allItems
 
 	const disableSaveButton = [
 		'CourseBundle',
@@ -214,24 +230,26 @@ export const CoursesEdit = () => {
 									>
 										前往傳統商品編輯介面
 									</Button>
-									<Tooltip
-										title={
-											record?.classroom_link
-												? undefined
-												: '此課程還沒有章節，無法前往教室'
-										}
-									>
-										<Button
-											href={record?.classroom_link}
-											target="_blank"
-											rel="noreferrer"
-											className="ml-4"
-											type="default"
-											disabled={!record?.classroom_link}
+									{!isExternal && (
+										<Tooltip
+											title={
+												record?.classroom_link
+													? undefined
+													: '此課程還沒有章節，無法前往教室'
+											}
 										>
-											前往教室
-										</Button>
-									</Tooltip>
+											<Button
+												href={record?.classroom_link}
+												target="_blank"
+												rel="noreferrer"
+												className="ml-4"
+												type="default"
+												disabled={!record?.classroom_link}
+											>
+												前往教室
+											</Button>
+										</Tooltip>
+									)}
 
 									<Button
 										href={`${SITE_URL}/${COURSE_PERMALINK_STRUCTURE}/${record?.slug}`}
