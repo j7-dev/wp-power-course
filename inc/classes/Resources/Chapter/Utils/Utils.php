@@ -539,6 +539,71 @@ abstract class Utils {
 		return true; // 可能可以 apply filters
 	}
 
+	/**
+	 * 檢查章節是否因線性觀看模式而被鎖定
+	 *
+	 * 線性觀看模式開啟時，學員必須按照 get_flatten_post_ids() 的排序
+	 * 依序完成章節，前一章節未完成時後續章節被鎖定。
+	 *
+	 * 豁免條件：
+	 * - 課程未開啟 enable_linear_mode
+	 * - 用戶擁有 manage_woocommerce 權限（管理員）
+	 * - 用戶是該課程的講師（teacher_ids）
+	 * - 該章節是展開排序中的第一個章節
+	 *
+	 * @param int      $course_id  課程 ID.
+	 * @param int      $chapter_id 章節 ID.
+	 * @param int|null $user_id    用戶 ID（null 時使用當前登入用戶）.
+	 * @return bool 是否被鎖定（true = 鎖定，false = 可存取）
+	 */
+	public static function is_chapter_locked( int $course_id, int $chapter_id, ?int $user_id = null ): bool {
+		$user_id = $user_id ?? \get_current_user_id();
+
+		// 1. 檢查是否開啟線性觀看
+		$enable_linear_mode = \get_post_meta( $course_id, 'enable_linear_mode', true );
+		if ( 'yes' !== $enable_linear_mode ) {
+			return false;
+		}
+
+		// 2. 管理員豁免（manage_woocommerce）
+		if ( $user_id && \user_can( $user_id, 'manage_woocommerce' ) ) {
+			return false;
+		}
+
+		// 3. 講師豁免（teacher_ids）
+		if ( $user_id ) {
+			/** @var array<int|string> $teacher_ids */
+			$teacher_ids = \get_post_meta( $course_id, 'teacher_ids' );
+			$teacher_ids = array_map( 'intval', $teacher_ids );
+			if ( in_array( $user_id, $teacher_ids, true ) ) {
+				return false;
+			}
+		}
+
+		// 4. 取得展開後的完整排序
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return false;
+		}
+
+		// 5. 找到當前章節在排序中的位置
+		$index = array_search( $chapter_id, $flatten_ids, true );
+		if ( false === $index ) {
+			return false; // 章節不在此課程中
+		}
+
+		// 6. 第一個章節永遠不鎖定
+		if ( 0 === $index ) {
+			return false;
+		}
+
+		// 7. 檢查前一個章節是否已完成
+		$prev_chapter_id = $flatten_ids[ $index - 1 ];
+		$finished_at     = MetaCRUD::get( (int) $prev_chapter_id, $user_id, 'finished_at', true );
+
+		return empty( $finished_at );
+	}
+
 
 	/**
 	 * 取得格式化後的水印文字
@@ -608,10 +673,21 @@ abstract class Utils {
 	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
 	 * @param int                            $depth 深度，預設從 0 (課程) 開始
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param int|null                       $course_id 課程 ID（遞迴時傳入，depth=0 時自動使用 $post_id）
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', ?int $course_id = null ): string {
 		global $post; // 當前文章
+
+		// depth=0 時 $post_id 就是課程 ID
+		if ( null === $course_id && 0 === $depth ) {
+			$course_id = $post_id;
+		}
+
+		// 判斷是否開啟線性觀看模式（只查一次）
+		$is_linear_mode = $course_id
+			? ( 'yes' === \get_post_meta( $course_id, 'enable_linear_mode', true ) )
+			: false;
 
 		$html = '';
 		if ($children_posts === null) {
@@ -678,9 +754,24 @@ abstract class Utils {
 			]
 			);
 
+			// 線性觀看鎖定狀態判斷
+			$is_locked      = $is_linear_mode && $course_id && self::is_chapter_locked( $course_id, $child_post->ID );
+			$locked_attr    = $is_locked ? ' data-locked="true"' : '';
+			$locked_classes = $is_locked ? ' opacity-60' : '';
+
+			// 鎖定章節顯示鎖頭圖示，否則顯示原本的完成/未完成圖示
+			$icon_html = '';
+			if ( 'course-product' !== $context ) {
+				if ( $is_locked ) {
+					$icon_html = '<div class="pc-chapter-icon size-8 p-1"><div class="pc-tooltip pc-tooltip-right h-6" data-tip="請先完成前面的章節"><svg class="size-6 stroke-base-content/40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 14.5V16.5M7 10.0288C7.47142 10 8.05259 10 8.8 10H15.2C15.9474 10 16.5286 10 17 10.0288M7 10.0288C6.41168 10.0647 5.99429 10.1455 5.63803 10.327C5.07354 10.6146 4.6146 11.0735 4.32698 11.638C4 12.2798 4 13.1199 4 14.8V16.2C4 17.8802 4 18.7202 4.32698 19.362C4.6146 19.9265 5.07354 20.3854 5.63803 20.673C6.27976 21 7.11984 21 8.8 21H15.2C16.8802 21 17.7202 21 18.362 20.673C18.9265 20.3854 19.3854 19.9265 19.673 19.362C20 18.7202 20 17.8802 20 16.2V14.8C20 13.1199 20 12.2798 19.673 11.638C19.3854 11.0735 18.9265 10.6146 18.362 10.327C18.0057 10.1455 17.5883 10.0647 17 10.0288M7 10.0288V8C7 5.23858 9.23858 3 12 3C14.7614 3 17 5.23858 17 8V10.0288" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+				} else {
+					$icon_html = '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html( $child_post->ID ) . '</div>';
+				}
+			}
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s%8$s" style="padding-left: %5$s;"%9$s>
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -691,7 +782,7 @@ abstract class Utils {
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
+			$icon_html,
 			$child_post->post_title,
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
@@ -701,7 +792,9 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$locked_classes,
+			$locked_attr
 			);
 
 			// 沒有子章節就結束
@@ -709,8 +802,8 @@ abstract class Utils {
 				continue;
 			}
 
-			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			// 有子章節就遞迴取得子章節的子章節（傳遞 course_id）
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $course_id);
 		}
 		$html .= /* html */'</ul>';
 

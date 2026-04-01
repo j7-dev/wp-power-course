@@ -57,6 +57,15 @@ if (!current_user_can('manage_woocommerce')) {
 		exit;
 	}
 
+	// 線性觀看鎖定檢查
+	$course_id = $course_product ? $course_product->get_id() : 0;
+	if ( $course_id && ChapterUtils::is_chapter_locked( $course_id, (int) $chapter_post->ID, $current_user_id ) ) {
+		get_header();
+		Plugin::load_template( '404/locked', null );
+		get_footer();
+		exit;
+	}
+
 	if ('publish' !== $post->post_status) {
 		\wp_safe_redirect(site_url('404'));
 		exit;

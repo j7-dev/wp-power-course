@@ -261,6 +261,18 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 				</Item>
 			</div>
 
+			<Heading>學習模式</Heading>
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['enable_linear_mode'],
+						label: '啟用線性觀看（學員必須依序觀看章節）',
+						tooltip:
+							'啟用後，學員必須按照章節順序完成學習，前一章節未完成則後續章節會被鎖定。管理員與講師不受此限制。',
+					}}
+				/>
+			</div>
+
 			<Heading>課程詳情</Heading>
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch

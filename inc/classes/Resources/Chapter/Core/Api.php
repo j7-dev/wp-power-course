@@ -286,6 +286,17 @@ final class Api extends ApiBase {
 			);
 		}
 
+		// 線性觀看鎖定檢查：標記完成時，若章節被鎖定則拒絕（取消完成不受限制）
+		if ( ! $is_this_chapter_finished && ChapterUtils::is_chapter_locked( $course_id, $chapter_id, $user_id ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => 'rest_forbidden',
+					'message' => '章節已鎖定，請先完成前面的章節',
+				],
+				403
+			);
+		}
+
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {

@@ -71,10 +71,19 @@ $index       = array_search($current_chapter_id, $chapter_ids, true);
 /** @var int|false $index */
 $next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
 
+// 線性觀看：判斷下一章節是否被鎖定
+$is_next_chapter_locked = false;
+if ( false !== $next_chapter_id ) {
+	$is_next_chapter_locked = ChapterUtils::is_chapter_locked( $product_id, (int) $next_chapter_id );
+}
+
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
 		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多章節</button>';
+	} elseif ( $is_next_chapter_locked ) {
+		// 線性觀看：下一章節被鎖定，顯示禁用按鈕
+		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4 text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">請先完成本章節</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'

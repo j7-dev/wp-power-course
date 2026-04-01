@@ -75,6 +75,7 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				const $li = $(this);
 				const href = $li.data('href');
+				const isLocked = $li.data('locked') === true || $li.data('locked') === 'true';
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
@@ -84,6 +85,12 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				// 如果點擊的是箭頭，就只展開/收合，不要跳轉頁面
 				if ($(e.target).closest('.icon-arrow').length > 0) {
+					return;
+				}
+
+				// 線性觀看：鎖定章節攔截跳轉，顯示 Toast 提示
+				if (isLocked) {
+					showLockedToast();
 					return;
 				}
 
@@ -97,6 +104,14 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				// 阻止原本的超連結行為
 				e.preventDefault();
 				e.stopPropagation();
+
+				// 線性觀看：鎖定章節攔截跳轉
+				const $li = $(this).closest('li');
+				const isLocked = $li.data('locked') === true || $li.data('locked') === 'true';
+				if (isLocked) {
+					showLockedToast();
+					return;
+				}
 
 				handle_save_expanded_post_ids()
 
@@ -121,6 +136,28 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				// 記錄到 sessionStorage
 				sessionStorage.setItem('expanded_post_ids', JSON.stringify(expanded_post_ids));
+			}
+
+			// 線性觀看：顯示鎖定章節 Toast 提示
+			function showLockedToast() {
+				// 移除已存在的 toast（避免重複）
+				$('.pc-toast-locked').remove();
+
+				const $toast = $('<div class="pc-toast pc-toast-locked pc-toast-center pc-toast-top z-[9999] pointer-events-none" style="position:fixed;top:1rem;left:50%;transform:translateX(-50%);">' +
+					'<div class="pc-alert pc-alert-warning shadow-lg">' +
+						'<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>' +
+						'<span>請先完成前面的章節才能觀看此章節</span>' +
+					'</div>' +
+				'</div>');
+
+				$('body').append($toast);
+
+				// 3 秒後自動消失
+				setTimeout(function() {
+					$toast.fadeOut(300, function() {
+						$(this).remove();
+					});
+				}, 3000);
 			}
 
 			// 恢復章節的展開狀態
