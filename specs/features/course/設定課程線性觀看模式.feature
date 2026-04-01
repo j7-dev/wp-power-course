@@ -1,4 +1,4 @@
-@ignore @command
+@command
 Feature: 設定課程線性觀看模式
 
   管理員可在每門課程的「其他設定」中，開啟或關閉「線性觀看」模式（enable_linear_mode）。

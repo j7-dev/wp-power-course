@@ -1,4 +1,4 @@
-@ignore @command
+@command
 Feature: 存取被鎖定章節
 
   當課程開啟線性觀看模式（enable_linear_mode = yes），學員嘗試存取被鎖定的章節時，

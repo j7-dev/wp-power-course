@@ -1,4 +1,4 @@
-@ignore @query
+@query
 Feature: 線性觀看章節鎖定
 
   課程開啟 enable_linear_mode 後，學員必須按照章節排序（menu_order ASC、展開後 DFS）
