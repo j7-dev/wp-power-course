@@ -55,6 +55,11 @@ if (!current_user_can('manage_woocommerce')) {
 		Plugin::load_template( '404/expired', null );
 		get_footer();
 		exit;
+	} elseif ( ChapterUtils::is_chapter_locked( (int) $chapter_post->ID, $current_user_id ) ) {
+		get_header();
+		Plugin::load_template( '404/locked', null );
+		get_footer();
+		exit;
 	}
 
 	if ('publish' !== $post->post_status) {
