@@ -1,0 +1,127 @@
+# 線性觀看功能 — API 規格
+# 基於現有 power-course/v2 REST API 的擴充
+
+openapi: 3.0.3
+info:
+  title: Power Course — Linear Viewing API
+  version: 1.0.0
+  description: 課程線性觀看功能的 API 擴充規格
+
+paths:
+  # === 既有端點修改 ===
+
+  /wp-json/power-course/toggle-finish-chapters/{id}:
+    post:
+      summary: 切換章節完成狀態（線性模式下行為調整）
+      description: |
+        既有端點，新增線性模式邏輯：
+        - 線性模式開啟時，禁止將已完成章節切換回未完成（回傳 403）
+        - 完成章節時，回應中新增 `next_chapter_unlocked` 欄位
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 章節 ID
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - course_id
+              properties:
+                course_id:
+                  type: integer
+                  description: 課程（商品）ID
+      responses:
+        '200':
+          description: 成功標記為完成
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: '200'
+                  message:
+                    type: string
+                    example: '單元 1-1 已標示為完成！'
+                  data:
+                    type: object
+                    properties:
+                      chapter_id:
+                        type: integer
+                      course_id:
+                        type: integer
+                      is_this_chapter_finished:
+                        type: boolean
+                      progress:
+                        type: number
+                        format: float
+                      icon_html:
+                        type: string
+                      next_chapter_unlocked:
+                        type: object
+                        nullable: true
+                        description: 線性模式下，剛解鎖的下一章節資訊（非線性模式時為 null）
+                        properties:
+                          chapter_id:
+                            type: integer
+                          chapter_title:
+                            type: string
+                          icon_html:
+                            type: string
+        '403':
+          description: 線性模式下禁止取消完成
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: '403'
+                  message:
+                    type: string
+                    example: '線性觀看模式下，已完成的章節無法取消完成'
+
+  # === 管理員端：課程設定 ===
+  # enable_linear_mode 作為 WC Product Meta 存取
+  # 透過既有的課程更新 API（POST /wp-json/power-course/courses/{id}）傳遞
+  # 前端在課程編輯表單中新增開關，隨表單一起送出
+
+  # === 教室模板：鎖定狀態 ===
+  # 鎖定邏輯主要在 PHP 模板層實作，不另設獨立 API
+  # sidebar 章節列表的 HTML 中加入 data-locked 屬性和鎖定圖示
+  # 學員存取鎖定章節的 URL 時，模板層直接替換為鎖定提示頁面
+
+# === 資料模型 ===
+# 無新增資料表，使用既有結構：
+#
+# WC Product Meta:
+#   key: enable_linear_mode
+#   value: 'yes' | 'no'（預設不存在等同 'no'）
+#
+# pc_avl_chaptermeta:
+#   既有 finished_at 欄位用於判斷完成狀態
+#
+# 鎖定判斷邏輯（偽代碼）：
+#   function is_chapter_locked(chapter_id, course_id, user_id):
+#     if !get_post_meta(course_id, 'enable_linear_mode', true) == 'yes':
+#       return false  # 未開啟線性模式
+#     if current_user_can('manage_woocommerce'):
+#       return false  # 管理員繞過
+#     flatten_ids = get_flatten_post_ids(course_id)
+#     index = array_search(chapter_id, flatten_ids)
+#     if index == 0:
+#       return false  # 第一個章節永遠解鎖
+#     chapter = new Chapter(chapter_id, user_id)
+#     if chapter.finished_at:
+#       return false  # 已完成的章節不鎖定
+#     prev_chapter_id = flatten_ids[index - 1]
+#     prev_chapter = new Chapter(prev_chapter_id, user_id)
+#     return !prev_chapter.finished_at  # 前一章未完成 → 鎖定

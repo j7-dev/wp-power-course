@@ -1,0 +1,54 @@
+// 線性觀看功能 — Entity Relationship Model
+// 無新增資料表，僅擴充現有結構
+
+// === 既有結構（參考） ===
+
+Table wp_postmeta {
+  meta_id bigint [pk, increment]
+  post_id bigint [ref: > wp_posts.ID, note: '課程商品 ID']
+  meta_key varchar(255)
+  meta_value longtext
+
+  Note: '''
+  新增 meta:
+  - key: enable_linear_mode
+  - value: 'yes' | 'no'
+  - 預設不存在等同 'no'
+  - 每個課程獨立設定
+  '''
+}
+
+Table wp_posts {
+  ID bigint [pk, increment]
+  post_type varchar(20) [note: 'product | pc_chapter']
+  post_parent bigint [note: '子章節的父章節 ID']
+  menu_order int [note: '排序順序，決定線性觀看的先後']
+  post_title text
+  post_content longtext
+  post_status varchar(20)
+}
+
+Table pc_avl_chaptermeta {
+  id bigint [pk, increment]
+  chapter_id bigint [ref: > wp_posts.ID, note: '章節 ID']
+  user_id bigint [note: '學員 ID']
+  meta_key varchar(255) [note: 'finished_at | first_visit_at']
+  meta_value longtext [note: 'Y-m-d H:i:s 格式時間戳']
+
+  Note: '''
+  既有結構，不修改。
+  線性觀看功能讀取 finished_at 判斷章節完成狀態。
+  線性模式下禁止刪除 finished_at（禁止取消完成）。
+  '''
+}
+
+// === 關聯說明 ===
+// Course (wp_posts.post_type = 'product')
+//   └── enable_linear_mode (wp_postmeta)
+//   └── Chapters (wp_posts.post_type = 'pc_chapter')
+//         └── 頂層章節透過 meta parent_course_id 關聯
+//         └── 子章節透過 post_parent 關聯
+//         └── 排序依 menu_order ASC
+//         └── ChapterProgress (pc_avl_chaptermeta)
+//               └── finished_at: 完成時間
+//               └── first_visit_at: 首次瀏覽時間
