@@ -28,7 +28,18 @@ if (! ( $product instanceof \WC_Product )) {
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
+
+// 線性觀看模式：計算鎖定映射表，使用 uncached 版本避免快取個人化衝突
+$is_sequential = ( (string) $product->get_meta( 'is_sequential' ) ) === 'yes';
+$locked_map    = [];
+if ( $is_sequential ) {
+	$current_user_id = \get_current_user_id();
+	if ( $current_user_id && ! \current_user_can( 'manage_woocommerce' ) ) {
+		$locked_map = ChapterUtils::get_sequential_access_map( $product->get_id(), $current_user_id );
+	}
+}
+
+$chapters_html = ChapterUtils::get_children_posts_html_uncached( $product->get_id(), null, 0, 'classroom', $locked_map );
 
 /** @var \WP_Post $chapter */
 global $chapter;
@@ -54,7 +65,7 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 	<span class="text-base tracking-wide font-bold">課程章節</span>
 	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
 </div>
-<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0" data-ancestor_ids="<?php echo $ancestor_ids_string; ?>">
+<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0" data-ancestor_ids="<?php echo $ancestor_ids_string; ?>" data-is_sequential="<?php echo $is_sequential ? 'true' : 'false'; ?>">
 	<?php echo $chapters_html; ?>
 </div>
 
@@ -75,11 +86,18 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
 				const $li = $(this);
 				const href = $li.data('href');
+				const isLocked = $li.data('locked') === true;
 				const $sub_ul = $li.next('ul'); // 子章節
 
 				if ($sub_ul.length > 0) {
 					$li.toggleClass('expanded'); // 如果有找到子章節
 					$sub_ul.slideToggle('fast'); // 如果有找到子章節
+				}
+
+				// 鎖定章節：顯示友善提示，不跳轉
+				if (isLocked) {
+					alert('請先完成前面的章節，才能觀看此章節喔！');
+					return;
 				}
 
 				// 如果點擊的是箭頭，就只展開/收合，不要跳轉頁面
