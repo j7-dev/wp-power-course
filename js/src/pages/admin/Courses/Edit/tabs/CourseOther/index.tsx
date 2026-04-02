@@ -351,6 +351,17 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 				/>
 			</div>
 
+			<Heading>學習模式</Heading>
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['enable_linear_mode'],
+						label: '線性觀看',
+						tooltip: '開啟後，學員必須按照章節順序逐一完成，才能解鎖下一個章節',
+					}}
+				/>
+			</div>
+
 			<Heading>發佈時間</Heading>
 
 			<div className="grid 2xl:grid-cols-3 gap-6">

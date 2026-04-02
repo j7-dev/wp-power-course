@@ -87,6 +87,11 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 					return;
 				}
 
+				// 線性觀看：如果章節已鎖定，阻止導航
+				if ($li.hasClass('pc-chapter-locked')) {
+					return;
+				}
+
 				if (href) {
 					window.location.href = href;
 				}
@@ -97,6 +102,12 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				// 阻止原本的超連結行為
 				e.preventDefault();
 				e.stopPropagation();
+
+				// 線性觀看：如果父層章節已鎖定，阻止導航
+				const $parentLi = $(this).closest('li');
+				if ($parentLi.hasClass('pc-chapter-locked')) {
+					return;
+				}
 
 				handle_save_expanded_post_ids()
 

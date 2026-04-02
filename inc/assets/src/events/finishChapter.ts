@@ -17,7 +17,10 @@ export function finishChapter() {
 			dialogMessage,
 			isFinished,
 			progress,
-			icon_html
+			icon_html,
+			next_chapter_id,
+			next_chapter_unlocked,
+			next_chapter_icon_html,
 		} = store.get(finishChapterAtom)
 
 		const ChapterIcon = $(`li[data-post-id="${chapter_id}"]`).find('.pc-chapter-icon')
@@ -32,8 +35,24 @@ export function finishChapter() {
 			if (ChapterIcon?.length > 0) {
 				ChapterIcon.html(icon_html)
 			}
+
+			// 線性觀看：如果下一章節因此次完成而解鎖，更新側邊欄
+			if (next_chapter_unlocked && next_chapter_id) {
+				const $nextLi = $(`li[data-post-id="${next_chapter_id}"]`)
+				$nextLi.removeClass('pc-chapter-locked opacity-60')
+				const $nextIcon = $nextLi.find('.pc-chapter-icon')
+				if ($nextIcon.length > 0 && next_chapter_icon_html) {
+					$nextIcon.html(next_chapter_icon_html)
+				}
+			}
+
+			// 對話框訊息：如有解鎖下一章節，附加提示
+			const displayMessage = next_chapter_unlocked && next_chapter_id
+				? `${dialogMessage}\n下一章節已解鎖`
+				: dialogMessage
+
 			Dialog.find('#finish-chapter__dialog__title').text('成功')
-			Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
+			Dialog.find('#finish-chapter__dialog__message').text(displayMessage)
 
 			// FinishButton.hide()
 			if (isFinished === true) {
@@ -122,6 +141,11 @@ export function finishChapter() {
 				const progress = xhr?.responseJSON?.data?.progress
 				const icon_html = xhr?.responseJSON?.data?.icon_html
 
+				// 線性觀看相關回應欄位
+				const next_chapter_id = xhr?.responseJSON?.data?.next_chapter_id ?? null
+				const next_chapter_unlocked = xhr?.responseJSON?.data?.next_chapter_unlocked ?? false
+				const next_chapter_icon_html = xhr?.responseJSON?.data?.next_chapter_icon_html ?? ''
+
 				store.set(finishChapterAtom, (prev) => ({
 					...prev,
 					isLoading: false,
@@ -130,6 +154,9 @@ export function finishChapter() {
 					isFinished: is_this_chapter_finished,
 					progress,
 					icon_html,
+					next_chapter_id,
+					next_chapter_unlocked,
+					next_chapter_icon_html,
 				}))
 			},
 		})
