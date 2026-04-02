@@ -1,0 +1,20 @@
+[ACTIVITY] 線性觀看學習旅程
+[ACTOR] 學員 -> {specs/actors/學員.md}
+[ACTOR] 管理員 -> {specs/actors/管理員.md}
+
+[STEP:1] @管理員 {features/linear-viewing/設定課程線性觀看模式.feature}
+[STEP:2] @學員 進入教室頁面，查看章節列表
+[DECISION:2a] 章節解鎖狀態判定 {features/linear-viewing/線性觀看章節解鎖判定.feature}
+  [BRANCH:2a:章節已解鎖] @學員 觀看章節內容 {specs/ui/章節內容頁.md}
+  [BRANCH:2a:章節已鎖定] @學員 顯示鎖定提示 {features/linear-viewing/線性觀看存取攔截.feature}
+[MERGE:2a]
+[DECISION:3a] 學員在已解鎖章節中的操作
+  [BRANCH:3a:標記章節完成] @學員 {features/linear-viewing/線性觀看完成章節限制.feature}
+  [BRANCH:3a:觀看內容] @學員 {specs/ui/章節內容頁.md}
+  [BRANCH:3a:發表留言] @學員 {features/comment/發表章節留言.feature}
+[MERGE:3a]
+[DECISION:4a] 完成章節後
+  [BRANCH:4a:還有未完成章節] JS 局部解鎖下一章 -> 2
+  [BRANCH:4a:所有章節已完成] {specs/ui/課程完成頁面.md}
+[MERGE:4a]
+[END]

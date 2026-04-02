@@ -1,0 +1,93 @@
+# Linear Viewing API 變更規格
+# 此文件描述「線性觀看」功能對現有 API 的增量變更
+# 基底文件：specs/api/api.yml
+
+# ============================================================
+# 變更 1：Course API — 新增 enable_linear_mode 欄位
+# ============================================================
+# 影響端點：
+#   GET  /courses/{id}  (CourseDetail schema)
+#   POST /courses/{id}  (更新課程)
+#
+# CourseDetail schema 新增欄位：
+#   enable_linear_mode:
+#     type: string
+#     enum: [yes, no]
+#     default: "no"
+#     description: 是否開啟線性觀看模式。開啟後學員必須按章節順序完成才能解鎖下一章。
+#
+# 更新課程 API (POST /courses/{id}) 接受此欄位：
+#   requestBody 新增 enable_linear_mode 參數
+#   驗證：值必須為 "yes" 或 "no"
+
+# ============================================================
+# 變更 2：Toggle Finish API — 線性觀看模式下的行為變更
+# ============================================================
+# 影響端點：POST /toggle-finish-chapters/{chapter_id}
+#
+# 前置條件新增（線性觀看模式開啟時）：
+#   - 403: 章節已鎖定 — 學員不可對鎖定的章節執行 toggle-finish
+#     response:
+#       code: "403"
+#       message: "此章節尚未解鎖，請先完成前面的章節"
+#
+#   - 403: 禁止取消完成 — 線性觀看模式下已完成的章節不可取消完成
+#     response:
+#       code: "403"
+#       message: "線性觀看模式下無法取消已完成的章節"
+#
+# 回應 data 新增欄位（僅線性觀看模式開啟時）：
+#   next_chapter_id:
+#     type: integer
+#     nullable: true
+#     description: |
+#       下一章節的 ID（按 flatten menu_order 順序）。
+#       如果已是最後一章，則為 null。
+#   next_chapter_unlocked:
+#     type: boolean
+#     description: |
+#       下一章節是否因本次完成而解鎖。
+#       true = 下一章節從鎖定變為解鎖。
+#       false = 沒有下一章，或下一章節已經解鎖。
+#   next_chapter_icon_html:
+#     type: string
+#     nullable: true
+#     description: |
+#       下一章節解鎖後的 icon HTML（用於前端局部更新側邊欄）。
+#       僅在 next_chapter_unlocked = true 時回傳。
+
+# ============================================================
+# 變更 3：Chapter 側邊欄 HTML — 新增鎖定樣式
+# ============================================================
+# 影響函式：ChapterUtils::get_children_posts_html_uncached()
+#
+# 行為變更：
+#   - 線性觀看模式開啟時，鎖定的章節：
+#     1. <li> 新增 CSS class: "pc-chapter-locked"
+#     2. 圖示改為鎖頭 SVG（取代原本的影片/已完成圖示）
+#     3. 點擊鎖定章節時，前端阻止導航（不跳轉）
+#     4. tooltip 顯示「請先完成前面的章節」
+#
+#   - 鎖頭 icon HTML:
+#     新增模板 templates/icon/lock.php
+#     SVG 使用 DaisyUI / Heroicons 風格的鎖頭圖示
+
+# ============================================================
+# 變更 4：Chapter 模板 — 新增鎖定攔截頁面
+# ============================================================
+# 影響檔案：single-pc_chapter.php
+#
+# 新增模板：templates/pages/classroom/locked.php
+#   Props:
+#     - $chapter: WP_Post — 被鎖定的章節
+#     - $prev_chapter: WP_Post — 需要先完成的前一章
+#     - $product: WC_Product — 課程商品
+#   渲染內容：
+#     - 鎖頭圖示（大型，置中）
+#     - 主標題：「此章節尚未解鎖」
+#     - 說明文字：「請先完成『{prev_chapter_title}』章節，即可解鎖此章節」
+#     - 導引按鈕：「前往上一章節」連結至 prev_chapter permalink
+#   注意：
+#     - 不載入影片播放器
+#     - 不載入章節內容 (the_content)
+#     - 保留側邊欄和 header（方便導航回其他章節）
