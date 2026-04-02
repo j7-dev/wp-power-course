@@ -234,16 +234,39 @@ jobs:
             echo "**情況 A：尚未提過任何澄清問題（第一輪）**"
             echo "1. 全面分析需求中缺少的細節（邊界情境、錯誤處理、UI 行為、資料模型、API 格式等）"
             echo "2. 一次提出至少 5 個澄清問題，讓用戶可以一次回答"
-            echo "3. 優先選擇題格式（A/B/C 選項讓用戶選）"
-            echo "4. 在留言的**最底部**，附上你對每題的建議答案，格式範例：\`建議 A A A C D B A\`（依題目順序排列，用空格分隔）。答案必須用 \\\`backtick\\\` 框住，方便用戶直接複製貼上回覆"
-            echo "5. 使用 \`gh issue comment ${ISSUE_NUM} --body \"問題內容\"\` 在 Issue 上發表所有問題（合併為一則留言）"
-            echo "6. 結束本次 run"
+            echo "3. **問題分類**：每題標記為 [情境問題] 或 [工程問題]"
+            echo "   - [情境問題]：關於業務邏輯、使用者體驗、功能行為，避免技術用詞，非工程人員也能理解"
+            echo "   - [工程問題]：技術實作、架構決策，可使用技術術語，但選項說明需讓人容易理解"
+            echo "4. **每題使用 HTML <details> 標籤折疊**，格式範例（嚴格遵守，注意空行）："
+            echo ""
+            echo "   <details>"
+            echo "   <summary>[情境問題] Q1. 問題標題（讓用戶一眼看出問的是什麼）</summary>"
+            echo ""
+            echo "   （可在此補充問題背景說明，可省略）"
+            echo ""
+            echo "   | 選項 | 說明 |"
+            echo "   |------|------|"
+            echo "   | A | 選項說明 |"
+            echo "   | B | 選項說明 |"
+            echo ""
+            echo "   💡 **建議：A** — 1-2 句理由，說清楚推薦此選項的原因"
+            echo ""
+            echo "   </details>"
+            echo ""
+            echo "5. 在所有 <details> 題目之後，附上建議答案摘要區塊："
+            echo "   > 💡 \`建議 A A A C D B A\`"
+            echo "   >"
+            echo "   > - Q1: A — 簡短理由"
+            echo "   > - Q2: A — 簡短理由"
+            echo "   （依 Q1→Qn 順序，空格分隔，讓用戶可直接複製 backtick 內容一鍵回覆）"
+            echo "6. 使用 \`gh issue comment ${ISSUE_NUM} --body \"問題內容\"\` 在 Issue 上發表所有問題（合併為一則留言）"
+            echo "7. 結束本次 run"
             echo "⚠️ 第一輪嚴禁少於 5 個問題，嚴禁判斷「需求已夠清晰」，嚴禁生成 specs"
             echo ""
             echo "**情況 B：已經提過澄清問題（後續輪次）**"
             echo "判斷需求是否已足夠清晰（所有邊界情境、錯誤處理、資料模型都已被用戶確認）。"
             echo ""
-            echo "- 如果仍不夠清晰 → 繼續追問（不限問題數量，1 個也可以），同樣在留言底部附上建議答案（如 \\\`建議 A D\\\`）"
+            echo "- 如果仍不夠清晰 → 繼續追問（不限問題數量，1 個也可以），同樣使用 <details> 折疊格式與 [情境問題]/[工程問題] 分類，在留言底部附上建議答案摘要（格式同情況 A 步驟 5）"
             echo "- 如果已足夠清晰 → 進入全流程管線："
             echo "  1. 生成規格文件到 ./specs 目錄（使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill）"
             echo "  2. Commit specs 到當前分支"
@@ -1279,6 +1302,30 @@ jobs:
       - name: 安裝 Composer 依賴（主機端）
         run: composer install --no-interaction --prefer-dist
 
+      - name: 套用 LC Bypass（跳過外掛授權驗證）
+        run: |
+          node -e "
+            const fs = require('fs');
+            const CAPABILITY_LINE = \"'capability'  => 'manage_woocommerce',\";
+            const LC_LINE = \"\t\t\t\t\t'lc'          => false,\";
+            const content = fs.readFileSync('plugin.php', 'utf-8');
+            if (!content.includes(\"'lc'\")) {
+              const modified = content.replace(CAPABILITY_LINE, CAPABILITY_LINE + '\n' + LC_LINE);
+              if (modified !== content) {
+                fs.writeFileSync('plugin.php', modified);
+                console.log('✅ LC bypass applied to plugin.php');
+              } else {
+                console.warn('⚠️ capability line not found in plugin.php, skipping LC bypass');
+              }
+            } else {
+              console.log('ℹ️ LC bypass already applied');
+            }
+            const p = JSON.parse(fs.readFileSync('.e2e-progress.json', 'utf-8'));
+            p.lc_bypass_applied = true;
+            fs.writeFileSync('.e2e-progress.json', JSON.stringify(p, null, '\t'));
+            console.log('✅ .e2e-progress.json: lc_bypass_applied = true');
+          "
+
       - name: 建立 uploads 目錄
         run: |
           sudo rm -rf ./tests/e2e/.uploads
@@ -1316,12 +1363,22 @@ jobs:
         working-directory: tests/e2e
         run: npx playwright install chromium --with-deps
 
+      - name: 檢查 auth-state artifact 是否存在
+        id: check_auth
+        run: |
+          COUNT=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts \
+            --jq '[.artifacts[] | select(.name=="auth-state")] | length' 2>/dev/null || echo "0")
+          echo "exists=$([ "$COUNT" -gt "0" ] && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "ℹ️ auth-state artifact 存在: $([ "$COUNT" -gt "0" ] && echo '是' || echo '否')"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: 下載 E2E Auth State
+        if: steps.check_auth.outputs.exists == 'true'
         uses: actions/download-artifact@v4
         with:
           name: auth-state
           path: tests/e2e/.auth/
-        continue-on-error: true
 
       - name: 偵測是否需要 Browser Smoke Test
         id: detect_smoke
@@ -1359,16 +1416,30 @@ jobs:
             - Admin URL: http://localhost:8895/wp-admin/
             - Admin SPA: http://localhost:8895/wp-admin/admin.php?page=power-course#/
             - 帳號: admin / password
-            - 認證狀態: tests/e2e/.auth/admin.json（已由 E2E 測試建立）
+            - 認證狀態: tests/e2e/.auth/admin.json（已由 E2E 測試建立，若不存在請手動登入）
 
             ## Admin SPA 路由 (HashRouter)
             #/courses, #/teachers, #/students, #/products, #/emails, #/settings, #/analytics
+
+            ## 授權狀態
+            - .e2e-progress.json 中 lc_bypass_applied = true，外掛授權驗證已跳過，可直接操作外掛功能
+
+            ## 瀏覽器與截圖設定（重要）
+            - 在開始任何測試前，先將瀏覽器視窗調整為 1920×1080（使用 resize_window 工具）
+            - 所有截圖與錄影解析度固定為 1920×1080，確保無灰色填充
+            - 截圖前請先滾動頁面，確保目標元素（尤其是頁面底部新增的元素）完整可見
+            - 截圖盡量使用 fullPage 模式以捕獲完整頁面內容
 
             ## 任務
             1. 執行 `git diff --name-only ${{ needs.claude.outputs.initial_sha }} HEAD` 分析變更
             2. 根據變更的檔案動態判斷哪些頁面受影響
             3. 對受影響頁面進行瀏覽器測試，截圖存到 tests/e2e/screenshots/
             4. 產出 test-report.md 測試報告
+
+            ## test-report.md 輸出格式
+            - 包含：測試摘要、測試結果明細（每個受測頁面一個 ### 區塊）
+            - 不需要 "產出物" 和 "變更分析" 區塊，請省略
+            - 截圖和影片命名格式：`NN-description.png` / `NN-description.webm`（NN 為兩位數序號，如 01, 02）
 
             請使用 /browser-tester skill 的標準流程。
             影片錄製是必須的，請確實錄製每個頁面的操作過程。
@@ -1477,18 +1548,40 @@ jobs:
             const urlPrefix = '${{ steps.upload_smoke_media.outputs.media_url_prefix }}';
             const screenshotFiles = '${{ steps.upload_smoke_media.outputs.screenshot_files }}'.split(',').filter(Boolean);
             const videoFiles = '${{ steps.upload_smoke_media.outputs.video_files }}'.split(',').filter(Boolean);
-            const testReport = process.env.SMOKE_TEST_REPORT || '';
+            const rawReport = process.env.SMOKE_TEST_REPORT || '';
 
-            let screenshotMd = '';
+            // 移除不需要的 sections（產出物、變更分析）
+            let processedReport = rawReport;
+            processedReport = processedReport.replace(/\n## 產出物[\s\S]*?(?=\n## |\s*$)/g, '');
+            processedReport = processedReport.replace(/\n## 變更分析[\s\S]*?(?=\n## |\s*$)/g, '');
+            processedReport = processedReport.trim();
+
+            // 將截圖與影片按數字前綴（01-, 02- ...）配對，組成統一的測試明細區塊
+            const groupMap = {};
             for (const filename of screenshotFiles) {
-              const label = filename.replace('.png', '').replace(/[-_]/g, ' ');
-              screenshotMd += `### ${label}\n![${label}](${urlPrefix}/${filename})\n\n`;
+              const match = filename.match(/^(\d+)/);
+              const key = match ? match[1] : filename;
+              if (!groupMap[key]) groupMap[key] = { screenshots: [], videos: [] };
+              groupMap[key].screenshots.push(filename);
+            }
+            for (const filename of videoFiles) {
+              const match = filename.match(/^(\d+)/);
+              const key = match ? match[1] : filename;
+              if (!groupMap[key]) groupMap[key] = { screenshots: [], videos: [] };
+              groupMap[key].videos.push(filename);
             }
 
-            let videoMd = '';
-            for (const filename of videoFiles) {
-              const label = filename.replace('.webm', '').replace(/[-_]/g, ' ');
-              videoMd += `### 📹 ${label}\n[▶️ 觀看測試影片](${urlPrefix}/${filename})\n\n`;
+            let combinedMd = '';
+            for (const key of Object.keys(groupMap).sort()) {
+              const { screenshots, videos } = groupMap[key];
+              for (const shot of screenshots) {
+                const label = shot.replace('.png', '').replace(/[-_]/g, ' ');
+                combinedMd += `#### 📸 ${label}\n\n![${label}](${urlPrefix}/${shot})\n\n`;
+              }
+              for (const vid of videos) {
+                const label = vid.replace('.webm', '').replace(/[-_]/g, ' ');
+                combinedMd += `#### 📹 ${label}\n\n[▶️ 觀看操作影片](${urlPrefix}/${vid})\n\n`;
+              }
             }
 
             const smokeStatus = '${{ steps.run_ai_acceptance.outcome }}';
@@ -1498,10 +1591,9 @@ jobs:
             const body = [
               `## 🖥️ AI 驗收 ${emoji} ${statusText} — wp-workflows:browser-tester`,
               '',
-              testReport || '> ⚠️ Agent 未產出測試報告',
+              processedReport || '> ⚠️ Agent 未產出測試報告',
               '',
-              screenshotMd ? `## 📸 頁面截圖\n\n${screenshotMd}` : '',
-              videoMd ? `## 📹 操作影片\n\n${videoMd}` : '',
+              combinedMd ? `## 🖼️ 測試明細（截圖 + 影片）\n\n${combinedMd}` : '',
               '---',
               `*🤖 Smoke Test 由 CI 自動執行（run \`${{ github.run_id }}\`）*`,
             ].filter(Boolean).join('\n');
