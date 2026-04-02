@@ -11,11 +11,15 @@ import {
 	cart,
 	HlsSupport,
 	watermarkPDF,
+	sequentialNotice,
 } from './events'
 	; (function ($) {
 		$(document).ready(function () {
 			// classroom 頁面，完成章節
 			finishChapter()
+
+			// 線性觀看模式導向提示
+			sequentialNotice()
 
 			// 改變大小時設定 state
 			dynamicWidth()
