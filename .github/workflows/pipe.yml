@@ -959,7 +959,8 @@ jobs:
           BUNNY_STORAGE_PASSWORD: ${{ secrets.BUNNY_STORAGE_PASSWORD }}
           BUNNY_CDN_URL: ${{ secrets.BUNNY_CDN_URL }}
         run: |
-          MEDIA_PREFIX="ci/e2e-test/${{ github.run_id }}"
+          BRANCH_DIR=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          MEDIA_PREFIX="ci/${BRANCH_DIR}/e2e-test"
           UPLOAD_OK=true
 
           for file in /tmp/e2e-media/*; do
@@ -1556,7 +1557,8 @@ jobs:
           BUNNY_STORAGE_PASSWORD: ${{ secrets.BUNNY_STORAGE_PASSWORD }}
           BUNNY_CDN_URL: ${{ secrets.BUNNY_CDN_URL }}
         run: |
-          MEDIA_PREFIX="ci/smoke-test/${{ github.run_id }}"
+          BRANCH_DIR=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          MEDIA_PREFIX="ci/${BRANCH_DIR}/smoke-test"
           UPLOAD_OK=true
 
           for file in /tmp/smoke-media/*; do
