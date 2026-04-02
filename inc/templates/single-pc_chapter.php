@@ -5,6 +5,7 @@
 
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearAccess;
 use J7\PowerCourse\Plugin;
 use J7\Powerhouse\Theme\Core\FrontEnd as Theme;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
@@ -63,6 +64,8 @@ if (!current_user_can('manage_woocommerce')) {
 	}
 }
 
+// 線性觀看鎖定檢查（管理員已在上面的 if 中繞過存取控制，但線性鎖定在 LinearAccess 內部處理繞過邏輯）
+$is_chapter_locked = LinearAccess::is_chapter_locked( $chapter_post->ID, $current_user_id, $course_product ? $course_product->get_id() : null );
 
 do_action('power_course_before_classroom_render');
 
@@ -84,7 +87,22 @@ $settings = Settings::instance();
 
 			Plugin::load_template('classroom/sider');
 			echo '<div id="pc-classroom-main">';
-			Plugin::load_template( 'classroom/body', null, true, true );
+			if ( $is_chapter_locked ) {
+				$prev_chapter_id  = LinearAccess::get_prev_required_chapter_id( $chapter_post->ID, $course_product ? $course_product->get_id() : 0 );
+				$prev_chapter_post = $prev_chapter_id ? \get_post( $prev_chapter_id ) : null;
+				Plugin::load_template(
+					'classroom/locked',
+					[
+						'product'      => $course_product,
+						'chapter'      => $chapter_post,
+						'prev_chapter' => $prev_chapter_post instanceof \WP_Post ? $prev_chapter_post : null,
+					],
+					true,
+					true
+				);
+			} else {
+				Plugin::load_template( 'classroom/body', null, true, true );
+			}
 			echo '</div>';
 
 

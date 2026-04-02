@@ -7,6 +7,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearAccess;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -49,10 +50,25 @@ $user_id                    = \get_current_user_id();
 $avl_chapter                = new Chapter( (int) $current_chapter_id, (int) $user_id );
 $finished_at                = $avl_chapter->finished_at;
 $is_this_chapter_finished   = (bool) $finished_at;
+$is_linear_mode             = LinearAccess::is_linear_mode_enabled( $product_id );
+$can_bypass_linear          = LinearAccess::can_bypass_linear( $product_id, $user_id );
 $finish_chapter_button_html = '';
-$finish_chapter_button_html = sprintf(
+
+if ( $is_linear_mode && $is_this_chapter_finished && ! $can_bypass_linear ) {
+	// 線性模式下已完成的章節：顯示已完成狀態（disabled），不顯示「標示為未完成」按鈕
+	$finish_chapter_button_html = sprintf(
 		/*html*/'
-		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base %3$s">
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" data-linear-mode="yes" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base pc-btn-outline border-solid cursor-not-allowed opacity-70" disabled>
+			<span>已完成</span>
+		</button>
+		',
+		$product_id,
+		$current_chapter_id
+	);
+} else {
+	$finish_chapter_button_html = sprintf(
+		/*html*/'
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" %5$s class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base %3$s">
 			<span>%4$s</span>
 			<span class="pc-loading pc-loading-spinner w-3 sm:w-4 h-3 sm:h-4 tw-hidden"></span>
 		</button>
@@ -60,8 +76,10 @@ $finish_chapter_button_html = sprintf(
 		$product_id,
 		$current_chapter_id,
 		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : 'text-white',
-		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成'
+		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成',
+		$is_linear_mode ? 'data-linear-mode="yes"' : ''
 	);
+}
 
 
 // next chapter button html

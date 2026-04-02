@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace J7\PowerCourse\Resources\Chapter\Core;
 
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Resources\Chapter\Utils\LinearAccess;
 use J7\PowerCourse\Resources\Chapter\Core\CPT as ChapterCPT;
 use J7\WpUtils\Classes\WP;
 use J7\WpUtils\Classes\General;
@@ -286,9 +287,34 @@ final class Api extends ApiBase {
 			);
 		}
 
+		$is_linear_mode = LinearAccess::is_linear_mode_enabled( $course_id );
+		$can_bypass     = LinearAccess::can_bypass_linear( $course_id, $user_id );
+
+		// 線性模式下，鎖定的章節不允許操作
+		if ( $is_linear_mode && ! $can_bypass && LinearAccess::is_chapter_locked( $chapter_id, $user_id, $course_id ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => '403',
+					'message' => '此章節尚未解鎖，請先完成前面的章節',
+				],
+				403
+			);
+		}
+
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {
+			// 線性模式下，非管理員不允許取消已完成的章節
+			if ( $is_linear_mode && ! $can_bypass ) {
+				return new \WP_REST_Response(
+					[
+						'code'    => '403',
+						'message' => '線性觀看模式下無法取消已完成的章節',
+					],
+					403
+				);
+			}
+
 			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
 				$user_id,
@@ -325,6 +351,17 @@ final class Api extends ApiBase {
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
+		// 計算下一章資訊
+		$next_chapter_id       = ChapterUtils::get_next_post_id( $chapter_id );
+		$next_chapter_unlocked = false;
+		$next_chapter_icon_html = null;
+
+		if ( null !== $next_chapter_id && $is_linear_mode ) {
+			// 完成當前章節後，下一章是否因此解鎖
+			$next_chapter_unlocked = ! LinearAccess::is_chapter_locked( $next_chapter_id, $user_id, $course_id );
+			$next_chapter_icon_html = ChapterUtils::get_chapter_icon_html( $next_chapter_id );
+		}
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
@@ -335,6 +372,9 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_chapter_id'          => $next_chapter_id,
+						'next_chapter_unlocked'    => $next_chapter_unlocked,
+						'next_chapter_icon_html'   => $next_chapter_icon_html,
 					],
 				],
 				$success ? 200 : 400

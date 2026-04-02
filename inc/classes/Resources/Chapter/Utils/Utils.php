@@ -678,9 +678,11 @@ abstract class Utils {
 			]
 			);
 
+			$is_child_locked = ( 'classroom' === $context ) ? LinearAccess::is_chapter_locked( $child_post->ID ) : false;
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s %8$s" style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -701,7 +703,8 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$is_child_locked ? 'pc-chapter-locked opacity-60' : ''
 			);
 
 			// 沒有子章節就結束
@@ -721,10 +724,22 @@ abstract class Utils {
 	/**
 	 * 取得章節的 icon html
 	 *
+	 * 若章節被線性鎖定，回傳鎖頭圖示；否則依照觀看/完成狀態回傳對應圖示。
+	 *
 	 * @param int $chapter_id 章節 ID.
 	 * @return string
 	 */
 	public static function get_chapter_icon_html( int $chapter_id ): string {
+		// 線性鎖定判斷：鎖定時回傳鎖頭圖示
+		if ( LinearAccess::is_chapter_locked( $chapter_id ) ) {
+			$icon_html = Plugin::load_template( 'icon/lock', [ 'color' => '#9ca3af' ], false );
+			return sprintf(
+				/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
+				'此章節尚未解鎖',
+				$icon_html
+			);
+		}
+
 		$avl_chapter    = new Chapter( (int) $chapter_id );
 		$first_visit_at = $avl_chapter->first_visit_at;
 		$finished_at    = $avl_chapter->finished_at;
