@@ -61,6 +61,18 @@ if (!current_user_can('manage_woocommerce')) {
 		\wp_safe_redirect(site_url('404'));
 		exit;
 	}
+
+	// 線性觀看存取控制：檢查是否可存取此章節
+	$course_id_for_sequential = (int) $course_product->get_id();
+	$is_accessible            = ChapterUtils::is_chapter_accessible( (int) $chapter_post->ID, $current_user_id, $course_id_for_sequential );
+
+	if ( ! $is_accessible ) {
+		// 導向到目前進度章節
+		$progress_chapter_id  = ChapterUtils::get_current_progress_chapter_id( $current_user_id, $course_id_for_sequential );
+		$redirect_url         = $progress_chapter_id ? \get_permalink( $progress_chapter_id ) : \get_permalink( $course_product->get_id() );
+		\wp_safe_redirect( $redirect_url ?: \site_url() );
+		exit;
+	}
 }
 
 
@@ -88,6 +100,7 @@ $settings = Settings::instance();
 			echo '</div>';
 
 
+			$enable_sequential_value = $course_product ? (string) $course_product->get_meta( 'enable_sequential' ) : 'no';
 			printf(
 			/*html*/'
 			<script>
@@ -98,7 +111,8 @@ $settings = Settings::instance();
 						"qty": "%3$d",
 						"color": "%4$s",
 						"text": "%5$s"
-					}
+					},
+					"enable_sequential": "%6$s"
 				}
 			</script>
 			',
@@ -106,7 +120,8 @@ $settings = Settings::instance();
 			Plugin::$url,
 			$settings->pc_pdf_watermark_qty,
 			$settings->pc_pdf_watermark_color,
-			ChapterUtils::get_formatted_watermark_text('pdf')
+			ChapterUtils::get_formatted_watermark_text('pdf'),
+			\esc_js( $enable_sequential_value )
 			);
 			Theme::render_button();
 			\wp_footer();

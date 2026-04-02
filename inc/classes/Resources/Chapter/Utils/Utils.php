@@ -604,13 +604,15 @@ abstract class Utils {
 	/**
 	 * 取得課程章節的 HTML
 	 *
-	 * @param int                            $post_id 課程 id
+	 * @param int                            $post_id 課程 id（depth=0 時為課程 ID，depth>0 時為父章節 ID）
 	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
 	 * @param int                            $depth 深度，預設從 0 (課程) 開始
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param int                            $course_id 課程 ID（用於線性觀看鎖定判斷，0 表示不檢查）
+	 * @param int                            $user_id   用戶 ID（用於線性觀看鎖定判斷，0 表示不檢查）
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', int $course_id = 0, int $user_id = 0 ): string {
 		global $post; // 當前文章
 
 		$html = '';
@@ -678,9 +680,29 @@ abstract class Utils {
 			]
 			);
 
+			// 判斷章節是否被鎖定（線性觀看）
+			$is_locked    = false;
+			$locked_class = '';
+			$locked_attr  = '';
+			$lock_icon    = '';
+
+			if ( $course_id > 0 && $user_id > 0 && $context === 'classroom' ) {
+				$is_locked = ! self::is_chapter_accessible( $child_post->ID, $user_id, $course_id );
+			}
+
+			if ( $is_locked ) {
+				$locked_class = 'pc-locked';
+				$locked_attr  = 'data-locked="true"';
+				$lock_icon    = /*html*/'
+				<div class="p-2 flex items-center text-gray-400" title="請先完成前面的章節">
+					<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2a5 5 0 0 0-5 5v2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm3 7V7a3 3 0 1 0-6 0v2h6zm-3 3a1.5 1.5 0 0 1 1 2.6V16a1 1 0 1 1-2 0v-1.4A1.5 1.5 0 0 1 12 12z"/></svg>
+				</div>
+				';
+			}
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s %8$s" style="padding-left: %5$s;" %9$s>
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -688,6 +710,7 @@ abstract class Utils {
 				<div class="flex items-center justify-end gap-x-0 w-8">
 					%4$s
 				</div>
+				%10$s
 			</li>
 			',
 			\get_the_permalink($child_post->ID),
@@ -701,7 +724,10 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$locked_class,
+			$locked_attr,
+			$lock_icon
 			);
 
 			// 沒有子章節就結束
@@ -710,7 +736,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $course_id, $user_id);
 		}
 		$html .= /* html */'</ul>';
 
@@ -874,5 +900,88 @@ abstract class Utils {
 		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
 
 		return $next_post_id === null ? null : (int) $next_post_id;
+	}
+
+	/**
+	 * 判斷某個章節是否可被存取（線性觀看邏輯）
+	 *
+	 * 規則：
+	 * - 若課程未開啟線性觀看（enable_sequential != 'yes'），永遠回傳 true
+	 * - 扁平化順序的第一個章節永遠可存取
+	 * - 若前一個章節已有 finished_at 紀錄，則可存取
+	 * - 否則不可存取
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @param int $user_id    用戶 ID.
+	 * @param int $course_id  課程 ID.
+	 * @return bool
+	 */
+	public static function is_chapter_accessible( int $chapter_id, int $user_id, int $course_id ): bool {
+		// 檢查課程是否開啟線性觀看
+		$enable_sequential = \get_post_meta( $course_id, 'enable_sequential', true );
+		if ( 'yes' !== $enable_sequential ) {
+			return true;
+		}
+
+		// 取得扁平化的章節順序列表
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+
+		if ( empty( $flatten_ids ) ) {
+			return true;
+		}
+
+		// 第一個章節永遠可存取
+		if ( $flatten_ids[0] === $chapter_id ) {
+			return true;
+		}
+
+		// 找到當前章節在列表中的位置
+		/** @var int|false $current_index */
+		$current_index = array_search( $chapter_id, $flatten_ids, true );
+
+		if ( false === $current_index ) {
+			// 章節不在課程的扁平化列表中
+			return false;
+		}
+
+		// 取得前一個章節 ID
+		$prev_chapter_id = $flatten_ids[ $current_index - 1 ] ?? null;
+
+		if ( null === $prev_chapter_id ) {
+			return true;
+		}
+
+		// 檢查前一個章節是否已完成（有 finished_at 紀錄）
+		$finished_at = \J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD::get( $prev_chapter_id, $user_id, 'finished_at', true );
+
+		return ! empty( $finished_at );
+	}
+
+	/**
+	 * 取得用戶在課程中的當前進度章節 ID
+	 *
+	 * 遍歷扁平化章節列表，找到第一個沒有 finished_at 的章節 ID。
+	 * 若全部完成，則回傳最後一個章節 ID。
+	 *
+	 * @param int $user_id   用戶 ID.
+	 * @param int $course_id 課程 ID.
+	 * @return int 當前進度章節 ID，若無章節則回傳 0
+	 */
+	public static function get_current_progress_chapter_id( int $user_id, int $course_id ): int {
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+
+		if ( empty( $flatten_ids ) ) {
+			return 0;
+		}
+
+		foreach ( $flatten_ids as $chapter_id ) {
+			$finished_at = \J7\PowerCourse\Resources\Chapter\Utils\MetaCRUD::get( $chapter_id, $user_id, 'finished_at', true );
+			if ( empty( $finished_at ) ) {
+				return $chapter_id;
+			}
+		}
+
+		// 全部章節已完成，回傳最後一個章節 ID
+		return (int) end( $flatten_ids );
 	}
 }

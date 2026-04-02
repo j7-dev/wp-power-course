@@ -28,7 +28,8 @@ if (! ( $product instanceof \WC_Product )) {
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
+$current_user_id_for_lock = \get_current_user_id();
+$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id(), null, 0, 'classroom', (int) $product->get_id(), $current_user_id_for_lock);
 
 /** @var \WP_Post $chapter */
 global $chapter;
@@ -45,6 +46,17 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 	.expanded .icon-arrow svg {
 		transform: rotate(90deg);
 		transition: all 0.3s ease-in-out;
+	}
+
+	/* 線性觀看：鎖定章節樣式 */
+	.pc-locked {
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	.pc-locked:hover {
+		background-color: transparent !important;
 	}
 </style>
 

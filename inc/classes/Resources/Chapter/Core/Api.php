@@ -325,6 +325,18 @@ final class Api extends ApiBase {
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
+		// 若課程開啟線性觀看，計算下一個可存取的章節 ID
+		$enable_sequential       = \get_post_meta( $course_id, 'enable_sequential', true );
+		$next_unlocked_chapter_id = null;
+		if ( 'yes' === $enable_sequential ) {
+			$flatten_ids   = ChapterUtils::get_flatten_post_ids( $course_id );
+			/** @var int|false $current_index */
+			$current_index = array_search( $chapter_id, $flatten_ids, true );
+			if ( false !== $current_index && isset( $flatten_ids[ $current_index + 1 ] ) ) {
+				$next_unlocked_chapter_id = $flatten_ids[ $current_index + 1 ];
+			}
+		}
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
@@ -335,6 +347,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_unlocked_chapter_id' => $next_unlocked_chapter_id,
 					],
 				],
 				$success ? 200 : 400

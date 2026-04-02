@@ -17,7 +17,8 @@ export function finishChapter() {
 			dialogMessage,
 			isFinished,
 			progress,
-			icon_html
+			icon_html,
+			next_unlocked_chapter_id,
 		} = store.get(finishChapterAtom)
 
 		const ChapterIcon = $(`li[data-post-id="${chapter_id}"]`).find('.pc-chapter-icon')
@@ -45,6 +46,15 @@ export function finishChapter() {
 					.removeClass('pc-badge-accent')
 					.addClass('pc-badge-secondary')
 					.text('已完成')
+
+				// 線性觀看：解鎖下一個章節的 UI 鎖定狀態
+				if (next_unlocked_chapter_id) {
+					$(`li[data-post-id="${next_unlocked_chapter_id}"]`)
+						.removeClass('pc-locked')
+						.removeAttr('data-locked')
+						.find('.pc-lock-icon')
+						.remove()
+				}
 			}
 
 			if (isFinished === false) {
@@ -56,6 +66,12 @@ export function finishChapter() {
 					.removeClass('pc-badge-secondary')
 					.addClass('pc-badge-accent')
 					.text('未完成')
+
+				// 線性觀看：取消完成後重新整理頁面更新鎖定狀態
+				const enable_sequential = (window as any).pc_data?.enable_sequential
+				if (enable_sequential === 'yes') {
+					window.location.reload()
+				}
 			}
 
 			// 調整進度條
@@ -82,6 +98,18 @@ export function finishChapter() {
 	FinishButton.on('click', function (e) {
 		const course_id = $(this).data('course-id')
 		const chapter_id = $(this).data('chapter-id')
+		const is_currently_finished = $(this).hasClass('pc-btn-outline')
+
+		// 線性觀看：取消完成時需要用戶確認
+		const enable_sequential = (window as any).pc_data?.enable_sequential
+		if (enable_sequential === 'yes' && is_currently_finished) {
+			const confirmed = window.confirm(
+				'取消完成後，後續章節將會重新鎖定，確定要取消嗎？'
+			)
+			if (!confirmed) {
+				return
+			}
+		}
 
 		store.set(finishChapterAtom, (prev) => ({
 			...prev,
@@ -121,6 +149,8 @@ export function finishChapter() {
 					xhr?.responseJSON?.data?.is_this_chapter_finished
 				const progress = xhr?.responseJSON?.data?.progress
 				const icon_html = xhr?.responseJSON?.data?.icon_html
+				const next_unlocked_chapter_id =
+					xhr?.responseJSON?.data?.next_unlocked_chapter_id
 
 				store.set(finishChapterAtom, (prev) => ({
 					...prev,
@@ -130,6 +160,7 @@ export function finishChapter() {
 					isFinished: is_this_chapter_finished,
 					progress,
 					icon_html,
+					next_unlocked_chapter_id,
 				}))
 			},
 		})

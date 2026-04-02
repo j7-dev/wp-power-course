@@ -309,6 +309,8 @@ final class Course extends ApiBase {
 			],
 			// bundle product
 			'bundle_ids'                    => $bundle_ids,
+			// 線性觀看設定
+			'enable_sequential'             => (string) $product->get_meta( 'enable_sequential' ) ?: 'no',
 		] + SubscriptionUtils::get_normalized_meta( $product ) + [
 			'editor'                        => (string) $product->get_meta( 'editor' ) ?: 'power-editor',
 
