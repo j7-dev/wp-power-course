@@ -3,11 +3,19 @@
 
 [STEP:1] @學員 {features/progress/取得課程進度.feature}
 [STEP:2] @學員 {specs/ui/教室頁面.md}
-[DECISION:2a] 學員在教室中的操作
-  [BRANCH:2a:觀看章節內容] @學員 {specs/ui/章節內容頁.md}
-  [BRANCH:2a:標記章節完成] @學員 {features/progress/切換章節完成狀態.feature}
-  [BRANCH:2a:發表留言] @學員 {features/comment/發表章節留言.feature}
+[DECISION:2a] 課程是否開啟線性觀看
+  [BRANCH:2a:enable_sequential=yes] @學員 {features/linear-viewing/線性觀看存取控制.feature}
+  [BRANCH:2a:enable_sequential=no] 自由選擇任何章節
 [MERGE:2a]
+[DECISION:2b] 學員在教室中的操作
+  [BRANCH:2b:觀看章節內容] @學員 {specs/ui/章節內容頁.md}
+  [BRANCH:2b:標記章節完成] @學員 {features/progress/切換章節完成狀態.feature}
+    [DECISION:2b1] 線性觀看模式下的完成/取消完成
+      [BRANCH:2b1:完成章節] @學員 {features/linear-viewing/線性觀看取消完成連鎖.feature} 解鎖下一個章節
+      [BRANCH:2b1:取消完成] @學員 {features/linear-viewing/線性觀看取消完成連鎖.feature} 後續章節重新鎖定
+    [MERGE:2b1]
+  [BRANCH:2b:發表留言] @學員 {features/comment/發表章節留言.feature}
+[MERGE:2b]
 [DECISION:3a] 課程學習狀態
   [BRANCH:3a:還有未完成章節 -> 2] @學員 {specs/ui/教室頁面.md}
   [BRANCH:3a:所有章節已完成] {specs/ui/課程完成頁面.md}
