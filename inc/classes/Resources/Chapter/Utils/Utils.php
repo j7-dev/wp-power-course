@@ -610,8 +610,11 @@ abstract class Utils {
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', ?int $course_id = null ): string {
 		global $post; // 當前文章
+
+		// 深度為 0 時，$post_id 即為課程 ID；遞迴時透過 $course_id 傳遞
+		$resolved_course_id = $depth === 0 ? $post_id : ( $course_id ?? $post_id );
 
 		$html = '';
 		if ($children_posts === null) {
@@ -678,14 +681,27 @@ abstract class Utils {
 			]
 			);
 
+			// 線性模式：判斷此章節是否被鎖定
+			$is_locked   = false;
+			$lock_icon   = '';
+			$locked_attr = '';
+			if ( $context === 'classroom' ) {
+				$is_locked = self::is_chapter_locked( $child_post->ID, $resolved_course_id );
+				if ( $is_locked ) {
+					$locked_attr = ' data-locked="true"';
+					$lock_icon   = /*html*/'<svg class="pc-lock-icon size-4 fill-base-content/50 flex-shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 10H7V7a5 5 0 1 1 10 0v3Zm-5 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4Zm6-9V7A6 6 0 0 0 6 7v3a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Z"/></svg>';
+				}
+			}
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s"%8$s style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
 				</div>
-				<div class="flex items-center justify-end gap-x-0 w-8">
+				<div class="flex items-center justify-end gap-x-1 w-8">
+					%9$s
 					%4$s
 				</div>
 			</li>
@@ -701,7 +717,9 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$locked_attr,
+			$lock_icon
 			);
 
 			// 沒有子章節就結束
@@ -710,7 +728,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $resolved_course_id);
 		}
 		$html .= /* html */'</ul>';
 
@@ -840,6 +858,109 @@ abstract class Utils {
 		return $prev_post_id ? (int) $prev_post_id : null;
 	}
 
+
+	/**
+	 * 判斷章節是否被線性模式鎖定
+	 *
+	 * 鎖定條件（所有條件均需滿足）：
+	 * 1. 課程已開啟 enable_linear_mode
+	 * 2. 用戶不具備 manage_woocommerce 權限
+	 * 3. 不是第一個章節（flatten index 0）
+	 * 4. 該章節尚未完成（finished_at 為空）
+	 * 5. 前一個章節尚未完成
+	 *
+	 * @param int      $chapter_id 章節 ID.
+	 * @param int      $course_id  課程 ID.
+	 * @param int|null $user_id    用戶 ID（null 時使用當前登入用戶）.
+	 * @return bool 是否被鎖定
+	 */
+	public static function is_chapter_locked( int $chapter_id, int $course_id, ?int $user_id = null ): bool {
+		// 1. 檢查課程是否開啟線性模式
+		$linear_mode = \get_post_meta( $course_id, 'enable_linear_mode', true );
+		if ( 'yes' !== $linear_mode ) {
+			return false;
+		}
+
+		// 2. 管理員（manage_woocommerce）繞過鎖定
+		$effective_user_id = $user_id ?? \get_current_user_id();
+		$user              = \get_userdata( $effective_user_id );
+		if ( $user && $user->has_cap( 'manage_woocommerce' ) ) {
+			return false;
+		}
+
+		// 3. 取得課程扁平化章節順序
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		/** @var int|false $index */
+		$index = \array_search( $chapter_id, $flatten_ids, true );
+
+		// 找不到章節，不鎖定
+		if ( false === $index ) {
+			return false;
+		}
+
+		// 第一個章節（index 0）永遠解鎖
+		if ( 0 === $index ) {
+			return false;
+		}
+
+		// 4. 已完成的章節不鎖定
+		try {
+			$chapter = new Chapter( $chapter_id, $effective_user_id );
+			if ( $chapter->finished_at ) {
+				return false;
+			}
+		} catch ( \Exception $e ) {
+			// 無法建立 Chapter 物件（例如未登入），直接鎖定
+			return true;
+		}
+
+		// 5. 前一章節未完成 → 鎖定
+		$prev_chapter_id = $flatten_ids[ $index - 1 ] ?? null;
+		if ( null === $prev_chapter_id ) {
+			return false;
+		}
+
+		try {
+			$prev_chapter = new Chapter( (int) $prev_chapter_id, $effective_user_id );
+			return ! $prev_chapter->finished_at;
+		} catch ( \Exception $e ) {
+			return true;
+		}
+	}
+
+	/**
+	 * 取得學員需要先完成的前一章節標題
+	 *
+	 * 若章節已解鎖（非線性模式、已完成、第一章等），回傳 null。
+	 * 若章節被鎖定，回傳前一章節的標題（用於顯示鎖定提示）。
+	 *
+	 * @param int      $chapter_id 章節 ID.
+	 * @param int      $course_id  課程 ID.
+	 * @param int|null $user_id    用戶 ID（null 時使用當前登入用戶）.
+	 * @return string|null 前一章節標題，或 null 表示章節未被鎖定
+	 */
+	public static function get_required_chapter_title( int $chapter_id, int $course_id, ?int $user_id = null ): ?string {
+		// 章節未被鎖定，不需要前置章節提示
+		if ( ! self::is_chapter_locked( $chapter_id, $course_id, $user_id ) ) {
+			return null;
+		}
+
+		// 取得前一章節
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		/** @var int|false $index */
+		$index = \array_search( $chapter_id, $flatten_ids, true );
+
+		if ( false === $index || 0 === $index ) {
+			return null;
+		}
+
+		$prev_chapter_id = $flatten_ids[ $index - 1 ] ?? null;
+		if ( null === $prev_chapter_id ) {
+			return null;
+		}
+
+		return \get_the_title( (int) $prev_chapter_id ) ?: null;
+	}
 
 	/**
 	 * 取得下一個章節的 id

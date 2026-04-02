@@ -296,6 +296,7 @@ final class Course extends ApiBase {
 			'show_customer_amount'          => (string) $product->get_meta( 'show_customer_amount' ) ?: 'no',
 			'show_total_sales'              => (string) $product->get_meta( 'show_total_sales' ) ?: 'no',
 			'show_rest_stock'               => (string) $product->get_meta( 'show_rest_stock' ) ?: 'no',
+			'enable_linear_mode'            => (string) $product->get_meta( 'enable_linear_mode' ) ?: 'no',
 			'extra_student_count'           => (int) $product->get_meta( 'extra_student_count' ),
 			'feature_video'                 => $product->get_meta( 'feature_video' ) ?: [
 				'type' => 'none',

@@ -288,6 +288,18 @@ final class Api extends ApiBase {
 
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
+		// 線性模式：禁止取消已完成章節
+		$linear_mode = \get_post_meta( $course_id, 'enable_linear_mode', true );
+		if ( $is_this_chapter_finished && 'yes' === $linear_mode ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => '403',
+					'message' => '線性觀看模式下，已完成的章節無法取消完成',
+				],
+				403
+			);
+		}
+
 		if ($is_this_chapter_finished) {
 			$success = AVLChapterMeta::delete(
 				(int) $chapter_id,
@@ -325,6 +337,19 @@ final class Api extends ApiBase {
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
+		// 線性模式：取得剛解鎖的下一章節資訊
+		$next_chapter_unlocked = null;
+		if ( $success && 'yes' === $linear_mode ) {
+			$next_chapter_id = ChapterUtils::get_next_post_id( $chapter_id );
+			if ( $next_chapter_id ) {
+				$next_chapter_unlocked = [
+					'chapter_id'    => $next_chapter_id,
+					'chapter_title' => \get_the_title( $next_chapter_id ),
+					'icon_html'     => ChapterUtils::get_chapter_icon_html( $next_chapter_id ),
+				];
+			}
+		}
+
 		return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
@@ -335,6 +360,7 @@ final class Api extends ApiBase {
 						'is_this_chapter_finished' => $success ? true : false,
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_chapter_unlocked'    => $next_chapter_unlocked,
 					],
 				],
 				$success ? 200 : 400
