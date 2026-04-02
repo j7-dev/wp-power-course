@@ -1416,8 +1416,8 @@ jobs:
       - name: 偵測是否需要 Browser Smoke Test
         id: detect_smoke
         run: |
-          INITIAL_SHA="${{ needs.claude.outputs.initial_sha }}"
-          CHANGED=$(git diff --name-only "$INITIAL_SHA" HEAD)
+          git fetch origin master --depth=1 2>/dev/null || true
+          CHANGED=$(git diff --name-only origin/master...HEAD)
           if echo "$CHANGED" | grep -qE '^(js/src/|inc/templates/|inc/assets/|inc/classes/)'; then
             echo "needed=true" >> $GITHUB_OUTPUT
             echo "🧪 偵測到前後端變更，將執行 Browser Smoke Test"
@@ -1480,7 +1480,7 @@ jobs:
             測試操作完成後執行：   "$PWCLI" video-stop --filename "output/playwright/browser-test/videos/NN-description.webm"
 
             ## 任務
-            1. 執行 `git diff --name-only ${{ needs.claude.outputs.initial_sha }} HEAD` 分析變更
+            1. 執行 `git diff --name-only origin/master...HEAD` 分析變更
             2. 根據變更的檔案動態判斷哪些頁面受影響
             3. 對受影響頁面進行瀏覽器測試
             4. 所有測試完成後，用 Bash 工具將報告寫入 output/playwright/browser-test/test-report.md
