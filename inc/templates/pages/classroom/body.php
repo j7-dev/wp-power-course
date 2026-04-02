@@ -31,6 +31,27 @@ if ( ! ( $product instanceof \WC_Product ) ) {
 /** @var \WP_Post $chapter */
 $chapter_id = $chapter->ID;
 
+// 線性模式：若章節被鎖定，替換為鎖定提示頁面
+$course_id       = $product->get_id();
+$required_title  = ChapterUtils::get_required_chapter_title( $chapter_id, $course_id );
+if ( null !== $required_title ) {
+	// 取得前一章節 ID 以提供連結
+	$flatten_ids     = ChapterUtils::get_flatten_post_ids( $course_id );
+	$chapter_index   = array_search( $chapter_id, $flatten_ids, true );
+	$prev_chapter_id = ( false !== $chapter_index && $chapter_index > 0 ) ? $flatten_ids[ $chapter_index - 1 ] : null;
+
+	Plugin::load_template(
+		'404/locked',
+		[
+			'product'         => $product,
+			'chapter'         => $chapter,
+			'required_title'  => $required_title,
+			'prev_chapter_id' => $prev_chapter_id,
+		]
+	);
+	return;
+}
+
 /**
  * @var array{type: string, id: string, meta: ?array} $video_info
  */

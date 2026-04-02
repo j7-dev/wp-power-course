@@ -49,8 +49,23 @@ $user_id                    = \get_current_user_id();
 $avl_chapter                = new Chapter( (int) $current_chapter_id, (int) $user_id );
 $finished_at                = $avl_chapter->finished_at;
 $is_this_chapter_finished   = (bool) $finished_at;
+$linear_mode                = \get_post_meta( $product_id, 'enable_linear_mode', true );
+$is_linear_mode             = 'yes' === $linear_mode;
 $finish_chapter_button_html = '';
-$finish_chapter_button_html = sprintf(
+
+// 線性模式下，已完成的章節不顯示「標示為未完成」按鈕；改為顯示不可逆的已完成狀態
+if ( $is_this_chapter_finished && $is_linear_mode ) {
+	$finish_chapter_button_html = sprintf(
+		/*html*/'
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base pc-btn-outline border-solid opacity-60 cursor-not-allowed" disabled>
+			<span>已完成（線性模式）</span>
+		</button>
+		',
+		$product_id,
+		$current_chapter_id
+	);
+} else {
+	$finish_chapter_button_html = sprintf(
 		/*html*/'
 		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base %3$s">
 			<span>%4$s</span>
@@ -62,6 +77,7 @@ $finish_chapter_button_html = sprintf(
 		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : 'text-white',
 		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成'
 	);
+}
 
 
 // next chapter button html
