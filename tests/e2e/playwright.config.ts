@@ -49,13 +49,13 @@ export default defineConfig({
 		{
 			name: 'frontend',
 			testDir: './02-frontend',
-			use: { ...devices['Desktop Chrome'] },
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } },
 		},
 		{
 			name: 'integration',
 			testDir: './03-integration',
 			timeout: 120_000,
-			use: { ...devices['Desktop Chrome'] },
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1920, height: 1080 } },
 		},
 	],
 })
