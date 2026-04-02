@@ -604,13 +604,14 @@ abstract class Utils {
 	/**
 	 * 取得課程章節的 HTML
 	 *
-	 * @param int                            $post_id 課程 id
+	 * @param int                            $post_id        課程 id
 	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
-	 * @param int                            $depth 深度，預設從 0 (課程) 開始
-	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param int                            $depth          深度，預設從 0 (課程) 開始
+	 * @param 'classroom' | 'course-product' $context        上下文，預設為 'classroom'，表示課程頁面
+	 * @param array<int, bool>               $locked_map     章節鎖定映射表 [chapter_id => is_locked]
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', array $locked_map = [] ): string {
 		global $post; // 當前文章
 
 		$html = '';
@@ -657,7 +658,7 @@ abstract class Utils {
 			return '';
 		}
 
-		$html .= sprintf(
+		$html .= \sprintf(
 		/*html*/'<ul class="m-0 p-0 list-none" %1$s>',
 			$depth > 0 ? 'style="display: none;"' : ''
 		);
@@ -678,9 +679,15 @@ abstract class Utils {
 			]
 			);
 
-			$html .= sprintf(
+			// 判斷此章節是否被鎖定
+			$is_locked    = ! empty( $locked_map ) && ( $locked_map[ $child_post->ID ] ?? false );
+			$locked_class = $is_locked ? ' pc-chapter-locked opacity-50 cursor-not-allowed' : '';
+			$locked_attr  = $is_locked ? ' data-locked="true"' : '';
+			$href_value   = $is_locked ? '#' : \get_the_permalink( $child_post->ID );
+
+			$html .= \sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s%8$s"%9$s style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -690,9 +697,9 @@ abstract class Utils {
 				</div>
 			</li>
 			',
-			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
-			$child_post->post_title,
+			$href_value,
+			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html( $child_post->ID, $is_locked ) . '</div>',
+			\esc_html( $child_post->post_title ),
 				// 如果有子章節，就顯示箭頭
 			$child_children_posts ? /*html*/'
 				<div class="p-2 icon-arrow flex items-center">
@@ -701,7 +708,9 @@ abstract class Utils {
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$locked_class,
+			$locked_attr
 			);
 
 			// 沒有子章節就結束
@@ -710,7 +719,7 @@ abstract class Utils {
 			}
 
 			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			$html .= self::get_children_posts_html_uncached( $child_post->ID, $child_children_posts, $depth + 1, $context, $locked_map );
 		}
 		$html .= /* html */'</ul>';
 
@@ -721,10 +730,24 @@ abstract class Utils {
 	/**
 	 * 取得章節的 icon html
 	 *
-	 * @param int $chapter_id 章節 ID.
+	 * @param int  $chapter_id 章節 ID.
+	 * @param bool $is_locked  是否被鎖定（線性觀看模式）.
 	 * @return string
 	 */
-	public static function get_chapter_icon_html( int $chapter_id ): string {
+	public static function get_chapter_icon_html( int $chapter_id, bool $is_locked = false ): string {
+
+		// 鎖定狀態優先顯示鎖頭圖示
+		if ( $is_locked ) {
+			$icon_html = Plugin::load_template( 'icon/lock', null, false );
+			$tooltip   = '請先完成前面的章節';
+			$icon_html_with_tooltip = \sprintf(
+				/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
+				$tooltip,
+				$icon_html
+			);
+			return $icon_html_with_tooltip;
+		}
+
 		$avl_chapter    = new Chapter( (int) $chapter_id );
 		$first_visit_at = $avl_chapter->first_visit_at;
 		$finished_at    = $avl_chapter->finished_at;
@@ -739,7 +762,7 @@ abstract class Utils {
 			$icon_html = Plugin::load_template( 'icon/check', null, false );
 			$tooltip   = "已於 {$finished_at} 完成章節";
 		}
-		$icon_html_with_tooltip = sprintf(
+		$icon_html_with_tooltip = \sprintf(
 			/*html*/'<div class="pc-tooltip pc-tooltip-right h-6" data-tip="%1$s">%2$s</div>',
 			$tooltip,
 			$icon_html
@@ -874,5 +897,127 @@ abstract class Utils {
 		\wp_cache_set( 'next_post_id_' . $chapter_id, $next_post_id, 'prev_next' );
 
 		return $next_post_id === null ? null : (int) $next_post_id;
+	}
+
+	/**
+	 * 取得課程的章節順序存取映射表
+	 * 計算每個章節是否對指定用戶鎖定（線性觀看模式）
+	 *
+	 * @param int $course_id 課程 ID.
+	 * @param int $user_id   用戶 ID.
+	 * @return array<int, bool> key=chapter_id, value=is_locked
+	 */
+	public static function get_sequential_access_map( int $course_id, int $user_id ): array {
+		$product = \wc_get_product( $course_id );
+		if ( ! $product instanceof \WC_Product ) {
+			return [];
+		}
+
+		$is_sequential = ( (string) $product->get_meta( 'is_sequential' ) ) === 'yes';
+		if ( ! $is_sequential ) {
+			return [];
+		}
+
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return [];
+		}
+
+		// 批次查詢所有章節的 finished_at，避免 N+1
+		global $wpdb;
+		$table_name   = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
+		$placeholders = \implode( ',', \array_fill( 0, \count( $flatten_ids ), '%d' ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare(
+			"SELECT post_id FROM {$table_name} WHERE user_id = %d AND meta_key = 'finished_at' AND meta_value != '' AND post_id IN ({$placeholders})",
+			\array_merge( [ $user_id ], $flatten_ids )
+		);
+
+		/** @var array<string> $finished_ids_raw */
+		$finished_ids_raw = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$finished_ids     = \array_map( 'intval', $finished_ids_raw );
+		$finished_set     = \array_flip( $finished_ids );
+
+		$map    = [];
+		$locked = false;
+
+		foreach ( $flatten_ids as $index => $chapter_id ) {
+			if ( 0 === $index ) {
+				// 第一個章節永遠不鎖定
+				$map[ $chapter_id ] = false;
+			} elseif ( $locked ) {
+				// 一旦某個章節被鎖定，後續全部鎖定
+				$map[ $chapter_id ] = true;
+			} else {
+				// 檢查前一個章節是否已完成
+				$prev_chapter_id = $flatten_ids[ $index - 1 ];
+				if ( ! isset( $finished_set[ $prev_chapter_id ] ) ) {
+					$map[ $chapter_id ] = true;
+					$locked             = true;
+				} else {
+					$map[ $chapter_id ] = false;
+				}
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * 檢查單一章節是否被鎖定（線性觀看模式）
+	 *
+	 * @param int $chapter_id 章節 ID.
+	 * @param int $course_id  課程 ID.
+	 * @param int $user_id    用戶 ID.
+	 * @return bool true = 被鎖定（不可存取）
+	 */
+	public static function is_chapter_locked( int $chapter_id, int $course_id, int $user_id ): bool {
+		$map = self::get_sequential_access_map( $course_id, $user_id );
+
+		// 空映射表代表非線性模式或無章節，不鎖定
+		if ( empty( $map ) ) {
+			return false;
+		}
+
+		return $map[ $chapter_id ] ?? false;
+	}
+
+	/**
+	 * 取得目前應觀看的章節 ID（第一個未完成的章節）
+	 *
+	 * @param int $course_id 課程 ID.
+	 * @param int $user_id   用戶 ID.
+	 * @return int|null 章節 ID，全部完成時回傳 null
+	 */
+	public static function get_next_available_chapter_id( int $course_id, int $user_id ): ?int {
+		$flatten_ids = self::get_flatten_post_ids( $course_id );
+		if ( empty( $flatten_ids ) ) {
+			return null;
+		}
+
+		// 批次查詢所有章節的 finished_at
+		global $wpdb;
+		$table_name   = $wpdb->prefix . Plugin::CHAPTER_TABLE_NAME;
+		$placeholders = \implode( ',', \array_fill( 0, \count( $flatten_ids ), '%d' ) );
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$query = $wpdb->prepare(
+			"SELECT post_id FROM {$table_name} WHERE user_id = %d AND meta_key = 'finished_at' AND meta_value != '' AND post_id IN ({$placeholders})",
+			\array_merge( [ $user_id ], $flatten_ids )
+		);
+
+		/** @var array<string> $finished_ids_raw */
+		$finished_ids_raw = $wpdb->get_col( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		$finished_set     = \array_flip( \array_map( 'intval', $finished_ids_raw ) );
+
+		foreach ( $flatten_ids as $chapter_id ) {
+			if ( ! isset( $finished_set[ $chapter_id ] ) ) {
+				return $chapter_id;
+			}
+		}
+
+		// 全部完成
+		return null;
 	}
 }

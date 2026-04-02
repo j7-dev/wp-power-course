@@ -286,6 +286,26 @@ final class Api extends ApiBase {
 			);
 		}
 
+		// 線性觀看模式下，檢查章節是否被鎖定（僅在嘗試「完成」時驗證，取消完成不受限）
+		$is_sequential = ( (string) $product->get_meta( 'is_sequential' ) ) === 'yes';
+		if ( $is_sequential && ! $is_this_chapter_finished ) {
+			$is_locked = ChapterUtils::is_chapter_locked( $chapter_id, $course_id, $user_id );
+			if ( $is_locked ) {
+				$next_available = ChapterUtils::get_next_available_chapter_id( $course_id, $user_id );
+				return new \WP_REST_Response(
+					[
+						'code'    => '403',
+						'message' => '請先完成前面的章節',
+						'data'    => [
+							'status'                     => 403,
+							'next_available_chapter_id'  => $next_available,
+						],
+					],
+					403
+				);
+			}
+		}
+
 		\wp_cache_delete( "pid_{$product->get_id()}_uid_{$user_id}", 'pc_course_progress' );
 
 		if ($is_this_chapter_finished) {
@@ -304,11 +324,12 @@ final class Api extends ApiBase {
 					'code'    => $success ? '200' : '400',
 					'message' => $success ? "單元 {$title} 已標示為未完成！" : "單元 {$title} 標示為未完成時出錯了！",
 					'data'    => [
-						'chapter_id'               => $chapter_id,
-						'course_id'                => $course_id,
-						'is_this_chapter_finished' => $success ? false : true,
-						'progress'                 => $progress,
-						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'chapter_id'                => $chapter_id,
+						'course_id'                 => $course_id,
+						'is_this_chapter_finished'  => $success ? false : true,
+						'progress'                  => $progress,
+						'icon_html'                 => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_unlocked_chapter_id'  => null,
 					],
 				],
 				$success ? 200 : 400
@@ -323,6 +344,12 @@ final class Api extends ApiBase {
 			);
 		$progress = CourseUtils::get_course_progress( $product );
 
+		// 計算下一個可解鎖的章節 ID（僅線性觀看模式下有意義）
+		$next_unlocked_chapter_id = null;
+		if ( $is_sequential && $success ) {
+			$next_unlocked_chapter_id = ChapterUtils::get_next_available_chapter_id( $course_id, $user_id );
+		}
+
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
 
 		return new \WP_REST_Response(
@@ -330,11 +357,12 @@ final class Api extends ApiBase {
 					'code'    => $success ? '200' : '400',
 					'message' => $success ? "單元 {$title} 已標示為完成！" : "單元 {$title} 標示為未完成時出錯了！",
 					'data'    => [
-						'chapter_id'               => $chapter_id,
-						'course_id'                => $course_id,
-						'is_this_chapter_finished' => $success ? true : false,
-						'progress'                 => $progress,
-						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'chapter_id'                => $chapter_id,
+						'course_id'                 => $course_id,
+						'is_this_chapter_finished'  => $success ? true : false,
+						'progress'                  => $progress,
+						'icon_html'                 => ChapterUtils::get_chapter_icon_html($chapter_id),
+						'next_unlocked_chapter_id'  => $next_unlocked_chapter_id,
 					],
 				],
 				$success ? 200 : 400
