@@ -694,7 +694,7 @@ abstract class Utils {
 				$locked_class = 'pc-locked';
 				$locked_attr  = 'data-locked="true"';
 				$lock_icon    = /*html*/'
-				<div class="p-2 flex items-center text-gray-400" title="請先完成前面的章節">
+				<div class="pc-lock-icon p-2 flex items-center text-gray-400" title="請先完成前面的章節">
 					<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2a5 5 0 0 0-5 5v2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm3 7V7a3 3 0 1 0-6 0v2h6zm-3 3a1.5 1.5 0 0 1 1 2.6V16a1 1 0 1 1-2 0v-1.4A1.5 1.5 0 0 1 12 12z"/></svg>
 				</div>
 				';
