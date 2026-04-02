@@ -194,6 +194,17 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 				)}
 			</div>
 
+			<Heading>課程學習</Heading>
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['is_sequential'],
+						label: '線性觀看',
+						tooltip: '開啟後學員必須按順序完成章節，才能存取下一個章節',
+					}}
+				/>
+			</div>
+
 			<Heading>課程資訊</Heading>
 
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
