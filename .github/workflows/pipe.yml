@@ -1611,9 +1611,20 @@ jobs:
 
             // 將 test-report.md 中的本地路徑替換為 CDN URL（讓截圖可預覽、影片可點擊）
             if (processedReport && urlPrefix) {
+              // 方式 A：Markdown 圖片語法 (screenshots/...) / (videos/...) → CDN URL
               processedReport = processedReport
                 .replace(/\(screenshots\//g, `(${urlPrefix}/`)
                 .replace(/\(videos\//g, `(${urlPrefix}/`);
+              // 方式 B：backtick 格式 `NN-xxx.webm` / `NN-xxx.png` → CDN Markdown 語法
+              // agent 自然產出的格式是 `01-xxx.png`，需要轉換成可渲染的 CDN 連結
+              processedReport = processedReport.replace(
+                /`(\d{2}-[^`]+\.webm)`/g,
+                (_, fn) => `[▶️ 觀看操作影片](${urlPrefix}/${fn})`
+              );
+              processedReport = processedReport.replace(
+                /`(\d{2}-[^`]+\.png)`/g,
+                (_, fn) => `![${fn.replace('.png', '')}](${urlPrefix}/${fn})`
+              );
             }
 
             // 將每個 ### N. 測試場景區塊包裹在 <details> 折疊中
