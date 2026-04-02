@@ -1198,8 +1198,11 @@ jobs:
             exit 0
           fi
 
-          # 檢查是否有相對於 master 的 commit 差異（避免只有 uncommitted changes 卻無 commit 的情況）
-          COMMIT_COUNT=$(git rev-list --count master..HEAD 2>/dev/null || echo "0")
+          # 確保有 origin/master 的引用（CI shallow clone 可能沒有）
+          git fetch origin master --depth=1 2>/dev/null || true
+
+          # 檢查是否有相對於 origin/master 的 commit 差異（避免只有 uncommitted changes 卻無 commit 的情況）
+          COMMIT_COUNT=$(git rev-list --count origin/master..HEAD 2>/dev/null || echo "0")
           if [ "$COMMIT_COUNT" -eq "0" ]; then
             echo "ℹ️ 分支與 master 無 commit 差異（可能僅有未 commit 的暫存變更），跳過 PR 建立"
             exit 0
