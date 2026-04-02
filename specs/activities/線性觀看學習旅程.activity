@@ -1,0 +1,23 @@
+[ACTIVITY] 線性觀看學習旅程
+[ACTOR] 學員 -> {specs/actors/學員.md}
+[ACTOR] 管理員 -> {specs/actors/管理員.md}
+
+[STEP:1] @管理員 {features/course/設定課程線性觀看.feature}
+[STEP:2] @學員 進入課程教室頁面
+[DECISION:2a] 課程是否啟用線性觀看 (is_sequential)
+  [BRANCH:2a:未啟用] @學員 自由選擇任何章節觀看 {specs/activities/學員學習旅程.activity}
+  [BRANCH:2a:已啟用 -> 3] 進入線性觀看流程
+[MERGE:2a]
+[STEP:3] @學員 系統顯示章節列表，鎖定章節顯示鎖頭圖示
+[STEP:4] @學員 點擊可存取的章節觀看內容
+[DECISION:4a] 學員是否點擊鎖定章節
+  [BRANCH:4a:點擊鎖定章節] 系統導向目前應觀看的章節，並顯示「請先完成前面的章節」提示
+  [BRANCH:4a:點擊可存取章節 -> 5] 正常觀看章節內容
+[MERGE:4a]
+[STEP:5] @學員 觀看完畢，點擊「完成章節」按鈕 {features/progress/切換章節完成狀態.feature}
+[STEP:6] 系統即時更新側邊欄：下一個章節的鎖頭圖示消失，變為可點擊
+[DECISION:6a] 課程學習狀態
+  [BRANCH:6a:還有未完成章節 -> 4] @學員 繼續觀看下一個解鎖章節
+  [BRANCH:6a:所有章節已完成] {specs/ui/課程完成頁面.md}
+[MERGE:6a]
+[END]

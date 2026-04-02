@@ -74,3 +74,39 @@ Feature: 切換章節完成狀態
       And 用戶 "Alice" 在課程 100 的進度應為 100
       And action "power_course_course_finished" 應以參數 (100, 2) 被觸發
       And 課程 100 對用戶 "Alice" 的 coursemeta finished_at 應不為空
+
+  # ========== 線性觀看模式 ==========
+
+  Rule: 前置（狀態）- 線性觀看模式下不可切換被鎖定章節的完成狀態
+
+    Example: 線性觀看模式下嘗試完成鎖定章節時操作失敗
+      Given 課程 100 的 is_sequential 為 true
+      And 用戶 "Alice" 無任何章節完成紀錄
+      When 用戶 "Alice" 切換章節 201 的完成狀態
+      Then 操作失敗，錯誤為「請先完成前面的章節」
+
+  Rule: 後置（回應）- 線性觀看模式下完成章節時回傳下一個解鎖的章節 ID
+
+    Example: 完成章節後回傳 next_unlocked_chapter_id
+      Given 課程 100 的 is_sequential 為 true
+      And 用戶 "Alice" 在章節 200 無 finished_at
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 回應中 next_unlocked_chapter_id 應為 201
+
+    Example: 完成最後一個章節時 next_unlocked_chapter_id 為 null
+      Given 課程 100 的 is_sequential 為 true
+      And 用戶 "Alice" 在章節 200 的 finished_at 為 "2025-06-01 10:00:00"
+      And 用戶 "Alice" 在章節 201 無 finished_at
+      When 用戶 "Alice" 切換章節 201 的完成狀態
+      Then 操作成功
+      And 回應中 next_unlocked_chapter_id 應為 null
+
+  Rule: 後置（回應）- 非線性觀看模式下不回傳 next_unlocked_chapter_id
+
+    Example: 非線性觀看模式下回應不含 next_unlocked_chapter_id
+      Given 課程 100 的 is_sequential 為 false
+      And 用戶 "Alice" 在章節 200 無 finished_at
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 回應中 next_unlocked_chapter_id 應為 null

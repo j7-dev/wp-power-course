@@ -82,3 +82,25 @@ Feature: 取得課程進度
       When 用戶 "Alice" 查詢課程 100 的進度
       Then 操作成功
       And 回應中 expire_date 應為 "0"
+
+  # ========== 線性觀看模式 ==========
+
+  Rule: 後置（回應）- 線性觀看模式下回傳鎖定章節清單與目前應觀看章節
+
+    Example: 查詢線性觀看課程的進度（部分完成）
+      Given 課程 100 的 is_sequential 為 true
+      When 用戶 "Alice" 查詢課程 100 的進度
+      Then 操作成功
+      And 回應中 is_sequential 應為 true
+      And 回應中 locked_chapters 應包含 chapterId 201
+      And 回應中 locked_chapters 應包含 chapterId 202
+      And 回應中 next_available_chapter_id 應為 201
+
+  Rule: 後置（回應）- 非線性觀看模式下不回傳鎖定資訊
+
+    Example: 查詢非線性觀看課程的進度
+      Given 課程 100 的 is_sequential 為 false
+      When 用戶 "Alice" 查詢課程 100 的進度
+      Then 操作成功
+      And 回應中 is_sequential 應為 false
+      And 回應中 locked_chapters 應為 null

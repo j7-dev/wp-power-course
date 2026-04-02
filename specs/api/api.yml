@@ -180,6 +180,12 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        is_sequential:
+          type: string
+          enum: [yes, no]
+          description: |
+            線性觀看開關。yes = 學員必須按章節排序順序（DFS 前序遍歷）逐一完成才能存取下一個。
+            預設為 no。
         total_students:
           type: integer
           description: 選課人數
@@ -982,6 +988,11 @@ paths:
                   type: string
                   enum: [yes, no]
                   default: no
+                is_sequential:
+                  type: string
+                  enum: [yes, no]
+                  default: no
+                  description: 線性觀看開關（預設 no）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -1206,6 +1217,10 @@ paths:
                 is_free:
                   type: string
                   enum: [yes, no]
+                is_sequential:
+                  type: string
+                  enum: [yes, no]
+                  description: 線性觀看開關
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -2425,6 +2440,27 @@ paths:
                     type: boolean
                     description: 課程是否已到期（true 時其他欄位仍回傳但應為最後已知值）
                     example: false
+                  is_sequential:
+                    type: boolean
+                    description: 課程是否啟用線性觀看
+                    example: false
+                  locked_chapters:
+                    type: array
+                    nullable: true
+                    description: |
+                      線性觀看模式下被鎖定的章節 ID 列表。
+                      僅在課程 is_sequential = true 時回傳。
+                      若課程未啟用線性觀看，回傳 null。
+                    items:
+                      type: integer
+                    example: [302, 400, 401]
+                  next_available_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: |
+                      線性觀看模式下，目前應觀看的章節 ID（第一個未完成的章節）。
+                      僅在課程 is_sequential = true 時回傳。
+                    example: 301
         "403":
           description: 前置狀態不符
           content:
@@ -2516,6 +2552,14 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  next_unlocked_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: |
+                      線性觀看模式下，完成此章節後下一個被解鎖的章節 ID。
+                      僅在課程 is_sequential = true 且本次操作為「標記完成」時回傳。
+                      若所有章節已完成或課程未啟用線性觀看，回傳 null。
+                    example: 302
         "403":
           description: 前置狀態不符
           content:
@@ -2544,6 +2588,14 @@ paths:
                     message: "必須登入"
                     data:
                       status: 403
+                chapterLocked:
+                  summary: 章節被鎖定（線性觀看模式）
+                  value:
+                    code: rest_forbidden
+                    message: "請先完成前面的章節"
+                    data:
+                      status: 403
+                      next_available_chapter_id: 301
         "404":
           description: 章節不存在
           content:
