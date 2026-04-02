@@ -180,6 +180,11 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        enable_linear_viewing:
+          type: string
+          enum: [yes, no]
+          description: 是否開啟線性觀看（開啟後學員須按順序完成章節）
+          default: "no"
         total_students:
           type: integer
           description: 選課人數
@@ -2425,6 +2430,21 @@ paths:
                     type: boolean
                     description: 課程是否已到期（true 時其他欄位仍回傳但應為最後已知值）
                     example: false
+                  linear_viewing:
+                    type: boolean
+                    description: 課程是否開啟線性觀看（僅在 enable_linear_viewing = yes 時出現）
+                    example: true
+                  unlocked_chapters:
+                    type: array
+                    description: 已解鎖的章節 ID 列表（僅線性觀看開啟時回傳，依攤平排序）
+                    items:
+                      type: integer
+                    example: [200, 201]
+                  next_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: 下一個可觀看的章節 ID（僅線性觀看開啟時回傳，全部完成時為 null）
+                    example: 201
         "403":
           description: 前置狀態不符
           content:
@@ -2486,6 +2506,10 @@ paths:
         - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
         - 切換後重新計算課程進度
 
+        **線性觀看限制（enable_linear_viewing = yes 時）:**
+        - 標記完成：章節必須已解鎖（前一章已完成），否則回傳 403
+        - 取消完成：禁止操作，回傳 403
+
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
       parameters:
@@ -2516,6 +2540,14 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  next_unlocked_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: 下一個解鎖的章節 ID（線性觀看開啟時回傳，供前端更新鎖定圖示）
+                  next_unlocked_chapter_icon_html:
+                    type: string
+                    nullable: true
+                    description: 下一個解鎖章節的圖示 HTML（供前端直接替換 DOM）
         "403":
           description: 前置狀態不符
           content:
@@ -2542,6 +2574,20 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "必須登入"
+                    data:
+                      status: 403
+                chapterLocked:
+                  summary: 章節尚未解鎖（線性觀看）
+                  value:
+                    code: rest_forbidden
+                    message: "章節尚未解鎖，請先完成前面的章節"
+                    data:
+                      status: 403
+                unfinishForbidden:
+                  summary: 線性觀看模式下禁止取消完成
+                  value:
+                    code: rest_forbidden
+                    message: "線性觀看模式下無法取消章節完成"
                     data:
                       status: 403
         "404":

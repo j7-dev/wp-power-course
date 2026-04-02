@@ -1,0 +1,24 @@
+[ACTIVITY] 學員線性觀看學習旅程
+[ACTOR] 學員 -> {specs/actors/學員.md}
+
+[STEP:1] @學員 進入教室頁面
+[DECISION:1a] 課程是否開啟線性觀看
+  [BRANCH:1a:線性觀看關閉] @學員 自由瀏覽任何章節 {specs/ui/教室頁面.md}
+  [BRANCH:1a:線性觀看開啟] @學員 查看章節解鎖狀態 {features/progress/查詢章節解鎖狀態.feature}
+[MERGE:1a]
+[STEP:2] @學員 選擇章節
+[DECISION:2a] 章節是否已解鎖
+  [BRANCH:2a:已解鎖] @學員 觀看章節內容 {specs/ui/章節內容頁.md}
+  [BRANCH:2a:被鎖定] @學員 顯示鎖定提示「請先完成前面的章節」 {features/progress/線性觀看章節存取控制.feature}
+    [STEP:2a:被鎖定:1] 導向到第一個未完成的章節
+[MERGE:2a]
+[STEP:3] @學員 觀看完畢，按下「標示為已完成」
+[DECISION:3a] 線性觀看下的完成處理
+  [BRANCH:3a:線性觀看開啟] 標記完成 + 解鎖下一章 {features/progress/線性觀看切換完成限制.feature}
+  [BRANCH:3a:線性觀看關閉] 標記完成（無額外限制） {features/progress/切換章節完成狀態.feature}
+[MERGE:3a]
+[DECISION:4a] 課程學習狀態
+  [BRANCH:4a:還有未完成章節 -> 2] @學員 繼續下一章
+  [BRANCH:4a:所有章節已完成] {specs/ui/課程完成頁面.md}
+[MERGE:4a]
+[END]
