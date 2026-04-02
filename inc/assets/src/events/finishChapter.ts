@@ -17,7 +17,8 @@ export function finishChapter() {
 			dialogMessage,
 			isFinished,
 			progress,
-			icon_html
+			icon_html,
+			next_chapter_unlocked,
 		} = store.get(finishChapterAtom)
 
 		const ChapterIcon = $(`li[data-post-id="${chapter_id}"]`).find('.pc-chapter-icon')
@@ -32,8 +33,31 @@ export function finishChapter() {
 			if (ChapterIcon?.length > 0) {
 				ChapterIcon.html(icon_html)
 			}
-			Dialog.find('#finish-chapter__dialog__title').text('成功')
-			Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
+
+			// 線性模式：JS 局部解鎖下一章節
+			if (next_chapter_unlocked) {
+				const nextChapterId = next_chapter_unlocked.chapter_id
+				const nextChapterItem = $(`li[data-post-id="${nextChapterId}"]`)
+
+				if (nextChapterItem.length > 0) {
+					// 移除鎖定屬性
+					nextChapterItem.removeAttr('data-locked')
+					// 替換鎖頭圖示
+					nextChapterItem.find('.pc-lock-icon').remove()
+					// 更新下一章節的 icon（若 API 回傳）
+					if (next_chapter_unlocked.icon_html) {
+						nextChapterItem.find('.pc-chapter-icon').html(next_chapter_unlocked.icon_html)
+					}
+				}
+
+				Dialog.find('#finish-chapter__dialog__title').text('已完成！')
+				Dialog.find('#finish-chapter__dialog__message').text(
+					`「${next_chapter_unlocked.chapter_title}」已解鎖，可以繼續學習了！`,
+				)
+			} else {
+				Dialog.find('#finish-chapter__dialog__title').text('成功')
+				Dialog.find('#finish-chapter__dialog__message').text(dialogMessage)
+			}
 
 			// FinishButton.hide()
 			if (isFinished === true) {
@@ -121,6 +145,8 @@ export function finishChapter() {
 					xhr?.responseJSON?.data?.is_this_chapter_finished
 				const progress = xhr?.responseJSON?.data?.progress
 				const icon_html = xhr?.responseJSON?.data?.icon_html
+				const next_chapter_unlocked =
+					xhr?.responseJSON?.data?.next_chapter_unlocked ?? undefined
 
 				store.set(finishChapterAtom, (prev) => ({
 					...prev,
@@ -130,8 +156,26 @@ export function finishChapter() {
 					isFinished: is_this_chapter_finished,
 					progress,
 					icon_html,
+					next_chapter_unlocked,
 				}))
 			},
 		})
+	})
+
+	// 線性模式：攔截鎖定章節的點擊事件
+	$(document).on('click', 'li[data-locked="true"]', function (e) {
+		e.preventDefault()
+		e.stopPropagation()
+
+		const chapterId = $(this).data('post-id')
+		const chapterTitle =
+			$(this).find('span.ml-2').text() || $(this).find('span').first().text()
+
+		Dialog.find('#finish-chapter__dialog__title').text('章節已鎖定')
+		Dialog.find('#finish-chapter__dialog__message').text(
+			`「${chapterTitle}」尚未解鎖，請先完成前一個章節。`,
+		)
+		// @ts-ignore
+		Dialog?.[0]?.showModal()
 	})
 }
