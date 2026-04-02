@@ -20,6 +20,11 @@
             <group>error</group>
             <group>edge</group>
             <group>security</group>
+            <group>access_denied</group>
+            <group>hierarchy</group>
+            <group>sequential_off</group>
+            <group>redirect</group>
+            <group>access_permission</group>
         </include>
     </groups>
 
