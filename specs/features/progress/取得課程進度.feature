@@ -68,13 +68,21 @@ Feature: 取得課程進度
         | total_chapters    | 3      |
       And 回應中 finished_chapters 應包含 chapterId 200
 
-  Rule: 後置（回應）- 應回傳最後造訪資訊
+  Rule: 後置（回應）- 應回傳最後造訪資訊（含播放進度秒數）
 
     Example: 查詢含最後造訪紀錄的進度
-      Given 用戶 "Alice" 在課程 100 的 last_visit_info 為 chapter_id 200，last_visit_at "2025-06-01 10:30:00"
+      Given 用戶 "Alice" 在課程 100 的 last_visit_info 為 chapter_id 200，last_visit_at "2025-06-01 10:30:00"，video_progress_seconds 332
       When 用戶 "Alice" 查詢課程 100 的進度
       Then 操作成功
       And 回應中 last_visit_info.chapter_id 應為 200
+      And 回應中 last_visit_info.video_progress_seconds 應為 332
+
+    Example: 查詢舊資料（無 video_progress_seconds）向下相容
+      Given 用戶 "Alice" 在課程 100 的 last_visit_info 為 chapter_id 200，last_visit_at "2025-06-01 10:30:00"（無 video_progress_seconds 欄位）
+      When 用戶 "Alice" 查詢課程 100 的進度
+      Then 操作成功
+      And 回應中 last_visit_info.chapter_id 應為 200
+      And 回應中 last_visit_info.video_progress_seconds 應為 0
 
   Rule: 後置（回應）- 應回傳到期時間
 
