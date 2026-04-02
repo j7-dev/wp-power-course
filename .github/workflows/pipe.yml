@@ -1426,6 +1426,12 @@ jobs:
             echo "ℹ️ 無前後端變更，跳過 Smoke Test"
           fi
 
+      - name: 建立 browser-test 輸出目錄
+        if: steps.detect_smoke.outputs.needed == 'true'
+        run: |
+          mkdir -p output/playwright/browser-test/videos
+          mkdir -p output/playwright/browser-test/screenshots
+
       - name: "AI 驗收 (Claude Code)"
         id: run_ai_acceptance
         if: steps.detect_smoke.outputs.needed == 'true'
@@ -1463,20 +1469,34 @@ jobs:
             - 截圖前請先滾動頁面，確保目標元素（尤其是頁面底部新增的元素）完整可見
             - 截圖盡量使用 fullPage 模式以捕獲完整頁面內容
 
+            ## 產出物路徑（必須嚴格遵守）
+            - 截圖：output/playwright/browser-test/screenshots/NN-description.png（同步複製到 tests/e2e/screenshots/）
+            - 影片：output/playwright/browser-test/videos/NN-description.webm
+            - 測試報告：output/playwright/browser-test/test-report.md（所有測試完成後必須用 Bash 工具寫入此檔案）
+
+            ## 影片錄製（每個測試場景必做）
+            設定 PWCLI 路徑：export PWCLI="$HOME/.codex/skills/playwright/scripts/playwright_cli.sh"
+            每個頁面測試前先執行：  "$PWCLI" video-start
+            測試操作完成後執行：   "$PWCLI" video-stop --filename "output/playwright/browser-test/videos/NN-description.webm"
+
             ## 任務
             1. 執行 `git diff --name-only ${{ needs.claude.outputs.initial_sha }} HEAD` 分析變更
             2. 根據變更的檔案動態判斷哪些頁面受影響
-            3. 對受影響頁面進行瀏覽器測試，截圖存到 tests/e2e/screenshots/
-            4. 產出 test-report.md 測試報告
+            3. 對受影響頁面進行瀏覽器測試
+            4. 所有測試完成後，用 Bash 工具將報告寫入 output/playwright/browser-test/test-report.md
 
             ## test-report.md 輸出格式
             - 包含：測試摘要、測試結果明細（每個受測頁面一個 ### 區塊）
             - 不需要 "產出物" 和 "變更分析" 區塊，請省略
             - 截圖和影片命名格式：`NN-description.png` / `NN-description.webm`（NN 為兩位數序號，如 01, 02）
+            - 每個 ### 區塊包含：變更類型、結果（✅/⚠️/❌）、操作步驟、影片檔名、截圖檔名、Console 錯誤、Network 異常
 
             請使用 /browser-tester skill 的標準流程。
             影片錄製是必須的，請確實錄製每個頁面的操作過程。
-            重要：不需要發佈 Issue Comment，媒體上傳由 CI workflow 處理。
+
+            ## CI 環境禁止事項
+            - 禁止使用 gh CLI 發佈 Issue Comment（CI workflow 的後續 steps 會自動處理上傳與發佈）
+            - test-report.md 必須用 Bash 工具寫入磁碟，不可只輸出 text 內容
           claude_args: |
             --dangerously-skip-permissions
             --max-turns 200
@@ -1589,6 +1609,26 @@ jobs:
             processedReport = processedReport.replace(/\n## 變更分析[\s\S]*?(?=\n## |\s*$)/g, '');
             processedReport = processedReport.trim();
 
+            // 將 test-report.md 中的本地路徑替換為 CDN URL（讓截圖可預覽、影片可點擊）
+            if (processedReport && urlPrefix) {
+              processedReport = processedReport
+                .replace(/\(screenshots\//g, `(${urlPrefix}/`)
+                .replace(/\(videos\//g, `(${urlPrefix}/`);
+            }
+
+            // 將每個 ### N. 測試場景區塊包裹在 <details> 折疊中
+            if (processedReport) {
+              processedReport = processedReport.replace(
+                /(### \d+\..+\n)([\s\S]*?)(?=\n### \d+\.|\n## (?!測試結果明細)|$)/g,
+                (match, header, body) => {
+                  const title = header.replace(/^### /, '').trim();
+                  const trimmedBody = body.trim();
+                  if (!trimmedBody) return match;
+                  return `<details>\n<summary><b>${title}</b></summary>\n\n${trimmedBody}\n\n</details>\n\n`;
+                }
+              );
+            }
+
             // 將截圖與影片按數字前綴（01-, 02- ...）配對，組成統一的測試明細區塊
             const groupMap = {};
             for (const filename of screenshotFiles) {
@@ -1607,26 +1647,40 @@ jobs:
             let combinedMd = '';
             for (const key of Object.keys(groupMap).sort()) {
               const { screenshots, videos } = groupMap[key];
+              const firstName = screenshots[0] || videos[0];
+              const groupTitle = firstName
+                ? firstName.replace(/\.(png|webm)$/, '').replace(/^\d+-/, '').replace(/[-_]/g, ' ')
+                : key;
+
+              let groupContent = '';
               for (const shot of screenshots) {
                 const label = shot.replace('.png', '').replace(/[-_]/g, ' ');
-                combinedMd += `#### 📸 ${label}\n\n![${label}](${urlPrefix}/${shot})\n\n`;
+                groupContent += `![${label}](${urlPrefix}/${shot})\n\n`;
               }
               for (const vid of videos) {
-                const label = vid.replace('.webm', '').replace(/[-_]/g, ' ');
-                combinedMd += `#### 📹 ${label}\n\n[▶️ 觀看操作影片](${urlPrefix}/${vid})\n\n`;
+                groupContent += `[▶️ 觀看操作影片](${urlPrefix}/${vid})\n\n`;
               }
+
+              combinedMd += `<details>\n<summary><b>${groupTitle}</b></summary>\n\n${groupContent}</details>\n\n`;
             }
 
             const smokeStatus = '${{ steps.run_ai_acceptance.outcome }}';
             const emoji = smokeStatus === 'success' ? '✅' : '⚠️';
             const statusText = smokeStatus === 'success' ? '通過' : '異常';
 
+            // processedReport 為主要內容（含 CDN 圖片預覽）；combinedMd 僅在 report 缺失時作為 fallback
+            const mainContent = processedReport
+              ? processedReport
+              : [
+                  '> ⚠️ Agent 未產出測試報告',
+                  '',
+                  combinedMd ? `## 🖼️ 媒體備份\n\n${combinedMd}` : '',
+                ].filter(Boolean).join('\n');
+
             const body = [
               `## 🖥️ AI 驗收 ${emoji} ${statusText} — wp-workflows:browser-tester`,
               '',
-              processedReport || '> ⚠️ Agent 未產出測試報告',
-              '',
-              combinedMd ? `## 🖼️ 測試明細（截圖 + 影片）\n\n${combinedMd}` : '',
+              mainContent,
               '---',
               `*🤖 Smoke Test 由 CI 自動執行（run \`${{ github.run_id }}\`）*`,
             ].filter(Boolean).join('\n');
