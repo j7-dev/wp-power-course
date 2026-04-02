@@ -467,6 +467,21 @@ jobs:
               echo "❌ wp-env start 嘗試 ${MAX_ATTEMPTS} 次均失敗"
               exit 1
             fi
+            # Recovery: 重啟 unhealthy 容器（避免 tests-mysql 初始化競態）
+            UNHEALTHY=$(docker ps --filter "health=unhealthy" --format "{{.Names}}" 2>/dev/null)
+            if [ -n "$UNHEALTHY" ]; then
+              echo "♻️ 重啟 unhealthy 容器: $UNHEALTHY"
+              echo "$UNHEALTHY" | xargs docker restart
+              echo "⏳ 等待容器恢復（最多 120s）..."
+              for i in $(seq 1 60); do
+                STILL_UNHEALTHY=$(docker ps --filter "health=unhealthy" --format "{{.Names}}" 2>/dev/null)
+                if [ -z "$STILL_UNHEALTHY" ]; then
+                  echo "✅ 所有容器已恢復 (第 ${i} 次檢查)"
+                  break
+                fi
+                sleep 2
+              done
+            fi
             DELAY=${DELAYS[$((ATTEMPT - 1))]}
             echo "⚠️ 第 ${ATTEMPT} 次失敗，等待 ${DELAY} 秒後重試..."
             sleep "$DELAY"
@@ -1346,6 +1361,21 @@ jobs:
             if [ "$ATTEMPT" -eq "$MAX_ATTEMPTS" ]; then
               echo "❌ wp-env start 嘗試 ${MAX_ATTEMPTS} 次均失敗"
               exit 1
+            fi
+            # Recovery: 重啟 unhealthy 容器（避免 tests-mysql 初始化競態）
+            UNHEALTHY=$(docker ps --filter "health=unhealthy" --format "{{.Names}}" 2>/dev/null)
+            if [ -n "$UNHEALTHY" ]; then
+              echo "♻️ 重啟 unhealthy 容器: $UNHEALTHY"
+              echo "$UNHEALTHY" | xargs docker restart
+              echo "⏳ 等待容器恢復（最多 120s）..."
+              for i in $(seq 1 60); do
+                STILL_UNHEALTHY=$(docker ps --filter "health=unhealthy" --format "{{.Names}}" 2>/dev/null)
+                if [ -z "$STILL_UNHEALTHY" ]; then
+                  echo "✅ 所有容器已恢復 (第 ${i} 次檢查)"
+                  break
+                fi
+                sleep 2
+              done
             fi
             DELAY=${DELAYS[$((ATTEMPT - 1))]}
             echo "⚠️ 第 ${ATTEMPT} 次失敗，等待 ${DELAY} 秒後重試..."
