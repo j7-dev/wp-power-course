@@ -20,6 +20,8 @@
             <group>error</group>
             <group>edge</group>
             <group>security</group>
+            <group>chapter</group>
+            <group>linear-viewing</group>
         </include>
     </groups>
 
