@@ -367,7 +367,9 @@ final class Api extends ApiBase {
 						'progress'                 => $progress,
 						'icon_html'                => ChapterUtils::get_chapter_icon_html($chapter_id),
 						'next_chapter_id'          => $next_chapter_id,
-						'next_chapter_unlocked'    => $next_chapter_id ? true : false,
+						'next_chapter_unlocked'    => $next_chapter_id
+							? ChapterUtils::is_chapter_unlocked( $next_chapter_id, $user_id, $course_id )
+							: false,
 						'next_chapter_permalink'   => $next_chapter_permalink,
 					],
 				],
