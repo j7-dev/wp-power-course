@@ -1307,7 +1307,7 @@ jobs:
           (steps.e2e_result.outputs.status == 'passed' || steps.e2e_result.outputs.status == 'skipped')
         run: |
           git fetch origin master --depth=1 2>/dev/null || true
-          CHANGED=$(git diff --name-only origin/master...HEAD)
+          CHANGED=$(git diff --name-only origin/master..HEAD 2>/dev/null || echo "")
           if echo "$CHANGED" | grep -qE '^(js/src/|inc/templates/|inc/assets/|inc/classes/)'; then
             echo "needed=true" >> $GITHUB_OUTPUT
             echo "🧪 偵測到前後端變更，將執行 Browser Smoke Test"
