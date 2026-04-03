@@ -770,7 +770,7 @@ jobs:
 
       - name: 建置前端
         if: steps.final_result.outputs.status == 'passed' && steps.detect_changed_e2e.outputs.has_e2e_changes == 'true'
-        run: pnpm run build
+        run: pnpm run build && pnpm run build:wp
 
       - name: 安裝 CJK 字型（繁體中文截圖正常顯示）
         if: steps.final_result.outputs.status == 'passed' && steps.detect_changed_e2e.outputs.has_e2e_changes == 'true'
@@ -845,7 +845,7 @@ jobs:
 
       - name: "重新建置前端 (fix 1 後)"
         if: steps.e2e_cycle_1.outcome == 'failure'
-        run: pnpm run build
+        run: pnpm run build && pnpm run build:wp
 
       # ── E2E 測試循環 2/3 ─────────────────────────────
       - name: "Playwright E2E 測試 (cycle 2/3)"
@@ -911,7 +911,7 @@ jobs:
 
       - name: "重新建置前端 (fix 2 後)"
         if: steps.e2e_cycle_2.outcome == 'failure'
-        run: pnpm run build
+        run: pnpm run build && pnpm run build:wp
 
       # ── E2E 測試循環 3/3（最終測試，無修復）───────────
       - name: "Playwright E2E 測試 (cycle 3/3 - final)"
@@ -1343,7 +1343,7 @@ jobs:
 
       - name: 建置前端（AI 驗收用，E2E skipped 時可能未 build）
         if: steps.detect_smoke.outputs.needed == 'true'
-        run: pnpm run build
+        run: pnpm run build && pnpm run build:wp
 
       - name: 安裝 CJK 字型（供 Smoke Test 使用，E2E skipped 時補裝）
         if: steps.detect_smoke.outputs.needed == 'true' && steps.detect_changed_e2e.outputs.has_e2e_changes != 'true'
