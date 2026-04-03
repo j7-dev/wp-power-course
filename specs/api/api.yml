@@ -180,6 +180,12 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        enable_sequential_learning:
+          type: string
+          enum: [yes, no]
+          description: |
+            線性觀看模式。開啟後學員須依展平順序逐步完成章節。
+            預設值 'no'。
         total_students:
           type: integer
           description: 選課人數
@@ -2476,6 +2482,9 @@ paths:
         **前置（狀態）:**
         - 學員必須已有該章節所屬課程的存取權
         - 課程存取未到期（expire_date = 0 或 expire_date > now()）
+        - **[線性觀看]** 若課程 `enable_sequential_learning = 'yes'`：
+          - 已完成的章節不可取消完成（回傳 403）
+          - 只能完成已解鎖的章節（前一章已完成或為第一章）
 
         **前置（參數）:**
         - `chapter_id`（路徑參數）必須存在且 `post_type = 'pc_chapter'`
@@ -2483,8 +2492,13 @@ paths:
 
         **後置（狀態）:**
         - 標記完成：新增 `finished_at` 並觸發 `power_course_chapter_finished` action
-        - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
+        - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action（線性觀看開啟時禁止）
         - 切換後重新計算課程進度
+
+        **後置（回應）— 線性觀看額外欄位:**
+        - `next_chapter_unlocked`：下一章是否因此次完成而解鎖
+        - `next_chapter_id`：下一章 ID（若存在）
+        - `next_chapter_icon_html`：下一章更新後的圖示 HTML（供 JS 即時替換側邊欄圖示）
 
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
@@ -2516,6 +2530,25 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  next_chapter_unlocked:
+                    type: boolean
+                    description: |
+                      [線性觀看] 下一章是否因此次完成而解鎖。
+                      僅在課程 enable_sequential_learning = 'yes' 時回傳。
+                    example: true
+                  next_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: |
+                      [線性觀看] 下一章 ID。null 表示已是最後一章。
+                      僅在課程 enable_sequential_learning = 'yes' 時回傳。
+                    example: 301
+                  next_chapter_icon_html:
+                    type: string
+                    description: |
+                      [線性觀看] 下一章更新後的圖示 HTML，供 JS 即時替換側邊欄圖示。
+                      僅在課程 enable_sequential_learning = 'yes' 且 next_chapter_unlocked = true 時回傳。
+                    example: '<div class="pc-chapter-icon ..."><svg>...</svg></div>'
         "403":
           description: 前置狀態不符
           content:
@@ -2542,6 +2575,20 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "必須登入"
+                    data:
+                      status: 403
+                sequentialCannotUnfinish:
+                  summary: 線性觀看模式下無法取消完成
+                  value:
+                    code: rest_forbidden
+                    message: "線性觀看模式下無法取消已完成章節"
+                    data:
+                      status: 403
+                sequentialChapterLocked:
+                  summary: 章節尚未解鎖
+                  value:
+                    code: rest_forbidden
+                    message: "必須先完成前面的章節"
                     data:
                       status: 403
         "404":

@@ -1,0 +1,107 @@
+Activity: 線性觀看學習流程
+
+Actor: 學員
+Trigger: 學員進入已啟用線性觀看的課程教室頁面
+Predecessors: 學員已被授權該課程、課程已啟用 enable_sequential_learning
+
+---
+
+## 主流程：按順序學習
+
+1. [學員] 進入課程教室頁面
+2. [系統/PHP] 計算章節鎖定狀態：
+   - 取得展平章節序列 `get_flatten_post_ids(course_id)`
+   - 遍歷序列，第一個章節永遠解鎖
+   - 章節 N 解鎖條件 = 章節 N-1 的 `finished_at` 不為空
+3. [系統/PHP] 渲染教室頁面：
+   - 側邊欄章節列表：解鎖章節顯示正常圖示，鎖定章節顯示鎖頭圖示
+   - 鎖定章節的 `<li>` 元素加上 `data-locked="true"` 屬性
+   - 「前往下一章節」按鈕：下一章鎖定時顯示為灰色禁用
+4. [學員] 觀看目前解鎖的章節內容
+5. [學員] 點擊「標示為已完成」按鈕
+6. [系統/JS] 發送 AJAX POST 到 `toggle-finish-chapters/{chapter_id}`
+7. [系統/API] 驗證前置條件：
+   - 學員有課程存取權 ✓
+   - 章節為已解鎖狀態 ✓
+   - 章節尚未完成（非取消操作）✓
+8. [系統/API] 寫入 `finished_at` 到 `pc_avl_chaptermeta`
+9. [系統/API] 回傳成功，包含：
+   - `is_this_chapter_finished: true`
+   - `progress: 新進度百分比`
+   - `icon_html: 已完成圖示 HTML`
+   - `next_chapter_unlocked: true/false`
+   - `next_chapter_id: 下一章 ID`
+   - `next_chapter_icon_html: 下一章新圖示 HTML`
+10. [系統/JS] 即時更新 UI（不重整頁面）：
+    - 當前章節圖示更新為已完成 ✓
+    - 下一章鎖頭圖示替換為可觀看圖示
+    - 下一章 `<li>` 移除 `data-locked="true"`
+    - 「前往下一章節」按鈕從灰色禁用變為可點擊
+    - 進度條更新
+    - 完成按鈕變為「已完成」不可點擊狀態
+11. [學員] 點擊「前往下一章節」或從側邊欄點擊下一章
+12. 回到步驟 4，直到所有章節完成
+
+---
+
+## 分支：學員嘗試存取鎖定章節（點擊側邊欄）
+
+分支於步驟 4：
+1. [學員] 在側邊欄點擊鎖定章節
+2. [系統/JS] 偵測 `data-locked="true"`，阻止導航
+3. [系統/JS] 顯示提示訊息：「請先完成前面的章節」
+4. [學員] 確認提示，繼續學習目前章節
+
+---
+
+## 分支：學員透過 URL 直接存取鎖定章節
+
+分支於步驟 1：
+1. [學員] 透過 URL 直接存取鎖定章節
+2. [系統/PHP] 在 `single-pc_chapter.php` 模板載入時檢查鎖定狀態
+3. [系統/PHP] 判定章節為鎖定狀態
+4. [系統/PHP] 計算第一個未完成章節的 URL
+5. [系統/PHP] `wp_safe_redirect()` 導向到第一個未完成章節
+6. 回到主流程步驟 2
+
+---
+
+## 分支：學員嘗試透過 API 取消完成
+
+分支於步驟 6：
+1. [學員/系統] 對已完成章節呼叫 `toggle-finish-chapters/{chapter_id}`
+2. [系統/API] 檢查課程 `enable_sequential_learning` 為 'yes'
+3. [系統/API] 檢查章節 `finished_at` 不為空（已完成）
+4. [系統/API] 拒絕操作，回傳錯誤「線性觀看模式下無法取消已完成章節」
+
+---
+
+Activity: 管理員設定線性觀看
+
+Actor: 管理員
+Trigger: 管理員進入課程編輯頁面
+Predecessors: 管理員已登入且具有編輯課程權限
+
+---
+
+## 主流程：開啟線性觀看
+
+1. [管理員] 進入 WordPress 後台 → Power Course → 課程編輯頁面
+2. [系統/React SPA] 載入課程設定，顯示「線性觀看」開關（FiSwitch 元件）
+   - meta key: `enable_sequential_learning`
+   - 預設值: 'no'（關閉）
+   - 位置: CourseOther 區塊，與現有開關（顯示章節、留言等）同區
+3. [管理員] 切換「線性觀看」開關為開啟
+4. [管理員] 點擊儲存
+5. [系統/API] 更新課程 product meta `enable_sequential_learning` 為 'yes'
+6. [系統] 前台教室頁面立即生效
+
+---
+
+## 分支：關閉線性觀看
+
+分支於步驟 3：
+1. [管理員] 切換「線性觀看」開關為關閉
+2. [管理員] 點擊儲存
+3. [系統/API] 更新課程 product meta `enable_sequential_learning` 為 'no'
+4. [系統] 前台教室頁面立即恢復自由瀏覽，所有鎖頭消失
