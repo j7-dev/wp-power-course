@@ -180,6 +180,11 @@ components:
         is_free:
           type: string
           enum: [yes, no]
+        linear_chapter_mode:
+          type: string
+          enum: [yes, no]
+          description: 線性觀看模式（yes = 學員必須按章節順序完成，no = 自由觀看）
+          default: "no"
         total_students:
           type: integer
           description: 選課人數
@@ -1206,6 +1211,10 @@ paths:
                 is_free:
                   type: string
                   enum: [yes, no]
+                linear_chapter_mode:
+                  type: string
+                  enum: [yes, no]
+                  description: 線性觀看模式開關（yes = 開啟，no = 關閉）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
