@@ -171,6 +171,11 @@ components:
           items:
             type: integer
           description: 講師 user ID 列表
+        sequential_mode:
+          type: string
+          enum: [yes, no]
+          description: 線性觀看模式開關（yes = 學員必須依序完成章節才能解鎖後續）
+          default: "no"
         is_popular:
           type: string
           enum: [yes, no]
@@ -982,6 +987,11 @@ paths:
                   type: string
                   enum: [yes, no]
                   default: no
+                sequential_mode:
+                  type: string
+                  enum: [yes, no]
+                  default: no
+                  description: 線性觀看模式（yes = 學員必須依序完成章節）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -1206,6 +1216,10 @@ paths:
                 is_free:
                   type: string
                   enum: [yes, no]
+                sequential_mode:
+                  type: string
+                  enum: [yes, no]
+                  description: 線性觀看模式開關。yes = 學員必須依序完成章節才能解鎖後續章節
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
@@ -2488,6 +2502,10 @@ paths:
 
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
+
+        **線性觀看模式額外回傳：**
+        - 若課程啟用 `sequential_mode = yes`，回傳 `unlocked_chapter_ids`（標記完成時新解鎖的章節）
+          或 `locked_chapter_ids`（取消完成時重新鎖定的章節），供前端即時更新 UI
       parameters:
         - name: chapter_id
           in: path
@@ -2516,6 +2534,22 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  unlocked_chapter_ids:
+                    type: array
+                    items:
+                      type: integer
+                    description: |
+                      （僅 sequential_mode=yes 時回傳）
+                      標記完成後新解鎖的章節 ID 列表。前端用此陣列即時移除鎖頭圖示。
+                    example: [201]
+                  locked_chapter_ids:
+                    type: array
+                    items:
+                      type: integer
+                    description: |
+                      （僅 sequential_mode=yes 時回傳）
+                      取消完成後重新鎖定的章節 ID 列表。前端用此陣列即時顯示鎖頭圖示。
+                    example: [202, 203]
         "403":
           description: 前置狀態不符
           content:

@@ -18,4 +18,8 @@
   [BRANCH:4a:單一商品定價] {specs/ui/課程商品設定頁.md}
 [MERGE:4a]
 [STEP:5] @管理員 {features/course/更新課程.feature}
+[DECISION:5a] 是否需要啟用線性觀看
+  [BRANCH:5a:啟用線性觀看] @管理員 {features/course/設定課程線性觀看.feature}
+  [BRANCH:5a:不需要線性觀看] @管理員
+[MERGE:5a]
 [END]
