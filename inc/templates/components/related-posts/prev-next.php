@@ -37,19 +37,43 @@ if ($prev_post) {
 }
 
 if ($next_post) {
-	printf(
-	/*html*/'
-	<a href="%1$s" class="pc-next-post group w-full rounded-box border border-solid border-base-content/30 p-4 flex items-center gap-x-2 md:gap-x-4 relative">
-		<div class="flex-1 text-right pt-6">
-			<p class="m-0 text-sm md:text-base text-base-content group-hover:text-primary">%2$s</p>
+	// 線性觀看：判斷下一章節是否被鎖定
+	$linear_state   = $GLOBALS['pc_linear_state'] ?? null;
+	$is_next_locked = false;
+	if ( $linear_state && $linear_state['enabled'] ) {
+		$is_next_locked = !in_array( (int) $next_post_id, $linear_state['unlocked_chapter_ids'], true );
+	}
+
+	if ( $is_next_locked ) {
+		// 線性觀看：下一章節鎖定時顯示禁用狀態
+		printf(
+		/*html*/'
+		<div class="pc-next-post group w-full rounded-box border border-solid border-base-content/10 p-4 flex items-center gap-x-2 md:gap-x-4 relative opacity-50 cursor-not-allowed" data-locked-next="true">
+			<div class="flex-1 text-right pt-6">
+				<p class="m-0 text-sm md:text-base text-base-content/50">%1$s</p>
+				<p class="m-0 text-xs text-base-content/30 mt-1">&#x1F512; 完成本章節後即可觀看</p>
+			</div>
+			<svg class="size-4 md:size-6 stroke-base-content/30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+			<p class="m-0 text-xs md:text-sm text-base-content/50 absolute top-4 right-10 md:right-14">下一個</p>
 		</div>
-		<svg class="size-4 md:size-6 stroke-base-content group-hover:stroke-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-		<p class="m-0 text-xs md:text-sm text-base-content/50 absolute top-4 right-10 md:right-14">下一個</p>
-	</a>
-	',
-	get_the_permalink($next_post->ID),
-	$next_post->post_title,
-	);
+		',
+		\esc_html( $next_post->post_title ),
+		);
+	} else {
+		printf(
+		/*html*/'
+		<a href="%1$s" class="pc-next-post group w-full rounded-box border border-solid border-base-content/30 p-4 flex items-center gap-x-2 md:gap-x-4 relative">
+			<div class="flex-1 text-right pt-6">
+				<p class="m-0 text-sm md:text-base text-base-content group-hover:text-primary">%2$s</p>
+			</div>
+			<svg class="size-4 md:size-6 stroke-base-content group-hover:stroke-primary" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path d="M4 12H20M20 12L16 8M20 12L16 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+			<p class="m-0 text-xs md:text-sm text-base-content/50 absolute top-4 right-10 md:right-14">下一個</p>
+		</a>
+		',
+		\get_the_permalink( $next_post->ID ),
+		\esc_html( $next_post->post_title ),
+		);
+	}
 }
 
 

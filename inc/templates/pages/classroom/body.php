@@ -41,6 +41,14 @@ $video_info = \get_post_meta( $chapter_id, 'chapter_video', true );
 $next_post_id  = ChapterUtils::get_next_post_id( $chapter_id );
 $next_post_url = $next_post_id ? ( \get_permalink( $next_post_id ) ?: '' ) : '';
 
+// 線性觀看：下一章節被鎖定時清空 next_post_url，阻止影片播完自動跳轉
+$linear_state = $GLOBALS['pc_linear_state'] ?? null;
+if ( $linear_state && $linear_state['enabled'] && $next_post_id ) {
+	if ( !in_array( (int) $next_post_id, $linear_state['unlocked_chapter_ids'], true ) ) {
+		$next_post_url = ''; // 清空 → vidstack 不會自動跳轉
+	}
+}
+
 echo '<div id="pc-classroom-body" class="w-full bg-base-100 lg:pl-[25rem]">';
 
 Plugin::load_template(
