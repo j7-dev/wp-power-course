@@ -268,6 +268,36 @@ jobs:
           fi
 
       # ══════════════════════════════════════════════════
+      # Stage 1→2 橋接：動態升級管線模式
+      # ══════════════════════════════════════════════════
+
+      - name: 動態升級為管線模式（clarifier 已完成規格生成）
+        id: dynamic_upgrade
+        if: env.PIPELINE_MODE == 'false' && steps.detect_specs.outputs.specs_changed == 'true'
+        run: |
+          echo "🔄 Clarifier 已生成 specs，動態升級為管線模式"
+          echo "PIPELINE_MODE=true" >> $GITHUB_ENV
+          echo "upgraded=true" >> $GITHUB_OUTPUT
+
+      - name: 通知用戶管線已自動啟動
+        if: steps.dynamic_upgrade.outputs.upgraded == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUM: ${{ steps.resolve_branch.outputs.issue_num }}
+          UPGRADE_MSG: |-
+            ## 🚀 需求已確認，自動啟動開發管線
+
+            Clarifier 判定需求已足夠清晰，已生成規格文件並自動啟動後續流程：
+            **Planner → TDD Coordinator → Testing**
+
+            > 如需中止，可取消此 GitHub Actions run。
+        run: |
+          if [ -n "$ISSUE_NUM" ]; then
+            gh issue comment "$ISSUE_NUM" --body "$UPGRADE_MSG"
+          fi
+
+      # ══════════════════════════════════════════════════
       # Stage 2: Planner（規劃實作計畫）
       # ══════════════════════════════════════════════════
 
