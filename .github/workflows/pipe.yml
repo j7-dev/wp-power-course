@@ -8,6 +8,10 @@ on:
   pull_request_review:
     types: [submitted]
 
+concurrency:
+  group: claude-pipe-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   claude:
     name: 釐清需求及開發
@@ -43,17 +47,20 @@ jobs:
         if: github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment'
         env:
           GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          COMMENT_ID: ${{ github.event.comment.id }}
         run: |
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+          if [ "$EVENT_NAME" = "issue_comment" ]; then
+            gh api "repos/${REPO}/issues/comments/${COMMENT_ID}/reactions" \
               -f content=eyes --silent
-          elif [ "${{ github.event_name }}" = "pull_request_review_comment" ]; then
-            gh api repos/${{ github.repository }}/pulls/comments/${{ github.event.comment.id }}/reactions \
+          elif [ "$EVENT_NAME" = "pull_request_review_comment" ]; then
+            gh api "repos/${REPO}/pulls/comments/${COMMENT_ID}/reactions" \
               -f content=eyes --silent
           fi
 
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -61,18 +68,22 @@ jobs:
         id: resolve_branch
         env:
           GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.comment.issue_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           # 取得 issue number
-          if [ "${{ github.event_name }}" = "issues" ]; then
-            ISSUE_NUM="${{ github.event.issue.number }}"
-          elif [ "${{ github.event_name }}" = "issue_comment" ]; then
-            ISSUE_NUM=$(echo "${{ github.event.comment.issue_url }}" | grep -oP '\d+$' || echo "")
+          if [ "$EVENT_NAME" = "issues" ]; then
+            ISSUE_NUM="$ISSUE_NUMBER"
+          elif [ "$EVENT_NAME" = "issue_comment" ]; then
+            ISSUE_NUM=$(echo "$ISSUE_URL" | grep -oE '[0-9]+$' || echo "")
             if [ -z "$ISSUE_NUM" ]; then
-              ISSUE_NUM="${{ github.event.issue.number }}"
+              ISSUE_NUM="$ISSUE_NUMBER"
             fi
-          elif [ "${{ github.event_name }}" = "pull_request_review_comment" ] || \
-               [ "${{ github.event_name }}" = "pull_request_review" ]; then
-            ISSUE_NUM="${{ github.event.pull_request.number }}"
+          elif [ "$EVENT_NAME" = "pull_request_review_comment" ] || \
+               [ "$EVENT_NAME" = "pull_request_review" ]; then
+            ISSUE_NUM="$PR_NUMBER"
           fi
 
           echo "issue_num=$ISSUE_NUM" >> $GITHUB_OUTPUT
@@ -129,10 +140,10 @@ jobs:
           fi
 
           # 擷取 @claude 後面的文字來比對關鍵字
-          AFTER_CLAUDE=$(echo "$COMMENT" | grep -oP '@claude\s+\K.*' || echo "")
+          AFTER_CLAUDE=$(echo "$COMMENT" | sed -n 's/.*@claude[[:space:]]*//p' | head -1 || echo "")
 
           # 全流程管線模式（最高優先）— 釐清完畢後由用戶觸發
-          if echo "$AFTER_CLAUDE" | grep -qiP '(開工|全自動|確認|OK|沒問題|開始|go|start)'; then
+          if echo "$AFTER_CLAUDE" | grep -qiE '開工|全自動|確認|OK|沒問題|開始|go|start'; then
             PIPELINE_MODE="true"
           else
             PIPELINE_MODE="false"
@@ -174,181 +185,32 @@ jobs:
       - name: 組合 Clarifier Prompt
         run: |
           ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
-
           if [ "$PIPELINE_MODE" = "true" ]; then
-            # ── Pipeline 模式：直接生成 specs ──
-            {
-              echo 'CLARIFIER_PROMPT<<GHEOF'
-              echo "$ISSUE_CONTEXT"
-              echo ""
-              echo "---"
-              echo "你現在處於 CI 全流程管線模式（@claude 開工）。"
-              echo "上方是 Issue #${ISSUE_NUM} 完整內容（包含所有留言與澄清紀錄），視為已完成的釐清。"
-              echo ""
-              echo "### 你的任務：規格生成"
-              echo "- 根據 Issue 內容（含澄清留言）生成規格文件到 ./specs 目錄"
-              echo "- 使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill 產出完整 .feature 規格"
-              echo "- 如果 ./specs 目錄已有此功能的相關規格文件，請檢查是否需要更新"
-              echo "- 完成後 commit specs 到當前分支"
-              echo "- 使用 \`gh issue comment ${ISSUE_NUM} --body \"...\"\` 回報規格生成進度"
-              echo ""
-              echo "### 嚴禁"
-              echo "- 不要實作功能程式碼（實作由後續 workflow step 的 tdd-coordinator 負責）"
-              echo "- 不要啟動任何 sub-agent（planner、tdd-coordinator 等）"
-              echo "- 完成 specs 的 commit 後就結束"
-              echo 'GHEOF'
-            } >> $GITHUB_ENV
+            TEMPLATE=".github/prompts/clarifier-pipeline.md"
           else
-            # ── 互動澄清模式 ──
-            {
-              echo 'CLARIFIER_PROMPT<<GHEOF'
-              echo "$ISSUE_CONTEXT"
-              echo ""
-              echo "---"
-              echo "你是 clarifier agent，在 CI 環境中運作。"
-              echo ""
-              echo "### 第 1 步：判斷這是第幾輪提問"
-              echo "閱讀上方 Issue Comments，檢查 claude[bot] 或 github-actions[bot] 是否已經發表過澄清問題。"
-              echo "只計算「向用戶提問並等待回答」的留言，不計算狀態更新或進度報告。"
-              echo ""
-              echo "### 第 2 步：根據輪數決定行動"
-              echo ""
-              echo "**情況 A：尚未提過任何澄清問題（第一輪）**"
-              echo "1. 全面分析需求中缺少的細節（邊界情境、錯誤處理、UI 行為、資料模型、API 格式等）"
-              echo "2. 一次提出至少 5 個澄清問題，讓用戶可以一次回答"
-              echo "3. **問題分類**：每題標記為 [情境問題] 或 [工程問題]"
-              echo "   - [情境問題]：關於業務邏輯、使用者體驗、功能行為，避免技術用詞，非工程人員也能理解"
-              echo "   - [工程問題]：技術實作、架構決策，可使用技術術語，但選項說明需讓人容易理解"
-              echo "4. **每題使用 HTML <details> 標籤折疊**，格式範例（嚴格遵守，注意空行）："
-              echo ""
-              echo "   <details>"
-              echo "   <summary>[情境問題] Q1. 問題標題（讓用戶一眼看出問的是什麼）</summary>"
-              echo ""
-              echo "   （可在此補充問題背景說明，可省略）"
-              echo ""
-              echo "   | 選項 | 說明 |"
-              echo "   |------|------|"
-              echo "   | A | 選項說明 |"
-              echo "   | B | 選項說明 |"
-              echo ""
-              echo "   💡 **建議：A** — 1-2 句理由，說清楚推薦此選項的原因"
-              echo ""
-              echo "   </details>"
-              echo ""
-              echo "5. 在所有 <details> 題目之後，附上建議答案摘要區塊："
-              echo "   > 💡 \`建議 A A A C D B A\`"
-              echo "   >"
-              echo "   > - Q1: A — 簡短理由"
-              echo "   > - Q2: A — 簡短理由"
-              echo "   （依 Q1→Qn 順序，空格分隔，讓用戶可直接複製 backtick 內容一鍵回覆）"
-              echo "6. 使用 \`gh issue comment ${ISSUE_NUM} --body \"問題內容\"\` 在 Issue 上發表所有問題（合併為一則留言）"
-              echo "7. 結束本次 run"
-              echo "⚠️ 第一輪嚴禁少於 5 個問題，嚴禁判斷「需求已夠清晰」，嚴禁生成 specs"
-              echo ""
-              echo "**情況 B：已經提過澄清問題（後續輪次）**"
-              echo "判斷需求是否已足夠清晰（所有邊界情境、錯誤處理、資料模型都已被用戶確認）。"
-              echo ""
-              echo "- 如果仍不夠清晰 → 繼續追問（不限問題數量，1 個也可以），同樣使用 <details> 折疊格式與 [情境問題]/[工程問題] 分類，在留言底部附上建議答案摘要（格式同情況 A 步驟 5）"
-              echo "- 如果已足夠清晰 → 生成規格文件："
-              echo "  1. 生成規格文件到 ./specs 目錄（使用 /aibdd.discovery、/aibdd.form.feature-spec 等 skill）"
-              echo "  2. Commit specs 到當前分支"
-              echo "  3. 使用 \`gh issue comment ${ISSUE_NUM} --body \"...\"\` 回報規格生成進度"
-              echo "  4. 結束本次 run（後續 workflow step 會自動啟動 tdd-coordinator）"
-              echo ""
-              echo "### 嚴禁"
-              echo "- 第一輪提問嚴禁少於 5 個問題"
-              echo "- 第一輪嚴禁判斷「需求已夠清晰」"
-              echo "- 不要直接實作功能程式碼（實作由後續 workflow step 的 tdd-coordinator 負責）"
-              echo "- 不要啟動任何 sub-agent（planner、tdd-coordinator 等）"
-              echo ""
-              echo "### 手動 override"
-              echo "用戶隨時可留言 \`@claude 確認\` 或 \`@claude 開工\` 跳過提問限制，直接生成 specs。"
-              echo 'GHEOF'
-            } >> $GITHUB_ENV
+            TEMPLATE=".github/prompts/clarifier-interactive.md"
           fi
+          {
+            echo 'CLARIFIER_PROMPT<<GHEOF'
+            echo "$ISSUE_CONTEXT"
+            echo ""
+            echo "---"
+            sed "s/{{ISSUE_NUM}}/${ISSUE_NUM}/g" "$TEMPLATE"
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
 
       # ══════════════════════════════════════════════════
       # Stage 1: Clarifier（釐清需求 + 生成 specs）
       # ══════════════════════════════════════════════════
 
-      # ── Clarifier 第 1 次嘗試 ─────────────────────────
-      - name: "Clarifier (attempt 1/3)"
-        id: clarifier_attempt_1
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
+      - name: "Stage 1: Clarifier"
+        id: clarifier
+        uses: ./.github/actions/claude-retry
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
           prompt: ${{ env.CLARIFIER_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
-            --model claude-opus-4-6
-            --agent wp-workflows:clarifier
-
-      # ── Clarifier 第 1 次失敗 → 等待後重試 ─────────────
-      - name: "等待重試 (clarifier attempt 1 failed)"
-        if: steps.clarifier_attempt_1.outcome == 'failure'
-        run: |
-          echo "⚠️ Clarifier 第 1 次嘗試失敗，等待 30 秒後重試..."
-          sleep 30
-
-      # ── Clarifier 第 2 次嘗試 ─────────────────────────
-      - name: "Clarifier (attempt 2/3)"
-        id: clarifier_attempt_2
-        if: steps.clarifier_attempt_1.outcome == 'failure'
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
-          prompt: ${{ env.CLARIFIER_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
-            --model claude-opus-4-6
-            --agent wp-workflows:clarifier
-
-      # ── Clarifier 第 2 次失敗 → 等待後重試 ─────────────
-      - name: "等待重試 (clarifier attempt 2 failed)"
-        if: steps.clarifier_attempt_1.outcome == 'failure' && steps.clarifier_attempt_2.outcome == 'failure'
-        run: |
-          echo "⚠️ Clarifier 第 2 次嘗試失敗，等待 60 秒後重試..."
-          sleep 60
-
-      # ── Clarifier 第 3 次嘗試（最後一次）──────────────
-      - name: "Clarifier (attempt 3/3 - final)"
-        id: clarifier_attempt_3
-        if: steps.clarifier_attempt_1.outcome == 'failure' && steps.clarifier_attempt_2.outcome == 'failure'
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
-          prompt: ${{ env.CLARIFIER_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
-            --model claude-opus-4-6
-            --agent wp-workflows:clarifier
+          max_turns: ${{ env.PIPELINE_MODE == 'true' && '200' || '120' }}
+          agent: wp-workflows:clarifier
 
       # ══════════════════════════════════════════════════
       # Stage 1→2 橋接：偵測 Specs 變更
@@ -357,13 +219,8 @@ jobs:
       - name: 偵測 Specs 變更
         id: detect_specs
         run: |
-          # Clarifier 是否成功
-          CLARIFIER_OK="false"
-          if [ "${{ steps.clarifier_attempt_1.outcome }}" = "success" ] || \
-             [ "${{ steps.clarifier_attempt_2.outcome }}" = "success" ] || \
-             [ "${{ steps.clarifier_attempt_3.outcome }}" = "success" ]; then
-            CLARIFIER_OK="true"
-          fi
+          # Clarifier 是否成功（由 composite action 彙整）
+          CLARIFIER_OK="${{ steps.clarifier.outputs.success }}"
 
           if [ "$CLARIFIER_OK" != "true" ]; then
             echo "specs_changed=false" >> $GITHUB_OUTPUT
@@ -390,18 +247,69 @@ jobs:
             echo "✅ 偵測到 specs 變更，將啟動 tdd-coordinator"
             echo "變更的 specs 檔案:"
             echo "$SPECS_DIFF"
-            [ -n "$SPECS_UNTRACKED" ] && echo "未追蹤的 specs 檔案:" && echo "$SPECS_UNTRACKED"
+            if [ -n "$SPECS_UNTRACKED" ]; then
+              echo "未追蹤的 specs 檔案:"
+              echo "$SPECS_UNTRACKED"
+            fi
           else
             echo "specs_changed=false" >> $GITHUB_OUTPUT
             echo "ℹ️ 無 specs 變更（clarifier 可能只是提問或修改其他檔案）"
           fi
 
+          # 檢查 3：specs/ 目錄是否有可用的規格檔案（跨 run 累積）
+          SPECS_FILES=$(find specs/ -name '*.feature' -o -name '*.activity' -o -name 'api.yml' -o -name 'erm.dbml' 2>/dev/null | head -1)
+          if [ -n "$SPECS_FILES" ]; then
+            echo "specs_available=true" >> $GITHUB_OUTPUT
+            echo "📦 specs 目錄有可用規格檔案"
+          else
+            echo "specs_available=false" >> $GITHUB_OUTPUT
+            echo "📦 specs 目錄無可用規格檔案"
+          fi
+
       # ══════════════════════════════════════════════════
-      # Stage 2: tdd-coordinator（規劃 + TDD 實作）
+      # Stage 2: Planner（規劃實作計畫）
+      # ══════════════════════════════════════════════════
+
+      - name: 組合 Planner Prompt
+        if: steps.detect_specs.outputs.specs_available == 'true' && env.PIPELINE_MODE == 'true'
+        run: |
+          ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
+          {
+            echo 'PLANNER_PROMPT<<GHEOF'
+            echo "$ISSUE_CONTEXT"
+            echo ""
+            echo "---"
+            sed "s/{{ISSUE_NUM}}/${ISSUE_NUM}/g" .github/prompts/planner.md
+            echo 'GHEOF'
+          } >> $GITHUB_ENV
+
+      - name: "Stage 2: Planner"
+        id: planner
+        if: steps.detect_specs.outputs.specs_available == 'true' && env.PIPELINE_MODE == 'true'
+        uses: ./.github/actions/claude-retry
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: ${{ env.PLANNER_PROMPT }}
+          max_turns: '120'
+          agent: wp-workflows:planner
+
+      # ══════════════════════════════════════════════════
+      # Stage 2→3 橋接：偵測 Planner 結果
+      # ══════════════════════════════════════════════════
+
+      - name: 偵測 Planner 結果
+        id: detect_planner
+        if: steps.detect_specs.outputs.specs_available == 'true' && env.PIPELINE_MODE == 'true'
+        run: |
+          echo "planner_ok=${{ steps.planner.outputs.success }}" >> $GITHUB_OUTPUT
+          echo "📋 Planner 結果: ${{ steps.planner.outputs.success }}"
+
+      # ══════════════════════════════════════════════════
+      # Stage 3: tdd-coordinator（TDD 實作）
       # ══════════════════════════════════════════════════
 
       - name: 組合 tdd-coordinator Prompt
-        if: steps.detect_specs.outputs.specs_changed == 'true'
+        if: steps.detect_planner.outputs.planner_ok == 'true'
         run: |
           ISSUE_NUM="${{ steps.resolve_branch.outputs.issue_num }}"
           {
@@ -409,109 +317,19 @@ jobs:
             echo "$ISSUE_CONTEXT"
             echo ""
             echo "---"
-            echo "你是 tdd-coordinator，在 CI 環境中運作。"
-            echo "Clarifier 已完成需求釐清，並將規格文件 commit 到 ./specs 目錄。"
-            echo ""
-            echo "### 你的任務"
-            echo "1. 閱讀 ./specs 目錄下的規格文件（.feature、.activity、api.yml、erm.dbml 等）"
-            echo "2. 根據規格制定實作計畫（你自己內部規劃，不需要單獨的 planner agent）"
-            echo "3. 以 TDD 流程實作功能："
-            echo "   - 先寫測試（使用對應的 aibdd skill）"
-            echo "   - 再寫生產程式碼讓測試通過"
-            echo "   - 重構"
-            echo "4. 所有變更 commit 到當前分支"
-            echo "5. 使用 \`gh issue comment ${ISSUE_NUM} --body \"...\"\` 回報每個階段的進度"
-            echo ""
-            echo "### 重要規則"
-            echo "- 在 CI 環境中直接在當前分支工作"
-            echo "- 每個有意義的實作步驟都要 commit"
-            echo "- 遇到問題時自行判斷最佳解法，不要停下來等用戶確認"
-            echo "- 動態組裝你需要的 agent team（使用 Agent tool），根據規格內容決定："
-            echo "  - PHP 後端：使用 aibdd.auto.php.it.* skills"
-            echo "  - TypeScript API：使用 aibdd.auto.typescript.api.* skills"
-            echo "  - 前端 E2E：使用 aibdd.auto.typescript.e2e.* skills"
+            sed "s/{{ISSUE_NUM}}/${ISSUE_NUM}/g" .github/prompts/tdd-coordinator.md
             echo 'GHEOF'
           } >> $GITHUB_ENV
 
-      # ── tdd-coordinator 第 1 次嘗試 ──────────────────
-      - name: "tdd-coordinator (attempt 1/3)"
-        id: tdd_attempt_1
-        if: steps.detect_specs.outputs.specs_changed == 'true'
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
+      - name: "Stage 3: TDD Coordinator"
+        id: tdd
+        if: steps.detect_planner.outputs.planner_ok == 'true'
+        uses: ./.github/actions/claude-retry
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
           prompt: ${{ env.TDD_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns 200
-            --model claude-opus-4-6
-            --agent wp-workflows:tdd-coordinator
-
-      # ── tdd-coordinator 第 1 次失敗 → 等待後重試 ──────
-      - name: "等待重試 (tdd attempt 1 failed)"
-        if: steps.detect_specs.outputs.specs_changed == 'true' && steps.tdd_attempt_1.outcome == 'failure'
-        run: |
-          echo "⚠️ tdd-coordinator 第 1 次嘗試失敗，等待 30 秒後重試..."
-          sleep 30
-
-      # ── tdd-coordinator 第 2 次嘗試 ──────────────────
-      - name: "tdd-coordinator (attempt 2/3)"
-        id: tdd_attempt_2
-        if: steps.detect_specs.outputs.specs_changed == 'true' && steps.tdd_attempt_1.outcome == 'failure'
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
-          prompt: ${{ env.TDD_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns 200
-            --model claude-opus-4-6
-            --agent wp-workflows:tdd-coordinator
-
-      # ── tdd-coordinator 第 2 次失敗 → 等待後重試 ──────
-      - name: "等待重試 (tdd attempt 2 failed)"
-        if: steps.detect_specs.outputs.specs_changed == 'true' && steps.tdd_attempt_1.outcome == 'failure' && steps.tdd_attempt_2.outcome == 'failure'
-        run: |
-          echo "⚠️ tdd-coordinator 第 2 次嘗試失敗，等待 60 秒後重試..."
-          sleep 60
-
-      # ── tdd-coordinator 第 3 次嘗試（最後一次）────────
-      - name: "tdd-coordinator (attempt 3/3 - final)"
-        id: tdd_attempt_3
-        if: steps.detect_specs.outputs.specs_changed == 'true' && steps.tdd_attempt_1.outcome == 'failure' && steps.tdd_attempt_2.outcome == 'failure'
-        continue-on-error: true
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          additional_permissions: |
-            actions: read
-          settings: .claude/settings.json
-          plugin_marketplaces: |
-            https://github.com/j7-dev/wp-workflows.git
-          plugins: |
-            wp-workflows@wp-workflows
-          prompt: ${{ env.TDD_PROMPT }}
-          claude_args: |
-            --dangerously-skip-permissions
-            --max-turns 200
-            --model claude-opus-4-6
-            --agent wp-workflows:tdd-coordinator
+          max_turns: '200'
+          agent: wp-workflows:tdd-coordinator
 
       # ══════════════════════════════════════════════════
       # 檢查整體結果
@@ -520,28 +338,31 @@ jobs:
       - name: 檢查 Claude 結果與程式碼變更
         id: check_result
         run: |
-          # Stage 1: Clarifier 成功檢查
-          CLARIFIER_OK="false"
-          if [ "${{ steps.clarifier_attempt_1.outcome }}" = "success" ] || \
-             [ "${{ steps.clarifier_attempt_2.outcome }}" = "success" ] || \
-             [ "${{ steps.clarifier_attempt_3.outcome }}" = "success" ]; then
-            CLARIFIER_OK="true"
-          fi
+          # Stage 1: Clarifier 成功檢查（由 composite action 彙整）
+          CLARIFIER_OK="${{ steps.clarifier.outputs.success }}"
 
-          # Stage 2: tdd-coordinator 成功檢查（僅在被觸發時）
-          SPECS_CHANGED="${{ steps.detect_specs.outputs.specs_changed }}"
-          TDD_OK="skipped"
-          if [ "$SPECS_CHANGED" = "true" ]; then
-            TDD_OK="false"
-            if [ "${{ steps.tdd_attempt_1.outcome }}" = "success" ] || \
-               [ "${{ steps.tdd_attempt_2.outcome }}" = "success" ] || \
-               [ "${{ steps.tdd_attempt_3.outcome }}" = "success" ]; then
-              TDD_OK="true"
+          # Stage 2: Planner 成功檢查（僅在 pipeline mode 且 specs 可用時）
+          SPECS_AVAILABLE="${{ steps.detect_specs.outputs.specs_available }}"
+          PIPELINE_MODE="${{ env.PIPELINE_MODE }}"
+          PLANNER_OK="skipped"
+          if [ "$SPECS_AVAILABLE" = "true" ] && [ "$PIPELINE_MODE" = "true" ]; then
+            PLANNER_OK="${{ steps.planner.outputs.success }}"
+            if [ -z "$PLANNER_OK" ]; then
+              PLANNER_OK="false"
             fi
           fi
 
-          # 整體判定：clarifier 必須成功 AND（tdd 成功 OR 未觸發）
-          if [ "$CLARIFIER_OK" = "true" ] && [ "$TDD_OK" != "false" ]; then
+          # Stage 3: tdd-coordinator 成功檢查（僅在 planner 成功後）
+          TDD_OK="skipped"
+          if [ "${{ steps.detect_planner.outputs.planner_ok }}" = "true" ]; then
+            TDD_OK="${{ steps.tdd.outputs.success }}"
+            if [ -z "$TDD_OK" ]; then
+              TDD_OK="false"
+            fi
+          fi
+
+          # 整體判定：clarifier 必須成功 AND（planner/tdd 成功 OR 未觸發）
+          if [ "$CLARIFIER_OK" = "true" ] && [ "$PLANNER_OK" != "false" ] && [ "$TDD_OK" != "false" ]; then
             echo "claude_ok=true" >> $GITHUB_OUTPUT
           else
             echo "claude_ok=false" >> $GITHUB_OUTPUT
@@ -559,13 +380,15 @@ jobs:
           fi
 
           # Agent 名稱（反映實際執行的 stages）
-          if [ "$SPECS_CHANGED" = "true" ]; then
-            echo "agent_name=clarifier+tdd-coordinator" >> $GITHUB_OUTPUT
+          if [ "${{ steps.detect_planner.outputs.planner_ok }}" = "true" ]; then
+            echo "agent_name=clarifier+planner+tdd-coordinator" >> $GITHUB_OUTPUT
+          elif [ "$PLANNER_OK" != "skipped" ]; then
+            echo "agent_name=clarifier+planner" >> $GITHUB_OUTPUT
           else
             echo "agent_name=clarifier" >> $GITHUB_OUTPUT
           fi
 
-          echo "📊 Clarifier: $CLARIFIER_OK | tdd-coordinator: $TDD_OK | Specs changed: $SPECS_CHANGED"
+          echo "📊 Clarifier: $CLARIFIER_OK | Planner: $PLANNER_OK | tdd-coordinator: $TDD_OK | Pipeline: $PIPELINE_MODE"
 
   # ══════════════════════════════════════════════════
   # Job 2: 整合測試（PHPUnit + E2E）
@@ -604,9 +427,9 @@ jobs:
       e2e_file_count: ${{ steps.detect_changed_e2e.outputs.file_count }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 50
           ref: ${{ needs.claude.outputs.branch_name }}
 
       - name: 強制 Git 使用 HTTPS（避免 plugin 安裝 SSH 失敗）
@@ -696,6 +519,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
           additional_permissions: |
             actions: read
           settings: .claude/settings.json
@@ -748,6 +572,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
           additional_permissions: |
             actions: read
           settings: .claude/settings.json
@@ -945,6 +770,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
           additional_permissions: |
             actions: read
           settings: .claude/settings.json
@@ -1010,6 +836,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
           additional_permissions: |
             actions: read
           settings: .claude/settings.json
@@ -1143,32 +970,7 @@ jobs:
           BUNNY_CDN_URL: ${{ secrets.BUNNY_CDN_URL }}
         run: |
           BRANCH_DIR=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
-          MEDIA_PREFIX="ci/${BRANCH_DIR}/e2e-test"
-          UPLOAD_OK=true
-
-          for file in /tmp/e2e-media/*; do
-            [ -f "$file" ] || continue
-            filename=$(basename "$file")
-            HTTP_CODE=$(curl --fail --silent --output /dev/null --write-out "%{http_code}" \
-              --request PUT \
-              --url "https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${MEDIA_PREFIX}/${filename}" \
-              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
-              --header "Content-Type: application/octet-stream" \
-              --data-binary "@${file}")
-            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-              echo "✅ 上傳成功: ${filename} (HTTP ${HTTP_CODE})"
-            else
-              echo "❌ 上傳失敗: ${filename} (HTTP ${HTTP_CODE})"
-              UPLOAD_OK=false
-            fi
-          done
-
-          SCREENSHOT_FILES=$(ls /tmp/e2e-media/*.png 2>/dev/null | xargs -I{} basename {} | tr '\n' ',' || echo "")
-          VIDEO_FILES=$(ls /tmp/e2e-media/*.webm 2>/dev/null | xargs -I{} basename {} | tr '\n' ',' || echo "")
-          echo "screenshot_files=${SCREENSHOT_FILES}" >> $GITHUB_OUTPUT
-          echo "video_files=${VIDEO_FILES}" >> $GITHUB_OUTPUT
-          echo "media_url_prefix=${BUNNY_CDN_URL}/${MEDIA_PREFIX}" >> $GITHUB_OUTPUT
-          echo "has_media=${UPLOAD_OK}" >> $GITHUB_OUTPUT
+          bash .github/scripts/upload-to-bunny.sh /tmp/e2e-media "ci/${BRANCH_DIR}/e2e-test"
 
       - name: 上傳 E2E 測試報告
         if: steps.detect_changed_e2e.outputs.has_e2e_changes == 'true'
@@ -1523,13 +1325,14 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
           additional_permissions: |
             actions: read
           settings: .claude/settings.json
           plugin_marketplaces: |
             https://github.com/j7-dev/wp-workflows.git
           plugins: |
-            wp-workflows
+            wp-workflows@wp-workflows
           prompt: |
             你是 browser-tester，在 CI 環境中運作。
             這是一個 WordPress 外掛（Power Course LMS），在 wp-env Docker 環境中運行。
@@ -1640,32 +1443,7 @@ jobs:
           BUNNY_CDN_URL: ${{ secrets.BUNNY_CDN_URL }}
         run: |
           BRANCH_DIR=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
-          MEDIA_PREFIX="ci/${BRANCH_DIR}/smoke-test"
-          UPLOAD_OK=true
-
-          for file in /tmp/smoke-media/*; do
-            [ -f "$file" ] || continue
-            filename=$(basename "$file")
-            HTTP_CODE=$(curl --fail --silent --output /dev/null --write-out "%{http_code}" \
-              --request PUT \
-              --url "https://${BUNNY_STORAGE_HOST}/${BUNNY_STORAGE_ZONE}/${MEDIA_PREFIX}/${filename}" \
-              --header "AccessKey: ${BUNNY_STORAGE_PASSWORD}" \
-              --header "Content-Type: application/octet-stream" \
-              --data-binary "@${file}")
-            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-              echo "✅ 上傳成功: ${filename} (HTTP ${HTTP_CODE})"
-            else
-              echo "❌ 上傳失敗: ${filename} (HTTP ${HTTP_CODE})"
-              UPLOAD_OK=false
-            fi
-          done
-
-          SCREENSHOT_FILES=$(ls /tmp/smoke-media/*.png 2>/dev/null | xargs -I{} basename {} | tr '\n' ',' || echo "")
-          VIDEO_FILES=$(ls /tmp/smoke-media/*.webm 2>/dev/null | xargs -I{} basename {} | tr '\n' ',' || echo "")
-          echo "screenshot_files=${SCREENSHOT_FILES}" >> $GITHUB_OUTPUT
-          echo "video_files=${VIDEO_FILES}" >> $GITHUB_OUTPUT
-          echo "media_url_prefix=${BUNNY_CDN_URL}/${MEDIA_PREFIX}" >> $GITHUB_OUTPUT
-          echo "has_media=${UPLOAD_OK}" >> $GITHUB_OUTPUT
+          bash .github/scripts/upload-to-bunny.sh /tmp/smoke-media "ci/${BRANCH_DIR}/smoke-test"
 
       - name: 上傳 Smoke Test 媒體 Artifact (備份)
         if: steps.collect_smoke_media.outputs.has_media == 'true'
