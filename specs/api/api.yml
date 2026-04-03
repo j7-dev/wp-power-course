@@ -2371,6 +2371,7 @@ paths:
         - 回傳最後造訪資訊
         - 回傳到期時間
         - 若課程已到期，回應中 `expired: true`，但 HTTP 狀態仍為 200
+        - 若課程開啟線性觀看，回傳 `linear_viewing` 物件（含解鎖章節列表與當前應觀看章節）
       parameters:
         - name: course_id
           in: path
@@ -2425,6 +2426,48 @@ paths:
                     type: boolean
                     description: 課程是否已到期（true 時其他欄位仍回傳但應為最後已知值）
                     example: false
+                  linear_viewing:
+                    type: object
+                    nullable: true
+                    description: |
+                      線性觀看狀態（僅在課程開啟 enable_linear_viewing 時回傳，否則為 null）。
+                      解鎖演算法：以最遠已完成章節位置為基準，位置 0 到 (最遠位置+1) 為解鎖。
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: 課程是否開啟線性觀看
+                        example: true
+                      unlocked_chapter_ids:
+                        type: array
+                        description: 已解鎖的章節 ID 列表（按 menu_order 排序）
+                        items:
+                          type: integer
+                        example: [200, 201]
+                      current_chapter_id:
+                        type: integer
+                        nullable: true
+                        description: 當前應觀看的章節 ID（第一個解鎖且未完成的章節，全部完成時為 null）
+                        example: 201
+                      locked_hints:
+                        type: object
+                        description: |
+                          鎖定章節的提示資訊，key 為被鎖定的 chapter_id，value 為提示物件。
+                          提示指向當前需完成的章節名稱。
+                        additionalProperties:
+                          type: object
+                          properties:
+                            prerequisite_chapter_id:
+                              type: integer
+                              description: 需先完成的章節 ID
+                              example: 201
+                            prerequisite_chapter_title:
+                              type: string
+                              description: 需先完成的章節名稱
+                              example: "1-2 變數與型別"
+                            message:
+                              type: string
+                              description: 提示文字
+                              example: "請先完成『1-2 變數與型別』才能觀看本章節"
         "403":
           description: 前置狀態不符
           content:
@@ -2476,6 +2519,7 @@ paths:
         **前置（狀態）:**
         - 學員必須已有該章節所屬課程的存取權
         - 課程存取未到期（expire_date = 0 或 expire_date > now()）
+        - 線性觀看模式下，不可完成被鎖定的章節（取消完成不受此限制）
 
         **前置（參數）:**
         - `chapter_id`（路徑參數）必須存在且 `post_type = 'pc_chapter'`
@@ -2485,6 +2529,7 @@ paths:
         - 標記完成：新增 `finished_at` 並觸發 `power_course_chapter_finished` action
         - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
         - 切換後重新計算課程進度
+        - 若課程開啟線性觀看，回應中包含更新後的解鎖章節列表
 
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
@@ -2516,6 +2561,15 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  unlocked_chapter_ids:
+                    type: array
+                    nullable: true
+                    description: |
+                      更新後的已解鎖章節 ID 列表（僅在課程開啟線性觀看時回傳，否則為 null）。
+                      前端根據此列表即時更新側邊欄鎖定/解鎖狀態，無需重新載入頁面。
+                    items:
+                      type: integer
+                    example: [200, 201]
         "403":
           description: 前置狀態不符
           content:
@@ -2542,6 +2596,13 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "必須登入"
+                    data:
+                      status: 403
+                chapterLocked:
+                  summary: 章節被線性觀看鎖定
+                  value:
+                    code: rest_forbidden
+                    message: "該章節尚未解鎖，請先完成前面的章節"
                     data:
                       status: 403
         "404":
