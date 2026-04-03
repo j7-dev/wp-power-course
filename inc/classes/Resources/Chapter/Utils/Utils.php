@@ -842,6 +842,103 @@ abstract class Utils {
 
 
 	/**
+	 * 判斷章節是否已解鎖（線性觀看模式）
+	 * 第一個章節固定解鎖，第 N 章需第 N-1 章已完成（有 finished_at）才解鎖
+	 *
+	 * @param int $chapter_id 章節 ID
+	 * @param int $user_id    用戶 ID
+	 * @param int $course_id  課程 ID
+	 * @return bool 已解鎖返回 true，否則返回 false
+	 */
+	public static function is_chapter_unlocked( int $chapter_id, int $user_id, int $course_id ): bool {
+		$chapter_ids = self::get_flatten_post_ids( $course_id );
+
+		// 攤平列表為空，或章節不在列表中 → 視為已解鎖
+		if ( empty( $chapter_ids ) ) {
+			return true;
+		}
+
+		/** @var int|false $index */
+		$index = array_search( $chapter_id, $chapter_ids, true );
+
+		if ( false === $index ) {
+			// 章節不在攤平列表中 → 允許存取
+			return true;
+		}
+
+		// 第一章固定解鎖
+		if ( 0 === $index ) {
+			return true;
+		}
+
+		// 檢查前一章是否已完成
+		$prev_chapter_id = $chapter_ids[ $index - 1 ];
+		$prev_chapter    = new Chapter( (int) $prev_chapter_id, (int) $user_id );
+
+		return (bool) $prev_chapter->finished_at;
+	}
+
+	/**
+	 * 取得用戶在課程中第一個尚未解鎖的（最新可存取）章節 ID
+	 * 用於線性觀看模式下的 302 導向目標
+	 *
+	 * @param int $user_id   用戶 ID
+	 * @param int $course_id 課程 ID
+	 * @return int|null 返回第一個已解鎖但未完成的章節 ID；若全部已完成則返回最後一章 ID
+	 */
+	public static function get_first_unlocked_chapter_id( int $user_id, int $course_id ): ?int {
+		$chapter_ids = self::get_flatten_post_ids( $course_id );
+
+		if ( empty( $chapter_ids ) ) {
+			return null;
+		}
+
+		foreach ( $chapter_ids as $index => $chapter_id ) {
+			$chapter = new Chapter( (int) $chapter_id, (int) $user_id );
+
+			// 找到第一個已解鎖但未完成的章節
+			if ( ! $chapter->finished_at ) {
+				// 驗證此章節確實已解鎖
+				if ( self::is_chapter_unlocked( (int) $chapter_id, $user_id, $course_id ) ) {
+					return (int) $chapter_id;
+				}
+				// 若未解鎖，代表上一章也沒完成，應返回上一章（index - 1）
+				$safe_index = max( 0, $index - 1 );
+				return (int) $chapter_ids[ $safe_index ];
+			}
+		}
+
+		// 所有章節皆已完成，返回最後一章
+		return (int) $chapter_ids[ count( $chapter_ids ) - 1 ];
+	}
+
+	/**
+	 * 取得用戶在課程中所有被鎖定的章節 ID 列表
+	 * 用於前端一次性初始化鎖定 UI
+	 *
+	 * @param int $user_id   用戶 ID
+	 * @param int $course_id 課程 ID
+	 * @return array<int> 所有鎖定章節的 ID 陣列
+	 */
+	public static function get_locked_chapter_ids( int $user_id, int $course_id ): array {
+		$chapter_ids = self::get_flatten_post_ids( $course_id );
+
+		if ( empty( $chapter_ids ) ) {
+			return [];
+		}
+
+		$locked_ids = [];
+
+		foreach ( $chapter_ids as $chapter_id ) {
+			if ( ! self::is_chapter_unlocked( (int) $chapter_id, $user_id, $course_id ) ) {
+				$locked_ids[] = (int) $chapter_id;
+			}
+		}
+
+		return $locked_ids;
+	}
+
+	/**
 	 * 取得下一個章節的 id
 	 *
 	 * @param int $chapter_id 章節 ID.

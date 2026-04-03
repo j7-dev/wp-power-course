@@ -15,6 +15,10 @@ export const finishChapterAtom = atom({
 	isFinished: undefined,
 	progress: undefined,
 	icon_html: '',
+	// 線性觀看模式：下一章節資訊
+	next_chapter_id: undefined as number | undefined,
+	next_chapter_unlocked: undefined as boolean | undefined,
+	next_chapter_permalink: undefined as string | undefined,
 })
 
 // RWD 相關

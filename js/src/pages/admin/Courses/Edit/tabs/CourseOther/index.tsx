@@ -36,6 +36,25 @@ const CourseOtherComponent = ({ formProps }: { formProps: FormProps }) => {
 
 	return (
 		<Form {...formProps}>
+			<Heading>教室設定</Heading>
+			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
+				<FiSwitch
+					formItemProps={{
+						name: ['linear_chapter_mode'],
+						label: (
+							<div className="flex gap-x-2">
+								<span className="bg-blue-100 text-blue-600 text-xs flex items-center px-2 py-1 rounded-md size-fit mb-1">
+									線性觀看
+								</span>
+								<span>開啟後學員必須按順序完成章節</span>
+							</div>
+						),
+						tooltip:
+							'開啟後，學員必須按照章節順序逐步完成才能觀看下一章節。第一個章節預設為解鎖狀態。',
+					}}
+				/>
+			</div>
+
 			<Heading>課程介紹區域</Heading>
 			<div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 gap-6">
 				<FiSwitch

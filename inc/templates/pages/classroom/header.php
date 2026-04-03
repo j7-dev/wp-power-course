@@ -7,6 +7,7 @@ use J7\PowerCourse\Plugin;
 use J7\PowerCourse\FrontEnd\MyAccount;
 use J7\PowerCourse\Resources\Chapter\Model\Chapter;
 use J7\PowerCourse\Resources\Chapter\Utils\Utils as ChapterUtils;
+use J7\PowerCourse\Utils\Course as CourseUtils;
 
 $default_args = [
 	'product' => $GLOBALS['course'] ?? null,
@@ -49,8 +50,22 @@ $user_id                    = \get_current_user_id();
 $avl_chapter                = new Chapter( (int) $current_chapter_id, (int) $user_id );
 $finished_at                = $avl_chapter->finished_at;
 $is_this_chapter_finished   = (bool) $finished_at;
+$is_linear                  = CourseUtils::is_linear_chapter_mode( $product_id );
 $finish_chapter_button_html = '';
-$finish_chapter_button_html = sprintf(
+
+if ( $is_linear && $is_this_chapter_finished ) {
+	// 線性觀看模式下已完成章節 → 不可點擊的「已完成」按鈕
+	$finish_chapter_button_html = sprintf(
+		/*html*/'
+		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base pc-btn-outline border-solid cursor-not-allowed opacity-70" disabled>
+			<span>已完成</span>
+		</button>
+		',
+		$product_id,
+		$current_chapter_id
+	);
+} else {
+	$finish_chapter_button_html = sprintf(
 		/*html*/'
 		<button id="finish-chapter__button" data-course-id="%1$s" data-chapter-id="%2$s" class="pc-btn pc-btn-secondary pc-btn-sm px-0 lg:px-4 w-full lg:w-auto text-xs sm:text-base %3$s">
 			<span>%4$s</span>
@@ -62,6 +77,7 @@ $finish_chapter_button_html = sprintf(
 		$is_this_chapter_finished ? 'pc-btn-outline border-solid' : 'text-white',
 		$is_this_chapter_finished ? '標示為未完成' : '標示為已完成'
 	);
+}
 
 
 // next chapter button html
@@ -71,26 +87,42 @@ $index       = array_search($current_chapter_id, $chapter_ids, true);
 /** @var int|false $index */
 $next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
 
+// 下一章節按鈕的 SVG 箭頭
+$next_btn_svg = /*html*/'
+	<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<g stroke-width="0"></g>
+		<g stroke-linecap="round" stroke-linejoin="round"></g>
+		<g>
+			<path fill-rule="evenodd" clip-rule="evenodd" d="M5.60439 4.23093C4.94586 3.73136 4 4.20105 4 5.02762V18.9724C4 19.799 4.94586 20.2686 5.60439 19.7691L14.7952 12.7967C15.3227 12.3965 15.3227 11.6035 14.7952 11.2033L5.60439 4.23093ZM2 5.02762C2 2.54789 4.83758 1.13883 6.81316 2.63755L16.004 9.60993C17.5865 10.8104 17.5865 13.1896 16.004 14.3901L6.81316 21.3625C4.83758 22.8612 2 21.4521 2 18.9724V5.02762Z" fill="#ffffff"></path>
+			<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
+		</g>
+	</svg>';
+
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
 		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多章節</button>';
+	} elseif ( $is_linear && ! $is_this_chapter_finished ) {
+		// 線性觀看模式下，當前章節未完成 → 下一章按鈕禁用
+		$next_chapter_button_html = sprintf(
+			/*html*/'
+		<button id="next-chapter__button" data-next-href="%1$s" class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4 text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base pc-tooltip" data-tip="請先完成當前章節" tabindex="-1" role="button" aria-disabled="true" disabled>
+			前往下一章節
+			%2$s
+		</button>',
+			\esc_attr( (string) \get_permalink( $next_chapter_id ) ),
+			$next_btn_svg
+		);
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'
-		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
+		<a id="next-chapter__button" href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
 					前往下一章節
-					<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-						<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-						<g id="SVGRepo_iconCarrier">
-							<path fill-rule="evenodd" clip-rule="evenodd" d="M5.60439 4.23093C4.94586 3.73136 4 4.20105 4 5.02762V18.9724C4 19.799 4.94586 20.2686 5.60439 19.7691L14.7952 12.7967C15.3227 12.3965 15.3227 11.6035 14.7952 11.2033L5.60439 4.23093ZM2 5.02762C2 2.54789 4.83758 1.13883 6.81316 2.63755L16.004 9.60993C17.5865 10.8104 17.5865 13.1896 16.004 14.3901L6.81316 21.3625C4.83758 22.8612 2 21.4521 2 18.9724V5.02762Z" fill="#ffffff"></path>
-							<path d="M20 3C20 2.44772 20.4477 2 21 2C21.5523 2 22 2.44772 22 3V21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V3Z" fill="#ffffff"></path>
-						</g>
-					</svg>
+					%2$s
 		</a>
 ',
-			\get_permalink($next_chapter_id)
+			\get_permalink($next_chapter_id),
+			$next_btn_svg
 		);
 	}
 }

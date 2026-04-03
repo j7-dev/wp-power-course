@@ -35,6 +35,13 @@ global $chapter;
 $ancestor_ids        = get_ancestors($chapter->ID, CPT::POST_TYPE, 'post_type');
 $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 
+// 線性觀看模式：取得鎖定章節資料
+$product_id      = $product->get_id();
+$is_linear       = CourseUtils::is_linear_chapter_mode( $product_id );
+$current_user_id = \get_current_user_id();
+$is_admin        = \current_user_can( 'manage_woocommerce' );
+$locked_ids_json = $is_linear ? \esc_attr( (string) wp_json_encode( ChapterUtils::get_locked_chapter_ids( $current_user_id, $product_id ) ) ) : '[]';
+
 ?>
 <style>
 	.icon-arrow svg {
@@ -54,7 +61,12 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 	<span class="text-base tracking-wide font-bold">課程章節</span>
 	<span class="text-sm text-gray-400"><?php echo $count_all_chapters; ?> 個章節<?php echo $course_length_in_minutes ? "，{$course_length_in_minutes} 分鐘" : ''; ?></span>
 </div>
-<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0" data-ancestor_ids="<?php echo $ancestor_ids_string; ?>">
+<div id="pc-sider__main-chapters" class="pc-sider-chapters overflow-y-auto lg:ml-0 lg:mr-0"
+	data-ancestor_ids="<?php echo $ancestor_ids_string; ?>"
+	data-linear="<?php echo $is_linear ? 'yes' : 'no'; ?>"
+	data-locked-ids="<?php echo $locked_ids_json; ?>"
+	data-is-admin="<?php echo $is_admin ? 'yes' : 'no'; ?>"
+>
 	<?php echo $chapters_html; ?>
 </div>
 
@@ -76,6 +88,13 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				const $li = $(this);
 				const href = $li.data('href');
 				const $sub_ul = $li.next('ul'); // 子章節
+
+				// 線性觀看模式：阻擋點擊鎖定章節（非管理員）
+				const isAdminUser = $el.data('is-admin') === 'yes'
+				if ($li.attr('data-locked') === 'true' && !isAdminUser) {
+					alert('請先完成前面的章節後再觀看此章節')
+					return
+				}
 
 				if ($sub_ul.length > 0) {
 					$li.toggleClass('expanded'); // 如果有找到子章節
@@ -112,6 +131,41 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 			});
 
 			restore_expanded_post_ids();
+
+			// 線性觀看模式：初始化鎖定 UI
+			initLinearLockUI();
+
+			// 線性觀看模式：初始化鎖定 UI
+			function initLinearLockUI() {
+				const isLinear = $el.data('linear') === 'yes'
+				const isAdminUser = $el.data('is-admin') === 'yes'
+				const lockedIds = $el.data('locked-ids') || []
+
+				if (!isLinear || lockedIds.length === 0) {
+					return
+				}
+
+				lockedIds.forEach(function(postId) {
+					const $li = $el.find(`li[data-post-id="${postId}"]`)
+					if ($li.length === 0) {
+						return
+					}
+
+					$li.attr('data-locked', 'true')
+
+					// 替換圖示為鎖頭
+					const $icon = $li.find('.pc-chapter-icon')
+					if ($icon.length > 0) {
+						$icon.html('<div class="pc-tooltip pc-tooltip-right h-6" data-tip="請先完成前面的章節"><svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C9.23858 1 7 3.23858 7 6V8H6C4.89543 8 4 8.89543 4 10V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V10C20 8.89543 19.1046 8 18 8H17V6C17 3.23858 14.7614 1 12 1ZM15 8V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V8H15ZM12 13C11.4477 13 11 13.4477 11 14V17C11 17.5523 11.4477 18 12 18C12.5523 18 13 17.5523 13 17V14C13 13.4477 12.5523 13 12 13Z" fill="#9ca3af"/></svg></div>')
+					}
+
+					// 非管理員時禁用點擊（移除 href 避免跳轉）
+					if (!isAdminUser) {
+						$li.addClass('opacity-50 cursor-not-allowed')
+						$li.removeAttr('data-href')
+					}
+				})
+			}
 
 			// 把當前展開的章節 id 先記錄起來
 			function handle_save_expanded_post_ids() {

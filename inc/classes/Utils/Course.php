@@ -449,6 +449,17 @@ abstract class Course {
 	}
 
 	/**
+	 * 檢查課程是否啟用線性觀看模式
+	 * 線性觀看模式下，學員必須按照章節順序逐步完成才能觀看下一章節
+	 *
+	 * @param int $product_id 課程商品 ID
+	 * @return bool 若 linear_chapter_mode 為 yes 則返回 true
+	 */
+	public static function is_linear_chapter_mode( int $product_id ): bool {
+		return \wc_string_to_bool( (string) \get_post_meta( $product_id, 'linear_chapter_mode', true ) );
+	}
+
+	/**
 	 * 檢查課程是否已過期。
 	 *
 	 * 根據產品ID和用戶ID，從AVLCourseMeta中獲取課程的過期日期，
@@ -481,7 +492,7 @@ abstract class Course {
 			return true;
 		}
 		// 已啟用或者待取消都還能看 = 還沒到期
-		return !$subscription->has_status(['active', 'pending-cancel']);
+		return !$subscription->has_status([ 'active', 'pending-cancel' ]);
 	}
 
 	/**

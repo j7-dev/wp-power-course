@@ -61,6 +61,18 @@ if (!current_user_can('manage_woocommerce')) {
 		\wp_safe_redirect(site_url('404'));
 		exit;
 	}
+
+	// 線性觀看模式：章節鎖定檢查（在所有基本權限驗證之後）
+	$product_id = $course_product ? $course_product->get_id() : 0;
+	if ( $product_id && CourseUtils::is_linear_chapter_mode( $product_id ) ) {
+		if ( ! ChapterUtils::is_chapter_unlocked( (int) $chapter_post->ID, $current_user_id, $product_id ) ) {
+			$target_chapter_id = ChapterUtils::get_first_unlocked_chapter_id( $current_user_id, $product_id );
+			if ( $target_chapter_id ) {
+				\wp_safe_redirect( (string) \get_permalink( $target_chapter_id ) );
+				exit;
+			}
+		}
+	}
 }
 
 
@@ -98,7 +110,9 @@ $settings = Settings::instance();
 						"qty": "%3$d",
 						"color": "%4$s",
 						"text": "%5$s"
-					}
+					},
+					"linear_chapter_mode": "%6$s",
+					"is_admin_preview": %7$s
 				}
 			</script>
 			',
@@ -106,7 +120,9 @@ $settings = Settings::instance();
 			Plugin::$url,
 			$settings->pc_pdf_watermark_qty,
 			$settings->pc_pdf_watermark_color,
-			ChapterUtils::get_formatted_watermark_text('pdf')
+			ChapterUtils::get_formatted_watermark_text('pdf'),
+			\esc_js( $course_product ? (string) $course_product->get_meta( 'linear_chapter_mode' ) : 'no' ),
+			\current_user_can( 'manage_woocommerce' ) ? 'true' : 'false'
 			);
 			Theme::render_button();
 			\wp_footer();
