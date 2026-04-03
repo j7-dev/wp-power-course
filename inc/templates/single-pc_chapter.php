@@ -77,7 +77,7 @@ if ( !current_user_can('manage_woocommerce') && $course_product ) {
 		&& !in_array( $chapter_post->ID, $linear_state['unlocked_chapter_ids'], true )
 	) {
 		$redirect_chapter_id = $linear_state['current_chapter_id']
-			?? ( $linear_state['unlocked_chapter_ids'][0] ?? null );
+		?? ( $linear_state['unlocked_chapter_ids'][0] ?? null );
 
 		if ( $redirect_chapter_id ) {
 			// 設定一次性 flash message（用 transient，5 秒過期）

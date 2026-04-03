@@ -313,6 +313,9 @@ final class Api extends ApiBase {
 
 			\do_action(ChapterLifeCycle::CHAPTER_UNFINISHEDED_ACTION, $chapter_id, $course_id, $user_id);
 
+			// 清除線性觀看快取，因為完成狀態已改變
+			LinearViewing::clear_cache( $course_id, $user_id );
+
 			return new \WP_REST_Response(
 				[
 					'code'    => $success ? '200' : '400',
@@ -341,6 +344,9 @@ final class Api extends ApiBase {
 		$progress = CourseUtils::get_course_progress( $product );
 
 		\do_action(ChapterLifeCycle::CHAPTER_FINISHED_ACTION, $chapter_id, $course_id, $user_id);
+
+		// 清除線性觀看快取，因為完成狀態已改變
+		LinearViewing::clear_cache( $course_id, $user_id );
 
 		return new \WP_REST_Response(
 				[

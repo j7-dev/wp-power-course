@@ -604,10 +604,10 @@ abstract class Utils {
 	/**
 	 * 取得課程章節的 HTML
 	 *
-	 * @param int                            $post_id 課程 id
-	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
-	 * @param int                            $depth 深度，預設從 0 (課程) 開始
-	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param int                                                                                                                                                                                                           $post_id 課程 id
+	 * @param array<int, \WP_Post>|null                                                                                                                                                                                     $children_posts 子章節.
+	 * @param int                                                                                                                                                                                                           $depth 深度，預設從 0 (課程) 開始
+	 * @param 'classroom' | 'course-product'                                                                                                                                                                                $context 上下文，預設為 'classroom'，表示課程頁面
 	 * @param array{enabled: bool, unlocked_chapter_ids: array<int>, current_chapter_id: int|null, locked_hints: array<int, array{prerequisite_chapter_id: int, prerequisite_chapter_title: string, message: string}>}|null $linear_state 線性觀看解鎖狀態（null 表示不啟用線性觀看）
 	 * @return string
 	 */
@@ -692,8 +692,8 @@ abstract class Utils {
 			// 鎖定章節：清空 data-href 阻止導航，加上鎖定相關屬性
 			$data_href     = $is_locked ? '' : (string) \get_the_permalink( $child_post->ID );
 			$lock_attrs    = $is_locked
-				? sprintf( ' data-locked="true" data-lock-hint="%1$s" data-original-href="%2$s"', \esc_attr( $lock_hint ), \esc_attr( (string) \get_the_permalink( $child_post->ID ) ) )
-				: '';
+			? sprintf( ' data-locked="true" data-lock-hint="%1$s" data-original-href="%2$s"', \esc_attr( $lock_hint ), \esc_attr( (string) \get_the_permalink( $child_post->ID ) ) )
+			: '';
 			$lock_classes  = $is_locked ? ' opacity-50 cursor-not-allowed' : '';
 
 			// 鎖定章節使用鎖頭圖示，解鎖章節使用一般圖示
