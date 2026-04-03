@@ -42,6 +42,7 @@ jobs:
       claude_ok: ${{ steps.check_result.outputs.claude_ok }}
       has_changes: ${{ steps.check_result.outputs.has_changes }}
       agent_name: ${{ steps.check_result.outputs.agent_name }}
+      pipeline_mode: ${{ steps.check_result.outputs.pipeline_mode }}
     steps:
       - name: 👀 對觸發留言加上 eyes reaction
         if: github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment'
@@ -373,10 +374,18 @@ jobs:
           if [ "$CURRENT_SHA" != "${{ steps.save_sha.outputs.initial_sha }}" ] || \
              [ -n "$(git status --porcelain)" ]; then
             echo "has_changes=true" >> $GITHUB_OUTPUT
-            echo "✅ 偵測到程式碼變更，將執行整合測試"
+            echo "✅ 偵測到程式碼變更"
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ 無程式碼變更，跳過測試"
+            echo "ℹ️ 無程式碼變更"
+          fi
+
+          # Pipeline mode 輸出（供下游 job 判斷是否該跑測試）
+          echo "pipeline_mode=$PIPELINE_MODE" >> $GITHUB_OUTPUT
+          if [ "$PIPELINE_MODE" = "true" ]; then
+            echo "🚀 Pipeline mode: 下游測試 job 可啟動"
+          else
+            echo "💬 Interactive mode: 僅 clarifier 階段，下游測試 job 不啟動"
           fi
 
           # Agent 名稱（反映實際執行的 stages）
@@ -397,7 +406,10 @@ jobs:
   integration-tests:
     name: 自動化測試 + AI 驗收
     needs: claude
-    if: needs.claude.outputs.claude_ok == 'true' && needs.claude.outputs.has_changes == 'true'
+    if: |
+      needs.claude.outputs.claude_ok == 'true' &&
+      needs.claude.outputs.has_changes == 'true' &&
+      needs.claude.outputs.pipeline_mode == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     permissions:
