@@ -121,7 +121,7 @@ if (count($chapter_ids) > 0) {
 					%2$s
 		</a>
 ',
-			\get_permalink($next_chapter_id),
+			\esc_url( (string) \get_permalink($next_chapter_id) ),
 			$next_btn_svg
 		);
 	}

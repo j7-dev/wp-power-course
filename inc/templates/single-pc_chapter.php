@@ -121,7 +121,7 @@ $settings = Settings::instance();
 			$settings->pc_pdf_watermark_qty,
 			$settings->pc_pdf_watermark_color,
 			ChapterUtils::get_formatted_watermark_text('pdf'),
-			\esc_js( $course_product ? (string) $course_product->get_meta( 'linear_chapter_mode' ) : 'no' ),
+			\esc_js( $course_product ? ( (string) $course_product->get_meta( 'linear_chapter_mode' ) ?: 'no' ) : 'no' ),
 			\current_user_can( 'manage_woocommerce' ) ? 'true' : 'false'
 			);
 			Theme::render_button();

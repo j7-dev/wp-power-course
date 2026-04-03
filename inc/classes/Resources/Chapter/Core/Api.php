@@ -291,7 +291,7 @@ final class Api extends ApiBase {
 		// 線性觀看模式檢查
 		$is_linear = CourseUtils::is_linear_chapter_mode( $course_id );
 
-		if ( $is_linear ) {
+		if ( $is_linear && ! \current_user_can( 'manage_woocommerce' ) ) {
 			// 禁止取消已完成章節
 			if ( $is_this_chapter_finished ) {
 				return new \WP_REST_Response(
@@ -354,7 +354,7 @@ final class Api extends ApiBase {
 
 		// 計算下一章節資訊（供前端線性觀看模式即時解鎖使用）
 		$next_chapter_id        = ChapterUtils::get_next_post_id( $chapter_id );
-		$next_chapter_permalink = $next_chapter_id ? \get_permalink( $next_chapter_id ) : null;
+		$next_chapter_permalink = $next_chapter_id ? \esc_url( (string) \get_permalink( $next_chapter_id ) ) : null;
 
 		return new \WP_REST_Response(
 				[
