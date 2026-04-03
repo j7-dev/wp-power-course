@@ -2476,6 +2476,9 @@ paths:
         **前置（狀態）:**
         - 學員必須已有該章節所屬課程的存取權
         - 課程存取未到期（expire_date = 0 或 expire_date > now()）
+        - **線性觀看模式額外檢查：**
+          - 章節必須為已解鎖狀態（前一章 finished_at 存在，或為第一個章節）
+          - 已完成的章節不可取消完成（toggle 變單向，只能 未完成→已完成）
 
         **前置（參數）:**
         - `chapter_id`（路徑參數）必須存在且 `post_type = 'pc_chapter'`
@@ -2483,11 +2486,15 @@ paths:
 
         **後置（狀態）:**
         - 標記完成：新增 `finished_at` 並觸發 `power_course_chapter_finished` action
-        - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
+        - 取消完成（非線性模式）：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
         - 切換後重新計算課程進度
 
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
+
+        **線性觀看模式回應額外欄位:**
+        - `next_chapter_id`：下一個章節 ID（若為最後章節則為 null）
+        - `next_chapter_unlocked`：下一個章節是否已解鎖（boolean）
       parameters:
         - name: chapter_id
           in: path
@@ -2516,6 +2523,15 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  next_chapter_id:
+                    type: integer
+                    nullable: true
+                    description: 下一個章節 ID（線性觀看模式下回傳，最後章節為 null）
+                    example: 201
+                  next_chapter_unlocked:
+                    type: boolean
+                    description: 下一個章節是否已解鎖（僅線性觀看模式下回傳）
+                    example: true
         "403":
           description: 前置狀態不符
           content:
@@ -2542,6 +2558,20 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "必須登入"
+                    data:
+                      status: 403
+                chapterLocked:
+                  summary: 章節未解鎖（線性觀看模式）
+                  value:
+                    code: rest_forbidden
+                    message: "此章節尚未解鎖，請先完成前面的章節"
+                    data:
+                      status: 403
+                cannotUncomplete:
+                  summary: 線性觀看模式下無法取消完成
+                  value:
+                    code: rest_forbidden
+                    message: "線性觀看模式下無法取消已完成的章節"
                     data:
                       status: 403
         "404":

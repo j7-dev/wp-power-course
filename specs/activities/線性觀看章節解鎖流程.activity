@@ -1,0 +1,60 @@
+@startuml 線性觀看章節解鎖流程
+
+title 線性觀看模式 — 章節解鎖與存取流程
+
+|學員|
+start
+:進入教室頁面（存取章節 URL）;
+
+|系統（後端）|
+:取得課程 linear_chapter_mode;
+if (linear_chapter_mode == "yes") then (yes)
+  :取得攤平章節列表\n（get_flatten_post_ids）;
+  :計算當前章節解鎖狀態\n（檢查前一章 finished_at）;
+  if (是管理員？) then (yes)
+    :允許存取（管理員預覽）;
+  else (no)
+    if (章節已解鎖？) then (yes)
+      :允許存取;
+    else (no)
+      :302 導向至最新可存取章節;
+      stop
+    endif
+  endif
+else (no)
+  :允許存取（自由觀看模式）;
+endif
+
+|系統（前端）|
+:渲染教室頁面;
+:側邊欄標記鎖定/解鎖圖示;
+:設定「前往下一章節」按鈕狀態\n（禁用/啟用）;
+:設定「完成章節」按鈕\n（線性模式：僅顯示「標示為已完成」）;
+
+|學員|
+:觀看章節內容;
+:點擊「標示為已完成」;
+
+|系統（後端 API）|
+:驗證章節是否已解鎖;
+if (章節已解鎖？) then (yes)
+  :新增 finished_at 到 chaptermeta;
+  :清除課程進度快取;
+  :觸發 chapter_finished action;
+  :回傳成功 + next_chapter_id;
+else (no)
+  :回傳錯誤「章節未解鎖」;
+  stop
+endif
+
+|系統（前端 JS）|
+:更新當前章節圖示為打勾;
+:移除下一章鎖頭圖示;
+:啟用「前往下一章節」按鈕;
+:更新進度條百分比;
+
+|學員|
+:點擊「前往下一章節」\n或點擊側邊欄下一章;
+
+stop
+@enduml
