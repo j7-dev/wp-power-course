@@ -608,9 +608,10 @@ abstract class Utils {
 	 * @param array<int, \WP_Post>|null      $children_posts 子章節.
 	 * @param int                            $depth 深度，預設從 0 (課程) 開始
 	 * @param 'classroom' | 'course-product' $context 上下文，預設為 'classroom'，表示課程頁面
+	 * @param array{enabled: bool, unlocked_chapter_ids: array<int>, current_chapter_id: int|null, locked_hints: array<int, array{prerequisite_chapter_id: int, prerequisite_chapter_title: string, message: string}>}|null $linear_state 線性觀看解鎖狀態（null 表示不啟用線性觀看）
 	 * @return string
 	 */
-	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom' ): string {
+	public static function get_children_posts_html_uncached( int $post_id, array $children_posts = null, $depth = 0, $context = 'classroom', ?array $linear_state = null ): string {
 		global $post; // 當前文章
 
 		$html = '';
@@ -678,9 +679,36 @@ abstract class Utils {
 			]
 			);
 
+			// 線性觀看：判斷章節是否被鎖定
+			$is_locked = false;
+			$lock_hint = '';
+			if ( $linear_state && $linear_state['enabled'] ) {
+				$is_locked = !in_array( $child_post->ID, $linear_state['unlocked_chapter_ids'], true );
+				if ( $is_locked && isset( $linear_state['locked_hints'][ $child_post->ID ] ) ) {
+					$lock_hint = $linear_state['locked_hints'][ $child_post->ID ]['message'];
+				}
+			}
+
+			// 鎖定章節：清空 data-href 阻止導航，加上鎖定相關屬性
+			$data_href     = $is_locked ? '' : (string) \get_the_permalink( $child_post->ID );
+			$lock_attrs    = $is_locked
+				? sprintf( ' data-locked="true" data-lock-hint="%1$s" data-original-href="%2$s"', \esc_attr( $lock_hint ), \esc_attr( (string) \get_the_permalink( $child_post->ID ) ) )
+				: '';
+			$lock_classes  = $is_locked ? ' opacity-50 cursor-not-allowed' : '';
+
+			// 鎖定章節使用鎖頭圖示，解鎖章節使用一般圖示
+			$icon_html_content = '';
+			if ( $context !== 'course-product' ) {
+				if ( $is_locked ) {
+					$icon_html_content = '<div class="pc-chapter-icon size-8 p-1"><div class="pc-tooltip pc-tooltip-right h-6" data-tip="' . \esc_attr( $lock_hint ) . '"><svg class="pc-lock-icon w-6 h-6 fill-base-content/50" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C9.23858 1 7 3.23858 7 6V8H5C3.89543 8 3 8.89543 3 10V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V10C21 8.89543 20.1046 8 19 8H17V6C17 3.23858 14.7614 1 12 1ZM15 8V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V8H15ZM12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13ZM12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"/></svg></div></div>';
+				} else {
+					$icon_html_content = '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html( $child_post->ID ) . '</div>';
+				}
+			}
+
 			$html .= sprintf(
 			/*html*/'
-			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s" style="padding-left: %5$s;">
+			<li data-post-id="%6$s" data-href="%1$s" class="hover:bg-primary/10 pr-2 transition-all duration-300 rounded-btn cursor-pointer flex items-center justify-between text-sm mb-1 %7$s%8$s"%9$s style="padding-left: %5$s;">
 				<div class="py-2 flex items-center flex-1">
 					%2$s
 					<span class="ml-2">%3$s</span>
@@ -690,18 +718,20 @@ abstract class Utils {
 				</div>
 			</li>
 			',
-			\get_the_permalink($child_post->ID),
-			$context === 'course-product' ? '' : '<div class="pc-chapter-icon size-8 p-1">' . self::get_chapter_icon_html($child_post->ID) . '</div>',
-			$child_post->post_title,
+			\esc_attr( $data_href ),
+			$icon_html_content,
+			\esc_html( $child_post->post_title ),
 				// 如果有子章節，就顯示箭頭
-			$child_children_posts ? /*html*/'
+			$child_children_posts && !$is_locked ? /*html*/'
 				<div class="p-2 icon-arrow flex items-center">
 					<svg class="w-4 h-4 fill-base-content" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g stroke-width="0"></g><g stroke-linecap="round" stroke-linejoin="round"></g><g> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z"></path> </g></svg>
 				</div>
 			' : '',
 			( ( $depth * 2 ) + 0.5 ) . 'rem',
 			$child_post->ID,
-			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content' // 如果是當前文章，就顯示 primary 顏色
+			$child_post->ID === $post->ID ? 'bg-primary/10 font-bold [&_a]:text-primary' : 'font-normal [&_a]:text-base-content', // 如果是當前文章，就顯示 primary 顏色
+			$lock_classes,
+			$lock_attrs
 			);
 
 			// 沒有子章節就結束
@@ -709,8 +739,8 @@ abstract class Utils {
 				continue;
 			}
 
-			// 有子章節就遞迴取得子章節的子章節
-			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context);
+			// 有子章節就遞迴取得子章節的子章節（傳遞 linear_state）
+			$html .= self::get_children_posts_html_uncached($child_post->ID, $child_children_posts, $depth + 1, $context, $linear_state);
 		}
 		$html .= /* html */'</ul>';
 
