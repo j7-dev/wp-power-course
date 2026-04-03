@@ -1482,9 +1482,8 @@ jobs:
 
             ## 任務
             1. 執行 `git diff --name-only origin/master...HEAD` 分析變更
-            2. 根據變更的檔案動態判斷哪些頁面受影響
-            3. 對受影響頁面進行瀏覽器測試
-            4. 所有測試完成後，用 Bash 工具將報告寫入 output/playwright/browser-test/test-report.md
+            2. 主要針對 `.\specs\**\*.feature` (不存在就僅參考 diff 變更)裡面的情境進行瀏覽器測試
+            3. 所有測試完成後，用 Bash 工具將報告寫入 output/playwright/browser-test/test-report.md
 
             ## test-report.md 輸出格式
             - 包含：測試摘要、測試結果明細（每個受測頁面一個 ### 區塊）
