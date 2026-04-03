@@ -500,6 +500,13 @@ abstract class Utils {
 	 * 改為: 最上層的 post_parent 是頂層章節，還要從 post_meta 取得 parent_course_id
 	 */
 	public static function get_course_id( int $chapter_id ): int|null {
+		// 優先從章節本身取得 parent_course_id（所有層級的章節都有此 meta）
+		$parent_course_id = (int) \get_post_meta( $chapter_id, 'parent_course_id', true );
+		if ($parent_course_id) {
+			return $parent_course_id;
+		}
+
+		// 向後相容：從最上層祖先取得 parent_course_id
 		$top_parent_id    = PostUtils::get_top_post_id($chapter_id);
 		$parent_course_id = (int) \get_post_meta( $top_parent_id, 'parent_course_id', true );
 		return $parent_course_id ? $parent_course_id : null;
@@ -775,6 +782,7 @@ abstract class Utils {
 						'value' => $course_id,
 					],
 				],
+				'post_parent'    => $course_id,
 				'post_status'    => 'publish',
 				'fields'         => 'ids',
 				'posts_per_page' => -1,
@@ -871,11 +879,15 @@ abstract class Utils {
 			return true;
 		}
 
-		// 檢查前一章是否已完成
-		$prev_chapter_id = $chapter_ids[ $index - 1 ];
-		$prev_chapter    = new Chapter( (int) $prev_chapter_id, (int) $user_id );
+		// 嚴格線性規則：所有前面的章節都必須已完成，才能解鎖當前章節
+		for ( $i = 0; $i < $index; $i++ ) {
+			$preceding_chapter = new Chapter( (int) $chapter_ids[ $i ], (int) $user_id );
+			if ( ! $preceding_chapter->finished_at ) {
+				return false;
+			}
+		}
 
-		return (bool) $prev_chapter->finished_at;
+		return true;
 	}
 
 	/**
