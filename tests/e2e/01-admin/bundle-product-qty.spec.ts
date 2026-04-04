@@ -33,19 +33,21 @@ async function createAndSelectBundle(page: import('@playwright/test').Page, cour
   await waitForFormLoaded(page)
   await clickTab(page, '銷售方案')
 
-  // 點擊「新增」按鈕（建立銷售方案）
-  const addBtn = page
-    .locator('.ant-tabs-tabpane-active')
-    .getByRole('button', { name: /新增/ })
-    .first()
+  // 等待銷售方案 Tab 內容渲染完成
+  const tabPane = page.locator('.ant-tabs-tabpane-active')
+  await expect(tabPane).toBeVisible({ timeout: 10_000 })
+
+  // 點擊「新增」按鈕（CourseBundles 元件中唯一的 primary button）
+  const addBtn = tabPane.locator('.ant-btn-primary').first()
   await expect(addBtn).toBeVisible({ timeout: 10_000 })
   await addBtn.click()
 
   // 等待列表刷新，出現新的銷售方案項目
-  const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+  // @ant-design/pro-editor SortableList 的 item 使用 data-testid="list-item"
+  const listItem = tabPane.locator('[data-testid="list-item"]').first()
   await expect(listItem).toBeVisible({ timeout: 15_000 })
 
-  // 點擊商品名稱進入編輯面板（ProductName 元件）
+  // 點擊商品名稱進入編輯面板
   await listItem.click()
 
   // 等待右側編輯面板載入（Refine <Edit> 元件含「儲存銷售方案」按鈕）
@@ -160,7 +162,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await clickTab(page, '銷售方案')
 
       // 點擊該銷售方案的名稱進入編輯（列表中的 item）
-      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      const listItem = page.locator('.ant-tabs-tabpane-active [data-testid="list-item"]').first()
       await expect(listItem).toBeVisible({ timeout: 10_000 })
       await listItem.click()
 
@@ -223,7 +225,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await clickTab(page, '銷售方案')
 
       // 點擊銷售方案項目進入編輯面板
-      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      const listItem = page.locator('.ant-tabs-tabpane-active [data-testid="list-item"]').first()
       await expect(listItem).toBeVisible({ timeout: 10_000 })
       await listItem.click()
 
@@ -293,7 +295,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await clickTab(page, '銷售方案')
 
       // 點擊銷售方案項目進入編輯面板
-      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      const listItem = page.locator('.ant-tabs-tabpane-active [data-testid="list-item"]').first()
       await expect(listItem).toBeVisible({ timeout: 10_000 })
       await listItem.click()
 

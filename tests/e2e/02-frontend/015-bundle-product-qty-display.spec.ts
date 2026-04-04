@@ -135,6 +135,22 @@ test.describe('銷售方案前台數量顯示', () => {
       await expect(courseQtyDisplay).not.toBeVisible()
     } finally {
       await context.close()
+
+      // 測試結束後立即清理此銷售方案，避免影響後續測試
+      if (bundleId) {
+        const { page: cleanPage, context: cleanCtx } = await browser.newContext({ storageState: '.auth/admin.json' }).then(async (ctx) => {
+          const p = await ctx.newPage()
+          return { page: p, context: ctx }
+        })
+        await cleanPage.goto(`${BASE_URL}/wp-admin/`, { waitUntil: 'domcontentloaded' })
+        await cleanPage.waitForFunction(() => !!(window as any).wpApiSettings?.nonce)
+        const cleanNonce = await cleanPage.evaluate(() => (window as any).wpApiSettings?.nonce || '')
+        await cleanPage.request.delete(`${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`, {
+          headers: { 'X-WP-Nonce': cleanNonce },
+        })
+        await cleanCtx.close()
+        bundleId = 0 // 已清理，避免 afterAll 重複刪除
+      }
     }
   })
 
