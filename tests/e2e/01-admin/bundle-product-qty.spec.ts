@@ -30,7 +30,10 @@ import { setupApiFromBrowser } from '../helpers/api-client'
  * 3. 點擊列表項目的產品名稱 → 右側內嵌 Card 編輯表單出現
  */
 async function createAndOpenBundleForm(page: Page): Promise<void> {
+	// 等待 active tab pane 渲染完成（forceRender: false 的 tab 需要 mount 時間）
 	const tabContent = page.locator('.ant-tabs-tabpane-active')
+	const addBtn = tabContent.locator('.ant-btn-primary').first()
+	await expect(addBtn).toBeVisible({ timeout: 10_000 })
 
 	// 記錄建立前的列表項目數量
 	const initialCount = await tabContent
@@ -46,8 +49,8 @@ async function createAndOpenBundleForm(page: Page): Promise<void> {
 		{ timeout: 15_000 },
 	)
 
-	// 點擊「新增」按鈕
-	await tabContent.getByRole('button', { name: '新增' }).click()
+	// 點擊「新增」按鈕（使用 CSS selector，與 bundle-product.spec.ts 一致）
+	await addBtn.click()
 
 	// 等待 API POST 完成
 	await postPromise
@@ -59,20 +62,21 @@ async function createAndOpenBundleForm(page: Page): Promise<void> {
 	)
 
 	// 點擊第一個列表項目的產品名稱以開啟編輯表單
-	// 排序為 date desc，新建的銷售方案在第一位
+	// 排序為 menu_order asc, date desc，新建的銷售方案在第一位
 	const listItem = tabContent.locator('[data-testid="list-item"]').first()
 	await listItem.locator('text=銷售方案').first().click()
 
-	// 等待編輯表單載入完成（含商品資料非同步載入）
+	// 等待編輯表單載入完成（EditBundle 面板出現）
 	const selectedProducts = page.locator(
 		'[data-testid="selected-products-list"]',
 	)
 	await expect(selectedProducts).toBeVisible({ timeout: 10_000 })
 
-	// 等待商品資料載入完成（loading skeleton 消失）
-	await expect(selectedProducts.locator('.animate-pulse')).toHaveCount(0, {
-		timeout: 10_000,
-	})
+	// 等待商品資料非同步載入完成（loading skeleton 在 selected-products-list 外層）
+	// 透過等待 selected-products-list 內有實際內容來判斷載入完成
+	await expect(
+		selectedProducts.locator('.ant-input-number'),
+	).toBeVisible({ timeout: 10_000 })
 }
 
 test.describe('銷售方案商品數量', () => {
@@ -170,8 +174,18 @@ test.describe('銷售方案商品數量', () => {
 		await waitForFormLoaded(page)
 		await clickTab(page, '銷售方案')
 
-		// 找到更名後的銷售方案並開啟
+		// 等待 tab content 渲染完成
 		const tabContent = page.locator('.ant-tabs-tabpane-active')
+		await expect(tabContent.locator('.ant-btn-primary').first()).toBeVisible({
+			timeout: 10_000,
+		})
+
+		// 等待列表載入完成
+		await expect(
+			tabContent.locator('[data-testid="list-item"]').first(),
+		).toBeVisible({ timeout: 15_000 })
+
+		// 找到更名後的銷售方案並開啟
 		const bundleItem = tabContent
 			.locator('[data-testid="list-item"]')
 			.filter({ hasText: '數量測試方案' })
@@ -185,9 +199,9 @@ test.describe('銷售方案商品數量', () => {
 				'[data-testid="selected-products-list"]',
 			)
 			await expect(reopenedProducts).toBeVisible({ timeout: 10_000 })
-			await expect(reopenedProducts.locator('.animate-pulse')).toHaveCount(0, {
-				timeout: 10_000,
-			})
+			await expect(
+				reopenedProducts.locator('.ant-input-number'),
+			).toBeVisible({ timeout: 10_000 })
 
 			// 驗證數量回顯為 3
 			const reopenedQtyInput = reopenedProducts
