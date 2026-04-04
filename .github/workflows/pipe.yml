@@ -285,15 +285,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUM: ${{ steps.resolve_branch.outputs.issue_num }}
-          UPGRADE_MSG: |-
-            ## 🚀 需求已確認，自動啟動開發管線
-
-            Clarifier 判定需求已足夠清晰，已生成規格文件並自動啟動後續流程：
-            **Planner → TDD Coordinator → Testing**
-
-            > 如需中止，可取消此 GitHub Actions run。
         run: |
           if [ -n "$ISSUE_NUM" ]; then
+            UPGRADE_MSG="$(sed '/^<!--/,/^-->/d' .github/templates/pipeline-upgrade-comment.md)"
             gh issue comment "$ISSUE_NUM" --body "$UPGRADE_MSG"
           fi
 
@@ -1037,6 +1031,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
+
+            // 通用模板替換函式：移除 HTML 註解、去除尾部空白後替換 {{VAR}} 佔位符
+            function renderTemplate(template, vars) {
+              const stripped = template.replace(/<!--[\s\S]*?-->\n*/g, '').trimEnd();
+              return Object.entries(vars).reduce(
+                (result, [key, value]) => result.split(`{{${key}}}`).join(value ?? ''),
+                stripped
+              );
+            }
+
             const status = '${{ steps.final_result.outputs.status }}';
             const cycle = '${{ steps.final_result.outputs.cycle }}';
             const fixCount = '${{ steps.final_result.outputs.fix_count }}';
@@ -1131,12 +1136,12 @@ jobs:
               let screenshotMd = '';
               for (const filename of e2eScreenshotFiles) {
                 const label = filename.replace('.png', '').replace(/[-_]/g, ' ');
-                screenshotMd += `### ${label}\n![${label}](${e2eMediaUrlPrefix}/${filename})\n\n`;
+                screenshotMd += `**${label}**\n\n![${label}](${e2eMediaUrlPrefix}/${filename})\n\n`;
               }
               let videoMd = '';
               for (const filename of e2eVideoFiles) {
                 const label = filename.replace('.webm', '').replace(/[-_]/g, ' ');
-                videoMd += `### 📹 ${label}\n[▶️ 觀看測試影片](${e2eMediaUrlPrefix}/${filename})\n\n`;
+                videoMd += `- [${label}](${e2eMediaUrlPrefix}/${filename})\n`;
               }
               if (screenshotMd || videoMd) {
                 e2eMediaSection = [
@@ -1174,23 +1179,19 @@ jobs:
             const agentName = '${{ needs.claude.outputs.agent_name }}';
             const agentSuffix = agentName ? ` — ${agentName}` : '';
 
-            const body = [
-              `## ${emoji} 整合測試${statusText}${agentSuffix}`,
-              fixInfo,
-              summaryTable,
-              '<details>',
-              '<summary>📋 PHPUnit 測試輸出（點擊展開）</summary>',
-              '',
-              '```',
-              testOutput.substring(0, 60000),
-              '```',
-              '',
-              '</details>',
-              e2eSection,
-              '',
-              '---',
-              `*🤖 測試在 Claude Code 開發完成後自動執行（PHPUnit cycle ${cycle}/3, E2E cycle ${e2eCycle || '0'}/3）*`,
-            ].join('\n');
+            // 讀取模板並替換佔位符
+            const template = fs.readFileSync('.github/templates/test-result-comment.md', 'utf-8');
+            const body = renderTemplate(template, {
+              STATUS_EMOJI: emoji,
+              STATUS_TEXT: statusText,
+              AGENT_SUFFIX: agentSuffix,
+              FIX_INFO: fixInfo,
+              SUMMARY_TABLE: summaryTable,
+              TEST_OUTPUT: testOutput.substring(0, 60000),
+              E2E_SECTION: e2eSection,
+              CYCLE: cycle,
+              E2E_CYCLE: e2eCycle || '0',
+            });
 
             const issueNumber = context.issue?.number
               || context.payload?.issue?.number
@@ -1502,6 +1503,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
+
+            // 通用模板替換函式：移除 HTML 註解、去除尾部空白後替換 {{VAR}} 佔位符
+            function renderTemplate(template, vars) {
+              const stripped = template.replace(/<!--[\s\S]*?-->\n*/g, '').trimEnd();
+              return Object.entries(vars).reduce(
+                (result, [key, value]) => result.split(`{{${key}}}`).join(value ?? ''),
+                stripped
+              );
+            }
+
             const urlPrefix = '${{ steps.upload_smoke_media.outputs.media_url_prefix }}';
             const screenshotFiles = '${{ steps.upload_smoke_media.outputs.screenshot_files }}'.split(',').filter(Boolean);
             const videoFiles = '${{ steps.upload_smoke_media.outputs.video_files }}'.split(',').filter(Boolean);
@@ -1591,13 +1603,14 @@ jobs:
                   combinedMd ? `## 🖼️ 媒體備份\n\n${combinedMd}` : '',
                 ].filter(Boolean).join('\n');
 
-            const body = [
-              `## 🖥️ AI 驗收 ${emoji} ${statusText} — wp-workflows:browser-tester`,
-              '',
-              mainContent,
-              '---',
-              `*🤖 Smoke Test 由 CI 自動執行（run \`${{ github.run_id }}\`）*`,
-            ].filter(Boolean).join('\n');
+            // 讀取模板並替換佔位符
+            const template = fs.readFileSync('.github/templates/acceptance-comment.md', 'utf-8');
+            const body = renderTemplate(template, {
+              STATUS_EMOJI: emoji,
+              STATUS_TEXT: statusText,
+              MAIN_CONTENT: mainContent,
+              RUN_ID: '${{ github.run_id }}',
+            });
 
             const issueNumber = context.issue?.number
               || context.payload?.issue?.number
