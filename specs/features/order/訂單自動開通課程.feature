@@ -49,6 +49,30 @@ Feature: 訂單自動開通課程
       When WooCommerce 訂單 "ORDER-2" 狀態變更為 "completed"
       Then 用戶 "Alice" 的 avl_course_ids 應包含課程 100
 
+  Rule: 後置（狀態）- 銷售方案展開時考慮 pbp_product_quantities 數量
+
+    # 詳見：specs/features/bundle/銷售方案商品數量.feature
+
+    Example: 購買含數量的銷售方案時，訂單項目名稱包含數量標記
+      Given 系統中有以下銷售方案：
+        | productId | name       | bundle_type | link_course_id | pbp_product_ids |
+        | 600       | 超值學習包 | bundle      | 100            | 100,500         |
+      And 銷售方案 600 的 pbp_product_quantities 為 '{"100":1,"500":3}'
+      And 用戶 "Alice" 建立訂單 "ORDER-3" 購買商品 600
+      When WooCommerce 訂單 "ORDER-3" 建立
+      Then 訂單 "ORDER-3" 應包含項目 "超值學習包 - 全端課程套餐 x3"，qty 為 1，total 為 0
+
+    Example: 購買含數量的銷售方案時，庫存按數量倍數扣減
+      Given 系統中有以下銷售方案：
+        | productId | name       | bundle_type | link_course_id | pbp_product_ids |
+        | 600       | 超值學習包 | bundle      | 100            | 500             |
+      And 銷售方案 600 的 pbp_product_quantities 為 '{"500":3}'
+      And 商品 500 庫存為 20，manage_stock 為 yes
+      And 用戶 "Alice" 建立訂單 "ORDER-3" 購買商品 600，數量 2
+      When WooCommerce 訂單 "ORDER-3" 完成庫存扣減
+      Then 商品 500 庫存應為 14
+      # 計算：20 - (2 份方案 x 3 本) = 14
+
   Rule: 後置（狀態）- 課程商品不允許訪客結帳
 
     Example: 訪客無法購買課程商品

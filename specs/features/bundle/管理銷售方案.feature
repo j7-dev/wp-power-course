@@ -57,3 +57,27 @@ Feature: 管理銷售方案
         | course_id | limit_type | limit_value | limit_unit |
         | 100       | fixed      | 365         | day        |
       Then 操作成功
+
+  Rule: 後置（狀態）- 建立銷售方案時自動將當前課程加入 pbp_product_ids
+
+    # 詳見：銷售方案當前課程統一管理.feature
+    Example: 新建銷售方案自動包含當前課程
+      When 管理員 "Admin" 建立銷售方案，參數如下：
+        | name     | link_course_id | price | bundle_type   |
+        | 月費方案 | 100            | 399   | single_course |
+      Then 操作成功
+      And 銷售方案的 pbp_product_ids 應包含 100
+
+  Rule: 後置（狀態）- 支援設定 pbp_product_quantities（每個商品的數量）
+
+    # 詳見：銷售方案商品數量.feature
+    Example: 建立含商品數量的銷售方案
+      When 管理員 "Admin" 建立銷售方案，參數如下：
+        | name       | link_course_id | price | bundle_type |
+        | 超值學習包 | 100            | 2000  | bundle      |
+      And 銷售方案的 pbp_product_quantities 為：
+        | product_id | qty |
+        | 100        | 1   |
+        | 200        | 3   |
+      Then 操作成功
+      And 銷售方案的 postmeta `pbp_product_quantities` 應為 JSON

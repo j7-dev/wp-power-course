@@ -277,6 +277,21 @@ components:
           type: string
         regular_price:
           type: string
+        pbp_product_ids:
+          type: array
+          description: 包含商品 ID 列表（含當前課程）
+          items:
+            type: string
+        pbp_product_quantities:
+          type: object
+          description: |
+            每個商品的數量，JSON 格式 {"商品ID": 數量}。
+            未設定的商品預設數量為 1。
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
+          example: {"100": 1, "200": 3}
 
     BundleProduct:
       type: object
@@ -301,6 +316,25 @@ components:
         regular_price:
           type: string
           example: "599"
+        pbp_product_ids:
+          type: array
+          description: |
+            包含商品 ID 列表（含當前課程，當前課程作為普通商品處理）。
+            建立時自動加入當前課程，管理員可移除。
+          items:
+            type: string
+          example: ["100", "200", "201"]
+        pbp_product_quantities:
+          type: object
+          description: |
+            每個商品的數量，JSON 格式 {"商品ID": 數量}。
+            值為 1~999 的正整數。不存在或未設定的商品預設為 1。
+            exclude_main_course 已廢棄，改由 pbp_product_ids 是否包含課程 ID 決定。
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
+          example: {"100": 1, "200": 3, "201": 2}
         bind_courses_data:
           type: array
           items:
@@ -2648,6 +2682,24 @@ paths:
                 regular_price:
                   type: string
                   example: "599"
+                pbp_product_ids:
+                  type: array
+                  description: |
+                    包含商品 ID 列表（含當前課程）。
+                    建立時若未提供，自動加入 link_course_id 對應的課程。
+                  items:
+                    type: string
+                  example: ["100", "200"]
+                pbp_product_quantities:
+                  type: object
+                  description: |
+                    每個商品的數量 {"商品ID": 數量}，1~999 正整數。
+                    未提供的商品預設為 1。
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
+                  example: {"100": 1, "200": 3}
                 bind_courses_data:
                   type: array
                   items:
@@ -2775,6 +2827,20 @@ paths:
                   type: string
                 link_course_id:
                   type: integer
+                pbp_product_ids:
+                  type: array
+                  description: 包含商品 ID 列表（含當前課程，可自由新增或移除）
+                  items:
+                    type: string
+                pbp_product_quantities:
+                  type: object
+                  description: |
+                    每個商品的數量 {"商品ID": 數量}，1~999 正整數。
+                    未提供的商品預設為 1。
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
                 bind_courses_data:
                   type: array
                   items:
