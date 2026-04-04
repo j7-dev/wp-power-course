@@ -90,7 +90,7 @@ const CourseBundlesComponent = () => {
 
 	const ref = useRef<SortableListRef>(null)
 
-	// 創建銷售方案
+	// 創建銷售方案（自動將當前課程加入 pbp_product_ids，qty=1）
 	const { mutate: create, isLoading: isCreating } = useCreate()
 	const handleCreate = () => {
 		const values = {
@@ -98,6 +98,9 @@ const CourseBundlesComponent = () => {
 			bundle_type: 'bundle',
 			name: '銷售方案',
 			link_course_ids: [courseId],
+			// 自動帶入當前課程，後端會在 post_bundle_products_callback 中處理
+			pbp_product_ids: [courseId],
+			pbp_product_quantities: JSON.stringify({ [courseId as string]: 1 }),
 		}
 
 		const formData = toFormData(values)

@@ -1,22 +1,20 @@
 import {
 	CheckOutlined,
-	PlusOutlined,
 	ExclamationCircleOutlined,
 } from '@ant-design/icons'
 import { useList } from '@refinedev/core'
-import { Form, Input, Tag, List, Select, Switch } from 'antd'
+import { Form, Input, Tag, List, Select, Switch, InputNumber } from 'antd'
 import { renderHTML } from 'antd-toolkit'
 import { useAtomValue, useAtom } from 'jotai'
 import React, { useState, memo, useEffect } from 'react'
 
 import defaultImage from '@/assets/images/defaultImage.jpg'
-import { FiSwitch } from '@/components/formItem'
 import { PopconfirmDelete, Heading } from '@/components/general'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { productTypes } from '@/utils'
 
-import { courseAtom, selectedProductsAtom, bundleProductAtom } from './atom'
+import { courseAtom, selectedProductsAtom, bundleProductAtom, productQuantitiesAtom } from './atom'
 import Gallery from './Gallery'
 import ProductPriceFields from './ProductPriceFields'
 import {
@@ -33,18 +31,15 @@ const BundleForm = () => {
 	const course = useAtomValue(courseAtom)
 	const record = useAtomValue(bundleProductAtom)
 	const [selectedProducts, setSelectedProducts] = useAtom(selectedProductsAtom)
+	const [quantities, setQuantities] = useAtom(productQuantitiesAtom)
 
 	const {
 		id: courseId,
-		name: courseName,
-		price_html: coursePrice,
 	} = course as TCourseRecord
 
 	const [searchKeyWord, setSearchKeyWord] = useState<string>('')
 	const [showList, setShowList] = useState<boolean>(false)
 	const bundleProductForm = Form.useFormInstance()
-	const watchExcludeMainCourse =
-		Form.useWatch(['exclude_main_course'], bundleProductForm) === 'yes'
 
 	const onSearch = (value: string) => {
 		setSearchKeyWord(value)
@@ -98,23 +93,26 @@ const BundleForm = () => {
 		const isInclude = selectedProducts?.some(({ id }) => id === product.id)
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
-
 			setSelectedProducts(
 				selectedProducts.filter(({ id }) => id !== product.id)
 			)
+			// 同步清理 quantities 中的對應 key
+			setQuantities((prev) => {
+				const next = { ...prev }
+				delete next[product.id]
+				return next
+			})
 		} else {
-			// 當前列表中沒有這個商品，所以要加入
-
+			// 當前列表中沒有這個商品，所以要加入，預設數量為 1
 			setSelectedProducts([...selectedProducts, product])
+			setQuantities((prev) => ({ ...prev, [product.id]: 1 }))
 		}
 	}
 
-	// 將當前商品移除
-	const initPIdsExcludedCourseId = (
-		record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
-	).filter((id) => id !== courseId)
+	// 使用完整的 pbp_product_ids 初始化商品列表（含當前課程）
+	const initProductIds = (record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || [])
 
-	// 初始狀態
+	// 初始狀態：取得所有包含商品的資料（含當前課程）
 	const { data: initProductsData, isFetching: initIsFetching } =
 		useList<TBundleProductRecord>({
 			dataProviderName: 'power-course',
@@ -123,12 +121,12 @@ const BundleForm = () => {
 				{
 					field: 'include',
 					operator: 'eq',
-					value: initPIdsExcludedCourseId,
+					value: initProductIds,
 				},
 			],
 			queryOptions: {
 				// 剛進來的時候才需要 fetch
-				enabled: !!initPIdsExcludedCourseId?.length,
+				enabled: !!initProductIds?.length,
 			},
 		})
 
@@ -136,51 +134,55 @@ const BundleForm = () => {
 
 	useEffect(() => {
 		if (!initIsFetching) {
-			// 初始化商品
-			setSelectedProducts(includedProducts)
+			// 初始化商品列表（按照 pbp_product_ids 順序）
+			const orderedProducts = initProductIds
+				.map((id) => includedProducts.find((p) => p.id === id))
+				.filter((p): p is TBundleProductRecord => p !== undefined)
+			setSelectedProducts(orderedProducts)
+
+			// 初始化 quantities（從 record 讀取）
+			const initQuantities = record?.pbp_product_quantities ?? {}
+			setQuantities(initQuantities)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [initIsFetching])
 
 	useEffect(() => {
 		// 選擇商品改變時，同步更新到表單上
-		const productIds = watchExcludeMainCourse
-			? selectedProducts.map(({ id }) => id)
-			: [
-					courseId,
-					...selectedProducts.map(({ id }) => id),
-				]
+		const productIds = selectedProducts.map(({ id }) => id)
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
 			productIds
 		)
 
+		// 同步 quantities 到表單（序列化為 JSON string，供後端處理）
+		bundleProductForm.setFieldValue(
+			['pbp_product_quantities'],
+			JSON.stringify(quantities)
+		)
+
+		// 更新原價（含數量計算）
 		bundleProductForm.setFieldValue(
 			['regular_price'],
-			getPrice({
-				type: 'regular_price',
-				products: selectedProducts,
-				course,
-				excludeMainCourse: watchExcludeMainCourse,
-			})
+			getPrice({ type: 'regular_price', products: selectedProducts, quantities })
 		)
-	}, [selectedProducts.length, watchExcludeMainCourse])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selectedProducts.length, quantities])
 
 	const bundlePrices = {
 		regular_price: getPrice({
 			isFetching: initIsFetching,
 			type: 'regular_price',
 			products: selectedProducts,
-			course,
+			quantities,
 			returnType: 'string',
-			excludeMainCourse: watchExcludeMainCourse,
 		}),
 		sale_price: getPrice({
 			isFetching: initIsFetching,
 			type: 'sale_price',
 			products: selectedProducts,
-			course,
+			quantities,
 			returnType: 'string',
-			excludeMainCourse: watchExcludeMainCourse,
 		}),
 	}
 
@@ -227,42 +229,12 @@ const BundleForm = () => {
 			</Item>
 
 			<Item name={[INCLUDED_PRODUCT_IDS_FIELD_NAME]} initialValue={[]} hidden />
+			<Item name={['pbp_product_quantities']} hidden />
 
 			<Heading className="mb-3">自由搭配你的銷售方案，選擇要加入的商品</Heading>
-			<FiSwitch
-				formItemProps={{
-					name: ['exclude_main_course'],
-					label: '排除目前課程',
-				}}
-				switchProps={{
-					size: 'small',
-				}}
-			/>
 
 			<div className="border-2 border-dashed rounded-xl p-4 mb-8 border-blue-500">
-				{/* 當前課程方案 */}
-				<div
-					className={`flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md ${watchExcludeMainCourse ? 'opacity-20 saturate-0' : ''}`}
-				>
-					<img
-						alt=""
-						src={course?.images?.[0]?.url || defaultImage}
-						className="h-9 w-16 rounded object-cover"
-					/>
-					<div className="w-full">
-						{courseName} #{courseId} {renderHTML(coursePrice || '')}
-					</div>
-					<div>
-						<Tag color="blue">目前課程</Tag>
-					</div>
-				</div>
-				{/* END 當前課程方案 */}
-				<div
-					className={`text-center my-2 ${watchExcludeMainCourse ? 'opacity-0' : ''}`}
-				>
-					<PlusOutlined />
-				</div>
-				<div className="text-primary">
+				<div className="text-primary mb-3">
 					<ExclamationCircleOutlined className="mr-2" />
 					您也可以選擇不加入產品，單純創建課程的定期定額銷售方案
 				</div>
@@ -322,52 +294,84 @@ const BundleForm = () => {
 					</div>
 				</div>
 
-				{!initIsFetching &&
-					selectedProducts?.map(({ id, images, name, price_html, type }) => {
-						const tag = productTypes.find(
-							(productType) => productType.value === type
-						)
+				{/* 已選商品列表（含當前課程，統一操作方式） */}
+				<div data-testid="selected-products-list">
+					{!initIsFetching &&
+						selectedProducts?.map(({ id, images, name, price_html, type }) => {
+							const tag = productTypes.find(
+								(productType) => productType.value === type
+							)
+							const isCurrentCourse = id === courseId
+							const qty = quantities[id] ?? 1
 
-						return (
-							<div
-								key={id}
-								className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2"
-							>
-								<div className="rounded aspect-video w-16 overflow-hidden">
-									<img
-										alt=""
-										src={images?.[0]?.url || defaultImage}
-										className="w-full h-full rounded object-cover"
-									/>
-								</div>
-								<div className="flex-1">
-									{name} #{id} {renderHTML(price_html)}
-								</div>
-								<div>
-									<Tag bordered={false} color={tag?.color} className="m-0">
-										{tag?.label}
-									</Tag>
-								</div>
-								<div className="w-8 text-right">
-									<PopconfirmDelete
-										popconfirmProps={{
-											onConfirm: () => {
-												setSelectedProducts(
-													selectedProducts?.filter(
-														({ id: productId }) => productId !== id
-													)
-												)
-											},
+							return (
+								<div
+									key={id}
+									className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2"
+								>
+									<div className="rounded aspect-video w-16 overflow-hidden">
+										<img
+											alt=""
+											src={images?.[0]?.url || defaultImage}
+											className="w-full h-full rounded object-cover"
+										/>
+									</div>
+									<div className="flex-1">
+										{name} #{id} {renderHTML(price_html)}
+									</div>
+									<div>
+										{isCurrentCourse && (
+											<Tag color="blue" className="mr-1">
+												目前課程
+											</Tag>
+										)}
+										<Tag bordered={false} color={tag?.color} className="m-0">
+											{tag?.label}
+										</Tag>
+									</div>
+									{/* 數量輸入框：1~999，空白或不合法時自動修正為 1 */}
+									<InputNumber
+										min={1}
+										max={999}
+										precision={0}
+										value={qty}
+										onChange={(val) => {
+											const newQty = Math.max(
+												1,
+												Math.min(999, Math.floor(val ?? 1))
+											)
+											setQuantities((prev) => ({ ...prev, [id]: newQty }))
 										}}
+										className="w-20"
+										aria-label={`商品 ${name} 數量`}
 									/>
+									<div className="w-8 text-right">
+										<PopconfirmDelete
+											popconfirmProps={{
+												onConfirm: () => {
+													setSelectedProducts(
+														selectedProducts?.filter(
+															({ id: productId }) => productId !== id
+														)
+													)
+													// 移除商品時同步清理 quantities
+													setQuantities((prev) => {
+														const next = { ...prev }
+														delete next[id]
+														return next
+													})
+												},
+											}}
+										/>
+									</div>
 								</div>
-							</div>
-						)
-					})}
+							)
+						})}
+				</div>
 
 				{/* Loading */}
 				{initIsFetching &&
-					initPIdsExcludedCourseId.map((id) => (
+					initProductIds.map((id) => (
 						<div
 							key={id}
 							className="flex items-center justify-start gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2 animate-pulse"

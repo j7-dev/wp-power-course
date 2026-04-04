@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
@@ -19,33 +21,31 @@ export const PRODUCT_TYPE_OPTIONS = [
 ]
 
 // 取得總金額
+// quantities: 各商品數量，key 為商品 ID，value 為數量（1~999）
+// 當前課程已統一在 products 列表中，不再需要 excludeMainCourse 參數
 export const getPrice = ({
 	isFetching = false,
 	type,
 	products,
-	course,
+	course: _course,
 	returnType = 'number',
-	excludeMainCourse = false,
+	quantities = {},
 }: {
 	isFetching?: boolean
 	type: 'regular_price' | 'sale_price'
 	products: TBundleProductRecord[] | undefined
-	course: TCourseRecord | undefined
+	course?: TCourseRecord | undefined
 	returnType?: 'string' | 'number'
-	excludeMainCourse?: boolean
+	quantities?: Record<string, number>
 }): React.ReactNode => {
 	if (isFetching) {
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
 	}
-	const coursePrice = Number(course?.[type] || course?.regular_price || 0)
 	const total =
-		Number(
-			products?.reduce(
-				(acc, product) =>
-					acc + Number(product?.[type] || product.regular_price),
-				0
-			)
-		) + (excludeMainCourse ? 0 : coursePrice)
+		products?.reduce((acc, product) => {
+			const qty = quantities[product.id] ?? 1
+			return acc + Number(product?.[type] || product.regular_price) * qty
+		}, 0) ?? 0
 
 	if ('number' === returnType) return total
 	return `NT$ ${total?.toLocaleString()}`

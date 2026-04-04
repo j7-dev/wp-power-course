@@ -10,6 +10,7 @@ use J7\WpUtils\Classes\General;
 use J7\PowerCourse\Utils\Base;
 use J7\PowerCourse\Utils\Course as CourseUtils;
 use J7\PowerCourse\BundleProduct\Helper;
+use J7\PowerCourse\BundleProduct\Migration;
 
 use J7\Powerhouse\Settings\Model\Settings;
 use J7\Powerhouse\Utils\Base as PowerhouseUtils;
@@ -54,6 +55,9 @@ final class Bootstrap {
 
 		\add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_script' ], 99 );
 		\add_action( 'wp_enqueue_scripts', [ $this, 'frontend_enqueue_script' ], 99 );
+
+		// 執行銷售方案向下相容遷移（將 exclude_main_course 邏輯轉換為 pbp_product_ids 列表）
+		\add_action( 'init', [ Migration::class, 'migrate_exclude_main_course' ], 5 );
 
 		// 讓 action scheduler 同時執行的數量增加
 		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );

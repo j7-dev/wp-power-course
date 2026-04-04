@@ -111,6 +111,7 @@ final class Order {
 			$helper = Helper::instance( $product );
 			if ( $helper?->is_bundle_product ) {
 				$included_product_ids = $helper?->get_product_ids() ?: []; // 綑綁的商品們
+				$quantities           = $helper?->get_product_quantities() ?: []; // 各商品數量
 
 				foreach ( $included_product_ids as $included_product_id ) {
 					$included_product = \wc_get_product( $included_product_id );
@@ -118,14 +119,24 @@ final class Order {
 						continue;
 					}
 
-					// ex: 買了 3 份銷售方案，應該要扣除3份庫存
-					$qty = $item->get_quantity() ?: 1;
+					// bundle_qty = 此銷售方案中的商品數量（預設 1）
+					$bundle_qty  = max( 1, min( 999, (int) ( $quantities[ (string) $included_product_id ] ?? 1 ) ) );
+					// purchase_qty = 購買幾份此銷售方案
+					$purchase_qty = $item->get_quantity() ?: 1;
+					// total_qty = 購買份數 × 方案內數量（WC 會用此數量扣庫存）
+					$total_qty = $purchase_qty * $bundle_qty;
+
+					// 訂單項目名稱：qty > 1 時加入 x{qty} 標記
+					$item_name = $product->get_name() . ' - ' . $included_product->get_name();
+					if ( $bundle_qty > 1 ) {
+						$item_name .= ' x' . $bundle_qty;
+					}
 
 					$order->add_product(
 						$included_product,
-						$qty, // TODO: 應該也要記錄數量
+						$total_qty,
 						[
-							'name'     => $product->get_name() . ' - ' . $included_product->get_name(),
+							'name'     => $item_name,
 							'subtotal' => 0,
 							'total'    => 0,
 						]

@@ -580,9 +580,13 @@ final class Product {
 			// Bundle 商品包含的商品 ids
 			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
 
+			// Bundle 商品各包含商品的數量（JSON: {"商品ID": 數量}），未設定時為空陣列
+			'pbp_product_quantities'             => ( $helper !== null ? $helper->get_product_quantities() : [] ),
+
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
 			'bundle_type_label'                  => (string) $product->get_meta( 'bundle_type_label' ),
+			/** @deprecated 使用 pbp_product_ids 列表判斷是否包含當前課程，此欄位保留向下相容 */
 			'exclude_main_course'                => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
 			'bind_courses_data'                  => $formatted_bind_courses_data,
 			Helper::LINK_COURSE_IDS_META_KEY     => $product->get_meta( Helper::LINK_COURSE_IDS_META_KEY ),
@@ -677,6 +681,25 @@ final class Product {
 		}
 
 		$product->save_meta_data();
+
+		// 新建方案後：自動將當前課程加入 pbp_product_ids（若尚未包含）
+		$bundle_helper = Helper::instance( $product );
+		if ( $bundle_helper ) {
+			$link_course_id = (int) $bundle_helper->link_course_id;
+			if ( $link_course_id > 0 ) {
+				$current_ids = $bundle_helper->get_product_ids();
+				if ( ! in_array( (string) $link_course_id, $current_ids, true ) ) {
+					$bundle_helper->add_bundled_ids( $link_course_id );
+				}
+
+				// 確保 quantities 中有課程的預設數量
+				$quantities = $bundle_helper->get_product_quantities();
+				if ( ! isset( $quantities[ (string) $link_course_id ] ) ) {
+					$quantities[ (string) $link_course_id ] = 1;
+					$bundle_helper->set_product_quantities( $quantities );
+				}
+			}
+		}
 
 		return new \WP_REST_Response(
 			[
@@ -915,6 +938,20 @@ final class Product {
 	 * @return array<string, mixed>
 	 */
 	public static function handle_special_fields( array $meta_data, \WC_Product $product ) {
+		// 處理 pbp_product_quantities（JSON 格式儲存各商品數量）
+		if ( isset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] ) ) {
+			$quantities_raw = $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ];
+			// 如果是 JSON string（從 FormData 來），先 decode
+			if ( is_string( $quantities_raw ) ) {
+				$quantities_raw = \json_decode( $quantities_raw, true ) ?: [];
+			}
+			if ( is_array( $quantities_raw ) ) {
+				$helper = Helper::instance( $product );
+				$helper?->set_product_quantities( $quantities_raw );
+			}
+			unset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] );
+		}
+
 		$update_array_meta_keys = [
 			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
 			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程

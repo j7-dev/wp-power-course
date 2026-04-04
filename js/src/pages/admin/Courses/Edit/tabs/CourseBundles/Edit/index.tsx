@@ -10,7 +10,7 @@ import React, { memo, useEffect } from 'react'
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
-import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
+import { selectedProductsAtom, courseAtom, bundleProductAtom, productQuantitiesAtom } from './atom'
 import BundleForm from './BundleForm'
 
 const EditBundleComponent = ({
@@ -26,6 +26,7 @@ const EditBundleComponent = ({
 	const selectedProducts = useAtomValue(selectedProductsAtom)
 	const [theCourse, setTheCourse] = useAtom(courseAtom)
 	const setBundleProduct = useSetAtom(bundleProductAtom)
+	const setQuantities = useSetAtom(productQuantitiesAtom)
 
 	// 初始化資料
 	const { formProps, form, saveButtonProps, mutation, onFinish } =
@@ -43,12 +44,12 @@ const EditBundleComponent = ({
 		})
 
 	const watchStatus = Form.useWatch(['status'], form)
-	const watchExcludeMainCourse =
-		Form.useWatch(['exclude_main_course'], form) === 'yes'
 
 	useEffect(() => {
 		form.setFieldsValue(record)
 		setBundleProduct(record)
+		// 初始化 quantities atom（從 record 讀取，確保 EditBundle 與 BundleForm 同步）
+		setQuantities(record.pbp_product_quantities ?? {})
 	}, [record])
 
 	useEffect(() => {
@@ -61,14 +62,6 @@ const EditBundleComponent = ({
 			bundle_type: 'bundle'
 			sale_date_range: [Dayjs | number, Dayjs | number]
 		}
-		if (
-			!selectedProducts?.length &&
-			values?.bundle_type === 'bundle' &&
-			watchExcludeMainCourse
-		) {
-			message.error('請至少選擇一個商品')
-			return
-		}
 		form
 			.validateFields()
 			.then(() => {
@@ -78,7 +71,7 @@ const EditBundleComponent = ({
 				])
 				onFinish(toFormData(formattedValues))
 			})
-			.catch((error) => {
+			.catch((_error) => {
 				message.error('請檢查是否有欄位尚未填寫')
 			})
 	}

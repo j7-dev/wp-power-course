@@ -16,6 +16,7 @@ namespace J7\PowerCourse\BundleProduct;
 final class Helper {
 	const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
 	const LINK_COURSE_IDS_META_KEY     = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const PRODUCT_QUANTITIES_META_KEY  = 'pbp_product_quantities'; // 此銷售方案各商品的數量（JSON）
 
 	/**
 	 * 銷售方案類型 'bundle'
@@ -196,5 +197,63 @@ final class Helper {
 			return null;
 		}
 		return $course_product;
+	}
+
+	/**
+	 * 取得銷售方案各商品的數量
+	 * 若 meta 不存在或無法解析，回傳空陣列（呼叫端應以 qty ?: 1 取得預設值）
+	 *
+	 * @return array<string, int> 商品 ID => 數量
+	 */
+	public function get_product_quantities(): array {
+		$id  = $this->product->get_id();
+		$raw = \get_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, true );
+
+		if (!$raw || !is_string($raw)) {
+			return [];
+		}
+
+		$decoded = \json_decode( $raw, true );
+		if (!is_array($decoded)) {
+			return [];
+		}
+
+		/** @var array<string, int> $result */
+		$result = [];
+		foreach ($decoded as $product_id => $qty) {
+			$result[ (string) $product_id ] = (int) $qty;
+		}
+		return $result;
+	}
+
+	/**
+	 * 取得指定商品在此銷售方案中的數量
+	 * 若未設定，預設為 1；並 clamp 到 1~999
+	 *
+	 * @param int $product_id 商品 ID
+	 * @return int 1~999 的正整數
+	 */
+	public function get_product_qty( int $product_id ): int {
+		$quantities = $this->get_product_quantities();
+		$qty        = (int) ( $quantities[ (string) $product_id ] ?? 1 );
+		return max( 1, min( 999, $qty ) );
+	}
+
+	/**
+	 * 設定銷售方案各商品的數量，並儲存到 postmeta
+	 * 不合法的數量（< 1 或 > 999）會自動 clamp 到合法範圍
+	 *
+	 * @param array<string, int> $quantities 商品 ID => 數量
+	 * @return void
+	 */
+	public function set_product_quantities( array $quantities ): void {
+		$id         = $this->product->get_id();
+		$normalized = [];
+
+		foreach ($quantities as $product_id => $qty) {
+			$normalized[ (string) $product_id ] = max( 1, min( 999, (int) $qty ) );
+		}
+
+		\update_post_meta( $id, self::PRODUCT_QUANTITIES_META_KEY, \wp_json_encode( $normalized ) );
 	}
 }

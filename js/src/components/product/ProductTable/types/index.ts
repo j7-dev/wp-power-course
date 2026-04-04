@@ -93,6 +93,8 @@ export type TProductRecord = {
 	children?: TProductVariation[]
 	parent_id?: string
 	pbp_product_ids: string[]
+	/** 各商品在此銷售方案中的數量，key 為商品 ID（string），value 為數量 */
+	pbp_product_quantities: Record<string, number>
 	sale_date_range: [number, number]
 	is_free: 'yes' | 'no' | ''
 	is_course: 'yes' | 'no' | ''
@@ -102,6 +104,7 @@ export type TProductRecord = {
 		answer: string
 	}[]
 	bundle_type_label: string
+	/** @deprecated 使用 pbp_product_ids 列表判斷是否包含當前課程 */
 	exclude_main_course: 'yes' | 'no' | ''
 	enable_bundles_sticky: 'yes' | 'no' | ''
 	enable_mobile_fixed_cta: 'yes' | 'no' | ''
