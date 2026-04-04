@@ -60,8 +60,8 @@ if ($image_url) {
 	/*html*/'
 	<img src="%1$s" alt="%2$s" class="w-full rounded-t" loading="lazy" decoding="async">
 	',
-	$image_url,
-	$product_name
+	\esc_url( $image_url ),
+	\esc_attr( $product_name )
 	);
 }
 
@@ -72,8 +72,8 @@ printf(
   <p class="text-xs text-center mb-1 text-error">%1$s</p>
 	<h6 class="text-base text-base-content font-semibold text-center">%2$s</h6>
 ',
-	(string) $bundle_type_label,
-	$product_name
+	\esc_html( (string) $bundle_type_label ),
+	\esc_html( $product_name )
 );
 
 Plugin::load_template( 'divider' );
@@ -163,7 +163,7 @@ if ('subscription' === $product->get_type()) {
 		printf(
 		/*html*/'<span class="text-gray-500 text-xs %1$s">- %2$s</span>',
 		$key % 2 === 0 ? 'text-left' : 'text-right',
-		$meta_data
+		\esc_html( $meta_data )
 		);
 	}
 	echo '</div>';
@@ -173,7 +173,7 @@ if ('subscription' === $product->get_type()) {
 if ($is_on_sale && $date_on_sale_to) {
 	printf(
 	/*html*/'<p class="text-gray-500 text-xs text-center mt-2 mb-0">限時優惠至 %s</p>',
-	$date_on_sale_to
+	\esc_html( $date_on_sale_to )
 	);
 }
 

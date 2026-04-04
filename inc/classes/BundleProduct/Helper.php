@@ -238,9 +238,12 @@ final class Helper {
 	public function set_product_quantities( array $quantities ): void {
 		$product_id = $this->product->get_id();
 
-		// 驗證並 clamp 每個數量值
+		// 驗證並 clamp 每個數量值，僅允許數字型 key（商品 ID）
 		$sanitized = [];
 		foreach ( $quantities as $pid => $qty ) {
+			if ( ! is_numeric( $pid ) ) {
+				continue;
+			}
 			$sanitized[ (string) $pid ] = max( 1, min( 999, (int) $qty ) );
 		}
 

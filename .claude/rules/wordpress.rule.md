@@ -84,6 +84,40 @@ Resources/{Entity}/
 
 新增業務實體時遵循此結構，並在 `Resources/Loader.php` 中註冊。
 
+## BundleProduct 銷售方案
+
+### Meta Key 常數（`J7\PowerCourse\BundleProduct\Helper`）
+
+| 常數 | Meta Key | 說明 |
+|------|----------|------|
+| `INCLUDE_PRODUCT_IDS_META_KEY` | `pbp_product_ids` | 方案內包含的商品 ID 陣列 |
+| `INCLUDE_PRODUCT_QUANTITIES_META_KEY` | `pbp_product_quantities` | 各商品數量 JSON `{"product_id": qty}` |
+| `LINK_COURSE_IDS_META_KEY` | `link_course_ids` | 此方案歸屬的課程 ID(s) |
+
+### Helper 方法
+
+- `get_product_quantities(): array<string, int>` — 取得各商品數量，空陣列表示全部數量為 1
+- `set_product_quantities(array $quantities): void` — 儲存商品數量（值自動 clamp 至 1~999）
+- `get_product_qty(int $product_id): int` — 取得指定商品的數量（預設 1，向下相容）
+
+### API 欄位（v1.1.0 起）
+
+- `pbp_product_quantities` 已加入 GET 商品回應（`Record<string, number>` 格式）
+- `exclude_main_course` 已從 API 回應中**移除**（Breaking Change，改由 `pbp_product_ids` 直接包含課程）
+- 新建銷售方案時，`link_course_id` 會自動加入 `pbp_product_ids` 並設定數量為 1
+- 更新時傳入 `pbp_product_quantities` 可接受 JSON 字串或陣列格式
+
+### 訂單展開邏輯
+
+`Resources/Order.php` 展開 bundle 商品時數量計算：`qty = bundle_qty × product_qty`
+
+### 相容性遷移（v1.1.0）
+
+`Compatibility/BundleProduct::migrate_exclude_main_course()` 於版本升級至 1.1.0 時自動執行：
+- `exclude_main_course = 'no'` 或不存在：將 `link_course_id` 補入 `pbp_product_ids` 並設定數量 1
+- `exclude_main_course = 'yes'`：`pbp_product_ids` 不變
+- 所有情況均刪除 `exclude_main_course` post meta
+
 ## 安全規範
 
 - **輸入清理**: 所有使用者輸入必須使用 `sanitize_text_field()`, `sanitize_email()`, `absint()` 等

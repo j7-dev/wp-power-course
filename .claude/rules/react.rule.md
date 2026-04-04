@@ -114,6 +114,39 @@ import { env, API_URL } from '@/utils/env'
 - **使用者選擇**: `UserTable` + `UserDrawer` 組合
 - **視頻輸入**: `VideoInput` 元件支援 Bunny/Vimeo/YouTube/Code/Iframe 五種模式
 
+## BundleProduct 銷售方案前端型別
+
+### TProductRecord（`js/src/components/product/ProductTable/types/index.ts`）
+
+- `pbp_product_quantities: Record<string, number>` — 各商品數量，key 為商品 ID 字串
+- `exclude_main_course` 已**移除**（Breaking Change，v1.1.0 起不再出現於 API 回應）
+
+### TSelectedProduct（`js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/atom.tsx`）
+
+```ts
+export type TSelectedProduct = TBundleProductRecord & { qty: number }
+```
+
+`selectedProductsAtom` 的元素型別，額外攜帶 `qty: number` 數量欄位。
+
+### getPrice() 函式（`CourseBundles/Edit/utils/index.tsx`）
+
+v1.1.0 起簽名異動（Breaking Change）：
+
+```ts
+// 移除的參數：course、excludeMainCourse
+// products 型別改為 TSelectedProduct[]（含 qty）
+getPrice({ isFetching, type, products, returnType })
+```
+
+- 不再接受 `course` 與 `excludeMainCourse` 參數
+- 每項商品總價計算：`price × qty`（qty 預設 1）
+
+### 常數（`CourseBundles/Edit/utils/index.tsx`）
+
+- `INCLUDED_PRODUCT_IDS_FIELD_NAME = 'pbp_product_ids'`
+- `PRODUCT_QUANTITIES_FIELD_NAME = 'pbp_product_quantities'`（新增）
+
 ## 前端測試
 
 目前無前端 unit test，品質依賴 ESLint + TypeScript strict mode + E2E 測試。

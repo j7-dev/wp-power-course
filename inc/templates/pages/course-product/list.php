@@ -46,12 +46,13 @@ printf(
 		<img class="w-full h-full object-cover group-hover:scale-105 duration-500 transition ease-in-out" src="%1$s" alt="%2$s" loading="lazy" decoding="async">
 	</div>
 	<div>
-		<h6 class="text-sm font-semibold mb-1">%2$s %4$s</h6>
-		<del class="tw-block text-xs text-gray-600">%3$s</del>
+		<h6 class="text-sm font-semibold mb-1">%3$s %5$s</h6>
+		<del class="tw-block text-xs text-gray-600">%4$s</del>
 	</div>
 </div>',
-	$product_image_url,
-	$product_name,
+	\esc_url( $product_image_url ),
+	\esc_attr( $product_name ),
+	\esc_html( $product_name ),
 	$regular_price_html,
 	$quantity_html
 );

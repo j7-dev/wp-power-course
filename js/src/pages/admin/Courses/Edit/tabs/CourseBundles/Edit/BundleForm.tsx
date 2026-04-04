@@ -98,7 +98,7 @@ const BundleForm = () => {
 		if (isInclude) {
 			// 當前列表中已經有這個商品，所以要移除
 			setSelectedProducts(
-				selectedProducts.filter(({ id }) => id !== product.id)
+				selectedProducts.filter(({ id }) => id !== product.id),
 			)
 		} else {
 			// 當前列表中沒有這個商品，所以要加入（預設數量 1）
@@ -110,9 +110,7 @@ const BundleForm = () => {
 	const handleQtyChange = (productId: string, newQty: number | null) => {
 		const qty = Math.max(1, Math.min(999, Math.floor(newQty || 1)))
 		setSelectedProducts(
-			selectedProducts.map((p) =>
-				p.id === productId ? { ...p, qty } : p
-			)
+			selectedProducts.map((p) => (p.id === productId ? { ...p, qty } : p)),
 		)
 	}
 
@@ -120,7 +118,7 @@ const BundleForm = () => {
 	const recordProductIds = record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
 	const recordQuantities = record?.pbp_product_quantities || {}
 	const initPIdsExcludedCourseId = recordProductIds.filter(
-		(id) => id !== courseId
+		(id) => id !== courseId,
 	)
 
 	// 初始狀態
@@ -167,14 +165,18 @@ const BundleForm = () => {
 
 			setSelectedProducts(productsWithQty)
 		}
-	}, [initIsFetching])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [initIsFetching, record?.id])
+
+	// 預先計算依賴值，避免在 useEffect deps 中使用複雜表達式
+	const selectedQtySerialized = selectedProducts.map((p) => p.qty).join(',')
 
 	useEffect(() => {
 		// 選擇商品改變時，同步更新到表單上
 		const productIds = selectedProducts.map(({ id }) => id)
 		bundleProductForm.setFieldValue(
 			[INCLUDED_PRODUCT_IDS_FIELD_NAME],
-			productIds
+			productIds,
 		)
 
 		// 同步 quantities
@@ -184,7 +186,7 @@ const BundleForm = () => {
 		})
 		bundleProductForm.setFieldValue(
 			[PRODUCT_QUANTITIES_FIELD_NAME],
-			JSON.stringify(quantities)
+			JSON.stringify(quantities),
 		)
 
 		bundleProductForm.setFieldValue(
@@ -192,13 +194,10 @@ const BundleForm = () => {
 			getPrice({
 				type: 'regular_price',
 				products: selectedProducts,
-			})
+			}),
 		)
-	}, [
-		selectedProducts.length,
-		// 當數量改變時也需要重新計算
-		selectedProducts.map((p) => p.qty).join(','),
-	])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selectedProducts.length, selectedQtySerialized])
 
 	const bundlePrices = {
 		regular_price: getPrice({
@@ -289,10 +288,10 @@ const BundleForm = () => {
 							renderItem={(product) => {
 								const { id, images, name, price_html } = product
 								const isInclude = selectedProducts?.some(
-									({ id: theId }) => theId === product.id
+									({ id: theId }) => theId === product.id,
 								)
 								const tag = productTypes.find(
-									(productType) => productType.value === product.type
+									(productType) => productType.value === product.type,
 								)
 								return (
 									<div
@@ -328,66 +327,68 @@ const BundleForm = () => {
 
 				{/* 已選商品列表（包含目前課程） */}
 				{!initIsFetching &&
-					selectedProducts?.map(({ id, images, name, price_html, type, qty }) => {
-						const tag = productTypes.find(
-							(productType) => productType.value === type
-						)
-						const isCurrentCourse = id === courseId
+					selectedProducts?.map(
+						({ id, images, name, price_html, type, qty }) => {
+							const tag = productTypes.find(
+								(productType) => productType.value === type,
+							)
+							const isCurrentCourse = id === courseId
 
-						return (
-							<div
-								key={id}
-								className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2 bundle-selected-item"
-							>
-								<div className="rounded aspect-video w-16 overflow-hidden">
-									<img
-										alt=""
-										src={images?.[0]?.url || defaultImage}
-										className="w-full h-full rounded object-cover"
-									/>
-								</div>
-								<div className="flex-1">
-									{name} #{id} {renderHTML(price_html)}
-								</div>
-								{isCurrentCourse && (
-									<div>
-										<Tag color="blue">目前課程</Tag>
+							return (
+								<div
+									key={id}
+									className="flex items-center justify-between gap-4 border border-solid border-gray-200 p-2 rounded-md mb-2 bundle-selected-item"
+								>
+									<div className="rounded aspect-video w-16 overflow-hidden">
+										<img
+											alt=""
+											src={images?.[0]?.url || defaultImage}
+											className="w-full h-full rounded object-cover"
+										/>
 									</div>
-								)}
-								{!isCurrentCourse && (
-									<div>
-										<Tag bordered={false} color={tag?.color} className="m-0">
-											{tag?.label}
-										</Tag>
+									<div className="flex-1">
+										{name} #{id} {renderHTML(price_html)}
 									</div>
-								)}
-								<div className="flex items-center gap-2">
-									<InputNumber
-										min={1}
-										max={999}
-										precision={0}
-										value={qty}
-										size="small"
-										style={{ width: 60 }}
-										onChange={(value) => handleQtyChange(id, value)}
-									/>
-								</div>
-								<div className="w-8 text-right">
-									<PopconfirmDelete
-										popconfirmProps={{
-											onConfirm: () => {
-												setSelectedProducts(
-													selectedProducts?.filter(
-														({ id: productId }) => productId !== id
+									{isCurrentCourse && (
+										<div>
+											<Tag color="blue">目前課程</Tag>
+										</div>
+									)}
+									{!isCurrentCourse && (
+										<div>
+											<Tag bordered={false} color={tag?.color} className="m-0">
+												{tag?.label}
+											</Tag>
+										</div>
+									)}
+									<div className="flex items-center gap-2">
+										<InputNumber
+											min={1}
+											max={999}
+											precision={0}
+											value={qty}
+											size="small"
+											style={{ width: 60 }}
+											onChange={(value) => handleQtyChange(id, value)}
+										/>
+									</div>
+									<div className="w-8 text-right">
+										<PopconfirmDelete
+											popconfirmProps={{
+												onConfirm: () => {
+													setSelectedProducts(
+														selectedProducts?.filter(
+															({ id: productId }) => productId !== id,
+														),
 													)
-												)
-											},
-										}}
-									/>
+												},
+											}}
+										/>
+									</div>
 								</div>
-							</div>
-						)
-					})}
+							)
+						},
+					)}
 
 				{/* 如果目前課程不在選中列表中，顯示加入按鈕 */}
 				{!isCourseSelected && !initIsFetching && (
