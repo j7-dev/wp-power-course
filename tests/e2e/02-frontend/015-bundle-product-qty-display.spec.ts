@@ -62,7 +62,7 @@ test.describe('銷售方案前台數量顯示', () => {
         await cleanPage.goto(`${BASE_URL}/wp-admin/`, { waitUntil: 'domcontentloaded' })
         await cleanPage.waitForFunction(() => !!(window as any).wpApiSettings?.nonce)
         const nonce = await cleanPage.evaluate(() => (window as any).wpApiSettings?.nonce || '')
-        await cleanPage.request.delete(`${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`, {
+        await cleanPage.request.delete(`${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`, {
           headers: { 'X-WP-Nonce': nonce },
         })
         await context.close()
@@ -97,7 +97,7 @@ test.describe('銷售方案前台數量顯示', () => {
     params.append('pbp_product_quantities', JSON.stringify({ [courseId]: 1, [tshirtId]: 3 }))
 
     const createResp = await setupPage.request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -160,7 +160,7 @@ test.describe('銷售方案前台數量顯示', () => {
     // 故意不傳 pbp_product_quantities
 
     const createResp = await setupPage.request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -198,7 +198,7 @@ test.describe('銷售方案前台數量顯示', () => {
       await cleanPage.goto(`${BASE_URL}/wp-admin/`, { waitUntil: 'domcontentloaded' })
       await cleanPage.waitForFunction(() => !!(window as any).wpApiSettings?.nonce)
       const cleanNonce = await cleanPage.evaluate(() => (window as any).wpApiSettings?.nonce || '')
-      await cleanPage.request.delete(`${BASE_URL}/wp-json/power-course/v2/bundle_products/${legacyBundleId}`, {
+      await cleanPage.request.delete(`${BASE_URL}/wp-json/power-course/bundle_products/${legacyBundleId}`, {
         headers: { 'X-WP-Nonce': cleanNonce },
       })
       await cleanCtx.close()

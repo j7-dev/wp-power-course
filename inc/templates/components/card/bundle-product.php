@@ -53,7 +53,7 @@ $url                      = \add_query_arg(
 	$checkout_url
 );
 
-echo '<div class="w-full bg-base-100 shadow-lg rounded">';
+echo '<div class="w-full bg-base-100 shadow-lg rounded bundle-product-card">';
 
 if ($image_url) {
 	printf(

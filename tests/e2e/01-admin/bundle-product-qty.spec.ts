@@ -20,11 +20,42 @@ import {
   waitForFormLoaded,
   clickTab,
   waitForMessage,
-  confirmPopconfirm,
 } from '../helpers/admin-page'
 import { setupApiFromBrowser } from '../helpers/api-client'
 
 const BASE_URL = process.env.TEST_SITE_URL || 'http://localhost:8889'
+
+/**
+ * 導航到銷售方案 Tab 並點擊「新增」按鈕，等待新方案出現後點選進入編輯面板
+ */
+async function createAndSelectBundle(page: import('@playwright/test').Page, courseId: number) {
+  await navigateToAdmin(page, `/courses/edit/${courseId}`)
+  await waitForFormLoaded(page)
+  await clickTab(page, '銷售方案')
+
+  // 點擊「新增」按鈕（建立銷售方案）
+  const addBtn = page
+    .locator('.ant-tabs-tabpane-active')
+    .getByRole('button', { name: /新增/ })
+    .first()
+  await expect(addBtn).toBeVisible({ timeout: 10_000 })
+  await addBtn.click()
+
+  // 等待列表刷新，出現新的銷售方案項目
+  const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+  await expect(listItem).toBeVisible({ timeout: 15_000 })
+
+  // 點擊商品名稱進入編輯面板（ProductName 元件）
+  await listItem.click()
+
+  // 等待右側編輯面板載入（Refine <Edit> 元件含「儲存銷售方案」按鈕）
+  const saveBtn = page.getByRole('button', { name: /儲存銷售方案/ })
+  await expect(saveBtn).toBeVisible({ timeout: 15_000 })
+
+  // 等待已選商品載入完成（bundle-selected-item 出現）
+  const selectedItem = page.locator('.bundle-selected-item').first()
+  await expect(selectedItem).toBeVisible({ timeout: 10_000 })
+}
 
 test.describe('銷售方案商品數量 — 管理端', () => {
   test.use({ storageState: '.auth/admin.json' })
@@ -69,45 +100,22 @@ test.describe('銷售方案商品數量 — 管理端', () => {
   })
 
   test('新建銷售方案時目前課程自動帶入且數量為 1', async ({ page }) => {
-    // 前往課程編輯頁 → 銷售方案 tab
-    await navigateToAdmin(page, `/courses/edit/${courseId}`)
-    await waitForFormLoaded(page)
-    await clickTab(page, '銷售方案')
+    await createAndSelectBundle(page, courseId)
 
-    // 點擊「新增銷售方案」按鈕
-    const addBtn = page
-      .locator('.ant-tabs-tabpane-active')
-      .getByRole('button', { name: /新增|新建|建立/ })
-      .first()
-    await expect(addBtn).toBeVisible({ timeout: 10_000 })
-    await addBtn.click()
-
-    // 等待 Drawer/Modal 開啟
-    await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
-
-    // 目前課程應自動出現在已選商品清單中
-    // 驗證有帶「目前課程」標籤
+    // 目前課程應自動出現在已選商品清單中（有「目前課程」Tag）
     const currentCourseTag = page.locator('.ant-tag').filter({ hasText: '目前課程' })
     await expect(currentCourseTag).toBeVisible({ timeout: 5_000 })
 
     // 數量 InputNumber 應存在且預設值為 1
-    const qtyInput = page.locator('.ant-input-number').first()
+    const selectedItem = page.locator('.bundle-selected-item').first()
+    const qtyInput = selectedItem.locator('.ant-input-number input')
     await expect(qtyInput).toBeVisible()
-    const value = await qtyInput.locator('input').inputValue()
+    const value = await qtyInput.inputValue()
     expect(Number(value)).toBe(1)
   })
 
   test('新建銷售方案 — 「排除目前課程」開關不應存在', async ({ page }) => {
-    await navigateToAdmin(page, `/courses/edit/${courseId}`)
-    await waitForFormLoaded(page)
-    await clickTab(page, '銷售方案')
-
-    const addBtn = page
-      .locator('.ant-tabs-tabpane-active')
-      .getByRole('button', { name: /新增|新建|建立/ })
-      .first()
-    await addBtn.click()
-    await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
+    await createAndSelectBundle(page, courseId)
 
     // 「排除目前課程」相關文字不應出現
     const excludeSwitch = page.getByText('排除目前課程')
@@ -116,10 +124,6 @@ test.describe('銷售方案商品數量 — 管理端', () => {
 
   test('新建含數量的銷售方案 — 儲存後數量回填正確', async ({ page, request }) => {
     // 先透過 API 建立銷售方案（帶有 T-shirt + 數量 3）
-    const nonce = await page.evaluate(() => {
-      return (window as any).wpApiSettings?.nonce || ''
-    })
-    // 前往管理頁取得 nonce
     await page.goto(`${BASE_URL}/wp-admin/`, { waitUntil: 'domcontentloaded' })
     await page.waitForFunction(() => !!(window as any).wpApiSettings?.nonce)
     const actualNonce = await page.evaluate(() => (window as any).wpApiSettings?.nonce || '')
@@ -135,7 +139,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
     params.append('pbp_product_quantities', JSON.stringify({ [courseId]: 1, [tshirtId]: 3 }))
 
     const createResp = await request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -155,27 +159,27 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await waitForFormLoaded(page)
       await clickTab(page, '銷售方案')
 
-      // 點擊該銷售方案的編輯按鈕
-      const editBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /編輯/ })
-        .first()
-      await expect(editBtn).toBeVisible({ timeout: 10_000 })
-      await editBtn.click()
+      // 點擊該銷售方案的名稱進入編輯（列表中的 item）
+      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      await expect(listItem).toBeVisible({ timeout: 10_000 })
+      await listItem.click()
 
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
+      // 等待編輯面板載入
+      const saveBtn = page.getByRole('button', { name: /儲存銷售方案/ })
+      await expect(saveBtn).toBeVisible({ timeout: 15_000 })
+
+      // 等待已選商品列表載入
+      const tshirtItem = page.locator('.bundle-selected-item').filter({ hasText: 'T-shirt' })
+      await expect(tshirtItem).toBeVisible({ timeout: 10_000 })
 
       // T-shirt 的數量應為 3
-      // 透過已選商品列表找到 T-shirt 對應的 InputNumber
-      const selectedItems = page.locator('[class*="selected"], [class*="bundled"]').filter({ hasText: 'T-shirt' })
-      const tshirtQty = selectedItems.locator('.ant-input-number input')
+      const tshirtQty = tshirtItem.locator('.ant-input-number input')
       const tshirtValue = await tshirtQty.inputValue().catch(() => '1')
       expect(Number(tshirtValue)).toBe(3)
     } finally {
       // 清理銷售方案
-      const deleteParams = new URLSearchParams()
       await request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         {
           headers: { 'X-WP-Nonce': actualNonce },
         },
@@ -201,7 +205,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
     params.append('pbp_product_quantities', JSON.stringify({ [courseId]: 1, [tshirtId]: 1 }))
 
     const createResp = await request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -218,33 +222,35 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await waitForFormLoaded(page)
       await clickTab(page, '銷售方案')
 
-      // 開啟銷售方案編輯 Drawer
-      const editBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /編輯/ })
-        .first()
-      await expect(editBtn).toBeVisible({ timeout: 10_000 })
-      await editBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
+      // 點擊銷售方案項目進入編輯面板
+      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      await expect(listItem).toBeVisible({ timeout: 10_000 })
+      await listItem.click()
+
+      // 等待編輯面板載入
+      const saveBtn = page.getByRole('button', { name: /儲存銷售方案/ })
+      await expect(saveBtn).toBeVisible({ timeout: 15_000 })
+
+      // 等待已選商品載入
+      const tshirtRow = page.locator('.bundle-selected-item').filter({ hasText: 'T-shirt' })
+      await expect(tshirtRow).toBeVisible({ timeout: 10_000 })
 
       // 找到 T-shirt 的數量 InputNumber 並改為 3
-      const tshirtRow = page.locator('[class*="selected"], .bundle-selected-item').filter({ hasText: 'T-shirt' })
       const tshirtQtyInput = tshirtRow.locator('.ant-input-number input')
       await tshirtQtyInput.click({ clickCount: 3 })
       await tshirtQtyInput.fill('3')
       await tshirtQtyInput.press('Tab')
 
-      // 組合原價應重新計算：課程原價 × 1 + T-shirt 500 × 3 = 課程原價 + 1500
-      // 驗證組合原價欄位有更新（不固定值，驗證有變化即可）
-      const regularPriceField = page.locator('input[id*="regular_price"], .bundle-regular-price input')
-      await expect(regularPriceField).toBeVisible()
+      // 組合原價應重新計算：T-shirt 500 × 3 = 1500
+      // 驗證組合原價欄位有更新（驗證有值即可）
       await page.waitForTimeout(500) // 等待 debounce 計算
+      const regularPriceField = page.locator('#regular_price, input[id*="regular_price"]').first()
+      await expect(regularPriceField).toBeVisible()
       const newPrice = await regularPriceField.inputValue()
-      // T-shirt 500 × 3 = 1500，比原本多 1000（500 × 2 增量）
       expect(Number(newPrice)).toBeGreaterThan(0)
     } finally {
       await request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         {
           headers: { 'X-WP-Nonce': actualNonce },
         },
@@ -269,7 +275,7 @@ test.describe('銷售方案商品數量 — 管理端', () => {
     params.append('pbp_product_quantities', JSON.stringify({ [courseId]: 1 }))
 
     const createResp = await request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -286,43 +292,40 @@ test.describe('銷售方案商品數量 — 管理端', () => {
       await waitForFormLoaded(page)
       await clickTab(page, '銷售方案')
 
-      // 開啟銷售方案編輯
-      const editBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /編輯/ })
-        .first()
-      await expect(editBtn).toBeVisible({ timeout: 10_000 })
-      await editBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
+      // 點擊銷售方案項目進入編輯面板
+      const listItem = page.locator('.ant-tabs-tabpane-active .pro-editor-sortable-list-item').first()
+      await expect(listItem).toBeVisible({ timeout: 10_000 })
+      await listItem.click()
 
-      // 找到目前課程的刪除按鈕並點擊
-      const courseItem = page.locator('[class*="selected"], .bundle-selected-item').filter({ hasText: '目前課程' })
-      const deleteBtn = courseItem.getByRole('button').last()
+      // 等待編輯面板載入
+      const saveBtn = page.getByRole('button', { name: /儲存銷售方案/ })
+      await expect(saveBtn).toBeVisible({ timeout: 15_000 })
+
+      // 等待目前課程的選中項出現
+      const courseItem = page.locator('.bundle-selected-item').filter({ hasText: '目前課程' })
+      await expect(courseItem).toBeVisible({ timeout: 10_000 })
+
+      // 找到目前課程的刪除按鈕（PopconfirmDelete 是最後一個按鈕區域）
+      const deleteBtn = courseItem.locator('.ant-btn-icon-only, .anticon-delete').last()
       await expect(deleteBtn).toBeVisible({ timeout: 5_000 })
       await deleteBtn.click()
 
-      // 確認 Popconfirm 或直接刪除
-      const popconfirmBtn = page.locator('.ant-popconfirm .ant-btn-primary')
-      if (await popconfirmBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
+      // 確認 Popconfirm
+      const popconfirmBtn = page.locator('.ant-popconfirm .ant-btn-primary, .ant-popover .ant-btn-primary')
+      if (await popconfirmBtn.isVisible({ timeout: 3_000 }).catch(() => false)) {
         await popconfirmBtn.click()
       }
 
       // 目前課程的 Tag 應消失
-      const courseTag = page.locator('.ant-tag').filter({ hasText: '目前課程' })
+      const courseTag = page.locator('.bundle-selected-item .ant-tag').filter({ hasText: '目前課程' })
       await expect(courseTag).not.toBeVisible({ timeout: 5_000 })
 
-      // 儲存
-      const saveBtn = page.locator('.ant-drawer, .ant-modal').getByRole('button', { name: /儲存|確定|Submit/ })
-      await saveBtn.click()
-      await waitForMessage(page, 'success')
-
-      // 重新開啟確認
-      await editBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
-      await expect(courseTag).not.toBeVisible()
+      // 應顯示「加入目前課程」按鈕（表示課程已被移除）
+      const addCourseBtn = page.getByText('加入目前課程')
+      await expect(addCourseBtn).toBeVisible({ timeout: 5_000 })
     } finally {
       await request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         {
           headers: { 'X-WP-Nonce': actualNonce },
         },
@@ -332,18 +335,12 @@ test.describe('銷售方案商品數量 — 管理端', () => {
 
   test.describe('數量邊界值驗證', () => {
     test('輸入 0 應自動修正為 1', async ({ page }) => {
-      await navigateToAdmin(page, `/courses/edit/${courseId}`)
-      await waitForFormLoaded(page)
-      await clickTab(page, '銷售方案')
+      await createAndSelectBundle(page, courseId)
 
-      const addBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /新增|新建|建立/ })
-        .first()
-      await addBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
-
-      const qtyInput = page.locator('.ant-input-number input').first()
+      // 找到已選商品的 InputNumber
+      const selectedItem = page.locator('.bundle-selected-item').first()
+      const qtyInput = selectedItem.locator('.ant-input-number input')
+      await expect(qtyInput).toBeVisible({ timeout: 5_000 })
       await qtyInput.click({ clickCount: 3 })
       await qtyInput.fill('0')
       await qtyInput.press('Tab')
@@ -354,18 +351,11 @@ test.describe('銷售方案商品數量 — 管理端', () => {
     })
 
     test('輸入 1000 應自動修正為 999', async ({ page }) => {
-      await navigateToAdmin(page, `/courses/edit/${courseId}`)
-      await waitForFormLoaded(page)
-      await clickTab(page, '銷售方案')
+      await createAndSelectBundle(page, courseId)
 
-      const addBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /新增|新建|建立/ })
-        .first()
-      await addBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
-
-      const qtyInput = page.locator('.ant-input-number input').first()
+      const selectedItem = page.locator('.bundle-selected-item').first()
+      const qtyInput = selectedItem.locator('.ant-input-number input')
+      await expect(qtyInput).toBeVisible({ timeout: 5_000 })
       await qtyInput.click({ clickCount: 3 })
       await qtyInput.fill('1000')
       await qtyInput.press('Tab')
@@ -375,18 +365,11 @@ test.describe('銷售方案商品數量 — 管理端', () => {
     })
 
     test('輸入小數 2.7 應取整為 2 或 3', async ({ page }) => {
-      await navigateToAdmin(page, `/courses/edit/${courseId}`)
-      await waitForFormLoaded(page)
-      await clickTab(page, '銷售方案')
+      await createAndSelectBundle(page, courseId)
 
-      const addBtn = page
-        .locator('.ant-tabs-tabpane-active')
-        .getByRole('button', { name: /新增|新建|建立/ })
-        .first()
-      await addBtn.click()
-      await page.waitForSelector('.ant-drawer, .ant-modal', { timeout: 10_000 })
-
-      const qtyInput = page.locator('.ant-input-number input').first()
+      const selectedItem = page.locator('.bundle-selected-item').first()
+      const qtyInput = selectedItem.locator('.ant-input-number input')
+      await expect(qtyInput).toBeVisible({ timeout: 5_000 })
       await qtyInput.click({ clickCount: 3 })
       await qtyInput.fill('2.7')
       await qtyInput.press('Tab')

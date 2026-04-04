@@ -52,7 +52,7 @@ async function createBundleProduct(
   }
 
   const resp = await request.post(
-    `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+    `${BASE_URL}/wp-json/power-course/bundle_products`,
     {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -192,7 +192,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -205,7 +205,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(bundle.pbp_product_quantities[String(tshirtId)]).toBe(3)
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -220,7 +220,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -231,7 +231,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(bundle.exclude_main_course).toBeUndefined()
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -248,7 +248,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
     // 故意不傳 pbp_product_ids
 
     const createResp = await adminPage.request.post(
-      `${BASE_URL}/wp-json/power-course/v2/bundle_products`,
+      `${BASE_URL}/wp-json/power-course/bundle_products`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -262,7 +262,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -274,7 +274,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(productIds.map(String)).toContain(String(courseId))
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -291,7 +291,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -304,7 +304,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(tshirtQty).toBe(1)
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -320,7 +320,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -330,7 +330,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(Number(savedQty)).toBeLessThanOrEqual(999)
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -346,7 +346,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
     try {
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -356,7 +356,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(Number(savedQty)).toBeGreaterThanOrEqual(1)
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -408,7 +408,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
     } finally {
       await buyerContext.close()
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -446,7 +446,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       // 此測試驗證遷移邏輯本身的正確性，可能需要額外的測試 endpoint
       // 目前先驗證：設定了 exclude=yes 的方案，pbp_product_ids 不包含 courseId
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -459,7 +459,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(productIds).not.toContain(String(courseId))
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
@@ -506,7 +506,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
 
       // 遷移後 pbp_product_ids 應包含 courseId
       const resp = await adminPage.request.get(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products?link_course_ids=${courseId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products?link_course_ids=${courseId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
       const data = await resp.json()
@@ -520,7 +520,7 @@ test.describe('銷售方案商品數量 — 整合測試', () => {
       expect(quantities[String(courseId)]).toBe(1)
     } finally {
       await adminPage.request.delete(
-        `${BASE_URL}/wp-json/power-course/v2/bundle_products/${bundleId}`,
+        `${BASE_URL}/wp-json/power-course/bundle_products/${bundleId}`,
         { headers: { 'X-WP-Nonce': nonce } },
       )
     }
