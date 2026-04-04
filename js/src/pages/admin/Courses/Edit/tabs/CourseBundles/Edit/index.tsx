@@ -43,8 +43,6 @@ const EditBundleComponent = ({
 		})
 
 	const watchStatus = Form.useWatch(['status'], form)
-	const watchExcludeMainCourse =
-		Form.useWatch(['exclude_main_course'], form) === 'yes'
 
 	useEffect(() => {
 		form.setFieldsValue(record)
@@ -61,14 +59,6 @@ const EditBundleComponent = ({
 			bundle_type: 'bundle'
 			sale_date_range: [Dayjs | number, Dayjs | number]
 		}
-		if (
-			!selectedProducts?.length &&
-			values?.bundle_type === 'bundle' &&
-			watchExcludeMainCourse
-		) {
-			message.error('請至少選擇一個商品')
-			return
-		}
 		form
 			.validateFields()
 			.then(() => {
@@ -78,7 +68,7 @@ const EditBundleComponent = ({
 				])
 				onFinish(toFormData(formattedValues))
 			})
-			.catch((error) => {
+			.catch((_error) => {
 				message.error('請檢查是否有欄位尚未填寫')
 			})
 	}
