@@ -41,20 +41,17 @@ final class Migration {
 		}
 
 		// 取得所有 bundle products
+		/** @var array<int> $bundle_product_ids */
 		$bundle_product_ids = \get_posts(
 			[
 				'post_type'   => 'product',
 				'numberposts' => -1,
 				'post_status' => [ 'any' ],
-				'meta_key'    => 'bundle_type', // @phpstan-ignore-line
-				'meta_value'  => 'bundle', // @phpstan-ignore-line
+				'meta_key'    => 'bundle_type', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'  => 'bundle', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 				'fields'      => 'ids',
 			]
 		);
-
-		if ( ! is_array( $bundle_product_ids ) ) {
-			return;
-		}
 
 		foreach ( $bundle_product_ids as $bundle_product_id ) {
 			self::migrate_single_bundle( (int) $bundle_product_id );
