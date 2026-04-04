@@ -4,13 +4,13 @@ import { useLink } from '@refinedev/core'
 import { Form, Switch, Alert, message } from 'antd'
 import { toFormData, formatDateRangeData } from 'antd-toolkit'
 import { Dayjs } from 'dayjs'
-import { useAtom, useSetAtom, useAtomValue } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import React, { memo, useEffect } from 'react'
 
 import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 
-import { selectedProductsAtom, courseAtom, bundleProductAtom } from './atom'
+import { courseAtom, bundleProductAtom } from './atom'
 import BundleForm from './BundleForm'
 
 const EditBundleComponent = ({
@@ -23,7 +23,6 @@ const EditBundleComponent = ({
 	const Link = useLink()
 	const { id, name } = record
 
-	const selectedProducts = useAtomValue(selectedProductsAtom)
 	const [theCourse, setTheCourse] = useAtom(courseAtom)
 	const setBundleProduct = useSetAtom(bundleProductAtom)
 

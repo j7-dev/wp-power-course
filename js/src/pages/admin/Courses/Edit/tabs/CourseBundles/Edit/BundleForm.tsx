@@ -39,11 +39,7 @@ const BundleForm = () => {
 	const record = useAtomValue(bundleProductAtom)
 	const [selectedProducts, setSelectedProducts] = useAtom(selectedProductsAtom)
 
-	const {
-		id: courseId,
-		name: courseName,
-		price_html: coursePrice,
-	} = course as TCourseRecord
+	const { id: courseId } = course as TCourseRecord
 
 	const [searchKeyWord, setSearchKeyWord] = useState<string>('')
 	const [showList, setShowList] = useState<boolean>(false)
