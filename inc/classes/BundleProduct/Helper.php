@@ -207,8 +207,7 @@ final class Helper {
 	 * @return array<string, int>
 	 */
 	public function get_product_quantities(): array {
-		$product_id = $this->product->get_id();
-		$raw        = \get_post_meta( $product_id, self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, true );
+		$raw = $this->product->get_meta( self::INCLUDE_PRODUCT_QUANTITIES_META_KEY );
 
 		if ( empty( $raw ) || ! is_string( $raw ) ) {
 			return [];
@@ -236,9 +235,7 @@ final class Helper {
 	 * @return void
 	 */
 	public function set_product_quantities( array $quantities ): void {
-		$product_id = $this->product->get_id();
-
-		// 驗證並 clamp 每個數量值，僅允許數字型 key（商品 ID）
+		// 驗證並 clamp ���個數量值，僅允許數字型 key（商品 ID）
 		$sanitized = [];
 		foreach ( $quantities as $pid => $qty ) {
 			if ( ! is_numeric( $pid ) ) {
@@ -252,7 +249,8 @@ final class Helper {
 			return;
 		}
 
-		\update_post_meta( $product_id, self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, $json );
+		$this->product->update_meta_data( self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, $json );
+		$this->product->save_meta_data();
 	}
 
 	/**

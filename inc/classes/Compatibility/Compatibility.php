@@ -94,7 +94,7 @@ final class Compatibility
 			self::extend_email_records_table_identifier_column();
 		}
 
-		// 1.1.0 之���移除 exclude_main_course，遷移銷售方案商品數量
+		// 1.1.0 之後移除 exclude_main_course，遷移銷售方案商品數量
 		if (version_compare($previous_version, '1.1.0', '<=')) {
 			BundleProduct::migrate_exclude_main_course();
 		}
