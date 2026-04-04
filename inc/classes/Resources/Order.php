@@ -127,10 +127,9 @@ final class Order {
 					$total_qty = $purchase_qty * $bundle_qty;
 
 					// 訂單項目名稱：qty > 1 時加入 x{qty} 標記
-					$item_name = $product->get_name() . ' - ' . $included_product->get_name();
-					if ( $bundle_qty > 1 ) {
-						$item_name .= ' x' . $bundle_qty;
-					}
+					$item_name = $bundle_qty > 1
+						? \sprintf( '%s - %s x%d', $product->get_name(), $included_product->get_name(), $bundle_qty )
+						: \sprintf( '%s - %s', $product->get_name(), $included_product->get_name() );
 
 					$order->add_product(
 						$included_product,

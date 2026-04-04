@@ -38,7 +38,7 @@ $product_image_url = Base::get_image_url_by_product( $product );
 $regular_price_html = \wc_price( $regular_price );
 
 // qty > 1 時顯示 ×N 標記；qty = 1 時不顯示
-$qty_display = $qty > 1 ? ' <span class="text-primary font-semibold">x' . $qty . '</span>' : '';
+$qty_display = $qty > 1 ? \sprintf( ' <span class="text-primary font-semibold">x%d</span>', $qty ) : '';
 
 printf(
 	'
@@ -51,7 +51,7 @@ printf(
 		<del class="tw-block text-xs text-gray-600">%3$s</del>
 	</div>
 </div>',
-	$product_image_url,
+	\esc_url( $product_image_url ),
 	\esc_html( $product_name ),
 	$regular_price_html,
 	$qty_display

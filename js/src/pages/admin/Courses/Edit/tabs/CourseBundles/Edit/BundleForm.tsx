@@ -1,7 +1,4 @@
-import {
-	CheckOutlined,
-	ExclamationCircleOutlined,
-} from '@ant-design/icons'
+import { CheckOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useList } from '@refinedev/core'
 import { Form, Input, Tag, List, Select, Switch, InputNumber } from 'antd'
 import { renderHTML } from 'antd-toolkit'
@@ -14,7 +11,12 @@ import { TBundleProductRecord } from '@/components/product/ProductTable/types'
 import { TCourseRecord } from '@/pages/admin/Courses/List/types'
 import { productTypes } from '@/utils'
 
-import { courseAtom, selectedProductsAtom, bundleProductAtom, productQuantitiesAtom } from './atom'
+import {
+	courseAtom,
+	selectedProductsAtom,
+	bundleProductAtom,
+	productQuantitiesAtom,
+} from './atom'
 import Gallery from './Gallery'
 import ProductPriceFields from './ProductPriceFields'
 import {
@@ -33,9 +35,7 @@ const BundleForm = () => {
 	const [selectedProducts, setSelectedProducts] = useAtom(selectedProductsAtom)
 	const [quantities, setQuantities] = useAtom(productQuantitiesAtom)
 
-	const {
-		id: courseId,
-	} = course as TCourseRecord
+	const { id: courseId } = course as TCourseRecord
 
 	const [searchKeyWord, setSearchKeyWord] = useState<string>('')
 	const [showList, setShowList] = useState<boolean>(false)
@@ -110,7 +110,7 @@ const BundleForm = () => {
 	}
 
 	// 使用完整的 pbp_product_ids 初始化商品列表（含當前課程）
-	const initProductIds = (record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || [])
+	const initProductIds = record?.[INCLUDED_PRODUCT_IDS_FIELD_NAME] || []
 
 	// 初始狀態：取得所有包含商品的資料（含當前課程）
 	const { data: initProductsData, isFetching: initIsFetching } =
@@ -164,7 +164,11 @@ const BundleForm = () => {
 		// 更新原價（含數量計算）
 		bundleProductForm.setFieldValue(
 			['regular_price'],
-			getPrice({ type: 'regular_price', products: selectedProducts, quantities })
+			getPrice({
+				type: 'regular_price',
+				products: selectedProducts,
+				quantities,
+			})
 		)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedProducts.length, quantities])

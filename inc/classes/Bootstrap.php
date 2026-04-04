@@ -57,7 +57,8 @@ final class Bootstrap {
 		\add_action( 'wp_enqueue_scripts', [ $this, 'frontend_enqueue_script' ], 99 );
 
 		// 執行銷售方案向下相容遷移（將 exclude_main_course 邏輯轉換為 pbp_product_ids 列表）
-		\add_action( 'init', [ Migration::class, 'migrate_exclude_main_course' ], 5 );
+		// 使用 admin_init 避免前台每次請求都查詢遷移狀態
+		\add_action( 'admin_init', [ Migration::class, 'migrate_exclude_main_course' ], 5 );
 
 		// 讓 action scheduler 同時執行的數量增加
 		\add_filter( 'action_scheduler_queue_runner_concurrent_batches', fn() => 10 );

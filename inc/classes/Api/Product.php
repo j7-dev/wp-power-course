@@ -947,7 +947,15 @@ final class Product {
 			}
 			if ( is_array( $quantities_raw ) ) {
 				$helper = Helper::instance( $product );
-				$helper?->set_product_quantities( $quantities_raw );
+				if ( $helper ) {
+					// 僅保留存在於 pbp_product_ids 中的商品數量，防止注入無關 key
+					$valid_ids         = $helper->get_product_ids();
+					$filtered_quantities = \array_intersect_key(
+						$quantities_raw,
+						\array_flip( $valid_ids )
+					);
+					$helper->set_product_quantities( $filtered_quantities );
+				}
 			}
 			unset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] );
 		}
