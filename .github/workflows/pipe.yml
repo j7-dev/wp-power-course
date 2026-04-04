@@ -423,6 +423,24 @@ jobs:
 
           echo "📊 Clarifier: $CLARIFIER_OK | Planner: $PLANNER_OK | tdd-coordinator: $TDD_OK | Pipeline: $PIPELINE_MODE"
 
+      # ── 兜底：確保所有 local commits 都推到 remote ──
+      - name: 推送 local commits 到 remote（兜底）
+        if: steps.check_result.outputs.has_changes == 'true' && steps.resolve_branch.outputs.branch_switched == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="${{ steps.resolve_branch.outputs.branch_name }}"
+          LOCAL_SHA=$(git rev-parse HEAD)
+          REMOTE_SHA=$(git rev-parse "origin/${BRANCH}" 2>/dev/null || echo "none")
+
+          if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
+            echo "ℹ️ Local 與 remote 已同步，無需推送"
+          else
+            echo "🔄 偵測到 local commits 未推送（local: ${LOCAL_SHA:0:7}, remote: ${REMOTE_SHA:0:7}）"
+            git push origin "HEAD:${BRANCH}" --force-with-lease
+            echo "✅ 兜底推送完成"
+          fi
+
   # ══════════════════════════════════════════════════
   # Job 2: 整合測試（PHPUnit + E2E）
   # ══════════════════════════════════════════════════
