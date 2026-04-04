@@ -277,6 +277,18 @@ components:
           type: string
         regular_price:
           type: string
+        pbp_product_ids:
+          type: array
+          description: 包含的商品 ID 列表
+          items:
+            type: integer
+        pbp_product_quantities:
+          type: object
+          description: 各商品數量 JSON（key=商品ID, value=數量）
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
 
     BundleProduct:
       type: object
@@ -301,6 +313,22 @@ components:
         regular_price:
           type: string
           example: "599"
+        pbp_product_ids:
+          type: array
+          description: 銷售方案包含的商品 ID 列表（含當前課程）
+          items:
+            type: integer
+          example: [100, 200, 201]
+        pbp_product_quantities:
+          type: object
+          description: |
+            各商品的數量（JSON 格式，key 為商品 ID 字串，value 為數量整數）。
+            未在此 map 中的商品預設數量為 1。
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
+          example: {"100": 1, "200": 3, "201": 2}
         bind_courses_data:
           type: array
           items:
@@ -2648,6 +2676,24 @@ paths:
                 regular_price:
                   type: string
                   example: "599"
+                pbp_product_ids:
+                  type: array
+                  description: |
+                    包含的商品 ID 列表（含當前課程）。
+                    當前課程重構為與其他商品一致：建立時自動包含、可移除。
+                  items:
+                    type: integer
+                  example: [100, 200, 201]
+                pbp_product_quantities:
+                  type: object
+                  description: |
+                    各商品的數量 JSON（key=商品ID字串, value=1~999整數）。
+                    未指定的商品預設數量為 1。
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
+                  example: {"100": 1, "200": 3, "201": 2}
                 bind_courses_data:
                   type: array
                   items:
@@ -2775,6 +2821,18 @@ paths:
                   type: string
                 link_course_id:
                   type: integer
+                pbp_product_ids:
+                  type: array
+                  description: 包含的商品 ID 列表（含當前課程）
+                  items:
+                    type: integer
+                pbp_product_quantities:
+                  type: object
+                  description: 各商品數量 JSON（key=商品ID, value=1~999整數）
+                  additionalProperties:
+                    type: integer
+                    minimum: 1
+                    maximum: 999
                 bind_courses_data:
                   type: array
                   items:

@@ -325,9 +325,10 @@ Table bundle_products {
   name             varchar(255) [not null, note: 'wp_posts.post_title']
   status           course_status [not null, default: 'publish']
   bundle_type      varchar(50)  [not null, note: 'postmeta: bundle_type — non-empty string identifies this as a bundle/sales plan (e.g. single_course, annual_course)']
-  link_course_id   integer      [not null, note: 'postmeta: link_course_ids — the single course this bundle grants access to']
+  link_course_id   integer      [not null, note: 'postmeta: link_course_ids — the single course this bundle grants access to (determines which course page shows this bundle)']
   price            varchar(30)  [null, note: 'WC _price meta']
-  regular_price    varchar(30)  [null]
+  regular_price    varchar(30)  [null, note: 'Auto-calculated: sum of (product regular_price × qty) for all included products']
+  pbp_product_quantities json   [null, note: 'postmeta: pbp_product_quantities — JSON {"product_id": qty, ...}. Default qty=1 if missing. Range: 1~999']
   bind_courses_data json        [null, note: 'postmeta: bind_courses_data — [{course_id, limit_type, limit_value, limit_unit}]']
   created_at       timestamp    [not null]
   updated_at       timestamp    [not null]
@@ -343,14 +344,31 @@ Table bundle_products {
   Stored in wp_posts (post_type="product") with additional wp_postmeta.
 
   Key postmeta fields:
-    - bundle_type:        non-empty string (presence = is a bundle product)
-    - link_course_ids:    int — the course this bundle grants access to
-    - pbp_product_ids:    multiple meta rows (included WC product IDs for bundle packages)
-    - bind_courses_data:  serialized array of BindCourseData objects
+    - bundle_type:              non-empty string (presence = is a bundle product)
+    - link_course_ids:          int — which course page shows this bundle (1:N relationship)
+    - pbp_product_ids:          multiple meta rows — included WC product IDs (including the linked course if not removed)
+    - pbp_product_quantities:   JSON string — {"product_id": qty} — per-product quantity (1~999, default 1)
+    - bind_courses_data:        serialized array of BindCourseData objects
+
+  v0.13.0 Changes (Issue #179):
+    - NEW: pbp_product_quantities meta — stores per-product quantity as JSON
+    - CHANGED: "current course" is no longer special-cased; it is auto-added to pbp_product_ids on creation
+      and can be removed by the admin, just like any other product
+    - DEPRECATED: exclude_main_course meta — replaced by presence/absence of course in pbp_product_ids
+    - Migration: existing bundles with exclude_main_course=no get course added to pbp_product_ids;
+      exclude_main_course=yes bundles remain without course in product list
 
   Constraints:
     - Cannot nest bundle products inside other bundles.
     - bind_courses_data.limit_type = "fixed" requires limit_value + limit_unit to be set.
+    - pbp_product_quantities values must be integers in range [1, 999].
+
+  Stock deduction (Order processing):
+    - Order item name format: "BundleName - ProductName ×N" (×N only when N > 1)
+    - Order item WC qty = purchase quantity (how many bundles the customer bought)
+    - Order item meta _pbp_qty stores the bundle internal quantity
+    - Actual stock deduction = WC qty × _pbp_qty (custom logic via woocommerce_reduce_order_stock hook)
+    - Example: buy 2 bundles containing "講義 ×3" → stock deduction = 2 × 3 = 6
 
   Helper: Helper::instance($product_id) → J7\PowerCourse\BundleProduct\Helper
   '''
