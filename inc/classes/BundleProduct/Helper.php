@@ -14,8 +14,9 @@ namespace J7\PowerCourse\BundleProduct;
  * 銷售方案 Helper
  */
 final class Helper {
-	const INCLUDE_PRODUCT_IDS_META_KEY = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
-	const LINK_COURSE_IDS_META_KEY     = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
+	const INCLUDE_PRODUCT_IDS_META_KEY      = 'pbp_product_ids'; // 此銷售方案裡面包含的商品 ids
+	const INCLUDE_PRODUCT_QUANTITIES_META_KEY = 'pbp_product_quantities'; // 各商品的數量 JSON {"product_id": qty}
+	const LINK_COURSE_IDS_META_KEY          = 'link_course_ids'; // 此銷售方案歸屬於哪個課程 id(s)
 
 	/**
 	 * 銷售方案類型 'bundle'
@@ -196,5 +197,73 @@ final class Helper {
 			return null;
 		}
 		return $course_product;
+	}
+
+	/**
+	 * 取得銷售方案中各商品的數量
+	 * 回傳格式：[product_id => qty]
+	 * JSON decode 失敗時回傳空陣列（所有商品數量預設為 1）
+	 *
+	 * @return array<string, int>
+	 */
+	public function get_product_quantities(): array {
+		$product_id = $this->product->get_id();
+		$raw        = \get_post_meta( $product_id, self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, true );
+
+		if ( empty( $raw ) || ! is_string( $raw ) ) {
+			return [];
+		}
+
+		$decoded = json_decode( $raw, true );
+		if ( ! is_array( $decoded ) ) {
+			return [];
+		}
+
+		// 確保每個值為正整數
+		$quantities = [];
+		foreach ( $decoded as $pid => $qty ) {
+			$quantities[ (string) $pid ] = max( 1, min( 999, (int) $qty ) );
+		}
+
+		return $quantities;
+	}
+
+	/**
+	 * 設定銷售方案中各商品的數量
+	 *
+	 * @param array<string|int, int> $quantities [product_id => qty]
+	 *
+	 * @return void
+	 */
+	public function set_product_quantities( array $quantities ): void {
+		$product_id = $this->product->get_id();
+
+		// 驗證並 clamp 每個數量值
+		$sanitized = [];
+		foreach ( $quantities as $pid => $qty ) {
+			$sanitized[ (string) $pid ] = max( 1, min( 999, (int) $qty ) );
+		}
+
+		$json = \wp_json_encode( $sanitized );
+		if ( false === $json ) {
+			return;
+		}
+
+		\update_post_meta( $product_id, self::INCLUDE_PRODUCT_QUANTITIES_META_KEY, $json );
+	}
+
+	/**
+	 * 取得指定商品在銷售方案中的數量
+	 * 預設為 1（向下相容：無 quantities meta 時）
+	 *
+	 * @param int $product_id 商品 ID
+	 *
+	 * @return int 數量（1~999）
+	 */
+	public function get_product_qty( int $product_id ): int {
+		$quantities = $this->get_product_quantities();
+		$qty        = $quantities[ (string) $product_id ] ?? 1;
+
+		return max( 1, min( 999, (int) $qty ) );
 	}
 }

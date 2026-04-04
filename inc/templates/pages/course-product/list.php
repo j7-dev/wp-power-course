@@ -6,7 +6,8 @@
 use J7\PowerCourse\Utils\Base;
 
 $default_args = [
-	'product' => $GLOBALS['course'] ?? null,
+	'product'  => $GLOBALS['course'] ?? null,
+	'quantity' => 1,
 ];
 
 /**
@@ -16,8 +17,11 @@ $default_args = [
 $args = wp_parse_args( $args, $default_args );
 
 [
-	'product' => $product,
+	'product'  => $product,
+	'quantity' => $quantity,
 ] = $args;
+
+$quantity = (int) $quantity;
 
 if ( ! ( $product instanceof \WC_Product ) ) {
 	return;
@@ -33,6 +37,8 @@ $product_image_url = Base::get_image_url_by_product( $product );
 
 $regular_price_html = \wc_price( $regular_price );
 
+$quantity_html = $quantity > 1 ? sprintf( '<span class="text-primary font-bold">&times;%d</span>', $quantity ) : '';
+
 printf(
 	'
 <div class="grid grid-cols-[1fr_2fr] gap-5">
@@ -40,11 +46,12 @@ printf(
 		<img class="w-full h-full object-cover group-hover:scale-105 duration-500 transition ease-in-out" src="%1$s" alt="%2$s" loading="lazy" decoding="async">
 	</div>
 	<div>
-		<h6 class="text-sm font-semibold mb-1">%2$s</h6>
+		<h6 class="text-sm font-semibold mb-1">%2$s %4$s</h6>
 		<del class="tw-block text-xs text-gray-600">%3$s</del>
 	</div>
 </div>',
 	$product_image_url,
 	$product_name,
-	$regular_price_html
+	$regular_price_html,
+	$quantity_html
 );

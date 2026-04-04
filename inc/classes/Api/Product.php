@@ -578,12 +578,13 @@ final class Product {
 			'parent_id'                          => (string) $product->get_parent_id(),
 
 			// Bundle 商品包含的商品 ids
-			Helper::INCLUDE_PRODUCT_IDS_META_KEY => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			Helper::INCLUDE_PRODUCT_IDS_META_KEY      => ( $helper !== null ? $helper->get_product_ids() : [] ),
+			// 各商品數量 {"product_id": qty}
+			Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY => ( $helper !== null ? $helper->get_product_quantities() : new \stdClass() ),
 
 			'is_free'                            => (string) $product->get_meta( 'is_free' ),
 			'qa_list'                            => [],
 			'bundle_type_label'                  => (string) $product->get_meta( 'bundle_type_label' ),
-			'exclude_main_course'                => (string) $product->get_meta( 'exclude_main_course' ) ?: 'no',
 			'bind_courses_data'                  => $formatted_bind_courses_data,
 			Helper::LINK_COURSE_IDS_META_KEY     => $product->get_meta( Helper::LINK_COURSE_IDS_META_KEY ),
 
@@ -677,6 +678,22 @@ final class Product {
 		}
 
 		$product->save_meta_data();
+
+		// 新建方案時，預設帶入目前課程到 pbp_product_ids（若尚未包含）
+		$helper = Helper::instance( $product );
+		if ( $helper && $helper->link_course_id > 0 ) {
+			$current_ids = $helper->get_product_ids();
+			if ( ! in_array( (string) $helper->link_course_id, $current_ids, true ) ) {
+				$helper->add_bundled_ids( $helper->link_course_id );
+
+				// 同時設定該課程的數量為 1（如 quantities 不存在）
+				$quantities = $helper->get_product_quantities();
+				if ( ! isset( $quantities[ (string) $helper->link_course_id ] ) ) {
+					$quantities[ (string) $helper->link_course_id ] = 1;
+					$helper->set_product_quantities( $quantities );
+				}
+			}
+		}
 
 		return new \WP_REST_Response(
 			[
@@ -927,6 +944,29 @@ final class Product {
 		];
 
 		$product_id = $product->get_id();
+
+		// 處理 pbp_product_quantities：JSON 格式，需特殊處理
+		if ( isset( $meta_data[ Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY ] ) ) {
+			$raw_quantities = $meta_data[ Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY ];
+
+			// 前端以 JSON 字串傳送
+			if ( is_string( $raw_quantities ) ) {
+				$decoded = json_decode( $raw_quantities, true );
+			} elseif ( is_array( $raw_quantities ) ) {
+				$decoded = $raw_quantities;
+			} else {
+				$decoded = null;
+			}
+
+			if ( is_array( $decoded ) ) {
+				$helper = Helper::instance( $product );
+				if ( $helper ) {
+					$helper->set_product_quantities( $decoded );
+				}
+			}
+
+			unset( $meta_data[ Helper::INCLUDE_PRODUCT_QUANTITIES_META_KEY ] );
+		}
 
 		// 直接更新 array 的 meta data
 		foreach ($update_array_meta_keys as $meta_key) {

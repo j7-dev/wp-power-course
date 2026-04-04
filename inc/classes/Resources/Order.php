@@ -118,12 +118,14 @@ final class Order {
 						continue;
 					}
 
-					// ex: 買了 3 份銷售方案，應該要扣除3份庫存
-					$qty = $item->get_quantity() ?: 1;
+					// 購買份數 × 方案內商品數量
+					$bundle_qty  = $item->get_quantity() ?: 1;
+					$product_qty = $helper->get_product_qty( (int) $included_product_id );
+					$qty         = $bundle_qty * $product_qty;
 
 					$order->add_product(
 						$included_product,
-						$qty, // TODO: 應該也要記錄數量
+						$qty,
 						[
 							'name'     => $product->get_name() . ' - ' . $included_product->get_name(),
 							'subtotal' => 0,
