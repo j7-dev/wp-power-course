@@ -9,8 +9,8 @@ import { type Page, expect } from '@playwright/test'
 /** Admin SPA 基礎 URL */
 const ADMIN_PAGE = '/wp-admin/admin.php?page=power-course'
 
-/** SPA 載入最長等待時間 */
-const SPA_LOAD_TIMEOUT = 15_000
+/** SPA 載入最長等待時間（CI 環境給予更多時間） */
+const SPA_LOAD_TIMEOUT = process.env.CI ? 30_000 : 15_000
 
 /**
  * 導航到 Admin SPA 的指定路由
