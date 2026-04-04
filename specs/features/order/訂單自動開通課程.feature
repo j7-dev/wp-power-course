@@ -49,6 +49,17 @@ Feature: 訂單自動開通課程
       When WooCommerce 訂單 "ORDER-2" 狀態變更為 "completed"
       Then 用戶 "Alice" 的 avl_course_ids 應包含課程 100
 
+  Rule: 後置（狀態）- 銷售方案展開時依 pbp_product_quantities 設定各商品 line item qty
+
+    Example: 購買含多數量的銷售方案時正確展開 qty
+      Given 系統中有以下銷售方案：
+        | productId | name     | bundle_type | link_course_id | pbp_product_ids | pbp_product_quantities |
+        | 700       | 超值套餐 | bundle      | 100            | 100,500         | {"100": 2, "500": 3}   |
+      And 用戶 "Alice" 建立訂單 "ORDER-5" 購買商品 700，數量 1
+      When WooCommerce 訂單 "ORDER-5" 建立
+      Then 訂單 "ORDER-5" 應包含展開的 line item "超值套餐 - PHP 基礎課" qty = 2
+      And 訂單 "ORDER-5" 應包含展開的 line item "超值套餐 - 全端課程套餐" qty = 3
+
   Rule: 後置（狀態）- 課程商品不允許訪客結帳
 
     Example: 訪客無法購買課程商品

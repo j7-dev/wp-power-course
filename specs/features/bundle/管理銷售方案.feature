@@ -47,6 +47,15 @@ Feature: 管理銷售方案
       And 新建商品的 bundle_type meta 應為 "single_course"
       And 新建商品的 link_course_ids meta 應為 100
 
+  Rule: 後置（狀態）- 新建銷售方案時預設帶入目前課程到 pbp_product_ids
+
+    Example: 新建方案自動包含目前課程
+      When 管理員 "Admin" 建立銷售方案，參數如下：
+        | name     | link_course_id | price | bundle_type |
+        | 月費方案 | 100            | 399   | bundle      |
+      Then 操作成功
+      And 銷售方案的 pbp_product_ids 應包含 100
+
   Rule: 後置（狀態）- 支援設定 bind_courses_data（與普通商品共用綁定課程到商品邏輯）
 
     Example: 建立含多課程綁定的銷售方案
