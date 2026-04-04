@@ -301,6 +301,27 @@ components:
         regular_price:
           type: string
           example: "599"
+        pbp_product_ids:
+          type: array
+          description: 方案包含的商品 ID 列表（包含目前課程）
+          items:
+            type: string
+          example: ["100", "200", "300"]
+        pbp_product_quantities:
+          type: object
+          description: |
+            各商品的數量設定（JSON object，key = 商品 ID，value = 數量）。
+            未設定的商品預設數量為 1。
+            數量範圍：1–999 正整數。
+            空物件 {} 或欄位缺失 = 所有商品數量為 1（向下相容）。
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 999
+          example:
+            "100": 1
+            "200": 3
+            "300": 1
         bind_courses_data:
           type: array
           items:
