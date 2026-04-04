@@ -107,6 +107,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * 無 pbp_product_quantities meta 時，get_product_quantities() 應回傳空陣列
+	 *
+	 * @group happy
 	 */
 	public function test_get_product_quantities_returns_empty_when_no_meta(): void {
 		// 確保 meta 不存在
@@ -120,6 +122,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * 有 pbp_product_quantities JSON meta 時，get_product_quantities() 應正確 decode
+	 *
+	 * @group happy
 	 */
 	public function test_get_product_quantities_decodes_json_correctly(): void {
 		$expected = [
@@ -149,6 +153,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * 有設定數量的商品，get_product_qty() 應回傳正確數量
+	 *
+	 * @group happy
 	 */
 	public function test_get_product_qty_returns_correct_qty_when_exists(): void {
 		$quantities = [
@@ -167,6 +173,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * 未設定數量的商品，get_product_qty() 應回傳 1（預設值）
+	 *
+	 * @group edge
 	 */
 	public function test_get_product_qty_returns_1_when_product_not_in_quantities(): void {
 		// 設定其他商品的數量，不設定 product_200
@@ -186,6 +194,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * 無 pbp_product_quantities meta 時，任何商品的 get_product_qty() 應回傳 1
+	 *
+	 * @group edge
 	 */
 	public function test_get_product_qty_returns_1_when_no_meta(): void {
 		\delete_post_meta( $this->bundle_product_id, Helper::PRODUCT_QUANTITIES_META_KEY );
@@ -199,6 +209,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 應正確儲存 JSON 格式到 meta
+	 *
+	 * @group happy
 	 */
 	public function test_set_product_quantities_saves_json_correctly(): void {
 		$quantities = [
@@ -227,6 +239,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 數量 0 應自動修正為 1
+	 *
+	 * @group edge
 	 */
 	public function test_set_product_quantities_clamps_zero_to_1(): void {
 		$quantities = [
@@ -241,6 +255,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 負數應自動修正為 1
+	 *
+	 * @group edge
 	 */
 	public function test_set_product_quantities_clamps_negative_to_1(): void {
 		$quantities = [
@@ -255,6 +271,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 數量超過 999 應自動修正為 999
+	 *
+	 * @group edge
 	 */
 	public function test_set_product_quantities_clamps_over_limit_to_999(): void {
 		$quantities = [
@@ -269,6 +287,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 合法數量（1~999）應正確儲存
+	 *
+	 * @group happy
 	 */
 	public function test_set_product_quantities_saves_valid_quantity(): void {
 		$quantities = [
@@ -283,6 +303,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * set_product_quantities() 空陣列應清空 meta 中的數量
+	 *
+	 * @group edge
 	 */
 	public function test_set_product_quantities_saves_empty_array(): void {
 		// 先設定一些數量
@@ -304,6 +326,8 @@ class HelperQuantityTest extends TestCase {
 
 	/**
 	 * PRODUCT_QUANTITIES_META_KEY 常數應存在且值正確
+	 *
+	 * @group smoke
 	 */
 	public function test_product_quantities_meta_key_constant_exists(): void {
 		$this->assertSame(
