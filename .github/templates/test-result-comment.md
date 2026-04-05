@@ -1,5 +1,5 @@
 <!--
-  用途：整合測試結果（PHPUnit + E2E）Issue Comment
+  用途：整合測試結果（PHPUnit）Issue Comment
   使用方式：JS 端用 fs.readFileSync 讀取後，renderTemplate() 替換佔位符
 
   佔位符清單：
@@ -9,9 +9,7 @@
     {{FIX_INFO}}           - 修復資訊（含前導換行與 > 前綴，可為空）
     {{SUMMARY_TABLE}}      - PHPUnit 統計表（含標題，可為空）
     {{TEST_OUTPUT}}        - PHPUnit 測試輸出文字
-    {{E2E_SECTION}}        - 完整的 E2E 測試區塊（含標題，可為空）
     {{CYCLE}}              - PHPUnit 測試循環次數
-    {{E2E_CYCLE}}          - E2E 測試循環次數（可為 "0"）
 
   條件區塊：無（所有條件邏輯由 JS 端預處理後插入對應佔位符）
 -->
@@ -26,7 +24,6 @@
 ```
 
 </details>
-{{E2E_SECTION}}
 
 ---
-*🤖 測試在 Claude Code 開發完成後自動執行（PHPUnit cycle {{CYCLE}}/3, E2E cycle {{E2E_CYCLE}}/3）*
+*🤖 測試在 Claude Code 開發完成後自動執行（PHPUnit cycle {{CYCLE}}/3）*
