@@ -225,7 +225,11 @@ Table pc_avl_coursemeta {
     - expire_date:        "0" (unlimited) | "1735689600" (10-digit timestamp) | "subscription_123"
     - course_granted_at:  "Y-m-d H:i:s" string
     - finished_at:        "Y-m-d H:i:s" string (set when course progress reaches 100%)
-    - last_visit_info:    JSON string: {"chapter_id": int, "last_visit_at": "Y-m-d H:i:s"}
+    - last_visit_info:    JSON string: {"chapter_id": int, "last_visit_at": "Y-m-d H:i:s", "video_progress_seconds": int}
+                          video_progress_seconds 為選填，舊資料缺少時視為 0。
+                          章節完成時 video_progress_seconds 重置為 0。
+    - pc_last_active_course (wp_usermeta): JSON string: {"course_id": int, "last_active_at": "Y-m-d H:i:s"}
+                          記錄學員跨課程的最後造訪資訊，在 power_course_visit_chapter hook 中更新。
 
   Write pattern for granting access (must use DB transaction):
     1. add_user_meta($user_id, "avl_course_ids", $course_id)   -- if not already exists

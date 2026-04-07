@@ -3586,6 +3586,137 @@ paths:
                     data:
                       status: 404
 
+  # ----------------------------------------------------------
+  # /chapters/{id}/video-progress  (POST report video progress)
+  # ----------------------------------------------------------
+  /chapters/{id}/video-progress:
+    post:
+      summary: 回報影片播放進度
+      operationId: reportVideoProgress
+      tags: [Progress]
+      description: |
+        學員在教室頁面觀看影片時，前端定期回報當前播放秒數至後端。
+        此為輕量級端點，不觸發完整的 visit 流程（不寫入 student log、不更新 pc_last_active_course）。
+
+        **前置（狀態）:**
+        - 學員必須已登入
+        - 學員必須擁有該章節所屬課程的存取權（CourseUtils::is_avl()）
+        - 課程存取未到期
+
+        **前置（參數）:**
+        - chapter_id 必須存在且 post_type 為 pc_chapter
+        - video_progress_seconds 必須為 0 到 86400 之間的整數
+
+        **後置（狀態）:**
+        - 更新 pc_avl_coursemeta 中 last_visit_info 的 video_progress_seconds 和 last_visit_at
+        - 若章節 chapter_video.type 為 none，video_progress_seconds 寫入 0
+        - 不觸發 power_course_visit_chapter action
+        - 不寫入 student_logs
+        - 不更新 pc_last_active_course user_meta
+
+        **節流建議:**
+        - 前端每 15 秒回報一次（throttle）
+        - 暫停影片、離開頁面（beforeunload）時立即回報
+        - 離開頁面使用 fetch + keepalive: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 章節 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - video_progress_seconds
+              properties:
+                video_progress_seconds:
+                  type: integer
+                  minimum: 0
+                  maximum: 86400
+                  description: 影片播放進度（秒）
+                  example: 332
+      responses:
+        "200":
+          description: 播放進度回報成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  video_progress_seconds:
+                    type: integer
+                    description: 已記錄的播放秒數
+                    example: 332
+        "400":
+          description: 參數驗證失敗（video_progress_seconds 超出範圍）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidSeconds:
+                  summary: 秒數超出範圍
+                  value:
+                    code: rest_invalid_param
+                    message: "video_progress_seconds 必須為 0 到 86400 之間的整數"
+                    data:
+                      status: 400
+        "401":
+          description: 未登入
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notLoggedIn:
+                  summary: 未登入
+                  value:
+                    code: rest_not_logged_in
+                    message: "必須登入"
+                    data:
+                      status: 401
+        "403":
+          description: 無課程存取權或已到期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noAccess:
+                  summary: 無課程存取權
+                  value:
+                    code: rest_forbidden
+                    message: "無此課程存取權"
+                    data:
+                      status: 403
+                expired:
+                  summary: 課程已到期
+                  value:
+                    code: rest_forbidden
+                    message: "課程存取已到期"
+                    data:
+                      status: 403
+        "404":
+          description: 章節不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                chapterNotFound:
+                  summary: 章節不存在
+                  value:
+                    code: rest_not_found
+                    message: "章節不存在"
+                    data:
+                      status: 404
+
   # ==========================================================
   # Power Email endpoints (base path: /wp-json/power-email)
   # ==========================================================
