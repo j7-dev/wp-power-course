@@ -23,6 +23,36 @@ Feature: 切換章節完成狀態
       When 用戶 "Bob" 切換章節 200 的完成狀態
       Then 操作失敗，錯誤為「無此課程存取權」
 
+  Rule: 前置（狀態）- 線性觀看模式下不可完成被鎖定的章節
+
+    Example: 嘗試完成被鎖定的章節時操作失敗
+      Given 課程 100 的 enable_linear_viewing 為 "yes"
+      And 用戶 "Alice" 未完成任何章節
+      # 僅章節 200 解鎖，章節 201 被鎖定
+      When 用戶 "Alice" 切換章節 201 的完成狀態
+      Then 操作失敗，錯誤為「該章節尚未解鎖，請先完成前面的章節」
+
+    Example: 線性觀看模式下完成已解鎖章節成功
+      Given 課程 100 的 enable_linear_viewing 為 "yes"
+      And 用戶 "Alice" 未完成任何章節
+      # 章節 200 為第一個章節，永遠解鎖
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+
+    Example: 線性觀看模式下取消完成已完成章節成功
+      Given 課程 100 的 enable_linear_viewing 為 "yes"
+      And 用戶 "Alice" 在章節 200 的 finished_at 為 "2025-06-01 10:00:00"
+      # 取消完成不受線性觀看限制（已完成的章節必然已解鎖）
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 章節 200 對用戶 "Alice" 的 chaptermeta finished_at 應為空
+
+    Example: 線性觀看未開啟時不限制任何章節
+      Given 課程 100 的 enable_linear_viewing 為 "no"
+      And 用戶 "Alice" 未完成任何章節
+      When 用戶 "Alice" 切換章節 201 的完成狀態
+      Then 操作成功
+
   Rule: 前置（狀態）- 課程存取未到期
 
     Example: 課程已到期時操作失敗
@@ -74,3 +104,50 @@ Feature: 切換章節完成狀態
       And 用戶 "Alice" 在課程 100 的進度應為 100
       And action "power_course_course_finished" 應以參數 (100, 2) 被觸發
       And 課程 100 對用戶 "Alice" 的 coursemeta finished_at 應不為空
+
+  # ========== 線性觀看模式 ==========
+
+  Rule: 後置（回應）- 啟用線性觀看時，回傳解鎖/鎖定的章節 ID
+
+    Example: 標記完成後回傳 unlocked_chapter_ids
+      Given 系統中有以下課程：
+        | courseId | name       | _is_course | status  | sequential_mode |
+        | 100      | PHP 基礎課 | yes        | publish | yes             |
+      And 課程 100 有以下章節：
+        | chapterId | post_title | post_parent |
+        | 200       | 第一章     | 100         |
+        | 201       | 第二章     | 100         |
+        | 202       | 第三章     | 100         |
+      And 用戶 "Alice" 在章節 200 無 finished_at
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 回應中 unlocked_chapter_ids 應包含 201
+      And 回應中 unlocked_chapter_ids 不應包含 202
+
+    Example: 取消完成後回傳 locked_chapter_ids
+      Given 系統中有以下課程：
+        | courseId | name       | _is_course | status  | sequential_mode |
+        | 100      | PHP 基礎課 | yes        | publish | yes             |
+      And 課程 100 有以下章節：
+        | chapterId | post_title | post_parent |
+        | 200       | 第一章     | 100         |
+        | 201       | 第二章     | 100         |
+        | 202       | 第三章     | 100         |
+      And 用戶 "Alice" 在章節 200 的 finished_at 為 "2025-06-01 10:00:00"
+      And 用戶 "Alice" 在章節 201 無 finished_at
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 回應中 locked_chapter_ids 應包含 201
+
+    Example: 未啟用線性觀看時不回傳鎖定資訊
+      Given 系統中有以下課程：
+        | courseId | name       | _is_course | status  | sequential_mode |
+        | 100      | PHP 基礎課 | yes        | publish | no              |
+      And 課程 100 有以下章節：
+        | chapterId | post_title | post_parent |
+        | 200       | 第一章     | 100         |
+        | 201       | 第二章     | 100         |
+      When 用戶 "Alice" 切換章節 200 的完成狀態
+      Then 操作成功
+      And 回應中不應包含 unlocked_chapter_ids
+      And 回應中不應包含 locked_chapter_ids

@@ -14,6 +14,7 @@ paths:
   - `J7\PowerCourse\Api\` → API 端點
   - `J7\PowerCourse\Resources\Chapter\Core\` → 章節核心邏輯
   - `J7\PowerCourse\PowerEmail\` → 郵件子系統
+  - `J7\PowerCourse\Utils\` → 跨 Resource 的頂層靜態工具類別（Course, User, LinearViewing 等）
 
 ## PHP 編碼風格
 

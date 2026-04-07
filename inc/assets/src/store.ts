@@ -15,6 +15,7 @@ export const finishChapterAtom = atom({
 	isFinished: undefined,
 	progress: undefined,
 	icon_html: '',
+	unlocked_chapter_ids: undefined as number[] | null | undefined, // 線性觀看：已解鎖章節 IDs
 })
 
 // RWD 相關

@@ -41,12 +41,12 @@ export const getPrice = ({
 		return <div className="w-20 bg-slate-300 animate-pulse h-3 inline-block" />
 	}
 
-	// 課程價格 × 數量（如果課程在方案中）
+	// 課程價格 x 數量（如果課程在方案中）
 	const courseQty = courseId ? (quantities[String(courseId)] ?? 1) : 0
 	const coursePrice =
 		Number(course?.[type] || course?.regular_price || 0) * courseQty
 
-	// 其他商品價格 × 各自數量
+	// 其他商品價格 x 各自數量
 	const productsTotal = Number(
 		products?.reduce((acc, product) => {
 			const qty = quantities[String(product.id)] ?? 1

@@ -78,6 +78,22 @@ Feature: 建立課程
       And 新建課程的 teacher_ids meta 應包含 userId 10
       And 新建課程的 teacher_ids meta 應包含 userId 11
 
+  Rule: 後置（狀態）- enable_linear_viewing 預設為 no
+
+    Example: 未指定 enable_linear_viewing 時預設為 no
+      When 管理員 "Admin" 建立課程，參數如下：
+        | name         | status  | price | limit_type |
+        | PHP 基礎入門 | publish | 1200  | unlimited  |
+      Then 操作成功
+      And 新建課程的 enable_linear_viewing meta 應為 "no"
+
+    Example: 建立課程時指定開啟線性觀看
+      When 管理員 "Admin" 建立課程，參數如下：
+        | name         | status  | price | limit_type | enable_linear_viewing |
+        | 認證培訓課程 | publish | 3000  | unlimited  | yes                   |
+      Then 操作成功
+      And 新建課程的 enable_linear_viewing meta 應為 "yes"
+
   Rule: 後置（狀態）- 回傳新建課程的完整資料（含 ID）
 
     Example: 建立課程後回應包含完整課程資料
@@ -86,12 +102,13 @@ Feature: 建立課程
         | Vue 前端完整課程 | draft  | 3000  | fixed      | 365         | day        | 0               | yes        | no          |
       Then 操作成功
       And 回應資料應包含以下欄位：
-        | 欄位            | 期望值           |
-        | name            | Vue 前端完整課程 |
-        | status          | draft            |
-        | limit_type      | fixed            |
-        | limit_value     | 365              |
-        | limit_unit      | day              |
-        | is_popular      | yes              |
-        | is_featured     | no               |
-        | _is_course      | yes              |
+        | 欄位                  | 期望值           |
+        | name                  | Vue 前端完整課程 |
+        | status                | draft            |
+        | limit_type            | fixed            |
+        | limit_value           | 365              |
+        | limit_unit            | day              |
+        | is_popular            | yes              |
+        | is_featured           | no               |
+        | _is_course            | yes              |
+        | enable_linear_viewing | no               |

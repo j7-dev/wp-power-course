@@ -225,6 +225,7 @@ const BundleForm = () => {
 	return (
 		<>
 			<Item name={['id']} hidden />
+			<Item name={['pbp_product_quantities']} hidden />
 			<Gallery limit={1} />
 			<Item
 				name={['bundle_type']}
@@ -357,11 +358,6 @@ const BundleForm = () => {
 											目前課程
 										</Tag>
 									)}
-								</div>
-								<div>
-									<Tag bordered={false} color={tag?.color} className="m-0">
-										{tag?.label}
-									</Tag>
 								</div>
 								{/* 數量 InputNumber */}
 								<InputNumber

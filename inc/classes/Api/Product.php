@@ -686,6 +686,16 @@ final class Product {
 
 		$meta_data = self::handle_special_fields( $meta_data, $product );
 
+		if ( \is_wp_error( $meta_data ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => $meta_data->get_error_code(),
+					'message' => $meta_data->get_error_message(),
+				],
+				400
+			);
+		}
+
 		foreach ( $meta_data as $key => $value ) {
 			/** @var string|array<mixed> $value */
 			$product->update_meta_data( $key, $value );
@@ -842,6 +852,16 @@ final class Product {
 
 		$meta_data = self::handle_special_fields( $meta_data, $product );
 
+		if ( \is_wp_error( $meta_data ) ) {
+			return new \WP_REST_Response(
+				[
+					'code'    => $meta_data->get_error_code(),
+					'message' => $meta_data->get_error_message(),
+				],
+				400
+			);
+		}
+
 		foreach ( $meta_data as $key => $value ) {
 			/** @var string|array<mixed> $value */
 			$product->update_meta_data( $key, $value );
@@ -927,9 +947,51 @@ final class Product {
 	 *
 	 * @param array<string, mixed> $meta_data Meta data.
 	 * @param \WC_Product          $product Product.
-	 * @return array<string, mixed>
+	 * @return array<string, mixed>|\WP_Error 發生驗證錯誤時回傳 WP_Error
 	 */
 	public static function handle_special_fields( array $meta_data, \WC_Product $product ) {
+		// 處理 pbp_product_quantities：驗證並儲存
+		if ( isset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] ) ) {
+			/** @var mixed $quantities_raw */
+			$quantities_raw = $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ];
+
+			// 支援 JSON 字串或陣列
+			if ( is_string( $quantities_raw ) ) {
+				$decoded = \json_decode( $quantities_raw, true );
+				if ( is_array( $decoded ) ) {
+					$quantities_raw = $decoded;
+				} else {
+					$quantities_raw = [];
+				}
+			}
+
+			if ( is_array( $quantities_raw ) ) {
+				// 驗證所有數量 >= 1
+				foreach ( $quantities_raw as $product_id => $qty ) {
+					$qty_int = (int) $qty;
+					if ( $qty_int < 1 ) {
+						return new \WP_Error(
+							'invalid_quantity',
+							sprintf(
+								'商品 %s 的數量必須為正整數（≥ 1），目前值為 %d',
+								(string) $product_id,
+								$qty_int
+							),
+							[ 'status' => 400 ]
+						);
+					}
+				}
+
+				$helper = Helper::instance( $product );
+				if ( $helper !== null ) {
+					/** @var array<int|string, int> $quantities_raw */
+					$helper->set_product_quantities( $quantities_raw );
+				}
+			}
+
+			unset( $meta_data[ Helper::PRODUCT_QUANTITIES_META_KEY ] );
+		}
+
 		$update_array_meta_keys = [
 			Helper::INCLUDE_PRODUCT_IDS_META_KEY,
 			Helper::LINK_COURSE_IDS_META_KEY, // 用來表示 bundle product 連結的課程

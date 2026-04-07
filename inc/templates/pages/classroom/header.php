@@ -69,16 +69,26 @@ $finish_chapter_button_html = sprintf(
 $chapter_ids = ChapterUtils::get_flatten_post_ids($product_id);
 $index       = array_search($current_chapter_id, $chapter_ids, true);
 /** @var int|false $index */
-$next_chapter_id = $index ? $chapter_ids[ $index + 1 ] ?? false : false;
+$next_chapter_id = $index !== false ? ( $chapter_ids[ $index + 1 ] ?? false ) : false;
+
+// 線性觀看：檢查下一章節是否被鎖定
+$linear_state   = $GLOBALS['pc_linear_state'] ?? null;
+$is_next_locked = false;
+if ( $linear_state && $linear_state['enabled'] && $next_chapter_id ) {
+	$is_next_locked = !in_array( (int) $next_chapter_id, $linear_state['unlocked_chapter_ids'], true );
+}
 
 $next_chapter_button_html = '';
 if (count($chapter_ids) > 0) {
 	if (false === $next_chapter_id) {
 		$next_chapter_button_html = '<button class="pc-btn pc-btn-sm pc-btn-primary px-0 lg:px-4  text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true">沒有更多章節</button>';
+	} elseif ( $is_next_locked ) {
+		// 線性觀看：下一章節被鎖定時顯示禁用按鈕
+		$next_chapter_button_html = '<button id="pc-next-chapter-btn" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white cursor-not-allowed opacity-70 w-full lg:w-auto text-xs sm:text-base" tabindex="-1" role="button" aria-disabled="true" data-locked="true" data-next-chapter-id="' . (int) $next_chapter_id . '">完成本章節後即可觀看下一章</button>';
 	} else {
 		$next_chapter_button_html = sprintf(
 			/*html*/'
-		<a href="%1$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
+		<a id="pc-next-chapter-btn" href="%1$s" data-next-chapter-id="%2$s" class="pc-btn pc-btn-primary pc-btn-sm px-0 lg:px-4 text-white w-full lg:w-auto text-xs sm:text-base">
 					前往下一章節
 					<svg class="size-3 sm:size-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -90,7 +100,8 @@ if (count($chapter_ids) > 0) {
 					</svg>
 		</a>
 ',
-			\get_permalink($next_chapter_id)
+			\get_permalink( (int) $next_chapter_id ),
+			(int) $next_chapter_id
 		);
 	}
 }

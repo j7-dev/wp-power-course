@@ -141,20 +141,39 @@ components:
           type: integer
         name:
           type: string
+        type:
+          type: string
+          enum: [simple, subscription, external]
+          description: |
+            產品類型：
+            - simple: 站內課程（WC Simple Product）
+            - subscription: 站內訂閱課程（WC Subscription Product）
+            - external: 外部課程（WC External Product，不可購買）
         status:
           type: string
           enum: [publish, draft]
         price:
           type: string
-          description: 售價（WooCommerce 格式字串）
+          description: 售價（WooCommerce 格式字串）；外部課程為展示用
           example: "1200"
         regular_price:
           type: string
-          description: 原價
+          description: 原價；外部課程為展示用
           example: "1500"
+        product_url:
+          type: string
+          nullable: true
+          description: 外部課程連結 URL（僅 type=external 時有值），必須為 http/https 開頭
+          example: "https://hahow.in/courses/12345"
+        button_text:
+          type: string
+          nullable: true
+          description: 外部課程 CTA 按鈕文字（僅 type=external 時有值），預設「前往課程」
+          example: "前往 Hahow 上課"
         limit_type:
           type: string
           enum: [unlimited, fixed, assigned, follow_subscription]
+          description: 觀看期限類型（僅 type=simple|subscription 時適用）
         limit_value:
           type: integer
           nullable: true
@@ -164,13 +183,18 @@ components:
           nullable: true
         course_schedule:
           type: integer
-          description: 開課時間 Unix timestamp（0 = 立即開課）
+          description: 開課時間 Unix timestamp（0 = 立即開課，僅 type=simple|subscription）
           example: 0
         teacher_ids:
           type: array
           items:
             type: integer
           description: 講師 user ID 列表
+        sequential_mode:
+          type: string
+          enum: [yes, no]
+          description: 線性觀看模式開關（yes = 學員必須依序完成章節才能解鎖後續）
+          default: "no"
         is_popular:
           type: string
           enum: [yes, no]
@@ -182,7 +206,7 @@ components:
           enum: [yes, no]
         total_students:
           type: integer
-          description: 選課人數
+          description: 選課人數（外部課程固定為 0）
         created_at:
           type: string
           format: date-time
@@ -284,9 +308,13 @@ components:
             type: integer
         pbp_product_quantities:
           type: object
-          description: 各商品數量 {"product_id": qty}
+          description: |
+            各商品數量 {"product_id": qty}。
+            舊資料若無此欄位，回傳空物件 {}。
           additionalProperties:
             type: integer
+            minimum: 1
+          example: {"100": 2, "200": 3}
 
     BundleProduct:
       type: object
@@ -326,6 +354,8 @@ components:
             方案中每個商品的數量，以 JSON 物件 {"product_id": qty} 儲存。
             缺少此欄位時所有商品 fallback 數量為 1。
             qty 範圍：1~999，0 或空值自動修正為 1。
+            結帳時庫存扣減 = 此數量 x 銷售方案購買數量。
+            課程類商品：數量僅影響庫存扣減，課程授權只給 1 次。
           additionalProperties:
             type: integer
             minimum: 1
@@ -830,7 +860,8 @@ paths:
       operationId: listCourses
       tags: [Courses]
       description: |
-        查詢課程列表，支援分頁、排序、狀態篩選與關鍵字搜尋。
+        查詢課程列表，支援分頁、排序、狀態篩選、類型篩選與關鍵字搜尋。
+        預設回傳所有類型的課程（simple + subscription + external）。
 
         **前置（參數）:**
         - `posts_per_page` 為負數時使用預設值（回傳全部）
@@ -838,7 +869,14 @@ paths:
         **後置（回應）:**
         - 回應包含 `X-WP-Total` 和 `X-WP-TotalPages` Headers
         - 無符合條件的課程時回傳空陣列
+        - 每筆課程回應中包含 `type` 欄位（simple | subscription | external）
       parameters:
+        - name: type
+          in: query
+          description: 篩選課程產品類型（不傳時回傳所有類型）
+          schema:
+            type: string
+            enum: [simple, subscription, external]
         - name: posts_per_page
           in: query
           description: 每頁筆數（預設 10）
@@ -908,19 +946,26 @@ paths:
       tags: [Courses]
       description: |
         建立新的 WooCommerce 課程商品，設定名稱、售價、存取期限、開課時間、講師等基本資訊。
+        支援建立站內課程（simple/subscription）或外部課程（external）。
 
         **前置（狀態）:** 無
 
         **前置（參數）:**
         - `name` 不可為空
-        - `limit_type` 為 `fixed` 時，`limit_value` 與 `limit_unit` 不可為空
-        - `limit_type` 為 `assigned` 時，`limit_value` 必須是有效的 10 位 Unix timestamp
+        - `limit_type` 為 `fixed` 時，`limit_value` 與 `limit_unit` 不可為空（僅 simple/subscription）
+        - `limit_type` 為 `assigned` 時，`limit_value` 必須是有效的 10 位 Unix timestamp（僅 simple/subscription）
         - `price` 若有設定須為非負數
+        - 若 `is_external` 為 `true`：
+          - `product_url` 為必填，且須為合法 http/https URL
+          - `button_text` 選填，預設「前往課程」
+          - `limit_type`、`limit_value`、`limit_unit` 被忽略
 
         **後置（狀態）:**
         - 建立 WooCommerce 商品並設 `_is_course` 為 `yes`
+        - `is_external` 為 `true` 時，建立 `WC_Product_External`（product_type = external）
+        - `is_external` 為 `false` 或未傳時，建立 `WC_Product_Simple`（預設）
         - `teacher_ids` 以多筆 meta rows 分別儲存
-        - 回傳新建課程的完整資料（含 ID）
+        - 回傳新建課程的完整資料（含 ID 與 type）
       requestBody:
         required: true
         content:
@@ -983,10 +1028,30 @@ paths:
                   type: string
                   enum: [yes, no]
                   default: no
+                sequential_mode:
+                  type: string
+                  enum: [yes, no]
+                  default: no
+                  description: 線性觀看模式（yes = 學員必須依序完成章節）
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
                   $ref: '#/components/schemas/VideoObject'
+                is_external:
+                  type: boolean
+                  default: false
+                  description: |
+                    是否為外部課程。為 true 時建立 WC_Product_External（product_type=external），
+                    此時 product_url 為必填，limit_type/limit_value/limit_unit/course_schedule 被忽略。
+                product_url:
+                  type: string
+                  description: 外部課程連結 URL（is_external=true 時必填，須為 http/https 開頭）
+                  example: "https://hahow.in/courses/12345"
+                button_text:
+                  type: string
+                  description: 外部課程 CTA 按鈕文字（is_external=true 時適用，預設「前往課程」）
+                  default: "前往課程"
+                  example: "前往 Hahow 上課"
       responses:
         "200":
           description: 課程建立成功，回傳完整課程資料（含新建 ID）
@@ -1034,6 +1099,20 @@ paths:
                   value:
                     code: rest_invalid_param
                     message: "limit_value 必須是有效的 10 位 Unix timestamp"
+                    data:
+                      status: 400
+                missingProductUrl:
+                  summary: 外部課程缺少 product_url
+                  value:
+                    code: rest_invalid_param
+                    message: "外部課程的 product_url 為必填欄位"
+                    data:
+                      status: 400
+                invalidProductUrl:
+                  summary: product_url 格式不合法
+                  value:
+                    code: rest_invalid_param
+                    message: "product_url 必須為合法的 http/https URL"
                     data:
                       status: 400
 
@@ -1142,16 +1221,19 @@ paths:
       tags: [Courses]
       description: |
         更新指定課程的基本資訊、定價、存取設定、媒體等（僅更新有傳入的欄位）。
+        外部課程（type=external）可更新 product_url 與 button_text。
 
         **前置（狀態）:** 指定 id 對應的課程必須存在且 `_is_course = 'yes'`
 
         **前置（參數）:**
         - `id` 不可為空且必須為正整數
         - 同 CreateCourse 的參數驗證規則
+        - 外部課程的 `product_url` 若有傳入，須為合法 http/https URL，不可為空
 
         **後置（狀態）:**
         - 更新 WC_Product 後持久化
         - `teacher_ids` 先 delete_meta_data 再 add_meta_data loop（完全替換）
+        - 產品類型（type）不可變更（建立後鎖定）
 
         **後置觸發:** `power_course_before_update_product_meta` action
       parameters:
@@ -1207,10 +1289,20 @@ paths:
                 is_free:
                   type: string
                   enum: [yes, no]
+                sequential_mode:
+                  type: string
+                  enum: [yes, no]
+                  description: 線性觀看模式開關。yes = 學員必須依序完成章節才能解鎖後續章節
                 feature_video:
                   $ref: '#/components/schemas/VideoObject'
                 trial_video:
                   $ref: '#/components/schemas/VideoObject'
+                product_url:
+                  type: string
+                  description: 外部課程連結 URL（僅 type=external 時適用，須為 http/https 開頭，不可為空）
+                button_text:
+                  type: string
+                  description: 外部課程 CTA 按鈕文字（僅 type=external 時適用）
       responses:
         "200":
           description: 課程更新成功，回傳完整更新後課程資料
@@ -2372,6 +2464,7 @@ paths:
         - 回傳最後造訪資訊
         - 回傳到期時間
         - 若課程已到期，回應中 `expired: true`，但 HTTP 狀態仍為 200
+        - 若課程開啟線性觀看，回傳 `linear_viewing` 物件（含解鎖章節列表與當前應觀看章節）
       parameters:
         - name: course_id
           in: path
@@ -2426,6 +2519,48 @@ paths:
                     type: boolean
                     description: 課程是否已到期（true 時其他欄位仍回傳但應為最後已知值）
                     example: false
+                  linear_viewing:
+                    type: object
+                    nullable: true
+                    description: |
+                      線性觀看狀態（僅在課程開啟 enable_linear_viewing 時回傳，否則為 null）。
+                      解鎖演算法：以最遠已完成章節位置為基準，位置 0 到 (最遠位置+1) 為解鎖。
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: 課程是否開啟線性觀看
+                        example: true
+                      unlocked_chapter_ids:
+                        type: array
+                        description: 已解鎖的章節 ID 列表（按 menu_order 排序）
+                        items:
+                          type: integer
+                        example: [200, 201]
+                      current_chapter_id:
+                        type: integer
+                        nullable: true
+                        description: 當前應觀看的章節 ID（第一個解鎖且未完成的章節，全部完成時為 null）
+                        example: 201
+                      locked_hints:
+                        type: object
+                        description: |
+                          鎖定章節的提示資訊，key 為被鎖定的 chapter_id，value 為提示物件。
+                          提示指向當前需完成的章節名稱。
+                        additionalProperties:
+                          type: object
+                          properties:
+                            prerequisite_chapter_id:
+                              type: integer
+                              description: 需先完成的章節 ID
+                              example: 201
+                            prerequisite_chapter_title:
+                              type: string
+                              description: 需先完成的章節名稱
+                              example: "1-2 變數與型別"
+                            message:
+                              type: string
+                              description: 提示文字
+                              example: "請先完成『1-2 變數與型別』才能觀看本章節"
         "403":
           description: 前置狀態不符
           content:
@@ -2477,6 +2612,7 @@ paths:
         **前置（狀態）:**
         - 學員必須已有該章節所屬課程的存取權
         - 課程存取未到期（expire_date = 0 或 expire_date > now()）
+        - 線性觀看模式下，不可完成被鎖定的章節（取消完成不受此限制）
 
         **前置（參數）:**
         - `chapter_id`（路徑參數）必須存在且 `post_type = 'pc_chapter'`
@@ -2486,9 +2622,14 @@ paths:
         - 標記完成：新增 `finished_at` 並觸發 `power_course_chapter_finished` action
         - 取消完成：刪除 `finished_at` 並觸發 `power_course_chapter_unfinished` action
         - 切換後重新計算課程進度
+        - 若課程開啟線性觀看，回應中包含更新後的解鎖章節列表
 
         **後置觸發:**
         - 若進度達 100%：`power_course_course_finished` action + 設定 `AVLCourseMeta::finished_at`
+
+        **線性觀看模式額外回傳：**
+        - 若課程啟用 `sequential_mode = yes`，回傳 `unlocked_chapter_ids`（標記完成時新解鎖的章節）
+          或 `locked_chapter_ids`（取消完成時重新鎖定的章節），供前端即時更新 UI
       parameters:
         - name: chapter_id
           in: path
@@ -2517,6 +2658,24 @@ paths:
                     type: boolean
                     description: 課程是否在此次操作後達到 100% 完成
                     example: true
+                  unlocked_chapter_ids:
+                    type: array
+                    nullable: true
+                    description: |
+                      更新後的已解鎖章節 ID 列表（僅在課程開啟線性觀看時回傳，否則為 null）。
+                      前端根據此列表即時更新側邊欄鎖定/解鎖狀態，無需重新載入頁面。
+                    items:
+                      type: integer
+                    example: [200, 201]
+                  locked_chapter_ids:
+                    type: array
+                    nullable: true
+                    items:
+                      type: integer
+                    description: |
+                      取消完成後重新鎖定的章節 ID 列表（僅在課程開啟線性觀看時回傳，否則為 null）。
+                      前端用此陣列即時顯示鎖頭圖示。
+                    example: [202, 203]
         "403":
           description: 前置狀態不符
           content:
@@ -2543,6 +2702,13 @@ paths:
                   value:
                     code: rest_forbidden
                     message: "必須登入"
+                    data:
+                      status: 403
+                chapterLocked:
+                  summary: 章節被線性觀看鎖定
+                  value:
+                    code: rest_forbidden
+                    message: "該章節尚未解鎖，請先完成前面的章節"
                     data:
                       status: 403
         "404":
@@ -2650,6 +2816,8 @@ paths:
 
         **後置（狀態）:**
         - 建立 WooCommerce 商品並設定 bundle_type meta
+        - 儲存 pbp_product_quantities（每個商品的數量，JSON 格式）
+        - 未指定 pbp_product_quantities 時，所有 pbp_product_ids 中的商品預設數量為 1
         - 支援設定 bind_courses_data（與普通商品共用綁定課程到商品邏輯）
         - 新建時預設自動加入 link_course_id 對應的課程到 pbp_product_ids（×1）
         - pbp_product_quantities 以 JSON 物件儲存各商品數量
@@ -2838,10 +3006,12 @@ paths:
                   description: |
                     各商品數量 {"product_id": qty}。
                     qty 範圍 1~999，0/空值自動修正為 1。
+                    若提供 pbp_product_ids 但不提供此欄位，不變更既有數量。
                   additionalProperties:
                     type: integer
                     minimum: 1
                     maximum: 999
+                  example: {"100": 2, "200": 3}
                 bind_courses_data:
                   type: array
                   items:
@@ -3527,6 +3697,137 @@ paths:
                   value:
                     code: rest_not_found
                     message: "該語言字幕不存在"
+                    data:
+                      status: 404
+
+  # ----------------------------------------------------------
+  # /chapters/{id}/video-progress  (POST report video progress)
+  # ----------------------------------------------------------
+  /chapters/{id}/video-progress:
+    post:
+      summary: 回報影片播放進度
+      operationId: reportVideoProgress
+      tags: [Progress]
+      description: |
+        學員在教室頁面觀看影片時，前端定期回報當前播放秒數至後端。
+        此為輕量級端點，不觸發完整的 visit 流程（不寫入 student log、不更新 pc_last_active_course）。
+
+        **前置（狀態）:**
+        - 學員必須已登入
+        - 學員必須擁有該章節所屬課程的存取權（CourseUtils::is_avl()）
+        - 課程存取未到期
+
+        **前置（參數）:**
+        - chapter_id 必須存在且 post_type 為 pc_chapter
+        - video_progress_seconds 必須為 0 到 86400 之間的整數
+
+        **後置（狀態）:**
+        - 更新 pc_avl_coursemeta 中 last_visit_info 的 video_progress_seconds 和 last_visit_at
+        - 若章節 chapter_video.type 為 none，video_progress_seconds 寫入 0
+        - 不觸發 power_course_visit_chapter action
+        - 不寫入 student_logs
+        - 不更新 pc_last_active_course user_meta
+
+        **節流建議:**
+        - 前端每 15 秒回報一次（throttle）
+        - 暫停影片、離開頁面（beforeunload）時立即回報
+        - 離開頁面使用 fetch + keepalive: true
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: 章節 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - video_progress_seconds
+              properties:
+                video_progress_seconds:
+                  type: integer
+                  minimum: 0
+                  maximum: 86400
+                  description: 影片播放進度（秒）
+                  example: 332
+      responses:
+        "200":
+          description: 播放進度回報成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  video_progress_seconds:
+                    type: integer
+                    description: 已記錄的播放秒數
+                    example: 332
+        "400":
+          description: 參數驗證失敗（video_progress_seconds 超出範圍）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidSeconds:
+                  summary: 秒數超出範圍
+                  value:
+                    code: rest_invalid_param
+                    message: "video_progress_seconds 必須為 0 到 86400 之間的整數"
+                    data:
+                      status: 400
+        "401":
+          description: 未登入
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notLoggedIn:
+                  summary: 未登入
+                  value:
+                    code: rest_not_logged_in
+                    message: "必須登入"
+                    data:
+                      status: 401
+        "403":
+          description: 無課程存取權或已到期
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                noAccess:
+                  summary: 無課程存取權
+                  value:
+                    code: rest_forbidden
+                    message: "無此課程存取權"
+                    data:
+                      status: 403
+                expired:
+                  summary: 課程已到期
+                  value:
+                    code: rest_forbidden
+                    message: "課程存取已到期"
+                    data:
+                      status: 403
+        "404":
+          description: 章節不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                chapterNotFound:
+                  summary: 章節不存在
+                  value:
+                    code: rest_not_found
+                    message: "章節不存在"
                     data:
                       status: 404
 

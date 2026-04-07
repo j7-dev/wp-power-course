@@ -114,6 +114,9 @@ final class Order {
 				$quantities           = $helper?->get_product_quantities() ?: []; // 各商品設定數量
 				$order_qty            = $item->get_quantity() ?: 1; // 購買份數
 
+				// 購買數量（購買幾份銷售方案）
+				$bundle_purchase_qty = $item->get_quantity() ?: 1;
+
 				foreach ( $included_product_ids as $included_product_id ) {
 					$included_product = \wc_get_product( $included_product_id );
 					if ( ! $included_product ) {

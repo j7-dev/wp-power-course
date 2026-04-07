@@ -49,6 +49,24 @@ Feature: 更新課程
       And 課程 100 的 name 應為 "PHP 進階實戰課"
       And 課程 100 的 price 應為 "1800"
 
+  Rule: 後置（狀態）- 更新 enable_linear_viewing 設定
+
+    Example: 開啟課程線性觀看
+      Given 課程 100 的 enable_linear_viewing 為 "no"
+      When 管理員 "Admin" 更新課程 100，參數如下：
+        | enable_linear_viewing |
+        | yes                   |
+      Then 操作成功
+      And 課程 100 的 enable_linear_viewing meta 應為 "yes"
+
+    Example: 關閉課程線性觀看
+      Given 課程 100 的 enable_linear_viewing 為 "yes"
+      When 管理員 "Admin" 更新課程 100，參數如下：
+        | enable_linear_viewing |
+        | no                    |
+      Then 操作成功
+      And 課程 100 的 enable_linear_viewing meta 應為 "no"
+
   Rule: 後置（狀態）- teacher_ids 先 delete_meta_data 再 add_meta_data loop
 
     Example: 更新課程講師列表

@@ -28,7 +28,15 @@ if (! ( $product instanceof \WC_Product )) {
 
 $count_all_chapters       = count(ChapterUtils::get_flatten_post_ids($product->get_id()));
 $course_length_in_minutes = CourseUtils::get_course_length($product, 'minute');
-$chapters_html            = ChapterUtils::get_children_posts_html_uncached($product->get_id());
+// 線性觀看：從全域變數取得解鎖狀態（由 single-pc_chapter.php 注入）
+$linear_state  = $GLOBALS['pc_linear_state'] ?? null;
+$chapters_html = ChapterUtils::get_children_posts_html_uncached(
+	$product->get_id(),
+	null,
+	0,
+	'classroom',
+	$linear_state
+);
 
 /** @var \WP_Post $chapter */
 global $chapter;
@@ -68,8 +76,25 @@ $ancestor_ids_string = '[' . implode(',', $ancestor_ids) . ']';
 				return
 			}
 
+			// 點擊被鎖定的章節時顯示提示訊息
+			$el.on('click', 'li[data-locked="true"]', function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				const hint = $(this).data('lock-hint');
+				if (hint) {
+					const $dialog = $('#finish-chapter__dialog');
+					if ($dialog.length) {
+						$dialog.find('#finish-chapter__dialog__title').text('章節尚未解鎖');
+						$dialog.find('#finish-chapter__dialog__message').text(hint);
+						$dialog[0].showModal();
+					} else {
+						alert(hint);
+					}
+				}
+			});
+
 			// 點擊箭頭展開或收合章節
-			$el.on('click', 'li', function(e) {
+			$el.on('click', 'li:not([data-locked="true"])', function(e) {
 				e.preventDefault();
 				e.stopPropagation();
 
