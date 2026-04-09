@@ -1131,7 +1131,7 @@ jobs:
           BUNNY_STORAGE_PASSWORD: ${{ secrets.BUNNY_STORAGE_PASSWORD }}
           BUNNY_CDN_URL: ${{ secrets.BUNNY_CDN_URL }}
         run: |
-          BRANCH_DIR=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          BRANCH_DIR=$(echo "${{ needs.claude.outputs.branch_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
           bash .github/scripts/upload-to-bunny.sh /tmp/smoke-media "ci/${BRANCH_DIR}/smoke-test"
 
       - name: 上傳 Smoke Test 媒體 Artifact (備份)
@@ -1145,7 +1145,7 @@ jobs:
 
       # ── 發佈 Smoke Test 報告到 Issue Comment ────────
       - name: 發佈 Smoke Test 報告
-        if: steps.upload_smoke_media.outputs.has_media == 'true'
+        if: steps.collect_smoke_media.outputs.has_media == 'true'
         uses: actions/github-script@v7
         with:
           script: |
