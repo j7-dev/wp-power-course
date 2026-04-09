@@ -94,12 +94,7 @@ foreach ( $pbp_product_ids as $pbp_product_id ) :
 	$pbp_qty          = (int) ( $pbp_quantities[ (string) $pbp_product_id ] ?? 1 );
 	$pbp_product_name = $pbp_product->get_name();
 	echo '<div>';
-	// 顯示「商品名 × 數量」格式
-	printf(
-		/*html*/'<p class="text-sm mb-1">%1$s <span class="text-gray-500">× %2$d</span></p>',
-		\esc_html( $pbp_product_name ),
-		$pbp_qty
-	);
+
 	Plugin::load_template(
 		'course-product/list',
 		[
