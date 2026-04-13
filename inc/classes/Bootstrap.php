@@ -161,6 +161,14 @@ final class Bootstrap {
 			]
 		);
 
+		// 接線 React bundle 到 power-course text domain，讓 @wordpress/i18n (__, _x, sprintf 等) 能載入對應的 .json 翻譯檔
+		// 對應檔名格式：power-course-{locale}-{handle}.json，由 wp-scripts make-json 從 .po 產生
+		\wp_set_script_translations(
+			Plugin::$kebab,
+			'power-course',
+			Plugin::$dir . '/languages'
+		);
+
 		$post_id   = \get_the_ID();
 		$permalink = $post_id ? \get_permalink( $post_id ) : '';
 
