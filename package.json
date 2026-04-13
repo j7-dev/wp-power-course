@@ -31,7 +31,9 @@
 		"test:e2e:integration": "cd tests/e2e && npx playwright test --project=integration",
 		"test:e2e:ui": "cd tests/e2e && npx playwright test --ui",
 		"test:e2e:debug": "cd tests/e2e && npx playwright test --debug",
-		"test:phpunit": "npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course composer run test"
+		"test:phpunit": "npx wp-env run tests-cli --env-cwd=wp-content/plugins/power-course composer run test",
+		"i18n:pot": "wp i18n make-pot . languages/power-course.pot --domain=power-course --slug=power-course --exclude=node_modules,vendor,tests,release,js/dist,languages",
+		"i18n:json": "wp i18n make-json languages --no-purge --pretty-print"
 	},
 	"dependencies": {
 		"@ant-design/charts": "^2.3.0",
