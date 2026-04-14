@@ -599,8 +599,10 @@ final class Course extends ApiBase {
 
 		if ( $is_external ) {
 			// 外部課程處理：取出 product_url 與 button_text，套用並驗證
-			$product_url = isset( $meta_data['product_url'] ) ? (string) $meta_data['product_url'] : '';
-			$button_text = isset( $meta_data['button_text'] ) ? (string) $meta_data['button_text'] : '';
+			$product_url_raw = $meta_data['product_url'] ?? '';
+			$button_text_raw = $meta_data['button_text'] ?? '';
+			$product_url     = is_string( $product_url_raw ) ? $product_url_raw : '';
+			$button_text     = is_string( $button_text_raw ) ? $button_text_raw : '';
 			unset( $meta_data['product_url'], $meta_data['button_text'] );
 
 			// 驗證 product_url（只有在有傳入時才驗證）
