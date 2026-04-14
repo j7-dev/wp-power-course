@@ -38,12 +38,17 @@ final class Chapter {
 			return [];
 		}
 
+		$str_course_ids = [];
+		foreach ( $course_ids as $cid ) {
+			$str_course_ids[] = is_scalar( $cid ) ? (string) $cid : '';
+		}
+
 		$chapter_ids = $wpdb->get_col(
 			\wp_unslash( // phpcs:ignore
 			$wpdb->prepare(
 				"SELECT ID FROM {$wpdb->posts} WHERE post_type = '%1\$s' AND post_parent IN (%2\$s)",
 				CPT::POST_TYPE,
-				"'" . implode( "','", $course_ids ) . "'"
+				"'" . implode( "','", $str_course_ids ) . "'"
 			)
 			)
 		);

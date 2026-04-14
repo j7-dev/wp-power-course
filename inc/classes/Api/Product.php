@@ -1024,7 +1024,8 @@ final class Product {
 					$qty_int              = (int) $qty;
 					$clean[ (string) $pid ] = max( 1, min( 999, $qty_int ) );
 				}
-				$product->update_meta_data( $quantities_key, \wp_json_encode($clean) );
+				$encoded_quantities = \wp_json_encode( $clean );
+				$product->update_meta_data( $quantities_key, false === $encoded_quantities ? '' : $encoded_quantities );
 			}
 
 			unset( $meta_data[ $quantities_key ] );

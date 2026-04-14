@@ -169,14 +169,24 @@ final class Api extends ApiBase {
 		/** @var array<string, mixed> $sanitized_params */
 		$sanitized_params = is_array( $params ) ? $params : [];
 
+		$avl_course_ids = [];
+		if ( isset( $sanitized_params['avl_course_ids'] ) && is_array( $sanitized_params['avl_course_ids'] ) ) {
+			foreach ( $sanitized_params['avl_course_ids'] as $course_id_value ) {
+				$avl_course_ids[] = is_scalar( $course_id_value ) ? (string) $course_id_value : '';
+			}
+		}
+
+		$include_ids = [];
+		if ( isset( $sanitized_params['include'] ) && is_array( $sanitized_params['include'] ) ) {
+			foreach ( $sanitized_params['include'] as $include_value ) {
+				$include_ids[] = is_scalar( $include_value ) ? (string) $include_value : '';
+			}
+		}
+
 		return [
 			'search'         => (string) ( $sanitized_params['search'] ?? '' ),
-			'avl_course_ids' => isset( $sanitized_params['avl_course_ids'] ) && is_array( $sanitized_params['avl_course_ids'] )
-				? $sanitized_params['avl_course_ids']
-				: [],
-			'include'        => isset( $sanitized_params['include'] ) && is_array( $sanitized_params['include'] )
-				? $sanitized_params['include']
-				: [],
+			'avl_course_ids' => $avl_course_ids,
+			'include'        => $include_ids,
 		];
 	}
 

@@ -168,7 +168,7 @@ final class Subtitle {
 			$upload['file']
 		);
 
-		if ( \is_wp_error( $attachment_id ) || 0 === $attachment_id ) { // phpcs:ignore -- wp_insert_attachment 可能回傳 0 或 WP_Error.
+		if ( 0 === $attachment_id ) {
 			throw new \RuntimeException( '建立媒體附件失敗' );
 		}
 

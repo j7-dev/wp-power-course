@@ -29,7 +29,7 @@ if ( ! $helper?->is_bundle_product ) {
 
 
 $pbp_product_ids  = $helper?->get_product_ids_with_compat() ?? []; // @phpstan-ignore-line
-$pbp_quantities   = $helper?->get_product_quantities() ?? [];
+$pbp_quantities   = $helper->get_product_quantities();
 
 $product_name = $product->get_name();
 

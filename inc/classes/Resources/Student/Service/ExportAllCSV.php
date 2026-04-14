@@ -134,8 +134,13 @@ final class ExportAllCSV extends ExportCSVBase {
 					}
 
 					// 取得此用戶的所有課程
-					$user_courses = \get_user_meta( $user->ID, 'avl_course_ids' );
-					$user_courses = \is_array( $user_courses ) ? $user_courses : [];
+					$user_courses_raw = \get_user_meta( $user->ID, 'avl_course_ids' );
+					$user_courses     = [];
+					if ( \is_array( $user_courses_raw ) ) {
+						foreach ( $user_courses_raw as $course_value ) {
+							$user_courses[] = is_scalar( $course_value ) ? (string) $course_value : '';
+						}
+					}
 
 					// 若有課程篩選，取交集
 					if ( ! empty( $this->avl_course_ids ) ) {
