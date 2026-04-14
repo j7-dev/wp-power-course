@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-13T11:10:46+00:00\n"
+"POT-Creation-Date: 2026-04-14T11:15:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: power-course\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #: plugin.php
-msgid "https://github.com/p9-cloud/wp-power-course"
+msgid "https://github.com/zenbuapps/wp-power-course"
 msgstr ""
 
 #. Description of the plugin
@@ -39,7 +39,7 @@ msgstr ""
 msgid "https://github.com/j7-dev"
 msgstr ""
 
-#: inc/classes/Api/Course.php:806
+#: inc/classes/Api/Course.php:808
 msgid "刪除課程資料失敗"
 msgstr ""
 
