@@ -1,201 +1,189 @@
-# Copyright (C) 2026 J7
-# This file is distributed under the GPL v2 or later.
+# Copyright (C) 2026 power-course
+# This file is distributed under the GPL v2 or later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: Power Course | WordPress 最好用的課程外掛 1.1.2\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/power-course\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: power-course 1.1.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugins/power-course\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-14T12:00:11+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.11.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"POT-Creation-Date: 2026-04-14T12:23:43.993Z\n"
+"PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
+"Last-Translator: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
+"Language-Team: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
+"X-Generator: @wp-blocks/make-pot 1.6.6\n"
+"Language: en\n"
 "X-Domain: power-course\n"
 
-#. Plugin Name of the plugin
-#: plugin.php
-msgid "Power Course | WordPress 最好用的課程外掛"
+#: power-course.php
+#. Name of the plugin
+msgid "power-course"
 msgstr ""
 
-#. Plugin URI of the plugin
-#: plugin.php
-msgid "https://github.com/zenbuapps/wp-power-course"
-msgstr ""
-
-#. Description of the plugin
-#: plugin.php
-msgid "WordPress 最好用的課程外掛"
-msgstr ""
-
+#: power-course.php
 #. Author of the plugin
-#: plugin.php
-msgid "J7"
-msgstr ""
-
-#. Author URI of the plugin
-#: plugin.php
-msgid "https://github.com/j7-dev"
-msgstr ""
-
-#. translators: %s: 站台名稱
-#: inc/classes/Admin/Entry.php:62
-msgid "Course Admin | %s"
-msgstr ""
-
-#: inc/classes/Admin/Product.php:56
-msgid "Course"
-msgstr ""
-
-#: inc/classes/Admin/Product.php:57
-msgid "Whether this is a course product. Course products can only be used with [Simple Product] and [Simple Subscription]."
-msgstr ""
-
-#: inc/classes/Admin/Product.php:115
-msgid "Course Product"
-msgstr ""
-
-#: inc/classes/Admin/Product.php:119
-msgid "Course Bundle Product"
-msgstr ""
-
-#: inc/classes/Api/Course.php:808
-msgid "刪除課程資料失敗"
-msgstr ""
-
-#: inc/classes/FrontEnd/MyAccount.php:52
-msgid "我的課程"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/Api.php:380
-msgid "刪除章節資料失敗"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:26
-#: inc/classes/Resources/Chapter/Core/CPT.php:27
-#: inc/classes/Resources/Chapter/Core/CPT.php:47
-#: inc/classes/Resources/Chapter/Core/CPT.php:60
-msgid "chapter"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:28
-msgid "Add new"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:29
-msgid "Add new item"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:30
-msgid "Edit"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:31
-msgid "New"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:32
-#: inc/classes/Resources/Chapter/Core/CPT.php:33
-msgid "View"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:34
-msgid "Search power-course"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:35
-msgid "Not Found"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:36
-msgid "Not found in trash"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:37
-msgid "Parent item"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:38
-msgid "All"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:39
-msgid "chapter archives"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:40
-msgid "chapter attributes"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:41
-msgid "Insert to this power-course"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:42
-msgid "Uploaded to this power-course"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:43
-msgid "Featured image"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:44
-msgid "Set featured image"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:45
-msgid "Remove featured image"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:46
-msgid "Use featured image"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:48
-msgid "Filter power-course list"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:49
-msgid "Filter by date"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:50
-msgid "chapter list navigation"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:51
-msgid "chapter list"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:52
-msgid "chapter published"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:53
-msgid "chapter published privately"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:54
-msgid "chapter reverted to draft"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:55
-msgid "chapter scheduled"
-msgstr ""
-
-#: inc/classes/Resources/Chapter/Core/CPT.php:56
-msgid "chapter updated"
+msgid "J7 <j7.dev.gg@gmail.com>"
 msgstr ""
 
 #: inc/classes/Utils/Duplicate.php:92
-msgid "文章不存在"
+msgid "?????"
 msgstr ""
 
 #: inc/classes/Utils/Duplicate.php:111
-msgid "複製文章失敗"
+msgid "??????"
 msgstr ""
 
 #: inc/classes/Utils/Duplicate.php:161
-msgid "產品不存在"
+msgid "?????"
+msgstr ""
+
+#: inc/classes/FrontEnd/MyAccount.php:52
+msgid "????"
+msgstr ""
+
+#: inc/classes/Api/Course.php:808
+msgid "????????"
+msgstr ""
+
+#: inc/templates/components/review/comment_form.php:10
+msgid "Add a review"
+msgstr ""
+
+#: inc/templates/components/review/comment_form.php:12
+msgid "Submit"
+msgstr ""
+
+#: inc/classes/Resources/Chapter/Core/Api.php:380
+msgid "????????"
+msgstr ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:111
+msgid "%s year"
+msgid_plural "%s years"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:116
+msgid "%s month"
+msgid_plural "%s months"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:121
+msgid "%s week"
+msgid_plural "%s weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:126
+msgid "%s day"
+msgid_plural "%s days"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:131
+msgid "%s hour"
+msgid_plural "%s hours"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:136
+msgid "%s minute"
+msgid_plural "%s minutes"
+msgstr[0] ""
+msgstr[1] ""
+
+# %s: amount of time
+#: inc/classes/PowerEmail/Resources/Email/Api.php:141
+msgid "%s second"
+msgid_plural "%s seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: inc/classes/PowerEmail/Resources/Email/Api.php:265
+msgid "New Email"
+msgstr ""
+
+#: inc/classes/PowerEmail/Resources/Email/Api.php:424
+msgid "??????????"
+msgstr ""
+
+# %s: time interval
+#: inc/classes/PowerEmail/Resources/Email/Api.php:624
+msgid "Every %s"
+msgstr ""
+
+#: inc/classes/PowerEmail/Resources/Email/Api.php:630
+msgid "Non-repeating"
+msgstr ""
+
+#: inc/classes/PowerEmail/Resources/Email/Api.php:648
+msgid "Now!"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:109
+msgid "Course Description"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:115
+msgid "Course Pricing"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:121
+msgid "Bundles"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:127
+msgid "Chapters"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:133
+msgid "Q&A Settings"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:146
+msgid "Other Settings"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:152
+msgid "Students"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:158
+msgid "Analytics"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:194
+msgid "Save"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:216
+msgid "Published"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:217
+msgid "Draft"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:241
+msgid "Open Classic Product Editor"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:248
+msgid "This course has no chapters yet, the classroom is unavailable."
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:262
+msgid "Open Classroom"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:274
+msgid "View Sales Page"
 msgstr ""
