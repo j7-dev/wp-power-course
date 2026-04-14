@@ -138,29 +138,6 @@ if (!\class_exists('J7\PowerCourse\Plugin')) {
 		}
 	}
 
-	/*
-	 * 註冊 text domain 載入
-	 *
-	 * 說明：
-	 * PluginTrait::load_textdomain() 會在 init hook 載入 domain = 'power_course'（底線），
-	 * 但 plugin header 宣告的是 'power-course'（連字號），與 __/_e/_x 等翻譯函式呼叫一致。
-	 * 因此我們在此自行 hook 到 init（priority=1，早於預設 10），補上正確 domain 的載入。
-	 * 這段邏輯獨立於 Bootstrap 類別，確保即使依賴外掛（WooCommerce、Powerhouse）尚未啟用、
-	 * 顯示缺失警告時，plugin header meta 與 admin 警告訊息的翻譯仍能載入。
-	 *
-	 * 相容性：符合 WordPress 6.7+ 對 textdomain 必須在 init 之後載入的規範。
-	 */
-	\add_action(
-		'init',
-		static function (): void {
-			\load_plugin_textdomain(
-				'power-course',
-				false,
-				\dirname(\plugin_basename(__FILE__)) . '/languages'
-			);
-		},
-		1
-	);
-
+	// text domain 由 wp-plugin-trait >= 0.2.20 的 PluginTrait::load_textdomain() 自動載入，無需手動呼叫
 	Plugin::instance();
 }
