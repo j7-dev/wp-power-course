@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-14T11:15:45+00:00\n"
+"POT-Creation-Date: 2026-04-14T12:00:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: power-course\n"
@@ -37,6 +37,27 @@ msgstr ""
 #. Author URI of the plugin
 #: plugin.php
 msgid "https://github.com/j7-dev"
+msgstr ""
+
+#. translators: %s: 站台名稱
+#: inc/classes/Admin/Entry.php:62
+msgid "Course Admin | %s"
+msgstr ""
+
+#: inc/classes/Admin/Product.php:56
+msgid "Course"
+msgstr ""
+
+#: inc/classes/Admin/Product.php:57
+msgid "Whether this is a course product. Course products can only be used with [Simple Product] and [Simple Subscription]."
+msgstr ""
+
+#: inc/classes/Admin/Product.php:115
+msgid "Course Product"
+msgstr ""
+
+#: inc/classes/Admin/Product.php:119
+msgid "Course Bundle Product"
 msgstr ""
 
 #: inc/classes/Api/Course.php:808

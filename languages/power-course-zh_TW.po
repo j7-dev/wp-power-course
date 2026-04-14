@@ -1,0 +1,98 @@
+# Copyright (C) 2026 J7
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Power Course 1.1.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/power-course\n"
+"Last-Translator: J7 <j7.dev.gg@gmail.com>\n"
+"Language-Team: Traditional Chinese <j7.dev.gg@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-04-14T11:15:45+00:00\n"
+"PO-Revision-Date: 2026-04-14 00:00+0800\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Claude Code Power Course i18n\n"
+"X-Domain: power-course\n"
+
+#: inc/classes/Admin/Entry.php:62
+#, php-format
+msgid "Course Admin | %s"
+msgstr "課程後台 | %s"
+
+#: inc/classes/Admin/Product.php:56
+msgid "Course"
+msgstr "課程"
+
+#: inc/classes/Admin/Product.php:57
+msgid "Whether this is a course product. Course products can only be used with [Simple Product] and [Simple Subscription]."
+msgstr "是否為課程商品，課程商品只能用於【簡單商品】以及【簡易訂閱】"
+
+#: inc/classes/Admin/Product.php:115
+msgid "Course Product"
+msgstr "課程商品"
+
+#: inc/classes/Admin/Product.php:119
+msgid "Course Bundle Product"
+msgstr "銷售方案商品"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:109
+msgid "Course Description"
+msgstr "課程描述"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:115
+msgid "Course Pricing"
+msgstr "課程訂價"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:121
+msgid "Bundles"
+msgstr "銷售方案"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:127
+msgid "Chapters"
+msgstr "章節管理"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:133
+msgid "Q&A Settings"
+msgstr "QA設定"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:146
+msgid "Other Settings"
+msgstr "其他設定"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:152
+msgid "Students"
+msgstr "學員管理"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:158
+msgid "Analytics"
+msgstr "分析"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:194
+msgid "Save"
+msgstr "儲存"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:216
+msgid "Published"
+msgstr "發佈"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:217
+msgid "Draft"
+msgstr "草稿"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:241
+msgid "Open Classic Product Editor"
+msgstr "前往傳統商品編輯介面"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:248
+msgid "This course has no chapters yet, the classroom is unavailable."
+msgstr "此課程還沒有章節，無法前往教室"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:262
+msgid "Open Classroom"
+msgstr "前往教室"
+
+#: js/src/pages/admin/Courses/Edit/index.tsx:274
+msgid "View Sales Page"
+msgstr "前往銷售頁"
