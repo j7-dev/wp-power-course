@@ -53,8 +53,8 @@ final class Product {
 		$product_type_options[ $option ] = [
 			'id'            => "_{$option}",
 			'wrapper_class' => 'show_if_simple',
-			'label'         => '課程',
-			'description'   => '是否為課程商品，課程商品只能用於【簡單商品】以及【簡易訂閱】',
+			'label'         => \esc_html__( 'Course', 'power-course' ),
+			'description'   => \esc_html__( 'Whether this is a course product. Course products can only be used with [Simple Product] and [Simple Subscription].', 'power-course' ),
 			'default'       => 'no',
 		];
 
@@ -112,11 +112,11 @@ final class Product {
 		}
 
 		if ( CourseUtils::is_course_product( $post->ID ) ) {
-			$post_states['course'] = '課程商品';
+			$post_states['course'] = \esc_html__( 'Course Product', 'power-course' );
 		}
 		$helper = Helper::instance( $post->ID );
 		if ( $helper?->is_bundle_product ) {
-			$post_states['bundle'] = '銷售方案商品';
+			$post_states['bundle'] = \esc_html__( 'Course Bundle Product', 'power-course' );
 		}
 		return $post_states;
 	}
