@@ -7,7 +7,7 @@
 	"scripts": {
 		"bootstrap": "composer install --no-interaction",
 		"dev": "vite",
-		"build": "vite build",
+		"build": "pnpm run i18n:build && vite build",
 		"build:wp": "vite --config vite.config-for-wp.ts build",
 		"preview": "vite preview",
 		"format": "prettier-eslint --write \"js/src/**/*.tsx\"",
