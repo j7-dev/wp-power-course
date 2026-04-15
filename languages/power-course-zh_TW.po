@@ -96,3 +96,238 @@ msgstr "前往教室"
 #: js/src/pages/admin/Courses/Edit/index.tsx:274
 msgid "View Sales Page"
 msgstr "前往銷售頁"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:102
+msgid "Course Publishing"
+msgstr "課程發佈"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:104
+msgid "Sales URL"
+msgstr "銷售網址"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:131
+msgid "Course Name"
+msgstr "課程名稱"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:142
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:153
+msgid "Multiple selection"
+msgstr "可多選"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:161
+msgid "Short Description"
+msgstr "簡短說明"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:183
+msgid "Course Cover Image"
+msgstr "課程封面圖"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:231
+msgid "Course Cover Video"
+msgstr "課程封面影片"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:237
+msgid "Course Free Preview Video"
+msgstr "課程免費試看影片"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:246
+msgid "External Link Settings"
+msgstr "外部連結設定"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:250
+msgid "External Link URL"
+msgstr "外部連結 URL"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:255
+msgid "External Link URL is required"
+msgstr "外部連結 URL 為必填"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:262
+msgid "Please enter a valid URL (must start with http:// or https://)"
+msgstr "請輸入合法的 URL（須以 http:// 或 https:// 開頭）"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:272
+msgid "CTA Button Text"
+msgstr "CTA 按鈕文字"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:275
+msgid "Go to Course"
+msgstr "前往課程"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:283
+msgid "Instructor Information"
+msgstr "講師資訊"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:46
+msgid "Course Introduction Section"
+msgstr "課程介紹區域"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:53
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:66
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:79
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:105
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:135
+msgid "Show"
+msgstr "顯示"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:55
+msgid "Sold OO units"
+msgstr "已售出 OO 組"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:68
+msgid "OO units remaining"
+msgstr "剩餘 OO 組"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:94
+msgid "Popular Course"
+msgstr "熱門課程"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:123
+msgid "Featured Course"
+msgstr "精選課程"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:155
+msgid "Start Learning Now"
+msgstr "立即上課"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:168
+msgid "Show course rating stars"
+msgstr "顯示課程評價星星"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:174
+msgid "Custom course rating"
+msgstr "自訂課程評價星星"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:181
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:183
+msgid "Preview"
+msgstr "預覽"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:196
+msgid "Padded review count"
+msgstr "灌水課程評價數量"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:199
+msgid "Frontend displayed review count = actual review count + padded review count"
+msgstr "前台顯示評價數量 = 實際評價數量 + 灌水評價數量"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:210
+msgid "Course Information"
+msgstr "課程資訊"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:220
+msgid "Show \"Course fully launched\""
+msgstr "顯示「✅ 課程已全數上架完畢」"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:229
+msgid "Show course start date"
+msgstr "顯示開課時間"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:237
+msgid "Show course duration"
+msgstr "顯示課程時長"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:245
+msgid "Show number of chapters"
+msgstr "顯示單元數量"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:252
+msgid "Show watch time"
+msgstr "顯示觀看時間"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:259
+msgid "Show course students"
+msgstr "顯示課程學員"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:265
+msgid "Padded student count"
+msgstr "灌水學員人數"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:268
+msgid "Frontend displayed student count = actual student count + padded student count"
+msgstr "前台顯示學員人數 = 實際學員人數 + 灌水學員人數"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:274
+msgid "Actual student count + "
+msgstr "實際學員人數 + "
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:275
+msgid "people"
+msgstr "人"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:284
+msgid "Course Details"
+msgstr "課程詳情"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:289
+msgid "Show introduction"
+msgstr "顯示介紹"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:298
+msgid "Show chapters"
+msgstr "顯示章節"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:304
+msgid "Show comments"
+msgstr "顯示留言"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:312
+msgid "Show Q&A"
+msgstr "顯示問答"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:319
+msgid "Show reviews"
+msgstr "顯示評價"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:327
+msgid "Show user course reviews"
+msgstr "顯示用戶課程評價"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:332
+msgid "Allow purchased users to review course"
+msgstr "開放已購買用戶評價課程"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:337
+msgid "Allow purchased users to review the course. You can also design it to only collect user reviews without displaying them."
+msgstr "開放已購買用戶評價課程，您也可以設計成只蒐集用戶評價，但不顯示評價"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:341
+msgid "Users must meet both conditions \"Purchased course\" and \"Not yet reviewed this course\" to review the course"
+msgstr "用戶必須符合「已購買課程」、「尚未評價過該課程」兩個條件才能評價課程"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:360
+msgid "Show \"OO students have purchased this bundle\" text"
+msgstr "顯示「已有 OO 位學員購買此方案」文字"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:370
+msgid "Show \"OO units remaining\" text"
+msgstr "顯示「剩餘 OO 組」文字"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:374
+msgid "Only takes effect when you have set the course stock quantity"
+msgstr "只有當你有設定課程的庫存數量時才會作用"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:384
+msgid "Sticky bundles on desktop (> 810px)"
+msgstr "桌機板( > 810px )時，銷售方案 Sticky"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:388
+msgid "When enabled, if your course introduction is too long, the bundles on the side will stick to the screen"
+msgstr "啟用後，如果你的課程介紹內容過長，旁邊的銷售方案會 sticky 在畫面上"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:398
+msgid "Fix mobile CTA at bottom (< 810px)"
+msgstr "手機板( < 810px )時，fix 行動呼籲在底部"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:402
+msgid "Mobile CTA: if there is only one course, it will directly add the course and go to checkout; if there are multiple bundles, it will scroll to the bundles section for user selection"
+msgstr "行動呼籲，如果只有單一課程會直接加入1個課程並前往結帳頁，如果有多個銷售組合則會移動到方案區域讓用戶做選擇"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:411
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:417
+msgid "Publish Time"
+msgstr "發佈時間"
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseOther/index.tsx:420
+msgid "You can control the course display order by setting the publish time together with shortcodes"
+msgstr "你可以透過控制發布時間，搭配短代碼，控制課程的排列順序"
