@@ -125,7 +125,7 @@ printf(
 	data-is_finished="%13$s"
 	%10$s
 >
-	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">LOADING...</div>
+	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %1$s">%14$s</div>
 </div>
 ',
 	$class,
@@ -141,4 +141,5 @@ printf(
 	(string) $chapter_id,
 	(string) $course_id,
 	$is_finished_attr,
+	esc_html__( '影片載入中...', 'power-course' ),
 );

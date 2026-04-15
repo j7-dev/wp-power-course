@@ -61,9 +61,10 @@ echo '<div class="relative [&>*]:absolute [&>*]:top-0 [&>*]:left-0 [&>*]:w-full 
 printf(
 	/*html*/'
 	<iframe class="z-20 border-0 %2$s" src="%1$s" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %2$s">LOADING...</div>
+	<div class="z-10 animate-pulse aspect-video bg-gray-200 text-gray-400 tracking-widest flex items-center justify-center %2$s">%3$s</div>
 			',
 	$iframe_url,
-	$class
+	$class,
+	esc_html__( '影片載入中...', 'power-course' )
 );
 echo '</div>';

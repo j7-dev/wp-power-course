@@ -174,9 +174,10 @@ printf(
 		</div>
 	</div>
 	<form method="dialog" class="pc-modal-backdrop">
-		<button class="opacity-0">close</button>
+		<button class="opacity-0">%2$s</button>
 	</form>
 </dialog>
 ',
+esc_html__( '關閉', 'power-course' ),
 esc_html__( '關閉', 'power-course' )
 );
