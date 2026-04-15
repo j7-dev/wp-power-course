@@ -2,12 +2,11 @@ import { useNavigation } from '@refinedev/core'
 import { useWindowSize } from '@uidotdev/usehooks'
 import { Table, TableProps, Tag } from 'antd'
 import { DateTime } from 'antd-toolkit'
-import { POST_STATUS } from 'antd-toolkit/wp'
+import { POST_STATUS, ProductName } from 'antd-toolkit/wp'
 import React from 'react'
 
 import { SecondToStr } from '@/components/general'
 import {
-	ProductName,
 	ProductType,
 	ProductPrice,
 	ProductTotalSales,
@@ -20,9 +19,6 @@ import { TCourseBaseRecord } from '@/pages/admin/Courses/List/types'
 const useColumns = () => {
 	const { width } = useWindowSize()
 	const { edit } = useNavigation()
-	const onClick = (record: TCourseBaseRecord) => () => {
-		edit('courses', record.id)
-	}
 	const columns: TableProps<TCourseBaseRecord>['columns'] = [
 		Table.SELECTION_COLUMN,
 		{
@@ -34,7 +30,7 @@ const useColumns = () => {
 			render: (_, record) => (
 				<ProductName<TCourseBaseRecord>
 					record={record}
-					onClick={onClick(record)}
+					onClick={() => edit('courses', record.id)}
 				/>
 			),
 		},
