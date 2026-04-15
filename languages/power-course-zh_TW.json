@@ -239,6 +239,141 @@
 			],
 			"You can control the course display order by setting the publish time together with shortcodes": [
 				"你可以透過控制發布時間，搭配短代碼，控制課程的排列順序"
+			],
+			"Bundle": [
+				"銷售方案"
+			],
+			"Add": [
+				"新增"
+			],
+			"Sort order saved": [
+				"排序儲存成功"
+			],
+			"No bundles yet": [
+				"目前沒有銷售方案"
+			],
+			"Duplicate bundle": [
+				"複製銷售方案"
+			],
+			"Delete": [
+				"刪除"
+			],
+			"Are you sure you want to delete this bundle?": [
+				"確認刪除這個銷售方案嗎?"
+			],
+			"Please select at least one product": [
+				"請至少選擇一個商品"
+			],
+			"Please check if any fields are incomplete": [
+				"請檢查是否有欄位尚未填寫"
+			],
+			"《Edit》 %s": [
+				"《編輯》 %s"
+			],
+			"Save bundle": [
+				"儲存銷售方案"
+			],
+			"Bundles are saved separately. Remember to save after editing": [
+				"銷售方案是分開儲存的，編輯完成請記得儲存"
+			],
+			"Notes": [
+				"注意事項"
+			],
+			"Bundle deal": [
+				"合購優惠"
+			],
+			": You may leave this course unlinked. If this course is not linked, course access will not be granted automatically, and it can be used as an add-on product": [
+				"：可以不綁定此課程商品，如果不綁定此課程，就不會自動給予課程權限，可以當作其他加購商品使用"
+			],
+			"Subscription": [
+				"定期定額"
+			],
+			": By default, the course access duration will be tied to the subscription product in this bundle. Please make sure the access duration is already saved": [
+				"：預設會把課程觀看期限綁定在，此銷售方案的定期定額商品上，請先確認已經儲存觀看期限"
+			],
+			"Bundles are products themselves. You can go to": [
+				"銷售方案本身就是商品，皆可以在"
+			],
+			"Course Access Binding": [
+				"課程權限綁定"
+			],
+			"to further adjust course access and viewing duration": [
+				"再額外調整課程權限以及課程觀看期限"
+			],
+			"Bundle Type": [
+				"銷售方案種類"
+			],
+			"Bundle Product Type": [
+				"銷售方案商品種類"
+			],
+			"Bundle Type Display Text": [
+				"銷售方案種類顯示文字"
+			],
+			"The red small text above the bundle name": [
+				"銷售方案名稱上方的紅色小字"
+			],
+			"Bundle Name": [
+				"銷售方案名稱"
+			],
+			"Please enter the bundle name": [
+				"請輸入銷售方案名稱"
+			],
+			"Bundle Description": [
+				"銷售方案說明"
+			],
+			"Freely customize your bundle by selecting products to include": [
+				"自由搭配你的銷售方案，選擇要加入的商品"
+			],
+			"You may also skip adding any product and simply create a subscription bundle for the course": [
+				"您也可以選擇不加入產品，單純創建課程的定期定額銷售方案"
+			],
+			"Enter keywords and press ENTER to search. Up to 20 results per query": [
+				"請輸入關鍵字後按下 ENTER 搜尋，每次最多返回 20 筆資料"
+			],
+			"Current Course": [
+				"目前課程"
+			],
+			"Add current course %s": [
+				"加入目前課程 %s"
+			],
+			"Virtual Product": [
+				"虛擬商品"
+			],
+			"Product Images": [
+				"商品圖片"
+			],
+			"Cover": [
+				"封面"
+			],
+			"Set as Cover": [
+				"設為封面"
+			],
+			"Linked Course": [
+				"綁定課程"
+			],
+			"Linked Product": [
+				"連接商品"
+			],
+			"Bundle Regular Price": [
+				"此銷售組合原價"
+			],
+			"Bundle Sale Price": [
+				"方案折扣價"
+			],
+			"Bundle Original Regular Price": [
+				"此銷售組合原訂原價"
+			],
+			"Bundle Original Sale Price": [
+				"此銷售組合原訂折扣價"
+			],
+			"Sale price exceeds regular price": [
+				"折扣價超過原價"
+			],
+			"🚧 Group buy deal (in development...)": [
+				"🚧 團購優惠 (開發中...)"
+			],
+			"Simple Product": [
+				"簡單商品"
 			]
 		}
 	}
