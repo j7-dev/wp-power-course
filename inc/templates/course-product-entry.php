@@ -90,14 +90,15 @@ printf(
 		</div>
 	</div>
   <form method="dialog" class="pc-modal-backdrop">
-    <button class="opacity-0">close</button>
+    <button class="opacity-0">%5$s</button>
   </form>
 </dialog>
 ',
 esc_html__( '您已經購買過此課程', 'power-course' ),
 esc_html__( '還是要購買嗎?', 'power-course' ),
 esc_html__( '取消', 'power-course' ),
-esc_html__( '確認購買', 'power-course' )
+esc_html__( '確認購買', 'power-course' ),
+esc_html__( '關閉', 'power-course' )
 );
 
 Theme::render_button();

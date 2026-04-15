@@ -47,7 +47,7 @@ printf(
 					</div>
 				</div>
 			</div>
-			<label for="pc-classroom-drawer" aria-label="close sidebar" class="pc-drawer-overlay w-full h-full"></label>
+			<label for="pc-classroom-drawer" aria-label="%5$s" class="pc-drawer-overlay w-full h-full"></label>
 		</div>
 	</div>
 ',
@@ -60,5 +60,6 @@ printf(
 		),
 	esc_url( \wc_get_account_endpoint_url( MyAccount::COURSES_ENDPOINT ) ),
 	esc_url( Plugin::$url . '/inc/assets/images/back.svg' ),
-	esc_html__( '回《我的課程》', 'power-course' )
+	esc_html__( '回《我的課程》', 'power-course' ),
+	esc_attr__( '關閉側邊欄', 'power-course' )
 );

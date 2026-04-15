@@ -37,11 +37,19 @@ $wrapper_class  = $args['wrapper_class'];
 $args['href']   = '#';
 $args['class'] .= ' product_type_simple add_to_cart_button ajax_add_to_cart cursor-pointer ';
 $args['attr']  .= sprintf(
-	' data-product_id="%1$s" data-quantity="%2$s" data-product_sku="%3$s" aria-label="Add to cart: “%4$s”" aria-describedby="" rel="nofollow" ',
+	/* translators: %s: 商品名稱 */
+	' data-product_id="%1$s" data-quantity="%2$s" data-product_sku="%3$s" aria-label="%5$s" aria-describedby="" rel="nofollow" ',
 	$product->get_id(),
 	$args['qty'],
 	$product->get_sku(),
-	$product->get_name()
+	$product->get_name(),
+	\esc_attr(
+		sprintf(
+			/* translators: %s: 商品名稱 */
+			\__( '加入購物車：「%s」', 'power-course' ),
+			$product->get_name()
+		)
+	)
 );
 
 unset($args['product'], $args['wrapper_class'], $args['qty']);
