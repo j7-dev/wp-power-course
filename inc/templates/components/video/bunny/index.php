@@ -37,7 +37,11 @@ if ( ! $library_id || ! $video_id ) {
 	Plugin::load_template(
 		'video/404',
 		[
-			'message' => '缺少 ' . ( ! $library_id ? 'library_id' : 'video_id' ) . ' ，請聯絡老師',
+			'message' => sprintf(
+				/* translators: %s: 缺少的欄位名稱 (library_id 或 video_id) */
+				esc_html__( '缺少 %s ，請聯絡老師', 'power-course' ),
+				! $library_id ? 'library_id' : 'video_id'
+			),
 		]
 		);
 

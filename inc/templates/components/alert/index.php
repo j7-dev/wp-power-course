@@ -5,7 +5,7 @@
 
 $default_args = [
 	'type'    => 'info', // error, success, warning, info
-	'message' => '您還沒購買此課程，無法上課，前往購買',
+	'message' => \esc_html__( '您還沒購買此課程，無法上課，前往購買', 'power-course' ),
 	'buttons' => '',
 ];
 
