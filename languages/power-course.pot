@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"POT-Creation-Date: 2026-04-15T02:25:39.950Z\n"
+"POT-Creation-Date: 2026-04-15T02:34:30.524Z\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
 "Language-Team: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
@@ -169,11 +169,13 @@ msgstr ""
 #: js/src/pages/admin/Courses/Edit/index.tsx:216
 #: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:114
 #: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:120
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:137
 msgid "Published"
 msgstr ""
 
 #: js/src/pages/admin/Courses/Edit/index.tsx:217
 #: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:121
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:138
 msgid "Draft"
 msgstr ""
 
@@ -439,4 +441,196 @@ msgstr ""
 
 #: js/src/pages/admin/Courses/Edit/tabs/CourseDescription/index.tsx:283
 msgid "Instructor Information"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/index.tsx:100
+msgid "Bundle"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/index.tsx:129
+msgid "Add"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/index.tsx:155
+msgid "Sort order saved"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/index.tsx:166
+msgid "No bundles yet"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/ListItem/index.tsx:84
+msgid "Duplicate bundle"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/ListItem/index.tsx:88
+msgid "Delete"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/ListItem/index.tsx:90
+msgid "Are you sure you want to delete this bundle?"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:71
+msgid "Please select at least one product"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:92
+msgid "Please check if any fields are incomplete"
+msgstr ""
+
+# %s: ??????
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:112
+msgid "?Edit? %s"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:120
+msgid "Save bundle"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:129
+msgid "Bundles are saved separately. Remember to save after editing"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:158
+msgid "Notes"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:162
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils/index.tsx:11
+msgid "Bundle deal"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:163
+msgid ""
+": You may leave this course unlinked. If this course is not linked, course "
+"access will not be granted automatically, and it can be used as an add-on "
+"product"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:169
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils/index.tsx:25
+msgid "Subscription"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:170
+msgid ""
+": By default, the course access duration will be tied to the subscription "
+"product in this bundle. Please make sure the access duration is already "
+"saved"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:176
+msgid "Bundles are products themselves. You can go to"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:179
+msgid "Course Access Binding"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/index.tsx:181
+msgid "to further adjust course access and viewing duration"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/Gallery.tsx:111
+msgid "Product Images"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/Gallery.tsx:142
+msgid "Cover"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/Gallery.tsx:143
+msgid "Set as Cover"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:232
+msgid "Bundle Type"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:240
+msgid "Bundle Product Type"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:247
+msgid "Bundle Type Display Text"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:248
+msgid "The red small text above the bundle name"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:257
+msgid "Bundle Name"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:261
+msgid "Please enter the bundle name"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:267
+msgid "Bundle Description"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:275
+msgid "Freely customize your bundle by selecting products to include"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:284
+msgid ""
+"You may also skip adding any product and simply create a subscription "
+"bundle for the course"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:291
+msgid "Enter keywords and press ENTER to search. Up to 20 results per query"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:372
+msgid "Current Course"
+msgstr ""
+
+# %s: ????
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:452
+msgid "Add current course %s"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/BundleForm.tsx:463
+msgid "Virtual Product"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils/index.tsx:16
+msgid "?? Group buy deal (in development...)"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/utils/index.tsx:24
+msgid "Simple Product"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:39
+msgid "Linked Course"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:45
+msgid "Linked Product"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:55
+msgid "Bundle Regular Price"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:58
+msgid "Bundle Sale Price"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:62
+msgid "Bundle Original Regular Price"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:64
+msgid "Bundle Original Sale Price"
+msgstr ""
+
+#: js/src/pages/admin/Courses/Edit/tabs/CourseBundles/Edit/ProductPriceFields/index.tsx:69
+msgid "Sale price exceeds regular price"
 msgstr ""
