@@ -64,7 +64,12 @@ $tags_html .= '</div>';
 $course_hour = (int) $product->get_meta( 'course_hour' );
 $course_minute = (int) $product->get_meta( 'course_minute' );
 
-$course_length = "{$course_hour} 小時 {$course_minute} 分";
+$course_length = sprintf(
+	/* translators: 1: 小時數, 2: 分鐘數 */
+	\esc_html__( '%1$d 小時 %2$d 分', 'power-course' ),
+	$course_hour,
+	$course_minute
+);
 $course_length = $course_hour + $course_minute > 0 ? $course_length : '-';
 $course_length_html = Plugin::load_template( 'icon/clock', null, false ) . $course_length;
 
@@ -86,7 +91,8 @@ if ( $is_external ) {
 		false
 	);
 	$external_icon_html = sprintf(
-		'<span class="absolute top-2 right-2 bg-primary/80 rounded-full p-1 flex items-center justify-center" title="外部課程">%s</span>',
+		'<span class="absolute top-2 right-2 bg-primary/80 rounded-full p-1 flex items-center justify-center" title="%1$s">%2$s</span>',
+		\esc_attr__( '外部課程', 'power-course' ),
 		(string) $external_icon_html
 	);
 }

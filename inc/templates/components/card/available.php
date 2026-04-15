@@ -76,7 +76,7 @@ printf(
 	<p class="pc-course-card__teachers">%5$s</p>
 	<div>%6$s</div>
 	<div class="flex gap-2 items-center">
-		<span class="text-gray-400 text-xs text-nowrap">觀看期限</span>
+		<span class="text-gray-400 text-xs text-nowrap">%8$s</span>
 		<span class="text-primary text-xs text-nowrap font-bold">%7$s</span>
 	</div>
 </div>
@@ -93,5 +93,6 @@ $badge_html,
 		],
 		false
 	),
-	$expire_date_label
+	$expire_date_label,
+	\esc_html__( '觀看期限', 'power-course' )
 );

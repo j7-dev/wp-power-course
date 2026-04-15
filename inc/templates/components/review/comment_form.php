@@ -18,7 +18,7 @@ $comment_form = [
 			'button',
 			[
 				'size'     => 'sm',
-				'children' => '送出',
+				'children' => \esc_html__( '送出', 'power-course' ),
 				'class'    => 'px-4 pc-btn-primary text-white',
 				'attr'     => 'name="submit" type="submit"',
 			],

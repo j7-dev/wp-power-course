@@ -8,7 +8,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Plural-Forms: nplurals=2; plural=(n!=1);\n"
-"POT-Creation-Date: 2026-04-15T02:34:30.524Z\n"
+"POT-Creation-Date: 2026-04-15T04:51:27.098Z\n"
 "PO-Revision-Date: 2026-MO-DA HO:MI+ZONE\n"
 "Last-Translator: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
 "Language-Team: J7 <j7.dev.gg@gmail.com> <j7.dev.gg@gmail.com>\n"
@@ -24,6 +24,26 @@ msgstr ""
 #: power-course.php
 #. Author of the plugin
 msgid "J7 <j7.dev.gg@gmail.com>"
+msgstr ""
+
+#: inc/templates/course-product-entry.php:61
+msgid "??????????????"
+msgstr ""
+
+#: inc/templates/course-product-entry.php:97
+msgid "?????????"
+msgstr ""
+
+#: inc/templates/course-product-entry.php:98
+msgid "???????"
+msgstr ""
+
+#: inc/templates/course-product-entry.php:99
+msgid "??"
+msgstr ""
+
+#: inc/templates/course-product-entry.php:100
+msgid "????"
 msgstr ""
 
 #: inc/classes/Utils/Duplicate.php:92
@@ -46,12 +66,295 @@ msgstr ""
 msgid "????????"
 msgstr ""
 
+#: inc/templates/pages/my-account/index.php:11
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/my-account/index.php:15
+msgid "???"
+msgstr ""
+
+#: inc/templates/pages/my-account/index.php:19
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/info.php:15
+msgid "items ?????"
+msgstr ""
+
+#: inc/templates/pages/course-product/grid.php:47
+msgid "OOPS! ?????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:46
+msgid "???????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:50
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:62
+msgid "???"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:76
+msgid "?????????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:82
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:88
+msgid "????"
+msgstr ""
+
+# 1: ?????, 2: ?????
+#: inc/templates/pages/course-product/body.php:91
+msgid "%1$s ?? %2$s ?"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:99
+msgid "????"
+msgstr ""
+
+# %s: ????
+#: inc/templates/pages/course-product/body.php:102
+msgid "%s ?"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:109
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:115
+msgid "????"
+msgstr ""
+
+# %s: ????
+#: inc/templates/pages/course-product/body.php:118
+msgid "%s ?"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:131
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:173
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/body.php:221
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/classroom/sider.php:63
+msgid "???????"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:63
+msgid "??????"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:63
+msgid "??????"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:79
+msgid "??????"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:97
+msgid "??????"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:122
+msgid "???"
+msgstr ""
+
+#: inc/templates/pages/classroom/header.php:122
+msgid "???"
+msgstr ""
+
+#: inc/templates/pages/classroom/chapters.php:54
+msgid "????"
+msgstr ""
+
+# 1: ????
+#: inc/templates/pages/classroom/chapters.php:60
+msgid "%1$d ???"
+msgstr ""
+
+# 1: ??????
+#: inc/templates/pages/classroom/chapters.php:68
+msgid "?%1$d ??"
+msgstr ""
+
+#: inc/templates/pages/classroom/body.php:68
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/classroom/body.php:75
+msgid "?????????"
+msgstr ""
+
+# 1: ??????
+#: inc/templates/pages/classroom/body.php:156
+msgid "?????%1$s"
+msgstr ""
+
+#: inc/templates/pages/classroom/body.php:181
+msgid "??"
+msgstr ""
+
+# 1: ??????
+#: inc/templates/pages/404/not-ready.php:30
+msgid "????????? %1$s ??"
+msgstr ""
+
+#: inc/templates/pages/404/buy.php:33
+msgid "?????????????"
+msgstr ""
+
+#: inc/templates/pages/404/buy.php:37
+msgid "????"
+msgstr ""
+
+#: inc/templates/components/video/404.php:8
+msgid "?????"
+msgstr ""
+
+#: inc/templates/components/video/404.php:9
+msgid "?????"
+msgstr ""
+
+#: inc/templates/components/user/about.php:56
+msgid "???????"
+msgstr ""
+
+# %s: ?????
+#: inc/templates/components/stock/total_sales.php:37
+msgid "??? %s ?"
+msgstr ""
+
+# %s: ????
+#: inc/templates/components/stock/index.php:54
+msgid "?? %s ?"
+msgstr ""
+
 #: inc/templates/components/review/comment_form.php:10
 msgid "Add a review"
 msgstr ""
 
 #: inc/templates/components/review/comment_form.php:12
 msgid "Submit"
+msgstr ""
+
+# 3: ?????????
+#: inc/templates/components/related-posts/prev-next.php:25
+msgid "???"
+msgstr ""
+
+# 3: ?????????
+#: inc/templates/components/related-posts/prev-next.php:44
+msgid "???"
+msgstr ""
+
+# %d: ????
+#: inc/templates/components/customer_amount/index.php:48
+msgid "?? %d ????????"
+msgstr ""
+
+# %s: ????
+#: inc/templates/components/countdown/sales.php:41
+msgid "%s ?"
+msgstr ""
+
+#: inc/templates/components/countdown/sales.php:44
+msgid "??"
+msgstr ""
+
+#: inc/templates/components/countdown/sales.php:59
+msgid "??"
+msgstr ""
+
+#: inc/templates/components/countdown/index.php:10
+msgid "?"
+msgstr ""
+
+#: inc/templates/components/countdown/index.php:10
+msgid "?"
+msgstr ""
+
+#: inc/templates/components/countdown/index.php:10
+msgid "?"
+msgstr ""
+
+#: inc/templates/components/countdown/index.php:10
+msgid "?"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:61
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:71
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:76
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:81
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:93
+msgid "??"
+msgstr ""
+
+#: inc/templates/pages/course-product/tabs/index.php:98
+msgid "?????"
+msgstr ""
+
+#: inc/templates/pages/course-product/header/index.php:127
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/footer/index.php:50
+msgid "????"
+msgstr ""
+
+#: inc/templates/pages/course-product/footer/index.php:72
+msgid "????"
+msgstr ""
+
+#: inc/templates/components/video/vidstack/index.php:71
+msgid "?? video_id | src ??????"
+msgstr ""
+
+#: inc/templates/components/video/iframe/youtube.php:41
+#: inc/templates/components/video/iframe/vimeo.php:41
+msgid "?? video_id ??????"
+msgstr ""
+
+#: inc/templates/components/video/code/index.php:41
+msgid "?? video ?? ??????"
+msgstr ""
+
+# %s: ??????? (library_id ? video_id)
+#: inc/templates/components/video/bunny/index.php:42
+msgid "?? %s ??????"
+msgstr ""
+
+#: inc/templates/components/typography/title/index.php:8
+msgid "??"
+msgstr ""
+
+#: inc/templates/components/typography/paragraph/expandable.php:27
+msgid "????"
 msgstr ""
 
 #: inc/classes/Resources/Chapter/Core/Api.php:380

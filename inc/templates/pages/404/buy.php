@@ -30,11 +30,11 @@ Plugin::load_template(
 	'alert',
 	[
 		'type'    => 'error',
-		'message' => '您還沒購買此課程，無法上課',
+		'message' => esc_html__( '您還沒購買此課程，無法上課', 'power-course' ),
 		'buttons' => sprintf(
 			/*html*/'<a  href="%1$s" target="_blank" class="pc-btn pc-btn-sm pc-btn-primary text-white">%2$s</a>',
-				site_url( "{$course_permalink_structure}/{$product->get_slug()}" ),
-				'前往購買',
+				esc_url( site_url( "{$course_permalink_structure}/{$product->get_slug()}" ) ),
+				esc_html__( '前往購買', 'power-course' ),
 				),
 	]
 );
