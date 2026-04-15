@@ -9,10 +9,13 @@ import { Tag } from 'antd'
 import { FC } from 'react'
 
 import { TStockStatus } from '@/components/product/ProductTable/types'
-import { TCourseRecord } from '@/pages/admin/Courses/List/types'
+import {
+	TCourseRecord,
+	TCourseBaseRecord,
+} from '@/pages/admin/Courses/List/types'
 
 type TProductStockProps = {
-	record: TCourseRecord
+	record: TCourseBaseRecord | TCourseRecord
 	type?: 'tag' | 'text'
 }
 

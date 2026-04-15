@@ -144,6 +144,7 @@ const Main = () => {
 				<Table
 					{...(defaultTableProps as unknown as TableProps<TCourseBaseRecord>)}
 					{...tableProps}
+					scroll={{ x: 1700 }}
 					pagination={{
 						...tableProps.pagination,
 						...getDefaultPaginationProps({ label: '課程' }),
