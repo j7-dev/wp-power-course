@@ -161,13 +161,14 @@ final class Bootstrap {
 			]
 		);
 
-		// 接線 React bundle 到 power-course text domain，讓 @wordpress/i18n (__, _x, sprintf 等) 能載入對應的 .json 翻譯檔
-		// 對應檔名格式：power-course-{locale}-{handle}.json，由 wp-scripts make-json 從 .po 產生
+		// 接線 React bundle 到 power-course text domain，wp_set_script_translations 會自動把 wp-i18n 列為 dependency
 		\wp_set_script_translations(
 			Plugin::$kebab,
 			'power-course',
 			Plugin::$dir . '/languages'
 		);
+
+		self::inject_script_locale_data();
 
 		$post_id   = \get_the_ID();
 		$permalink = $post_id ? \get_permalink( $post_id ) : '';
@@ -222,5 +223,55 @@ final class Bootstrap {
 	 */
 	public function frontend_enqueue_script(): void {
 		self::enqueue_script();
+	}
+
+	/**
+	 * 注入 wp.i18n.setLocaleData inline script 為 React bundle 載入翻譯資料。
+	 *
+	 * WP 核心的 script translations 載入機制依賴檔名格式
+	 * power-course-{locale}-{md5_of_src_path}.json，但 vite-for-wp 產出的 bundle
+	 * 帶 hash 且每次 build 會變，導致 md5 檔名不可預測。改用固定檔名
+	 * languages/power-course-{locale}.json（由 scripts/i18n-make-json.mjs 產出），
+	 * 在 React bundle 之前呼叫 wp.i18n.setLocaleData 注入翻譯資料。
+	 *
+	 * @return void
+	 */
+	private static function inject_script_locale_data(): void {
+		$locale         = \determine_locale();
+		$json_file_path = Plugin::$dir . "/languages/power-course-{$locale}.json";
+
+		if ( ! file_exists( $json_file_path ) ) {
+			return;
+		}
+
+		$json_raw = file_get_contents( $json_file_path );
+		if ( ! is_string( $json_raw ) ) {
+			return;
+		}
+
+		$json_decoded = json_decode( $json_raw, true );
+		if ( ! is_array( $json_decoded ) ) {
+			return;
+		}
+
+		$locale_data = $json_decoded['locale_data'] ?? null;
+		if ( ! is_array( $locale_data ) ) {
+			return;
+		}
+
+		$messages = $locale_data['messages'] ?? null;
+		if ( ! is_array( $messages ) ) {
+			return;
+		}
+
+		\wp_add_inline_script(
+			Plugin::$kebab,
+			sprintf(
+				'( function() { if ( window.wp && window.wp.i18n ) { window.wp.i18n.setLocaleData( %s, %s ); } } )();',
+				(string) \wp_json_encode( $messages ),
+				(string) \wp_json_encode( 'power-course' )
+			),
+			'before'
+		);
 	}
 }

@@ -258,6 +258,9 @@ importers:
       eslint-plugin-react-hooks:
         specifier: ^4.6.2
         version: 4.6.2(eslint@8.57.1)
+      gettext-parser:
+        specifier: ^9.0.2
+        version: 9.0.2
       glob:
         specifier: ^10.4.5
         version: 10.5.0
@@ -6471,6 +6474,10 @@ packages:
 
   gettext-parser@1.4.0:
     resolution: {integrity: sha512-sedZYLHlHeBop/gZ1jdg59hlUEcpcZJofLq2JFwJT1zTqAU3l2wFv6IsuwFHGqbiT9DWzMUW4/em2+hspnmMMA==}
+
+  gettext-parser@9.0.2:
+    resolution: {integrity: sha512-dGvq3S1gpS6e9KzNkwgPED5xxfWk7mNYzzdi/fPdJF5qS7B+yo8El2ZQyyhJ79PyzTtHbwiqYOFsqBdzbQ0GPg==}
+    engines: {node: '>=20'}
 
   giget@1.2.5:
     resolution: {integrity: sha512-r1ekGw/Bgpi3HLV3h1MRBIlSAdHoIMklpaQ3OQLFcRw9PwAj2rqigvIbg+dBUI51OxVI2jsEtDywDBjSiuf7Ug==}
@@ -19487,6 +19494,11 @@ snapshots:
     dependencies:
       encoding: 0.1.13
       safe-buffer: 5.2.1
+
+  gettext-parser@9.0.2:
+    dependencies:
+      content-type: 1.0.5
+      encoding: 0.1.13
 
   giget@1.2.5:
     dependencies:
