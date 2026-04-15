@@ -88,7 +88,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const setSelectedUserIdsNotInCurrentPage = selectedUserIds.filter(
-					(selectedUserId) => !currentAllKeys.includes(selectedUserId),
+					(selectedUserId) => !currentAllKeys.includes(selectedUserId)
 				)
 
 				/**
@@ -96,7 +96,7 @@ const UserTableComponent = ({
 				 * @type string[]
 				 */
 				const currentSelectedRowKeysStringify = currentSelectedRowKeys.map(
-					(key) => key.toString(),
+					(key) => key.toString()
 				)
 
 				setSelectedUserIds(() => {
@@ -176,7 +176,7 @@ const UserTableComponent = ({
 		if (values?.search) params.append('search', values.search)
 		if (values?.avl_course_ids?.length) {
 			values.avl_course_ids.forEach((id) =>
-				params.append('avl_course_ids[]', id),
+				params.append('avl_course_ids[]', id)
 			)
 		}
 		if (values?.include?.length) {
@@ -212,7 +212,7 @@ const UserTableComponent = ({
 							? () => {
 									window.open(
 										`${apiUrl}/students/export-all?${urlParams}`,
-										'_blank',
+										'_blank'
 									)
 								}
 							: undefined,

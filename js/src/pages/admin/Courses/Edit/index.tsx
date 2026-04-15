@@ -1,13 +1,5 @@
 import { Edit, useForm } from '@refinedev/antd'
-import {
-	Tabs,
-	TabsProps,
-	Form,
-	Switch,
-	Button,
-	Tooltip,
-	FormProps,
-} from 'antd'
+import { Tabs, TabsProps, Form, Switch, Button, Tooltip, FormProps } from 'antd'
 import { formatDateRangeData } from 'antd-toolkit'
 import { TImage } from 'antd-toolkit/wp'
 import { memo, useMemo, useState } from 'react'
