@@ -25,6 +25,7 @@ import {
 	pickNotDeprecated,
 	useWarnAboutChange,
 } from '@refinedev/core'
+import { __ } from '@wordpress/i18n'
 import {
 	Layout,
 	Menu,
@@ -35,7 +36,6 @@ import {
 	ConfigProvider,
 	Divider,
 } from 'antd'
-import { __ } from '@wordpress/i18n'
 import React, { useContext, type CSSProperties } from 'react'
 import { FaBook } from 'react-icons/fa'
 
@@ -155,8 +155,8 @@ export const ThemedSiderV2: React.FC<RefineThemedLayoutV2SiderProps> = ({
 			const confirm = window.confirm(
 				translate(
 					'warnWhenUnsavedChanges',
-					'Are you sure you want to leave? You have unsaved changes.'
-				)
+					'Are you sure you want to leave? You have unsaved changes.',
+				),
 			)
 
 			if (confirm) {
